@@ -1,4 +1,4 @@
-# Funes Employment Portal — Project context
+# Funes Employment Portal - Project context
 
 ## Summary
 
@@ -67,13 +67,37 @@ Not included initially:
 - Public advanced analytics.
 - Unmediated communication between arbitrary companies and candidates.
 
+## Course-defined technical direction
+
+The official course environment guide establishes the following baseline:
+
+- Next.js with React for the web application, routes, and server-side functionality.
+- TypeScript for typed application code.
+- Tailwind CSS for interface styling.
+- Node.js 24 LTS and npm for the development environment and dependencies.
+- Supabase for PostgreSQL data storage and authentication.
+- Git and GitHub for version control and team collaboration.
+- Vercel for publishing the course demonstration.
+
+This baseline is fixed for the training project. Exact versions beyond Node.js 24 LTS, architecture, schema, security model, storage, testing tools, and deployment configuration must be defined during `$speckit-plan`. See `docs/TECHNICAL_BASELINE.md`.
+
+## Team delivery model
+
+- One developer owns each Spec Kit stage while the other reviews the resulting pull request.
+- One developer will own the primary end-to-end implementation run with Codex after the Spec Kit artifacts are approved.
+- The second developer will guide product decisions, review progress, and avoid concurrent edits to the same files during that run.
+- The first implementation is a starting point, not an unquestioned final result. Both developers will verify it and then improve it through focused tasks and pull requests.
+- The repository documentation and approved Spec Kit artifacts, rather than private chat history, provide the shared context for every Codex session.
+
 ## Current state
 
 - The repository and `main` branch exist.
 - Spec Kit 1.0.8 is initialized for Codex using PowerShell scripts.
 - Managed Spec Kit files pass `specify integration status`.
-- Discovery documentation is being established.
-- Technology stack, hosting, constitution, feature specification, plan, and task breakdown remain undecided.
+- Discovery documentation has been established from the available source material.
+- The course technical stack and demonstration platform are known.
+- The constitution, feature specification, clarification results, architecture plan, checklist, and task breakdown still require review and approval before implementation.
+- Municipal production hosting, privacy, retention, branding, and reporting requirements remain unresolved.
 
 ## Success direction
 
