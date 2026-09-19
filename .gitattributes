@@ -1,0 +1,3 @@
+# Keep Spec Kit managed files byte-stable across Windows checkouts
+.specify/** text eol=lf
+.agents/skills/** text eol=lf
