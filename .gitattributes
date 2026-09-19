@@ -1,3 +1,7 @@
+# Keep Markdown documentation byte-stable across platforms
+.gitattributes text eol=lf
+*.md text eol=lf
+
 # Keep Spec Kit managed files byte-stable across Windows checkouts
 .specify/** text eol=lf
 .agents/skills/** text eol=lf
