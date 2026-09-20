@@ -53,11 +53,12 @@ Todos deben terminar con código cero. `test:db` debe reiniciar una base aislada
 Cobertura mínima por riesgo:
 
 - autenticación, verificación, recuperación y suspensión;
+- corrección directa, archivo inmediato solicitado por candidato y restauración administrativa segura;
 - RLS positiva y negativa para público, candidato, empresa y admin;
-- moderación de oferta;
+- moderación y cierre automático de oferta vencida;
 - postulación y nominación administrativa;
 - preentrevista, preselección y derivación;
-- vista empresarial limitada y descarga de CV;
+- vista empresarial limitada a todos los contactos vigentes y a la versión de CV de la derivación;
 - feedback empresarial y resultado final administrativo;
 - cierre automático a 30 días y corrección tardía;
 - previsualización CSV, duplicados y rollback total;
@@ -70,7 +71,8 @@ Cobertura mínima por riesgo:
 3. Verificar que el panel está disponible pero el perfil todavía no está activo.
 4. Completar localidad, al menos dos categorías, resumen, disponibilidad, consentimiento y PDF válido.
 5. Activar el perfil y postularse a dos ofertas publicadas.
-6. Retirar una postulación y desactivar disponibilidad.
+6. Corregir un dato del perfil y comprobar que se aplica directamente con historial.
+7. Retirar una postulación y desactivar disponibilidad.
 
 Esperado:
 
@@ -79,15 +81,18 @@ Esperado:
 - cada oferta tiene seguimiento independiente;
 - candidato ve recepción y resultado final, no evaluación interna;
 - retiro/desactivación conservan historial.
+- la corrección no crea una solicitud administrativa pendiente.
 
 ## Escenario 2: empresa y moderación
 
-1. Registrar una empresa ficticia con nombre, CUIT, responsable, contacto, actividad y localidad.
+1. Registrar una empresa ficticia con email, contraseña, nombre, CUIT, responsable, contacto,
+   actividad y localidad; verificar email e iniciar sesión.
 2. Crear un borrador completo con dos categorías y salario opcional vacío.
 3. Enviar a revisión; confirmar que no se publica directamente.
 4. Como admin, solicitar correcciones con mensaje visible.
 5. Como empresa, corregir y reenviar.
 6. Como admin, aprobar y publicar; luego pausar y reanudar.
+7. Llevar `closing_date` al pasado con reloj de prueba y ejecutar la automatización dos veces.
 
 Esperado:
 
@@ -95,18 +100,22 @@ Esperado:
 - cada decisión conserva actor, fecha, estado previo/nuevo y mensaje;
 - empresa solo ve su propia organización/ofertas;
 - pausa bloquea nuevas postulaciones sin perder existentes.
+- el vencimiento cierra una sola vez, quita la oferta del público y preserva participaciones.
 
 ## Escenario 3: intermediación y privacidad
 
 1. Como admin, filtrar candidatos por categoría, habilidad, disponibilidad, localidad y vigencia.
-2. Registrar preentrevista, contacto y nota interna sobre una participación.
+2. Registrar preentrevista, contacto y nota interna sobre una participación; en otro caso, avanzar
+   omitiendo revisión/preentrevista/preselección con motivo y sin omitir la derivación.
 3. Preseleccionar y derivar a un candidato con consentimiento/CV vigentes.
-4. Como empresa de la oferta, consultar el candidato y descargar el CV.
-5. Intentar consultar el DNI, domicilio, nota interna, otra participación y un candidato no derivado.
+4. Reemplazar el CV del candidato después de derivarlo y agregar o actualizar un contacto vigente.
+5. Como empresa de la oferta, consultar el candidato y descargar el CV.
+6. Intentar consultar el DNI, domicilio, nota interna, otra participación y un candidato no derivado.
 
 Esperado:
 
-- empresa ve solo perfil laboral, contactos autorizados y CV de la derivación propia;
+- empresa ve solo perfil laboral, todos los contactos vigentes y el CV exacto guardado en la
+  derivación, no el reemplazo posterior;
 - todos los intentos adicionales son rechazados sin confirmar datos;
 - empresa nunca explora el padrón;
 - candidato no ve preentrevista, preselección ni nota.
@@ -141,6 +150,7 @@ Esperado:
 - acciones identifican al admin;
 - nota de capacitación es libre e interna;
 - vinculación preserva ID e historial y no crea duplicado.
+- una persona sin email puede ser atendida por este flujo, pero no por autorregistro.
 
 ## Escenario 6: duplicados e importación
 
@@ -150,36 +160,84 @@ Una vez disponible:
 1. Previsualizar un CSV ficticio con fila válida, DNI duplicado, email coincidente, categoría sin
    mapear, campo faltante y encabezado desconocido en archivos separados.
 2. Comprobar que no existan perfiles nuevos después de previsualizar.
-3. Resolver bloqueos permitidos y confirmar un lote totalmente válido.
+3. Resolver cada duplicado eligiendo explícitamente `use_or_update_existing`, `correct_and_create` o
+   `reject`, con motivo; para un falso positivo, corregir el dato y volver a validar.
 4. Forzar un error en una fila dentro de la transacción.
 
 Esperado:
 
 - todas las anomalías aparecen antes de confirmar;
 - no hay fusión automática;
+- cada resolución conserva decisión, motivo y actor, sin sobrescribir silenciosamente un perfil;
 - lote válido importa completo;
 - fallo revierte todas las filas y deja resultado explícito recuperable;
 - logs no contienen datos de filas.
 
 ## Escenario 7: métricas y exportación
 
-1. Como admin, seleccionar período y categoría.
-2. Comparar conteos con los fixtures conocidos.
-3. Exportar CSV y abrirlo como texto.
-4. Incluir en fixtures un valor que comience con `=` o `+`.
-5. Intentar descargar la exportación sin sesión y como empresa.
+1. Restablecer los fixtures reproducibles: 500 candidatos, 50 empresas, 100 ofertas y 1.000
+   participaciones.
+2. Como admin, seleccionar período y categoría e iniciar cronómetro al aplicar filtros.
+3. Comparar conteos con los fixtures conocidos y descargar el CSV; detener al completar la descarga.
+4. Medir una búsqueda desde que abre la pantalla administrativa hasta registrar una preentrevista y
+   guardar la preselección.
+5. Para ofertas preparadas, comparar días desde publicación hasta primera contratación y hasta cubrir
+   todas las vacantes; comprobar que la segunda métrica queda pendiente si faltan contrataciones.
+6. Incluir en fixtures un valor que comience con `=` o `+`.
+7. Intentar descargar la exportación sin sesión y como empresa.
 
 Esperado:
 
 - conteos de candidatos, empresas, ofertas, postulaciones, preentrevistas, derivaciones y resultados
   coinciden con la base;
-- exportación termina dentro de 30 segundos de interacción;
+- candidato activo exige estado activo, disponibilidad, consentimiento y confirmación dentro de seis
+  meses, sin depender de que tenga CV;
+- búsqueda y preselección se guardan en menos de 5 minutos;
+- conteos y exportación terminan dentro de 30 segundos desde que se aplican los filtros;
+- las dos métricas de contratación permanecen separadas y la cobertura total no se anticipa;
 - valores peligrosos están neutralizados;
 - solo admin accede.
 
+## Escenario 8: suspensión, eliminación y restauración
+
+1. Como admin, iniciar suspensión de candidato y empresa; comprobar que la opción esté destacada y
+   cancelar una vez antes de confirmar con motivo.
+2. Verificar bloqueo de acciones nuevas y revocación del acceso empresarial a perfiles/CV, sin
+   convertir casos existentes en resultados finales.
+3. Reactivar y comprobar que ofertas, derivaciones y accesos no vuelven automáticamente; restaurar
+   después una oferta con motivo y verificar que regresa a `draft`.
+4. Como candidato activo, solicitar eliminación y confirmar la acción.
+5. Comprobar archivo inmediato y ausencia de borrado físico; como admin, restaurar con motivo.
+
+Esperado:
+
+- toda transición identifica actor, estado previo/nuevo, fecha y motivo;
+- el candidato no espera aprobación para quedar archivado;
+- el perfil restaurado queda `draft`, la empresa inactiva y sus ofertas restauradas en `draft`;
+- participaciones, resultados y evidencias históricas se conservan sin reactivarse.
+
+## Protocolo de aceptación de tiempos y tareas
+
+- Candidato y empresa: ejecutar 10 recorridos por rol con al menos cinco personas distintas por rol,
+  datos ficticios ya preparados, conexión estable y sin ayuda externa. Para candidato, medir desde la
+  apertura del formulario de registro hasta la postulación confirmada; para empresa, desde la
+  apertura del formulario de registro hasta el envío a revisión confirmado. Al menos 9 de 10
+  ejecuciones de cada rol deben terminar en menos de 10 minutos.
+- Administración: usar exclusivamente el dataset reproducible del escenario 7. Medir búsqueda desde
+  la apertura de la pantalla hasta guardar la preselección, y métricas/exportación desde aplicar los
+  filtros hasta ver conteos y completar la descarga.
+- Primer intento: no hubo ayuda externa ni reinicio del recorrido. Corregir un error mediante los
+  mensajes de la propia interfaz no invalida el intento.
+- Las cinco tareas de éxito son: candidato completa perfil y se postula; empresa crea y envía una
+  oferta; admin modera una oferta; admin busca, preselecciona y deriva; admin registra el resultado
+  final. Los usuarios representativos deben completar al menos cuatro de las cinco en primer intento
+  bajo la definición anterior.
+
 ## Verificación manual de accesibilidad y experiencia
 
-Ejecutar los escenarios críticos en ancho móvil y escritorio:
+Ejecutar los recorridos críticos de candidato, empresa y administración en 360×800 y 1366×768, tanto
+a 100 % como a 200 % de zoom. Completarlos solo con teclado y repetir al menos uno representativo por
+rol con NVDA:
 
 - navegación completa solo con teclado, orden de foco visible y sin trampas;
 - zoom 200 % sin pérdida de controles o contenido esencial;
@@ -187,7 +245,8 @@ Ejecutar los escenarios críticos en ancho móvil y escritorio:
 - mensajes asociados programáticamente a campos inválidos;
 - foco movido al resumen de error o contenido actualizado cuando corresponda;
 - contraste y landmarks revisados; axe sin violaciones graves conocidas;
-- prueba con lector de pantalla de registro, oferta, postulación y derivación.
+- NVDA anuncia estructura, nombres, estados, errores y confirmaciones del recorrido sin depender de
+  información visual.
 
 ## Validación de Pull Request
 

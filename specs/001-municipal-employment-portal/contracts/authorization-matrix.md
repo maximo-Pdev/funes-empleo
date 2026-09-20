@@ -18,6 +18,7 @@ también deniega acceso interactivo.
 | Oferta publicada vigente: consultar | Sí, campos públicos | Sí | Sí | Sí | No |
 | Oferta no publicada: consultar | No | No | Solo propia | Sí | No |
 | Perfil candidato: crear/editar | No | Solo propio | No | Sí, asistido/autorizado | No |
+| Perfil candidato: solicitar eliminación | No | Archiva el propio de inmediato | No | Puede restaurar con motivo | No |
 | DNI/domicilio candidato | No | Solo propio | Nunca | Sí | No |
 | Contacto y perfil laboral | No | Solo propio | Solo derivado a oferta propia | Sí | No |
 | CV: cargar/reemplazar | No | Solo propio | No | Sí, sobre perfil atendido | No |
@@ -38,6 +39,7 @@ también deniega acceso interactivo.
 | Auditoría completa | No | No | No | Sí, lectura | Solo insertar evento acotado |
 | Importación, métricas, exportación | No | No | No | Sí | No |
 | Suspender/reactivar cuentas | No | No | No | Sí | No |
+| Cerrar oferta vencida | No | No | No | Puede consultar historial | Solo oferta publicada vencida |
 
 ## Proyección empresarial de candidato derivado
 
@@ -48,8 +50,8 @@ La empresa puede ver, únicamente en el contexto de su oferta:
 - categorías/intereses;
 - resumen de habilidades y experiencia;
 - disponibilidad;
-- contactos marcados para compartir;
-- CV vigente asociado a la derivación;
+- todos los contactos vigentes y no archivados;
+- la versión exacta de CV registrada al crear la derivación, aunque luego sea reemplazada;
 - información visible de entrevista/feedback de esa derivación.
 
 La empresa nunca recibe:
@@ -77,6 +79,8 @@ La empresa nunca recibe:
 - Empresa A no lee empresa/oferta B ni ninguna persona no derivada a una oferta A.
 - Empresa no lee DNI, domicilio o notas aun con derivación válida.
 - Empresa no registra resultado final.
+- Suspender o archivar candidato/empresa revoca inmediatamente el acceso empresarial a perfil y CV;
+  reactivar no lo restablece automáticamente.
 - Administrador suspendido no actúa.
 - Clave publicable no elude RLS; clave secreta nunca aparece en cliente.
 - Toda política tiene prueba positiva y negativa pgTAP y al menos un recorrido E2E crítico.

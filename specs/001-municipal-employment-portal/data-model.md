@@ -36,6 +36,7 @@ candidate_profiles ── * participations * ── job_openings
 
 all material aggregates ── * audit_events
 import_batches ── * import_rows
+candidate/import staging ── * duplicate_reviews
 ```
 
 ## Identidad y acceso
@@ -52,14 +53,19 @@ Representa la identidad de aplicación vinculada a Supabase Auth.
 | `status` | `pending_verification`, `active`, `suspended` o `archived`. |
 | `suspended_reason` | Solo administración; obligatorio cuando `status = suspended`. |
 | `suspended_at`, `suspended_by` | Completos juntos. |
+| `archived_at`, `archived_by` | Archivo recuperable; en autogestión puede iniciarlo el titular. |
 | `last_sign_in_at` | Referencia operativa; no reemplaza datos de Auth. |
 | `created_at`, `updated_at`, `version` | Auditoría técnica y concurrencia. |
 
 Reglas:
 
-- Registro público solo crea `candidate` o `company`.
+- Registro público solo crea `candidate` o `company`, con email verificado y contraseña administrada
+  por Auth. Un candidato sin email solo puede ingresar mediante atención asistida sin cuenta.
 - `admin` se crea fuera del registro público; habrá cuatro cuentas individuales con igual permiso.
-- Una cuenta suspendida no puede ejecutar acciones privadas aunque sus registros permanezcan.
+- Una cuenta suspendida no puede ejecutar acciones privadas aunque sus registros permanezcan. La
+  suspensión revoca además todo acceso empresarial interactivo a datos y CV de candidatos.
+- La solicitud de eliminación del candidato archiva inmediatamente cuenta y perfil; no elimina el
+  usuario de Auth. Solo administración restaura con motivo y sin reactivar relaciones.
 - El email de acceso reside en Auth; no se duplica en eventos de auditoría.
 
 ## Candidatos
@@ -79,7 +85,7 @@ Contiene el perfil laboral y su estado, separado de identidad restringida.
 | `skills_experience_summary` | Texto laboral limitado; obligatorio para activar. |
 | `availability` | Valor controlado y detalle opcional; obligatorio para activar. |
 | `status` | `draft`, `active`, `needs_update`, `unavailable`, `consent_withdrawn` o `archived`. |
-| `referral_eligible` | Proyección calculada: activo, consentimiento vigente y CV válido; no se edita directamente. |
+| `referral_eligible` | Proyección calculada: activo, disponible, consentimiento vigente, confirmación menor o igual a seis meses y CV válido; no se edita directamente. |
 | `last_confirmed_at` | Fecha de confirmación del perfil. |
 | `refresh_due_at` | `last_confirmed_at + 6 meses`; al vencer pasa a `needs_update`. |
 | `activated_at` | Primera activación válida. |
@@ -94,6 +100,10 @@ Reglas de activación y uso:
   `referral_eligible` permanece falso y toda derivación se bloquea hasta incorporar un PDF válido.
 - Un perfil `needs_update`, `unavailable`, `consent_withdrawn` o archivado no aparece por defecto en
   búsqueda de candidatos activos.
+- La métrica `active_candidate` usa la misma vigencia de seis meses, pero no exige CV: estado activo,
+  disponibilidad activa, consentimiento vigente y `last_confirmed_at` dentro del período.
+- El titular corrige sus datos directamente. Solicitar eliminación archiva cuenta/perfil en la misma
+  operación; restaurar exige administración, motivo y devuelve el perfil a `draft`.
 - La vinculación de un perfil asistido con una cuenta personal verifica identidad y duplicados,
   conserva el mismo `candidate_profile.id` y registra evento; nunca copia la historia a otro perfil.
 - Las capacitaciones/orientaciones se registran en `internal_notes` con tipo
@@ -109,11 +119,28 @@ Datos que una empresa nunca puede consultar.
 | `dni_normalized` | Solo dígitos; requerido; índice único para impedir alta silenciosa duplicada. |
 | `dni_display` | Representación validada para el candidato/admin; en UI se enmascara por defecto. |
 | `address` | Opcional; no se incluye en proyecciones empresariales. |
-| `correction_requested_at` | Solicitud de corrección/eliminación pendiente. |
-| `correction_request_note` | Visible solo a admin y al titular cuando corresponda. |
 
-La previsualización de registro/importación compara DNI antes de insertar. Una coincidencia crea una
-observación administrativa en lugar de fusionar o sobrescribir.
+La previsualización de registro/importación compara DNI antes de insertar. Una coincidencia bloquea
+el alta hasta una resolución administrativa y nunca fusiona ni sobrescribe automáticamente.
+
+### `duplicate_reviews`
+
+Registra la resolución explícita de una coincidencia detectada durante alta asistida, vinculación o
+importación, sin fusionar datos automáticamente.
+
+| Campo | Regla |
+| --- | --- |
+| `id` | UUID primario. |
+| `source_type`, `source_id` | `self_registration`, `assisted_registration`, `account_link` o `import_row` y referencia de staging/correlación sin PII. |
+| `matched_candidate_id` | Candidato existente que originó la alerta. |
+| `match_basis` | `dni`, `email` o ambos; código sin copiar el valor sensible. |
+| `status` | `pending` o `resolved`. |
+| `decision` | `use_or_update_existing`, `correct_and_create` o `reject`; nulo hasta resolver. |
+| `reason`, `resolved_by`, `resolved_at` | Obligatorios al resolver; visibles solo a administración. |
+
+`correct_and_create` exige corregir primero el dato que produjo el falso positivo y volver a validar
+las restricciones únicas. La revisión conserva la decisión y su actor, pero no copia DNI o contacto
+a auditoría.
 
 ### `candidate_contacts`
 
@@ -123,11 +150,11 @@ observación administrativa en lugar de fusionar o sobrescribir.
 | `kind` | `email`, `phone` u `other_approved`. |
 | `value`, `normalized_value` | Valor validado y forma para búsqueda de duplicados. |
 | `is_primary`, `verified_at` | Solo un primario por tipo; email de autorregistro debe estar verificado en Auth. |
-| `share_after_referral` | Verdadero solo para contactos que la empresa puede recibir después de derivación. |
 | archivo y timestamps | Recuperables. |
 
 Debe existir al menos un contacto para registro. Las coincidencias por email se marcan para revisión;
-no producen fusión automática.
+no producen fusión automática. Mientras una derivación esté activa, la empresa recibe todos los
+contactos no archivados vigentes; no existe selección individual por contacto.
 
 ### `candidate_consents`
 
@@ -190,6 +217,9 @@ bloqueado hasta resolver OQ-010; tests usan categorías ficticias.
 
 No existen documentos de identidad empresarial ni estado “verificado” en el MVP.
 
+Restaurar una empresa archivada exige administración y motivo, y la devuelve a `incomplete`. Una
+reactivación posterior a suspensión tampoco reactiva ofertas ni accesos relacionados.
+
 ### `job_openings`
 
 | Campo | Regla |
@@ -209,11 +239,17 @@ No existen documentos de identidad empresarial ni estado “verificado” en el 
 `opening_categories` relaciona muchas categorías con una oferta, con par único
 oferta/categoría. Una oferta debe tener al menos una antes de revisión.
 
+Una oferta publicada se cierra automáticamente cuando finaliza `closing_date`; deja de ser pública y
+de aceptar postulaciones, sin alterar participaciones existentes. Al suspender una empresa, sus
+ofertas no finales pasan a `suspended`; una reactivación no las devuelve automáticamente al estado
+anterior y administración debe reabrirlas a un estado seguro.
+
 ### `opening_moderation_events`
 
 Append-only: `id`, `opening_id`, `decision` (`submitted`, `approved`, `changes_requested`, `rejected`,
-`paused`, `resumed`, `closed`, `cancelled`), `previous_status`, `new_status`, `company_message`,
-`internal_reason`, `actor_account_id`, `created_at`.
+`paused`, `resumed`, `closed`, `auto_closed`, `suspended`, `restored_to_draft`, `cancelled`),
+`previous_status`, `new_status`, `company_message`, `internal_reason`, `actor_type`,
+`actor_account_id`, `created_at`. `actor_account_id` es nulo únicamente para `actor_type = system`.
 
 La empresa solo ve `company_message`; `internal_reason` es administrativo.
 
@@ -241,7 +277,9 @@ Precondiciones:
 - Nominación admin: candidato activo y consentimiento vigente; no requiere postulación ni aceptación
   específica por oferta.
 - Derivación: admin, oferta propia publicada o en tratamiento válido, consentimiento vigente y CV
-  válido. Crear derivación no expone DNI, domicilio ni notas.
+  válido. Crear derivación guarda el `cv_document_id` exacto y no expone DNI, domicilio ni notas.
+- Revisión, preentrevista y preselección pueden omitirse únicamente al avanzar, con motivo
+  administrativo; nunca se omite la derivación.
 - Solo admin registra el resultado final. Feedback de empresa es una comunicación pendiente.
 - La vista del candidato calcula una proyección de `status`: muestra `received` mientras el caso está
   abierto y el resultado final cuando existe; no guarda un segundo estado mutable.
@@ -265,10 +303,12 @@ Todo contenido es interno. Puede haber varias instancias y el historial no se so
 | `feedback_due_at` | Exactamente 30 días desde `referred_at`. |
 | `revoked_at`, `revoked_by`, `revocation_reason` | Recuperable y auditado. |
 
-La autorización de la empresa exige que su empresa sea dueña de la oferta, la derivación esté activa
-y el recurso solicitado sea la proyección permitida. La retención del acceso después de retiro o
-cierre no se amplía hasta que OQ-001 sea resuelta; por defecto se revoca acceso interactivo y se
-conserva evidencia solo para administración.
+La autorización de la empresa exige que su empresa sea dueña de la oferta, ambas cuentas estén
+activas, la derivación esté activa y el recurso solicitado sea la proyección permitida. La proyección
+incluye todos los contactos vigentes y exactamente `cv_document_id`, aunque el candidato haya
+reemplazado después su CV. Suspensión, archivo o retiro revocan acceso interactivo; una reactivación
+no lo repone automáticamente. La retención posterior no se amplía hasta resolver OQ-001 y la evidencia
+se conserva solo para administración.
 
 ### `company_feedback`
 
@@ -337,7 +377,7 @@ El archivo bruto es temporal y se descarta después de previsualizar/confirmar s
 ### `import_rows`
 
 Staging protegido: `id`, `batch_id`, `row_number`, `status` (`valid`, `warning`, `invalid`,
-`potential_duplicate`, `imported`), `normalized_payload` JSON acotado, `error_codes` array,
+`potential_duplicate`, `unmapped_category`, `imported`), `normalized_payload` JSON acotado, `error_codes` array,
 `matched_candidate_id` nullable, `created_candidate_id` nullable.
 
 Reglas:
@@ -352,14 +392,18 @@ Reglas:
 
 No se crean tablas agregadas para el MVP. Vistas o funciones protegidas calculan:
 
-- candidatos activos;
+- candidatos activos: perfil `active`, disponible, con consentimiento vigente y confirmado dentro de
+  los últimos seis meses;
 - empresas por estado;
 - ofertas por estado;
 - participaciones/postulaciones;
 - preentrevistas;
 - derivaciones;
 - contrataciones, no selecciones, retiros, cancelaciones y falta de respuesta;
-- tendencias por categoría y tiempo de cobertura cuando los datos sean suficientes.
+- tendencias por categoría;
+- días desde `published_at` hasta la primera contratación confirmada por administración;
+- días desde `published_at` hasta que las contrataciones confirmadas alcanzan `vacancies`, nulo y
+  presentado como pendiente mientras falten vacantes.
 
 Filtros mínimos: período y categoría cuando corresponda. Las vistas respetan RLS y solo admin puede
 consultarlas/exportarlas. Los formatos oficiales adicionales quedan fuera hasta resolver OQ-005.
@@ -373,7 +417,8 @@ pending_verification -> active -> suspended -> active
                                \-> archived
 ```
 
-Archivo no elimina registros relacionados. Solo admin suspende/reactiva.
+Archivo no elimina registros relacionados. Solo admin suspende/reactiva/restaura; la restauración no
+reactiva perfiles, empresas, ofertas ni accesos relacionados.
 
 ### Candidato
 
@@ -387,7 +432,7 @@ draft -> active -> needs_update -> active
     consent_withdrawn -> active (solo con nuevo consentimiento)
              |
              v
-          archived
+          archived --admin/motivo--> draft
 ```
 
 El proceso de seis meses marca `needs_update`; nunca elimina.
@@ -402,7 +447,9 @@ draft -> pending_review -> published -> paused -> published
              +-> changes_requested -> pending_review
 
 cualquier estado no final --admin--> cancelled
+published --system al vencer--> closed
 published/paused --admin--> closed
+cualquier estado no final --suspensión empresa--> suspended --admin--> draft
 ```
 
 Solo `published` es pública y recibe postulaciones.
@@ -422,8 +469,9 @@ cualquier estado no final -> cancelled (admin por cierre justificado)
 no_company_response -> hired | not_selected | withdrawn | cancelled (admin, respuesta tardía)
 ```
 
-- Las etapas se pueden omitir solo mediante transición administrativa permitida y auditada; nunca se
-  omite la derivación para dar acceso a la empresa.
+- `under_review`, `preinterview` y `preselected` se pueden omitir solo hacia adelante mediante una
+  transición administrativa permitida y auditada con motivo; nunca se omite la derivación para dar
+  acceso a la empresa.
 - `hired`, `not_selected`, `withdrawn`, `cancelled` y `no_company_response` son finales para la vista
   del candidato. El override de respuesta tardía conserva el evento anterior.
 - La empresa comunica feedback, pero no ejecuta la transición final.

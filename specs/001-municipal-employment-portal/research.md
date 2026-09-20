@@ -255,3 +255,77 @@ El diseño proporciona límites seguros y puntos de configuración sin fingir ap
 
 **Alternativas consideradas**: inventar retención, catálogo, columnas históricas, operación
 productiva o formatos oficiales violaría la especificación y la constitución.
+
+## 15. Proyección empresarial de contactos y CV
+
+**Decisión**: una derivación activa expone todos los contactos vigentes del candidato y guarda como
+evidencia la versión exacta del CV compartida. Reemplazar el CV cambia únicamente las derivaciones
+futuras; los contactos no se congelan y la empresa ve los que permanezcan vigentes mientras conserve
+acceso a esa derivación.
+
+**Fundamento**: aplica literalmente las aclaraciones de FR-036. El `cv_document_id` convierte el
+documento compartido en una evidencia reproducible, mientras que eliminar una marca de selección por
+contacto evita una regla ya descartada por producto.
+
+**Alternativas consideradas**: compartir solo un contacto principal, seleccionar contactos por
+derivación, mostrar siempre el CV más reciente o exponer todas sus versiones fueron rechazadas en
+clarificación.
+
+## 16. Suspensión, archivo, eliminación y restauración
+
+**Decisión**: las transiciones se ejecutan mediante funciones atómicas y auditadas. Suspender bloquea
+acciones nuevas y revoca acceso empresarial sin cerrar participaciones. La eliminación solicitada
+por un candidato archiva de inmediato cuenta/perfil, sin revisión administrativa ni borrado físico.
+Solo un administrador restaura, con motivo, dejando perfiles/empresas inactivos y ofertas en borrador;
+ninguna relación se reactiva automáticamente.
+
+**Fundamento**: separa control de acceso, estado laboral e historial. Mantener Auth y registros evita
+destrucción irreversible mientras OQ-001 siga abierta y permite cumplir la restauración recuperable.
+
+**Alternativas consideradas**: borrar el usuario o sus relaciones, conservar accesos empresariales,
+cancelar automáticamente participaciones o restaurar el estado previo completo se descartaron por
+privacidad, pérdida de trazabilidad y contradicción con la especificación.
+
+## 17. Automatización de vencimientos y saltos de evaluación
+
+**Decisión**: el mantenimiento diario idempotente cierra tanto ofertas publicadas vencidas como
+derivaciones sin respuesta a 30 días desde `referred_at`. Revisión, preentrevista y preselección son
+etapas omitibles solo hacia adelante por un administrador, con motivo; la derivación explícita nunca
+es omitible.
+
+**Fundamento**: una única frontera programada conserva actor `system`, evita ofertas vencidas y
+reutiliza el patrón transaccional ya elegido. Los saltos autorizados reducen trabajo innecesario sin
+debilitar la intermediación municipal.
+
+**Alternativas consideradas**: cierre manual de ofertas, reinicio del plazo por contactos, etapas
+internas siempre obligatorias o saltos sin motivo fueron rechazados durante aclaración.
+
+## 18. Definiciones y validación reproducible de métricas
+
+**Decisión**: candidato activo significa perfil activo, disponible, con consentimiento vigente y
+confirmado en los últimos seis meses. Se calculan dos duraciones desde `published_at`: hasta la
+primera contratación confirmada y hasta que las contrataciones confirmadas alcancen `vacancies`; la
+segunda permanece nula mientras falten vacantes. La aceptación administrativa usa fixtures de
+500 candidatos, 50 empresas, 100 ofertas y 1.000 participaciones.
+
+**Fundamento**: las fórmulas dependen de hechos auditables y el dataset fijo vuelve comparables las
+mediciones de búsqueda, conteos y exportación.
+
+**Alternativas consideradas**: contar todo perfil no archivado, medir desde el borrador o primera
+derivación, considerar cualquier feedback como contratación o probar con volúmenes variables se
+descartaron por producir resultados no comparables.
+
+## 19. Protocolo de aceptación y accesibilidad
+
+**Decisión**: candidato y empresa se miden en 10 ejecuciones por rol con al menos cinco personas
+distintas, datos ficticios preparados, conexión estable y sin ayuda. Accesibilidad se verifica en
+360×800 y 1366×768, zoom 100 %/200 %, teclado completo y un recorrido por rol con NVDA. Los usuarios
+representativos deben completar al menos cuatro de las cinco tareas de SC-010 en primer intento, sin
+ayuda externa ni reinicio; corregir mediante mensajes de la interfaz está permitido.
+
+**Fundamento**: fija muestra, condiciones, comienzo/fin y criterio de éxito, complementando axe con
+pruebas humanas de teclado y lector de pantalla.
+
+**Alternativas consideradas**: medir solo a los desarrolladores, aceptar muestras variables,
+reemplazar usuarios por E2E o usar únicamente axe fueron descartadas porque no validan usabilidad
+real ni accesibilidad completa.

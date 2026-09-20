@@ -21,10 +21,13 @@ autorizan integraciones nuevas.
   de cuentas ajenas, PII, notas internas ni secretos.
 - Códigos comunes: `AUTH_REQUIRED`, `ACCOUNT_SUSPENDED`, `FORBIDDEN`, `NOT_FOUND`, `INVALID_INPUT`,
   `INVALID_TRANSITION`, `CONFLICT_STALE_DATA`, `CONSENT_REQUIRED`, `VALID_CV_REQUIRED`,
-  `OPENING_NOT_PUBLIC`, `POTENTIAL_DUPLICATE`, `IMPORT_BLOCKED`, `INTERNAL_ERROR`.
+  `OPENING_NOT_PUBLIC`, `POTENTIAL_DUPLICATE`, `IMPORT_BLOCKED`, `RESTORE_CONFLICT`,
+  `INTERNAL_ERROR`.
 - Una respuesta `NOT_FOUND` reemplaza `FORBIDDEN` cuando confirmar la existencia revelaría datos.
 - Ninguna operación acepta un rol, actor o propietario enviado por el cliente; se deriva de sesión y
   relaciones persistidas.
+- Suspensión o archivo invalida el acceso privado en servidor y RLS. Restaurar nunca repone de forma
+  implícita ofertas, derivaciones, participaciones ni permisos empresariales anteriores.
 
 ## Contratos de archivo HTTP
 
