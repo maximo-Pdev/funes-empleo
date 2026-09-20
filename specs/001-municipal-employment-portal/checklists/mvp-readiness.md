@@ -14,22 +14,22 @@ significa que la implementación esté terminada.
 
 ## Completitud de requisitos
 
-- [ ] CHK001 ¿Está documentado el ciclo completo de acceso para cada rol —registro permitido,
+- [x] CHK001 ¿Está documentado el ciclo completo de acceso para cada rol —registro permitido,
   verificación, inicio/cierre de sesión, recuperación, suspensión, reactivación y archivo— y se
   distinguen las operaciones públicas de las administrativas? [Completeness, Spec §FR-001–FR-006]
-- [ ] CHK002 ¿Está completo el ciclo del candidato para autogestión y atención asistida, incluyendo
+- [x] CHK002 ¿Está completo el ciclo del candidato para autogestión y atención asistida, incluyendo
   alta, activación, vigencia, disponibilidad, consentimiento, CV, vinculación de cuenta, corrección y
   solicitud de eliminación? [Completeness, Spec §FR-010–FR-017]
-- [ ] CHK003 ¿Están definidas todas las decisiones de moderación de empresa/oferta, sus motivos
+- [x] CHK003 ¿Están definidas todas las decisiones de moderación de empresa/oferta, sus motivos
   visibles e internos y el tratamiento de borrador, corrección, rechazo, pausa, reanudación, cierre,
   cancelación y reactivación? [Completeness, Spec §FR-020–FR-026; Plan §Integridad, estados y concurrencia]
-- [ ] CHK004 ¿Está documentado el ciclo completo de participación tanto para postulación propia como
+- [x] CHK004 ¿Está documentado el ciclo completo de participación tanto para postulación propia como
   para nominación administrativa, incluyendo preentrevista, preselección, derivación, entrevista,
   feedback, resultado, retiro, cancelación y falta de respuesta? [Completeness, Spec §FR-030–FR-041]
-- [ ] CHK005 ¿Los requisitos identifican todas las acciones que deben dejar historia, el actor
+- [x] CHK005 ¿Los requisitos identifican todas las acciones que deben dejar historia, el actor
   responsable —incluido `system`—, los motivos obligatorios y la información que nunca debe copiarse
   a auditoría? [Completeness, Spec §FR-050–FR-054; Plan §Integridad, estados y concurrencia]
-- [ ] CHK006 ¿La importación, las métricas y la exportación tienen requisitos completos para
+- [x] CHK006 ¿La importación, las métricas y la exportación tienen requisitos completos para
   previsualización, bloqueo, confirmación, recuperación, filtros, datos autorizados y trazabilidad,
   sin asumir el mapeo todavía ausente? [Completeness, Spec §FR-060–FR-067; Contract CSV]
 
