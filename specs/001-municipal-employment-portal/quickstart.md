@@ -36,6 +36,13 @@ Resultado esperado:
 - emails de prueba capturados localmente, sin enviar a personas reales;
 - cuatro identidades administrativas ficticias y separadas para validación.
 
+Para SC-003 y SC-008 se utilizará el entorno alojado de demostración, no el entorno local. Antes de
+cada medición se ejecutará el comando previsto `npm run acceptance:reset-demo`, que debe abortar si
+el entorno no es `demo`, si el identificador de proyecto no coincide con el configurado o si falta
+confirmación explícita. El reset transaccional aplica únicamente el fixture ficticio versionado,
+verifica los conteos 500/50/100/1.000 y muestra su versión/hash sin imprimir PII. Nunca puede aceptar
+un proyecto productivo.
+
 ## Gates automatizados previstos
 
 ```powershell
@@ -111,6 +118,9 @@ Esperado:
 4. Reemplazar el CV del candidato después de derivarlo y agregar o actualizar un contacto vigente.
 5. Como empresa de la oferta, consultar el candidato y descargar el CV.
 6. Intentar consultar el DNI, domicilio, nota interna, otra participación y un candidato no derivado.
+7. Sobre una derivación, retirar la postulación; sobre otra, retirar el consentimiento general.
+8. Como empresa, intentar volver a consultar ambos perfiles, contactos y CV; luego registrar un nuevo
+   consentimiento y comprobar que no restaura el acceso anterior.
 
 Esperado:
 
@@ -119,21 +129,32 @@ Esperado:
 - todos los intentos adicionales son rechazados sin confirmar datos;
 - empresa nunca explora el padrón;
 - candidato no ve preentrevista, preselección ni nota.
+- retirar postulación o consentimiento revoca inmediatamente cada permiso afectado y la autorización
+  se vuelve a comprobar en cada solicitud de CV, sin URL reutilizable;
+- reconsentir no reactiva derivaciones anteriores y administración conserva la historia.
+- la prueba verifica que no puedan iniciarse nuevas consultas o descargas después de revocar; una
+  copia ya descargada no puede retirarse técnicamente y queda sujeta al aviso y a OQ-001.
 
 ## Escenario 4: feedback, resultado y falta de respuesta
 
 1. Como empresa, registrar una entrevista y comunicar `hired` para una derivación.
 2. Verificar que el feedback queda pendiente y no cambia el resultado final.
 3. Como admin, confirmar contratación.
-4. Crear otra derivación con reloj de prueba vencido más de 30 días y ejecutar la función programada.
-5. Confirmar `no_company_response`; luego registrar feedback tardío y corregir como admin a
-   `not_selected`.
+4. Confirmar que la empresa conserva acceso al perfil/contactos/CV porque el permiso seguía activo.
+5. Crear otras derivaciones para confirmar `not_selected` y `cancelled`; verificar revocación
+   inmediata en ambas.
+6. Crear otra derivación con reloj de prueba vencido más de 30 días y ejecutar la función programada.
+7. Confirmar `no_company_response` y la revocación; como empresa, comunicar feedback tardío sin poder
+   recuperar los datos y corregir como admin a `hired`.
 
 Esperado:
 
 - solo admin fija el resultado real;
 - el job es idempotente y atribuye el evento a `system`;
 - la corrección conserva el cierre anterior;
+- `hired` conserva únicamente un permiso que seguía activo; no selección, cancelación y falta de
+  respuesta lo revocan;
+- feedback tardío no devuelve datos y corregir `no_company_response` a `hired` no reactiva el permiso;
 - candidato no seleccionado sigue activo para otras búsquedas.
 
 ## Escenario 5: atención presencial
@@ -175,16 +196,20 @@ Esperado:
 
 ## Escenario 7: métricas y exportación
 
-1. Restablecer los fixtures reproducibles: 500 candidatos, 50 empresas, 100 ofertas y 1.000
-   participaciones.
-2. Como admin, seleccionar período y categoría e iniciar cronómetro al aplicar filtros.
-3. Comparar conteos con los fixtures conocidos y descargar el CSV; detener al completar la descarga.
-4. Medir una búsqueda desde que abre la pantalla administrativa hasta registrar una preentrevista y
+1. Usar un único administrador de prueba sin capacitación ni práctica previa y entregarle solamente
+   la descripción de cada tarea; no realizar recorridos de calentamiento.
+2. En el mismo entorno de demostración, restablecer los fixtures reproducibles: 500 candidatos, 50
+   empresas, 100 ofertas y 1.000 participaciones. Registrar commit/despliegue, versión/hash, reset,
+   fecha, navegador, dispositivo, conexión e identificador seudónimo del participante.
+3. Seleccionar período y categoría e iniciar cronómetro al aplicar filtros.
+4. Comparar conteos con los fixtures conocidos y descargar el CSV; detener al completar la descarga.
+5. Restablecer nuevamente el mismo fixture y registrar la nueva confirmación antes de SC-003.
+6. Medir una búsqueda desde que abre la pantalla administrativa hasta registrar una preentrevista y
    guardar la preselección.
-5. Para ofertas preparadas, comparar días desde publicación hasta primera contratación y hasta cubrir
+7. Para ofertas preparadas, comparar días desde publicación hasta primera contratación y hasta cubrir
    todas las vacantes; comprobar que la segunda métrica queda pendiente si faltan contrataciones.
-6. Incluir en fixtures un valor que comience con `=` o `+`.
-7. Intentar descargar la exportación sin sesión y como empresa.
+8. Incluir en fixtures un valor que comience con `=` o `+`.
+9. Intentar descargar la exportación sin sesión y como empresa.
 
 Esperado:
 
@@ -223,15 +248,23 @@ Esperado:
   apertura del formulario de registro hasta la postulación confirmada; para empresa, desde la
   apertura del formulario de registro hasta el envío a revisión confirmado. Al menos 9 de 10
   ejecuciones de cada rol deben terminar en menos de 10 minutos.
-- Administración: usar exclusivamente el dataset reproducible del escenario 7. Medir búsqueda desde
-  la apertura de la pantalla hasta guardar la preselección, y métricas/exportación desde aplicar los
-  filtros hasta ver conteos y completar la descarga.
+- Administración: un único administrador de prueba, sin capacitación ni práctica previa, recibe solo
+  la descripción de cada tarea. Usar el mismo entorno de demostración y restablecer separadamente el
+  dataset reproducible antes de SC-003 y antes de SC-008, con conexión estable y sin calentamiento.
+  Medir búsqueda desde la apertura de la pantalla hasta guardar la preselección, y
+  métricas/exportación desde aplicar los filtros hasta ver conteos y completar la descarga. Registrar
+  para cada ejecución commit/despliegue, versión/hash y confirmación del reset, fecha, navegador,
+  dispositivo, conexión e identificador seudónimo del participante.
 - Primer intento: no hubo ayuda externa ni reinicio del recorrido. Corregir un error mediante los
   mensajes de la propia interfaz no invalida el intento.
 - Las cinco tareas de éxito son: candidato completa perfil y se postula; empresa crea y envía una
   oferta; admin modera una oferta; admin busca, preselecciona y deriva; admin registra el resultado
-  final. Los usuarios representativos deben completar al menos cuatro de las cinco en primer intento
-  bajo la definición anterior.
+  final. SC-010 usa cohortes separadas de al menos cinco candidatos, cinco representantes de empresa
+  y los cuatro administradores previstos o personal municipal equivalente. Cada persona realiza solo
+  tareas de su rol. Para cada tipo se registra participantes elegibles, éxitos de primer intento,
+  porcentaje y resultado; aprueba con al menos 80 %. SC-010 aprueba cuando cumplen al menos cuatro de
+  los cinco tipos de tarea; con cinco participantes se requieren cuatro éxitos y con exactamente
+  cuatro administradores se requieren cuatro.
 
 ## Verificación manual de accesibilidad y experiencia
 
@@ -267,6 +300,8 @@ El `.env.example` futuro documentará nombres sin secretos:
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY` — solo servidor, si las operaciones acotadas la requieren
 - `NEXT_PUBLIC_APP_URL`
+- `APP_ENV` — valor controlado `local`, `preview` o `demo`; nunca se asume `demo`
+- `ACCEPTANCE_DEMO_PROJECT_REF` — identificador no secreto usado por el guard del reset alojado
 - identificadores/configuración no sensible del consentimiento aprobado
 
 No se incorpora una variable SMTP productiva ni secretos de cron mientras sus decisiones sigan

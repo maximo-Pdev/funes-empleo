@@ -33,7 +33,7 @@ o cancelar.
 | Confirmar/actualizar | Titular/admin | Datos válidos | Actualiza `last_confirmed_at` y `refresh_due_at`; puede volver de `needs_update`. |
 | Corregir datos | Titular/admin autorizado | Perfil no archivado y entrada válida | Aplica el cambio directamente y registra historia; no crea solicitud pendiente. |
 | Desactivar disponibilidad | Titular/admin | Perfil no archivado | `unavailable`; no borra participaciones. |
-| Retirar consentimiento | Titular/admin autorizado | Consentimiento vigente | `consent_withdrawn`; bloquea nuevas derivaciones. |
+| Retirar consentimiento | Titular/admin autorizado | Consentimiento vigente | `consent_withdrawn`; bloquea nuevas derivaciones y revoca atómicamente todos los permisos empresariales activos del candidato. |
 | Solicitar eliminación | Titular | Perfil propio no archivado | Archiva cuenta/perfil inmediatamente; revoca actividad y accesos sin borrar historia. |
 | Restaurar | Admin | Perfil archivado, motivo y ausencia de conflicto | Devuelve cuenta utilizable y perfil a `draft`; no reactiva participaciones ni derivaciones. |
 | Vincular cuenta | Admin + candidato autenticado | Verificación aprobada y sin duplicado | Conserva el mismo perfil/historial y asigna `account_id`. |
@@ -54,16 +54,20 @@ Estados internos: `received`, `under_review`, `preinterview`, `preselected`, `re
 | Avanzar omitiendo etapa | Admin | Destino posterior a revisión, preentrevista o preselección y anterior/igual a derivación | Avanza solo hacia adelante; motivo obligatorio; no permite saltar la derivación. |
 | Derivar | Admin | Candidato activo, consentimiento vigente, CV PDF válido, oferta propia de la empresa y no final | Crea derivación, guarda el `cv_document_id` exacto, fija fecha límite +30 días y habilita todos los contactos vigentes. |
 | Registrar entrevista | Empresa propia o admin | Derivación activa | Agrega entrevista; estado puede pasar a `company_interview`. |
-| Comunicar feedback | Empresa propia | Derivación activa, sin resultado real confirmado | Agrega feedback `pending_admin`; no fija resultado final. |
-| Marcar espera | Admin | Derivación activa sin final | `awaiting_feedback`; no altera fecha límite original. |
-| Confirmar resultado | Admin | Feedback/evidencia registrada o motivo administrativo | `hired`, `not_selected`, `withdrawn` o `cancelled`; actor admin obligatorio. |
-| Cerrar sin respuesta | Sistema | Derivada, sin final y `feedback_due_at <= now()` | `no_company_response`, una vez, con actor sistema. |
-| Corregir respuesta tardía | Admin | `no_company_response` y feedback posterior | Resultado real final nuevo; conserva evento automático anterior. |
-| Retirar postulación | Candidato/admin | Estado no final | `withdrawn`; revoca acceso empresarial interactivo según límite seguro. |
+| Comunicar feedback | Empresa propia | Derivación propia existente, aunque su permiso de datos esté revocado, y sin resultado real confirmado | Agrega feedback `pending_admin`; no fija resultado final ni habilita perfil/contactos/CV. |
+| Marcar espera | Admin | Participación derivada sin resultado final | `awaiting_feedback`; no altera fecha límite original. |
+| Confirmar resultado | Admin | Feedback/evidencia registrada o motivo administrativo | `hired` conserva un permiso todavía activo; `not_selected`, `withdrawn` o `cancelled` lo revocan; actor admin obligatorio. |
+| Cerrar sin respuesta | Sistema | Derivada, sin final y `feedback_due_at <= now()` | `no_company_response`, revocación y eventos una sola vez, con actor sistema. |
+| Corregir respuesta tardía | Admin | `no_company_response` y feedback posterior | Resultado real final nuevo; conserva evento automático y permiso revocado, incluso si pasa a `hired`. |
+| Retirar postulación | Candidato/admin | Estado no final | `withdrawn`; revoca inmediatamente el permiso empresarial sin borrar historia. |
 
 Una transición administrativa puede omitir `under_review`, `preinterview` o `preselected` cuando el
 caso lo justifique, siempre hacia adelante y con motivo. Nunca puede entregar datos empresariales sin
 una derivación explícita y auditada.
+
+La revocación funciona como un enclavamiento: `revoked` no vuelve a `active` por reconsentimiento,
+reactivación, restauración o corrección tardía. `expired_by_policy` no tiene transición ejecutable
+hasta que se resuelva OQ-001. Cada cambio de participación, acceso y auditoría es transaccional.
 
 ## Suspensión y archivo
 
