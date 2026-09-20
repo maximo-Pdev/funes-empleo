@@ -14,22 +14,22 @@ significa que la implementación esté terminada.
 
 ## Completitud de requisitos
 
-- [ ] CHK001 ¿Está documentado el ciclo completo de acceso para cada rol —registro permitido,
+- [x] CHK001 ¿Está documentado el ciclo completo de acceso para cada rol —registro permitido,
   verificación, inicio/cierre de sesión, recuperación, suspensión, reactivación y archivo— y se
   distinguen las operaciones públicas de las administrativas? [Completeness, Spec §FR-001–FR-006]
-- [ ] CHK002 ¿Está completo el ciclo del candidato para autogestión y atención asistida, incluyendo
+- [x] CHK002 ¿Está completo el ciclo del candidato para autogestión y atención asistida, incluyendo
   alta, activación, vigencia, disponibilidad, consentimiento, CV, vinculación de cuenta, corrección y
   solicitud de eliminación? [Completeness, Spec §FR-010–FR-017]
-- [ ] CHK003 ¿Están definidas todas las decisiones de moderación de empresa/oferta, sus motivos
+- [x] CHK003 ¿Están definidas todas las decisiones de moderación de empresa/oferta, sus motivos
   visibles e internos y el tratamiento de borrador, corrección, rechazo, pausa, reanudación, cierre,
   cancelación y reactivación? [Completeness, Spec §FR-020–FR-026; Plan §Integridad, estados y concurrencia]
-- [ ] CHK004 ¿Está documentado el ciclo completo de participación tanto para postulación propia como
+- [x] CHK004 ¿Está documentado el ciclo completo de participación tanto para postulación propia como
   para nominación administrativa, incluyendo preentrevista, preselección, derivación, entrevista,
   feedback, resultado, retiro, cancelación y falta de respuesta? [Completeness, Spec §FR-030–FR-041]
-- [ ] CHK005 ¿Los requisitos identifican todas las acciones que deben dejar historia, el actor
+- [x] CHK005 ¿Los requisitos identifican todas las acciones que deben dejar historia, el actor
   responsable —incluido `system`—, los motivos obligatorios y la información que nunca debe copiarse
   a auditoría? [Completeness, Spec §FR-050–FR-054; Plan §Integridad, estados y concurrencia]
-- [ ] CHK006 ¿La importación, las métricas y la exportación tienen requisitos completos para
+- [x] CHK006 ¿La importación, las métricas y la exportación tienen requisitos completos para
   previsualización, bloqueo, confirmación, recuperación, filtros, datos autorizados y trazabilidad,
   sin asumir el mapeo todavía ausente? [Completeness, Spec §FR-060–FR-067; Contract CSV]
 
@@ -253,3 +253,99 @@ significa que la implementación esté terminada.
 - Los ítems CHK041–CHK058 se agregaron sin alterar ni aprobar CHK001–CHK040.
 - Esta revisión incremental evalúa la calidad y trazabilidad de requisitos posteriores a la nueva
   planificación; los conflictos señalados no modifican `tasks.md` durante `$speckit-checklist`.
+
+## Revisión incremental de privacidad, autorización, estados y auditoría — 2026-09-20
+
+### Límites de autorización y privacidad
+
+- [ ] CHK059 ¿Cada superficie protegida —página, acción servidor, Route Handler, Data API, Storage,
+  exportación y proceso programado— identifica de forma inequívoca la fuente de autorización y las
+  condiciones de sesión, rol, estado, propiedad o derivación que debe reevaluar? [Completeness, Spec
+  §FR-004, FR-071; Plan §Autorización y privacidad de datos; Contract Authorization §Matriz de recursos]
+- [ ] CHK060 ¿Los requisitos delimitan exactamente qué operaciones pueden usar credenciales que
+  eluden RLS, prohíben su uso interactivo o en operaciones administrativas normales y exigen que el
+  actor real permanezca atribuible? [Clarity, Plan §Identidad, sesión y cuentas; Contract
+  Authorization §Actores; Tasks §T012, T014]
+- [ ] CHK061 ¿Está especificado cuándo y cómo una suspensión o cambio de estado invalida una sesión
+  ya abierta y una solicitud concurrente, incluido el rechazo seguro que no revela si existe un
+  recurso ajeno? [Gap, Spec §FR-005, FR-056; Plan §Identidad, sesión y cuentas; Tasks §T015, T088]
+- [ ] CHK062 ¿El ciclo de las cuentas administrativas cubre aprovisionamiento individual,
+  recuperación, suspensión, reactivación y atribución histórica, y descarta explícitamente el
+  autorregistro, la elevación pública de rol y las credenciales compartidas? [Completeness, Spec
+  §FR-002–FR-005; Plan §Identidad, sesión y cuentas; Contract Authorization §Actores]
+- [ ] CHK063 ¿El alcance de la “revocación inmediata” distingue acceso futuro desde el portal,
+  respuestas almacenadas, caché y enlaces reutilizables de una copia de CV ya descargada que el
+  sistema no puede recuperar, sin presentar ese límite como una política de retención aprobada?
+  [Clarity, Spec §FR-036, FR-038, FR-055; Plan §CV y archivos; Dependency §OQ-001]
+- [ ] CHK064 ¿El permiso excepcional para feedback empresarial tardío define los metadatos mínimos
+  no personales que siguen visibles y permanece separado, en todos los artefactos, del permiso ya
+  revocado para perfil, contactos y CV? [Consistency, Spec §FR-039–FR-040; Plan §Autorización y
+  privacidad de datos; Contract Authorization §Proyección de estado]
+- [ ] CHK065 ¿El consentimiento tiene requisitos completos para versión y texto presentados, actor,
+  origen asistido o autogestionado, vigencia, retiro, nueva aceptación y efecto sobre todas las
+  derivaciones existentes, sin borrar evidencia legítima ni reactivar permisos? [Completeness, Spec
+  §FR-055; Data Model §candidate_consents; Contract States §Perfil candidato]
+
+### Autoridad y precisión de las máquinas de estado
+
+- [ ] CHK066 ¿Existe una fuente normativa identificable y completa para los estados de cuenta,
+  empresa, perfil candidato, oferta, participación, permiso de derivación, consentimiento, CV e
+  importación, evitando que estados definidos solo en el modelo o las tareas se vuelvan requisitos
+  implícitos? [Traceability, Spec §FR-005, FR-023–FR-025, FR-037–FR-040; Data Model §Máquinas de
+  estado; Contract States]
+- [ ] CHK067 ¿Para cada transición crítica están documentados actor autorizado, origen, destino,
+  precondiciones, motivo, efecto sobre entidades relacionadas y resultado ante versión obsoleta o
+  estado inválido? [Completeness, Spec §FR-037, FR-050; Plan §Integridad, estados y concurrencia;
+  Contract States §Errores y concurrencia]
+- [ ] CHK068 ¿Las relaciones entre estado de cuenta y estado del registro de negocio están definidas
+  sin ambigüedad al suspender una empresa o candidato, incluyendo el estado seguro de sus ofertas o
+  perfiles y qué decisiones administrativas se requieren después de reactivar? [Ambiguity, Spec
+  §FR-005, FR-025; Plan §Suspensión, archivo y restauración; Contract States §Suspensión y archivo]
+- [ ] CHK069 ¿La condición irreversible de un permiso de derivación `revoked` es consistente con
+  contratación, corrección tardía, reconsentimiento, reactivación y restauración, y se distingue de
+  conservar un permiso `active` que nunca fue revocado? [Consistency, Spec §FR-036, FR-038, FR-055;
+  Data Model §referrals; Contract States §Participación y derivación]
+- [ ] CHK070 ¿Los requisitos temporales fijan el instante, zona horaria y regla de límite para los 30
+  días desde la derivación y para la fecha de cierre de oferta, de modo que el cambio automático sea
+  inequívoco en el borde del plazo? [Ambiguity, Spec §FR-021, FR-040; Data Model §Convenciones;
+  Plan §Automatizaciones diarias]
+- [ ] CHK071 ¿Las garantías de atomicidad cubren conjuntamente cambio de entidad, evento de
+  auditoría, revocación de acceso y cualquier actualización relacionada, y definen el resultado
+  recuperable cuando una parte falla? [Recovery, Spec §Edge Cases; Plan §Integridad, estados y
+  concurrencia; Contract States §Errores y concurrencia]
+
+### Integridad y utilidad de la auditoría
+
+- [ ] CHK072 ¿Está enumerado qué constituye una acción material auditable —aprovisionamiento y
+  suspensión, consentimiento, CV, duplicados, moderación, saltos, derivación/acceso, resultado,
+  archivo/restauración, importación y automatizaciones— en lugar de depender solo del término
+  genérico “crítica”? [Gap, Spec §FR-050, SC-006; Constitution §III; Data Model §audit_events]
+- [ ] CHK073 ¿Las reglas de motivo obligatorio son consistentes para rechazo, suspensión,
+  cancelación, salto de etapa, restauración, resolución de duplicado y corrección tardía, y separan
+  el mensaje visible a la empresa del texto interno limitado y libre de datos personales?
+  [Consistency, Spec §FR-023, FR-037, FR-050, FR-054; Data Model §audit_events; Contract States]
+- [ ] CHK074 ¿La inmutabilidad y corrección del historial definen quién puede insertar y leer,
+  prohíben actualización o eliminación por roles de aplicación, preservan eventos superados y
+  restringen el actor `system` a comandos programados expresamente autorizados? [Completeness, Plan
+  §Integridad, estados y concurrencia; Data Model §audit_events; Contract Authorization §Matriz de recursos]
+- [ ] CHK075 ¿SC-006 identifica el conjunto exacto de transiciones y acciones críticas, los campos de
+  auditoría exigidos y el criterio para demostrar atomicidad e inmutabilidad, de forma que su “100 %”
+  sea objetivamente reproducible? [Measurability, Spec §SC-006, FR-050; Contract States; Data Model
+  §audit_events]
+
+### Trazabilidad hacia el desglose de tareas
+
+- [ ] CHK076 ¿Las tareas conservan cobertura positiva y negativa en las capas de sesión, servidor,
+  RLS y Storage para credenciales privilegiadas, sesiones obsoletas, aislamiento entre propietarios,
+  errores no reveladores y revocación inmediata? [Coverage, Plan §Autorización y privacidad de datos;
+  Contract Authorization §Controles obligatorios de prueba; Tasks §T008, T012–T016, T023, T088]
+- [ ] CHK077 ¿Las tareas exigen evidencia específica de rollback atómico, conflicto optimista,
+  historial append-only, motivos obligatorios, actor `system` acotado e idempotencia de las
+  automatizaciones, sin reducir esas garantías a una prueba genérica de flujo feliz? [Coverage, Plan
+  §Integridad, estados y concurrencia y §Automatizaciones diarias; Tasks §T022–T027, T034, T037]
+
+### Notas de esta ejecución
+
+- Los ítems CHK059–CHK077 se agregaron sin alterar ni aprobar CHK001–CHK058.
+- El foco de esta revisión es la calidad y trazabilidad de requisitos críticos de privacidad,
+  autorización, estados y auditoría; no valida una implementación ni modifica otros artefactos.
