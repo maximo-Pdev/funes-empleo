@@ -10,7 +10,7 @@ El MVP será una aplicación web única con tres experiencias protegidas —cand
 administración municipal— y una consulta pública limitada a ofertas aprobadas. La Oficina de Empleo
 mantiene la intermediación: modera ofertas, evalúa y preselecciona personas, decide derivaciones y
 confirma los resultados finales. Las empresas nunca acceden al padrón general y solo ven datos
-laborales, contacto y CV de una persona derivada a una oferta propia.
+laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
 CSS, desplegada en Vercel para la demostración. Supabase aportará Auth, PostgreSQL, Row Level
@@ -46,10 +46,11 @@ fuera de este plan hasta resolver OQ-006.
 **Tipo de proyecto**: aplicación web full-stack única. Next.js entrega UI, renderizado servidor,
 Server Actions y Route Handlers; no se agrega un backend independiente.
 
-**Objetivos de rendimiento**: consultas administrativas y exportación listas en menos de 30
-segundos de interacción; navegación con estados de carga inmediatos; listados paginados en servidor;
-búsquedas sobre campos normalizados e indexados. No se fija un SLA productivo ni una capacidad de
-concurrencia no respaldada por evidencia.
+**Objetivos de rendimiento**: sobre fixtures reproducibles de 500 candidatos, 50 empresas, 100
+ofertas y 1.000 participaciones, la búsqueda, preentrevista y preselección deben completarse en menos
+de 5 minutos y los conteos más la exportación filtrada en menos de 30 segundos; navegación con
+estados de carga inmediatos, listados paginados en servidor y búsquedas sobre campos normalizados e
+indexados. No se fija un SLA productivo ni una capacidad de concurrencia no respaldada por evidencia.
 
 **Restricciones**: interfaz en español, responsive y operable con teclado; cuatro administradores
 individuales con igual permiso; autorización en servidor y base; CV PDF privado de hasta 5 MiB para
@@ -61,9 +62,12 @@ formatos oficiales de informes no suministrados.
 funcionales de la especificación. La arquitectura usa paginación e índices para crecer sin adoptar
 infraestructura distribuida; el dimensionamiento productivo se pospone junto con OQ-006.
 
-**Clarificaciones técnicas resueltas**: no quedan marcadores `NEEDS CLARIFICATION`. Las dependencias
-externas OQ-001, OQ-005, OQ-006, OQ-010, OQ-017 y OQ-018 permanecen visibles y no se consideran
-decisiones aprobadas por el plan.
+**Clarificaciones técnicas resueltas**: no quedan decisiones técnicas pendientes dentro del alcance
+planificado. El plan adopta las decisiones registradas en `spec.md` para autorregistro por email,
+contactos compartidos, versión
+de CV, duplicados, suspensión, archivo/restauración, vencimientos, saltos administrativos, métricas y
+aceptación. Las dependencias externas OQ-001, OQ-005, OQ-006, OQ-010, OQ-017 y OQ-018 permanecen
+visibles y no se consideran decisiones aprobadas por el plan.
 
 ## Verificación de la constitución
 
@@ -83,6 +87,11 @@ decisiones aprobadas por el plan.
 No se solicitan excepciones constitucionales. Supabase CLI y Docker se incorporan solo como
 herramientas de desarrollo para migraciones y pruebas locales reproducibles de RLS; no agregan una
 capa productiva y responden a una exigencia explícita de integridad y autorización.
+
+La revalidación posterior a Fase 1 incluye `research.md`, `data-model.md`, `contracts/` y
+`quickstart.md`: ninguno introduce un actor que eluda la intermediación, datos reales, borrado
+destructivo, un stack alternativo ni una excepción al flujo de revisión. La puerta constitucional
+permanece aprobada sin excepciones.
 
 ## Arquitectura y límites
 
@@ -105,7 +114,8 @@ capa productiva y responden a una exigencia explícita de integridad y autorizac
 ### Identidad, sesión y cuentas
 
 - El autorregistro de candidatos y empresas usa email y contraseña; el email verificado cuenta como
-  el contacto mínimo del flujo autogestionado. La verificación y recuperación usan Supabase Auth.
+  credencial y contacto mínimo del flujo autogestionado. La verificación y recuperación usan
+  Supabase Auth. Un candidato sin email ingresa únicamente mediante perfil asistido sin cuenta.
 - `@supabase/ssr` mantiene sesión en cookies. La autorización servidor valida claims o usuario
   vigente; nunca confía en `getSession()` ni en metadatos editables por el usuario.
 - Una tabla de cuentas de aplicación contiene rol y estado. El registro público solo puede crear
@@ -123,8 +133,9 @@ capa productiva y responden a una exigencia explícita de integridad y autorizac
 - RLS se habilita en toda tabla expuesta a la Data API. Tablas y funciones internas viven en un
   esquema privado o tienen grants explícitos mínimos.
 - Candidato: sus datos, CV, postulaciones y la proyección pública permitida de sus estados.
-- Empresa: su perfil y ofertas; tras una derivación vigente, la proyección laboral, contactos y CV
-  de esa persona para esa oferta. DNI, domicilio, notas y motivos internos se excluyen por diseño.
+- Empresa: su perfil y ofertas; tras una derivación vigente, la proyección laboral, todos los
+  contactos vigentes y exactamente la versión del CV guardada en esa derivación. DNI, domicilio,
+  notas y motivos internos se excluyen por diseño.
 - Administrador activo: operación municipal completa, siempre con actor identificado.
 - Anónimo: solo ofertas publicadas vigentes y campos expresamente públicos.
 - DNI y otros datos identificatorios se separan de la proyección laboral, se normalizan para detectar
@@ -139,7 +150,8 @@ capa productiva y responden a una exigencia explícita de integridad y autorizac
 - La descarga pasa por un Route Handler autenticado que vuelve a comprobar propietario, rol o
   derivación. Si se emite URL firmada, dura como máximo 60 segundos y no se persiste ni registra.
 - Los metadatos y versiones quedan en PostgreSQL; reemplazar archiva la versión anterior. No hay
-  eliminación automática hasta que exista una política de retención aprobada.
+  eliminación automática hasta que exista una política de retención aprobada. Cada derivación
+  guarda `cv_document_id`; un reemplazo solo afecta derivaciones futuras.
 - El límite de 5 MiB resuelve la configuración técnica de la demostración, pero OQ-017 continúa
   requiriendo ratificación municipal antes de tratar documentos reales.
 
@@ -151,16 +163,36 @@ capa productiva y responden a una exigencia explícita de integridad y autorizac
   rol, estado vigente, consentimiento y CV, actualizan el agregado e insertan el historial.
 - Los registros mutables incluyen `version` o `updated_at` esperado. Una acción sobre una versión
   obsoleta devuelve conflicto y obliga a recargar, evitando que dos administradores pisen decisiones.
+- Revisión, preentrevista y preselección pueden omitirse al avanzar, pero las etapas efectivamente
+  realizadas mantienen su orden, todo salto exige motivo y nunca se omite la derivación explícita.
 - El historial es append-only. Incluye actor de cuenta o actor de sistema, fecha, entidad, acción,
   estado anterior/nuevo y motivo obligatorio cuando corresponda.
 - Los registros se archivan con `archived_at` y `archived_by`; no se ejecutan cascadas destructivas
   sobre historial, derivaciones, importaciones o auditoría.
 
-### Automatización de falta de respuesta
+### Suspensión, archivo y restauración
+
+- Suspender una cuenta bloquea de inmediato sus acciones privadas. Un candidato suspendido queda
+  fuera de búsquedas, postulaciones y derivaciones nuevas; una empresa suspendida deja de admitir
+  nuevas postulaciones o derivaciones en sus ofertas. En ambos casos se revoca el acceso empresarial
+  interactivo a perfiles y CV, sin convertir participaciones existentes en resultados finales.
+- La acción administrativa de suspensión se presenta destacada y requiere confirmación explícita;
+  la función servidor vuelve a validar actor, estado, versión y motivo. Reactivar la cuenta no
+  reactiva automáticamente ofertas, derivaciones ni otros registros relacionados.
+- El candidato puede corregir directamente sus datos. Solicitar eliminación ejecuta una transición
+  atómica que archiva cuenta/perfil de inmediato, bloquea actividad futura y preserva historial y
+  archivos según OQ-001; no elimina el usuario de Auth ni datos de negocio.
+- Solo un administrador puede restaurar, con motivo y detección previa de conflictos. Un perfil o
+  empresa vuelve inactivo y una oferta vuelve a borrador; accesos y participaciones no se reactivan.
+
+### Automatizaciones diarias
 
 - Supabase Cron ejecuta diariamente una función SQL idempotente. Toma participaciones derivadas sin
   resultado final cuyo `feedback_due_at` —fijado a 30 días desde la derivación— ya venció, las cierra
   como `no_company_response` e inserta un evento con actor `system` en la misma transacción.
+- La misma ejecución diaria cierra ofertas `published` cuya fecha de cierre ya finalizó. Las quita
+  de la consulta pública, impide postulaciones nuevas, conserva las participaciones existentes e
+  inserta un evento de cierre automático con actor `system`.
 - Una ejecución repetida no genera eventos duplicados. Una respuesta tardía crea feedback nuevo y un
   administrador registra el resultado real como otra transición, sin borrar el cierre automático.
 - Supabase Cron está en beta y debe reevaluarse antes de producción. Vercel Cron queda documentado
@@ -183,6 +215,10 @@ capa productiva y responden a una exigencia explícita de integridad y autorizac
 
 - Vistas o funciones SQL protegidas calculan conteos y tendencias sobre datos autorizados. No hay
   analítica pública ni formatos oficiales adicionales mientras OQ-005 siga abierto.
+- `active_candidate` exige perfil activo, disponibilidad, consentimiento vigente y confirmación en
+  los últimos seis meses. Por oferta se calculan separadamente días desde publicación hasta la
+  primera contratación confirmada y hasta que las contrataciones confirmadas igualan las vacantes;
+  esta última queda nula/pendiente mientras no se cubra el total.
 - Un logger servidor con lista permitida registra código de evento, request ID, rol, UUID interno,
   duración y resultado. Prohíbe nombres, DNI, CUIT, contactos, notas, nombres/contenido de archivos,
   filas CSV, cookies, tokens y secretos.
@@ -294,6 +330,12 @@ microservicios ni un backend separado para el MVP.
 
 También se requiere confirmar las cuatro identidades administrativas, la política/versión exacta del
 texto de consentimiento y los requisitos visuales municipales antes de la aceptación con usuarios.
+
+La aceptación del demo usa datos exclusivamente ficticios: 10 ejecuciones por rol y al menos cinco
+personas distintas para los recorridos de candidato/empresa; el dataset reproducible de
+500 candidatos, 50 empresas, 100 ofertas y 1.000 participaciones para administración; tamaños
+360×800 y 1366×768 a 100 %/200 % de zoom, teclado y NVDA; y al menos cuatro de las cinco tareas de
+SC-010 completadas en primer intento, según `quickstart.md`.
 
 ## Seguimiento de complejidad
 

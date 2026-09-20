@@ -75,7 +75,7 @@ Salida visible:
 ## Fase 2: confirmación
 
 Entrada: `batch_id`, `file_sha256`, `mapping_version`, `version` esperada y decisiones administrativas
-permitidas sobre advertencias.
+permitidas sobre advertencias y duplicados.
 
 Precondiciones:
 
@@ -91,6 +91,12 @@ Efecto:
   observaciones e historial dentro de una transacción;
 - si una fila falla, revierte todo y marca el lote `failed` con código sanitizado;
 - si termina, marca filas `imported`, conteos finales y lote `completed`.
+
+Para cada `potential_duplicate`, administración debe registrar una resolución con motivo:
+`use_or_update_existing`, `correct_and_create` o `reject`. `correct_and_create` exige corregir el dato
+que causó el falso positivo y volver a validar; `use_or_update_existing` solo aplica los cambios que
+el administrador confirma expresamente. La decisión queda en historial y la previsualización
+recalcula los bloqueos antes de habilitar la confirmación.
 
 ## Seguridad y auditoría
 
