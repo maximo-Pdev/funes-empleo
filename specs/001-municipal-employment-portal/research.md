@@ -106,16 +106,18 @@ operaciones se descartan. La clave secreta queda limitada a Auth Admin y trabajo
 ## 6. Almacenamiento protegido de CV
 
 **Decisión**: bucket privado, rutas opacas por UUID, metadatos versionados en PostgreSQL y descarga
-autenticada. Si se usa URL firmada, se emite después de autorizar y dura como máximo 60 segundos.
-Para demo: solo PDF hasta 5 MiB, validado por extensión, MIME, firma y lectura básica.
+autenticada mediante streaming desde un Route Handler que revalida el permiso en cada solicitud y
+responde `private, no-store`; no se entrega una URL firmada reutilizable. Para demo: solo PDF hasta
+5 MiB, validado por extensión, MIME, firma y lectura básica.
 
 **Fundamento**: el bucket privado evita URLs permanentes. La autorización por derivación debe
 evaluarse en cada acceso; el nombre físico nunca revela identidad. Versionar conserva trazabilidad y
 permite que un rechazo no sustituya el CV vigente.
 
-**Alternativas consideradas**: bucket público, nombres con DNI/email o URLs firmadas de larga vida se
-descartan. Almacenamiento binario en PostgreSQL agrega carga sin beneficio. El límite técnico de 5 MiB
-requiere ratificación municipal antes de datos reales.
+**Alternativas consideradas**: bucket público, nombres con DNI/email y URLs firmadas reutilizables se
+descartan porque no permiten cortar nuevos accesos inmediatamente. Almacenamiento binario en
+PostgreSQL agrega carga sin beneficio. El límite técnico de 5 MiB requiere ratificación municipal
+antes de datos reales.
 
 **Fuentes**: [buckets privados](https://supabase.com/docs/guides/storage/buckets/fundamentals),
 [descargas](https://supabase.com/docs/guides/storage/serving/downloads),
@@ -161,11 +163,13 @@ descarta mientras OQ-001 continúe abierto.
 
 **Decisión**: Supabase Cron invoca diariamente una función SQL idempotente. La función cierra como
 `no_company_response` derivaciones sin resultado cuyo vencimiento sea 30 días después de derivar y
-registra actor `system` en la misma transacción.
+registra actor `system` y revoca el acceso empresarial a los datos derivados en la misma transacción.
 
-**Fundamento**: el trabajo solo afecta datos y su historia, por lo que ejecutarlo dentro de
-PostgreSQL evita HTTP y secretos adicionales. Cron conserva historial de ejecución. Una respuesta
-tardía agrega otra transición administrativa y no reescribe la anterior.
+**Fundamento**: el trabajo solo afecta datos, autorización y su historia, por lo que ejecutarlo
+dentro de PostgreSQL evita HTTP y secretos adicionales. Cron conserva historial de ejecución. La
+empresa puede comunicar una respuesta tardía sobre su referencia sin recuperar perfil/contactos/CV;
+la transición administrativa no reescribe el cierre anterior. Un resultado tardío `hired` no
+reactiva un permiso ya revocado: la contratación solo conserva una autorización que seguía activa.
 
 **Alternativas consideradas**: Vercel Cron requeriría Route Handler, `CRON_SECRET`, tolerancia a
 solapamientos y entregas duplicadas. Es contingencia válida si Supabase Cron no está disponible. Como
@@ -248,7 +252,9 @@ objetos arbitrarios se descarta porque Vercel conserva esa salida.
 **Decisión**: no resolver OQ-001, OQ-005, OQ-006, OQ-010 ni OQ-018. OQ-017 recibe un límite técnico
 de demostración de 5 MiB, pero sigue pendiente de aprobación municipal antes de CV reales. También
 quedan como gates el SMTP real, las cuatro identidades admin, el texto/versionado del consentimiento
-y la identidad visual municipal.
+y la identidad visual municipal. Mientras OQ-001 siga abierta, no existe TTL, purga ni transición
+automática a `expired_by_policy` para el acceso conservado por una contratación; autorización y
+retención se mantienen como conceptos separados.
 
 **Fundamento**: son decisiones legales, operativas o de contenido cuyo dueño no es el equipo técnico.
 El diseño proporciona límites seguros y puntos de configuración sin fingir aprobación.
@@ -258,24 +264,32 @@ productiva o formatos oficiales violaría la especificación y la constitución.
 
 ## 15. Proyección empresarial de contactos y CV
 
-**Decisión**: una derivación activa expone todos los contactos vigentes del candidato y guarda como
+**Decisión**: un permiso de derivación `active` expone todos los contactos vigentes del candidato y guarda como
 evidencia la versión exacta del CV compartida. Reemplazar el CV cambia únicamente las derivaciones
 futuras; los contactos no se congelan y la empresa ve los que permanezcan vigentes mientras conserve
-acceso a esa derivación.
+acceso a esa derivación. El permiso se recalcula en cada lectura y termina ante retiro de la
+postulación o del consentimiento, no selección, cancelación, falta de respuesta, suspensión o
+archivo. Una contratación confirmada conserva el acceso solo si el permiso todavía está `active`,
+mientras no exista otro bloqueo y hasta que una política aprobada de OQ-001 disponga un vencimiento.
 
 **Fundamento**: aplica literalmente las aclaraciones de FR-036. El `cv_document_id` convierte el
 documento compartido en una evidencia reproducible, mientras que eliminar una marca de selección por
-contacto evita una regla ya descartada por producto.
+contacto evita una regla ya descartada por producto. Separar la capacidad de comunicar feedback de
+la proyección de datos permite recibir respuestas tardías sin reabrir información personal. El
+permiso funciona como un enclavamiento: las condiciones vigentes pueden denegarlo y una revocación
+persistida no vuelve a `active` por una transición posterior.
 
 **Alternativas consideradas**: compartir solo un contacto principal, seleccionar contactos por
-derivación, mostrar siempre el CV más reciente o exponer todas sus versiones fueron rechazadas en
-clarificación.
+derivación, mostrar siempre el CV más reciente, exponer todas sus versiones, mantener acceso tras
+cualquier resultado o exigir revocación manual fueron rechazadas en clarificación.
 
 ## 16. Suspensión, archivo, eliminación y restauración
 
 **Decisión**: las transiciones se ejecutan mediante funciones atómicas y auditadas. Suspender bloquea
 acciones nuevas y revoca acceso empresarial sin cerrar participaciones. La eliminación solicitada
 por un candidato archiva de inmediato cuenta/perfil, sin revisión administrativa ni borrado físico.
+Retirar una postulación derivada o el consentimiento general revoca todos los permisos afectados en
+la misma transacción; reconsentir no los restaura.
 Solo un administrador restaura, con motivo, dejando perfiles/empresas inactivos y ofertas en borrador;
 ninguna relación se reactiva automáticamente.
 
@@ -289,9 +303,11 @@ privacidad, pérdida de trazabilidad y contradicción con la especificación.
 ## 17. Automatización de vencimientos y saltos de evaluación
 
 **Decisión**: el mantenimiento diario idempotente cierra tanto ofertas publicadas vencidas como
-derivaciones sin respuesta a 30 días desde `referred_at`. Revisión, preentrevista y preselección son
-etapas omitibles solo hacia adelante por un administrador, con motivo; la derivación explícita nunca
-es omitible.
+derivaciones sin respuesta a 30 días desde `referred_at`; para estas últimas también revoca el
+permiso empresarial y registra ambos cambios con actor `system` en una transacción. El feedback
+tardío se admite sin datos personales y no restaura el permiso, incluso si administración corrige el
+resultado a `hired`. Revisión, preentrevista y preselección son etapas omitibles solo hacia adelante
+por un administrador, con motivo; la derivación explícita nunca es omitible.
 
 **Fundamento**: una única frontera programada conserva actor `system`, evita ofertas vencidas y
 reutiliza el patrón transaccional ya elegido. Los saltos autorizados reducen trabajo innecesario sin
@@ -306,10 +322,12 @@ internas siempre obligatorias o saltos sin motivo fueron rechazados durante acla
 confirmado en los últimos seis meses. Se calculan dos duraciones desde `published_at`: hasta la
 primera contratación confirmada y hasta que las contrataciones confirmadas alcancen `vacancies`; la
 segunda permanece nula mientras falten vacantes. La aceptación administrativa usa fixtures de
-500 candidatos, 50 empresas, 100 ofertas y 1.000 participaciones.
+500 candidatos, 50 empresas, 100 ofertas y 1.000 participaciones y restablece ese mismo conjunto
+antes de cada medición SC-003 y SC-008.
 
 **Fundamento**: las fórmulas dependen de hechos auditables y el dataset fijo vuelve comparables las
-mediciones de búsqueda, conteos y exportación.
+mediciones de búsqueda, conteos y exportación. Un reset separado antes de cada cronómetro impide que
+la primera tarea altere las condiciones de la segunda.
 
 **Alternativas consideradas**: contar todo perfil no archivado, medir desde el borrador o primera
 derivación, considerar cualquier feedback como contratación o probar con volúmenes variables se
@@ -318,14 +336,29 @@ descartaron por producir resultados no comparables.
 ## 19. Protocolo de aceptación y accesibilidad
 
 **Decisión**: candidato y empresa se miden en 10 ejecuciones por rol con al menos cinco personas
-distintas, datos ficticios preparados, conexión estable y sin ayuda. Accesibilidad se verifica en
-360×800 y 1366×768, zoom 100 %/200 %, teclado completo y un recorrido por rol con NVDA. Los usuarios
-representativos deben completar al menos cuatro de las cinco tareas de SC-010 en primer intento, sin
-ayuda externa ni reinicio; corregir mediante mensajes de la interfaz está permitido.
+distintas, datos ficticios preparados, conexión estable y sin ayuda. SC-003 y SC-008 usan un único
+administrador de prueba sin capacitación ni práctica previa, que recibe solo la descripción de la
+tarea; ambas mediciones se realizan en el mismo entorno de demostración, con el dataset
+500/50/100/1.000 restablecido, sin calentamiento y registrando las condiciones. Accesibilidad se
+verifica en 360×800 y 1366×768, zoom 100 %/200 %, teclado completo y un recorrido por rol con NVDA.
+SC-010 usa cohortes separadas de al menos cinco candidatos, cinco representantes de empresa y los
+cuatro administradores previstos o personal municipal equivalente. Cada persona realiza solo tareas
+de su rol; cada tipo de tarea requiere 80 % de éxito en primer intento y el criterio global aprueba
+cuando cumplen al menos cuatro de los cinco tipos. No se permite ayuda externa ni reinicio; corregir
+mediante mensajes de la interfaz está permitido.
 
-**Fundamento**: fija muestra, condiciones, comienzo/fin y criterio de éxito, complementando axe con
-pruebas humanas de teclado y lector de pantalla.
+El entorno alojado se restablece mediante una operación servidor transaccional, versionada y
+exclusiva de demo. Debe verificar entorno e identificador de proyecto, exigir confirmación explícita,
+bloquear ejecución concurrente, negarse a operar sobre producción, aplicar solo datos ficticios y
+emitir la versión/hash y los conteos esperados sin PII. La evidencia de cada medición registra
+commit/despliegue, fixture/reset, navegador, dispositivo, conexión e identificador seudónimo del
+participante.
 
-**Alternativas consideradas**: medir solo a los desarrolladores, aceptar muestras variables,
-reemplazar usuarios por E2E o usar únicamente axe fueron descartadas porque no validan usabilidad
-real ni accesibilidad completa.
+**Fundamento**: fija muestra, preparación, entorno, condiciones, comienzo/fin y criterio de éxito,
+complementando axe con pruebas humanas de teclado y lector de pantalla. Restablecer el mismo entorno
+y evitar calentamiento reduce variaciones no atribuibles al producto.
+
+**Alternativas consideradas**: capacitar o permitir práctica al administrador, medir en local o en
+entornos variables, hacer que cada persona pruebe roles ajenos, usar una sola ejecución por tarea,
+medir solo a los desarrolladores, reemplazar usuarios por E2E o usar únicamente axe fueron
+descartadas porque reducen comparabilidad o no validan usabilidad real y accesibilidad completa.

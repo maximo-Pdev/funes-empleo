@@ -28,6 +28,9 @@ autorizan integraciones nuevas.
   relaciones persistidas.
 - Suspensión o archivo invalida el acceso privado en servidor y RLS. Restaurar nunca repone de forma
   implícita ofertas, derivaciones, participaciones ni permisos empresariales anteriores.
+- Toda transición que termina acceso empresarial actualiza la participación, el permiso de la
+  derivación y la auditoría en una sola transacción. Un permiso `revoked` no vuelve implícitamente a
+  `active`; una contratación solo conserva un permiso que todavía estaba activo.
 
 ## Contratos de archivo HTTP
 
@@ -36,7 +39,7 @@ Los siguientes Route Handlers constituyen las únicas interfaces binarias/stream
 | Método y ruta lógica | Actor | Entrada/salida | Regla principal |
 | --- | --- | --- | --- |
 | `POST /api/candidate/cv` | Candidato o admin autorizado | `multipart/form-data` con PDF; metadata segura | Valida antes de reemplazar; máximo demo 5 MiB. |
-| `GET /api/cv/{cvId}` | Titular, admin o empresa derivada | Stream PDF privado | Autoriza en cada descarga; nunca URL pública. |
+| `GET /api/cv/{cvId}` | Titular, admin o empresa con permiso de derivación activo | Stream PDF privado, `private, no-store` | Autoriza en cada solicitud y exige coincidencia exacta de `cv_document_id`; no entrega URL reutilizable. |
 | `POST /api/admin/imports/preview` | Admin | CSV UTF-8; resumen y errores | No escribe entidades de negocio. |
 | `POST /api/admin/imports/{id}/confirm` | Admin | ID, hash, mapping version y version esperada | Una transacción all-or-nothing. |
 | `GET /api/admin/exports/operations.csv` | Admin | Filtros de período/categoría; CSV | Solo datos autorizados, neutraliza fórmulas. |

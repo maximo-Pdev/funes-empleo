@@ -153,8 +153,9 @@ a auditoría.
 | archivo y timestamps | Recuperables. |
 
 Debe existir al menos un contacto para registro. Las coincidencias por email se marcan para revisión;
-no producen fusión automática. Mientras una derivación esté activa, la empresa recibe todos los
-contactos no archivados vigentes; no existe selección individual por contacto.
+no producen fusión automática. Mientras `referrals.access_status = active` y las demás condiciones
+de autorización sigan vigentes, la empresa recibe todos los contactos no archivados vigentes; no
+existe selección individual por contacto.
 
 ### `candidate_consents`
 
@@ -171,7 +172,9 @@ Registro append-only del consentimiento general.
 | `source` | `self_service` o `assisted`. |
 
 El consentimiento vigente es el último evento aceptado no seguido por retiro. Su retiro bloquea
-nuevas derivaciones y tratamientos que dependan de él sin borrar historia legítima.
+nuevas derivaciones y tratamientos que dependan de él y revoca en la misma transacción el acceso de
+todas las derivaciones vigentes, sin borrar historia legítima. Una aceptación posterior no reactiva
+automáticamente esas derivaciones.
 
 ### `cv_documents`
 
@@ -281,6 +284,10 @@ Precondiciones:
 - Revisión, preentrevista y preselección pueden omitirse únicamente al avanzar, con motivo
   administrativo; nunca se omite la derivación.
 - Solo admin registra el resultado final. Feedback de empresa es una comunicación pendiente.
+- Confirmar `hired` conserva el acceso de la derivación si todavía está `active` y consentimiento,
+  cuentas y registros siguen vigentes. `not_selected`, `withdrawn`, `cancelled` y
+  `no_company_response` revocan ese acceso en la
+  misma transacción que cambia el resultado.
 - La vista del candidato calcula una proyección de `status`: muestra `received` mientras el caso está
   abierto y el resultado final cuando existe; no guarda un segundo estado mutable.
 
@@ -296,25 +303,36 @@ Todo contenido es interno. Puede haber varias instancias y el historial no se so
 
 | Campo | Regla |
 | --- | --- |
-| `id`, `participation_id` | Una derivación activa por participación. |
+| `id`, `participation_id` | Una derivación por participación; el permiso tiene ciclo propio. |
 | `referred_by`, `referred_at` | Siempre admin. |
-| `access_status` | `active`, `revoked` o `expired_by_policy`. |
+| `access_status` | `active` permite la proyección empresarial; `revoked` la deniega de forma persistente; `expired_by_policy` queda reservado. |
 | `consent_event_id`, `cv_document_id` | Evidencia vigente al derivar. |
 | `feedback_due_at` | Exactamente 30 días desde `referred_at`. |
-| `revoked_at`, `revoked_by`, `revocation_reason` | Recuperable y auditado. |
+| `access_changed_at` | Fecha del último cambio de autorización. |
+| `access_changed_actor_type` | `account` o `system`; coherente con el evento que cambió el acceso. |
+| `access_changed_by_account_id` | Cuenta responsable; nula únicamente para actor `system`. |
+| `access_change_reason` | `referral_created`, `application_withdrawn`, `consent_withdrawn`, `not_selected`, `process_cancelled`, `no_company_response`, `candidate_suspended`, `company_suspended`, `candidate_archived`, `company_archived` o `policy_expired`. |
 
-La autorización de la empresa exige que su empresa sea dueña de la oferta, ambas cuentas estén
-activas, la derivación esté activa y el recurso solicitado sea la proyección permitida. La proyección
-incluye todos los contactos vigentes y exactamente `cv_document_id`, aunque el candidato haya
-reemplazado después su CV. Suspensión, archivo o retiro revocan acceso interactivo; una reactivación
-no lo repone automáticamente. La retención posterior no se amplía hasta resolver OQ-001 y la evidencia
-se conserva solo para administración.
+La autorización de la empresa exige que su empresa sea dueña de la oferta, las cuentas y registros
+no estén suspendidos ni archivados, exista consentimiento vigente, `access_status = active` y el recurso solicitado sea
+la proyección permitida. La proyección incluye todos los contactos vigentes y exactamente
+`cv_document_id`, aunque el candidato haya reemplazado después su CV. Retiro de postulación o
+consentimiento, no selección, cancelación, falta de respuesta, suspensión o archivo cambian el acceso
+a `revoked` de forma atómica y auditada. Confirmar `hired` lo mantiene; una corrección tardía desde
+`no_company_response` a `hired` no vuelve a activarlo, porque la contratación solo conserva un
+permiso que no había sido revocado. Reactivar una cuenta, restaurar un registro o aceptar nuevamente
+el consentimiento tampoco repone acceso automáticamente. El
+valor `expired_by_policy` queda reservado y no se usa hasta resolver OQ-001; la evidencia histórica
+permanece disponible solo para administración. `unavailable` y `needs_update` afectan nuevas
+búsquedas/derivaciones, pero no revocan por sí solos una contratación confirmada.
 
 ### `company_feedback`
 
 Append-only: `id`, `referral_id`, `reported_outcome` (`hired`, `not_selected`, `candidate_withdrew`,
 `process_cancelled`, `other`), `message`, `reported_by`, `reported_at`, `review_status`
-(`pending_admin`, `accepted`, `superseded`). No cambia por sí mismo el resultado final.
+(`pending_admin`, `accepted`, `superseded`). No cambia por sí mismo el resultado final. Una empresa
+activa puede registrar feedback tardío sobre una derivación propia aunque `access_status` ya no sea
+`active`; esa autorización limitada no permite consultar perfil, contactos ni CV.
 
 ### `company_interviews`
 
@@ -474,6 +492,10 @@ no_company_response -> hired | not_selected | withdrawn | cancelled (admin, resp
   acceso a la empresa.
 - `hired`, `not_selected`, `withdrawn`, `cancelled` y `no_company_response` son finales para la vista
   del candidato. El override de respuesta tardía conserva el evento anterior.
+- `hired` mantiene `referrals.access_status = active` cuando ya estaba activo y no existe otro bloqueo.
+  `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo cambian a `revoked` dentro de la
+  misma transacción. Corregir tardíamente `no_company_response` a `hired` conserva la revocación y el
+  evento automático previo.
 - La empresa comunica feedback, pero no ejecuta la transición final.
 
 ## Índices y restricciones esenciales
@@ -483,9 +505,9 @@ no_company_response -> hired | not_selected | withdrawn | cancelled (admin, resp
   oferta/categoría y participación activa `(candidate_id, opening_id)`.
 - Índices: estados/fechas de oferta; candidato por estado, localidad, vigencia y disponibilidad;
   tablas puente por categoría; participación por oferta/estado; derivación por empresa implícita vía
-  oferta; `feedback_due_at`; auditoría por entidad/fecha; importación por lote/fila.
+  oferta y por `access_status`; `feedback_due_at`; auditoría por entidad/fecha; importación por lote/fila.
 - Checks: vacantes positivas, fecha de cierre coherente, CV 1..5 MiB, tipos/estados válidos, actor
-  coherente, fechas de archivo y suspensión completas.
+  coherente, cambio de acceso con actor/fecha/motivo completos, fechas de archivo y suspensión completas.
 - FKs de historia usan `RESTRICT` o referencias preservadas; ningún cascade borra evidencia.
 
 ## Reglas RLS mínimas verificables
@@ -493,8 +515,9 @@ no_company_response -> hired | not_selected | withdrawn | cancelled (admin, resp
 - Anónimo: `SELECT` solo sobre proyección de ofertas `published` y vigentes.
 - Candidato: su cuenta/perfil/privados/contactos/consentimientos/CV; sus participaciones con proyección
   limitada; nunca notas, preentrevistas o motivos internos.
-- Empresa: su perfil/ofertas/moderación visible; feedback propio; proyección de candidatos y CV solo
-  para derivaciones activas de ofertas propias.
+- Empresa: su perfil/ofertas/moderación visible; puede crear feedback propio incluso tardío sin leer
+  datos del candidato; la proyección y el CV requieren oferta propia, `access_status = active`,
+  consentimiento vigente y cuentas/registros activos.
 - Admin activo: operación autorizada completa; auditoría sigue siendo inmutable.
 - Cuenta suspendida: ninguna acción privada, incluso si conserva sesión.
 - Secret/system: solo funciones acotadas, nunca navegador.

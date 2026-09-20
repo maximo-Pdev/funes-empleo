@@ -1,6 +1,6 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
-**Rama**: `spec/municipal-employment-portal-mvp` | **Fecha**: 2026-09-19 | **Especificación**: [spec.md](./spec.md)
+**Rama**: `spec/municipal-employment-portal-mvp` | **Fecha**: 2026-09-20 | **Especificación**: [spec.md](./spec.md)
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
@@ -11,6 +11,9 @@ administración municipal— y una consulta pública limitada a ofertas aprobada
 mantiene la intermediación: modera ofertas, evalúa y preselecciona personas, decide derivaciones y
 confirma los resultados finales. Las empresas nunca acceden al padrón general y solo ven datos
 laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
+Ese acceso se calcula en cada lectura: se revoca ante retiro de postulación o consentimiento, no
+  selección, cancelación o falta de respuesta; una contratación confirmada debe conservarlo mientras
+no exista otro bloqueo y hasta que la política de retención aprobada disponga lo contrario.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
 CSS, desplegada en Vercel para la demostración. Supabase aportará Auth, PostgreSQL, Row Level
@@ -50,7 +53,10 @@ Server Actions y Route Handlers; no se agrega un backend independiente.
 ofertas y 1.000 participaciones, la búsqueda, preentrevista y preselección deben completarse en menos
 de 5 minutos y los conteos más la exportación filtrada en menos de 30 segundos; navegación con
 estados de carga inmediatos, listados paginados en servidor y búsquedas sobre campos normalizados e
-indexados. No se fija un SLA productivo ni una capacidad de concurrencia no respaldada por evidencia.
+indexados. Ambas mediciones se ejecutan por un único administrador de prueba sin capacitación ni
+práctica previa, con solo la descripción de la tarea, en el mismo entorno de demostración, con el
+dataset restablecido, conexión estable, sin calentamiento y registrando las condiciones. No se fija
+un SLA productivo ni una capacidad de concurrencia no respaldada por evidencia.
 
 **Restricciones**: interfaz en español, responsive y operable con teclado; cuatro administradores
 individuales con igual permiso; autorización en servidor y base; CV PDF privado de hasta 5 MiB para
@@ -66,8 +72,9 @@ infraestructura distribuida; el dimensionamiento productivo se pospone junto con
 planificado. El plan adopta las decisiones registradas en `spec.md` para autorregistro por email,
 contactos compartidos, versión
 de CV, duplicados, suspensión, archivo/restauración, vencimientos, saltos administrativos, métricas y
-aceptación. Las dependencias externas OQ-001, OQ-005, OQ-006, OQ-010, OQ-017 y OQ-018 permanecen
-visibles y no se consideran decisiones aprobadas por el plan.
+aceptación, incluida la revocación por retiro o resultado y la conservación condicionada después de
+una contratación. Las dependencias externas OQ-001, OQ-005, OQ-006, OQ-010, OQ-017 y OQ-018
+permanecen visibles y no se consideran decisiones aprobadas por el plan.
 
 ## Verificación de la constitución
 
@@ -76,7 +83,7 @@ visibles y no se consideran decisiones aprobadas por el plan.
 | Principio o control | Resultado previo | Evidencia de diseño posterior |
 | --- | --- | --- |
 | I. Misión e intermediación municipal | Cumple | La autorización y los contratos impiden el padrón empresarial; solo una derivación administrativa habilita la vista mínima del candidato. |
-| II. Privacidad y seguridad desde el diseño | Cumple | Cuentas individuales, SSR seguro, RLS, bucket privado, validación de archivos, secretos solo en servidor y fixtures ficticios. |
+| II. Privacidad y seguridad desde el diseño | Cumple | Cuentas individuales, SSR seguro, RLS, bucket privado, validación de archivos, acceso empresarial recalculado y revocado según el resultado, secretos solo en servidor y fixtures ficticios. |
 | III. Trazabilidad e integridad | Cumple | Transiciones transaccionales, eventos append-only, actor sistema identificable, bloqueo optimista y archivo recuperable. |
 | IV. Accesibilidad e inclusión | Cumple | Diseño mobile-first, español, teclado, pruebas axe y manuales, y perfiles asistidos con la misma protección. |
 | V. Especificaciones, simplicidad y calidad | Cumple | Monolito modular sin backend adicional, estados y catálogos centralizados, cobertura automatizada de flujos críticos. |
@@ -91,7 +98,10 @@ capa productiva y responden a una exigencia explícita de integridad y autorizac
 La revalidación posterior a Fase 1 incluye `research.md`, `data-model.md`, `contracts/` y
 `quickstart.md`: ninguno introduce un actor que eluda la intermediación, datos reales, borrado
 destructivo, un stack alternativo ni una excepción al flujo de revisión. La puerta constitucional
-permanece aprobada sin excepciones.
+permanece aprobada sin excepciones. La revisión del 2026-09-20 confirma además que la revocación se
+aplica en servidor y RLS con historia preservada, que `hired` solo conserva permisos todavía activos,
+que OQ-001 no se convirtió en TTL ni purga inventados y que el protocolo de aceptación utiliza
+únicamente participantes seudónimos y datos ficticios.
 
 ## Arquitectura y límites
 
@@ -136,6 +146,17 @@ permanece aprobada sin excepciones.
 - Empresa: su perfil y ofertas; tras una derivación vigente, la proyección laboral, todos los
   contactos vigentes y exactamente la versión del CV guardada en esa derivación. DNI, domicilio,
   notas y motivos internos se excluyen por diseño.
+- El permiso empresarial a la proyección y al CV se evalúa en cada consulta. Requiere cuentas y
+  registros no suspendidos ni archivados, consentimiento vigente y una derivación cuyo acceso no
+  haya terminado. La indisponibilidad laboral o `needs_update` no revocan por sí solos una
+  contratación confirmada. Retiro
+  de postulación o consentimiento, no selección, cancelación y falta de respuesta terminan el acceso
+  en la misma transacción que registra el evento. Una contratación confirmada lo conserva mientras
+  sigan cumpliéndose las demás condiciones y OQ-001 no imponga un vencimiento aprobado.
+- La empresa puede enviar feedback tardío sobre una derivación propia cuyo acceso a datos fue
+  revocado, pero esa capacidad acotada no vuelve a exponer el perfil, los contactos ni el CV. Una
+  corrección tardía de `no_company_response` a `hired` conserva el acceso revocado: “mantener” una
+  autorización de contratación no equivale a restaurar una autorización que ya terminó.
 - Administrador activo: operación municipal completa, siempre con actor identificado.
 - Anónimo: solo ofertas publicadas vigentes y campos expresamente públicos.
 - DNI y otros datos identificatorios se separan de la proyección laboral, se normalizan para detectar
@@ -147,8 +168,11 @@ permanece aprobada sin excepciones.
 - Un único bucket privado `candidate-cvs`; claves opacas con UUID, nunca nombres, DNI o email.
 - Para la demostración se acepta únicamente PDF de hasta 5 MiB. Se validan extensión, MIME declarado,
   firma `%PDF-`, tamaño y lectura básica antes de reemplazar el CV vigente. Un rechazo no lo sustituye.
-- La descarga pasa por un Route Handler autenticado que vuelve a comprobar propietario, rol o
-  derivación. Si se emite URL firmada, dura como máximo 60 segundos y no se persiste ni registra.
+- El acceso al CV pasa por un Route Handler autenticado que vuelve a comprobar propietario, rol y
+  autorización vigente en cada solicitud, transmite el archivo con `Cache-Control: private,
+  no-store` y no entrega URLs reutilizables. Esto permite revocar inmediatamente nuevos accesos desde
+  el portal; una copia ya descargada queda fuera del control técnico del sistema y debe quedar
+  cubierta por el aviso y la política pendiente de OQ-001.
 - Los metadatos y versiones quedan en PostgreSQL; reemplazar archiva la versión anterior. No hay
   eliminación automática hasta que exista una política de retención aprobada. Cada derivación
   guarda `cv_document_id`; un reemplazo solo afecta derivaciones futuras.
@@ -161,6 +185,11 @@ permanece aprobada sin excepciones.
   tablas controladas en PostgreSQL.
 - Las transiciones críticas llaman funciones PostgreSQL transaccionales que verifican precondición,
   rol, estado vigente, consentimiento y CV, actualizan el agregado e insertan el historial.
+- Las transiciones terminales actualizan además la autorización de la derivación dentro de esa misma
+  transacción: `hired` la mantiene si ya estaba activa y no hay otro bloqueo; `not_selected`,
+  `withdrawn`, `cancelled` y
+  `no_company_response` la revocan con actor, fecha y motivo. Una corrección tardía nunca borra el
+  evento anterior ni reactiva un permiso ya revocado.
 - Los registros mutables incluyen `version` o `updated_at` esperado. Una acción sobre una versión
   obsoleta devuelve conflicto y obliga a recargar, evitando que dos administradores pisen decisiones.
 - Revisión, preentrevista y preselección pueden omitirse al avanzar, pero las etapas efectivamente
@@ -182,6 +211,10 @@ permanece aprobada sin excepciones.
 - El candidato puede corregir directamente sus datos. Solicitar eliminación ejecuta una transición
   atómica que archiva cuenta/perfil de inmediato, bloquea actividad futura y preserva historial y
   archivos según OQ-001; no elimina el usuario de Auth ni datos de negocio.
+- Retirar una postulación ya derivada o retirar el consentimiento general revoca en la misma
+  transacción todo acceso empresarial relacionado. Un consentimiento posterior o la restauración de
+  una cuenta no recuperan automáticamente esos accesos; una nueva derivación requiere una decisión
+  municipal explícita.
 - Solo un administrador puede restaurar, con motivo y detección previa de conflictos. Un perfil o
   empresa vuelve inactivo y una oferta vuelve a borrador; accesos y participaciones no se reactivan.
 
@@ -189,12 +222,16 @@ permanece aprobada sin excepciones.
 
 - Supabase Cron ejecuta diariamente una función SQL idempotente. Toma participaciones derivadas sin
   resultado final cuyo `feedback_due_at` —fijado a 30 días desde la derivación— ya venció, las cierra
-  como `no_company_response` e inserta un evento con actor `system` en la misma transacción.
+  como `no_company_response`, revoca el acceso empresarial a perfil/contactos/CV e inserta un evento
+  con actor `system` en la misma transacción.
 - La misma ejecución diaria cierra ofertas `published` cuya fecha de cierre ya finalizó. Las quita
   de la consulta pública, impide postulaciones nuevas, conserva las participaciones existentes e
   inserta un evento de cierre automático con actor `system`.
-- Una ejecución repetida no genera eventos duplicados. Una respuesta tardía crea feedback nuevo y un
-  administrador registra el resultado real como otra transición, sin borrar el cierre automático.
+- Una ejecución repetida no genera eventos duplicados. Una respuesta tardía puede comunicarse sin
+  recuperar acceso a datos; un administrador registra el resultado real como otra transición, sin
+  borrar el cierre automático. `not_selected`, `withdrawn` o `cancelled` mantienen la revocación;
+  `hired` conserva el acceso únicamente si este nunca fue revocado y no lo restaura después de
+  `no_company_response`.
 - Supabase Cron está en beta y debe reevaluarse antes de producción. Vercel Cron queda documentado
   como alternativa de contingencia, no se implementan ambos mecanismos.
 
@@ -234,6 +271,16 @@ permanece aprobada sin excepciones.
 - Preview de Vercel: nunca usa producción; emplea un entorno Supabase de prueba aislado o pruebas sin
   datos persistentes. No se entregan secretos a PR no confiables.
 - Demostración: proyecto Supabase y proyecto Vercel separados, con identidades ficticias controladas.
+- Aceptación administrativa: siempre el mismo despliegue de demostración y proyecto de datos. Antes
+  de cada medición SC-003 y, nuevamente, antes de cada medición SC-008 se restablece el fixture
+  500/50/100/1.000; no hay recorrido de calentamiento. La evidencia registra fecha, commit/despliegue,
+  versión o hash del fixture, confirmación del reset, navegador, dispositivo y condición de conexión,
+  usando identificadores seudónimos para participantes.
+- El reset alojado se ejecuta mediante un script servidor versionado y una función SQL privada y
+  transaccional. Ambos abortan salvo que el entorno se declare `demo`, el identificador del proyecto
+  coincida con el demo configurado y se proporcione una confirmación explícita; nunca aceptan un
+  proyecto de producción. El proceso toma un bloqueo, limpia solo entidades de negocio ficticias,
+  reaplica el fixture conocido, verifica sus conteos/hash y emite un resumen sin PII.
 - Producción municipal: no se crea ni configura hasta resolver hosting, responsables, región,
   backups, incidentes, SMTP, retención y datos reales.
 - GitHub Actions en cada PR ejecuta instalación desde lockfile, typecheck, lint, Vitest, pgTAP,
@@ -321,7 +368,7 @@ microservicios ni un backend separado para el MVP.
 
 | ID | Tratamiento en este plan | Gate antes de datos reales o aceptación |
 | --- | --- | --- |
-| OQ-001 | Archivo recuperable, sin purga automática | Política de retención aprobada por responsable legal/de datos. |
+| OQ-001 | Archivo recuperable, sin purga ni TTL automático; `expired_by_policy` permanece inalcanzable | Política de retención y duración del acceso posterior a contratación aprobadas por responsable legal/de datos. |
 | OQ-005 | Métricas internas y CSV genérico | Ejemplos y aprobación para cualquier informe oficial adicional. |
 | OQ-006 | Solo local, preview y demo ficticia | Operador, hosting, región, backups, incidentes y SMTP definidos. |
 | OQ-010 | Modelo de catálogo versionable y multiselección | Catálogo canónico depurado y aprobado por Oficina de Empleo. |
@@ -331,11 +378,16 @@ microservicios ni un backend separado para el MVP.
 También se requiere confirmar las cuatro identidades administrativas, la política/versión exacta del
 texto de consentimiento y los requisitos visuales municipales antes de la aceptación con usuarios.
 
-La aceptación del demo usa datos exclusivamente ficticios: 10 ejecuciones por rol y al menos cinco
-personas distintas para los recorridos de candidato/empresa; el dataset reproducible de
-500 candidatos, 50 empresas, 100 ofertas y 1.000 participaciones para administración; tamaños
-360×800 y 1366×768 a 100 %/200 % de zoom, teclado y NVDA; y al menos cuatro de las cinco tareas de
-SC-010 completadas en primer intento, según `quickstart.md`.
+La aceptación del demo usa datos exclusivamente ficticios: 10 ejecuciones de candidato y 10 de
+empresa, con al menos cinco personas distintas en cada rol; un único administrador de prueba sin
+capacitación ni práctica previa para SC-003 y SC-008, con solo la descripción de la tarea; el mismo
+entorno de demostración restablecido al dataset reproducible de 500 candidatos, 50 empresas, 100
+ofertas y 1.000 participaciones, conexión estable, sin calentamiento y con condiciones registradas;
+tamaños 360×800 y 1366×768 a 100 %/200 % de zoom, teclado y NVDA; y cohortes separadas de al menos
+cinco candidatos, cinco representantes de empresa y los cuatro administradores previstos o personal
+municipal equivalente para SC-010. Cada participante ejecuta solo tareas de su rol; cada tipo de
+tarea exige 80 % de éxito en primer intento y el criterio global aprueba con al menos cuatro de los
+cinco tipos, según `quickstart.md`.
 
 ## Seguimiento de complejidad
 

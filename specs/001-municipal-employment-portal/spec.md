@@ -97,6 +97,30 @@ los flujos completos de candidatos, empresas y administradores."
   preseleccionar y derivar; y registrar el resultado final. Primer intento significa hacerlo sin
   ayuda externa ni reiniciar, aunque se permite corregir errores usando solo los mensajes de la interfaz.
 
+### Session 2026-09-20
+
+- Q: Si un candidato retira una postulación después de ser derivado o retira su consentimiento
+  general, ¿cuándo debe perder la empresa el acceso al perfil, los contactos y el CV? → A: El acceso
+  empresarial se revoca inmediatamente en ambos casos, se conserva el historial administrativo y
+  no se restaura automáticamente.
+- Q: ¿Cómo debe evaluarse el criterio “4 de 5 tareas en el primer intento” con usuarios
+  representativos? → A: Con cohortes por rol de al menos cinco candidatos, cinco representantes de
+  empresas y los cuatro administradores previstos o personal municipal equivalente; cada persona
+  realiza solo tareas de su rol, cada tipo de tarea exige al menos 80 % de éxito en el primer intento
+  y el criterio global aprueba cuando cumplen al menos cuatro de los cinco tipos de tarea.
+- Q: ¿Quiénes deben ejecutar las mediciones administrativas de SC-003 y SC-008 y qué preparación
+  pueden recibir antes del cronómetro? → A: Un único administrador de prueba, sin capacitación ni
+  práctica previa, que recibe solamente la descripción de la tarea antes de cada medición.
+- Q: ¿En qué condiciones debe ejecutarse el cronómetro de SC-003 y SC-008 para que los resultados
+  administrativos sean comparables? → A: En el mismo entorno de demostración, con el conjunto
+  ficticio restablecido, conexión estable, sin recorridos de calentamiento y registrando las
+  condiciones de la ejecución.
+- Q: Cuando una participación finaliza por contratación, no selección, cancelación o falta de
+  respuesta empresarial, ¿qué debe ocurrir con el acceso de la empresa al perfil, los contactos y
+  el CV del candidato? → A: El acceso se mantiene si se confirma la contratación y se revoca
+  inmediatamente en los demás resultados finales; el acceso conservado sigue sujeto al retiro de
+  consentimiento, la suspensión, el archivo y la política de retención pendiente.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Intermediación municipal de una búsqueda laboral (Priority: P1)
@@ -298,9 +322,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - Un perfil supera el período aprobado de vigencia sin confirmación; no se elimina y deja de aparecer
   por defecto entre candidatos activos hasta que se actualice.
 - Un candidato se retira después de ser preseleccionado o derivado; el retiro se registra y la
-  empresa solo conserva el acceso que autoricen las reglas pendientes de privacidad y retención.
+  empresa pierde inmediatamente el acceso al perfil, los contactos y el CV de esa derivación. La
+  revocación conserva el historial administrativo y no se revierte automáticamente.
 - Un candidato retira el consentimiento general; se impiden nuevos tratamientos y derivaciones que
-  dependan de ese consentimiento, sin borrar el historial que deba conservarse legítimamente.
+  dependan de ese consentimiento y se revoca inmediatamente todo acceso empresarial vigente a su
+  perfil, contactos y CV, sin borrar el historial que deba conservarse legítimamente ni restaurar
+  el acceso de forma automática.
 - Un candidato solicita eliminar sus datos; el perfil se archiva o desactiva inmediatamente sin
   revisión administrativa, deja de participar en nuevas búsquedas, postulaciones y derivaciones, y
   conserva de forma recuperable el historial sujeto a la política de retención pendiente.
@@ -310,8 +337,13 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - Una empresa no comunica un resultado; el caso permanece pendiente durante 30 días exactos desde
   la derivación y luego se cierra automáticamente como sin respuesta empresarial, sin registrarlo
   como contratación o no selección. Entrevistas, contactos y seguimientos no pausan ni reinician el
-  plazo. Si la empresa responde más tarde, un administrador puede registrar el resultado real sin
-  eliminar el cierre anterior del historial.
+  plazo y el acceso empresarial al perfil, los contactos y el CV se revoca al producirse el cierre.
+  Si la empresa responde más tarde, puede comunicar el resultado sin recuperar ese acceso y un
+  administrador puede registrar el resultado real sin eliminar el cierre anterior del historial.
+- Una participación finaliza como no seleccionada o cancelada; se revoca inmediatamente el acceso
+  empresarial al perfil, los contactos y el CV. Si finaliza con una contratación confirmada, la
+  empresa conserva el acceso mientras no se retire el consentimiento ni se suspenda o archive una
+  cuenta o registro relacionado, sujeto además a la política de retención pendiente.
 - Un CV tiene tipo o tamaño no admitido, está dañado o intenta contener contenido ejecutable; se
   rechaza con un mensaje claro sin sustituir el CV vigente.
 - Un perfil asistido todavía no tiene CV PDF; puede mantenerse y evaluarse internamente, pero todo
@@ -380,7 +412,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   disponibilidad y corrija directamente sus propios datos. Cuando solicite la eliminación, el
   sistema DEBE archivar o desactivar su perfil de inmediato y sin revisión administrativa, impedir
   nuevas búsquedas, postulaciones y derivaciones, y conservar el historial de forma recuperable
-  mientras no exista una política de retención aprobada.
+  mientras no exista una política de retención aprobada. Si la postulación retirada ya tenía una
+  derivación, el sistema DEBE revocar inmediatamente el acceso empresarial al perfil, los contactos
+  y el CV, conservar el historial administrativo y NO DEBE restaurar ese acceso automáticamente.
 - **FR-017 (Should)**: El sistema DEBERÍA permitir vincular un perfil asistido con la cuenta personal
   del mismo candidato mediante un proceso aprobado que evite duplicados y preserve todo el
   historial.
@@ -430,7 +464,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **FR-036**: Tras una derivación, la empresa DEBE ver el perfil laboral, todos los contactos
   vigentes del candidato y la versión del CV asociada a esa derivación; los contactos se comparten
   automáticamente y reemplazar el CV solo afecta derivaciones posteriores. La empresa NO DEBE ver
-  su DNI, domicilio ni notas internas.
+  su DNI, domicilio ni notas internas. El acceso DEBE revocarse inmediatamente si el resultado final
+  es no selección, cancelación o falta de respuesta empresarial. Si un administrador confirma una
+  contratación, el acceso DEBE mantenerse sujeto al consentimiento vigente, al estado activo de
+  las cuentas y registros relacionados entendido como ausencia de suspensión o archivo, y a la
+  política de retención pendiente. La indisponibilidad laboral o la necesidad de actualizar el
+  perfil NO DEBEN revocar por sí solas el acceso de una contratación confirmada.
 - **FR-037**: La progresión de cada participación DEBE distinguir recepción, revisión,
   preentrevista, preselección, derivación, entrevista empresarial y los resultados finales
   aprobados. Un administrador PUEDE omitir revisión, preentrevista o preselección al avanzar, siempre
@@ -438,7 +477,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   DEBE ser siempre explícita, solo administrativa y anterior a cualquier acceso empresarial a los
   datos del candidato.
 - **FR-038**: Los resultados finales DEBEN distinguir contratación, no selección, retiro,
-  cancelación y cierre por falta de respuesta empresarial.
+  cancelación y cierre por falta de respuesta empresarial. El retiro, la no selección, la
+  cancelación y la falta de respuesta DEBEN revocar inmediatamente el acceso empresarial a los
+  datos derivados; únicamente la contratación confirmada DEBE conservarlo bajo las condiciones de
+  FR-036.
 - **FR-039**: La empresa DEBE poder comunicar el resultado de una entrevista, pero solo un
   administrador DEBE poder registrar el estado final de la participación según esa comunicación.
 - **FR-040**: Cuando no exista respuesta empresarial, el caso DEBE permanecer pendiente durante 30
@@ -473,7 +515,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **FR-055**: Al activar un perfil de candidato, incluido un perfil asistido, el sistema DEBE
   presentar y registrar el consentimiento aprobado para el tratamiento laboral de sus datos y su
   entrega en futuras derivaciones municipales; no se requiere una aceptación adicional para cada
-  derivación mientras ese consentimiento continúe vigente.
+  derivación mientras ese consentimiento continúe vigente. Retirar el consentimiento DEBE impedir
+  nuevos tratamientos y derivaciones dependientes de él, revocar inmediatamente el acceso
+  empresarial vigente al perfil, los contactos y el CV y conservar el historial administrativo sin
+  restaurar ese acceso automáticamente.
 - **FR-056**: Los errores y rechazos DEBEN comunicarse en español de forma accionable sin revelar
   credenciales, datos personales, notas internas ni detalles operativos sensibles.
 - **FR-057 (Should)**: La interfaz DEBERÍA ofrecer plantillas de mensaje o enlaces seguros para
@@ -540,6 +585,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **Derivación**: Autorización municipal que vincula un candidato con una oferta y habilita a la
   empresa correspondiente a consultar su perfil laboral, todos sus contactos vigentes y la versión
   de CV asociada a esa derivación, excluyendo DNI, domicilio y notas internas.
+  El retiro posterior de la postulación o del consentimiento general revoca inmediatamente ese
+  acceso sin borrar el historial administrativo ni permitir su restauración automática. La no
+  selección, cancelación o falta de respuesta también lo revocan; una contratación confirmada debe
+  conservarlo mientras se mantengan las condiciones de FR-036.
 - **Entrevista y resultado**: Información comunicada por la empresa o recabada por el personal; solo
   un administrador registra el estado final de la participación.
 - **Evento de contacto**: Registro de una comunicación telefónica, por correo, WhatsApp o presencial
@@ -564,9 +613,13 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   minutos sin ayuda técnica. El cronómetro comienza al abrir el formulario de registro y termina al
   confirmarse el envío de la oferta.
 - **SC-003**: Sobre un conjunto reproducible de 500 candidatos, 50 empresas, 100 ofertas y 1.000
-  participaciones ficticias, un administrador capacitado DEBE localizar candidatos mediante los
+  participaciones ficticias, un único administrador de prueba, sin capacitación ni práctica previa
+  y habiendo recibido solamente la descripción de la tarea, DEBE localizar candidatos mediante los
   filtros definidos, registrar una preentrevista y guardar una preselección en menos de 5 minutos.
-  El cronómetro comienza al abrir la pantalla de búsqueda y termina al confirmarse la preselección.
+  La medición DEBE realizarse en el mismo entorno de demostración, con el conjunto ficticio
+  restablecido, conexión estable, sin recorridos de calentamiento y registrando las condiciones de
+  ejecución. El cronómetro comienza al abrir la pantalla de búsqueda y termina al confirmarse la
+  preselección.
 - **SC-004**: El 100 % de las ofertas no aprobadas permanece fuera de la consulta pública y no acepta
   postulaciones durante las pruebas de permisos.
 - **SC-005**: El 100 % de los intentos de una empresa por consultar el padrón general, otra empresa o
@@ -575,8 +628,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   historial identificable de actor, fecha y cambio realizado.
 - **SC-007**: En archivos de prueba, el 100 % de filas CSV inválidas o potencialmente duplicadas se
   identifica antes de confirmar, y ningún fallo de importación deja datos parciales ocultos.
-- **SC-008**: Sobre el mismo conjunto reproducible, un administrador DEBE obtener los conteos
-  operativos básicos y completar una exportación filtrada en menos de 30 segundos. El cronómetro
+- **SC-008**: Sobre el mismo conjunto reproducible, un único administrador de prueba, sin
+  capacitación ni práctica previa y habiendo recibido solamente la descripción de la tarea, DEBE
+  obtener los conteos operativos básicos y completar una exportación filtrada en menos de 30
+  segundos. La medición DEBE utilizar el mismo entorno de demostración y las mismas condiciones
+  definidas en SC-003, con el conjunto ficticio restablecido antes de comenzar. El cronómetro
   comienza al aplicar los filtros de período y categoría y termina cuando los conteos están visibles
   y la descarga finalizó.
 - **SC-009**: Los recorridos críticos de candidato, empresa y administración DEBEN completarse en
@@ -588,7 +644,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   una oferta; buscar, preseleccionar y derivar un candidato; y registrar el resultado final. Primer
   intento significa completar la tarea sin ayuda externa ni reiniciarla; corregir un error usando
   únicamente los mensajes de la interfaz continúa siendo parte del mismo intento. Todo error DEBE
-  presentar un mensaje claro en español que permita corregirlo.
+  presentar un mensaje claro en español que permita corregirlo. La evaluación DEBE incluir cohortes
+  separadas de al menos cinco candidatos, cinco representantes de empresas y los cuatro
+  administradores previstos o personal municipal equivalente. Cada participante DEBE realizar
+  únicamente las tareas correspondientes a su rol. Un tipo de tarea se considera aprobado cuando
+  al menos el 80 % de su cohorte lo completa en el primer intento, y SC-010 se considera cumplido
+  cuando aprueban al menos cuatro de los cinco tipos de tarea.
 
 ## Assumptions
 
