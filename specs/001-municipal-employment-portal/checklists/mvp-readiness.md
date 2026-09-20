@@ -167,3 +167,89 @@ significa que la implementación esté terminada.
   `$speckit-clarify`.
 - Registrar hallazgos y decisiones junto al ítem correspondiente, enlazando el artefacto actualizado.
 - Este checklist evalúa la redacción y coherencia de requisitos; no prueba la implementación.
+
+## Revisión incremental posterior a la replanificación — 2026-09-20
+
+### Completitud de ciclos y decisiones aclaradas
+
+- [ ] CHK041 ¿El ciclo de corrección, solicitud de eliminación, archivo inmediato y restauración
+  administrativa está especificado para cuenta y perfil, con autoridad, motivo, estado seguro de
+  retorno y relaciones que no deben reactivarse? [Completeness, Spec §FR-016, FR-054; Plan
+  §Suspensión, archivo y restauración]
+- [ ] CHK042 ¿Los requisitos de suspensión cubren de manera completa candidato, empresa, ofertas,
+  operaciones nuevas, casos existentes y acceso empresarial a perfiles/CV, además de exigir una
+  acción destacada y confirmación explícita? [Completeness, Spec §FR-005, FR-025; Contract States
+  §Suspensión y archivo]
+- [ ] CHK043 ¿El cierre automático por vencimiento está definido como una transición idempotente con
+  actor de sistema, salida de la consulta pública, bloqueo de nuevas postulaciones y continuidad de
+  las participaciones existentes? [Completeness, Spec §FR-021, FR-024; Plan §Automatizaciones diarias]
+- [ ] CHK044 ¿La resolución de duplicados documenta para autorregistro, atención asistida e
+  importación las tres decisiones permitidas —usar o actualizar, corregir y crear separado, o
+  rechazar— junto con motivo, historial y prohibición de fusión automática? [Completeness, Spec
+  §FR-014, FR-061; Data Model §duplicate_reviews; Contract CSV §Fase 2]
+- [ ] CHK045 ¿La proyección empresarial especifica conjuntamente todos los contactos vigentes, la
+  versión exacta del CV fijada en la derivación y las condiciones que revocan el acceso sin exponer
+  DNI, domicilio, otras participaciones o notas internas? [Completeness, Spec §FR-035–FR-036;
+  Contract Authorization §Proyección empresarial]
+
+### Claridad de estados, métricas y transiciones
+
+- [ ] CHK046 ¿Se distingue con términos y estados inequívocos reactivar una cuenta suspendida de
+  restaurar un perfil, empresa u oferta archivada, incluyendo que perfil vuelve a `draft`, empresa a
+  `incomplete` y oferta a `draft`? [Clarity, Spec §FR-005, FR-025, FR-054; Data Model §Máquinas de estado]
+- [ ] CHK047 ¿Los requisitos enumeran exactamente qué etapas puede omitir un administrador, exigen
+  avance solo hacia adelante y motivo por salto, y mantienen la derivación como frontera obligatoria
+  antes del acceso empresarial? [Clarity, Spec §FR-037; Contract States §Participación y derivación]
+- [ ] CHK048 ¿La definición de candidato activo para métricas está separada de
+  `referral_eligible`, dejando claro que exige estado activo, disponibilidad, consentimiento y
+  actualización en seis meses, pero no necesariamente CV? [Clarity, Spec §FR-064; Data Model
+  §candidate_profiles]
+- [ ] CHK049 ¿Las dos métricas temporales están definidas con el mismo origen `published_at`, con
+  contratación confirmada por administración como evento y cobertura total pendiente hasta igualar
+  la cantidad de vacantes? [Measurability, Spec §FR-067; Plan §Métricas, logs y recuperación]
+- [ ] CHK050 ¿Está expresado de manera consistente que los contactos se consultan en su estado
+  vigente mientras el CV permanece congelado por derivación, evitando interpretar que ambos se
+  versionan o que ambos cambian dinámicamente? [Clarity, Spec §FR-036; Research §15; Data Model
+  §candidate_contacts y §referrals]
+
+### Consistencia con contratos y desglose de tareas
+
+- [ ] CHK051 ¿La tarea de proyección empresarial está alineada con “todos los contactos vigentes” y
+  `cv_document_id`, sin conservar el concepto anterior de contactos seleccionados para compartir ni
+  del CV más reciente? [Conflict, Spec §FR-036; Plan §Autorización y privacidad; Tasks §T031]
+- [ ] CHK052 ¿El desglose de tareas representa las dos automatizaciones diarias —ofertas vencidas y
+  derivaciones sin respuesta— con sus transiciones, auditoría, idempotencia y escenarios de
+  aceptación respectivos? [Coverage, Plan §Automatizaciones diarias; Quickstart §Escenarios 2 y 4;
+  Tasks §T034]
+- [ ] CHK053 ¿Las tareas incluyen requisitos explícitos para corrección directa, archivo inmediato
+  solicitado por el candidato, suspensión con confirmación destacada y restauración administrativa
+  sin reactivación implícita? [Coverage, Spec §FR-005, FR-016, FR-054; Quickstart §Escenario 8;
+  Tasks §US2 y §T060]
+- [ ] CHK054 ¿Las tareas de duplicados y de importación conservan las tres resoluciones aprobadas,
+  la corrección previa del falso positivo y la evidencia de actor, fecha y motivo, en lugar de una
+  resolución administrativa genérica? [Consistency, Spec §FR-014; Contract CSV §Fase 2; Tasks
+  §T064, T071 y T076]
+- [ ] CHK055 ¿Las tareas de métricas distinguen explícitamente tiempo hasta primera contratación y
+  tiempo hasta cobertura total, incluida la condición pendiente cuando no se cubrieron todas las
+  vacantes? [Consistency, Spec §FR-067; Data Model §Métricas y exportaciones; Tasks §T079 y T081]
+- [ ] CHK056 ¿Las tareas y la guía de validación conservan los protocolos completos de SC-001,
+  SC-002, SC-003, SC-008, SC-009 y SC-010 —muestras, dataset, cronómetros, tamaños, zoom, teclado,
+  NVDA y cuatro de cinco tareas— sin reducirlos a una verificación genérica? [Traceability, Spec
+  §SC-001–SC-003, SC-008–SC-010; Quickstart §Protocolo de aceptación; Tasks §T087, T089 y T092]
+
+### Dependencias y límites de aprobación
+
+- [ ] CHK057 ¿El límite de 5 MiB permanece identificado como decisión técnica para la demostración
+  sujeta a OQ-017, y la implementación definitiva del importador continúa bloqueada por muestra y
+  mapeo aprobados de OQ-018? [Dependency, Spec §Open Questions; Plan §CV y archivos y §Importación;
+  Tasks §T044 y T069]
+- [ ] CHK058 ¿La documentación deja claro que esta replanificación obliga a revisar y, si
+  corresponde, regenerar el desglose de tareas y el análisis antes de implementar, sin considerar
+  aprobado automáticamente ningún artefacto generado previamente? [Governance, Constitution §V y
+  §Development Workflow; AGENTS §Spec Kit collaboration]
+
+### Notas de esta ejecución
+
+- Los ítems CHK041–CHK058 se agregaron sin alterar ni aprobar CHK001–CHK040.
+- Esta revisión incremental evalúa la calidad y trazabilidad de requisitos posteriores a la nueva
+  planificación; los conflictos señalados no modifican `tasks.md` durante `$speckit-checklist`.
