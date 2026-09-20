@@ -52,20 +52,20 @@ foundations required by all stories.
 
 **⚠️ CRITICAL**: No user story work begins until this phase is complete.
 
-- [ ] T008 [P] Write failing pgTAP specifications for account roles/status, public/admin registration boundaries, catalog integrity, base grants, and suspended-account denial in `supabase/tests/001_foundation_rls.test.sql`
+- [ ] T008 [P] Write failing pgTAP specifications for account roles/status, public/admin registration boundaries, catalog integrity, base grants, suspended/archived-account denial, access revocation, and restoration without implicit related-record reactivation in `supabase/tests/001_foundation_rls.test.sql`
 - [ ] T009 [P] Write failing unit specifications for role parsing, Spanish safe-error mapping, normalized identifiers, and centralized state/catalog values in `tests/unit/foundation/auth-and-domain.test.ts`
-- [ ] T010 Create the accounts and controlled catalog migration in `supabase/migrations/202609190001_accounts_catalogs.sql` with these data-model constraints: `auth_user_id` UUID unique/non-null; role exactly `candidate|company|admin`; account status exactly `pending_verification|active|suspended|archived`; suspension reason/actor/date complete together; category `(version, code)` unique and deactivation recoverable
-- [ ] T011 Create the shared business-schema migration in `supabase/migrations/202609190002_business_entities.sql` with the data-model constraints for candidate, private DNI, contacts, consent, versioned CV metadata, company, opening, category joins, participation, preinterview, referral, feedback, interview, contact, internal note, import batch, and import row; include UUID keys, UTC timestamps, `version`, archive fields, unique normalized DNI/CUIT, positive vacancies, one active CV, one active candidate/opening participation, and no destructive cascade over history
-- [ ] T012 Create private authorization helpers, append-only `audit_events`, actor constraints, optimistic-version functions, minimum grants, and RLS enablement for every exposed table in `supabase/migrations/202609190003_authorization_audit.sql`; audit metadata must exclude PII, notes, credentials, tokens, and file content
-- [ ] T013 Create the private `candidate-cvs` bucket and Storage policies in `supabase/migrations/202609190004_private_storage.sql`; object paths must be opaque UUIDs, MIME must be `application/pdf`, demo size must be `1..5 MiB`, and access must be limited to owner, active admin, or company with an active referral to its own opening
+- [ ] T010 Create the accounts and controlled catalog migration in `supabase/migrations/202609190001_accounts_catalogs.sql` with these data-model constraints: `auth_user_id` UUID unique/non-null; role exactly `candidate|company|admin`; account status exactly `pending_verification|active|suspended|archived`; suspension and archive reason/actor/date fields complete together; category `(version, code)` unique and deactivation recoverable
+- [ ] T011 Create the shared business-schema migration in `supabase/migrations/202609190002_business_entities.sql` with every field/relationship from `data-model.md` for candidate/private data/contacts/consent/versioned CV, `duplicate_reviews`, company/opening/categories, participation/preinterview/referral/feedback/interview/contact/internal note, import batch/row; enforce UUID/UTC/version/archive conventions, unique normalized DNI/CUIT, positive vacancies, one valid CV, one active participation per candidate/opening, referral `consent_event_id` plus immutable `cv_document_id`, opening `suspended` support, duplicate decision `use_or_update_existing|correct_and_create|reject`, import-row `unmapped_category`, and no destructive cascade over history
+- [ ] T012 Create private authorization helpers, append-only `audit_events`, actor constraints for account/system, optimistic-version functions, minimum grants, and RLS enablement for every exposed table in `supabase/migrations/202609190003_authorization_audit.sql`; audit metadata must exclude PII, notes, credentials, tokens, and file content, and suspension/archive must revoke private access without erasing history
+- [ ] T013 Create the private `candidate-cvs` bucket and Storage policies in `supabase/migrations/202609190004_private_storage.sql`; object paths must be opaque UUIDs, MIME must be `application/pdf`, demo size must be `1..5 MiB`, and access must be limited to owner, active admin, or an active company/referral pair requesting exactly that referral's `cv_document_id`
 - [ ] T014 Generate typed database definitions and implement separate browser, cookie-bound server, and isolated secret clients in `src/lib/supabase/database.types.ts`, `src/lib/supabase/browser.ts`, `src/lib/supabase/server.ts`, and `src/lib/supabase/admin.ts`, marking privileged code `server-only`
 - [ ] T015 Implement session validation and role/status guards without trusting `getSession()` or editable metadata in `src/lib/auth/session.ts`, `src/lib/auth/guards.ts`, and `src/app/auth/callback/route.ts`
-- [ ] T016 Implement public candidate/company role allowlisting, individual admin invitation/provisioning, suspension/reactivation, and generic recovery behavior in `src/features/accounts/service.ts` and `src/features/accounts/actions.ts`; public input must never create `admin`
+- [ ] T016 Implement public candidate/company role allowlisting, individual admin invitation/provisioning, suspension/reactivation, recoverable archive/restore primitives, and generic access recovery in `src/features/accounts/service.ts` and `src/features/accounts/actions.ts`; public input must never create `admin`, every administrative transition requires actor/reason/version, and reactivation/restoration must not reactivate related offers, referrals, participations, or company access
 - [ ] T017 Create the shared Spanish login, logout, verification-pending, recovery-request, password-update, and suspended-account pages in `src/app/(auth)/` and accessible auth forms in `src/features/accounts/components/`
 - [ ] T018 [P] Implement allowlisted structured server logging, request IDs, safe Spanish error codes, and error boundaries in `src/lib/logging/logger.ts`, `src/lib/errors/codes.ts`, `src/lib/errors/public-error.ts`, `src/app/error.tsx`, and `src/app/global-error.tsx`
-- [ ] T019 [P] Implement centralized Zod schemas and domain catalogs for DNI/CUIT/contact normalization, roles, states, modalities, contract types, and channels in `src/validation/common.ts`, `src/domain/catalogs/`, and `src/domain/states/`
+- [ ] T019 [P] Implement centralized Zod schemas and domain catalogs for DNI/CUIT/contact normalization, roles, every account/profile/opening/participation/import state, duplicate decisions, modalities, contract types, and channels in `src/validation/common.ts`, `src/domain/catalogs/`, and `src/domain/states/`; include `suspended`, `auto_closed`, `restored_to_draft`, `no_company_response`, and `unmapped_category` without duplicated string literals
 - [ ] T020 [P] Build responsive, keyboard-accessible Spanish UI primitives and role layouts with loading, empty, error, focus, and status patterns in `src/components/ui/`, `src/components/layouts/`, and `src/app/loading.tsx`
-- [ ] T021 Add exclusively fictitious local identities, companies, candidates, categories, offers, and deterministic reset helpers in `supabase/seed.sql` and `tests/fixtures/`; do not seed a “final” occupation catalog while OQ-010 remains open
+- [ ] T021 Add exclusively fictitious local identities and deterministic reset helpers in `supabase/seed.sql` and `tests/fixtures/`, including a reproducible acceptance dataset of 500 candidates, 50 companies, 100 offers, and 1,000 participations with known active-candidate and hiring outcomes; do not seed a “final” occupation catalog while OQ-010 remains open
 
 **Checkpoint**: Shared schema, identity, RLS, Storage, errors, validation, fixtures, and layouts pass
 foundation tests and can support each story.
@@ -83,24 +83,24 @@ the company can see only referred data and every critical transition retains act
 
 ### Tests for User Story 1
 
-- [ ] T022 [P] [US1] Write failing unit tests for allowed/forbidden offer and participation transitions, 30-day deadline, late-response override, and optimistic conflicts in `tests/unit/intermediation/transitions.test.ts`
-- [ ] T023 [P] [US1] Write failing pgTAP tests for offer moderation, admin-only preselection/referral/final outcome, append-only history, company referral projection, and denial of DNI/address/internal notes/general-pool access in `supabase/tests/010_intermediation_rls.test.sql`
-- [ ] T024 [P] [US1] Write failing component tests for moderation, candidate filtering, preinterview, referral, feedback, and safe Spanish errors in `tests/components/intermediation/admin-workflow.test.tsx`
-- [ ] T025 [US1] Write the failing end-to-end municipal intermediation scenario from Quickstart scenarios 2–4 in `tests/e2e/intermediation.spec.ts`
+- [ ] T022 [P] [US1] Write failing unit tests for allowed/forbidden offer and participation transitions, forward-only omission of review/preinterview/preselection with mandatory reason, explicit referral, offer-date auto-close, 30-day deadline without pause/reset, late-response override, and optimistic conflicts in `tests/unit/intermediation/transitions.test.ts`
+- [ ] T023 [P] [US1] Write failing pgTAP tests for offer moderation, admin-only preselection/referral/final outcome, append-only history, company projection of all current contacts plus exactly the referred `cv_document_id`, revocation on suspension/archive, and denial of DNI/address/internal notes/general-pool access in `supabase/tests/010_intermediation_rls.test.sql`
+- [ ] T024 [P] [US1] Write failing component tests for moderation, candidate filtering, preinterview, justified stage omission, referral, feedback, prominent suspension confirmation, restoration-safe states, and safe Spanish errors in `tests/components/intermediation/admin-workflow.test.tsx`
+- [ ] T025 [US1] Write the failing end-to-end municipal intermediation scenarios from Quickstart scenarios 2–4 plus the administrative portions of scenario 8 in `tests/e2e/intermediation.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T026 [P] [US1] Implement centralized offer and participation transition definitions and guards in `src/domain/transitions/opening.ts` and `src/domain/transitions/participation.ts`, preserving municipal referral as the only boundary that exposes candidate data
-- [ ] T027 [US1] Implement atomic SQL functions for submit/moderate/pause/close/cancel offers and for review/preinterview/preselect/refer/finalize participations in `supabase/migrations/202609190010_workflow_functions.sql`; each function must check expected version and write entity plus actor/date/previous/new state/reason in one transaction
+- [ ] T026 [P] [US1] Implement centralized offer and participation transition definitions and guards in `src/domain/transitions/opening.ts` and `src/domain/transitions/participation.ts`, including suspend/restore-to-draft, forward-only justified omission of review/preinterview/preselection, and municipal referral as the non-skippable boundary that exposes candidate data
+- [ ] T027 [US1] Implement atomic SQL functions for submit/moderate/pause/suspend/restore-to-draft/close/cancel offers and for review/preinterview/preselect/justified-skip/refer/finalize participations in `supabase/migrations/202609190010_workflow_functions.sql`; each function must check expected version and write entity plus actor/date/previous/new state/reason in one transaction
 - [ ] T028 [P] [US1] Implement admin offer-review queries/actions with separate company-visible message and internal reason in `src/features/openings/admin-service.ts`, `src/features/openings/admin-actions.ts`, and `src/validation/opening-moderation.ts`
 - [ ] T029 [P] [US1] Implement paginated admin candidate search by categories, skills, availability, locality, vigency, and referral eligibility in `src/features/candidates/search-service.ts` and `src/validation/candidate-search.ts`
 - [ ] T030 [P] [US1] Implement append-only preinterview, preselection, contact, training-guidance note, and internal applicant-note commands in `src/features/participations/evaluation-service.ts`, `src/features/participations/evaluation-actions.ts`, and `src/validation/evaluation.ts`
-- [ ] T031 [US1] Implement the referral service and database-safe company projection in `src/features/referrals/service.ts` and `supabase/migrations/202609190011_referral_projection.sql`; expose job profile, shareable contacts, and referred CV only, and always exclude DNI, address, duplicate alerts, other participations, and internal notes/reasons
-- [ ] T032 [US1] Implement authenticated CV streaming with owner/admin/referral authorization and optional non-persisted signed URL of at most 60 seconds in `src/app/api/cv/[cvId]/route.ts`
+- [ ] T031 [US1] Implement the referral service and database-safe company projection in `src/features/referrals/service.ts` and `supabase/migrations/202609190011_referral_projection.sql`; persist the exact `cv_document_id`, expose the job profile, every current non-archived contact, and only that CV version while both accounts/referral remain active, and always exclude DNI, address, duplicate alerts, other participations, and internal notes/reasons
+- [ ] T032 [US1] Implement authenticated CV streaming in `src/app/api/cv/[cvId]/route.ts` with owner/admin checks or an active own-opening referral whose stored `cv_document_id` exactly matches the requested resource; optional signed URLs must be non-persisted and expire within 60 seconds
 - [ ] T033 [P] [US1] Implement append-only company interview/feedback submission and admin-only final outcome confirmation in `src/features/referrals/feedback-service.ts`, `src/features/referrals/feedback-actions.ts`, and `src/validation/referral-feedback.ts`
-- [ ] T034 [US1] Add the idempotent daily Supabase Cron function that closes unresolved referrals 30 days after `referred_at` as `no_company_response` with actor `system` in `supabase/migrations/202609190012_no_response_cron.sql`; permit a later admin result without removing the automatic event
-- [ ] T035 [US1] Build the admin offer moderation, candidate search, participation timeline, preinterview, preselection, referral, and outcome pages in `src/app/(admin)/admin/openings/`, `src/app/(admin)/admin/candidates/`, and `src/app/(admin)/admin/participations/`
-- [ ] T036 [P] [US1] Build the company read-only referred-candidate projection, interview, and feedback UI in `src/app/(company)/company/openings/[openingId]/referrals/` and `src/features/referrals/components/`
+- [ ] T034 [US1] Add one idempotent daily Supabase Cron function in `supabase/migrations/202609190012_daily_automations.sql` that records actor `system`, closes `published` offers after `closing_date` without altering existing participations, and closes unresolved referrals exactly 30 days after `referred_at` as `no_company_response` without pause/reset from interviews, contacts, or follow-up; repeated runs create no duplicate events and later admin outcomes preserve the automatic event
+- [ ] T035 [US1] Build the admin offer moderation/suspension/restoration, candidate-account suspension and candidate restore-to-`draft`, candidate search, participation timeline, preinterview, justified stage-skip, preselection, referral, and outcome pages in `src/app/(admin)/admin/openings/`, `src/app/(admin)/admin/candidates/`, and `src/app/(admin)/admin/participations/`
+- [ ] T036 [P] [US1] Build the company read-only referred-candidate projection showing all current contacts and only the CV version attached to that referral, plus interview and feedback UI, in `src/app/(company)/company/openings/[openingId]/referrals/` and `src/features/referrals/components/`
 - [ ] T037 [US1] Integrate audit timelines, stale-version conflict recovery, loading/empty/error states, and cache invalidation across the US1 pages in `src/features/participations/components/` and `src/features/openings/components/`
 
 **Checkpoint**: US1 is independently demonstrable with admin/company fixtures and proves that no
@@ -110,29 +110,30 @@ candidate data crosses to a company without an explicit municipal referral.
 
 ## Phase 4: User Story 2 - Autogestión del candidato (Priority: P1)
 
-**Goal**: Let a candidate register, complete and maintain a multi-category profile and protected CV,
-accept/withdraw consent, apply to multiple published offers, withdraw, and see only receipt/final
-result.
+**Goal**: Let a candidate register, complete and directly correct a multi-category profile and
+protected CV, accept/withdraw consent, apply to multiple published offers, withdraw, request
+immediate recoverable archive, and see only receipt/final result.
 
-**Independent Test**: A fictitious candidate verifies access, activates a valid profile, applies to
-two offers, withdraws one participation, changes availability, and cannot see internal stages or
-notes.
+**Independent Test**: A fictitious candidate verifies access, activates and corrects a valid profile,
+applies to two offers, withdraws one participation, changes availability, archives the account/profile
+immediately, and after an admin restoration returns to `draft` without reactivated relations; the
+candidate never sees internal stages or notes.
 
 ### Tests for User Story 2
 
-- [ ] T038 [P] [US2] Write failing unit/component tests for candidate registration, activation prerequisites, six-month freshness, consent versioning, CV rejection/replacement, multi-category profile, and application withdrawal in `tests/components/candidate/candidate-flow.test.tsx`
-- [ ] T039 [P] [US2] Write failing pgTAP tests proving a candidate can access only their profile/private data/contacts/consents/CV and the limited status projection of their participations in `supabase/tests/020_candidate_rls.test.sql`
-- [ ] T040 [US2] Write the failing end-to-end candidate scenario from Quickstart scenario 1, including two independent applications and hidden internal stages, in `tests/e2e/candidate-self-service.spec.ts`
+- [ ] T038 [P] [US2] Write failing unit/component tests for candidate registration, activation prerequisites, six-month freshness, consent versioning, CV rejection/replacement without changing prior referral snapshots, direct profile correction, multi-category profile, application withdrawal, immediate archive request, and admin restore-to-draft in `tests/components/candidate/candidate-flow.test.tsx`
+- [ ] T039 [P] [US2] Write failing pgTAP tests proving a candidate can access only their profile/private data/contacts/consents/CV and limited participation projection, archive their own account/profile atomically, lose private/new-operation access immediately, and never restore or reactivate related records themselves in `supabase/tests/020_candidate_rls.test.sql`
+- [ ] T040 [US2] Write the failing end-to-end candidate scenario from Quickstart scenario 1 plus the candidate archive/restore path from scenario 8, including two independent applications and hidden internal stages, in `tests/e2e/candidate-self-service.spec.ts`
 
 ### Implementation for User Story 2
 
 - [ ] T041 [US2] Implement candidate signup and verified-email bootstrap with name, normalized DNI, email contact, duplicate blocking, and `draft` profile in `src/features/candidates/registration-service.ts`, `src/features/candidates/registration-actions.ts`, and `src/validation/candidate-registration.ts`
-- [ ] T042 [P] [US2] Implement own-profile/contact/category/availability update queries and actions in `src/features/candidates/profile-service.ts`, `src/features/candidates/profile-actions.ts`, and `src/validation/candidate-profile.ts`
+- [ ] T042 [P] [US2] Implement direct own-profile/contact/category/availability correction, immediate atomic candidate account/profile archive request, and admin-only conflict-checked restore-to-`draft` with mandatory reason in `src/features/candidates/profile-service.ts`, `src/features/candidates/profile-actions.ts`, `src/features/candidates/admin-actions.ts`, and `src/validation/candidate-profile.ts`; archive/restore must preserve history/CVs and never reactivate participations, referrals, or company access
 - [ ] T043 [P] [US2] Implement append-only policy-version/hash consent acceptance and withdrawal plus activation eligibility in `src/features/candidates/consent-service.ts`, `src/features/candidates/consent-actions.ts`, and `src/validation/consent.ts`; use no real municipal text until the approved version is supplied
 - [ ] T044 [US2] Implement candidate/admin PDF upload and replacement in `src/app/api/candidate/cv/route.ts` and `src/lib/files/pdf-validation.ts`; validate extension, declared MIME, `%PDF-` signature, readable structure, and `1..5 MiB`, and never replace the valid CV on rejection
 - [ ] T045 [P] [US2] Implement public published-offer listing/detail queries with pagination and no private fields in `src/features/openings/public-service.ts` and `src/app/(public)/ofertas/`
 - [ ] T046 [US2] Implement self-application and withdrawal commands with one active participation per candidate/opening and independent history in `src/features/participations/candidate-service.ts`, `src/features/participations/candidate-actions.ts`, and `src/validation/application.ts`
-- [ ] T047 [P] [US2] Build candidate registration, profile, categories, consent, availability, and CV panels with Spanish labels and accessible validation in `src/app/(auth)/registro/candidato/` and `src/app/(candidate)/candidato/perfil/`
+- [ ] T047 [P] [US2] Build candidate registration, profile, direct correction, categories, consent, availability, CV, and explicit archive-confirmation panels with Spanish labels and accessible validation in `src/app/(auth)/registro/candidato/` and `src/app/(candidate)/candidato/perfil/`
 - [ ] T048 [P] [US2] Build published-offer application controls and the candidate participation view that maps every non-final internal state to `received` and reveals only the final outcome in `src/app/(candidate)/candidato/ofertas/` and `src/app/(candidate)/candidato/postulaciones/`
 - [ ] T049 [US2] Add the idempotent six-month freshness function that marks overdue profiles `needs_update` without deletion in `supabase/migrations/202609190020_candidate_freshness.sql`
 - [ ] T050 [US2] Integrate candidate loading/empty/error/focus states, masked private data, conflict recovery, and cache invalidation in `src/features/candidates/components/` and `src/features/participations/components/candidate-status.tsx`
@@ -145,17 +146,19 @@ self-service screens.
 ## Phase 5: User Story 3 - Gestión de empresa y ofertas (Priority: P1)
 
 **Goal**: Let a company register and maintain its profile, create/edit/submit offers, respond to
-correction requests, and view only its moderation state and municipally referred candidates.
+correction requests, undergo safe suspension/restoration, and view only its moderation state and
+municipally referred candidates.
 
-**Independent Test**: A fictitious company completes its profile, submits a complete draft, corrects
-and resubmits it, and sees only its own opening and referrals without being able to publish or set a
-final outcome.
+**Independent Test**: A fictitious company completes its profile, submits/corrects/resubmits a draft,
+observes automatic closing at the deadline, loses private/referral access when suspended, and after
+explicit restoration remains `incomplete` with offers in `draft`; it sees only its own resources and
+cannot publish or set a final outcome.
 
 ### Tests for User Story 3
 
-- [ ] T051 [P] [US3] Write failing component tests for required company fields, draft completeness, optional salary/benefits, submission/resubmission, moderation visibility, and suspension messages in `tests/components/company/company-flow.test.tsx`
-- [ ] T052 [P] [US3] Write failing pgTAP tests for company ownership, offer draft/update/submit permissions, denial of publish/moderate/final-outcome operations, and isolation from other companies in `supabase/tests/030_company_rls.test.sql`
-- [ ] T053 [US3] Write the failing end-to-end company scenario from Quickstart scenario 2 plus referral isolation in `tests/e2e/company-offers.spec.ts`
+- [ ] T051 [P] [US3] Write failing component tests for required company fields, draft completeness, optional salary/benefits, submission/resubmission, moderation visibility, automatic expiry messaging, prominently presented suspension with explicit confirmation, and restore-to-inactive/draft messaging in `tests/components/company/company-flow.test.tsx`
+- [ ] T052 [P] [US3] Write failing pgTAP tests for company ownership, offer draft/update/submit permissions, system-only idempotent expiry close, suspended-company denial/revocation, restore-to-`incomplete`/`draft` without implicit related access, denial of publish/moderate/final-outcome operations, and isolation from other companies in `supabase/tests/030_company_rls.test.sql`
+- [ ] T053 [US3] Write the failing end-to-end company scenario from Quickstart scenario 2 plus referral isolation and the company suspension/restoration path from scenario 8 in `tests/e2e/company-offers.spec.ts`
 
 ### Implementation for User Story 3
 
@@ -165,7 +168,7 @@ final outcome.
 - [ ] T057 [P] [US3] Build company registration/profile pages and accessible status/errors in `src/app/(auth)/registro/empresa/` and `src/app/(company)/empresa/perfil/`
 - [ ] T058 [P] [US3] Build company offer list, draft editor, submission, correction, and moderation-history pages in `src/app/(company)/empresa/ofertas/` and `src/features/openings/components/company/`
 - [ ] T059 [US3] Build the company dashboard projection that contains only its profile, its offers, visible moderation messages, and its referrals in `src/app/(company)/empresa/page.tsx`
-- [ ] T060 [US3] Implement admin company/offer suspension and reactivation with mandatory reason, preserved history, and no automatic reactivation of related records in `src/features/companies/admin-actions.ts` and `src/app/(admin)/admin/empresas/`
+- [ ] T060 [US3] Implement admin company/offer suspension, reactivation, archive restoration, and UI in `src/features/companies/admin-actions.ts` and `src/app/(admin)/admin/empresas/`; suspension must be visually prominent with explicit confirmation and mandatory reason, revoke private/referral access without finalizing cases, and restoration must return company to `incomplete` and offers to `draft` without reactivating related records
 
 **Checkpoint**: US3 completes the company-side lifecycle while municipal publication/referral/final
 outcome authority remains intact.
@@ -184,15 +187,15 @@ verified account while preserving the same profile/history.
 
 ### Tests for User Story 4
 
-- [ ] T061 [P] [US4] Write failing unit/component tests for assisted-profile prerequisites, admin attribution, DNI/email potential matches, no-CV referral block, free-text training note, and claim conflicts in `tests/components/admin/assisted-candidate.test.tsx`
-- [ ] T062 [P] [US4] Write failing pgTAP tests for admin-only assisted maintenance, duplicate non-overwrite, active-but-not-referral-eligible profiles, and history-preserving account linkage in `supabase/tests/040_assisted_candidate.test.sql`
+- [ ] T061 [P] [US4] Write failing unit/component tests for assisted-profile prerequisites, admin attribution, DNI/email matches, the exact `use_or_update_existing|correct_and_create|reject` decisions with reason, false-positive correction before separate creation, no-CV referral block, free-text training note, and claim conflicts in `tests/components/admin/assisted-candidate.test.tsx`
+- [ ] T062 [P] [US4] Write failing pgTAP tests for admin-only assisted maintenance, persisted duplicate actor/date/reason, no automatic merge/overwrite, unique-key revalidation after `correct_and_create`, active-but-not-referral-eligible profiles, and history-preserving account linkage in `supabase/tests/040_assisted_candidate.test.sql`
 - [ ] T063 [US4] Write the failing end-to-end assisted-service scenario from Quickstart scenario 5 in `tests/e2e/assisted-candidate.spec.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T064 [US4] Implement potential-duplicate search and an explicit admin resolution service that never silently merges or overwrites DNI/email matches in `src/features/candidates/duplicate-service.ts`, `src/features/candidates/duplicate-actions.ts`, and `src/validation/duplicate-resolution.ts`
+- [ ] T064 [US4] Implement potential-duplicate search and explicit `use_or_update_existing|correct_and_create|reject` admin resolution with mandatory reason/history in `src/features/candidates/duplicate-service.ts`, `src/features/candidates/duplicate-actions.ts`, and `src/validation/duplicate-resolution.ts`; only expressly confirmed fields may update an existing profile, false positives must be corrected/revalidated before separate creation, and no path may silently merge profiles
 - [ ] T065 [US4] Implement assisted create/update commands with `origin=assisted`, nullable `account_id`, mandatory responsible admin, at least one contact, and action history in `src/features/candidates/assisted-service.ts` and `src/features/candidates/assisted-actions.ts`
-- [ ] T066 [P] [US4] Build the admin assisted-profile wizard, duplicate review, consent/contact/category/availability/CV maintenance, and internal `training_guidance` note UI in `src/app/(admin)/admin/candidates/assisted/` and `src/features/candidates/components/assisted/`
+- [ ] T066 [P] [US4] Build the admin assisted-profile wizard with the three explicit duplicate decisions and reason capture, plus consent/contact/category/availability/CV maintenance and internal `training_guidance` note UI, in `src/app/(admin)/admin/candidates/assisted/` and `src/features/candidates/components/assisted/`
 - [ ] T067 [US4] Enforce referral eligibility so an assisted profile may remain active for internal evaluation without a CV but cannot be referred until a valid PDF exists in `src/features/referrals/service.ts` and `src/domain/permissions/referral.ts`
 - [ ] T068 [US4] Implement the approved-identity account-claim transaction that preserves `candidate_profile.id`, relations, and audit history and rejects account/DNI/email conflicts in `supabase/migrations/202609190040_claim_assisted_profile.sql` and `src/features/candidates/claim-actions.ts`
 
@@ -217,7 +220,7 @@ columns or use a real workbook.
 
 - [ ] T069 [US5] Obtain the anonymized workbook structure and approved written mapping from the Employment Office, record exact headers/transformations/category mappings and approval evidence in `docs/import/candidate-import-v1.md`, and keep US5 blocked if either input is missing
 - [ ] T070 [P] [US5] Write failing parser tests for the approved mapping plus UTF-8/BOM, exact/duplicate/unknown headers, inconsistent columns, empty file, `5 MiB`, `10,000 rows`, `64 KiB` record, invalid fields, intra-file duplicates, and unmapped/deactivated categories in `tests/unit/imports/csv-parser.test.ts`
-- [ ] T071 [P] [US5] Write failing pgTAP tests for admin-only staging, hash/mapping/version preconditions, double confirmation, duplicate resolution, complete rollback, and sanitized audit summary in `supabase/tests/050_import_atomicity.test.sql`
+- [ ] T071 [P] [US5] Write failing pgTAP tests for admin-only staging, hash/mapping/version preconditions, double confirmation, all three duplicate decisions with mandatory actor/date/reason, false-positive correction/revalidation, complete rollback, and sanitized audit summary in `supabase/tests/050_import_atomicity.test.sql`
 - [ ] T072 [US5] Write the failing end-to-end import scenario from Quickstart scenario 6 with only fictitious rows in `tests/e2e/candidate-import.spec.ts`
 
 ### Implementation for User Story 5
@@ -225,8 +228,8 @@ columns or use a real workbook.
 - [ ] T073 [US5] Finalize the placeholder import-batch/import-row schema against the approved mapping without storing the raw file indefinitely in `supabase/migrations/202609190050_import_schema.sql`; statuses must be exactly `uploaded|preview_ready|blocked|confirming|completed|failed|archived` and row statuses must cover valid, warning, invalid, potential duplicate, unmapped category, and imported
 - [ ] T074 [US5] Implement strict, non-casting, streaming CSV parsing and row normalization for the approved contract in `src/features/imports/parser.ts`, `src/features/imports/mapping.ts`, and `src/validation/candidate-import.ts`
 - [ ] T075 [US5] Implement admin-only preview with zero business writes, masked sensitive values, row/error codes, counts, impact summary, and temporary-file cleanup in `src/features/imports/preview-service.ts` and `src/app/api/admin/imports/preview/route.ts`
-- [ ] T076 [P] [US5] Build the accessible preview and explicit duplicate/category resolution UI with confirmation disabled while blockers remain in `src/app/(admin)/admin/imports/new/` and `src/features/imports/components/`
-- [ ] T077 [US5] Implement the all-or-nothing confirmation function that revalidates batch ID/hash/mapping/version and writes profiles, contacts, categories, observations, and audit in one transaction in `supabase/migrations/202609190051_confirm_import.sql`
+- [ ] T076 [P] [US5] Build the accessible preview and explicit `use_or_update_existing|correct_and_create|reject` duplicate/category resolution UI with reason capture, masked sensitive values, false-positive correction/revalidation, and confirmation disabled while blockers remain in `src/app/(admin)/admin/imports/new/` and `src/features/imports/components/`
+- [ ] T077 [US5] Implement the all-or-nothing confirmation function that revalidates batch ID/hash/mapping/version and every recorded duplicate decision, then writes only expressly approved profile/contact/category changes, observations, and audit in one transaction in `supabase/migrations/202609190051_confirm_import.sql`
 - [ ] T078 [US5] Implement the confirmation handler and batch-history/result pages with safe retry/conflict messages in `src/app/api/admin/imports/[batchId]/confirm/route.ts` and `src/app/(admin)/admin/imports/`
 
 **Checkpoint**: US5 is complete only with approved anonymized mapping evidence and passing rollback,
@@ -239,21 +242,22 @@ duplicate, authorization, and privacy tests.
 **Goal**: Let admins reconstruct contact history, consult basic period/category metrics, and export a
 generic authorized CSV without public access or spreadsheet-formula injection.
 
-**Independent Test**: With known fictitious fixtures across periods/categories, an admin sees the
-expected counts and timeline and downloads a filtered CSV within the acceptance interaction target;
+**Independent Test**: With the reproducible 500-candidate/50-company/100-offer/1,000-participation
+fixture, an admin sees expected counts, contact timeline, days to first confirmed hire, and total
+coverage only after confirmed hires equal vacancies, then downloads a filtered CSV within 30 seconds;
 anonymous/company requests are denied and dangerous cell prefixes are neutralized.
 
 ### Tests for User Story 6
 
-- [ ] T079 [P] [US6] Write failing SQL/unit tests for metric definitions, period/category filters, active-candidate semantics, time-to-fill when computable, and contact ordering in `supabase/tests/060_metrics.test.sql` and `tests/unit/metrics/metrics.test.ts`
-- [ ] T080 [US6] Write the failing end-to-end dashboard/export scenario from Quickstart scenario 7, including unauthenticated/company denial and formula-prefixed fixtures, in `tests/e2e/admin-metrics.spec.ts`
+- [ ] T079 [P] [US6] Write failing SQL/unit tests for period/category filters; active candidate as `active` + available + current consent + confirmation within six months without requiring CV; days from `published_at` to first admin-confirmed hire; days to confirmed hires equaling `vacancies` with null/pending before full coverage; and contact ordering in `supabase/tests/060_metrics.test.sql` and `tests/unit/metrics/metrics.test.ts`
+- [ ] T080 [US6] Write the failing end-to-end dashboard/export scenario from Quickstart scenario 7 using exactly 500 candidates, 50 companies, 100 offers, and 1,000 participations, including both hiring durations, pending full coverage, under-30-second filtered counts/download, unauthenticated/company denial, and formula-prefixed fixtures, in `tests/e2e/admin-metrics.spec.ts`
 
 ### Implementation for User Story 6
 
-- [ ] T081 [US6] Implement protected invoker-safe metric functions/views for candidates, companies, offers by state, applications, preinterviews, referrals, hires, non-selections, withdrawals, no-response, category trends, and time-to-fill in `supabase/migrations/202609190060_metrics.sql`
+- [ ] T081 [US6] Implement protected invoker-safe metric functions/views in `supabase/migrations/202609190060_metrics.sql` for the exact active-candidate predicate, companies, offers by state, applications, preinterviews, referrals, hires, non-selections, withdrawals, no-response, category trends, days from publication to first admin-confirmed hire, and days to confirmed hires equaling `vacancies` with null until full coverage
 - [ ] T082 [P] [US6] Implement period/category filter validation and admin metrics queries without public cache leakage in `src/features/metrics/service.ts` and `src/validation/metrics.ts`
 - [ ] T083 [P] [US6] Implement the chronological admin contact/follow-up timeline with phone, email, WhatsApp, and in-person channels and no direct messaging integration in `src/features/participations/contact-service.ts` and `src/features/participations/components/contact-timeline.tsx`
-- [ ] T084 [US6] Build the accessible admin metrics dashboard with definitions, empty/loading/error states, filters, and comprehensible trends in `src/app/(admin)/admin/metrics/page.tsx` and `src/features/metrics/components/`
+- [ ] T084 [US6] Build the accessible admin metrics dashboard with visible definitions for active candidate and both hiring durations, explicit pending full coverage, empty/loading/error states, filters, and comprehensible trends in `src/app/(admin)/admin/metrics/page.tsx` and `src/features/metrics/components/`
 - [ ] T085 [US6] Implement streaming generic CSV export with the same authorized filters and neutralization of cells beginning with `=`, `+`, `-`, `@`, tab, or carriage return in `src/features/metrics/csv-export.ts` and `src/app/api/admin/exports/operations.csv/route.ts`
 - [ ] T086 [P] [US6] Implement optional staff-only message templates/safe links without sending integrations in `src/features/participations/message-templates.ts` and `src/features/participations/components/contact-tools.tsx`
 
@@ -267,12 +271,12 @@ outside scope until OQ-005 is resolved.
 **Purpose**: Prove the whole MVP meets privacy, accessibility, recovery, performance, documentation,
 and delivery gates without expanding scope.
 
-- [ ] T087 [P] Add axe-assisted and keyboard/focus/zoom regression coverage for representative public, candidate, company, admin, and assisted flows in `tests/e2e/accessibility.spec.ts`
+- [ ] T087 [P] Add axe-assisted coverage and document manual keyboard/focus/no-trap/control/message checks for every critical candidate/company/admin flow at 360×800 and 1366×768 with 100% and 200% zoom, plus at least one representative NVDA journey per role, in `tests/e2e/accessibility.spec.ts` and `docs/validation/accessibility.md`
 - [ ] T088 [P] Add cross-role negative authorization coverage for every protected page/action/handler, suspended accounts, stale sessions, and non-disclosing `NOT_FOUND` behavior in `tests/e2e/authorization-boundaries.spec.ts`
-- [ ] T089 Add pagination/query-index validation and acceptance measurements for candidate search, metrics, import preview, and export using agreed fictitious datasets in `tests/performance/acceptance.test.ts` and `docs/validation/performance.md`
+- [ ] T089 Add pagination/query-index validation and reproducible acceptance measurements in `tests/performance/acceptance.test.ts` and `docs/validation/performance.md`: on the exact 500/50/100/1,000 fixture measure admin search from screen open through recorded preinterview and saved preselection under 5 minutes, and metrics/export from applying period/category filters through visible counts and completed download under 30 seconds
 - [ ] T090 [P] Document local/preview/demo environment separation, admin provisioning, email limitations, migrations, forward recovery, Cron risk/fallback, and variables in `README.md`, `.env.example`, and `docs/operations/demo-runbook.md`
 - [ ] T091 [P] Record every unresolved stakeholder gate—retention, reports, production operation, catalog, CV approval, CSV mapping, consent text, admin identities, SMTP, and municipal visual/accessibility requirements—without treating safe defaults as approval in `docs/validation/release-gates.md`
-- [ ] T092 Execute every scenario in `specs/001-municipal-employment-portal/quickstart.md` with fictitious data and record results/limitations in `docs/validation/quickstart-results.md`
+- [ ] T092 Execute every scenario in `specs/001-municipal-employment-portal/quickstart.md` with fictitious data and record results/limitations in `docs/validation/quickstart-results.md`; include 10 candidate and 10 company runs with at least five distinct people per role and 9/10 under 10 minutes from registration-open to confirmed application/offer submission, plus representative users completing at least four of five SC-010 tasks on first attempt without external help or restart
 - [ ] T093 Run `npm run typecheck`, `npm run lint`, `npm run test:unit`, `npm run test:db`, `npm run build`, and `npm run test:e2e`, then record exact commands and outcomes in `docs/validation/quality-gates.md`
 - [ ] T094 Review tracked files, fixtures, logs, traces, screenshots, dependencies, migrations, RLS, and `.env.example` for secrets/real PII/unapproved scope, and document the second developer’s PR findings in `docs/validation/final-review.md`
 
@@ -290,7 +294,9 @@ explicit, and the implementation is ready for analysis/review rather than automa
 - **Phase 3 — US1**: depends only on Phase 2; it is the first demonstrable municipal-intermediation
   increment and the suggested technical MVP.
 - **Phase 4 — US2**: depends on Phase 2; may run beside US1 after shared schema/RLS are stable.
-- **Phase 5 — US3**: depends on Phase 2; may run beside US1/US2 after shared schema/RLS are stable.
+- **Phase 5 — US3**: depends on Phase 2; company/profile/offer work may run beside US1/US2 after
+  shared schema/RLS are stable, but its automatic-expiry acceptance depends on the shared daily
+  automation in T034.
 - **Phase 6 — US4**: depends on Phase 2 and reuses candidate/CV/consent services completed in US2;
   schedule after US2 in a two-person team to avoid overlapping files.
 - **Phase 7 — US5**: depends on Phase 2 and the external T069 mapping gate; it does not depend on UI
@@ -308,9 +314,9 @@ Setup -> Foundation -> US1 (municipal intermediation) -> US6 (meaningful operati
                     -> US5 (CSV import), gated independently by approved mapping T069
 ```
 
-US1, US2, and US3 can begin in parallel after Foundation if developers own disjoint files. US4 has a
-deliberate service dependency on US2; US6 needs representative activity from the transactional
-stories; US5 is externally gated.
+US1, US2, and most US3 work can begin in parallel after Foundation if developers own disjoint files;
+US3 automatic-expiry integration waits for T034. US4 has a deliberate service dependency on US2;
+US6 needs representative activity from the transactional stories; US5 is externally gated.
 
 ### Within Each User Story
 
@@ -327,7 +333,8 @@ stories; US5 is externally gated.
 - US1 test tasks T022–T024 can run in parallel; services T028–T030 and UI T035/T036 can be divided
   after their SQL dependencies are ready.
 - US2 test tasks T038/T039 and services T042/T043/T045 can run in parallel.
-- US3 tests T051/T052 and UI T057/T058 can run in parallel around the shared company service.
+- US3 tests T051/T052 and UI T057/T058 can run in parallel around the shared company service; the
+  automatic-expiry assertions wait for T034.
 - US4 tests T061/T062 and UI T066 can run in parallel after service contracts are fixed.
 - US5 tests T070/T071 and later parser/UI T074/T076 can run in parallel only after T069.
 - US6 T079 and T082/T083 can run in parallel before dashboard integration.
