@@ -30,7 +30,9 @@ autorizan integraciones nuevas.
   implícita ofertas, derivaciones, participaciones ni permisos empresariales anteriores.
 - Toda transición que termina acceso empresarial actualiza la participación, el permiso de la
   derivación y la auditoría en una sola transacción. Un permiso `revoked` no vuelve implícitamente a
-  `active`; una contratación solo conserva un permiso que todavía estaba activo.
+  `active`; una contratación solo conserva durante 720 horas desde su confirmación un permiso que
+  todavía estaba activo. La autorización deniega nuevas lecturas desde el vencimiento aunque el
+  estado materializado y su evento se registren en la siguiente ejecución programada.
 
 ## Contratos de archivo HTTP
 

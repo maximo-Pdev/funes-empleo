@@ -62,6 +62,10 @@ Reglas:
 - Registro público solo crea `candidate` o `company`, con email verificado y contraseña administrada
   por Auth. Un candidato sin email solo puede ingresar mediante atención asistida sin cuenta.
 - `admin` se crea fuera del registro público; habrá cuatro cuentas individuales con igual permiso.
+- Solo otro administrador activo puede suspender o reactivar una cuenta `admin`, con motivo,
+  confirmación y evento auditable; se rechaza autosuspensión o suspensión del último administrador
+  activo. Reactivar conserva la misma cuenta y su atribución histórica. `accounts.status = archived`
+  no es una transición permitida para `admin` durante el MVP.
 - Una cuenta suspendida no puede ejecutar acciones privadas aunque sus registros permanezcan. La
   suspensión revoca además todo acceso empresarial interactivo a datos y CV de candidatos.
 - La solicitud de eliminación del candidato archiva inmediatamente cuenta y perfil; no elimina el
@@ -104,8 +108,12 @@ Reglas de activación y uso:
   disponibilidad activa, consentimiento vigente y `last_confirmed_at` dentro del período.
 - El titular corrige sus datos directamente. Solicitar eliminación archiva cuenta/perfil en la misma
   operación; restaurar exige administración, motivo y devuelve el perfil a `draft`.
-- La vinculación de un perfil asistido con una cuenta personal verifica identidad y duplicados,
-  conserva el mismo `candidate_profile.id` y registra evento; nunca copia la historia a otro perfil.
+- La vinculación de un perfil asistido con una cuenta personal exige DNI exhibido y comprobado
+  presencialmente por un administrador, sin copia almacenada, y correo verificado en la cuenta. Una
+  coincidencia durante el alta deja pendiente la vinculación y no crea un segundo perfil. Conflictos
+  de cuenta, DNI o correo se bloquean para la resolución de duplicados; no hay fusión automática.
+  La vinculación conserva `candidate_profile.id`, `origin`, consentimiento, estados y relaciones,
+  asigna `account_id` una sola vez y registra actor y fecha sin copiar DNI o documento a auditoría.
 - Las capacitaciones/orientaciones se registran en `internal_notes` con tipo
   `training_guidance`; no se duplican como campo ni crean un catálogo de cursos.
 
@@ -172,9 +180,10 @@ Registro append-only del consentimiento general.
 | `source` | `self_service` o `assisted`. |
 
 El consentimiento vigente es el último evento aceptado no seguido por retiro. Su retiro bloquea
-nuevas derivaciones y tratamientos que dependan de él y revoca en la misma transacción el acceso de
-todas las derivaciones vigentes, sin borrar historia legítima. Una aceptación posterior no reactiva
-automáticamente esas derivaciones.
+nuevas derivaciones y tratamientos que dependan de él, cierra como `withdrawn` con motivo
+`consent_withdrawn` todas las participaciones aún no finales y revoca en la misma transacción el
+acceso de todas las derivaciones vigentes, sin borrar historia legítima ni alterar resultados ya
+finales. Una aceptación posterior no reactiva automáticamente participaciones ni derivaciones.
 
 ### `cv_documents`
 
@@ -220,8 +229,11 @@ bloqueado hasta resolver OQ-010; tests usan categorías ficticias.
 
 No existen documentos de identidad empresarial ni estado “verificado” en el MVP.
 
-Restaurar una empresa archivada exige administración y motivo, y la devuelve a `incomplete`. Una
-reactivación posterior a suspensión tampoco reactiva ofertas ni accesos relacionados.
+Restaurar una empresa archivada exige administración y motivo, y la devuelve a `incomplete`.
+Reactivar una cuenta empresarial suspendida cambia esa cuenta a `active` y, en la misma decisión,
+devuelve el perfil empresarial a `incomplete`; no reactiva ofertas, participaciones ni accesos
+relacionados. La empresa debe completar de nuevo los campos requeridos antes de que el perfil
+pueda volver a `active`.
 
 ### `job_openings`
 
@@ -236,7 +248,7 @@ reactivación posterior a suspensión tampoco reactiva ofertas ni accesos relaci
 | `salary`, `benefits` | Opcionales; texto saneado. |
 | `status` | Estado de la máquina definida más abajo. |
 | `published_at`, `closed_at` | Coherentes con estado. |
-| `moderation_message_public` | Motivo accionable visible a la empresa; sin nota sensible. |
+| `moderation_message_public` | Explicación accionable visible solo para `changes_requested` o `rejected`; sin nota sensible. Para otros estados la empresa ve solo el estado. |
 | timestamps, `version`, archivo | Convenciones generales. |
 
 `opening_categories` relaciona muchas categorías con una oferta, con par único
@@ -246,6 +258,19 @@ Una oferta publicada se cierra automáticamente cuando finaliza `closing_date`; 
 de aceptar postulaciones, sin alterar participaciones existentes. Al suspender una empresa, sus
 ofertas no finales pasan a `suspended`; una reactivación no las devuelve automáticamente al estado
 anterior y administración debe reabrirlas a un estado seguro.
+La pausa y el cierre ordinario tampoco finalizan participaciones existentes. Cancelar una oferta
+finaliza atómicamente como `cancelled` todas sus participaciones aún abiertas y revoca los accesos
+empresariales afectados, sin alterar resultados finales previos ni borrar eventos.
+
+`closing_date` es una fecha calendario local: su límite exclusivo es las 00:00 del día siguiente en
+`America/Buenos_Aires`, convertido a UTC para comparar con el instante actual. Para una derivación,
+`feedback_due_at = referred_at + 720 horas`; el cierre por falta de respuesta aplica al alcanzar o
+superar ese instante, no antes.
+
+La proyección pública de una oferta vigente incluye `company_profiles.legal_name`, `title`, `tasks`,
+categorías, `vacancies`, `location`, `modality`, `schedule`, `contract_type`, `requirements` y
+`closing_date`, más `salary` y `benefits` solo si se informaron. Excluye CUIT, responsable y contactos
+privados de la empresa, así como candidatos, participaciones y resultados individuales.
 
 ### `opening_moderation_events`
 
@@ -254,7 +279,11 @@ Append-only: `id`, `opening_id`, `decision` (`submitted`, `approved`, `changes_r
 `previous_status`, `new_status`, `company_message`, `internal_reason`, `actor_type`,
 `actor_account_id`, `created_at`. `actor_account_id` es nulo únicamente para `actor_type = system`.
 
-La empresa solo ve `company_message`; `internal_reason` es administrativo.
+`company_message` es obligatorio únicamente para solicitud de cambios o rechazo y visible solo a la
+empresa dueña; en las demás decisiones no se publica un motivo. `internal_reason` es administrativo
+y obligatorio para rechazo, pausa, cierre administrativo, cancelación, suspensión y restauración;
+aprobación y reanudación conservan actor, fecha y estados sin exigir motivo. El cierre automático
+usa actor `system` y código controlado, no un motivo humano.
 
 ## Participaciones e intermediación
 
@@ -270,7 +299,7 @@ archivada por candidato/oferta.
 | `created_by` | Candidato o admin según origen. |
 | `status` | Estado interno completo. |
 | `feedback_due_at` | Nulo hasta derivación; luego `referred_at + 30 días`. |
-| `final_outcome_at`, `final_outcome_by` | Solo admin para resultados finales reales. |
+| `final_outcome_at`, `final_outcome_by` | Admin para resultados comunicados por empresa y cancelación individual; candidato o admin a su pedido para retiro; sistema para falta de respuesta. |
 | `withdrawal_reason` | Opcional y protegido. |
 | timestamps, `version`, archivo | Convenciones generales. |
 
@@ -283,9 +312,13 @@ Precondiciones:
   válido. Crear derivación guarda el `cv_document_id` exacto y no expone DNI, domicilio ni notas.
 - Revisión, preentrevista y preselección pueden omitirse únicamente al avanzar, con motivo
   administrativo; nunca se omite la derivación.
-- Solo admin registra el resultado final. Feedback de empresa es una comunicación pendiente.
+- Solo admin confirma `hired` o `not_selected` y registra la cancelación individual; el candidato
+  puede retirar cualquier participación propia abierta y el admin solo registra un retiro a su
+  pedido. Feedback de empresa es una comunicación pendiente; `process_cancelled` puede referirse a
+  una sola participación y no cancela por sí mismo la oferta.
 - Confirmar `hired` conserva el acceso de la derivación si todavía está `active` y consentimiento,
-  cuentas y registros siguen vigentes. `not_selected`, `withdrawn`, `cancelled` y
+  cuentas y registros siguen vigentes, pero solo hasta 720 horas después de la confirmación.
+  `not_selected`, `withdrawn`, `cancelled` y
   `no_company_response` revocan ese acceso en la
   misma transacción que cambia el resultado.
 - La vista del candidato calcula una proyección de `status`: muestra `received` mientras el caso está
@@ -305,20 +338,25 @@ Todo contenido es interno. Puede haber varias instancias y el historial no se so
 | --- | --- |
 | `id`, `participation_id` | Una derivación por participación; el permiso tiene ciclo propio. |
 | `referred_by`, `referred_at` | Siempre admin. |
-| `access_status` | `active` permite la proyección empresarial; `revoked` la deniega de forma persistente; `expired_by_policy` queda reservado. |
+| `access_status` | `active` permite la proyección empresarial solo si también se cumple el plazo poscontratación; `revoked` la deniega de forma persistente; `expired_by_policy` queda reservado a OQ-001. |
 | `consent_event_id`, `cv_document_id` | Evidencia vigente al derivar. |
 | `feedback_due_at` | Exactamente 30 días desde `referred_at`. |
+| `post_hire_access_until` | Nulo hasta confirmar `hired` con permiso todavía activo; luego instante de confirmación administrativa +720 horas. No se rellena para un permiso revocado ni se reinicia por corrección tardía. |
 | `access_changed_at` | Fecha del último cambio de autorización. |
 | `access_changed_actor_type` | `account` o `system`; coherente con el evento que cambió el acceso. |
 | `access_changed_by_account_id` | Cuenta responsable; nula únicamente para actor `system`. |
-| `access_change_reason` | `referral_created`, `application_withdrawn`, `consent_withdrawn`, `not_selected`, `process_cancelled`, `no_company_response`, `candidate_suspended`, `company_suspended`, `candidate_archived`, `company_archived` o `policy_expired`. |
+| `access_change_reason` | `referral_created`, `application_withdrawn`, `consent_withdrawn`, `not_selected`, `process_cancelled`, `no_company_response`, `candidate_suspended`, `company_suspended`, `candidate_archived`, `company_archived`, `post_hire_window_ended` o `policy_expired`. |
 
 La autorización de la empresa exige que su empresa sea dueña de la oferta, las cuentas y registros
-no estén suspendidos ni archivados, exista consentimiento vigente, `access_status = active` y el recurso solicitado sea
+no estén suspendidos ni archivados, exista consentimiento vigente, `access_status = active`, el
+plazo `post_hire_access_until` no haya vencido cuando exista y el recurso solicitado sea
 la proyección permitida. La proyección incluye todos los contactos vigentes y exactamente
-`cv_document_id`, aunque el candidato haya reemplazado después su CV. Retiro de postulación o
+`cv_document_id`, aunque el candidato haya reemplazado después su CV. El acceso posterior a `hired`
+se deniega desde el instante exacto `post_hire_access_until`, aun si la tarea programada todavía no
+materializó `revoked` y el evento de auditoría; esa tarea registra actor `system`, plazo y ejecución
+sin copiar datos personales. El límite de acceso de 720 horas no elimina ni purga datos. Retiro de postulación o
 consentimiento, no selección, cancelación, falta de respuesta, suspensión o archivo cambian el acceso
-a `revoked` de forma atómica y auditada. Confirmar `hired` lo mantiene; una corrección tardía desde
+a `revoked` de forma atómica y auditada. Confirmar `hired` lo mantiene solo durante esa ventana; una corrección tardía desde
 `no_company_response` a `hired` no vuelve a activarlo, porque la contratación solo conserva un
 permiso que no había sido revocado. Reactivar una cuenta, restaurar un registro o aceptar nuevamente
 el consentimiento tampoco repone acceso automáticamente. El
@@ -332,7 +370,8 @@ Append-only: `id`, `referral_id`, `reported_outcome` (`hired`, `not_selected`, `
 `process_cancelled`, `other`), `message`, `reported_by`, `reported_at`, `review_status`
 (`pending_admin`, `accepted`, `superseded`). No cambia por sí mismo el resultado final. Una empresa
 activa puede registrar feedback tardío sobre una derivación propia aunque `access_status` ya no sea
-`active`; esa autorización limitada no permite consultar perfil, contactos ni CV.
+`active`; esa autorización limitada solo permite ver el identificador de derivación, el identificador
+y título de la oferta propia y `referred_at`, sin consultar nombre, perfil, contactos ni CV.
 
 ### `company_interviews`
 
@@ -366,14 +405,18 @@ Append-only y sin `UPDATE`/`DELETE` para roles de aplicación.
 | `entity_type`, `entity_id` | Agregado afectado. |
 | `action` | Código controlado. |
 | `previous_state`, `new_state` | Estados controlados; nullable para acciones sin transición. |
-| `reason_code`, `reason_text` | Motivo limitado; obligatorio para rechazo, suspensión, cancelación y override tardío. |
+| `reason_code`, `reason_text` | Motivo limitado; obligatorio para rechazo, suspensión, cancelación, salto de etapa, restauración, resolución de duplicado y corrección de resultado tardío. El mensaje accionable visible a la empresa se conserva separado del motivo interno; ninguno debe copiar datos personales a auditoría. |
 | `actor_type` | `account` o `system`. |
 | `actor_account_id` | Obligatorio si `actor_type = account`. |
 | `occurred_at`, `request_id` | Fecha y correlación. |
 | `metadata_safe` | JSON con lista permitida; nunca PII, notas ni contenido de archivos. |
 
 La función de transición escribe entidad y evento en la misma transacción. El actor sistema solo puede
-usarse desde funciones programadas protegidas.
+usarse desde funciones programadas protegidas para cierres automáticos de ofertas y derivaciones.
+El catálogo controlado de `action` cubre las clases enumeradas en FR-050; eventos no aplicables a
+una transición usan estados nulos, pero conservan entidad, acción, actor y fecha. El permiso de
+lectura de auditoría es administrativo; los roles de aplicación no pueden modificar ni borrar
+eventos anteriores. Una falla al insertar el evento revierte también el cambio de entidad y permiso.
 
 ## Importaciones
 
@@ -389,8 +432,12 @@ usarse desde funciones programadas protegidas.
 | `total_rows`, `valid_rows`, `warning_rows`, `invalid_rows`, `duplicate_rows` | Conteos coherentes. |
 | `confirmed_by`, `confirmed_at`, `completed_at` | Solo para fases respectivas. |
 | `failure_code` | Código sanitizado; no fila ni dato personal. |
+| `retry_of_batch_id` | Referencia opcional al lote fallido anterior; permite reconstruir intentos sin sobrescribir su resultado. |
 
 El archivo bruto es temporal y se descarta después de previsualizar/confirmar salvo política futura.
+Un lote fallido no deja cambios de negocio parciales y no se reanuda: el administrador vuelve a
+cargar un archivo corregido, obtiene otra previsualización y confirma un lote nuevo vinculado al
+anterior; ambos resultados siguen consultables.
 
 ### `import_rows`
 
@@ -423,8 +470,19 @@ No se crean tablas agregadas para el MVP. Vistas o funciones protegidas calculan
 - días desde `published_at` hasta que las contrataciones confirmadas alcanzan `vacancies`, nulo y
   presentado como pendiente mientras falten vacantes.
 
-Filtros mínimos: período y categoría cuando corresponda. Las vistas respetan RLS y solo admin puede
-consultarlas/exportarlas. Los formatos oficiales adicionales quedan fuera hasta resolver OQ-005.
+Filtros mínimos: período y categoría cuando corresponda. Candidatos activos, empresas y ofertas
+por estado son una foto al cierre del período; postulaciones, preentrevistas, derivaciones y
+resultados usan el instante de su evento dentro del período. La categoría se toma del candidato
+para el conteo de candidatos y de la oferta para ofertas y casos; empresas no usan filtro de
+categoría. Las vistas respetan RLS y solo admin puede consultarlas/exportarlas. La exportación
+genérica contiene solo las filas de métricas visibles con esos filtros: período, categoría
+aplicable, indicador, valor, unidad y estado calculado/pendiente; las filas de los dos tiempos de
+contratación incluyen además código y título de su oferta. Los dos tiempos por oferta usan como
+cohorte las ofertas publicadas dentro del período, incluso cuando sus contrataciones ocurren
+después; la categoría se toma de la oferta y las coberturas aún incompletas se muestran pendientes.
+No descarga padrones ni listados operativos individuales ni datos personales. La auditoría de
+descarga conserva administrador, fecha y filtros, nunca el CSV. Los formatos oficiales adicionales
+quedan fuera hasta resolver OQ-005.
 
 ## Máquinas de estado
 
@@ -482,8 +540,8 @@ received/admin_nomination -> under_review -> preinterview -> preselected -> refe
                                                                       -> not_selected
                                                                       -> no_company_response
 
-cualquier estado no final -> withdrawn (candidato/admin según origen)
-cualquier estado no final -> cancelled (admin por cierre justificado)
+cualquier estado no final -> withdrawn (candidato, cualquier origen; admin solo a su pedido)
+cualquier estado no final -> cancelled (admin, caso individual motivado u oferta cancelada)
 no_company_response -> hired | not_selected | withdrawn | cancelled (admin, respuesta tardía)
 ```
 
@@ -492,11 +550,16 @@ no_company_response -> hired | not_selected | withdrawn | cancelled (admin, resp
   acceso a la empresa.
 - `hired`, `not_selected`, `withdrawn`, `cancelled` y `no_company_response` son finales para la vista
   del candidato. El override de respuesta tardía conserva el evento anterior.
-- `hired` mantiene `referrals.access_status = active` cuando ya estaba activo y no existe otro bloqueo.
+- `hired` mantiene `referrals.access_status = active` cuando ya estaba activo y no existe otro
+  bloqueo, con `post_hire_access_until` fijado a confirmación +720 horas. La autorización deniega
+  nuevas lecturas desde ese instante aunque la materialización del estado ocurra después; el
+  vencimiento pasa el permiso a `revoked` y conserva historia.
   `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo cambian a `revoked` dentro de la
   misma transacción. Corregir tardíamente `no_company_response` a `hired` conserva la revocación y el
   evento automático previo.
-- La empresa comunica feedback, pero no ejecuta la transición final.
+- La empresa comunica feedback, pero no ejecuta la transición final. El feedback
+  `process_cancelled` permite al administrador cancelar solo ese caso sin cancelar la oferta; toda
+  corrección tardía requiere conservar el cierre previo.
 
 ## Índices y restricciones esenciales
 
@@ -505,7 +568,8 @@ no_company_response -> hired | not_selected | withdrawn | cancelled (admin, resp
   oferta/categoría y participación activa `(candidate_id, opening_id)`.
 - Índices: estados/fechas de oferta; candidato por estado, localidad, vigencia y disponibilidad;
   tablas puente por categoría; participación por oferta/estado; derivación por empresa implícita vía
-  oferta y por `access_status`; `feedback_due_at`; auditoría por entidad/fecha; importación por lote/fila.
+  oferta y por `access_status`; `feedback_due_at` y `post_hire_access_until`; auditoría por
+  entidad/fecha; importación por lote/fila.
 - Checks: vacantes positivas, fecha de cierre coherente, CV 1..5 MiB, tipos/estados válidos, actor
   coherente, cambio de acceso con actor/fecha/motivo completos, fechas de archivo y suspensión completas.
 - FKs de historia usan `RESTRICT` o referencias preservadas; ningún cascade borra evidencia.

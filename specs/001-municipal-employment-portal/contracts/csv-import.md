@@ -92,6 +92,13 @@ Efecto:
 - si una fila falla, revierte todo y marca el lote `failed` con código sanitizado;
 - si termina, marca filas `imported`, conteos finales y lote `completed`.
 
+Un lote `failed` conserva su identificador, responsable, fecha, hash, versión de mapeo, conteos y
+código de fallo sanitizado, pero no deja altas ni cambios parciales en perfiles. Como el CSV bruto
+es temporal, no se reanuda ni confirma ese mismo lote: el administrador corrige el archivo o las
+decisiones, vuelve a cargarlo y obtiene otra previsualización y otro lote vinculado al intento
+fallido. La nueva confirmación repite todas las validaciones; no hay reintento automático. Un lote
+`completed` no se reimporta accidentalmente con el mismo hash.
+
 Para cada `potential_duplicate`, administración debe registrar una resolución con motivo:
 `use_or_update_existing`, `correct_and_create` o `reject`. `correct_and_create` exige corregir el dato
 que causó el falso positivo y volver a validar; `use_or_update_existing` solo aplica los cambios que

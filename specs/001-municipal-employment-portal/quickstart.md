@@ -60,6 +60,8 @@ Todos deben terminar con código cero. `test:db` debe reiniciar una base aislada
 Cobertura mínima por riesgo:
 
 - autenticación, verificación, recuperación y suspensión;
+- correo no verificado, enlace de verificación vencido, recuperación inválida o vencida, sesión
+  revocada y cuenta suspendida, con respuestas que no permiten enumerar cuentas;
 - corrección directa, archivo inmediato solicitado por candidato y restauración administrativa segura;
 - RLS positiva y negativa para público, candidato, empresa y admin;
 - moderación y cierre automático de oferta vencida;
@@ -100,11 +102,16 @@ Esperado:
 5. Como empresa, corregir y reenviar.
 6. Como admin, aprobar y publicar; luego pausar y reanudar.
 7. Llevar `closing_date` al pasado con reloj de prueba y ejecutar la automatización dos veces.
+8. En ofertas ficticias separadas, rechazar, cerrar y cancelar; suspender y reactivar una empresa y
+   comprobar los mensajes/estados visibles frente a los motivos internos.
 
 Esperado:
 
 - solo `published` aparece públicamente y acepta postulaciones;
-- cada decisión conserva actor, fecha, estado previo/nuevo y mensaje;
+- cada decisión conserva actor, fecha y estado previo/nuevo; mensaje empresarial solo cuando
+  corresponde según la moderación;
+- corrección y rechazo ofrecen explicación accionable a la empresa; pausa, suspensión, cierre y
+  cancelación exponen solo estado, mientras el motivo permanece administrativo;
 - empresa solo ve su propia organización/ofertas;
 - pausa bloquea nuevas postulaciones sin perder existentes.
 - el vencimiento cierra una sola vez, quita la oferta del público y preserva participaciones.
@@ -120,7 +127,9 @@ Esperado:
 6. Intentar consultar el DNI, domicilio, nota interna, otra participación y un candidato no derivado.
 7. Sobre una derivación, retirar la postulación; sobre otra, retirar el consentimiento general.
 8. Como empresa, intentar volver a consultar ambos perfiles, contactos y CV; luego registrar un nuevo
-   consentimiento y comprobar que no restaura el acceso anterior.
+   consentimiento y comprobar que no restaura el acceso anterior ni reabre participaciones cerradas.
+9. Crear una nominación administrativa todavía abierta; retirarla como candidato y, en otra
+   nominación, registrar el retiro mediante un administrador tras solicitud del candidato.
 
 Esperado:
 
@@ -131,6 +140,10 @@ Esperado:
 - candidato no ve preentrevista, preselección ni nota.
 - retirar postulación o consentimiento revoca inmediatamente cada permiso afectado y la autorización
   se vuelve a comprobar en cada solicitud de CV, sin URL reutilizable;
+- el retiro de una nominación tiene el mismo efecto que el de una postulación propia; el personal
+  no puede registrar un retiro sin solicitud del candidato;
+- retirar el consentimiento cierra como `withdrawn` todas las participaciones aún abiertas, conserva
+  los resultados finales preexistentes y registra el motivo `consent_withdrawn`;
 - reconsentir no reactiva derivaciones anteriores y administración conserva la historia.
 - la prueba verifica que no puedan iniciarse nuevas consultas o descargas después de revocar; una
   copia ya descargada no puede retirarse técnicamente y queda sujeta al aviso y a OQ-001.
@@ -141,19 +154,24 @@ Esperado:
 2. Verificar que el feedback queda pendiente y no cambia el resultado final.
 3. Como admin, confirmar contratación.
 4. Confirmar que la empresa conserva acceso al perfil/contactos/CV porque el permiso seguía activo.
-5. Crear otras derivaciones para confirmar `not_selected` y `cancelled`; verificar revocación
-   inmediata en ambas.
+   Adelantar el reloj hasta el límite de 720 horas desde la confirmación y verificar que ya no puede
+   consultar ni descargar; ejecutar la automatización dos veces y comprobar una sola revocación
+   materializada con actor `system`, sin eliminar datos.
+5. Crear otras derivaciones para confirmar `not_selected` y cancelar individualmente una
+   participación con motivo operativo, incluido un feedback empresarial `process_cancelled`;
+   verificar la revocación inmediata en ambas y que la oferta y los demás casos siguen abiertos.
 6. Crear otra derivación con reloj de prueba vencido más de 30 días y ejecutar la función programada.
 7. Confirmar `no_company_response` y la revocación; como empresa, comunicar feedback tardío sin poder
    recuperar los datos y corregir como admin a `hired`.
 
 Esperado:
 
-- solo admin fija el resultado real;
+- solo admin confirma resultados comunicados por la empresa; el candidato puede retirar su caso
+  propio y el administrador puede registrar ese retiro solo a su pedido;
 - el job es idempotente y atribuye el evento a `system`;
 - la corrección conserva el cierre anterior;
-- `hired` conserva únicamente un permiso que seguía activo; no selección, cancelación y falta de
-  respuesta lo revocan;
+- `hired` conserva únicamente un permiso que seguía activo durante las 720 horas posteriores a la
+  confirmación; no selección, cancelación y falta de respuesta lo revocan inmediatamente;
 - feedback tardío no devuelve datos y corregir `no_company_response` a `hired` no reactiva el permiso;
 - candidato no seleccionado sigue activo para otras búsquedas.
 
@@ -163,14 +181,17 @@ Esperado:
 2. Registrar disponibilidad, categorías, contacto, consentimiento atendido y nota de capacitación.
 3. Intentar derivarlo sin CV.
 4. Cargar un PDF válido y derivar.
-5. Vincularlo a una cuenta personal ficticia mediante el proceso aprobado.
+5. Con datos ficticios, comprobar presencialmente la identidad sin almacenar imagen del DNI,
+   verificar el correo de la cuenta personal y vincularla al perfil asistido; probar además un
+   conflicto de cuenta, DNI o correo y comprobar que bloquea la vinculación hasta resolver duplicados.
 
 Esperado:
 
 - el alta sin PDF es posible, la derivación no;
 - acciones identifican al admin;
 - nota de capacitación es libre e interna;
-- vinculación preserva ID e historial y no crea duplicado.
+- vinculación presencial preserva ID, origen, consentimiento, estados e historial y no crea un
+  segundo perfil; el conflicto no se fusiona ni se resuelve automáticamente.
 - una persona sin email puede ser atendida por este flujo, pero no por autorregistro.
 
 ## Escenario 6: duplicados e importación
@@ -184,6 +205,8 @@ Una vez disponible:
 3. Resolver cada duplicado eligiendo explícitamente `use_or_update_existing`, `correct_and_create` o
    `reject`, con motivo; para un falso positivo, corregir el dato y volver a validar.
 4. Forzar un error en una fila dentro de la transacción.
+5. Confirmar que el lote fallido no dejó cambios de negocio, corregir el CSV ficticio y volver a
+   cargarlo para una nueva previsualización y confirmación vinculada al intento previo.
 
 Esperado:
 
@@ -192,6 +215,8 @@ Esperado:
 - cada resolución conserva decisión, motivo y actor, sin sobrescribir silenciosamente un perfil;
 - lote válido importa completo;
 - fallo revierte todas las filas y deja resultado explícito recuperable;
+- el lote fallido conserva código sanitizado e historial; el segundo lote se vincula al primero y
+  solo incorpora las filas después de nueva confirmación, sin reintento automático;
 - logs no contienen datos de filas.
 
 ## Escenario 7: métricas y exportación
@@ -203,11 +228,18 @@ Esperado:
    fecha, navegador, dispositivo, conexión e identificador seudónimo del participante.
 3. Seleccionar período y categoría e iniciar cronómetro al aplicar filtros.
 4. Comparar conteos con los fixtures conocidos y descargar el CSV; detener al completar la descarga.
+   Verificar que solo contiene filas de indicadores filtrados, y código/título de oferta únicamente
+   en las filas de tiempos de contratación, sin nombres de candidatos ni listados de casos.
 5. Restablecer nuevamente el mismo fixture y registrar la nueva confirmación antes de SC-003.
 6. Medir una búsqueda desde que abre la pantalla administrativa hasta registrar una preentrevista y
    guardar la preselección.
 7. Para ofertas preparadas, comparar días desde publicación hasta primera contratación y hasta cubrir
    todas las vacantes; comprobar que la segunda métrica queda pendiente si faltan contrataciones.
+   Comparar también una foto de candidatos/empresas/ofertas al cierre del período con eventos que
+   ocurrieron dentro del intervalo; comprobar que la categoría filtra candidatos por perfil,
+   ofertas/casos por oferta y no filtra el total de empresas. Para los tiempos por oferta, incluir
+   una oferta publicada dentro del período cuya contratación ocurrió después y mantener otra con
+   cobertura pendiente.
 8. Incluir en fixtures un valor que comience con `=` o `+`.
 9. Intentar descargar la exportación sin sesión y como empresa.
 
@@ -220,6 +252,9 @@ Esperado:
 - búsqueda y preselección se guardan en menos de 5 minutos;
 - conteos y exportación terminan dentro de 30 segundos desde que se aplican los filtros;
 - las dos métricas de contratación permanecen separadas y la cobertura total no se anticipa;
+- el CSV coincide con las métricas visibles y los filtros, identifica cada oferta en sus filas de
+  tiempos y deja pendiente el valor de cobertura incompleta; la auditoría registra descarga y
+  filtros sin copiar el archivo;
 - valores peligrosos están neutralizados;
 - solo admin accede.
 
@@ -229,8 +264,9 @@ Esperado:
    cancelar una vez antes de confirmar con motivo.
 2. Verificar bloqueo de acciones nuevas y revocación del acceso empresarial a perfiles/CV, sin
    convertir casos existentes en resultados finales.
-3. Reactivar y comprobar que ofertas, derivaciones y accesos no vuelven automáticamente; restaurar
-   después una oferta con motivo y verificar que regresa a `draft`.
+3. Reactivar la cuenta empresarial y comprobar que su perfil vuelve a `incomplete`, mientras
+   ofertas, derivaciones y accesos no vuelven automáticamente; restaurar después una oferta con
+   motivo y verificar que regresa a `draft`.
 4. Como candidato activo, solicitar eliminación y confirmar la acción.
 5. Comprobar archivo inmediato y ausencia de borrado físico; como admin, restaurar con motivo.
 
@@ -247,7 +283,10 @@ Esperado:
   datos ficticios ya preparados, conexión estable y sin ayuda externa. Para candidato, medir desde la
   apertura del formulario de registro hasta la postulación confirmada; para empresa, desde la
   apertura del formulario de registro hasta el envío a revisión confirmado. Al menos 9 de 10
-  ejecuciones de cada rol deben terminar en menos de 10 minutos.
+  ejecuciones de cada rol deben terminar en menos de 10 minutos. Un reinicio del recorrido está
+  permitido, pero no reinicia el cronómetro: el tiempo total sigue contando desde la primera
+  apertura. El éxito temporal exige la confirmación final dentro del plazo y se evalúa separado del
+  primer intento de SC-010.
 - Administración: un único administrador de prueba, sin capacitación ni práctica previa, recibe solo
   la descripción de cada tarea. Usar el mismo entorno de demostración y restablecer separadamente el
   dataset reproducible antes de SC-003 y antes de SC-008, con conexión estable y sin calentamiento.
