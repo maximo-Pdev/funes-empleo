@@ -12,8 +12,9 @@ mantiene la intermediación: modera ofertas, evalúa y preselecciona personas, d
 confirma los resultados finales. Las empresas nunca acceden al padrón general y solo ven datos
 laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
 Ese acceso se calcula en cada lectura: se revoca ante retiro de postulación o consentimiento, no
-  selección, cancelación o falta de respuesta; una contratación confirmada debe conservarlo mientras
-no exista otro bloqueo y hasta que la política de retención aprobada disponga lo contrario.
+selección, cancelación o falta de respuesta; una contratación confirmada conserva un permiso todavía
+vigente solo hasta 720 horas desde la confirmación administrativa, salvo bloqueo anterior. Esta
+ventana de consulta no decide la retención de registros pendiente en OQ-001.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
 CSS, desplegada en Vercel para la demostración. Supabase aportará Auth, PostgreSQL, Row Level
@@ -100,7 +101,7 @@ La revalidación posterior a Fase 1 incluye `research.md`, `data-model.md`, `con
 destructivo, un stack alternativo ni una excepción al flujo de revisión. La puerta constitucional
 permanece aprobada sin excepciones. La revisión del 2026-09-20 confirma además que la revocación se
 aplica en servidor y RLS con historia preservada, que `hired` solo conserva permisos todavía activos,
-que OQ-001 no se convirtió en TTL ni purga inventados y que el protocolo de aceptación utiliza
+que OQ-001 no se convirtió en TTL de datos ni purga inventados y que el protocolo de aceptación utiliza
 únicamente participantes seudónimos y datos ficticios.
 
 ## Arquitectura y límites
@@ -126,15 +127,29 @@ que OQ-001 no se convirtió en TTL ni purga inventados y que el protocolo de ace
 - El autorregistro de candidatos y empresas usa email y contraseña; el email verificado cuenta como
   credencial y contacto mínimo del flujo autogestionado. La verificación y recuperación usan
   Supabase Auth. Un candidato sin email ingresa únicamente mediante perfil asistido sin cuenta.
+- La coincidencia con un perfil asistido durante el alta de una cuenta candidata abre una solicitud
+  de vinculación pendiente y no crea otro perfil laboral. Solo un administrador completa la
+  vinculación después de comprobar presencialmente el DNI exhibido, sin guardar copia, y confirmar
+  el correo verificado de la cuenta. La operación comprueba conflictos de cuenta, DNI y correo,
+  conserva el mismo perfil y todo su historial y deja evento con administrador y fecha; no habilita
+  un reclamo remoto automático ni una fusión de perfiles.
 - `@supabase/ssr` mantiene sesión en cookies. La autorización servidor valida claims o usuario
   vigente; nunca confía en `getSession()` ni en metadatos editables por el usuario.
 - Una tabla de cuentas de aplicación contiene rol y estado. El registro público solo puede crear
   `candidate` o `company`; `admin` se aprovisiona mediante invitación controlada y acción auditada.
 - Las cuatro cuentas administrativas son individuales. Una suspensión se aplica inmediatamente en
   la tabla de aplicación y, cuando corresponda, mediante Auth Admin desde un módulo `server-only`.
+  Un administrador activo puede suspender o reactivar a otro desde el panel con motivo, confirmación
+  y auditoría; no puede suspenderse a sí mismo ni dejar sin cuentas administrativas activas a la
+  Oficina. La recuperación de cada cuenta conserva su identidad histórica. No se archivan cuentas
+  administrativas en el MVP; una baja permanente depende de un procedimiento municipal posterior.
 - La clave publicable puede llegar al navegador. La clave secreta solo existe en variables seguras y
-  se limita a aprovisionamiento, suspensión Auth y trabajos del sistema que realmente deban eludir
-  RLS. Las acciones normales de administradores usan su propia sesión y RLS.
+  se limita a invitación/aprovisionamiento individual de administradores, suspensión de usuario en
+  Auth y las tres acciones programadas —cierre de oferta, cierre sin respuesta y vencimiento de
+  acceso posterior a contratación— cuando realmente deban eludir RLS. Nunca se utiliza en páginas,
+  acciones interactivas ni operaciones administrativas ordinarias; estas usan la sesión del actor y
+  RLS. La auditoría conserva la cuenta humana responsable aun cuando una operación de Auth requiera
+  la credencial privilegiada; `system` queda reservado a estas acciones programadas.
 - El SMTP integrado se considera suficiente solo para pruebas controladas. Usuarios reales,
   dominio remitente y SMTP productivo quedan bloqueados hasta una decisión operativa autorizada.
 
@@ -151,17 +166,43 @@ que OQ-001 no se convirtió en TTL ni purga inventados y que el protocolo de ace
   haya terminado. La indisponibilidad laboral o `needs_update` no revocan por sí solos una
   contratación confirmada. Retiro
   de postulación o consentimiento, no selección, cancelación y falta de respuesta terminan el acceso
-  en la misma transacción que registra el evento. Una contratación confirmada lo conserva mientras
-  sigan cumpliéndose las demás condiciones y OQ-001 no imponga un vencimiento aprobado.
+  en la misma transacción que registra el evento. Una contratación confirmada lo conserva solo si
+  seguía vigente, durante 720 horas desde la confirmación administrativa y mientras sigan
+  cumpliéndose las demás condiciones. Cada consulta deniega el acceso al cumplirse el plazo aunque
+  la materialización programada de `revoked` y su evento ocurra después; OQ-001 sigue rigiendo la
+  retención, no esta ventana de acceso.
 - La empresa puede enviar feedback tardío sobre una derivación propia cuyo acceso a datos fue
-  revocado, pero esa capacidad acotada no vuelve a exponer el perfil, los contactos ni el CV. Una
+  revocado. Para ubicarla ve solo su identificador de derivación, el identificador y título de su
+  oferta y la fecha de derivación, sin nombre, perfil, contactos ni CV del candidato. Una
   corrección tardía de `no_company_response` a `hired` conserva el acceso revocado: “mantener” una
   autorización de contratación no equivale a restaurar una autorización que ya terminó.
 - Administrador activo: operación municipal completa, siempre con actor identificado.
-- Anónimo: solo ofertas publicadas vigentes y campos expresamente públicos.
+- Anónimo: solo ofertas publicadas vigentes con nombre de empresa y los campos laborales enumerados
+  en FR-024, incluidos salario y beneficios únicamente si fueron informados; nunca CUIT, responsable,
+  contactos privados, candidatos, participaciones ni resultados individuales.
 - DNI y otros datos identificatorios se separan de la proyección laboral, se normalizan para detectar
   duplicados, se enmascaran en UI y jamás se escriben en logs. Supabase aporta cifrado administrado
   en reposo; este MVP no añade criptografía de aplicación que impida las búsquedas necesarias.
+- La protección cubre todas las salidas: la UI usa proyecciones por rol y enmascara identificadores;
+  errores no revelan cuentas ajenas, PII ni detalles internos; lecturas privadas y respuestas de CV
+  usan `no-store` y no se comparten en caché; no se entregan URLs firmadas reutilizables de CV;
+  logs y trazas excluyen PII, credenciales, tokens y contenido de archivos. Las capturas y trazas de
+  prueba se guardan solo ante fallos y usan exclusivamente fixtures ficticios o anonimizados.
+  Exportaciones aplican autorización y filtros en servidor y neutralizan fórmulas; archivos CSV
+  temporales se descartan al procesar. Previews se aíslan de producción, no reciben datos reales
+  ni secretos de PR no confiables y no publican recursos privados.
+- El CSV genérico descarga solo los indicadores visibles del panel con idénticos filtros de período
+  y categoría: período, categoría aplicable, indicador, valor, unidad y estado de cálculo. Los dos
+  tiempos de contratación se representan por oferta con código y título; no se exportan listados
+  de personas ni registros operativos. Un evento seguro conserva administrador, fecha y filtros de
+  la descarga sin guardar el contenido.
+- Los conteos de candidatos activos, empresas y ofertas por estado son instantáneas al cierre del
+  período; los de postulaciones, preentrevistas, derivaciones y resultados se atribuyen al evento
+  ocurrido dentro del período. Categoría del candidato filtra el padrón; categoría de la oferta,
+  las ofertas y participaciones; empresas no admiten filtro de categoría. El CSV refleja exactamente
+  esos mismos conjuntos y definiciones. Para los dos tiempos por oferta, el período selecciona las
+  ofertas publicadas dentro del intervalo y permite que sus contrataciones se confirmen después;
+  cobertura incompleta permanece pendiente.
 
 ### CV y archivos
 
@@ -190,10 +231,24 @@ que OQ-001 no se convirtió en TTL ni purga inventados y que el protocolo de ace
   `withdrawn`, `cancelled` y
   `no_company_response` la revocan con actor, fecha y motivo. Una corrección tardía nunca borra el
   evento anterior ni reactiva un permiso ya revocado.
+- Cancelar una oferta cierra en la misma transacción sus participaciones no finales como `cancelled`,
+  revoca los permisos empresariales correspondientes e inserta todos los eventos; los resultados
+  finales existentes no cambian. Pausa y cierre ordinario o por vencimiento no finalizan las
+  participaciones existentes.
+- El candidato puede retirar cualquier participación propia no final, independientemente de si se
+  originó por postulación o nominación. El administrador solo registra ese retiro cuando existe
+  solicitud del candidato. La cancelación administrativa de un caso individual exige motivo
+  operativo y afecta únicamente esa participación y su permiso; el feedback empresarial
+  `process_cancelled` puede motivarla sin cancelar la oferta.
 - Los registros mutables incluyen `version` o `updated_at` esperado. Una acción sobre una versión
   obsoleta devuelve conflicto y obliga a recargar, evitando que dos administradores pisen decisiones.
 - Revisión, preentrevista y preselección pueden omitirse al avanzar, pero las etapas efectivamente
   realizadas mantienen su orden, todo salto exige motivo y nunca se omite la derivación explícita.
+- La moderación separa mensaje empresarial y motivo interno: solo solicitud de correcciones y
+  rechazo llevan explicación accionable visible. Pausa, suspensión, cancelación y cierre muestran
+  estado sin motivo a la empresa; sus motivos internos se registran. Aprobación y reanudación no
+  exigen motivo, pero sí evento con actor/fecha/estados. El cierre automático registra actor `system`
+  y código controlado.
 - El historial es append-only. Incluye actor de cuenta o actor de sistema, fecha, entidad, acción,
   estado anterior/nuevo y motivo obligatorio cuando corresponda.
 - Los registros se archivan con `archived_at` y `archived_by`; no se ejecutan cascadas destructivas
@@ -204,34 +259,48 @@ que OQ-001 no se convirtió en TTL ni purga inventados y que el protocolo de ace
 - Suspender una cuenta bloquea de inmediato sus acciones privadas. Un candidato suspendido queda
   fuera de búsquedas, postulaciones y derivaciones nuevas; una empresa suspendida deja de admitir
   nuevas postulaciones o derivaciones en sus ofertas. En ambos casos se revoca el acceso empresarial
-  interactivo a perfiles y CV, sin convertir participaciones existentes en resultados finales.
+  interactivo a perfiles y CV, sin convertir participaciones existentes en resultados finales. El
+  feedback ya recibido sigue pendiente de revisión municipal. Una empresa suspendida no puede
+  enviar nuevo feedback; si solo el candidato está suspendido, una empresa activa puede informar
+  sobre su derivación mediante la referencia no personal acotada, sin recuperar datos.
 - La acción administrativa de suspensión se presenta destacada y requiere confirmación explícita;
   la función servidor vuelve a validar actor, estado, versión y motivo. Reactivar la cuenta no
-  reactiva automáticamente ofertas, derivaciones ni otros registros relacionados.
+  reactiva automáticamente ofertas, derivaciones ni permisos relacionados. Al reactivar una cuenta
+  empresarial, la misma transición devuelve únicamente su perfil a `incomplete`; la empresa debe
+  completar de nuevo los datos requeridos antes de operar con su perfil, y sus ofertas permanecen
+  suspendidas hasta una decisión municipal separada.
 - El candidato puede corregir directamente sus datos. Solicitar eliminación ejecuta una transición
   atómica que archiva cuenta/perfil de inmediato, bloquea actividad futura y preserva historial y
   archivos según OQ-001; no elimina el usuario de Auth ni datos de negocio.
 - Retirar una postulación ya derivada o retirar el consentimiento general revoca en la misma
-  transacción todo acceso empresarial relacionado. Un consentimiento posterior o la restauración de
-  una cuenta no recuperan automáticamente esos accesos; una nueva derivación requiere una decisión
-  municipal explícita.
+  transacción todo acceso empresarial relacionado. Retirar el consentimiento cierra además como
+  `withdrawn` todas las participaciones abiertas del candidato con motivo `consent_withdrawn`, sin
+  alterar resultados finales anteriores. Un consentimiento posterior o la restauración de una
+  cuenta no recuperan esos accesos ni reabren participaciones; una nueva derivación requiere una
+  decisión municipal explícita.
 - Solo un administrador puede restaurar, con motivo y detección previa de conflictos. Un perfil o
   empresa vuelve inactivo y una oferta vuelve a borrador; accesos y participaciones no se reactivan.
 
 ### Automatizaciones diarias
 
 - Supabase Cron ejecuta diariamente una función SQL idempotente. Toma participaciones derivadas sin
-  resultado final cuyo `feedback_due_at` —fijado a 30 días desde la derivación— ya venció, las cierra
+  resultado final cuyo `feedback_due_at` —fijado a 720 horas desde `referred_at`— ya venció, las cierra
   como `no_company_response`, revoca el acceso empresarial a perfil/contactos/CV e inserta un evento
   con actor `system` en la misma transacción.
 - La misma ejecución diaria cierra ofertas `published` cuya fecha de cierre ya finalizó. Las quita
   de la consulta pública, impide postulaciones nuevas, conserva las participaciones existentes e
-  inserta un evento de cierre automático con actor `system`.
+  inserta un evento de cierre automático con actor `system`. El límite exclusivo de `closing_date`
+  es las 00:00 del día siguiente en `America/Buenos_Aires`, comparado como instante UTC.
+- También materializa como `revoked` los permisos posteriores a contratación cuyo
+  `post_hire_access_until` venció, con motivo `post_hire_window_ended` y evento `system`. La
+  autorización en servidor y base niega nuevas lecturas desde el instante exacto de vencimiento,
+  aun antes de la siguiente ejecución diaria; la tarea solo consolida estado e historial de forma
+  idempotente y no elimina datos ni CV.
 - Una ejecución repetida no genera eventos duplicados. Una respuesta tardía puede comunicarse sin
   recuperar acceso a datos; un administrador registra el resultado real como otra transición, sin
   borrar el cierre automático. `not_selected`, `withdrawn` o `cancelled` mantienen la revocación;
-  `hired` conserva el acceso únicamente si este nunca fue revocado y no lo restaura después de
-  `no_company_response`.
+  `hired` conserva el acceso únicamente si este nunca fue revocado, por un máximo de 720 horas, y
+  no lo restaura después de `no_company_response`.
 - Supabase Cron está en beta y debe reevaluarse antes de producción. Vercel Cron queda documentado
   como alternativa de contingencia, no se implementan ambos mecanismos.
 
@@ -303,7 +372,7 @@ specs/001-municipal-employment-portal/
 │   ├── authorization-matrix.md
 │   ├── state-machines.md
 │   └── csv-import.md
-└── tasks.md                  # Se generará únicamente con $speckit-tasks
+└── tasks.md                  # Generado con $speckit-tasks; revisar tras cada replanificación
 ```
 
 ### Código fuente previsto en la raíz
@@ -368,7 +437,7 @@ microservicios ni un backend separado para el MVP.
 
 | ID | Tratamiento en este plan | Gate antes de datos reales o aceptación |
 | --- | --- | --- |
-| OQ-001 | Archivo recuperable, sin purga ni TTL automático; `expired_by_policy` permanece inalcanzable | Política de retención y duración del acceso posterior a contratación aprobadas por responsable legal/de datos. |
+| OQ-001 | Archivo recuperable, sin purga ni TTL de datos automático; `expired_by_policy` permanece inalcanzable. La ventana de consulta posterior a contratación se limita a 720 horas como decisión del MVP, separada de retención. | Política de retención de perfiles, CV, contactos e historial aprobada por responsable legal/de datos. |
 | OQ-005 | Métricas internas y CSV genérico | Ejemplos y aprobación para cualquier informe oficial adicional. |
 | OQ-006 | Solo local, preview y demo ficticia | Operador, hosting, región, backups, incidentes y SMTP definidos. |
 | OQ-010 | Modelo de catálogo versionable y multiselección | Catálogo canónico depurado y aprobado por Oficina de Empleo. |
@@ -377,6 +446,10 @@ microservicios ni un backend separado para el MVP.
 
 También se requiere confirmar las cuatro identidades administrativas, la política/versión exacta del
 texto de consentimiento y los requisitos visuales municipales antes de la aceptación con usuarios.
+
+Cada replanificación exige contrastar `tasks.md` con la especificación, este plan, los contratos y
+`quickstart.md`, ajustar o regenerar las tareas que hayan quedado desactualizadas y volver a ejecutar
+`$speckit-analyze` antes de implementar. Ningún artefacto generado queda aprobado automáticamente.
 
 La aceptación del demo usa datos exclusivamente ficticios: 10 ejecuciones de candidato y 10 de
 empresa, con al menos cinco personas distintas en cada rol; un único administrador de prueba sin

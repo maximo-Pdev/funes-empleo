@@ -11,6 +11,26 @@
 Una cuenta suspendida equivale a denegación para toda acción privada. Archivar preserva historia y
 también deniega acceso interactivo.
 
+## Fuentes de autorización por superficie
+
+| Superficie | Fuente y reevaluación obligatoria |
+| --- | --- |
+| Página y layout protegidos | Sesión validada en servidor contra Auth y cuenta de aplicación vigente; comprueban rol y estado en cada petición, sin caché privada compartida. El layout no reemplaza los controles de acción ni RLS. |
+| Server Action | Deriva actor de la sesión vigente, vuelve a consultar rol/estado, propiedad y versión esperada; la función de negocio verifica precondiciones en la transacción y RLS restringe los datos. Una suspensión concurrente impide la mutación. |
+| Route Handler privado | Revalida sesión, rol, estado y propiedad en cada llamada. CV exige permiso `active` no vencido tras contratación, consentimiento, oferta propia y `cv_document_id` exacto; importación y exportación exigen administrador activo; el callback de Auth no otorga rol desde entrada pública. |
+| Data API y funciones SQL | RLS/grants usan identidad autenticada y estado/rol de `accounts`, propiedad del recurso y, para proyección empresarial, derivación y consentimiento vigentes más plazo de 720 horas aún no vencido tras contratación. Funciones de transición vuelven a validar antes de escribir; la clave publicable no elude RLS. |
+| Storage privado | Políticas restringen propietario, administrador activo o permiso empresarial de derivación todavía vigente. La descarga pasa por handler que reautoriza cada solicitud; no se entrega URL reutilizable. |
+| Exportación | Handler y consulta protegida reevaluan administrador activo y filtros autorizados; no usa caché pública ni acepta un propietario enviado por cliente. |
+| Proceso programado | Función SQL privada invocada por Supabase Cron, sin sesión interactiva; solo cierra ofertas vencidas y derivaciones sin respuesta y materializa la revocación de accesos poscontratación vencidos, con actor `system` e idempotencia. La autorización temporal niega la lectura desde el vencimiento aunque la tarea aún no corra. |
+
+La credencial que elude RLS se limita a invitación/aprovisionamiento individual de administradores,
+suspensión de usuario en Auth y mantenimiento programado protegido cuando realmente requiere ese
+privilegio. Ninguna operación administrativa ordinaria o solicitud interactiva utiliza esa credencial;
+cada acción iniciada por una persona conserva su cuenta como actor y `system` solo identifica los
+dos cierres programados y el vencimiento programado del acceso poscontratación. Los intentos sobre
+recursos ajenos responden `NOT_FOUND` cuando revelar su
+existencia expondría información.
+
 ## Matriz de recursos
 
 | Recurso/acción | Público | Candidato | Empresa | Administrador | Sistema |
@@ -28,18 +48,27 @@ también deniega acceso interactivo.
 | Perfil empresa | No | No | Solo propio | Sí | No |
 | Oferta: crear/editar borrador | No | No | Solo propia | Puede mantener/moderar | No |
 | Oferta: publicar/moderar | No | No | Nunca | Sí | No |
-| Postulación propia | No | Crear/retirar propia | No | Consultar/gestionar | No |
-| Nominación sin postulación | No | No | No | Sí | No |
+| Postulación propia | No | Crear/retirar propia | No | Consultar; registrar retiro solicitado por candidato; cancelar caso con motivo | No |
+| Nominación sin postulación | No | Retirar participación propia abierta | No | Crear/gestionar; registrar retiro solicitado por candidato; cancelar caso con motivo | No |
 | Preentrevista/preselección | No | No | No | Sí | No |
 | Derivación | No | No | Consultar las recibidas | Solo admin crea/revoca | No |
 | Feedback de empresa | No | No | Crear sobre derivación propia, incluso tardío, sin recuperar datos revocados | Consultar/aceptar | No |
-| Resultado final | Solo si la oferta sigue pública, sin personas | Solo resultado propio | Consultar derivado propio | Solo admin confirma/corrige | Cierra solo falta de respuesta |
+| Resultado final | No | Consultar el propio; retirar cualquier participación abierta propia | Consultar derivado propio | Confirma/corrige resultado; registra retiro solicitado o cancelación motivada de caso individual | Cierra solo falta de respuesta |
 | Notas/motivos internos | No | Nunca | Nunca | Sí | No |
 | Contactos de seguimiento | No | No | No | Sí | No |
 | Auditoría completa | No | No | No | Sí, lectura | Solo insertar evento acotado |
 | Importación, métricas, exportación | No | No | No | Sí | No |
-| Suspender/reactivar cuentas | No | No | No | Sí | No |
+| Suspender/reactivar cuentas | No | No | No | Sí; una cuenta admin solo por otro admin activo y nunca si deja cero admins activos | No |
 | Cerrar oferta vencida | No | No | No | Puede consultar historial | Solo oferta publicada vencida |
+
+## Proyección pública de oferta
+
+La proyección pública de una oferta `published` y vigente contiene solo nombre de la empresa,
+título, tareas, categorías, vacantes, ubicación, modalidad, horario, tipo de contratación,
+requisitos y fecha de cierre, con salario y beneficios si se informaron. No contiene CUIT, persona
+responsable, contactos privados de la empresa, candidatos, participaciones ni resultados
+individuales. Al cerrar por vencimiento deja de estar disponible públicamente y no recibe nuevas
+postulaciones; las participaciones previas continúan para gestión municipal.
 
 ## Proyección empresarial de candidato derivado
 
@@ -70,12 +99,14 @@ La empresa nunca recibe:
 - Candidato: `received` desde el alta de participación y solo el resultado final cuando exista. No
   recibe preentrevista, preselección, derivación ni espera interna como etapas detalladas.
 - Empresa: moderación visible de ofertas propias y candidatos derivados. Puede comunicar feedback,
-  pero no confirmar estado final.
+  pero no confirmar estado final. Solo ve explicación de correcciones solicitadas o rechazo; para
+  pausa, suspensión, cierre y cancelación ve el estado sin motivo interno.
 - Administrador: estado completo e historial.
 
-Una empresa cuyo permiso fue revocado conserva únicamente los metadatos no personales mínimos para
-identificar una derivación propia y comunicar feedback tardío. Esa vista no incluye nombre, perfil,
-contactos, CV ni ningún dato de otras participaciones. `hired` conserva un permiso todavía activo;
+Una empresa activa cuyo permiso fue revocado conserva únicamente el identificador de la derivación,
+el identificador y título de su propia oferta y la fecha de derivación para comunicar feedback
+tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de otras participaciones.
+`hired` conserva un permiso todavía activo solo hasta 720 horas desde la confirmación administrativa;
 `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo revocan. Una corrección tardía a
 `hired`, un consentimiento posterior, una reactivación o una restauración no revierten la revocación.
 
@@ -90,7 +121,9 @@ contactos, CV ni ningún dato de otras participaciones. `hired` conserva un perm
   reactivar no lo restablece automáticamente.
 - Retirar postulación o consentimiento revoca inmediatamente todos los permisos afectados; aceptar
   nuevamente o restaurar no los repone.
-- `hired` conserva acceso si seguía activo; `not_selected`, `withdrawn`, `cancelled` y
+- `hired` conserva acceso si seguía activo, por un máximo de 720 horas desde la confirmación;
+  incluso antes de que la tarea materialice `revoked`, toda lectura posterior al plazo se deniega.
+  `not_selected`, `withdrawn`, `cancelled` y
   `no_company_response` lo revocan atómicamente. El feedback tardío sigue permitido sin datos y no
   reactiva el acceso, incluso si luego el resultado real se corrige a `hired`.
 - La consulta empresarial de CV se reautoriza en cada solicitud y no entrega una URL reutilizable.

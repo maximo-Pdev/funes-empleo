@@ -252,9 +252,10 @@ objetos arbitrarios se descarta porque Vercel conserva esa salida.
 **Decisión**: no resolver OQ-001, OQ-005, OQ-006, OQ-010 ni OQ-018. OQ-017 recibe un límite técnico
 de demostración de 5 MiB, pero sigue pendiente de aprobación municipal antes de CV reales. También
 quedan como gates el SMTP real, las cuatro identidades admin, el texto/versionado del consentimiento
-y la identidad visual municipal. Mientras OQ-001 siga abierta, no existe TTL, purga ni transición
-automática a `expired_by_policy` para el acceso conservado por una contratación; autorización y
-retención se mantienen como conceptos separados.
+y la identidad visual municipal. Mientras OQ-001 siga abierta, no existe TTL de datos, purga ni
+transición automática a `expired_by_policy`. El acceso conservado por contratación tiene una
+ventana operativa de 720 horas desde su confirmación administrativa; autorización y retención se
+mantienen como conceptos separados.
 
 **Fundamento**: son decisiones legales, operativas o de contenido cuyo dueño no es el equipo técnico.
 El diseño proporciona límites seguros y puntos de configuración sin fingir aprobación.
@@ -270,7 +271,10 @@ futuras; los contactos no se congelan y la empresa ve los que permanezcan vigent
 acceso a esa derivación. El permiso se recalcula en cada lectura y termina ante retiro de la
 postulación o del consentimiento, no selección, cancelación, falta de respuesta, suspensión o
 archivo. Una contratación confirmada conserva el acceso solo si el permiso todavía está `active`,
-mientras no exista otro bloqueo y hasta que una política aprobada de OQ-001 disponga un vencimiento.
+por un máximo de 720 horas desde la confirmación administrativa y mientras no exista otro bloqueo.
+Ese vencimiento limita la consulta empresarial, no la retención o purga de datos aún abierta en
+OQ-001. La autorización temporal se verifica en cada lectura aunque la tarea que materializa
+`revoked` corra después.
 
 **Fundamento**: aplica literalmente las aclaraciones de FR-036. El `cv_document_id` convierte el
 documento compartido en una evidencia reproducible, mientras que eliminar una marca de selección por
