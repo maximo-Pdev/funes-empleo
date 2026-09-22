@@ -69,8 +69,9 @@ los flujos completos de candidatos, empresas y administradores."
   solicitud de eliminación archiva o desactiva el perfil de inmediato, sin revisión administrativa
   ni borrado permanente.
 - Q: ¿Quién debe poder restaurar un perfil, empresa u oferta archivada y en qué estado debe quedar
-  después de restaurarla? → A: Solo un administrador, registrando el motivo; el registro vuelve
-  inactivo o en borrador y no reactiva automáticamente ofertas, accesos ni participaciones relacionadas.
+  después de restaurarla? → A: Solo un administrador, registrando el motivo; el perfil candidato
+  vuelve a `draft`, el perfil empresarial a `incomplete` y la oferta a `draft`. La restauración no
+  reactiva automáticamente ofertas, accesos, derivaciones ni participaciones relacionadas.
 - Q: ¿Cómo deben definirse “candidato activo” y “tiempo de cobertura” en las métricas del MVP? → A:
   Un candidato activo tiene perfil activo, está disponible, mantiene consentimiento vigente y fue
   actualizado en los últimos seis meses. Se miden por separado los días desde la publicación hasta
@@ -132,6 +133,13 @@ los flujos completos de candidatos, empresas y administradores."
 - Q: ¿Qué referencia conserva la empresa para enviar feedback tardío cuando ya no puede ver al
   candidato? → A: Solo el identificador de derivación, el identificador y título de su propia oferta
   y la fecha de derivación; no conserva acceso a datos personales del candidato.
+- Q: ¿Qué evidencia admite una corrección por respuesta empresarial tardía y cómo se presenta? → A:
+  El administrador puede basarse en feedback enviado por la empresa desde el portal o en un contacto
+  municipal registrado por teléfono, correo, WhatsApp o atención presencial, siempre con fecha,
+  canal, administrador y nota breve sin datos sensibles innecesarios. Puede registrar `hired`,
+  `not_selected` o `cancelled`. La interfaz destaca el resultado vigente y conserva
+  `no_company_response` como cierre automático anterior, con fecha y señal de que fue reemplazado por
+  una corrección tardía; la corrección no reactiva el permiso empresarial.
 - Q: ¿Qué ocurre con las participaciones abiertas si el candidato retira su consentimiento general?
   → A: Se cierran de inmediato como retiradas, se conserva el historial y se revocan los accesos
   empresariales; una aceptación posterior no las reabre.
@@ -155,6 +163,16 @@ los flujos completos de candidatos, empresas y administradores."
 - Q: ¿A qué estado vuelve el perfil empresarial al reactivar una cuenta de empresa suspendida? → A:
   En la misma decisión, la cuenta recupera acceso y su perfil vuelve a `incomplete` para completarse
   de nuevo. Las ofertas, participaciones y permisos empresariales anteriores no se reactivan.
+- Q: ¿A qué estado vuelve el perfil candidato al reactivar una cuenta de candidato suspendida? → A:
+  La suspensión y la reactivación no cambian por sí mismas el estado del perfil: al volver la cuenta
+  a `active`, el perfil conserva el estado anterior. Las operaciones posteriores vuelven a validar
+  su estado y las condiciones vigentes de frescura, disponibilidad, consentimiento y CV; ofertas,
+  participaciones, derivaciones y permisos anteriores no se reactivan.
+- Q: ¿Quién puede archivar una cuenta y perfil empresarial? → A: La empresa puede archivar los
+  propios desde su sesión y un administrador también puede hacerlo, en este caso con motivo. Ambas
+  operaciones son recuperables, conservan historial y bloquean el acceso; solo administración puede
+  restaurar, dejando la cuenta activa, el perfil `incomplete` y las ofertas en `draft`, sin reactivar
+  participaciones, derivaciones ni permisos.
 - Q: ¿Quién puede retirar o cancelar una participación abierta? → A: El candidato puede retirar
   tanto una postulación propia como una nominación administrativa; un administrador solo registra
   un retiro si el candidato lo solicitó. La Oficina puede cancelar un caso individual por un motivo
@@ -269,8 +287,9 @@ controlado y trazable.
 preservar la confianza, la privacidad y el rol municipal.
 
 **Independent Test**: Puede probarse registrando una empresa ficticia, creando un borrador,
-enviándolo a revisión, respondiendo a una solicitud de cambios y consultando solo una derivación
-autorizada.
+enviándolo a revisión, respondiendo a una solicitud de cambios, consultando solo una derivación
+autorizada y recorriendo el archivo propio o administrativo más la restauración administrativa sin
+reactivar ofertas, participaciones ni accesos relacionados.
 
 **Acceptance Scenarios**:
 
@@ -287,6 +306,12 @@ autorizada.
 5. **Given** una oferta publicada que alcanza su fecha de cierre, **When** finaliza esa fecha,
    **Then** la oferta se cierra automáticamente, deja de mostrarse públicamente y no acepta nuevas
    postulaciones, sin cerrar las participaciones existentes.
+6. **Given** una empresa con cuenta/perfil y ofertas no finales, **When** la empresa archiva sus
+   propios registros o un administrador los archiva con motivo, **Then** cuenta, perfil y ofertas no
+   finales quedan archivados de forma recuperable, se bloquea el acceso empresarial y se revocan los
+   permisos de derivación sin borrar casos, resultados ni historia; **When** un administrador los
+   restaura con motivo, **Then** la cuenta queda `active`, el perfil `incomplete` y las ofertas en
+   `draft`, sin reactivar participaciones, derivaciones ni permisos.
 
 ---
 
@@ -383,8 +408,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   final. El feedback ya recibido permanece pendiente de revisión administrativa. Una empresa
   suspendida no puede enviar nuevo feedback; si solo el candidato está suspendido, una empresa aún
   activa puede informar sobre su derivación mediante la referencia no personal de FR-039, sin
-  recuperar datos del candidato. La reactivación de la cuenta no reactiva por sí sola ofertas,
-  derivaciones ni otros registros.
+  recuperar datos del candidato. Al reactivar una cuenta candidata, la cuenta vuelve a `active` y el
+  perfil conserva el estado anterior porque ni la suspensión ni la reactivación lo cambian por sí
+  mismas; cada operación posterior revalida las condiciones vigentes. La reactivación de cualquier
+  cuenta no reactiva por sí sola ofertas, participaciones, derivaciones, permisos ni otros registros.
 - Una empresa intenta publicar directamente, ver el padrón general o consultar una derivación de
   otra empresa; la acción debe rechazarse sin revelar datos.
 - Un correo todavía no verificado no habilita acciones privadas y recibe instrucciones para
@@ -420,15 +447,23 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - Un candidato solicita eliminar sus datos; el perfil se archiva o desactiva inmediatamente sin
   revisión administrativa, deja de participar en nuevas búsquedas, postulaciones y derivaciones, y
   conserva de forma recuperable el historial sujeto a la política de retención pendiente.
+- Una empresa archiva su propia cuenta/perfil, o un administrador los archiva con motivo; la
+  operación bloquea inmediatamente el acceso empresarial, marca sus ofertas no finales como
+  archivadas de forma recuperable y revoca sus permisos de derivación, sin borrar ni convertir casos
+  existentes en resultados finales. Solo un administrador puede restaurar esos registros.
 - Un administrador restaura un perfil, empresa u oferta archivada; debe registrar el motivo y el
-  registro vuelve inactivo o en borrador para revisión, sin reactivar automáticamente ofertas,
-  accesos empresariales ni participaciones relacionadas.
+  perfil candidato vuelve a `draft`, el perfil empresarial a `incomplete` y la oferta a `draft` para
+  revisión, sin reactivar automáticamente ofertas, accesos empresariales, derivaciones ni
+  participaciones relacionadas.
 - Una empresa no comunica un resultado; el caso permanece pendiente durante 30 días exactos desde
   la derivación y luego se cierra automáticamente como sin respuesta empresarial, sin registrarlo
   como contratación o no selección. Entrevistas, contactos y seguimientos no pausan ni reinician el
   plazo y el acceso empresarial al perfil, los contactos y el CV se revoca al producirse el cierre.
-  Si la empresa responde más tarde, puede comunicar el resultado sin recuperar ese acceso y un
-  administrador puede registrar el resultado real sin eliminar el cierre anterior del historial.
+  Si la empresa responde más tarde, puede comunicar el resultado sin recuperar ese acceso. Un
+  administrador puede usar ese feedback o un contacto municipal registrado por teléfono, correo,
+  WhatsApp o atención presencial —con fecha, canal, actor y nota breve— para corregir el resultado a
+  `hired`, `not_selected` o `cancelled`. La vista muestra el resultado vigente y conserva
+  `no_company_response` como antecedente automático reemplazado, sin eliminarlo del historial.
 - Una participación finaliza como no seleccionada o cancelada; se revoca inmediatamente el acceso
   empresarial al perfil, los contactos y el CV. Si finaliza con una contratación confirmada, la
   empresa conserva un permiso todavía vigente por un máximo de 720 horas desde la confirmación
@@ -488,10 +523,13 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   cualquier acceso empresarial a perfiles y CV relacionados, sin restaurarlo de forma
   automática al reactivar la cuenta. Los casos existentes DEBEN
   permanecer disponibles para gestión administrativa, sin adoptar automáticamente un resultado
-  final, y reactivar la cuenta NO DEBE reactivar automáticamente ofertas, participaciones ni
-  permisos relacionados. Como única excepción para la empresa, la reactivación de su cuenta DEBE
-  poner el perfil empresarial en `incomplete`, sin habilitarlo hasta que vuelva a completar los
-  datos requeridos. El
+  final, y reactivar la cuenta NO DEBE reactivar automáticamente ofertas, participaciones,
+  derivaciones ni permisos relacionados. Al reactivar una cuenta candidata, la cuenta DEBE volver a
+  `active` y el perfil candidato DEBE conservar el estado anterior: suspensión y reactivación NO
+  DEBEN cambiarlo por sí mismas. Cada operación posterior DEBE volver a validar el estado y las
+  condiciones vigentes de frescura, disponibilidad, consentimiento y CV cuando corresponda. Para la
+  empresa, en cambio, la reactivación de su cuenta DEBE poner el perfil empresarial en `incomplete`,
+  sin habilitarlo hasta que vuelva a completar los datos requeridos. El
   feedback ya recibido DEBE permanecer pendiente de revisión administrativa; la empresa suspendida
   NO DEBE enviar nuevo feedback. Si solo el candidato está suspendido, una empresa activa PUEDE
   informar sobre una derivación propia usando únicamente la referencia no personal de FR-039.
@@ -641,7 +679,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   automáticamente como sin respuesta empresarial,
   sin asignar contratación ni no selección. Entrevistas, contactos y seguimientos NO DEBEN pausar ni
   reiniciar el plazo. Si llega una respuesta posterior, un administrador DEBE poder cambiar el
-  estado al resultado real, conservando ambas transiciones en el historial.
+  estado a `hired`, `not_selected` o `cancelled` usando como evidencia el feedback empresarial del
+  portal o un contacto municipal registrado por teléfono, correo, WhatsApp o atención presencial,
+  con fecha, canal, administrador y nota breve sin datos sensibles innecesarios. La presentación
+  DEBE destacar el resultado final vigente y mostrar `no_company_response` como cierre automático
+  anterior reemplazado por la corrección tardía, conservando ambas transiciones en el historial y
+  sin reactivar el permiso empresarial revocado.
 - **FR-041**: Un candidato no seleccionado DEBE poder continuar activo y participar en otras
   búsquedas.
 - **FR-042 (Should)**: El personal DEBERÍA poder registrar una nota interna de texto libre sobre
@@ -675,10 +718,17 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **FR-054**: Los registros de negocio DEBEN archivarse o desactivarse de forma recuperable y NO
   DEBEN eliminarse permanentemente de manera automática mientras la Municipalidad no apruebe una
   política de retención. La solicitud de eliminación de un candidato DEBE archivar o desactivar su
-  perfil inmediatamente, sin revisión administrativa, y conservar el historial relacionado. Solo
-  un administrador DEBE poder restaurar un registro archivado, registrando el motivo; el registro
-  restaurado DEBE quedar inactivo o en borrador para revisión y NO DEBE reactivar automáticamente
-  ofertas, accesos empresariales ni participaciones relacionadas.
+  perfil inmediatamente, sin revisión administrativa, y conservar el historial relacionado. Una
+  empresa autenticada DEBE poder archivar su propia cuenta y perfil; un administrador también DEBE
+  poder archivarlos, registrando el motivo. En ambos casos se DEBEN marcar sus ofertas no finales
+  como archivadas de forma recuperable, sin crear un estado alternativo de desactivación, bloquear el
+  acceso empresarial y revocar los permisos de derivación, sin borrar historial ni alterar
+  resultados finales. Solo un administrador DEBE poder restaurar un registro
+  archivado, registrando el motivo; el registro restaurado DEBE quedar en un estado seguro para
+  revisión: perfil candidato en `draft`, cuenta empresarial en `active`, perfil empresarial en
+  `incomplete` y oferta en `draft`. Restaurar un registro archivado es una operación distinta de
+  reactivar una cuenta suspendida y NO DEBE reactivar automáticamente ofertas, accesos empresariales
+  ni participaciones relacionadas.
 - **FR-055**: Al activar un perfil de candidato, incluido un perfil asistido, el sistema DEBE
   presentar y registrar el consentimiento aprobado para el tratamiento laboral de sus datos y su
   entrega en futuras derivaciones municipales; no se requiere una aceptación adicional para cada
@@ -841,6 +891,27 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   definidas en SC-003, con el conjunto ficticio restablecido antes de comenzar. El cronómetro
   comienza al aplicar los filtros de período y categoría y termina cuando los conteos están visibles
   y la descarga finalizó.
+- **SC-008A**: En el entorno de demostración con el conjunto ficticio de SC-003, las búsquedas,
+  filtros y listados administrativos DEBEN responder en hasta 3 segundos; la descarga autorizada de
+  un CV válido de hasta 5 MiB DEBE completarse en hasta 10 segundos con conexión estable; la
+  previsualización de un CSV sintético de 1.000 filas DEBE completarse en hasta 30 segundos y su
+  confirmación válida en hasta 60 segundos. Cuatro sesiones administrativas concurrentes DEBEN
+  completar, sobre registros ficticios distintos, la moderación de una oferta, el guardado de una
+  preselección, el registro de un contacto y la confirmación de un resultado en hasta 5 segundos por
+  operación, salvo importación/exportación, sin estados parciales ni pérdida de auditoría. Cada caso
+  se mide una vez después de un restablecimiento separado y sin calentamiento; no se promedian
+  resultados y cualquier exceso incumple el criterio. Los casos de lectura son: buscar candidatos
+  con el término ficticio y los filtros de categoría/disponibilidad fijados por el fixture; filtrar
+  ofertas por estado y cambiar a la página fijada; y filtrar empresas por estado y cambiar a la
+  página fijada. El fixture versionado DEBE registrar entradas y conteos esperados para los tres. El
+  cronómetro va desde enviar la consulta, aplicar el filtro o cambiar de página hasta mostrar filas y
+  conteo o paginación actualizados sin indicador de carga; para CV, desde solicitar la descarga hasta
+  recibir el archivo completo; para CSV, desde enviar el archivo hasta mostrar el resumen de las
+  1.000 filas y desde confirmar hasta mostrar el lote terminal con sus conteos. En concurrencia, las
+  cuatro acciones comienzan mediante una barrera común, terminan al mostrar su confirmación y luego
+  se comprueba que las cuatro mutaciones y sus eventos de auditoría quedaron completos. Las pruebas
+  de carga por encima de cuatro administradores y los SLA productivos quedan excluidos hasta resolver
+  OQ-006.
 - **SC-009**: Los recorridos críticos de candidato, empresa y administración DEBEN completarse en
   tamaños de 360×800 y 1366×768, con zoom de 100 % y 200 %, usando únicamente teclado, foco visible y
   sin bloqueos, con todos los controles, validaciones y mensajes disponibles. Además, al menos un
@@ -906,14 +977,19 @@ municipal o decisiones propias de `$speckit-plan`. Esta especificación no adopt
 ninguna posición temporal; la planificación puede tratarlas como dependencias explícitas, pero no
 pueden cerrarse ni implementarse definitivamente hasta que responda el responsable indicado.
 
-| ID | Decisión pendiente | Límite seguro aplicado al borrador | Responsable |
-| --- | --- | --- | --- |
-| OQ-001 | Plazos de retención de perfiles, CV, contactos y auditoría | Archivar; no eliminar permanentemente de forma automática | Municipalidad / responsable legal o de datos |
-| OQ-005 | Formatos oficiales de reportes | Limitar el MVP a métricas internas y CSV genérico | Oficina de Empleo |
-| OQ-006 | Hosting productivo y responsables operativos | No definir producción; la demostración no resuelve operación municipal | Beex / Municipalidad |
-| OQ-010 | Catálogo final de categorías y ocupaciones | Requiere un catálogo canónico depurado y multiselección | Oficina de Empleo |
-| OQ-017 | Tamaño y formatos de archivo aceptados | PDF como posición inicial; límite pendiente de planificación y aprobación | Plan técnico / Municipalidad |
-| OQ-018 | Mapeo completo del Excel histórico | Bloquear la implementación del importador hasta contar con muestra anonimizada y mapeo escrito | Oficina de Empleo |
+| ID | Decisión pendiente | Límite seguro aplicado al borrador | Responsable | Etapa bloqueada | Evidencia para cerrar |
+| --- | --- | --- | --- | --- | --- |
+| OQ-001 | Plazos de retención de perfiles, CV, contactos y auditoría | Archivar; no eliminar permanentemente de forma automática | Municipalidad / responsable legal o de datos | Uso de datos reales, producción y cualquier purga/TTL | Política y aprobación escrita rastreable del responsable |
+| OQ-005 | Formatos oficiales de reportes | Limitar el MVP a métricas internas y CSV genérico | Oficina de Empleo | Informes oficiales adicionales; no bloquea métricas/CSV del demo | Ejemplo de formato y aprobación escrita rastreable |
+| OQ-006 | Hosting productivo y responsables operativos | No definir producción; la demostración no resuelve operación municipal | Beex / Municipalidad | Configuración y despliegue productivo | Plan operativo escrito con hosting, responsables, región, backups, incidentes y SMTP |
+| OQ-010 | Catálogo final de categorías y ocupaciones | Modelo versionable y multiselección; fixtures ficticios sin declararlos oficiales | Oficina de Empleo | Seed final y aceptación del catálogo municipal | Archivo canónico versionado y aprobación escrita rastreable |
+| OQ-017 | Tamaño y formatos de archivo aceptados | PDF y máximo técnico de 5 MiB solo para demo | Plan técnico / Municipalidad | Uso de CV reales y aceptación municipal de límites de archivo | Ratificación escrita rastreable de formatos y tamaño |
+| OQ-018 | Mapeo completo del Excel histórico | No inferir columnas; bloquear importador definitivo | Oficina de Empleo | Implementación/aceptación definitiva del importador histórico | Muestra anonimizada, mapeo versionado y aprobación escrita rastreable |
+
+La evidencia escrita puede ser un PR, issue, acta, correo o mensaje incorporado al repositorio; no
+requiere un documento formal separado, pero debe identificar decisión, responsable y fecha. Los
+límites técnicos de demo —incluidos 5 MiB, Vercel/Supabase de demostración y datos ficticios— no son
+aprobaciones municipales ni cierran las OQ.
 
 Además, la validación del MVP depende de recibir una muestra anonimizada de la planilla, el catálogo
 actual, ejemplos anonimizados de pedidos y reportes, confirmación del aprovisionamiento de las cuatro

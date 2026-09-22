@@ -84,7 +84,7 @@ significa que la implementación esté terminada.
 - [x] CHK020 ¿SC-003 identifica el tamaño y composición del conjunto de demostración, la preparación
   permitida al administrador y el punto exacto de finalización de la tarea? [Measurability, Spec
   §SC-003]
-- [ ] CHK021 ¿SC-008 define volumen de datos, entorno y alcance de la exportación necesarios para que
+- [x] CHK021 ¿SC-008 define volumen de datos, entorno y alcance de la exportación necesarios para que
   el umbral de 30 segundos sea repetible? [Measurability, Spec §SC-008; Plan §Objetivos de rendimiento]
 - [x] CHK022 ¿SC-009 especifica los tamaños móviles/escritorio, nivel de zoom, tecnologías de apoyo y
   criterio de aprobación para navegación solo con teclado? [Measurability, Spec §SC-009, FR-070;
@@ -109,7 +109,7 @@ significa que la implementación esté terminada.
 - [x] CHK028 ¿Los requisitos de estados vacíos, carga y error están aplicados a los recorridos
   críticos —búsqueda sin candidatos, oferta sin postulaciones, métricas sin datos e importación sin
   filas válidas— y no solo expresados de forma transversal? [Coverage, Spec §FR-056, FR-070]
-- [ ] CHK029 ¿Existen requisitos de recuperación para archivo/restauración de registros y para
+- [x] CHK029 ¿Existen requisitos de recuperación para archivo/restauración de registros y para
   migraciones fallidas que definan autoridad, conflictos posibles y evidencia a conservar?
   [Recovery, Spec §FR-054; Constitution §III; Plan §Métricas, logs y recuperación]
 
@@ -121,7 +121,7 @@ significa que la implementación esté terminada.
 - [x] CHK031 ¿El retiro del consentimiento define el efecto sobre nuevas acciones, participaciones en
   curso, derivaciones ya entregadas, acceso empresarial y datos que deben conservarse mientras OQ-001
   siga abierta? [Edge Case, Spec §FR-054–FR-055; Spec §Edge Cases]
-- [ ] CHK032 ¿La respuesta empresarial tardía define qué evidencia admite el administrador, qué
+- [x] CHK032 ¿La respuesta empresarial tardía define qué evidencia admite el administrador, qué
   resultados puede registrar y cómo se presenta el cierre anterior sin confundirlo con el resultado
   final vigente? [Edge Case, Spec §FR-039–FR-040]
 - [x] CHK033 ¿Los requisitos CSV cubren archivo vacío, codificación inválida, encabezados repetidos,
@@ -139,13 +139,13 @@ significa que la implementación esté terminada.
 - [x] CHK036 ¿Los requisitos de accesibilidad, español y responsive son suficientemente específicos
   para formularios, tablas, filtros, diálogos, cargas, errores, foco y atención asistida? [Coverage,
   Spec §FR-070; Constitution §IV]
-- [ ] CHK037 ¿Los objetivos de rendimiento y escala cubren búsquedas administrativas, listados,
+- [x] CHK037 ¿Los objetivos de rendimiento y escala cubren búsquedas administrativas, listados,
   descarga de CV, previsualización/importación y concurrencia, o están deliberadamente excluidos con
   una justificación documentada? [Gap, Spec §SC-003, SC-008; Plan §Objetivos de rendimiento]
 
 ## Dependencias, supuestos y conflictos abiertos
 
-- [ ] CHK038 ¿Cada OQ conservada identifica dueño, límite seguro, etapa de bloqueo y evidencia de
+- [x] CHK038 ¿Cada OQ conservada identifica dueño, límite seguro, etapa de bloqueo y evidencia de
   aprobación, y ninguna decisión técnica —incluidos 5 MiB, revocación de acceso o demo— se presenta
   como aprobación municipal? [Dependency, Spec §Open Questions; Plan §Dependencias externas]
 - [x] CHK039 ¿Están documentados como gates verificables la muestra anonimizada, el mapeo CSV, el
@@ -194,7 +194,7 @@ significa que la implementación esté terminada.
 
 ### Claridad de estados, métricas y transiciones
 
-- [ ] CHK046 ¿Se distingue con términos y estados inequívocos reactivar una cuenta suspendida de
+- [x] CHK046 ¿Se distingue con términos y estados inequívocos reactivar una cuenta suspendida de
   restaurar un perfil, empresa u oferta archivada, incluyendo que perfil vuelve a `draft`, empresa a
   `incomplete` y oferta a `draft`? [Clarity, Spec §FR-005, FR-025, FR-054; Data Model §Máquinas de estado]
 - [x] CHK047 ¿Los requisitos enumeran exactamente qué etapas puede omitir un administrador, exigen
@@ -217,8 +217,9 @@ significa que la implementación esté terminada.
 - [x] CHK051 ¿La tarea de proyección empresarial está alineada con “todos los contactos vigentes” y
   `cv_document_id`, sin conservar el concepto anterior de contactos seleccionados para compartir ni
   del CV más reciente? [Conflict, Spec §FR-036; Plan §Autorización y privacidad; Tasks §T031]
-- [x] CHK052 ¿El desglose de tareas representa las dos automatizaciones diarias —ofertas vencidas y
-  derivaciones sin respuesta— con sus transiciones, auditoría, idempotencia y escenarios de
+- [x] CHK052 ¿El desglose de tareas representa las tres acciones programadas diarias —cierre de
+  ofertas vencidas, cierre de derivaciones sin respuesta y materialización de la revocación del
+  acceso poscontratación vencido— con sus transiciones, auditoría, idempotencia y escenarios de
   aceptación respectivos? [Coverage, Plan §Automatizaciones diarias; Quickstart §Escenarios 2 y 4;
   Tasks §T034]
 - [x] CHK053 ¿Las tareas incluyen requisitos explícitos para corrección directa, archivo inmediato
@@ -288,16 +289,16 @@ significa que la implementación esté terminada.
 
 ### Autoridad y precisión de las máquinas de estado
 
-- [ ] CHK066 ¿Existe una fuente normativa identificable y completa para los estados de cuenta,
+- [x] CHK066 ¿Existe una fuente normativa identificable y completa para los estados de cuenta,
   empresa, perfil candidato, oferta, participación, permiso de derivación, consentimiento, CV e
   importación, evitando que estados definidos solo en el modelo o las tareas se vuelvan requisitos
   implícitos? [Traceability, Spec §FR-005, FR-023–FR-025, FR-037–FR-040; Data Model §Máquinas de
   estado; Contract States]
-- [ ] CHK067 ¿Para cada transición crítica están documentados actor autorizado, origen, destino,
+- [x] CHK067 ¿Para cada transición crítica están documentados actor autorizado, origen, destino,
   precondiciones, motivo, efecto sobre entidades relacionadas y resultado ante versión obsoleta o
   estado inválido? [Completeness, Spec §FR-037, FR-050; Plan §Integridad, estados y concurrencia;
   Contract States §Errores y concurrencia]
-- [ ] CHK068 ¿Las relaciones entre estado de cuenta y estado del registro de negocio están definidas
+- [x] CHK068 ¿Las relaciones entre estado de cuenta y estado del registro de negocio están definidas
   sin ambigüedad al suspender una empresa o candidato, incluyendo el estado seguro de sus ofertas o
   perfiles y qué decisiones administrativas se requieren después de reactivar? [Ambiguity, Spec
   §FR-005, FR-025; Plan §Suspensión, archivo y restauración; Contract States §Suspensión y archivo]
