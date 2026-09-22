@@ -68,8 +68,17 @@ Reglas:
   no es una transición permitida para `admin` durante el MVP.
 - Una cuenta suspendida no puede ejecutar acciones privadas aunque sus registros permanezcan. La
   suspensión revoca además todo acceso empresarial interactivo a datos y CV de candidatos.
+- Reactivar una cuenta candidata cambia solo `accounts.status` a `active`: ni la suspensión ni la
+  reactivación modifican por sí mismas `candidate_profiles.status`, que conserva el estado anterior.
+  Cada operación posterior revalida estado, frescura, disponibilidad, consentimiento y CV cuando
+  corresponda; no se reactivan ofertas, participaciones, derivaciones ni permisos relacionados.
 - La solicitud de eliminación del candidato archiva inmediatamente cuenta y perfil; no elimina el
   usuario de Auth. Solo administración restaura con motivo y sin reactivar relaciones.
+- Una empresa puede archivar su propia cuenta/perfil y un administrador puede archivarlos con motivo.
+  La operación registra actor y fecha, bloquea acceso, marca con archivo recuperable las ofertas no
+  finales y revoca permisos empresariales sin borrar historial ni resultados. Solo administración
+  restaura con motivo: cuenta a `active`, perfil empresarial a `incomplete` y ofertas a `draft`, sin
+  reactivar relaciones.
 - El email de acceso reside en Auth; no se duplica en eventos de auditoría.
 
 ## Candidatos
@@ -108,6 +117,9 @@ Reglas de activación y uso:
   disponibilidad activa, consentimiento vigente y `last_confirmed_at` dentro del período.
 - El titular corrige sus datos directamente. Solicitar eliminación archiva cuenta/perfil en la misma
   operación; restaurar exige administración, motivo y devuelve el perfil a `draft`.
+- Suspender o reactivar la cuenta vinculada no modifica por sí mismo `candidate_profiles.status`: al
+  reactivar, el perfil conserva el estado anterior y sus condiciones vigentes se vuelven a validar
+  antes de cada operación. La reactivación no repone participaciones, derivaciones ni permisos.
 - La vinculación de un perfil asistido con una cuenta personal exige DNI exhibido y comprobado
   presencialmente por un administrador, sin copia almacenada, y correo verificado en la cuenta. Una
   coincidencia durante el alta deja pendiente la vinculación y no crea un segundo perfil. Conflictos
@@ -230,6 +242,11 @@ bloqueado hasta resolver OQ-010; tests usan categorías ficticias.
 No existen documentos de identidad empresarial ni estado “verificado” en el MVP.
 
 Restaurar una empresa archivada exige administración y motivo, y la devuelve a `incomplete`.
+La propia empresa puede archivar atómicamente su cuenta y perfil; un administrador también puede
+hacerlo con motivo. En ambos casos las ofertas no finales se marcan con archivo recuperable, se
+bloquean operaciones empresariales y se revocan permisos de derivación sin borrar casos, resultados
+ni historial. La restauración administrativa deja la cuenta `active`, este perfil `incomplete` y las
+ofertas en `draft`, sin reactivar relaciones.
 Reactivar una cuenta empresarial suspendida cambia esa cuenta a `active` y, en la misma decisión,
 devuelve el perfil empresarial a `incomplete`; no reactiva ofertas, participaciones ni accesos
 relacionados. La empresa debe completar de nuevo los campos requeridos antes de que el perfil
@@ -258,6 +275,10 @@ Una oferta publicada se cierra automáticamente cuando finaliza `closing_date`; 
 de aceptar postulaciones, sin alterar participaciones existentes. Al suspender una empresa, sus
 ofertas no finales pasan a `suspended`; una reactivación no las devuelve automáticamente al estado
 anterior y administración debe reabrirlas a un estado seguro.
+El archivo empresarial no agrega otro estado a la máquina: establece `archived_at` en cada oferta no
+final y la excluye de toda operación y proyección pública o empresarial. La restauración
+administrativa limpia ese marcador y establece `status = draft`, sin recuperar el estado previo ni
+reactivar participaciones, derivaciones o permisos.
 La pausa y el cierre ordinario tampoco finalizan participaciones existentes. Cancelar una oferta
 finaliza atómicamente como `cancelled` todas sus participaciones aún abiertas y revoca los accesos
 empresariales afectados, sin alterar resultados finales previos ni borrar eventos.
@@ -373,6 +394,12 @@ activa puede registrar feedback tardío sobre una derivación propia aunque `acc
 `active`; esa autorización limitada solo permite ver el identificador de derivación, el identificador
 y título de la oferta propia y `referred_at`, sin consultar nombre, perfil, contactos ni CV.
 
+Una corrección tardía puede usar como evidencia este feedback o un `contact_event` administrativo
+relacionado con la participación, de canal `phone`, `email`, `whatsapp` o `in_person`, con fecha,
+administrador y resumen breve. El resultado corregido solo puede ser `hired`, `not_selected` o
+`cancelled`; `no_company_response` permanece como evento histórico reemplazado y el permiso revocado
+no vuelve a `active`.
+
 ### `company_interviews`
 
 `id`, `referral_id`, `scheduled_at`, `held_at`, `status` (`scheduled`, `completed`, `cancelled`,
@@ -412,7 +439,8 @@ Append-only y sin `UPDATE`/`DELETE` para roles de aplicación.
 | `metadata_safe` | JSON con lista permitida; nunca PII, notas ni contenido de archivos. |
 
 La función de transición escribe entidad y evento en la misma transacción. El actor sistema solo puede
-usarse desde funciones programadas protegidas para cierres automáticos de ofertas y derivaciones.
+usarse desde funciones programadas protegidas para cierres automáticos de ofertas y derivaciones, y
+para materializar el vencimiento del acceso empresarial posterior a una contratación confirmada.
 El catálogo controlado de `action` cubre las clases enumeradas en FR-050; eventos no aplicables a
 una transición usan estados nulos, pero conservan entidad, acción, actor y fecha. El permiso de
 lectura de auditoría es administrativo; los roles de aplicación no pueden modificar ni borrar
@@ -486,6 +514,10 @@ quedan fuera hasta resolver OQ-005.
 
 ## Máquinas de estado
 
+Esta sección resume la persistencia. La fuente normativa de estados, actores, transiciones,
+precondiciones, motivos, efectos y errores es `contracts/state-machines.md`; ningún estado definido
+solo en este modelo o en `tasks.md` es ejecutable.
+
 ### Cuenta
 
 ```text
@@ -494,7 +526,9 @@ pending_verification -> active -> suspended -> active
 ```
 
 Archivo no elimina registros relacionados. Solo admin suspende/reactiva/restaura; la restauración no
-reactiva perfiles, empresas, ofertas ni accesos relacionados.
+reactiva perfiles, empresas, ofertas ni accesos relacionados. Reactivar una cuenta candidata mueve
+solo la cuenta de `suspended` a `active` y conserva sin cambios el estado del perfil candidato;
+restaurar un registro archivado es una operación distinta y lo devuelve a su estado seguro.
 
 ### Candidato
 
@@ -542,7 +576,7 @@ received/admin_nomination -> under_review -> preinterview -> preselected -> refe
 
 cualquier estado no final -> withdrawn (candidato, cualquier origen; admin solo a su pedido)
 cualquier estado no final -> cancelled (admin, caso individual motivado u oferta cancelada)
-no_company_response -> hired | not_selected | withdrawn | cancelled (admin, respuesta tardía)
+no_company_response -> hired | not_selected | cancelled (admin, respuesta tardía con evidencia)
 ```
 
 - `under_review`, `preinterview` y `preselected` se pueden omitir solo hacia adelante mediante una

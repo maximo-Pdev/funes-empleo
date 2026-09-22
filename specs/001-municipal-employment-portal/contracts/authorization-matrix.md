@@ -46,6 +46,7 @@ existencia expondría información.
 | Padrón/búsqueda de candidatos | No | No | Nunca | Sí | No |
 | Consentimiento | No | Consultar/aceptar/retirar propio | No | Registrar asistido y consultar | No |
 | Perfil empresa | No | No | Solo propio | Sí | No |
+| Cuenta/perfil empresa: archivar/restaurar | No | No | Archiva los propios; no restaura | Archiva con motivo; restaura con motivo | No |
 | Oferta: crear/editar borrador | No | No | Solo propia | Puede mantener/moderar | No |
 | Oferta: publicar/moderar | No | No | Nunca | Sí | No |
 | Postulación propia | No | Crear/retirar propia | No | Consultar; registrar retiro solicitado por candidato; cancelar caso con motivo | No |
@@ -119,6 +120,12 @@ tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de o
 - Empresa no registra resultado final.
 - Suspender o archivar candidato/empresa revoca inmediatamente el acceso empresarial a perfil y CV;
   reactivar no lo restablece automáticamente.
+- El archivo empresarial propio y el administrativo bloquean la cuenta/perfil y las ofertas no
+  finales, preservan historial y resultados y no permiten restauración por la empresa; solo un
+  administrador restaura con motivo a cuenta `active`, perfil `incomplete` y ofertas `draft`.
+- Reactivar una cuenta candidata vuelve la cuenta a `active` sin cambiar el estado anterior del
+  perfil; cada operación posterior revalida estado, frescura, disponibilidad, consentimiento y CV,
+  y no repone ofertas, participaciones, derivaciones ni permisos relacionados.
 - Retirar postulación o consentimiento revoca inmediatamente todos los permisos afectados; aceptar
   nuevamente o restaurar no los repone.
 - `hired` conserva acceso si seguía activo, por un máximo de 720 horas desde la confirmación;

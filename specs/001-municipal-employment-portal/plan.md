@@ -57,7 +57,20 @@ estados de carga inmediatos, listados paginados en servidor y búsquedas sobre c
 indexados. Ambas mediciones se ejecutan por un único administrador de prueba sin capacitación ni
 práctica previa, con solo la descripción de la tarea, en el mismo entorno de demostración, con el
 dataset restablecido, conexión estable, sin calentamiento y registrando las condiciones. No se fija
-un SLA productivo ni una capacidad de concurrencia no respaldada por evidencia.
+un SLA productivo. En ese entorno, búsquedas, filtros y listados administrativos tienen límite de 3
+segundos; descargar un CV autorizado de hasta 5 MiB, 10 segundos; previsualizar 1.000 filas CSV
+sintéticas, 30 segundos; y confirmar un lote válido de ese tamaño, 60 segundos. Cuatro sesiones
+administrativas concurrentes deben moderar una oferta, guardar una preselección, registrar un
+contacto y confirmar un resultado sobre registros distintos en hasta 5 segundos por operación
+—excepto importación/exportación— sin estados parciales ni pérdida de auditoría. Se ejecuta una
+medición fría por caso después de un reset separado, sin promediar; cualquier exceso falla. El reloj
+cubre solicitud hasta render estable para consultas, solicitud hasta archivo completo para CV y
+envío/confirmación hasta estado terminal visible para CSV. Las lecturas fijadas son búsqueda de
+candidatos por término más categoría/disponibilidad, ofertas por estado más cambio de página y
+empresas por estado más cambio de página; el fixture versionado guarda sus entradas y conteos
+esperados. La prueba concurrente usa una barrera común y luego verifica las cuatro mutaciones y sus
+auditorías. Se excluyen carga superior a cuatro administradores y capacidad productiva hasta resolver
+OQ-006.
 
 **Restricciones**: interfaz en español, responsive y operable con teclado; cuatro administradores
 individuales con igual permiso; autorización en servidor y base; CV PDF privado de hasta 5 MiB para
@@ -265,21 +278,32 @@ que OQ-001 no se convirtió en TTL de datos ni purga inventados y que el protoco
   sobre su derivación mediante la referencia no personal acotada, sin recuperar datos.
 - La acción administrativa de suspensión se presenta destacada y requiere confirmación explícita;
   la función servidor vuelve a validar actor, estado, versión y motivo. Reactivar la cuenta no
-  reactiva automáticamente ofertas, derivaciones ni permisos relacionados. Al reactivar una cuenta
-  empresarial, la misma transición devuelve únicamente su perfil a `incomplete`; la empresa debe
-  completar de nuevo los datos requeridos antes de operar con su perfil, y sus ofertas permanecen
-  suspendidas hasta una decisión municipal separada.
+  reactiva automáticamente ofertas, participaciones, derivaciones ni permisos relacionados. Al
+  reactivar una cuenta candidata, solo `accounts.status` vuelve a `active`: la suspensión y la
+  reactivación no modifican por sí mismas `candidate_profiles.status`, que conserva el estado
+  anterior, y cada operación posterior revalida estado, frescura, disponibilidad, consentimiento y
+  CV cuando corresponda. Al reactivar una cuenta empresarial, la misma transición devuelve
+  únicamente su perfil a `incomplete`; la empresa debe completar de nuevo los datos requeridos antes
+  de operar con su perfil, y sus ofertas permanecen suspendidas hasta una decisión municipal
+  separada.
 - El candidato puede corregir directamente sus datos. Solicitar eliminación ejecuta una transición
   atómica que archiva cuenta/perfil de inmediato, bloquea actividad futura y preserva historial y
   archivos según OQ-001; no elimina el usuario de Auth ni datos de negocio.
+- Una empresa autenticada puede archivar su propia cuenta/perfil y un administrador puede ejecutar
+  el mismo archivo con motivo. La transición atómica bloquea el acceso empresarial, marca sus ofertas
+  no finales con archivo recuperable, revoca permisos de derivación y preserva casos, resultados e
+  historial; no introduce un estado alternativo de desactivación ni elimina el usuario de Auth o los
+  datos de negocio.
 - Retirar una postulación ya derivada o retirar el consentimiento general revoca en la misma
   transacción todo acceso empresarial relacionado. Retirar el consentimiento cierra además como
   `withdrawn` todas las participaciones abiertas del candidato con motivo `consent_withdrawn`, sin
   alterar resultados finales anteriores. Un consentimiento posterior o la restauración de una
   cuenta no recuperan esos accesos ni reabren participaciones; una nueva derivación requiere una
   decisión municipal explícita.
-- Solo un administrador puede restaurar, con motivo y detección previa de conflictos. Un perfil o
-  empresa vuelve inactivo y una oferta vuelve a borrador; accesos y participaciones no se reactivan.
+- Solo un administrador puede restaurar un registro archivado, con motivo y detección previa de
+  conflictos. Esta restauración se distingue de reactivar una cuenta suspendida: un perfil candidato
+  vuelve a `draft`; una cuenta empresarial vuelve a `active`, su perfil a `incomplete` y sus ofertas
+  a `draft`. Accesos, participaciones y derivaciones no se reactivan.
 
 ### Automatizaciones diarias
 
@@ -333,6 +357,18 @@ que OQ-001 no se convirtió en TTL de datos ni purga inventados y que el protoco
 - Migraciones SQL versionadas y forward-only, con patrón expand/contract. Antes de cambios
   destructivos: `db push --dry-run`, respaldo lógico y procedimiento de recuperación documentado.
   Backups/PITR productivos dependen de OQ-006 y del nivel de servicio que apruebe la Municipalidad.
+- Ante una migración fallida en local, preview o demo, cualquiera de los dos desarrolladores puede
+  detener ese despliegue y preparar una corrección en su rama y entorno aislado sin autorización
+  previa del otro. No se edita una migración ya aplicada: se verifica si hubo rollback completo,
+  DDL/datos parciales, divergencia de `schema_migrations`, versión de entorno incorrecta o una
+  migración posterior concurrente, y se crea una migración correctiva forward-only. Los entornos
+  exclusivamente ficticios pueden reconstruirse desde migraciones y fixtures después de conservar
+  la evidencia; producción sigue bloqueada por OQ-006.
+- La recuperación registra entorno, desarrollador y fecha, commit y migración afectada, error
+  sanitizado, estado observado antes/después, resultado de integridad y referencia al respaldo si
+  existe, sin copiar secretos ni datos personales. El autor comunica la incidencia y la corrección
+  al otro desarrollador mediante el PR o su comentario asociado después de prepararla; no necesita
+  consulta previa. La revisión normal del PR controla la integración al historial compartido.
 
 ### Entornos y entrega
 
@@ -435,14 +471,18 @@ microservicios ni un backend separado para el MVP.
 
 ## Dependencias externas y gates de aceptación
 
-| ID | Tratamiento en este plan | Gate antes de datos reales o aceptación |
-| --- | --- | --- |
-| OQ-001 | Archivo recuperable, sin purga ni TTL de datos automático; `expired_by_policy` permanece inalcanzable. La ventana de consulta posterior a contratación se limita a 720 horas como decisión del MVP, separada de retención. | Política de retención de perfiles, CV, contactos e historial aprobada por responsable legal/de datos. |
-| OQ-005 | Métricas internas y CSV genérico | Ejemplos y aprobación para cualquier informe oficial adicional. |
-| OQ-006 | Solo local, preview y demo ficticia | Operador, hosting, región, backups, incidentes y SMTP definidos. |
-| OQ-010 | Modelo de catálogo versionable y multiselección | Catálogo canónico depurado y aprobado por Oficina de Empleo. |
-| OQ-017 | PDF, máximo técnico de demo 5 MiB | Ratificación municipal antes de CV reales. |
-| OQ-018 | Flujo y contrato versionado, sin inferencia | Muestra anonimizada y mapeo escrito aprobado antes del importador definitivo. |
+| ID | Responsable | Tratamiento seguro | Etapa bloqueada | Evidencia rastreable para cerrar |
+| --- | --- | --- | --- | --- |
+| OQ-001 | Municipalidad / responsable legal o de datos | Archivo recuperable, sin purga ni TTL; `expired_by_policy` inalcanzable. Las 720 horas limitan acceso, no retención. | Datos reales, producción y purga/TTL | Política y aprobación escrita del responsable |
+| OQ-005 | Oficina de Empleo | Métricas internas y CSV genérico | Informes oficiales adicionales | Ejemplo de formato y aprobación escrita |
+| OQ-006 | Beex / Municipalidad | Solo local, preview y demo ficticia | Configuración/despliegue productivo | Plan escrito de operador, hosting, región, backups, incidentes y SMTP |
+| OQ-010 | Oficina de Empleo | Modelo versionable/multiselección y fixtures ficticios | Seed final y aceptación del catálogo | Catálogo canónico versionado y aprobación escrita |
+| OQ-017 | Plan técnico / Municipalidad | PDF y máximo técnico de 5 MiB solo para demo | CV reales y aceptación municipal del límite | Ratificación escrita de formatos y tamaño |
+| OQ-018 | Oficina de Empleo | Flujo/contrato versionado, sin inferencia | Importador histórico definitivo y su aceptación | Muestra anonimizada, mapeo versionado y aprobación escrita |
+
+Un PR, issue, acta, correo o mensaje incorporado al repositorio sirve como evidencia si identifica
+decisión, responsable y fecha; no se exige un documento formal adicional. Ningún límite técnico o
+etiqueta de demo equivale a aprobación municipal.
 
 También se requiere confirmar las cuatro identidades administrativas, la política/versión exacta del
 texto de consentimiento y los requisitos visuales municipales antes de la aceptación con usuarios.

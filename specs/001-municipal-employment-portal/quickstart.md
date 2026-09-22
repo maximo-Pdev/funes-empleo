@@ -162,14 +162,17 @@ Esperado:
    verificar la revocación inmediata en ambas y que la oferta y los demás casos siguen abiertos.
 6. Crear otra derivación con reloj de prueba vencido más de 30 días y ejecutar la función programada.
 7. Confirmar `no_company_response` y la revocación; como empresa, comunicar feedback tardío sin poder
-   recuperar los datos y corregir como admin a `hired`.
+   recuperar los datos y corregir como admin a `hired` usando ese feedback. Repetir con un contacto
+   municipal por teléfono, correo, WhatsApp o atención presencial que registre fecha, canal,
+   administrador y nota breve, y corregir a `not_selected` o `cancelled`.
 
 Esperado:
 
 - solo admin confirma resultados comunicados por la empresa; el candidato puede retirar su caso
   propio y el administrador puede registrar ese retiro solo a su pedido;
 - el job es idempotente y atribuye el evento a `system`;
-- la corrección conserva el cierre anterior;
+- la vista destaca el resultado vigente y conserva `no_company_response` con fecha como cierre
+  automático anterior reemplazado;
 - `hired` conserva únicamente un permiso que seguía activo durante las 720 horas posteriores a la
   confirmación; no selección, cancelación y falta de respuesta lo revocan inmediatamente;
 - feedback tardío no devuelve datos y corregir `no_company_response` a `hired` no reactiva el permiso;
@@ -264,17 +267,28 @@ Esperado:
    cancelar una vez antes de confirmar con motivo.
 2. Verificar bloqueo de acciones nuevas y revocación del acceso empresarial a perfiles/CV, sin
    convertir casos existentes en resultados finales.
-3. Reactivar la cuenta empresarial y comprobar que su perfil vuelve a `incomplete`, mientras
-   ofertas, derivaciones y accesos no vuelven automáticamente; restaurar después una oferta con
-   motivo y verificar que regresa a `draft`.
-4. Como candidato activo, solicitar eliminación y confirmar la acción.
-5. Comprobar archivo inmediato y ausencia de borrado físico; como admin, restaurar con motivo.
+3. Reactivar la cuenta candidata y comprobar que vuelve a `active` mientras el perfil conserva el
+   estado anterior; verificar que cada nueva operación revalida sus condiciones vigentes y que no
+   vuelven automáticamente participaciones, derivaciones ni accesos.
+4. Reactivar la cuenta empresarial y comprobar que su perfil vuelve a `incomplete`, mientras
+   ofertas, derivaciones y accesos no vuelven automáticamente; devolver después una oferta
+   suspendida a `draft` con una decisión y motivo separados.
+5. Como empresa, archivar la cuenta/perfil propios; comprobar bloqueo inmediato, ofertas no finales
+   marcadas con archivo recuperable y permisos revocados. Repetir el archivo sobre otra empresa como
+   admin, esta vez con motivo.
+6. Como candidato activo, solicitar eliminación y confirmar la acción.
+7. Comprobar archivo inmediato y ausencia de borrado físico; como admin, restaurar con motivo los
+   registros de candidato y empresa.
 
 Esperado:
 
 - toda transición identifica actor, estado previo/nuevo, fecha y motivo;
 - el candidato no espera aprobación para quedar archivado;
-- el perfil restaurado queda `draft`, la empresa inactiva y sus ofertas restauradas en `draft`;
+- reactivar la cuenta candidata conserva el estado anterior de su perfil y revalida las condiciones
+  vigentes, mientras restaurar el perfil candidato archivado lo devuelve a `draft`;
+- restaurar una empresa archivada la deja `incomplete` y restaurar una oferta archivada la devuelve
+  a `draft`; la cuenta empresarial queda `active`, pero la empresa nunca puede restaurarse por sí
+  misma;
 - participaciones, resultados y evidencias históricas se conservan sin reactivarse.
 
 ## Protocolo de aceptación de tiempos y tareas
@@ -294,6 +308,26 @@ Esperado:
   métricas/exportación desde aplicar los filtros hasta ver conteos y completar la descarga. Registrar
   para cada ejecución commit/despliegue, versión/hash y confirmación del reset, fecha, navegador,
   dispositivo, conexión e identificador seudónimo del participante.
+- Rendimiento complementario: sobre el mismo entorno/dataset, ejecutar una sola medición fría por
+  caso después de un reset separado, sin promediar resultados; cualquier exceso falla. Para búsqueda,
+  filtro y listado administrativos, iniciar al enviar la consulta, aplicar el filtro o cambiar de
+  página y terminar cuando filas y conteo o paginación actualizados estén visibles sin indicador de
+  carga; el límite es 3 segundos. Ejecutar exactamente: búsqueda de candidatos con el término
+  ficticio y filtros de categoría/disponibilidad definidos por el fixture; listado de ofertas por
+  estado y cambio a la página fijada; y listado de empresas por estado y cambio a la página fijada.
+  Guardar junto al hash del fixture las entradas y conteos esperados. Para el CV autorizado de hasta
+  5 MiB, medir desde solicitar la descarga hasta recibir el archivo completo y validar su tamaño/hash;
+  el límite es 10 segundos. Para el CSV sintético de 1.000 filas, medir la previsualización desde
+  enviar el archivo hasta mostrar el resumen completo —30 segundos— y la confirmación desde pulsar
+  confirmar hasta mostrar el lote terminal y sus conteos —60 segundos—; después comprobar integridad
+  y auditoría fuera del reloj.
+- Concurrencia complementaria: coordinar con una barrera común cuatro sesiones administrativas sobre
+  registros ficticios distintos: moderar una oferta pendiente, guardar una preselección, registrar un
+  contacto y confirmar un resultado. Medir cada una desde su acción final de envío/confirmación hasta
+  el estado de éxito visible; las cuatro deben terminar en hasta 5 segundos. Después verificar las
+  cuatro mutaciones completas y sus eventos de auditoría, sin estados parciales ni pérdida de
+  historia. Importación/exportación, capacidad superior y SLA productivo quedan fuera mientras
+  OQ-006 siga abierta.
 - Primer intento: no hubo ayuda externa ni reinicio del recorrido. Corregir un error mediante los
   mensajes de la propia interfaz no invalida el intento.
 - Las cinco tareas de éxito son: candidato completa perfil y se postula; empresa crea y envía una
@@ -330,6 +364,15 @@ Antes de considerar terminada una implementación:
 4. Incluir evidencia manual de los flujos críticos y accesibilidad.
 5. Declarar limitaciones y OQ todavía abiertas.
 6. Obtener revisión del segundo desarrollador; aprobación no equivale a merge.
+
+Si una migración falla en local, preview o demo, el desarrollador que la detecta puede detener ese
+despliegue y preparar una migración correctiva forward-only en su propia rama/entorno sin pedir
+autorización previa. Debe conservar antes entorno, fecha/actor, commit y migración, error sanitizado,
+estado de `schema_migrations`, indicio de cambios parciales, verificaciones de integridad y respaldo
+si existe. No modifica migraciones ya aplicadas. Después comunica el incidente y la corrección en el
+PR o comentario asociado; la revisión normal ocurre antes de integrar. Los entornos con datos solo
+ficticios pueden reconstruirse desde migraciones y fixtures una vez preservada la evidencia. No se
+aplica este procedimiento a producción mientras OQ-006 siga abierta.
 
 ## Variables previstas
 

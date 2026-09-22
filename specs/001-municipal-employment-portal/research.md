@@ -128,6 +128,13 @@ antes de datos reales.
 **Decisión**: versionar SQL en `supabase/migrations`, adoptar Supabase CLI y Docker para
 `db reset`, pgTAP y validación local. Migraciones forward-only, patrón expand/contract y script de
 recuperación para cambios riesgosos; `db push --dry-run` y respaldo antes de una migración destructiva.
+Si una migración falla en local, preview o demo, cualquiera de los dos desarrolladores puede detener
+ese despliegue, diagnosticar y preparar sin consulta previa una nueva migración forward-only en su
+rama y entorno aislado; luego informa al otro en el PR o comentario asociado. No se reescribe una
+migración aplicada. La evidencia mínima es entorno, actor/fecha, commit/migración, error sanitizado,
+estado de `schema_migrations`, posible estado parcial, verificaciones de integridad y respaldo cuando
+exista. Un entorno solo ficticio puede reconstruirse tras conservar esa evidencia; producción queda
+fuera hasta resolver OQ-006.
 
 **Fundamento**: la constitución exige migraciones revisables, recuperación y autorización probada en
 base. El entorno local reproducible justifica herramientas que la capacitación no exigía al inicio.
@@ -306,12 +313,15 @@ privacidad, pérdida de trazabilidad y contradicción con la especificación.
 
 ## 17. Automatización de vencimientos y saltos de evaluación
 
-**Decisión**: el mantenimiento diario idempotente cierra tanto ofertas publicadas vencidas como
-derivaciones sin respuesta a 30 días desde `referred_at`; para estas últimas también revoca el
-permiso empresarial y registra ambos cambios con actor `system` en una transacción. El feedback
-tardío se admite sin datos personales y no restaura el permiso, incluso si administración corrige el
-resultado a `hired`. Revisión, preentrevista y preselección son etapas omitibles solo hacia adelante
-por un administrador, con motivo; la derivación explícita nunca es omitible.
+**Decisión**: el mantenimiento diario idempotente cierra ofertas publicadas vencidas, cierra
+derivaciones sin respuesta a 30 días desde `referred_at` y materializa como `revoked` los permisos
+posteriores a contratación cuya ventana de 720 horas terminó. El cierre sin respuesta revoca el
+permiso empresarial en la misma transacción; cada una de las tres acciones registra actor `system`
+sin duplicar eventos. La autorización deniega nuevas lecturas desde el instante exacto del
+vencimiento poscontratación aunque la materialización se ejecute después. El feedback tardío se
+admite sin datos personales y no restaura el permiso, incluso si administración corrige el resultado
+a `hired`. Revisión, preentrevista y preselección son etapas omitibles solo hacia adelante por un
+administrador, con motivo; la derivación explícita nunca es omitible.
 
 **Fundamento**: una única frontera programada conserva actor `system`, evita ofertas vencidas y
 reutiliza el patrón transaccional ya elegido. Los saltos autorizados reducen trabajo innecesario sin
