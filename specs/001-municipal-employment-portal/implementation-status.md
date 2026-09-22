@@ -1,7 +1,8 @@
 # Estado de implementación — 2026-09-22
 
-Rama: `feature/mvp-implementation`. Base observada: `1cc466f` (merge de PR #16).
-Trabajo local sin commit, push ni PR creados por esta ejecución.
+Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
+El trabajo anterior ya estaba commiteado y el árbol limpio al retomar. Esta continuación no creó
+commits, push ni PR.
 
 ## Gate de entrada
 
@@ -17,16 +18,20 @@ Supabase y workflow CI. La página declara que los servicios todavía no están 
 No hay tablas de negocio, RLS, autenticación, perfiles, ofertas, derivaciones, importación ni métricas.
 Los helpers de identidad E2E contienen únicamente direcciones ficticias y no simulan autenticación.
 
-T002–T005 están verificadas y marcadas. Permanecen abiertas:
+T001–T007 están implementadas y marcadas; checkpoint técnico local de fase 1 validado.
 
-- T001: scaffold y lockfile creados, pero la revisión del complemento de dependencias de plan/research
-  por el segundo desarrollador sigue pendiente. No se atribuye esa aprobación al agente.
-- T006: config, carpetas, seed vacío y prueba de infraestructura pgTAP creados; ejecución sin verificar
-  porque no hay motor Docker local accesible.
-- T007: workflow creado con permisos de lectura y jobs de aplicación/base; no ejecutado en GitHub.
-  El E2E actual es solo smoke público; al incorporar identidad debe incorporar el entorno local
+- T001: se completaron las carpetas del plan, se revisaron las versiones fijadas y la justificación
+  de dependencias auxiliares en plan/research, y se comprobó `npm ci`. No se agregaron dependencias
+  en esta continuación. La revisión técnica del agente no sustituye la revisión humana del PR.
+- T006: Docker Desktop ya estaba instalado por usuario y activo, fuera de PATH. Se utilizó ese motor
+  sin instalar servicios ni modificar PATH global. Arranque, reset local y pgTAP terminaron con exit 0.
+- T007: YAML parseado y comprobados permisos de lectura y los siete comandos del workflow;
+  comandos validados localmente. No se afirma ejecución remota: GitHub devolvió 404 a la consulta
+  no autenticada de Actions. La revisión del segundo desarrollador y la ejecución en GitHub siguen
+  pendientes antes de integrar; no son evidencia sustituida por estas casillas de implementación.
+- T008 en adelante: no iniciadas por alcance de la solicitud («completa la fase 1»).
+  El E2E actual es solo smoke público; al incorporar identidad se debe añadir el entorno local
   ficticio de Supabase para esos escenarios, sin usar secretos de demo/producción.
-- T008 en adelante: no iniciadas. No avanzar de fase hasta cerrar el checkpoint de fase 1.
 
 ## Evidencia ejecutada
 
@@ -38,7 +43,8 @@ T002–T005 están verificadas y marcadas. Permanecen abiertas:
 | `npm run test:coverage` | Exit 0, 5 pruebas en 2 archivos |
 | `npm run build` | Exit 0, ruta pública prerenderizada |
 | `npm run test:e2e` | Exit 0, 1 prueba Chromium con axe y enlace de salto/foco |
-| `npm run test:db` | Exit 1, `LegacyLocalDbRunningError: failed to inspect service` |
+| `npm run test:db` | Exit 0, reset local + pgTAP: 1 archivo, 1 prueba, PASS |
+| Workflow CI | YAML, permisos y comandos comprobados; ejecución remota no verificada |
 
 La cobertura se limita explícitamente al módulo de esquema de entorno, no representa cobertura del
 MVP. Axe sobre la página inicial tampoco reemplaza la aceptación manual ni NVDA de los flujos futuros.
@@ -58,20 +64,23 @@ con permisos para manejar subprocesos; terminó normalmente en aproximadamente 3
   valores. Se rechazan claves `sb_secret_` y JWT `service_role` en configuración pública.
 - Config Supabase: grants explícitos, sin Realtime/Edge/analítica/vectores ni integración IA;
   email confirmado y cambio seguro, bucket/límites definitivos pendientes de las migraciones de fase 2.
-- No se detectó `docker` ni `podman` en PATH, tampoco Docker en su ruta habitual ni pipes
-  `docker_engine`/`dockerDesktopLinuxEngine`. No se instalaron ni modificaron servicios del sistema.
+- El diagnóstico inicial de Docker quedó superado: WSL2 y procesos del sistema revelaron una
+  instalación activa en `%LOCALAPPDATA%\Programs\DockerDesktop`, no en Program Files. Docker Server
+  29.8.0 funciona. La guía documenta cómo agregar su binario al PATH solo de la terminal actual.
+- Un intento de `npm ci` durante el arranque de Supabase encontró el ejecutable en uso (EPERM).
+  Se esperó a que terminara el arranque y se repitió con éxito, sin borrar archivos manualmente ni
+  cerrar procesos ajenos. Ejecutar reinstalaciones antes de comandos que usen esos binarios.
+- El entorno Docker local `funes-empleo` queda iniciado con seed vacío, sin datos de negocio.
 
 ## Cómo retomar
 
-1. Revisar diff y la corrección/complemento técnico de plan/research. No sobrescribir este trabajo.
-2. Disponer de Docker Desktop con motor Linux activo; ejecutar `npx supabase start` y
-   `npm run test:db` exclusivamente sobre el proyecto local ficticio. No imprimir credenciales en
-   conversaciones. El comando de prueba resetea únicamente la base local.
-3. Validar el workflow en PR con el segundo desarrollador. Completar T001/T006/T007 únicamente con
-   evidencia aplicable y cerrar el checkpoint de fase 1.
-4. Iniciar T008/T009 (tests que fallen por ausencia de funcionalidad) antes de las migraciones y
-   servicios de fase 2. No saltar directamente a historias.
-5. Mantener OQ abiertas; T069 y el importador histórico dependen del mapeo municipal aprobado.
+1. Revisar el diff y la corrección/complemento técnico de plan/research con el segundo desarrollador;
+   validar el workflow en el PR antes de integrar. No confundir validación local con aprobación humana.
+2. Ante una nueva solicitud de avanzar, iniciar T008/T009 (tests que fallen por ausencia de
+   funcionalidad) antes de las migraciones y servicios de fase 2. No saltar directamente a historias.
+3. Mantener Docker activo; `npm run test:db` resetea exclusivamente la base local ficticia. No imprimir
+   credenciales en conversaciones. No usar un entorno remoto real para estas pruebas.
+4. Mantener OQ abiertas; T069 y el importador histórico dependen del mapeo municipal aprobado.
 
 Constitución: se conserva intermediación, privacidad, datos ficticios, trazabilidad prevista y revisión
 por PR. Esta base no constituye el MVP terminado ni habilita datos reales o producción.

@@ -1,10 +1,10 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
 Esta guía define cómo deberá comprobarse la implementación. Desde el 2026-09-22 existe el esqueleto
-de la fase 1 y funcionan typecheck, lint, pruebas básicas, build y el smoke E2E. No están implementados
+de la fase 1 y funcionan typecheck, lint, pruebas básicas, pgTAP local, build y el smoke E2E. No están implementados
 los flujos de negocio ni sus fixtures. Los escenarios posteriores siguen siendo el contrato de
 aceptación, no evidencia de cumplimiento. Consultar `implementation-status.md` antes de continuar;
-la validación local de Supabase está bloqueada hasta disponer de Docker.
+la validación local de Supabase ya pasó con Docker Desktop y WSL2.
 
 ## Prerrequisitos
 
@@ -18,6 +18,20 @@ No usar credenciales, DNI, teléfonos, domicilios, CUIT, CV ni exportaciones rea
 habilita hasta resolver OQ-001, OQ-006 y las demás dependencias del plan.
 
 ## Preparación local prevista
+
+En Windows, Docker Desktop también puede instalarse por usuario en
+`%LOCALAPPDATA%\Programs\DockerDesktop`. Si el motor está iniciado pero `docker` no aparece en PATH,
+agregar únicamente para la terminal actual (no hace falta reinstalar ni modificar el PATH global):
+
+```powershell
+$dockerBin = Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\resources\bin'
+if (Test-Path (Join-Path $dockerBin 'docker.exe')) { $env:PATH = "$dockerBin;$env:PATH" }
+docker version
+```
+
+Ejecutar la instalación de paquetes antes de iniciar comandos de Next, Playwright o Supabase.
+En Windows, `npm ci` no debe correr mientras un proceso usa un binario dentro de `node_modules`:
+el sistema bloquea su reemplazo. No cerrar procesos ajenos ni borrar manualmente las dependencias.
 
 ```powershell
 npm ci
