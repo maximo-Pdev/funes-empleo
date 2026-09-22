@@ -30,9 +30,22 @@ PostgreSQL para migraciones, políticas, funciones y pruebas de base de datos.
 
 **Dependencias principales**: Next.js 16.3.5, React y React DOM 19.3.0, Tailwind CSS y
 `@tailwindcss/postcss` 4.3.3, `@supabase/supabase-js` 2.116.0, `@supabase/ssr` 0.12.7, Zod 4.6.5 y
-`csv-parse` 7.0.2. Herramientas: Supabase CLI 2.117.0, ESLint 10.10.0 y `eslint-config-next`
+`csv-parse` 7.0.2. Herramientas: Supabase CLI 2.117.0, ESLint 9.39.5 y `eslint-config-next`
 16.3.5. Todas las versiones directas se fijarán exactamente en `package.json` y el árbol
 reproducible quedará en `package-lock.json`; no se usarán rangos `^` o `~` para dependencias directas.
+
+**Complemento de implementación (2026-09-22)**: se explicitan dependencias auxiliares del mismo
+stack, verificadas en el registro npm: `@types/node` 24.13.6, `@types/react` 19.3.0,
+`@types/react-dom` 19.3.0, `jsdom` 30.1.1, `@testing-library/dom` 10.4.2,
+`@vitest/coverage-v8` 5.0.1 y `server-only` 0.0.1. Playwright se instala mediante
+`@playwright/test` 1.63.0, su runner de pruebas. No se agrega otro framework ni alcance de producto.
+La instrucción de continuar autónomamente habilita esta selección técnica mínima; la revisión del
+segundo desarrollador sigue pendiente en el PR y no se declara realizada por esta nota.
+
+**Corrección verificada (2026-09-22)**: ESLint 10.10.0 no puede cargar `react/display-name`
+con el plugin resuelto por `eslint-config-next` (`contextOrFilename.getFilename is not a function`).
+`eslint-plugin-react` 7.37.5 declara soporte hasta ESLint 9. Se fija 9.39.5, compatible con el
+peer `eslint >=9` de Next, sin deshabilitar reglas ni usar `--force`/`--legacy-peer-deps`.
 
 **Persistencia**: Supabase PostgreSQL para datos relacionales, RLS, funciones transaccionales,
 auditoría y vistas de métricas; Supabase Storage en bucket privado para CV; Supabase Auth para

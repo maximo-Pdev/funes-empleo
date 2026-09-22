@@ -6,9 +6,17 @@
 ## 1. Versiones reproducibles del stack
 
 **Decisión**: usar Node.js 24.21.0 LTS con npm 11.19.0, Next.js 16.3.5, React/React DOM
-19.3.0, TypeScript 6.0.3, Tailwind CSS y `@tailwindcss/postcss` 4.3.3, ESLint 10.10.0,
+19.3.0, TypeScript 6.0.3, Tailwind CSS y `@tailwindcss/postcss` 4.3.3, ESLint 9.39.5,
 `eslint-config-next` 16.3.5, Supabase CLI 2.117.0 y `csv-parse` 7.0.2. Fijar dependencias directas y
 commitear `package-lock.json`; CI instala con `npm ci`.
+
+Corrección de implementación del 2026-09-22: la versión inicialmente prevista de ESLint 10.10.0
+falló al cargar `react/display-name` por la retirada de `context.getFilename`. El paquete resuelto
+`eslint-plugin-react` 7.37.5 declara peers hasta ESLint 9. Se verificó en npm y se fijó 9.39.5,
+admitido por `eslint-config-next` 16.3.5 (`eslint >=9`). Se conserva el conjunto de reglas completo.
+Limitación: npm marca ESLint 9.39.5 como no mantenido. Es una fijación temporal por compatibilidad;
+se debe reevaluar al publicarse soporte de ESLint 10 en el plugin de React. No se silencia el aviso,
+ni se interpreta un audit sin vulnerabilidades como garantía de seguridad futura.
 
 **Fundamento**: respeta la capacitación, usa parches estables vigentes y evita variación entre
 desarrolladores y CI. TypeScript 6.0.3 se prefiere temporalmente a 7.0.2 porque Next 16.3 todavía
@@ -30,6 +38,19 @@ falta de reproducibilidad.
 [CSV Parse](https://www.npmjs.com/package/csv-parse).
 
 ## 2. Arquitectura de aplicación Next.js
+
+### Complemento de dependencias auxiliares (2026-09-22)
+
+Para materializar las herramientas ya elegidas se fijan `@types/node` 24.13.6,
+`@types/react`/`@types/react-dom` 19.3.0 (tipado), `jsdom` 30.1.1 (DOM en Vitest),
+`@testing-library/dom` 10.4.2 (peer requerido por React Testing Library),
+`@vitest/coverage-v8` 5.0.1 (cobertura) y `server-only` 0.0.1 (barrera de módulos privados).
+Se usa `@playwright/test` 1.63.0 como paquete del runner ya previsto. Se verificaron versiones,
+engines y peers mediante `npm view`: jsdom admite Node 24.21.0 y el peer `@vitest/browser` del
+proveedor de cobertura es opcional; no se añade ese paquete ni canvas. PostCSS llega mediante el
+plugin de Tailwind; no se agrega como dependencia directa sin un uso propio.
+Esto concreta herramientas existentes, no modifica decisiones funcionales ni cierra OQ. Queda
+sujeto a la revisión normal del PR; no se afirma aprobación del segundo desarrollador.
 
 **Decisión**: App Router en `src/app`, Server Components por defecto, Server Actions para
 mutaciones de formularios y Route Handlers solo para interfaces HTTP reales: Auth callback,

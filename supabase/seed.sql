@@ -1,0 +1,2 @@
+-- Phase 1 contains no business data. T021 will introduce fictitious fixtures only.
+-- Never place municipal records or real credentials in this file.

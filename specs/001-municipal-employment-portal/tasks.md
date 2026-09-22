@@ -33,10 +33,10 @@ an independent increment after the shared foundation.
 product behavior.
 
 - [ ] T001 Scaffold the single Next.js App Router project and planned directories in `package.json`, `package-lock.json`, `src/app/`, `src/components/`, `src/features/`, `src/domain/`, `src/lib/`, `src/validation/`, `supabase/`, and `tests/`; pin Node 24.21.0/npm 11.19.0 and every direct version enumerated in `plan.md`, and require a reviewed plan/research update before adding any unlisted direct dependency
-- [ ] T002 Configure strict TypeScript, Next.js 16.3.5, React 19.3.0, Tailwind 4.3.3/PostCSS, and ESLint 10.10.0 with zero warnings in `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `src/app/globals.css`, and `eslint.config.mjs`
-- [ ] T003 [P] Define validated, server/client-separated environment names and safe fictitious placeholders in `.env.example`, `src/lib/env/server.ts`, and `src/lib/env/client.ts`, excluding all real credentials and PII
-- [ ] T004 [P] Configure Vitest 5.0.1, React Testing Library 16.3.3, jsdom, and coverage scripts in `vitest.config.ts`, `tests/setup.ts`, and `package.json`
-- [ ] T005 [P] Configure Playwright 1.63.0 and `@axe-core/playwright` 4.13.0 with failure-only traces and fictitious test identities in `playwright.config.ts` and `tests/e2e/fixtures/auth.ts`
+- [X] T002 Configure strict TypeScript, Next.js 16.3.5, React 19.3.0, Tailwind 4.3.3/PostCSS, and ESLint 9.39.5 (compatibility correction documented in plan/research) with zero warnings in `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `src/app/globals.css`, and `eslint.config.mjs`
+- [X] T003 [P] Define validated, server/client-separated environment names and safe fictitious placeholders in `.env.example`, `src/lib/env/server.ts`, and `src/lib/env/client.ts`, excluding all real credentials and PII
+- [X] T004 [P] Configure Vitest 5.0.1, React Testing Library 16.3.3, jsdom, and coverage scripts in `vitest.config.ts`, `tests/setup.ts`, and `package.json`
+- [X] T005 [P] Configure Playwright 1.63.0 and `@axe-core/playwright` 4.13.0 with failure-only traces and fictitious test identities in `playwright.config.ts` and `tests/e2e/fixtures/auth.ts`
 - [ ] T006 [P] Configure the local Supabase 2.117.0 project, migration/test directories, private seed convention, and ignored temporary artifacts in `supabase/config.toml`, `supabase/migrations/.gitkeep`, `supabase/tests/.gitkeep`, and `.gitignore`
 - [ ] T007 Add the pull-request quality pipeline with read-only permissions and jobs for `npm ci`, typecheck, lint, Vitest, pgTAP, build, and Playwright in `.github/workflows/quality.yml`
 
