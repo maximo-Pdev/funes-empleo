@@ -1,8 +1,10 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
-Esta guía define cómo deberá comprobarse la implementación. En la etapa actual el repositorio aún no
-contiene la aplicación, por lo que los comandos son el contrato operativo para las fases de tareas e
-implementación, no una afirmación de que ya puedan ejecutarse.
+Esta guía define cómo deberá comprobarse la implementación. Desde el 2026-09-22 existe el esqueleto
+de la fase 1 y funcionan typecheck, lint, pruebas básicas, build y el smoke E2E. No están implementados
+los flujos de negocio ni sus fixtures. Los escenarios posteriores siguen siendo el contrato de
+aceptación, no evidencia de cumplimiento. Consultar `implementation-status.md` antes de continuar;
+la validación local de Supabase está bloqueada hasta disponer de Docker.
 
 ## Prerrequisitos
 
