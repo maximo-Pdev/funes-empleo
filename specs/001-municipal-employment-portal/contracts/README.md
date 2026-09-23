@@ -16,6 +16,10 @@ autorizan integraciones nuevas.
   callbacks, que requieren Route Handlers.
 - Cada mutación recibe la `version` esperada del agregado. Si cambió, responde `CONFLICT_STALE_DATA`
   y no escribe nada.
+- Excepción aprobada para feedback empresarial append-only: el envío tardío recibe la referencia de
+  derivación, bloquea y revalida propiedad/estado dentro de la transacción, e inserta un evento nuevo
+  sin sobrescribir el agregado ni exigir una versión adicional a la empresa. Así la referencia
+  revocada conserva exactamente los cuatro campos no personales de FR-039.
 - Éxito: resultado mínimo necesario, nueva versión y mensaje en español cuando corresponda.
 - Error esperado: código estable y mensaje accionable en español; no contiene stack, SQL, existencia
   de cuentas ajenas, PII, notas internas ni secretos.

@@ -1566,6 +1566,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+        admin_workflow_timeline: {
+          Args: { p_entity_type: string; p_entity_id: string }
+          Returns: {
+            event_id: string
+            action: string
+            previous_state: string | null
+            new_state: string | null
+            actor_type: string
+            actor_account_id: string | null
+            occurred_at: string
+            reason_code: string | null
+            reason: string | null
+          }[]
+        }
+        authorized_cv_path: {
+          Args: { p_cv: string }
+          Returns: string
+        }
       change_account_status: {
         Args: {
           p_account: string
@@ -1576,6 +1594,29 @@ export type Database = {
         }
         Returns: number
       }
+        company_referral: {
+          Args: { p_referral: string }
+          Returns: Json
+        }
+        company_referral_references: {
+          Args: { p_opening: string }
+          Returns: {
+            referral_id: string
+            opening_id: string
+            opening_title: string | null
+            referred_at: string
+          }[]
+        }
+        create_participation: {
+          Args: {
+            p_candidate: string
+            p_candidate_version: number
+            p_opening: string
+            p_opening_version: number
+            p_origin: string
+          }
+          Returns: string
+        }
       my_account_status: {
         Args: never
         Returns: {
@@ -1585,10 +1626,87 @@ export type Database = {
           version: number
         }[]
       }
+        record_contact: {
+          Args: {
+            p_participation: string
+            p_expected_version: number
+            p_channel: string
+            p_direction: string
+            p_occurred_at: string
+            p_summary: string
+            p_next_action_at?: string | null
+          }
+          Returns: number
+        }
+        record_internal_note: {
+          Args: {
+            p_candidate: string
+            p_expected_version: number
+            p_participation: string | null
+            p_kind: string
+            p_body: string
+            p_supersedes?: string | null
+          }
+          Returns: string
+        }
+        record_preinterview: {
+          Args: {
+            p_participation: string
+            p_expected_version: number
+            p_channel: string
+            p_scheduled_at: string | null
+            p_held_at: string | null
+            p_summary: string
+            p_recommendation: string
+            p_skip_reason?: string | null
+          }
+          Returns: number
+        }
       reserve_administrator_invitation: {
         Args: { p_actor: string; p_email: string }
         Returns: string
       }
+        submit_company_feedback: {
+          Args: {
+            p_referral: string
+            p_reported_outcome: string
+            p_message?: string | null
+          }
+          Returns: string
+        }
+        submit_company_interview: {
+          Args: {
+            p_referral: string
+            p_expected_version: number
+            p_status: string
+            p_scheduled_at: string | null
+            p_held_at: string | null
+            p_company_message?: string | null
+          }
+          Returns: string
+        }
+        transition_opening: {
+          Args: {
+            p_opening: string
+            p_expected_version: number
+            p_command: string
+            p_reason?: string | null
+            p_company_message?: string | null
+          }
+          Returns: number
+        }
+        transition_participation: {
+          Args: {
+            p_participation: string
+            p_expected_version: number
+            p_command: string
+            p_reason?: string | null
+            p_candidate_request?: string | null
+            p_feedback?: string | null
+            p_contact?: string | null
+          }
+          Returns: number
+        }
     }
     Enums: {
       account_role: "candidate" | "company" | "admin"
