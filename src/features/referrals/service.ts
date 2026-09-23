@@ -3,28 +3,31 @@ import { z } from "zod";
 import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
 
-const uuid = z.uuid();
-const referralInput = z.object({ participationId: uuid, expectedVersion: z.number().int().positive(), reason: z.string().trim().max(1_000).optional() });
+// PostgreSQL accepts all RFC 4122/GUID layouts. Local fixtures intentionally use
+// deterministic GUIDs whose version nibble is not v1-v8, so do not impose a
+// random-version UUID restriction at the application boundary.
+const id = z.guid();
+const referralInput = z.object({ participationId: id, expectedVersion: z.number().int().positive(), reason: z.string().trim().max(1_000).optional() });
 
 const categorySchema = z.object({ name: z.string(), kind: z.enum(["occupation", "interest"]) });
 const contactSchema = z.object({ kind: z.enum(["email", "phone", "other_approved"]), value: z.string() });
 const companyReferralSchema = z.object({
-  referralId: uuid,
-  openingId: uuid,
+  referralId: id,
+  openingId: id,
   openingTitle: z.string().nullable(),
   referredAt: z.iso.datetime({ offset: true }),
   participationVersion: z.number().int().positive().optional(),
   candidate: z.object({
     displayName: z.string(), locality: z.string().nullable(),
     skillsExperienceSummary: z.string().nullable(), availability: z.string().nullable(),
-    categories: z.array(categorySchema), contacts: z.array(contactSchema), cvDocumentId: uuid,
+    categories: z.array(categorySchema), contacts: z.array(contactSchema), cvDocumentId: id,
   }).optional(),
   interviews: z.array(z.object({
-    id: uuid, scheduledAt: z.string().nullable(), heldAt: z.string().nullable(),
+    id, scheduledAt: z.string().nullable(), heldAt: z.string().nullable(),
     status: z.string(), companyMessage: z.string().nullable(),
   })).optional(),
   feedback: z.array(z.object({
-    id: uuid, reportedOutcome: z.string(), message: z.string().nullable(),
+    id, reportedOutcome: z.string(), message: z.string().nullable(),
     reportedAt: z.iso.datetime({ offset: true }), reviewStatus: z.string(),
   })).optional(),
 });
@@ -54,7 +57,7 @@ export async function referCandidate(input: unknown) {
 }
 
 export async function listCompanyReferralReferences(openingId: string) {
-  if (!uuid.safeParse(openingId).success) throw new AppError("NOT_FOUND");
+  if (!id.safeParse(openingId).success) throw new AppError("NOT_FOUND");
   const session = await readAccountSession();
   if (!session) throw new AppError("AUTH_REQUIRED");
   if (session.account.role !== "company" || session.account.status !== "active") throw new AppError("NOT_FOUND");
@@ -67,7 +70,7 @@ export async function listCompanyReferralReferences(openingId: string) {
 }
 
 export async function getCompanyReferral(openingId: string, referralId: string): Promise<CompanyReferral> {
-  if (!uuid.safeParse(openingId).success || !uuid.safeParse(referralId).success) throw new AppError("NOT_FOUND");
+  if (!id.safeParse(openingId).success || !id.safeParse(referralId).success) throw new AppError("NOT_FOUND");
   const session = await readAccountSession();
   if (!session) throw new AppError("AUTH_REQUIRED");
   if (session.account.role !== "company" || session.account.status !== "active") throw new AppError("NOT_FOUND");

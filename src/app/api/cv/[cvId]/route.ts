@@ -18,7 +18,7 @@ function denied(status: number) {
 
 export async function GET(_request: Request, context: { params: Promise<{ cvId: string }> }) {
   const { cvId } = await context.params;
-  if (!z.uuid().safeParse(cvId).success) return denied(404);
+  if (!z.guid().safeParse(cvId).success) return denied(404);
   const session = await readAccountSession();
   if (!session || session.account.status !== "active") return denied(401);
 

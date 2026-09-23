@@ -38,7 +38,7 @@ function funesLocalToIso(value: FormDataEntryValue | null): string | undefined {
 export async function submitFeedbackAction(_previous: ReferralActionState, form: FormData): Promise<ReferralActionState> {
   try {
     const openingId = String(form.get("openingId") ?? "");
-    if (!z.uuid().safeParse(openingId).success) throw new AppError("VALIDATION_ERROR");
+    if (!z.guid().safeParse(openingId).success) throw new AppError("VALIDATION_ERROR");
     await submitCompanyFeedback({
       referralId: form.get("referralId"),
       reportedOutcome: form.get("reportedOutcome"), message: form.get("message") ?? "",
@@ -51,7 +51,7 @@ export async function submitFeedbackAction(_previous: ReferralActionState, form:
 export async function submitInterviewAction(_previous: ReferralActionState, form: FormData): Promise<ReferralActionState> {
   try {
     const openingId = String(form.get("openingId") ?? "");
-    if (!z.uuid().safeParse(openingId).success) throw new AppError("VALIDATION_ERROR");
+    if (!z.guid().safeParse(openingId).success) throw new AppError("VALIDATION_ERROR");
     await submitCompanyInterview({
       referralId: form.get("referralId"), expectedVersion: form.get("expectedVersion"),
       status: form.get("status"), scheduledAt: funesLocalToIso(form.get("scheduledAt")),

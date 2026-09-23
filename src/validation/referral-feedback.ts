@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-const id = z.uuid();
+// Accept deterministic PostgreSQL GUID fixtures as well as normal UUID v4 IDs.
+const id = z.guid();
 const shortMessage = z.string().trim().max(2_000);
 
 export const companyFeedbackInput = z.object({
