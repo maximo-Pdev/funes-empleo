@@ -1,0 +1,42 @@
+{
+  "version": "funes-demo-v1",
+  "seedSha256": "09ec247e1fbdf5588c6f8beb302991a812b917eacbba85ab8630c412feef42e1",
+  "cvSha256": "bc55ddf11de00a7dd85a1f5a8e4a8fea6a437851561b9092167492c4728896da",
+  "counts": {
+    "administrators": 4,
+    "candidates": 500,
+    "activeCandidates": 400,
+    "companies": 50,
+    "offers": 100,
+    "participations": 1000,
+    "confirmedHires": 50,
+    "fullyCoveredOffers": 20
+  },
+  "sc008a": {
+    "candidateSearch": {
+      "term": "Persona ficticia 001",
+      "categoryCode": "DEMO-B",
+      "availability": "available",
+      "expectedTotal": 1
+    },
+    "openingList": {
+      "status": "published",
+      "page": 2,
+      "pageSize": 10,
+      "expectedTotal": 80,
+      "expectedRows": 10
+    },
+    "companyList": {
+      "status": "active",
+      "page": 2,
+      "pageSize": 10,
+      "expectedTotal": 50,
+      "expectedRows": 10
+    }
+  },
+  "cvDownload": {
+    "candidateNumber": 1,
+    "file": "cv-fictitious.pdf",
+    "bytes": 608
+  }
+}

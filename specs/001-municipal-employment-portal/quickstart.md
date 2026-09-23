@@ -1,10 +1,9 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
-Esta guía define cómo deberá comprobarse la implementación. Desde el 2026-09-22 existe el esqueleto
-de la fase 1 y funcionan typecheck, lint, pruebas básicas, pgTAP local, build y el smoke E2E. No están implementados
-los flujos de negocio ni sus fixtures. Los escenarios posteriores siguen siendo el contrato de
-aceptación, no evidencia de cumplimiento. Consultar `implementation-status.md` antes de continuar;
-la validación local de Supabase ya pasó con Docker Desktop y WSL2.
+Esta guía define cómo deberá comprobarse la implementación. El esqueleto de la fase 1 y el fixture
+local ficticio 500/50/100/1.000 de la fase 2 ya existen. Los flujos de negocio posteriores siguen
+siendo el contrato de aceptación, no evidencia de cumplimiento. `implementation-status.md` conserva
+el estado histórico de la fase 1; la validación local de Supabase usa Docker Desktop y WSL2.
 
 ## Prerrequisitos
 
@@ -36,13 +35,18 @@ el sistema bloquea su reemplazo. No cerrar procesos ajenos ni borrar manualmente
 ```powershell
 npm ci
 npx supabase start
-npx supabase db reset
+node tests/fixtures/reset-local.mjs --confirm-local-reset
 Copy-Item .env.example .env.local
 npm run dev
 ```
 
 Completar `.env.local` solo con credenciales del entorno local generado. Nunca copiar claves de demo
 o producción a un archivo versionado ni a una conversación.
+El reinicio protegido verifica el proyecto y los puertos locales, los hashes de `seed.sql` y del PDF
+ficticio, los conteos con pgTAP, carga los 500 CV ficticios y comprueba accesos positivos y negativos
+en Storage. Destruye exclusivamente el dataset de la base local. Las entradas y resultados esperados
+de SC-008A se fijan en `tests/fixtures/acceptance-manifest.json`; no representan un catálogo
+municipal aprobado. `npm run test:db` también reconstruye la base local, pero no carga los blobs PDF.
 
 Resultado esperado:
 
