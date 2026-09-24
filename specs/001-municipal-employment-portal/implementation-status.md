@@ -153,3 +153,34 @@ configurado por Playwright.
 Antes de integrar, el segundo desarrollador debe revisar el PR y sus checks remotos. Permanecen las
 decisiones municipales abiertas sobre consentimiento real, retención, datos y límites de CV. No se
 usaron datos personales reales ni se probó un despliegue remoto.
+
+## Actualización 2026-09-24: integración de fases 4 y 5
+
+La fase 4 se publicó en la PR #23 desde `codex/phase-4-candidate-self-service` hacia
+`tasks.md-FASE-3-Maximo`. El workflow Quality pasó. GitHub registró la fusión con commit
+`741f5c7fb2fe0039dd630562e6c30f4d34a3e8be`; al consultarlo no figuraban revisiones de PR.
+Después de confirmar la fusión, se borró la rama de fase 4 tanto local como remotamente.
+Esa ausencia de revisión registrada no se presenta como aprobación del segundo desarrollador.
+
+Para avanzar en paralelo se había creado `codex/phase-5-company-self-service` desde fase 4,
+con commit intermedio `9eb9c61`. Tras la fusión se rebasó exclusivamente ese trabajo sobre el
+commit `741f5c7`, que pasó a identificarse como `0a3db46`. Se conservaron las ramas y PR por fase;
+la rama de integración aún no se fusionó a `main`.
+
+La fase 5 implementa T051–T060: cuenta y perfil empresarial individuales con CUIT normalizado,
+edición de borradores y categorías, envío/reenvío a moderación, historial visible limitado,
+tablero de ofertas y derivaciones propias, y suspensión/archivo/restauración por el administrador.
+La empresa puede archivar su perfil, pero no restaurarlo. La migración forward-only
+`202609190030_company_self_service.sql` agrega funciones de escritura con validación de actor,
+versión, propiedad y estado, además de proyecciones que omiten motivos internos. No se agregaron
+variables de entorno. Ante una migración aplicada fallida corresponde conservar evidencia y añadir
+una correctiva hacia adelante; en el entorno local ficticio puede reconstruirse con reset.
+
+Verificación con Supabase local restablecido y datos ficticios: typecheck, lint y build pasaron;
+79 pruebas unitarias/de componentes pasaron en 15 archivos; pgTAP pasó 300 pruebas en 6 archivos;
+Playwright pasó los 3 recorridos de `company-offers.spec.ts` sobre base recién reiniciada.
+Los recorridos incluyen registro y verificación de correo local, corrección, envío y aprobación de
+una oferta, pausa y reanudación, aislamiento entre empresas, suspensión, archivo y restauración.
+Se ejecutó axe sin violaciones en registro y perfil empresarial. No se realizaron las mediciones
+manuales de usuarios, zoom/NVDA o despliegue de demostración; siguen como aceptación posterior.
+Las decisiones municipales abiertas del documento de preguntas siguen vigentes.
