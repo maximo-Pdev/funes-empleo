@@ -184,3 +184,32 @@ una oferta, pausa y reanudación, aislamiento entre empresas, suspensión, archi
 Se ejecutó axe sin violaciones en registro y perfil empresarial. No se realizaron las mediciones
 manuales de usuarios, zoom/NVDA o despliegue de demostración; siguen como aceptación posterior.
 Las decisiones municipales abiertas del documento de preguntas siguen vigentes.
+
+## Actualización 2026-09-24: cierre de T025 de fase 3
+
+La fase 5 quedó publicada en la PR #24, desde `codex/phase-5-company-self-service` hacia
+`tasks.md-FASE-3-Maximo`. El workflow Quality pasó; al cerrar esta verificación la PR seguía sin
+revisiones registradas. La rama `codex/phase-3-e2e-completion` parte del commit de fase 5
+`2aa7139` para completar únicamente T025 mientras espera esa revisión. Por eso la integración a
+`main` todavía no corresponde.
+El cierre de T025 se publicó en la PR #25, desde `codex/phase-3-e2e-completion` hacia la rama
+de fase 5, con el commit `576636f`; se solicitó revisión a `MateoMansillaDev`.
+
+Se amplió `tests/e2e/intermediation.spec.ts` con los recorridos administrativos de Quickstart 2–4
+y 8: filtros del padrón, nominación, preentrevista, preselección, omisiones justificadas y derivación;
+retiros por candidato y administrador; confidencialidad empresarial tras cambios de CV/contactos,
+retiro y renovación del consentimiento; entrevista, no selección y cancelación individual;
+vencimiento de oferta, falta de respuesta a 30 días y permiso poscontratación a 720 horas con
+automatización idempotente y corrección tardía; rechazo, cierre, cancelación y suspensión sin
+reabrir permisos ni borrar el historial. El helper de reloj actúa solo contra la base Supabase local
+y el contenedor ficticio identificado de este proyecto. La nominación administrativa usa la RPC
+existente `create_participation`, con validación de rol, versión y condiciones en el servidor y la
+base. Se corrigió el enlace desde una oferta pública para que el candidato llegue a la oferta
+elegida y pueda postularse aunque no esté en la primera página del listado.
+
+Evidencia local con fixture ficticio reconstruido: 300/300 pgTAP, 79/79 pruebas unitarias y de
+componentes, typecheck, lint y build exitosos. Playwright pasó 21 recorridos; el de recuperación
+de contraseña conserva su omisión ambiental preexistente (1 skipped). El recorrido de nominación
+también pasó aislado antes de reiniciar la base para la suite completa. No se añadieron migraciones,
+variables de entorno ni datos reales en T025. Faltan revisión humana de las PR, mediciones manuales
+de aceptación y decisiones municipales ya documentadas; estos gates no se presentan como completos.
