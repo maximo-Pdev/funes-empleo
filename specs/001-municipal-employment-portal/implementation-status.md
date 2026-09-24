@@ -84,3 +84,31 @@ con permisos para manejar subprocesos; terminó normalmente en aproximadamente 3
 
 Constitución: se conserva intermediación, privacidad, datos ficticios, trazabilidad prevista y revisión
 por PR. Esta base no constituye el MVP terminado ni habilita datos reales o producción.
+
+## Actualización 2026-09-24: fase 3 de intermediación
+
+Las secciones anteriores describen el cierre histórico de fase 1; ya no representan el estado actual.
+La PR #22 de derivaciones y funciones SQL está fusionada en `main` remoto (`2aac079`) y también fue
+integrada en `tasks.md-FASE-3-Maximo`. La rama de trabajo incluye las pantallas y acciones municipales,
+el fixture PDF determinista corregido y pruebas de privacidad en navegador. No se fusionó esta rama
+de trabajo a `main`.
+
+Quedaron marcadas T022–T024 y T026–T037. T025 permanece abierta: los E2E actuales prueban búsqueda,
+lectura administrativa, aislamiento de rol, descarga del CV exacto, revocación después de la última
+derivación activa, feedback con confirmación municipal, contactos/notas y suspensión/reactivación sin
+restaurar acceso. No cubren todavía **todos** los recorridos de Quickstart 2–4 y la parte administrativa
+de 8 (por ejemplo alta/edición de empresa y oferta, reemplazo de CV, consentimiento y nominaciones de
+punta a punta), algunos de los cuales dependen de interfaces de fases posteriores. No marcar T025 por
+una cobertura parcial.
+
+Evidencia local sobre el fixture exclusivamente ficticio: reset y carga de 500 CV, 203 pruebas pgTAP,
+69 pruebas unitarias/de componentes, typecheck, lint y build exitosos; Playwright terminó con 12 pruebas
+aprobadas y una omisión ajena a US1 (`recovery-flow`). Docker Desktop se instaló en modo usuario
+y el motor local respondió; el agente no aceptó ningún acuerdo de licencia. La prueba de revocación
+contempla que una empresa puede
+tener otra derivación todavía vigente del mismo candidato: cancelar una sola no corta ese otro permiso;
+cancelar la última sí devuelve 404 en nuevas descargas. No se guarda URL firmada reutilizable.
+
+Antes de fusionar esta rama, revisar el diff y la nueva cobertura E2E en PR, comprobar los checks
+remotos y decidir cuándo completar T025 con las interfaces correspondientes. La validación local no
+equivale a aprobación humana ni prueba de despliegue en Vercel.

@@ -71,30 +71,20 @@ async function adminClient() {
 const SEARCH_COLUMNS = "id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,archived_at,version,accounts!candidate_profiles_account_id_fkey(status),candidate_categories(category_id,job_categories(code,name,active)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)";
 const BATCH_SIZE = 1000;
 
-// The bounded demonstration fixture fits in one request. Filtering eligibility
-// after reading the latest consent ensures the displayed count and page are exact;
-// a historical accepted consent must never make a withdrawn candidate eligible.
+// The bounded demonstration fixture fits in one request. Apply category and
+// eligibility against joined rows: sending hundreds of candidate UUIDs through
+// a PostgREST `in` URL can exceed the API/proxy request-line limit.
 export async function searchCandidates(input: unknown, now = new Date()) {
   const parsed = candidateSearchSchema.safeParse(input);
   if (!parsed.success) throw new AppError("VALIDATION_ERROR");
   const filters: CandidateSearchFilters = parsed.data;
   const client = await adminClient();
-  let candidateIds: string[] | null = null;
-  if (filters.categoryId) {
-    const categoryRows = await client.from("candidate_categories")
-      .select("candidate_id").eq("category_id", filters.categoryId);
-    if (categoryRows.error) throw new AppError("INTERNAL_ERROR");
-    candidateIds = [...new Set((categoryRows.data ?? []).map((row) => row.candidate_id))];
-    if (candidateIds.length === 0) return paginateCandidates<CandidateSearchHit>([], filters.page, filters.pageSize);
-  }
-
   const matches: CandidateSearchHit[] = [];
   for (let offset = 0; ; offset += BATCH_SIZE) {
     let query = client.from("candidate_profiles").select(SEARCH_COLUMNS)
       .order("display_name").order("id")
       .range(offset, offset + BATCH_SIZE - 1);
     if (filters.vigency !== "all") query = query.is("archived_at", null);
-    if (candidateIds) query = query.in("id", candidateIds);
     if (filters.term) {
       const pattern = `%${filters.term}%`;
       query = query.or(`display_name.ilike.${pattern},skills_experience_summary.ilike.${pattern}`);
@@ -112,6 +102,7 @@ export async function searchCandidates(input: unknown, now = new Date()) {
     if (result.error) throw new AppError("INTERNAL_ERROR");
     const rows = (result.data ?? []) as unknown as CandidateSearchRow[];
     for (const row of rows) {
+      if (filters.categoryId && !row.candidate_categories.some((entry) => entry.category_id === filters.categoryId)) continue;
       const eligible = candidateIsReferralEligible(row, now);
       if (filters.eligibility === "eligible" && !eligible) continue;
       if (filters.eligibility === "ineligible" && eligible) continue;

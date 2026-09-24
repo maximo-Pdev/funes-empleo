@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { openingModerationInput } from "@/validation/opening-moderation";
 import { evaluationInput } from "@/validation/evaluation";
+import { adminParticipationActionInput } from "@/validation/admin-participation-action";
 import { accountCommandInput } from "@/features/accounts/input";
 
 const id = "00000000-0000-0000-0000-000000000001";
@@ -39,5 +40,11 @@ describe("validaciones de acciones administrativas", () => {
     expect(evaluationInput.safeParse({ command: "skip_to_preselected", participationId: id, version: 2, reason: "Evaluación documentada" }).success).toBe(true);
     expect(evaluationInput.safeParse({ command: "record_training_guidance", candidateId: id, version: 1, body: "Orientación ficticia" }).success).toBe(true);
     expect(evaluationInput.safeParse({ command: "record_applicant_note", participationId: id, body: "" }).success).toBe(false);
+  });
+
+  it("acepta una cancelación individual enviada por el formulario sin canal de preentrevista", () => {
+    expect(adminParticipationActionInput.safeParse({ participationId: id, version: 1,
+      command: "cancel_individual", reason: "Motivo operativo ficticio",
+      channel: "", summary: "" }).success).toBe(true);
   });
 });

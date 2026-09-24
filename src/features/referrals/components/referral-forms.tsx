@@ -3,10 +3,12 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  initialReferralActionState,
   submitFeedbackAction,
   submitInterviewAction,
+  type ReferralActionState,
 } from "@/features/referrals/feedback-actions";
+
+const initialReferralActionState: ReferralActionState = { status: "idle", message: "" };
 
 export function FeedbackForm({ openingId, referralId }: { openingId: string; referralId: string }) {
   const [state, action, pending] = useActionState(submitFeedbackAction, initialReferralActionState);
