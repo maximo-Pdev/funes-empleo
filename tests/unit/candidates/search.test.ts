@@ -57,11 +57,13 @@ describe("búsqueda administrativa de candidatos", () => {
     const query = { is: vi.fn(), order: vi.fn(), range: vi.fn(), eq: vi.fn(), gt: vi.fn(),
       then: (resolve: (value: unknown) => unknown) => resolve({ data: rows, error: null }) };
     for (const method of ["is", "order", "range", "eq", "gt"] as const) query[method].mockReturnValue(query);
-    const client = { from: vi.fn(() => ({ select: vi.fn(() => query) })) };
+    const client = { from: vi.fn(() => ({ select: vi.fn(() => query) })),
+      rpc: vi.fn().mockResolvedValue({ data: 0, error: null }) };
     vi.mocked(readAccountSession).mockResolvedValue({ account: { role: "admin", status: "active" }, client } as never);
     const { searchCandidates } = await import("@/features/candidates/search-service");
     const result = await searchCandidates({ page: 2, pageSize: 1 }, current);
     expect(result).toMatchObject({ total: 2, page: 2, pageCount: 2 });
     expect(result.items.map((item) => item.id)).toEqual(["c"]);
+    expect(client.rpc).toHaveBeenCalledWith("refresh_candidate_freshness", { p_candidate: undefined });
   });
 });

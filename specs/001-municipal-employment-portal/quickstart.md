@@ -1,9 +1,9 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
-Esta guía define cómo deberá comprobarse la implementación. El esqueleto de la fase 1 y el fixture
-local ficticio 500/50/100/1.000 de la fase 2 ya existen. Los flujos de negocio posteriores siguen
-siendo el contrato de aceptación, no evidencia de cumplimiento. `implementation-status.md` conserva
-el estado histórico de la fase 1; la validación local de Supabase usa Docker Desktop y WSL2.
+Esta guía define cómo comprobar la implementación. El esqueleto de la fase 1 y el fixture local
+ficticio 500/50/100/1.000 de la fase 2 ya existen. Las fases 3 y 4 tienen evidencia automatizada
+parcial por escenario, registrada en `implementation-status.md`; los escenarios restantes siguen
+siendo el contrato de aceptación. La validación local de Supabase usa Docker Desktop y WSL2.
 
 ## Prerrequisitos
 

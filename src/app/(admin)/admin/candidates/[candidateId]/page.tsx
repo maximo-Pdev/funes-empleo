@@ -11,11 +11,12 @@ import { requireActiveAccount } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCandidateDetailPage({ params }: {
-  params: Promise<{ candidateId: string }>;
+export default async function AdminCandidateDetailPage({ params, searchParams }: {
+  params: Promise<{ candidateId: string }>; searchParams: Promise<{ cv?: string }>;
 }) {
   await requireActiveAccount(["admin"]);
   const { candidateId } = await params;
+  const { cv } = await searchParams;
   const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
 
   return <RoleShell role="admin" title={candidate.display_name}
@@ -44,6 +45,16 @@ export default async function AdminCandidateDetailPage({ params }: {
         <p>Habilidades: {candidate.skills_experience_summary ?? "Sin informar"}</p>
         <p>Categorías: {candidate.candidate_categories.map((item) => item.job_categories?.name).filter(Boolean).join(", ") || "Sin categorías"}</p>
       </section>
+      {candidate.status !== "archived" && <section aria-labelledby="candidate-cv" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+        <h2 id="candidate-cv" className="text-xl font-semibold">CV PDF del candidato</h2>
+        <p>La carga conserva las versiones anteriores usadas en derivaciones.</p>
+        {cv && <p role={cv === "ok" ? "status" : "alert"}>{cv === "ok" ? "CV guardado." : cv === "conflict" ? "El perfil cambió. Recargá antes de cargarlo." : "El PDF fue rechazado; el CV vigente no cambió."}</p>}
+        <form action="/api/candidate/cv" method="post" encType="multipart/form-data" className="grid gap-3">
+          <input type="hidden" name="candidateId" value={candidate.id} /><input type="hidden" name="version" value={candidate.version} />
+          <label className="grid gap-1">Archivo PDF<input type="file" name="cv" accept=".pdf,application/pdf" required className="rounded border p-2" /></label>
+          <button className="rounded bg-blue-800 p-3 text-white">Cargar CV</button>
+        </form>
+      </section>}
       <section aria-labelledby="candidate-history" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-history" className="text-xl font-semibold">Historial de cuenta y perfil</h2>
         {audit.length === 0 ? <EmptyState title="Sin eventos" description="Todavía no hay movimientos registrados." /> :

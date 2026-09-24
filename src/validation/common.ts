@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// PostgreSQL UUIDs from the reproducible fixture are MD5-derived and need not
+// carry RFC version/variant bits. Validate their database syntax, not z.guid().
+export const databaseUuidSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+
 const digitsAndSeparators = z.string().trim().min(1, "Ingresá un identificador.")
   .regex(/^[0-9.\s-]+$/, "Usá solo números y separadores habituales.");
 

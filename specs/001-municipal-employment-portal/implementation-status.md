@@ -112,3 +112,44 @@ cancelar la última sí devuelve 404 en nuevas descargas. No se guarda URL firma
 Antes de fusionar esta rama, revisar el diff y la nueva cobertura E2E en PR, comprobar los checks
 remotos y decidir cuándo completar T025 con las interfaces correspondientes. La validación local no
 equivale a aprobación humana ni prueba de despliegue en Vercel.
+
+## Actualización 2026-09-24: fase 4 de autogestión candidata
+
+Rama: `codex/phase-4-candidate-self-service`, creada sobre `tasks.md-FASE-3-Maximo` porque esa base
+todavía no está integrada. Commit intermedio: `ca247d8`. T038–T050 se implementaron y marcaron. T025
+de fase 3 permanece abierta y no se considera resuelta por estos recorridos.
+
+El candidato puede registrar una cuenta individual y verificar su correo, completar y corregir su
+perfil con varias categorías, decidir el consentimiento de demostración, cargar o reemplazar un CV
+PDF, activar el perfil, postularse a ofertas vigentes y retirar una postulación o nominación abierta.
+El reclamo de un perfil asistido con DNI coincidente queda pendiente de vinculación presencial sin
+duplicar el perfil. El archivo de cuenta y perfil es inmediato; una restauración administrativa con
+motivo vuelve el perfil a borrador sin reabrir casos ni accesos empresariales. Las pantallas de
+candidato muestran solo recepción o resultado final, con estados y mensajes en español.
+
+Migraciones `202609190019` y `202609190020`: comandos protegidos, consentimiento versionado,
+proyecciones limitadas, ofertas públicas vigentes y vigencia de seis meses atribuida a la cuenta que
+consulta. `202609190021` es una corrección hacia adelante: la proyección de participaciones debe ser
+`VOLATILE` porque la validación de sesión bloquea la fila de cuenta; PostgREST ejecutaba la función
+`STABLE` en una transacción de solo lectura. `202609190022` corrige hacia adelante la política de
+inserción de Storage: el metadato del objeto aún no existe al evaluarse la política. La carga de CV
+reserva la clave, sube el objeto privado
+y confirma la nueva versión después de comprobar metadatos; un rechazo conserva el CV anterior y
+las derivaciones previas mantienen su versión exacta. Un fallo entre reserva y confirmación puede
+dejar una fila `upload_pending` y un objeto sin vigencia: se reintenta con una nueva clave y se
+conserva la evidencia antes de cualquier limpieza. La recuperación de una migración aplicada exige
+otra migración correctiva, sin reescribir la aplicada. No se agregaron variables de entorno nuevas;
+`CONSENT_POLICY_VERSION=demo-not-approved` sigue siendo texto ficticio, no aprobación municipal.
+
+Verificación local con datos ficticios: `reset-local.mjs --confirm-local-reset` reconstruyó el fixture
+500/50/100/1.000 y cargó 500 CV; 262 pruebas pgTAP, 74 unitarias/de componentes, typecheck, lint y
+build pasaron. `npm run test:e2e -- --workers=1 --reporter=list` pasó 14/14, incluidos registro con
+correo local, reemplazo y rechazo de CV, dos postulaciones, retiro, corrección directa, cambio de
+disponibilidad, suspensión/reactivación, archivo/restauración y análisis axe de ofertas y perfil.
+Para evitar un bloqueo de cierre del servidor Playwright en Windows, se inició `next start` en otra
+terminal y se usó `PLAYWRIGHT_EXTERNAL_SERVER=1` solo para esa ejecución; CI conserva el servidor
+configurado por Playwright.
+
+Antes de integrar, el segundo desarrollador debe revisar el PR y sus checks remotos. Permanecen las
+decisiones municipales abiertas sobre consentimiento real, retención, datos y límites de CV. No se
+usaron datos personales reales ni se probó un despliegue remoto.

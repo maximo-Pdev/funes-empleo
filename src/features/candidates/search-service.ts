@@ -68,6 +68,11 @@ async function adminClient() {
   return session.client;
 }
 
+async function refreshDueProfiles(client: Awaited<ReturnType<typeof adminClient>>, candidateId?: string) {
+  const result = await client.rpc("refresh_candidate_freshness", { p_candidate: candidateId });
+  if (result.error) throw new AppError("INTERNAL_ERROR");
+}
+
 const SEARCH_COLUMNS = "id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,archived_at,version,accounts!candidate_profiles_account_id_fkey(status),candidate_categories(category_id,job_categories(code,name,active)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)";
 const BATCH_SIZE = 1000;
 
@@ -79,6 +84,7 @@ export async function searchCandidates(input: unknown, now = new Date()) {
   if (!parsed.success) throw new AppError("VALIDATION_ERROR");
   const filters: CandidateSearchFilters = parsed.data;
   const client = await adminClient();
+  await refreshDueProfiles(client);
   const matches: CandidateSearchHit[] = [];
   for (let offset = 0; ; offset += BATCH_SIZE) {
     let query = client.from("candidate_profiles").select(SEARCH_COLUMNS)
@@ -132,6 +138,7 @@ export async function getAdminCandidate(candidateId: string) {
   const parsed = candidateIdSchema.safeParse(candidateId);
   if (!parsed.success || !parsed.data) throw new AppError("NOT_FOUND");
   const client = await adminClient();
+  await refreshDueProfiles(client, parsed.data);
   const [candidate, participations, notes] = await Promise.all([
     client.from("candidate_profiles")
       .select("id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,version,accounts!candidate_profiles_account_id_fkey(id,status,version),candidate_categories(job_categories(code,name)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)")
