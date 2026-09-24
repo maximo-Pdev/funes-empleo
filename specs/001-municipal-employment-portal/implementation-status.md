@@ -213,3 +213,17 @@ de contraseña conserva su omisión ambiental preexistente (1 skipped). El recor
 también pasó aislado antes de reiniciar la base para la suite completa. No se añadieron migraciones,
 variables de entorno ni datos reales en T025. Faltan revisión humana de las PR, mediciones manuales
 de aceptación y decisiones municipales ya documentadas; estos gates no se presentan como completos.
+
+## Actualización 2026-09-24: integración efectiva de fases 3–5
+
+La PR #24 fusionó fase 5 en `tasks.md-FASE-3-Maximo` con `3162a20`. La PR #25 fusionó
+después T025 en la rama de fase 5 con `b1792a7`, por lo que ese cierre todavía no había llegado
+a la rama de integración. La PR #26 llevó el mismo delta de nueve archivos a
+`tasks.md-FASE-3-Maximo` con `5125575`; se comprobó que `ad7a810` es ancestro de esa rama.
+Quality pasó en las PR #24, #25 y #26. El usuario confirmó que el segundo desarrollador hizo
+la revisión; la API de GitHub no muestra revisiones formales en las PR #24 y #25, y este registro
+no las atribuye a una aprobación de GitHub.
+
+Las fases 3, 4 y 5 quedan integradas entre sí. Las fases 6 en adelante y las mediciones,
+decisiones municipales y validaciones finales del MVP siguen abiertas según `tasks.md` y
+`OPEN_QUESTIONS.md`; esta integración no equivale a completar todo el MVP.
