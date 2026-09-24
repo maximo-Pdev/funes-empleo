@@ -192,6 +192,8 @@ La fase 5 quedó publicada en la PR #24, desde `codex/phase-5-company-self-servi
 revisiones registradas. La rama `codex/phase-3-e2e-completion` parte del commit de fase 5
 `2aa7139` para completar únicamente T025 mientras espera esa revisión. Por eso la integración a
 `main` todavía no corresponde.
+El cierre de T025 se publicó en la PR #25, desde `codex/phase-3-e2e-completion` hacia la rama
+de fase 5, con el commit `576636f`; se solicitó revisión a `MateoMansillaDev`.
 
 Se amplió `tests/e2e/intermediation.spec.ts` con los recorridos administrativos de Quickstart 2–4
 y 8: filtros del padrón, nominación, preentrevista, preselección, omisiones justificadas y derivación;
