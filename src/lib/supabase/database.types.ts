@@ -1593,6 +1593,11 @@ export type Database = {
         Args: { p_dni: string; p_name: string }
         Returns: string
       }
+      bootstrap_company: {
+        Args: { p_activity: string; p_cuit: string; p_email: string; p_locality: string;
+          p_name: string; p_phone: string; p_responsible: string }
+        Returns: string
+      }
       candidate_consent_policy: {
         Args: never
         Returns: {
@@ -1672,9 +1677,26 @@ export type Database = {
           version: number
         }[]
       }
+      my_company_offers: {
+        Args: { p_id?: string | null; p_page?: number; p_page_size?: number }
+        Returns: Json
+      }
+      my_company_profile: { Args: never; Returns: Json }
       published_offers: {
         Args: { p_id?: string; p_page?: number; p_page_size?: number }
         Returns: Json
+      }
+      save_company_opening: {
+        Args: { p_benefits: string; p_categories: string[]; p_closing_date: string | null;
+          p_contract_type: string; p_id: string | null; p_location: string; p_modality: string;
+          p_requirements: string; p_salary: string; p_schedule: string; p_tasks: string;
+          p_title: string; p_vacancies: number | null; p_version: number | null }
+        Returns: Json
+      }
+      save_company_profile: {
+        Args: { p_activity: string; p_cuit: string; p_email: string; p_locality: string;
+          p_name: string; p_phone: string; p_responsible: string; p_version: number }
+        Returns: number
       }
       record_contact: {
         Args: {
