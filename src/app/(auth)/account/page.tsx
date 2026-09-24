@@ -9,7 +9,8 @@ export default async function AccountPage() {
   return <main id="contenido" className="mx-auto max-w-3xl px-6 py-12">
     <h1 className="text-3xl font-bold">Mi cuenta</h1>
     <p className="mt-4">Acceso individual activo. Rol: {account.role === "admin" ? "Administración" : account.role === "candidate" ? "Candidato" : "Empresa"}.</p>
-    <p className="mt-3">Esta etapa habilita la cuenta. Los demás flujos del portal se incorporarán en sus tareas correspondientes.</p>
+    {account.role === "candidate" ? <p className="mt-3"><Link className="text-blue-800 underline" href="/candidato/perfil">Completar mi perfil</Link> · <Link className="text-blue-800 underline" href="/candidato/ofertas">Ver ofertas</Link> · <Link className="text-blue-800 underline" href="/candidato/postulaciones">Mis participaciones</Link></p> :
+      <p className="mt-3">Los flujos de empresa se incorporarán en su etapa correspondiente.</p>}
     <Link href="/update-password" className="mt-4 block text-blue-800 underline">Cambiar contraseña</Link>
     <form action={logoutAction}><button className="my-4 rounded bg-blue-800 p-3 text-white">Cerrar sesión</button></form>
     {account.role !== "admin" && <section aria-label="Archivo recuperable"><h2 className="text-xl font-bold text-red-900">Archivar mi cuenta</h2><p>Se bloqueará el acceso. La Oficina conservará el historial y solo administración podrá restaurarla.</p><AccountChangeForm id={account.id} version={account.version} command="archive" /></section>}

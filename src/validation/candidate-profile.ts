@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { databaseUuidSchema } from "./common";
 
-const uuid = z.guid();
+const uuid = databaseUuidSchema;
 export const candidateProfileSchema = z.object({
   version: z.coerce.number().int().positive(),
   name: z.string().trim().min(2).max(200),
