@@ -1566,24 +1566,46 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-        admin_workflow_timeline: {
-          Args: { p_entity_type: string; p_entity_id: string }
-          Returns: {
-            event_id: string
-            action: string
-            previous_state: string | null
-            new_state: string | null
-            actor_type: string
-            actor_account_id: string | null
-            occurred_at: string
-            reason_code: string | null
-            reason: string | null
-          }[]
-        }
-        authorized_cv_path: {
-          Args: { p_cv: string }
-          Returns: string
-        }
+      activate_candidate: {
+        Args: { p_expected_version: number }
+        Returns: number
+      }
+      admin_workflow_timeline: {
+        Args: { p_entity_id: string; p_entity_type: string }
+        Returns: {
+          action: string
+          actor_account_id: string | null
+          actor_type: string
+          event_id: string
+          new_state: string | null
+          occurred_at: string
+          previous_state: string | null
+          reason: string | null
+          reason_code: string | null
+        }[]
+      }
+      apply_to_opening: {
+        Args: { p_candidate_version: number; p_opening: string }
+        Returns: string
+      }
+      authorized_cv_path: { Args: { p_cv: string }; Returns: string }
+      bootstrap_candidate: {
+        Args: { p_dni: string; p_name: string }
+        Returns: string
+      }
+      bootstrap_company: {
+        Args: { p_activity: string; p_cuit: string; p_email: string; p_locality: string;
+          p_name: string; p_phone: string; p_responsible: string }
+        Returns: string
+      }
+      candidate_consent_policy: {
+        Args: never
+        Returns: {
+          policy_hash: string
+          policy_text: string
+          version: string
+        }[]
+      }
       change_account_status: {
         Args: {
           p_account: string
@@ -1594,29 +1616,47 @@ export type Database = {
         }
         Returns: number
       }
-        company_referral: {
-          Args: { p_referral: string }
-          Returns: Json
+      change_candidate_consent: {
+        Args: {
+          p_expected_version: number
+          p_policy_hash: string
+          p_policy_version: string
+          p_status: string
         }
-        company_referral_references: {
-          Args: { p_opening: string }
-          Returns: {
-            referral_id: string
-            opening_id: string
-            opening_title: string | null
-            referred_at: string
-          }[]
+        Returns: number
+      }
+      commit_candidate_cv: {
+        Args: {
+          p_candidate: string
+          p_cv: string
+          p_expected_version: number
+          p_name: string
+          p_path: string
+          p_sha256: string
+          p_size: number
         }
-        create_participation: {
-          Args: {
-            p_candidate: string
-            p_candidate_version: number
-            p_opening: string
-            p_opening_version: number
-            p_origin: string
-          }
-          Returns: string
+        Returns: number
+      }
+      company_referral: { Args: { p_referral: string }; Returns: Json }
+      company_referral_references: {
+        Args: { p_opening: string }
+        Returns: {
+          opening_id: string
+          opening_title: string | null
+          referral_id: string
+          referred_at: string
+        }[]
+      }
+      create_participation: {
+        Args: {
+          p_candidate: string
+          p_candidate_version: number
+          p_opening: string
+          p_opening_version: number
+          p_origin: string
         }
+        Returns: string
+      }
       my_account_status: {
         Args: never
         Returns: {
@@ -1626,87 +1666,153 @@ export type Database = {
           version: number
         }[]
       }
-        record_contact: {
-          Args: {
-            p_participation: string
-            p_expected_version: number
-            p_channel: string
-            p_direction: string
-            p_occurred_at: string
-            p_summary: string
-            p_next_action_at?: string | null
-          }
-          Returns: number
+      my_candidate_participations: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_status: string
+          id: string
+          opening_id: string
+          opening_title: string
+          version: number
+        }[]
+      }
+      my_company_offers: {
+        Args: { p_id?: string | null; p_page?: number; p_page_size?: number }
+        Returns: Json
+      }
+      my_company_profile: { Args: never; Returns: Json }
+      published_offers: {
+        Args: { p_id?: string; p_page?: number; p_page_size?: number }
+        Returns: Json
+      }
+      save_company_opening: {
+        Args: { p_benefits: string; p_categories: string[]; p_closing_date: string | null;
+          p_contract_type: string; p_id: string | null; p_location: string; p_modality: string;
+          p_requirements: string; p_salary: string; p_schedule: string; p_tasks: string;
+          p_title: string; p_vacancies: number | null; p_version: number | null }
+        Returns: Json
+      }
+      save_company_profile: {
+        Args: { p_activity: string; p_cuit: string; p_email: string; p_locality: string;
+          p_name: string; p_phone: string; p_responsible: string; p_version: number }
+        Returns: number
+      }
+      record_contact: {
+        Args: {
+          p_channel: string
+          p_direction: string
+          p_expected_version: number
+          p_next_action_at?: string | null
+          p_occurred_at: string
+          p_participation: string
+          p_summary: string
         }
-        record_internal_note: {
-          Args: {
-            p_candidate: string
-            p_expected_version: number
-            p_participation: string | null
-            p_kind: string
-            p_body: string
-            p_supersedes?: string | null
-          }
-          Returns: string
+        Returns: number
+      }
+      record_internal_note: {
+        Args: {
+          p_body: string
+          p_candidate: string
+          p_expected_version: number
+          p_kind: string
+          p_participation: string | null
+          p_supersedes?: string | null
         }
-        record_preinterview: {
-          Args: {
-            p_participation: string
-            p_expected_version: number
-            p_channel: string
-            p_scheduled_at: string | null
-            p_held_at: string | null
-            p_summary: string
-            p_recommendation: string
-            p_skip_reason?: string | null
-          }
-          Returns: number
+        Returns: string
+      }
+      record_preinterview: {
+        Args: {
+          p_channel: string
+          p_expected_version: number
+          p_held_at: string | null
+          p_participation: string
+          p_recommendation: string
+          p_scheduled_at: string | null
+          p_skip_reason?: string | null
+          p_summary: string
         }
+        Returns: number
+      }
+      refresh_candidate_freshness: {
+        Args: { p_candidate?: string }
+        Returns: number
+      }
       reserve_administrator_invitation: {
         Args: { p_actor: string; p_email: string }
         Returns: string
       }
-        submit_company_feedback: {
-          Args: {
-            p_referral: string
-            p_reported_outcome: string
-            p_message?: string | null
-          }
-          Returns: string
+      reserve_candidate_cv: {
+        Args: {
+          p_candidate: string
+          p_cv: string
+          p_expected_version: number
+          p_name: string
+          p_path: string
+          p_sha256: string
+          p_size: number
         }
-        submit_company_interview: {
-          Args: {
-            p_referral: string
-            p_expected_version: number
-            p_status: string
-            p_scheduled_at: string | null
-            p_held_at: string | null
-            p_company_message?: string | null
-          }
-          Returns: string
+        Returns: undefined
+      }
+      save_candidate_profile: {
+        Args: {
+          p_address: string
+          p_availability: string
+          p_categories: string[]
+          p_detail: string
+          p_dni: string
+          p_expected_version: number
+          p_locality: string
+          p_name: string
+          p_summary: string
         }
-        transition_opening: {
-          Args: {
-            p_opening: string
-            p_expected_version: number
-            p_command: string
-            p_reason?: string | null
-            p_company_message?: string | null
-          }
-          Returns: number
+        Returns: number
+      }
+      set_candidate_phone: {
+        Args: { p_expected_version: number; p_phone: string }
+        Returns: number
+      }
+      submit_company_feedback: {
+        Args: {
+          p_message?: string | null
+          p_referral: string
+          p_reported_outcome: string
         }
-        transition_participation: {
-          Args: {
-            p_participation: string
-            p_expected_version: number
-            p_command: string
-            p_reason?: string | null
-            p_candidate_request?: string | null
-            p_feedback?: string | null
-            p_contact?: string | null
-          }
-          Returns: number
+        Returns: string
+      }
+      submit_company_interview: {
+        Args: {
+          p_company_message?: string | null
+          p_expected_version: number
+          p_held_at: string | null
+          p_referral: string
+          p_scheduled_at: string | null
+          p_status: string
         }
+        Returns: string
+      }
+      transition_opening: {
+        Args: {
+          p_command: string
+          p_company_message?: string | null
+          p_expected_version: number
+          p_opening: string
+          p_reason?: string | null
+        }
+        Returns: number
+      }
+      transition_participation: {
+        Args: {
+          p_candidate_request?: string | null
+          p_command: string
+          p_contact?: string | null
+          p_expected_version: number
+          p_feedback?: string | null
+          p_participation: string
+          p_reason?: string | null
+        }
+        Returns: number
+      }
     }
     Enums: {
       account_role: "candidate" | "company" | "admin"

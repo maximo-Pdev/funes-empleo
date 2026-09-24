@@ -5,3 +5,7 @@
 # Keep Spec Kit managed files byte-stable across Windows checkouts
 .specify/** text eol=lf
 .agents/skills/** text eol=lf
+
+# Preserve the demo CV exactly and keep the hashed seed stable on Windows.
+*.pdf binary
+supabase/seed.sql text eol=lf

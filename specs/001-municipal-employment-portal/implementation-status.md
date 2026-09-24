@@ -84,3 +84,146 @@ con permisos para manejar subprocesos; terminó normalmente en aproximadamente 3
 
 Constitución: se conserva intermediación, privacidad, datos ficticios, trazabilidad prevista y revisión
 por PR. Esta base no constituye el MVP terminado ni habilita datos reales o producción.
+
+## Actualización 2026-09-24: fase 3 de intermediación
+
+Las secciones anteriores describen el cierre histórico de fase 1; ya no representan el estado actual.
+La PR #22 de derivaciones y funciones SQL está fusionada en `main` remoto (`2aac079`) y también fue
+integrada en `tasks.md-FASE-3-Maximo`. La rama de trabajo incluye las pantallas y acciones municipales,
+el fixture PDF determinista corregido y pruebas de privacidad en navegador. No se fusionó esta rama
+de trabajo a `main`.
+
+Quedaron marcadas T022–T024 y T026–T037. T025 permanece abierta: los E2E actuales prueban búsqueda,
+lectura administrativa, aislamiento de rol, descarga del CV exacto, revocación después de la última
+derivación activa, feedback con confirmación municipal, contactos/notas y suspensión/reactivación sin
+restaurar acceso. No cubren todavía **todos** los recorridos de Quickstart 2–4 y la parte administrativa
+de 8 (por ejemplo alta/edición de empresa y oferta, reemplazo de CV, consentimiento y nominaciones de
+punta a punta), algunos de los cuales dependen de interfaces de fases posteriores. No marcar T025 por
+una cobertura parcial.
+
+Evidencia local sobre el fixture exclusivamente ficticio: reset y carga de 500 CV, 203 pruebas pgTAP,
+69 pruebas unitarias/de componentes, typecheck, lint y build exitosos; Playwright terminó con 12 pruebas
+aprobadas y una omisión ajena a US1 (`recovery-flow`). Docker Desktop se instaló en modo usuario
+y el motor local respondió; el agente no aceptó ningún acuerdo de licencia. La prueba de revocación
+contempla que una empresa puede
+tener otra derivación todavía vigente del mismo candidato: cancelar una sola no corta ese otro permiso;
+cancelar la última sí devuelve 404 en nuevas descargas. No se guarda URL firmada reutilizable.
+
+Antes de fusionar esta rama, revisar el diff y la nueva cobertura E2E en PR, comprobar los checks
+remotos y decidir cuándo completar T025 con las interfaces correspondientes. La validación local no
+equivale a aprobación humana ni prueba de despliegue en Vercel.
+
+## Actualización 2026-09-24: fase 4 de autogestión candidata
+
+Rama: `codex/phase-4-candidate-self-service`, creada sobre `tasks.md-FASE-3-Maximo` porque esa base
+todavía no está integrada. Commit intermedio: `ca247d8`. T038–T050 se implementaron y marcaron. T025
+de fase 3 permanece abierta y no se considera resuelta por estos recorridos.
+
+El candidato puede registrar una cuenta individual y verificar su correo, completar y corregir su
+perfil con varias categorías, decidir el consentimiento de demostración, cargar o reemplazar un CV
+PDF, activar el perfil, postularse a ofertas vigentes y retirar una postulación o nominación abierta.
+El reclamo de un perfil asistido con DNI coincidente queda pendiente de vinculación presencial sin
+duplicar el perfil. El archivo de cuenta y perfil es inmediato; una restauración administrativa con
+motivo vuelve el perfil a borrador sin reabrir casos ni accesos empresariales. Las pantallas de
+candidato muestran solo recepción o resultado final, con estados y mensajes en español.
+
+Migraciones `202609190019` y `202609190020`: comandos protegidos, consentimiento versionado,
+proyecciones limitadas, ofertas públicas vigentes y vigencia de seis meses atribuida a la cuenta que
+consulta. `202609190021` es una corrección hacia adelante: la proyección de participaciones debe ser
+`VOLATILE` porque la validación de sesión bloquea la fila de cuenta; PostgREST ejecutaba la función
+`STABLE` en una transacción de solo lectura. `202609190022` corrige hacia adelante la política de
+inserción de Storage: el metadato del objeto aún no existe al evaluarse la política. La carga de CV
+reserva la clave, sube el objeto privado
+y confirma la nueva versión después de comprobar metadatos; un rechazo conserva el CV anterior y
+las derivaciones previas mantienen su versión exacta. Un fallo entre reserva y confirmación puede
+dejar una fila `upload_pending` y un objeto sin vigencia: se reintenta con una nueva clave y se
+conserva la evidencia antes de cualquier limpieza. La recuperación de una migración aplicada exige
+otra migración correctiva, sin reescribir la aplicada. No se agregaron variables de entorno nuevas;
+`CONSENT_POLICY_VERSION=demo-not-approved` sigue siendo texto ficticio, no aprobación municipal.
+
+Verificación local con datos ficticios: `reset-local.mjs --confirm-local-reset` reconstruyó el fixture
+500/50/100/1.000 y cargó 500 CV; 262 pruebas pgTAP, 74 unitarias/de componentes, typecheck, lint y
+build pasaron. `npm run test:e2e -- --workers=1 --reporter=list` pasó 14/14, incluidos registro con
+correo local, reemplazo y rechazo de CV, dos postulaciones, retiro, corrección directa, cambio de
+disponibilidad, suspensión/reactivación, archivo/restauración y análisis axe de ofertas y perfil.
+Para evitar un bloqueo de cierre del servidor Playwright en Windows, se inició `next start` en otra
+terminal y se usó `PLAYWRIGHT_EXTERNAL_SERVER=1` solo para esa ejecución; CI conserva el servidor
+configurado por Playwright.
+
+Antes de integrar, el segundo desarrollador debe revisar el PR y sus checks remotos. Permanecen las
+decisiones municipales abiertas sobre consentimiento real, retención, datos y límites de CV. No se
+usaron datos personales reales ni se probó un despliegue remoto.
+
+## Actualización 2026-09-24: integración de fases 4 y 5
+
+La fase 4 se publicó en la PR #23 desde `codex/phase-4-candidate-self-service` hacia
+`tasks.md-FASE-3-Maximo`. El workflow Quality pasó. GitHub registró la fusión con commit
+`741f5c7fb2fe0039dd630562e6c30f4d34a3e8be`; al consultarlo no figuraban revisiones de PR.
+Después de confirmar la fusión, se borró la rama de fase 4 tanto local como remotamente.
+Esa ausencia de revisión registrada no se presenta como aprobación del segundo desarrollador.
+
+Para avanzar en paralelo se había creado `codex/phase-5-company-self-service` desde fase 4,
+con commit intermedio `9eb9c61`. Tras la fusión se rebasó exclusivamente ese trabajo sobre el
+commit `741f5c7`, que pasó a identificarse como `0a3db46`. Se conservaron las ramas y PR por fase;
+la rama de integración aún no se fusionó a `main`.
+
+La fase 5 implementa T051–T060: cuenta y perfil empresarial individuales con CUIT normalizado,
+edición de borradores y categorías, envío/reenvío a moderación, historial visible limitado,
+tablero de ofertas y derivaciones propias, y suspensión/archivo/restauración por el administrador.
+La empresa puede archivar su perfil, pero no restaurarlo. La migración forward-only
+`202609190030_company_self_service.sql` agrega funciones de escritura con validación de actor,
+versión, propiedad y estado, además de proyecciones que omiten motivos internos. No se agregaron
+variables de entorno. Ante una migración aplicada fallida corresponde conservar evidencia y añadir
+una correctiva hacia adelante; en el entorno local ficticio puede reconstruirse con reset.
+
+Verificación con Supabase local restablecido y datos ficticios: typecheck, lint y build pasaron;
+79 pruebas unitarias/de componentes pasaron en 15 archivos; pgTAP pasó 300 pruebas en 6 archivos;
+Playwright pasó los 3 recorridos de `company-offers.spec.ts` sobre base recién reiniciada.
+Los recorridos incluyen registro y verificación de correo local, corrección, envío y aprobación de
+una oferta, pausa y reanudación, aislamiento entre empresas, suspensión, archivo y restauración.
+Se ejecutó axe sin violaciones en registro y perfil empresarial. No se realizaron las mediciones
+manuales de usuarios, zoom/NVDA o despliegue de demostración; siguen como aceptación posterior.
+Las decisiones municipales abiertas del documento de preguntas siguen vigentes.
+
+## Actualización 2026-09-24: cierre de T025 de fase 3
+
+La fase 5 quedó publicada en la PR #24, desde `codex/phase-5-company-self-service` hacia
+`tasks.md-FASE-3-Maximo`. El workflow Quality pasó; al cerrar esta verificación la PR seguía sin
+revisiones registradas. La rama `codex/phase-3-e2e-completion` parte del commit de fase 5
+`2aa7139` para completar únicamente T025 mientras espera esa revisión. Por eso la integración a
+`main` todavía no corresponde.
+El cierre de T025 se publicó en la PR #25, desde `codex/phase-3-e2e-completion` hacia la rama
+de fase 5, con el commit `576636f`; se solicitó revisión a `MateoMansillaDev`.
+
+Se amplió `tests/e2e/intermediation.spec.ts` con los recorridos administrativos de Quickstart 2–4
+y 8: filtros del padrón, nominación, preentrevista, preselección, omisiones justificadas y derivación;
+retiros por candidato y administrador; confidencialidad empresarial tras cambios de CV/contactos,
+retiro y renovación del consentimiento; entrevista, no selección y cancelación individual;
+vencimiento de oferta, falta de respuesta a 30 días y permiso poscontratación a 720 horas con
+automatización idempotente y corrección tardía; rechazo, cierre, cancelación y suspensión sin
+reabrir permisos ni borrar el historial. El helper de reloj actúa solo contra la base Supabase local
+y el contenedor ficticio identificado de este proyecto. La nominación administrativa usa la RPC
+existente `create_participation`, con validación de rol, versión y condiciones en el servidor y la
+base. Se corrigió el enlace desde una oferta pública para que el candidato llegue a la oferta
+elegida y pueda postularse aunque no esté en la primera página del listado.
+
+Evidencia local con fixture ficticio reconstruido: 300/300 pgTAP, 79/79 pruebas unitarias y de
+componentes, typecheck, lint y build exitosos. Playwright pasó 21 recorridos; el de recuperación
+de contraseña conserva su omisión ambiental preexistente (1 skipped). El recorrido de nominación
+también pasó aislado antes de reiniciar la base para la suite completa. No se añadieron migraciones,
+variables de entorno ni datos reales en T025. Faltan revisión humana de las PR, mediciones manuales
+de aceptación y decisiones municipales ya documentadas; estos gates no se presentan como completos.
+
+## Actualización 2026-09-24: integración efectiva de fases 3–5
+
+La PR #24 fusionó fase 5 en `tasks.md-FASE-3-Maximo` con `3162a20`. La PR #25 fusionó
+después T025 en la rama de fase 5 con `b1792a7`, por lo que ese cierre todavía no había llegado
+a la rama de integración. La PR #26 llevó el mismo delta de nueve archivos a
+`tasks.md-FASE-3-Maximo` con `5125575`; se comprobó que `ad7a810` es ancestro de esa rama.
+Quality pasó en las PR #24, #25 y #26. El usuario confirmó que el segundo desarrollador hizo
+la revisión; la API de GitHub no muestra revisiones formales en las PR #24 y #25, y este registro
+no las atribuye a una aprobación de GitHub.
+
+Las fases 3, 4 y 5 quedan integradas entre sí. Las fases 6 en adelante y las mediciones,
+decisiones municipales y validaciones finales del MVP siguen abiertas según `tasks.md` y
+`OPEN_QUESTIONS.md`; esta integración no equivale a completar todo el MVP.

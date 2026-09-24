@@ -6,7 +6,6 @@ import { AppError, publicErrorFrom } from "@/lib/errors/public-error";
 import { confirmReportedOutcome, submitCompanyFeedback, submitCompanyInterview } from "./feedback-service";
 
 export type ReferralActionState = { status: "idle" | "success" | "error"; message: string };
-export const initialReferralActionState: ReferralActionState = { status: "idle", message: "" };
 
 function failure(error: unknown): ReferralActionState {
   return { status: "error", message: publicErrorFrom(error).message };

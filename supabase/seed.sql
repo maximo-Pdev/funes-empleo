@@ -39,8 +39,8 @@ begin
    insert into public.candidate_consents(id,candidate_id,policy_version,policy_hash,status,recorded_by,recorded_at,source)
    values(private.fixture_id('consent',i),cid,'demo-not-approved',repeat('0',64),'accepted',aid,t,'self_service');
    insert into public.cv_documents(id,candidate_id,storage_path,original_name_safe,mime_type,byte_size,sha256,status,validation_result,uploaded_by,created_at)
-   values(private.fixture_id('cv',i),cid,cid::text||'/'||private.fixture_id('cv',i)::text||'.pdf','cv-ficticio.pdf','application/pdf',608,
-    'bc55ddf11de00a7dd85a1f5a8e4a8fea6a437851561b9092167492c4728896da','valid','fictitious_fixture',aid,t);
+   values(private.fixture_id('cv',i),cid,cid::text||'/'||private.fixture_id('cv',i)::text||'.pdf','cv-ficticio.pdf','application/pdf',1426,
+    '1e6751c855dda6e8c69bfc5b4ba6d5efebffef6ea6cb7c3c10d697ed0d9ba397','valid','fictitious_fixture',aid,t);
    perform private.record_event('candidate_profiles',cid,'profile_created',null,case when i<=400 then 'active' else 'needs_update' end,admin_id,'fictitious_fixture');
  end loop;
  for i in 1..50 loop

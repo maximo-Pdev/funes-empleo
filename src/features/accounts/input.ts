@@ -10,7 +10,8 @@ export const emailInput = credentialsInput.pick({ email: true });
 export const passwordInput = z.object({ password: z.string().min(6).max(128), confirmation: z.string() })
   .refine((value) => value.password === value.confirmation, { path: ["confirmation"], message: "Las contraseñas deben coincidir." });
 export const accountCommandInput = z.object({
-  accountId: z.uuid(), version: z.coerce.number().int().positive(),
+  accountId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
+  version: z.coerce.number().int().positive(),
   command: z.enum(["suspend", "reactivate", "archive", "restore"]),
   reason: z.string().trim().max(500).optional(), confirmed: z.literal(true),
 });
