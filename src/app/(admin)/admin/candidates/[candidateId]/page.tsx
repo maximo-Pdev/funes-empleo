@@ -5,6 +5,8 @@ import { getAdminCandidate } from "@/features/candidates/search-service";
 import { candidateAccountDecisionAction } from "@/features/candidates/admin-actions";
 import { participationStatusLabel } from "@/features/participations/components/participation-timeline";
 import { SafetyDecisionForm } from "@/features/participations/components/safety-decision-form";
+import { InternalNoteForm } from "@/features/participations/components/internal-note-form";
+import { recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
@@ -14,13 +16,23 @@ export default async function AdminCandidateDetailPage({ params }: {
 }) {
   await requireActiveAccount(["admin"]);
   const { candidateId } = await params;
-  const { candidate, referralEligible, participations, audit } = await getAdminCandidate(candidateId);
+  const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
 
   return <RoleShell role="admin" title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
     navigation={[{ href: "/admin/candidates", label: "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
+      <InternalNoteForm key={`${candidate.id}:${candidate.version}`} candidateId={candidate.id}
+        version={candidate.version} onSubmit={recordEvaluationAction} />
+      <section aria-labelledby="candidate-notes" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+        <h2 id="candidate-notes" className="text-lg font-semibold">Notas internas</h2>
+        {notes.length === 0 ? <EmptyState title="Sin notas" description="Todavía no hay notas para este perfil." /> :
+          <ul className="space-y-3">{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
+            <p><strong>{item.note_kind === "training_guidance" ? "Orientación y capacitación" : "Nota sobre postulante"}</strong> · {new Date(item.created_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}</p>
+            <p className="whitespace-pre-wrap">{item.body}</p>
+          </li>)}</ul>}
+      </section>
       <section aria-labelledby="candidate-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-details" className="text-xl font-semibold">Perfil candidato</h2>
         <p>Estado: <strong>{candidate.status.replaceAll("_", " ")}</strong></p>

@@ -45,7 +45,7 @@ export interface CandidateSearchHit {
 export function candidateIsReferralEligible(row: Pick<CandidateSearchRow,
   "account_id" | "status" | "availability" | "archived_at" | "refresh_due_at" | "accounts" | "candidate_consents" | "cv_documents">,
 now: Date): boolean {
-  if (row.archived_at || row.status !== "active" || !row.availability?.trim() || !row.refresh_due_at ||
+  if (row.archived_at || row.status !== "active" || row.availability !== "available" || !row.refresh_due_at ||
       new Date(row.refresh_due_at).getTime() <= now.getTime()) return false;
   if (row.account_id && row.accounts?.status !== "active") return false;
   const latestConsent = [...row.candidate_consents].sort((a, b) =>
@@ -141,15 +141,19 @@ export async function getAdminCandidate(candidateId: string) {
   const parsed = candidateIdSchema.safeParse(candidateId);
   if (!parsed.success || !parsed.data) throw new AppError("NOT_FOUND");
   const client = await adminClient();
-  const [candidate, participations] = await Promise.all([
+  const [candidate, participations, notes] = await Promise.all([
     client.from("candidate_profiles")
       .select("id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,version,accounts!candidate_profiles_account_id_fkey(id,status,version),candidate_categories(job_categories(code,name)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)")
       .eq("id", parsed.data).maybeSingle(),
     client.from("participations")
       .select("id,status,origin,created_at,job_openings!participations_opening_id_fkey(id,title)")
       .eq("candidate_id", parsed.data).is("archived_at", null).order("created_at", { ascending: false }).limit(50),
+    client.from("internal_notes")
+      .select("id,note_kind,body,created_at")
+      .eq("candidate_id", parsed.data).is("archived_at", null)
+      .is("participation_id", null).order("created_at", { ascending: false }).limit(50),
   ]);
-  if (candidate.error || participations.error) throw new AppError("INTERNAL_ERROR");
+  if (candidate.error || participations.error || notes.error) throw new AppError("INTERNAL_ERROR");
   if (!candidate.data) throw new AppError("NOT_FOUND");
   const row = candidate.data as unknown as CandidateSearchRow;
   const entityIds = candidate.data.account_id ? [candidate.data.id, candidate.data.account_id] : [candidate.data.id];
@@ -159,5 +163,5 @@ export async function getAdminCandidate(candidateId: string) {
     .order("occurred_at", { ascending: false }).limit(50);
   if (audit.error) throw new AppError("INTERNAL_ERROR");
   return { candidate: candidate.data, referralEligible: candidateIsReferralEligible(row, new Date()),
-    participations: participations.data ?? [], audit: audit.data ?? [] };
+    participations: participations.data ?? [], notes: notes.data ?? [], audit: audit.data ?? [] };
 }

@@ -19,10 +19,12 @@ const decisionLabels: Record<AdminOpeningDecision, string> = {
   restored_to_draft: "Devolver a borrador", cancelled: "Cancelar",
 };
 const visibleChoices: Partial<Record<OpeningStatus, readonly AdminOpeningDecision[]>> = {
+  draft: ["suspended", "cancelled"],
   pending_review: ["approved", "changes_requested", "rejected", "suspended", "cancelled"],
+  changes_requested: ["suspended", "cancelled"],
   published: ["paused", "closed", "suspended", "cancelled"],
   paused: ["resumed", "closed", "suspended", "cancelled"],
-  suspended: ["restored_to_draft"],
+  suspended: ["restored_to_draft", "cancelled"],
 };
 const publicMessageDecisions = new Set<AdminOpeningDecision>(["changes_requested", "rejected"]);
 const reasonDecisions = new Set<AdminOpeningDecision>(["rejected", "paused", "closed", "suspended", "restored_to_draft", "cancelled"]);

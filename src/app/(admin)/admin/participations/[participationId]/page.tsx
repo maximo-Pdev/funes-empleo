@@ -2,7 +2,11 @@ import Link from "next/link";
 import { RoleShell } from "@/components/layouts";
 import { EmptyState, FeedbackMessage } from "@/components/ui";
 import { getAdminParticipation } from "@/features/participations/admin-query";
+import { ParticipationActionForm } from "@/features/participations/components/participation-action-form";
+import { ContactRecordForm } from "@/features/participations/components/contact-record-form";
+import { FeedbackReviewPanel } from "@/features/participations/components/feedback-review-panel";
 import { ParticipationTimeline } from "@/features/participations/components/participation-timeline";
+import { adminParticipationAction, confirmFeedbackAction, recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +28,26 @@ export default async function AdminParticipationDetailPage({ params }: {
     navigation={[{ href: "/admin/participations", label: "Volver a casos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
+        <ParticipationActionForm key={`${participation.id}:${participation.version}`} participationId={participation.id}
+          version={participation.version} status={participation.status}
+          contacts={contacts.map((item) => ({ id: item.id, direction: item.direction,
+            label: `${localDate(item.occurred_at)} · ${item.channel} · ${item.summary_internal.slice(0, 60)}` }))}
+          feedback={feedback.filter((item) => item.review_status === "pending_admin")
+            .map((item) => ({ id: item.id,
+              label: `${localDate(item.reported_at)} · ${item.reported_outcome.replaceAll("_", " ")}` }))}
+          onSubmit={adminParticipationAction} />
+        <FeedbackReviewPanel key={`feedback:${participation.id}:${participation.version}`}
+          participationId={participation.id} version={participation.version}
+          currentStatus={participation.status}
+          feedback={feedback.map((item) => ({ id: item.id, reportedOutcome: item.reported_outcome,
+            reportedAt: item.reported_at,
+            reviewStatus: item.review_status === "accepted" ? "accepted" as const :
+              item.review_status === "superseded" ? "superseded" as const : "pending_admin" as const,
+            message: item.message }))}
+          onConfirm={confirmFeedbackAction} />
+        <ContactRecordForm key={`contact:${participation.id}:${participation.version}`}
+          participationId={participation.id} version={participation.version}
+          onSubmit={recordEvaluationAction} />
         <section aria-labelledby="participation-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
           <h2 id="participation-details" className="text-xl font-semibold">Caso</h2>
           <p>Candidato: <Link href={`/admin/candidates/${participation.candidate_profiles.id}`} className="text-blue-800 underline">{participation.candidate_profiles.display_name}</Link></p>
@@ -35,10 +59,10 @@ export default async function AdminParticipationDetailPage({ params }: {
           {referral?.post_hire_access_until && <p>Fin de ventana poscontratación: {localDate(referral.post_hire_access_until)}</p>}
         </section>
         <ParticipationTimeline currentStatus={participation.status} events={audit.map((event) => ({
-          id: event.id, occurredAt: event.occurred_at, action: event.action,
+          id: event.event_id, occurredAt: event.occurred_at, action: event.action,
           actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${event.actor_account_id ?? "sin identificar"}`,
           previousStatus: event.previous_state, newStatus: event.new_state,
-          reason: event.reason_code,
+          reason: event.reason, reasonCode: event.reason_code,
         }))} />
       </div>
       <div className="space-y-6">

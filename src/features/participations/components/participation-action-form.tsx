@@ -14,7 +14,11 @@ export type ParticipationCommand = "start_review" | "record_preinterview" | "pre
 export type ParticipationActionPayload = {
   participationId: string; version: number; command: ParticipationCommand;
   reason: string; channel: string; summary: string;
+  scheduledAtLocal?: string; heldAtLocal?: string;
+  recommendation: "pending" | "preselect" | "do_not_preselect";
+  feedbackId?: string; contactId?: string; candidateRequestId?: string;
 };
+type EvidenceOption = { id: string; label: string; direction?: string };
 
 const actions: Partial<Record<ParticipationStatus, readonly { value: ParticipationCommand; label: string }[]>> = {
   received: [
@@ -52,8 +56,9 @@ function requiresStageReason(command: ParticipationCommand | "", status: Partici
     (command === "refer" && status !== "preselected");
 }
 
-export function ParticipationActionForm({ participationId, version, status, onSubmit }: {
+export function ParticipationActionForm({ participationId, version, status, contacts = [], feedback = [], onSubmit }: {
   participationId: string; version: number; status: ParticipationStatus;
+  contacts?: readonly EvidenceOption[]; feedback?: readonly EvidenceOption[];
   onSubmit: (payload: ParticipationActionPayload) => AdminMutationResult | Promise<AdminMutationResult>;
 }) {
   const router = useRouter();
@@ -61,6 +66,11 @@ export function ParticipationActionForm({ participationId, version, status, onSu
   const [reason, setReason] = useState("");
   const [channel, setChannel] = useState("");
   const [summary, setSummary] = useState("");
+  const [scheduledAtLocal, setScheduledAtLocal] = useState("");
+  const [heldAtLocal, setHeldAtLocal] = useState("");
+  const [recommendation, setRecommendation] = useState<ParticipationActionPayload["recommendation"]>("pending");
+  const [feedbackId, setFeedbackId] = useState("");
+  const [contactId, setContactId] = useState("");
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
   const choices = [...(actions[status] ?? [])];
@@ -78,10 +88,27 @@ export function ParticipationActionForm({ participationId, version, status, onSu
     if (command === "record_preinterview" && !channel) {
       setError("Indicá el canal de la preentrevista."); return;
     }
+    if (command === "record_preinterview" && (!summary.trim() || (!scheduledAtLocal && !heldAtLocal))) {
+      setError("Registrá un resumen y la fecha programada o realizada de la preentrevista."); return;
+    }
+    if (command === "withdraw_on_request" && !contactId) {
+      setError("Seleccioná el contacto entrante donde el candidato pidió el retiro."); return;
+    }
+    if (command.startsWith("correct_") && !feedbackId && !contactId) {
+      setError("Seleccioná feedback o un contacto municipal como evidencia."); return;
+    }
+    if ((command === "confirm_hired" || command === "confirm_not_selected") &&
+      !feedbackId && !contactId && !reason.trim()) {
+      setError("Registrá un motivo o seleccioná la evidencia del resultado."); return;
+    }
     setError("");
     startTransition(async () => {
       try {
-        const result = await onSubmit({ participationId, version, command, reason: reason.trim(), channel, summary: summary.trim() });
+        const result = await onSubmit({ participationId, version, command, reason: reason.trim(), channel,
+          summary: summary.trim(), scheduledAtLocal: scheduledAtLocal || undefined,
+          heldAtLocal: heldAtLocal || undefined, recommendation,
+          feedbackId: feedbackId || undefined, contactId: contactId || undefined,
+          candidateRequestId: command === "withdraw_on_request" ? contactId || undefined : undefined });
         const message = adminMutationError(result);
         if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
         router.refresh();
@@ -102,9 +129,31 @@ export function ParticipationActionForm({ participationId, version, status, onSu
         options={PREINTERVIEW_CHANNELS.map((value) => ({ value, label: ({ phone: "Teléfono", email: "Correo", whatsapp: "WhatsApp", in_person: "Presencial", video: "Video" })[value] }))} />
       <TextField id="preinterview-summary" label="Resumen interno" value={summary}
         onChange={(event) => setSummary(event.target.value)} maxLength={5000} />
+      <TextField id="preinterview-scheduled" label="Fecha programada" type="datetime-local"
+        value={scheduledAtLocal} onChange={(event) => setScheduledAtLocal(event.target.value)} />
+      <TextField id="preinterview-held" label="Fecha realizada" type="datetime-local"
+        value={heldAtLocal} onChange={(event) => setHeldAtLocal(event.target.value)} />
+      <SelectField id="preinterview-recommendation" label="Recomendación" value={recommendation}
+        onChange={(event) => setRecommendation(event.target.value as ParticipationActionPayload["recommendation"])}
+        options={[{ value: "pending", label: "Pendiente" }, { value: "preselect", label: "Preseleccionar" },
+          { value: "do_not_preselect", label: "No preseleccionar" }]} />
     </>}
-    {requiresStageReason(command, status) && <TextField id="participation-reason" label="Motivo interno"
-      value={reason} onChange={(event) => setReason(event.target.value)} maxLength={1000} required />}
+    {(requiresStageReason(command, status) || command === "confirm_hired" || command === "confirm_not_selected") &&
+      <TextField id="participation-reason" label="Motivo interno" value={reason}
+        onChange={(event) => setReason(event.target.value)} maxLength={1000}
+        required={requiresStageReason(command, status)} />}
+    {(command === "withdraw_on_request" || command?.startsWith("correct_") ||
+      command === "confirm_hired" || command === "confirm_not_selected") && <>
+      {feedback.length > 0 && command !== "withdraw_on_request" &&
+        <SelectField id="action-feedback" label="Feedback empresarial (opcional)" value={feedbackId}
+          onChange={(event) => setFeedbackId(event.target.value)}
+          options={[{ value: "", label: "Sin seleccionar" }, ...feedback.map((item) => ({ value: item.id, label: item.label }))]} />}
+      <SelectField id="action-contact" label={command === "withdraw_on_request" ? "Solicitud del candidato" : "Contacto municipal (opcional)"}
+        value={contactId} onChange={(event) => setContactId(event.target.value)}
+        options={[{ value: "", label: "Sin seleccionar" }, ...contacts
+          .filter((item) => command !== "withdraw_on_request" || item.direction === "inbound")
+          .map((item) => ({ value: item.id, label: item.label }))]} />
+    </>}
     {command === "refer" && <FeedbackMessage tone="info">La derivación requiere una decisión explícita de la Oficina. Solo entonces la empresa puede ver los datos autorizados.</FeedbackMessage>}
     {command?.startsWith("skip_") && <p className="text-sm text-slate-700">La derivación requiere una decisión explícita posterior.</p>}
     {command?.startsWith("correct_") && <FeedbackMessage tone="info">El cierre automático anterior quedará en el historial y el acceso empresarial revocado no se reactivará.</FeedbackMessage>}

@@ -44,10 +44,7 @@ export async function getAdminParticipation(participationId: string) {
     client.from("participations")
       .select("id,status,origin,version,created_at,feedback_due_at,final_outcome_at,candidate_profiles!participations_candidate_id_fkey(id,display_name),job_openings!participations_opening_id_fkey(id,title,status)")
       .eq("id", participationId).is("archived_at", null).maybeSingle(),
-    client.from("audit_events")
-      .select("id,action,previous_state,new_state,reason_code,actor_type,actor_account_id,occurred_at")
-      .eq("entity_type", "participations").eq("entity_id", participationId)
-      .order("occurred_at", { ascending: true }),
+    client.rpc("admin_workflow_timeline", { p_entity_type: "participations", p_entity_id: participationId }),
     client.from("preinterviews")
       .select("id,channel,scheduled_at,held_at,summary_internal,recommendation,created_at")
       .eq("participation_id", participationId).is("archived_at", null)

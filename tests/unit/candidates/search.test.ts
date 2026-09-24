@@ -31,6 +31,7 @@ describe("búsqueda administrativa de candidatos", () => {
     expect(candidateIsReferralEligible({ ...base, refresh_due_at: "2026-09-23T11:59:59Z" }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, cv_documents: [] }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, availability: null }, current)).toBe(false);
+    expect(candidateIsReferralEligible({ ...base, availability: "unavailable" }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, account_id: null, accounts: null }, current)).toBe(true);
   });
 

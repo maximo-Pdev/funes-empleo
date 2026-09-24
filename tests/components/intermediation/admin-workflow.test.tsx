@@ -113,6 +113,7 @@ describe("intermediación administrativa", () => {
     expect(screen.getByRole("alert").textContent).toMatch(/canal/i);
     fireEvent.change(screen.getByLabelText("Canal de preentrevista"), { target: { value: "phone" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Resumen interno" }), { target: { value: "Llamada ficticia" } });
+    fireEvent.change(screen.getByLabelText("Fecha realizada"), { target: { value: "2026-09-23T15:00" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(submit).toHaveBeenCalledWith(expect.objectContaining({ command: "record_preinterview", channel: "phone", summary: "Llamada ficticia" }));
   });

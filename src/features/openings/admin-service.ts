@@ -3,6 +3,8 @@ import { z } from "zod";
 import { openingStatusSchema } from "@/domain/states";
 import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
+import { workflowRpcError } from "@/lib/errors/workflow-rpc";
+import { openingModerationInput } from "@/validation/opening-moderation";
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 const listInput = z.object({
@@ -50,4 +52,24 @@ export async function getAdminOpening(openingId: string) {
   if (opening.error || events.error) throw new AppError("INTERNAL_ERROR");
   if (!opening.data) throw new AppError("NOT_FOUND");
   return { opening: opening.data, events: events.data ?? [] };
+}
+
+const commandForDecision = {
+  approved: "approve", changes_requested: "request_changes", rejected: "reject",
+  paused: "pause", resumed: "resume", closed: "close", suspended: "suspend",
+  restored_to_draft: "restore_to_draft", cancelled: "cancel",
+} as const;
+
+export async function moderateOpening(input: unknown) {
+  const parsed = openingModerationInput.safeParse(input);
+  if (!parsed.success) throw new AppError("VALIDATION_ERROR");
+  const client = await adminClient();
+  const { openingId, version, decision, internalReason, publicMessage } = parsed.data;
+  const result = await client.rpc("transition_opening", {
+    p_opening: openingId, p_expected_version: version,
+    p_command: commandForDecision[decision],
+    p_reason: internalReason || null, p_company_message: publicMessage || null,
+  });
+  if (result.error) throw workflowRpcError(result.error.message);
+  return { version: result.data };
 }

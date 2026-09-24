@@ -3,7 +3,8 @@ import type { ParticipationStatus } from "@/domain/states";
 
 export type ParticipationHistoryEvent = {
   id: string; occurredAt: string; action: string; actorLabel: string;
-  previousStatus: string | null; newStatus: string | null; reason?: string | null;
+  previousStatus: string | null; newStatus: string | null;
+  reason?: string | null; reasonCode?: string | null;
 };
 
 const stateLabels: Partial<Record<ParticipationStatus, string>> = {
@@ -33,7 +34,8 @@ export function ParticipationTimeline({ currentStatus, events }: {
       {events.map((event) => <li key={event.id} className="rounded-md border border-slate-200 bg-white p-3">
         <p className="font-medium">{stateLabels[event.newStatus as ParticipationStatus] ?? event.action}</p>
         <p className="text-sm text-slate-700">{new Date(event.occurredAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actorLabel}</p>
-        {event.reason && <p className="mt-1 text-sm">Código de motivo: {event.reason}</p>}
+        {event.reasonCode && <p className="mt-1 text-sm">Código de motivo: {event.reasonCode}</p>}
+        {event.reason && <p className="mt-1 text-sm">Motivo interno: {event.reason}</p>}
       </li>)}
     </ol>}
   </section>;

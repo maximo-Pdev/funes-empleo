@@ -27,17 +27,17 @@ describe("validaciones de acciones administrativas", () => {
   });
 
   it("valida preentrevista y contacto sin aceptar canales inventados", () => {
-    expect(evaluationInput.safeParse({ command: "record_preinterview", participationId: id, version: 1, channel: "phone", summary: "Conversación ficticia" }).success).toBe(true);
-    expect(evaluationInput.parse({ command: "record_preinterview", participationId: id, version: 1, channel: "phone", reason: "Salto justificado" })).toMatchObject({ reason: "Salto justificado" });
-    expect(evaluationInput.safeParse({ command: "record_preinterview", participationId: id, version: 1, channel: "telegram", summary: "Conversación ficticia" }).success).toBe(false);
-    expect(evaluationInput.safeParse({ command: "record_contact", participationId: id, channel: "whatsapp", occurredAt: "2026-09-23T15:00:00Z", summary: "Seguimiento ficticio" }).success).toBe(true);
+    expect(evaluationInput.safeParse({ command: "record_preinterview", participationId: id, version: 1, channel: "phone", heldAt: "2026-09-23T15:00:00Z", summary: "Conversación ficticia" }).success).toBe(true);
+    expect(evaluationInput.parse({ command: "record_preinterview", participationId: id, version: 1, channel: "phone", heldAt: "2026-09-23T15:00:00Z", summary: "Conversación ficticia", reason: "Salto justificado" })).toMatchObject({ reason: "Salto justificado" });
+    expect(evaluationInput.safeParse({ command: "record_preinterview", participationId: id, version: 1, channel: "telegram", heldAt: "2026-09-23T15:00:00Z", summary: "Conversación ficticia" }).success).toBe(false);
+    expect(evaluationInput.safeParse({ command: "record_contact", participationId: id, version: 1, channel: "whatsapp", occurredAt: "2026-09-23T15:00:00Z", summary: "Seguimiento ficticio" }).success).toBe(true);
     expect(evaluationInput.safeParse({ command: "record_contact", channel: "phone", occurredAt: "2026-09-23T15:00:00Z", summary: "Sin entidad" }).success).toBe(false);
   });
 
   it("exige motivo para saltar etapas y admite notas internas breves", () => {
     expect(evaluationInput.safeParse({ command: "skip_to_preselected", participationId: id, version: 2, reason: "" }).success).toBe(false);
     expect(evaluationInput.safeParse({ command: "skip_to_preselected", participationId: id, version: 2, reason: "Evaluación documentada" }).success).toBe(true);
-    expect(evaluationInput.safeParse({ command: "record_training_guidance", candidateId: id, body: "Orientación ficticia" }).success).toBe(true);
+    expect(evaluationInput.safeParse({ command: "record_training_guidance", candidateId: id, version: 1, body: "Orientación ficticia" }).success).toBe(true);
     expect(evaluationInput.safeParse({ command: "record_applicant_note", participationId: id, body: "" }).success).toBe(false);
   });
 });

@@ -14,6 +14,7 @@ export type PendingFeedback = {
 export type ConfirmFeedbackPayload = {
   participationId: string; version: number; feedbackId: string;
   outcome: "hired" | "not_selected" | "cancelled"; reason: string;
+  lateCorrection: boolean;
 };
 
 function proposedOutcome(value: string): ConfirmFeedbackPayload["outcome"] | null {
@@ -44,7 +45,8 @@ export function FeedbackReviewPanel({ participationId, version, currentStatus, f
     setError("");
     startTransition(async () => {
       try {
-        const result = await onConfirm({ participationId, version, feedbackId: latest.id, outcome, reason: reason.trim() });
+        const result = await onConfirm({ participationId, version, feedbackId: latest.id, outcome,
+          reason: reason.trim(), lateCorrection: currentStatus === "no_company_response" });
         const message = adminMutationError(result);
         if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
         router.refresh();

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { RoleShell } from "@/components/layouts";
 import { EmptyState } from "@/components/ui";
 import { getAdminOpening } from "@/features/openings/admin-service";
+import { moderateOpeningAction } from "@/features/openings/admin-actions";
+import { ModerationForm } from "@/features/openings/components/moderation-form";
 import { requireActiveAccount } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +19,7 @@ export default async function AdminOpeningDetailPage({ params }: {
     description="Detalle e historial de decisiones visible solo para la Oficina de Empleo."
     navigation={[{ href: "/admin/openings", label: "Volver a ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-6">
       <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="opening-details" className="text-xl font-semibold">Oferta y empresa</h2>
         <p>Empresa: <strong>{opening.company_profiles?.legal_name ?? "Sin nombre"}</strong></p>
@@ -31,6 +34,9 @@ export default async function AdminOpeningDetailPage({ params }: {
         <div><h3 className="font-semibold">Requisitos</h3><p className="whitespace-pre-wrap">{opening.requirements ?? "Sin definir"}</p></div>
         <Link href={`/admin/participations?openingId=${opening.id}`} className="inline-block text-blue-800 underline">Ver participaciones de esta oferta</Link>
       </section>
+      <ModerationForm key={`${opening.status}-${opening.version}`} openingId={opening.id}
+        version={opening.version} status={opening.status} onSubmit={moderateOpeningAction} />
+      </div>
       <section aria-labelledby="opening-history" className="space-y-4">
         <h2 id="opening-history" className="text-xl font-semibold">Historial de moderación</h2>
         {events.length === 0 ? <EmptyState title="Sin decisiones registradas" description="Todavía no hay eventos de moderación para esta oferta." /> :
