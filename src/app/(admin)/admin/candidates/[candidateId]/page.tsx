@@ -7,6 +7,9 @@ import { participationStatusLabel } from "@/features/participations/components/p
 import { SafetyDecisionForm } from "@/features/participations/components/safety-decision-form";
 import { InternalNoteForm } from "@/features/participations/components/internal-note-form";
 import { recordEvaluationAction } from "@/features/participations/evaluation-actions";
+import { listNominationOpenings } from "@/features/participations/nomination-service";
+import { createAdminNominationAction } from "@/features/participations/nomination-actions";
+import { NominationForm } from "@/features/participations/components/nomination-form";
 import { requireActiveAccount } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +21,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   const { candidateId } = await params;
   const { cv } = await searchParams;
   const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
+  const nominationOpenings = candidate.status === "active" ? await listNominationOpenings() : [];
 
   return <RoleShell role="admin" title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
@@ -67,6 +71,9 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       </section>
       </div>
       <div className="space-y-6">
+      {candidate.status === "active" && <NominationForm candidateId={candidate.id}
+        candidateVersion={candidate.version} openings={nominationOpenings}
+        onSubmit={createAdminNominationAction} />}
       {candidate.account_id && candidate.accounts && candidate.accounts.status !== "pending_verification" &&
         <SafetyDecisionForm key={`${candidate.accounts.status}-${candidate.accounts.version}`}
           resource="candidate_account" resourceId={candidate.account_id}
