@@ -100,5 +100,12 @@ select is((select count(*) from public.job_openings where company_id=private.fix
 select is((select count(*) from public.referrals r join public.participations p on p.id=r.participation_id
  join public.job_openings o on o.id=p.opening_id where o.company_id=private.fixture_id('business',1)
  and r.access_status='active'),0::bigint,'Restauración no recupera acceso anterior');
+reset role;
+select ok((private.run_daily_employment_maintenance('2027-01-01 03:00:00+00')->>'closedOpenings')::integer>0,
+ 'Proceso diario cierra ofertas publicadas tras su fecha límite');
+select is(private.run_daily_employment_maintenance('2027-01-01 03:00:00+00')->>'closedOpenings','0',
+ 'Repetición no vuelve a cerrar ni auditar ofertas');
+select ok(exists(select 1 from public.audit_events where action='opening_auto_closed' and actor_type='system'),
+ 'Cierre automático tiene actor de sistema');
 select * from finish();
 rollback;

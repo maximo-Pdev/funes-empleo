@@ -1,11 +1,17 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { createHash } from "node:crypto";
 
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => {
   test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"),
     "Solo Supabase local con datos ficticios");
 });
+
+function fixtureId(kind: string, number: number) {
+  const hash = createHash("md5").update(`funes-demo-v1:${kind}:${number}`).digest("hex");
+  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20)}`;
+}
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
   await page.goto("/login");
@@ -136,4 +142,48 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByRole("button", { name: "Restaurar empresa" }).click();
     await expect(admin.getByText("Decisión registrada", { exact: false })).toBeVisible();
   } finally { await adminContext.close(); }
+});
+
+test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva y restaura sin reabrirlas", async ({ browser }) => {
+  const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
+  const companyContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
+  try {
+    const admin = await adminContext.newPage();
+    const company = await companyContext.newPage();
+    await signIn(admin, "admin1@example.invalid", "Fictitious-Local-Only-2026!");
+    await signIn(company, "company3@example.invalid", "Fictitious-Local-Only-2026!");
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}`);
+    await expect(company.locator("body")).not.toContainText("Oferta ficticia 002");
+    await company.goto(`/company/openings/${fixtureId("opening", 2)}/referrals`);
+    await expect(company.locator("body")).not.toContainText("Persona ficticia 002");
+    await admin.goto(`/admin/empresas/${fixtureId("business", 3)}`);
+    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
+    await admin.getByLabel("Confirmo esta decisión.").last().check();
+    await admin.getByRole("button", { name: "Archivar empresa" }).click();
+    await expect(admin.getByText("Cuenta: archived", { exact: false })).toBeVisible();
+    await company.goto("/empresa/ofertas");
+    await expect(company).toHaveURL(/\/session-expired$/);
+    await admin.reload();
+    await expect(admin.getByText("Cuenta: archived", { exact: false })).toBeVisible();
+    await admin.getByLabel("Motivo interno (no visible a la empresa)").fill("Restauración administrativa ficticia");
+    await admin.getByLabel("Confirmo esta decisión.").check();
+    await admin.getByRole("button", { name: "Restaurar empresa" }).click();
+    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await signIn(company, "company3@example.invalid", "Fictitious-Local-Only-2026!");
+    await company.goto("/empresa/perfil");
+    await expect(company.getByText("Estado:")).toContainText("Incompleto");
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 3)}`);
+    await expect(company.getByText("Estado:")).toContainText("draft");
+    await expect(company.locator("body")).not.toContainText("Archivo administrativo ficticio");
+  } finally { await Promise.all([adminContext.close(), companyContext.close()]); }
+});
+
+test("una oferta vencida no aparece públicamente y la empresa ve su cierre", async ({ page }) => {
+  await signIn(page, "company31@example.invalid", "Fictitious-Local-Only-2026!");
+  await page.goto(`/empresa/ofertas/${fixtureId("opening", 81)}`);
+  await expect(page.getByText("Estado:")).toContainText("closed");
+  await expect(page.getByText(/ya no recibe postulaciones/i)).toBeVisible();
+  await page.goto(`/ofertas/${fixtureId("opening", 81)}`);
+  await expect(page.getByText("Oferta ficticia 081")).toHaveCount(0);
 });
