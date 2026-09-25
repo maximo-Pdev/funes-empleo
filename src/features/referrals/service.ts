@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
+import { workflowRpcError } from "@/lib/errors/workflow-rpc";
 
 // PostgreSQL accepts all RFC 4122/GUID layouts. Local fixtures intentionally use
 // deterministic GUIDs whose version nibble is not v1-v8, so do not impose a
@@ -46,13 +47,9 @@ export async function referCandidate(input: unknown) {
     p_command: "refer",
     p_reason: parsed.data.reason ?? null,
   });
-  if (error) {
-    if (error.message === "CONFLICT_STALE_DATA") throw new AppError("CONFLICT_STALE_DATA");
-    if (error.message === "CONSENT_REQUIRED") throw new AppError("CONSENT_REQUIRED");
-    if (error.message === "VALID_CV_REQUIRED") throw new AppError("VALID_CV_REQUIRED");
-    if (error.message === "INVALID_TRANSITION" || error.message === "INVALID_INPUT") throw new AppError("INVALID_TRANSITION");
-    throw new AppError("INTERNAL_ERROR");
-  }
+  // SQL revalidates current consent, account, profile and exact valid PDF in
+  // the same transaction as referral creation, including assisted profiles.
+  if (error) throw workflowRpcError(error.message);
   return { version: data };
 }
 

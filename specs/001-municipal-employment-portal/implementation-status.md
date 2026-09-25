@@ -227,3 +227,23 @@ no las atribuye a una aprobación de GitHub.
 Las fases 3, 4 y 5 quedan integradas entre sí. Las fases 6 en adelante y las mediciones,
 decisiones municipales y validaciones finales del MVP siguen abiertas según `tasks.md` y
 `OPEN_QUESTIONS.md`; esta integración no equivale a completar todo el MVP.
+
+## Actualización 2026-09-25: fase 6 de atención presencial asistida
+
+Rama `codex/temp-phase-6-assisted-service`, creada desde `main` actualizado (`8b9ff68`).
+T061–T068 implementadas y marcadas. Alta y mantenimiento sin cuenta ni CV, decisiones
+explícitas de duplicados, consentimiento y orientación internos, derivación bloqueada sin PDF
+y vinculación presencial con correo verificado conservando la ficha y su historial.
+
+Las migraciones `202609190040`–`202609190044` incluyen correcciones forward-only verificadas
+para campos no seleccionados, auditoría y autorización de perfiles sin cuenta. Sin nuevas
+dependencias, variables de entorno ni datos reales.
+
+Verificación local: 86 pruebas unitarias/componentes, 365 pgTAP, typecheck, lint y build
+correctos; Playwright completo con 23 recorridos correctos y 1 omisión ambiental preexistente.
+Se revisaron capturas móvil/escritorio y axe en US4. El runtime local es Node 24.16.0/npm
+11.13.0; permanece pendiente CI con las versiones exactas fijadas, revisión humana por PR
+y la aceptación municipal ya prevista.
+
+La evidencia, alcance, limitaciones y recuperación de migraciones están en
+[validación de fase 6](../../docs/validation/phase-6-assisted-service.md).

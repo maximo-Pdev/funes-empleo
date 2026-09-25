@@ -1566,6 +1566,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assisted_candidate_command: {
+        Args: {
+          p_candidate: string
+          p_command: string
+          p_expected_version: number
+          p_policy_hash?: string | null
+          p_policy_version?: string | null
+        }
+        Returns: number
+      }
+      assisted_claim_requests: { Args: { p_candidate: string }; Returns: Json }
+      claim_assisted_profile: {
+        Args: {
+          p_account: string
+          p_candidate: string
+          p_dni: string
+          p_expected_version: number
+          p_in_person: boolean
+          p_reason: string
+        }
+        Returns: string
+      }
+      save_assisted_candidate: {
+        Args: {
+          p_candidate: string | null
+          p_data: Json
+          p_decision?: string | null
+          p_expected_version: number | null
+          p_fields?: string[]
+          p_reason?: string | null
+          p_review?: string | null
+        }
+        Returns: Json
+      }
+      screen_assisted_duplicates: {
+        Args: { p_dni: string; p_email: string; p_exclude?: string | null }
+        Returns: Json
+      }
       activate_candidate: {
         Args: { p_expected_version: number }
         Returns: number
