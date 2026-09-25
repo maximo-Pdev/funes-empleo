@@ -2,6 +2,7 @@ import { AppError } from "./public-error";
 
 export function workflowRpcError(message: string): AppError {
   switch (message) {
+    case "POTENTIAL_DUPLICATE": return new AppError("POTENTIAL_DUPLICATE");
     case "CONFLICT_STALE_DATA": return new AppError("CONFLICT_STALE_DATA");
     case "INVALID_TRANSITION": return new AppError("INVALID_TRANSITION");
     case "INVALID_INPUT": return new AppError("VALIDATION_ERROR");

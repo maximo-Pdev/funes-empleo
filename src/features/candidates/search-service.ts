@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
+import { referralEligibility } from "@/domain/permissions/referral";
 import { candidateSearchSchema, type CandidateSearchFilters } from "@/validation/candidate-search";
 
 // PostgreSQL UUIDs in the deterministic local fixture are MD5-derived and do
@@ -45,13 +46,12 @@ export interface CandidateSearchHit {
 export function candidateIsReferralEligible(row: Pick<CandidateSearchRow,
   "account_id" | "status" | "availability" | "archived_at" | "refresh_due_at" | "accounts" | "candidate_consents" | "cv_documents">,
 now: Date): boolean {
-  if (row.archived_at || row.status !== "active" || row.availability !== "available" || !row.refresh_due_at ||
-      new Date(row.refresh_due_at).getTime() <= now.getTime()) return false;
-  if (row.account_id && row.accounts?.status !== "active") return false;
   const latestConsent = [...row.candidate_consents].sort((a, b) =>
     b.recorded_at.localeCompare(a.recorded_at) || b.id.localeCompare(a.id))[0];
-  return latestConsent?.status === "accepted" &&
-    row.cv_documents.some((document) => document.status === "valid" && !document.archived_at);
+  return referralEligibility({ status: row.status, available: row.availability === "available", archived: Boolean(row.archived_at),
+    fresh: Boolean(row.refresh_due_at && new Date(row.refresh_due_at).getTime() > now.getTime()),
+    accountActive: !row.account_id || row.accounts?.status === "active", currentConsent: latestConsent?.status === "accepted",
+    validCv: row.cv_documents.some((document) => document.status === "valid" && !document.archived_at) }) === null;
 }
 
 export function paginateCandidates<T>(items: readonly T[], page: number, pageSize: number) {

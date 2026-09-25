@@ -1,12 +1,13 @@
 export const PUBLIC_ERROR_CODES = [
   "AUTH_REQUIRED", "ACCESS_DENIED", "VALIDATION_ERROR", "CONFLICT_STALE_DATA",
   "INVALID_TRANSITION", "CONSENT_REQUIRED", "VALID_CV_REQUIRED", "NOT_FOUND",
-  "INTERNAL_ERROR",
+  "INTERNAL_ERROR", "POTENTIAL_DUPLICATE",
 ] as const;
 
 export type PublicErrorCode = (typeof PUBLIC_ERROR_CODES)[number];
 
 const PUBLIC_ERROR_MESSAGES: Record<PublicErrorCode, string> = {
+  POTENTIAL_DUPLICATE: "Hay una coincidencia de DNI o correo. Revisá los duplicados antes de continuar.",
   AUTH_REQUIRED: "Iniciá sesión para continuar.",
   ACCESS_DENIED: "No tenés permiso para realizar esta acción.",
   VALIDATION_ERROR: "Revisá los datos ingresados e intentá nuevamente.",
