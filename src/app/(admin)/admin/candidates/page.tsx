@@ -26,7 +26,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
   };
 
   return <RoleShell role="admin" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
-    navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Mi cuenta" }]}>
+    navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/admin/imports", label: "Importaciones" }, { href: "/account", label: "Mi cuenta" }]}>
     <Link href="/admin/candidates/assisted" className="inline-block rounded bg-blue-800 p-3 text-white">Nueva atención presencial</Link>
     <CandidateSearchForm categories={categories.map((category) => ({ id: category.id, name: category.name }))}
       initial={parsed.success ? parsed.data : undefined} />

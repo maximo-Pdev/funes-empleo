@@ -343,6 +343,13 @@ que OQ-001 no se convirtió en TTL de datos ni purga inventados y que el protoco
 
 ### Importación y exportación CSV
 
+- Excepción del proyecto aprobada por Mateo el 2026-09-25: implementar T070–T078
+  contra `demo-candidates-v1` en `docs/import/candidate-import-v1.md`, solo datos
+  ficticios. La aplicación y SQL aceptan únicamente esa versión; no habilita un
+  adaptador histórico, no cierra T069/OQ-018 ni convierte fixtures en catálogo oficial.
+  Se reutilizan validadores y comandos asistidos dentro de la transacción de
+  confirmación; tablas de staging solo admiten escritura mediante RPC administrativa.
+
 - Flujo de dos fases: previsualización sin escrituras de negocio y confirmación transaccional. El
   servidor vuelve a validar el lote confirmado; cualquier fallo revierte todas las filas.
 - Se aceptará CSV UTF-8 con BOM opcional, encabezados exactos de un contrato versionado, conteo y
