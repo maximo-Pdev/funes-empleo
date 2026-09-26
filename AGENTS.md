@@ -19,6 +19,7 @@ Before planning or changing the product, read these files in order:
 7. `docs/discovery/OPEN_QUESTIONS.md`
 8. The active feature artifacts under `specs/`, when they exist
 9. `.specify/memory/constitution.md`, once ratified
+10. `cambios-extra.md`, for necessary additions, their rationale, status, and review history
 
 Do not rely on prior chat history. The repository is the shared source of context for both developers and their Codex sessions.
 
@@ -31,6 +32,15 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - Discovery documents describe the current shared understanding and must not silently override an approved specification.
 - Items marked open, provisional, inferred, or unconfirmed must not be invented. Record the uncertainty and request a decision.
 - When evidence conflicts, preserve both versions in `OPEN_QUESTIONS.md` and identify the stakeholder who must resolve it.
+
+## Necessary additions discovered during implementation
+
+- Project authorization recorded by Mateo on 2026-09-26: if an additional requirement or technical prerequisite is demonstrably necessary to satisfy the approved task, the agent may add it within that task's scope instead of stopping solely because it was not enumerated. Prefer the smallest sufficient change; unrelated improvements are deferred.
+- Before implementing an addition, record it in the root `cambios-extra.md` with a stable ID, date, problem/evidence, originating approved requirement/task, proposed change, justification, affected files/contracts, risks, verification plan, and authorization/review status. Tell the user what will change and why.
+- Keep the specification, plan, data model, contracts, and tasks consistent where affected. The log is traceability, not a replacement for those artifacts or for the constitution. Follow existing Spec Kit review and analysis gates for architectural changes.
+- This authorization covers necessary implementation details and derived requirements; it does not authorize inventing municipal/legal decisions, resolving open questions, adding excluded MVP features, changing approved functional behavior, or bypassing privacy, security, the required stack, or quality gates. Record such proposals as pending and request the responsible stakeholder's decision before implementing them.
+- Preserve shared-file ownership and coordinate changes to shared contracts, schema, authentication, authorization, states, and global UI before implementation. Recording an entry alone is not coordination or approval by the second developer.
+- After implementation, update the entry with actual files, verification results, remaining limitations, and commit/PR references when available. Distinguish proposed, implemented, verified, and reviewed work; never mark review or acceptance complete without evidence.
 
 ## Current project phase
 

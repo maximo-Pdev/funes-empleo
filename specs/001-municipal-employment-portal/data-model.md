@@ -491,6 +491,14 @@ Reglas:
 
 ## Métricas y exportaciones
 
+Soporte implementado de FR-064 (`EXTRA-001`, 2026-09-26): tablas privadas
+`metrics_history`, `metrics_outcomes`, `metrics_coverage` y `metrics_exports`
+conservan evidencia mínima y filtros de descarga, no agregados ni datos personales
+duplicados. Triggers transaccionales append-only capturan estados/categorías para
+consultas históricas; RLS limita lectura a administración. Una base preexistente
+solo tiene cobertura desde su línea base, nunca desde fechas inferidas.
+Detalle y funciones en `docs/validation/phase-8-metrics.md`.
+
 No se crean tablas agregadas para el MVP. Vistas o funciones protegidas calculan:
 
 - candidatos activos: perfil `active`, disponible, con consentimiento vigente y confirmado dentro de

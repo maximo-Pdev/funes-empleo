@@ -261,3 +261,25 @@ Verificación: 100 unitarias/componentes, 412 pgTAP, tres E2E de importación,
 typecheck, lint y build correctos. Node 24.21.0/npm 11.19.0. Revisión móvil y axe;
 NVDA/aceptación humana, rendimiento alojado, CI y revisión del compañero pendientes.
 Evidencia y límites en [validación de fase 7](../../docs/validation/phase-7-csv-import.md).
+
+## Actualización 2026-09-26: fase 8, seguimiento y métricas
+
+Rama `codex/temp-phase-8-metrics` desde `4f422cf` (PR #30 integrada).
+T079–T086 implementadas y marcadas: panel administrativo, filtros temporales y de
+categoría, tiempos por oferta, CSV de métricas auditado, cronología de contactos y
+plantillas internas sin envío. No se implementaron fases posteriores.
+
+EXTRA-001, autorizado por Mateo y registrado en `cambios-extra.md`, agrega evidencia
+temporal mínima con RLS para reconstruir estados anteriores; una instalación
+existente no inventa datos previos a la migración. Migraciones 060–061 forward-only.
+`AGENTS.md` exige registrar y verificar estos extras sin resolver decisiones abiertas.
+
+Verificación local: 112 pruebas unitarias/componentes, 466 pgTAP, 29 E2E correctos y
+una omisión ambiental de recuperación sin Mailpit; typecheck, lint y build correctos.
+El proyecto Playwright de métricas precede a los recorridos que mutan el fixture.
+Axe y ancho móvil de 360 px correctos. Node 24.21.0/npm 11.19.0.
+
+Pendientes: revisión del segundo desarrollador, CI, aceptación humana alojada,
+NVDA y controles de fase 9. No acredita merge ni cierra OQ-005/OQ-018.
+Contratos, recuperación y evidencia en
+[validación de fase 8](../../docs/validation/phase-8-metrics.md).

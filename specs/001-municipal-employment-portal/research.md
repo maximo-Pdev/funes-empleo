@@ -359,6 +359,13 @@ internas siempre obligatorias o saltos sin motivo fueron rechazados durante acla
 
 ## 18. Definiciones y validación reproducible de métricas
 
+Complemento 2026-09-26 (`EXTRA-001`): las columnas mutables y la auditoría anterior
+no bastan para reconstruir fotos históricas de categorías/disponibilidad. Se agrega
+evidencia mínima privada, append-only y transaccional, no snapshots de PII ni tablas
+de agregados. Se descartan usar valores actuales como si fueran pasados y retrofechar
+la línea base de instalaciones existentes. La consulta usa invocador/RLS; la evidencia
+de filtros de descarga se enlaza a auditoría sin ampliar su lista de metadatos.
+
 **Decisión**: candidato activo significa perfil activo, disponible, con consentimiento vigente y
 confirmado en los últimos seis meses. Se calculan dos duraciones desde `published_at`: hasta la
 primera contratación confirmada y hasta que las contrataciones confirmadas alcancen `vacancies`; la
