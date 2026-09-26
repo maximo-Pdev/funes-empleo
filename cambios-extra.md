@@ -54,6 +54,7 @@ una propuesta en una decisión municipal aprobada.
   compartida al usuario. La revisión del diseño y de los archivos por Máximo sigue pendiente.
 - **Resultado:** fase 8 implementada; evidencia y límites en el documento de validación.
   Esta entrada no acredita aprobación municipal, revisión humana ni merge.
+- **Referencias:** implementación `1aea6be`, [PR #31](https://github.com/maximo-Pdev/funes-empleo/pull/31).
 
 ## Formato para próximas entradas
 
