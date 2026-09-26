@@ -247,3 +247,17 @@ y la aceptación municipal ya prevista.
 
 La evidencia, alcance, limitaciones y recuperación de migraciones están en
 [validación de fase 6](../../docs/validation/phase-6-assisted-service.md).
+
+## Actualización 2026-09-25: fase 7, demostración CSV
+
+Rama `codex/temp-phase-7-csv-import` desde `c1c7547`. Mateo aprobó la excepción
+documentada en `docs/import/candidate-import-v1.md`: T070–T078 implementadas para
+`demo-candidates-v1`, exclusivamente ficticio. T069/OQ-018 siguen pendientes para
+el padrón histórico; no existe aprobación municipal inferida.
+
+Parser, preview protegida, resoluciones explícitas, confirmación SQL atómica,
+historial y recuperación por nuevo lote vinculado. Migraciones 050–053 forward-only.
+Verificación: 100 unitarias/componentes, 412 pgTAP, tres E2E de importación,
+typecheck, lint y build correctos. Node 24.21.0/npm 11.19.0. Revisión móvil y axe;
+NVDA/aceptación humana, rendimiento alojado, CI y revisión del compañero pendientes.
+Evidencia y límites en [validación de fase 7](../../docs/validation/phase-7-csv-import.md).

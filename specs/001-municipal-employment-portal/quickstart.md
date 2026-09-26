@@ -219,8 +219,10 @@ Esperado:
 
 ## Escenario 6: duplicados e importación
 
-Este escenario queda bloqueado hasta contar con muestra anonimizada y `mapping_version` aprobado.
-Una vez disponible:
+Para el padrón histórico este escenario queda bloqueado hasta contar con muestra
+anonimizada y mapeo municipal aprobado. Por decisión de Mateo del 2026-09-25 se
+puede ejecutar con `demo-candidates-v1` y datos ficticios según
+`docs/import/candidate-import-v1.md`, sin cerrar T069/OQ-018:
 
 1. Previsualizar un CSV ficticio con fila válida, DNI duplicado, email coincidente, categoría sin
    mapear, campo faltante y encabezado desconocido en archivos separados.

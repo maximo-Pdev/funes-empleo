@@ -927,6 +927,11 @@ export type Database = {
       }
       import_rows: {
         Row: {
+          decision: string | null
+          decision_id: string | null
+          target_candidate_id: string | null
+          target_version: number | null
+          confirmed_fields: string[]
           batch_id: string
           created_at: string
           created_candidate_id: string | null
@@ -939,6 +944,11 @@ export type Database = {
           version: number
         }
         Insert: {
+          decision?: string | null
+          decision_id?: string | null
+          target_candidate_id?: string | null
+          target_version?: number | null
+          confirmed_fields?: string[]
           batch_id: string
           created_at?: string
           created_candidate_id?: string | null
@@ -951,6 +961,11 @@ export type Database = {
           version?: number
         }
         Update: {
+          decision?: string | null
+          decision_id?: string | null
+          target_candidate_id?: string | null
+          target_version?: number | null
+          confirmed_fields?: string[]
           batch_id?: string
           created_at?: string
           created_candidate_id?: string | null
@@ -1566,6 +1581,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      preview_candidate_import: { Args: { p_hash: string; p_mapping: string; p_rows: Json; p_retry?: string | null }; Returns: string }
+      import_batch_preview: { Args: { p_batch: string }; Returns: Json }
+      resolve_import_row: { Args: { p_batch: string; p_version: number; p_row: string; p_decision: string; p_reason: string;
+        p_data: Json; p_candidate: string | null; p_candidate_version: number | null; p_fields: string[] }; Returns: undefined }
+      confirm_candidate_import: { Args: { p_batch: string; p_version: number; p_hash: string; p_mapping: string }; Returns: string }
       assisted_candidate_command: {
         Args: {
           p_candidate: string

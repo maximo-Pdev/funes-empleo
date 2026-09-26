@@ -47,6 +47,11 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ## Evidence that still needs collection
 
+Project exception, 2026-09-25: Mateo approved implementing/testing US5 with a
+synthetic demo mapping (`docs/import/candidate-import-v1.md`). This is not Office
+approval: OQ-018/T069 remain open for the historical workbook, and OQ-010 remains
+open for the official catalog. No real data may be imported under this exception.
+
 - An anonymized copy of the current Excel column structure.
 - The current form fields and category list exported in a usable format.
 - Examples of real company requests, anonymized.

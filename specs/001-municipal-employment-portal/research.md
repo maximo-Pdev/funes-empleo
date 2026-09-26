@@ -209,6 +209,12 @@ Supabase Cron sigue en beta, debe reevaluarse antes de producción.
 
 ## 10. Importación y exportación CSV
 
+Complemento de proyecto (2026-09-25): Mateo autorizó construir y verificar la demo
+con `demo-candidates-v1` sin esperar el Excel municipal. La versión se documenta en
+`docs/import/candidate-import-v1.md`; el SQL admite solo esa versión y categorías
+ficticias del seed. Las funciones administrativas existentes se reutilizan dentro de
+la transacción del lote. Esto no agrega dependencias ni resuelve OQ-010/OQ-018/T069.
+
 **Decisión**: dos fases. La previsualización analiza CSV UTF-8 con BOM opcional, encabezados exactos,
 límites estrictos y reporte de errores sin escribir negocio. La confirmación vuelve a validar y llama
 una función PostgreSQL all-or-nothing. El mapeo final queda bloqueado por OQ-018.

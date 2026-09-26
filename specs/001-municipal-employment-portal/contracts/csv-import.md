@@ -9,6 +9,11 @@ importador terminado.
 
 ## Sobre del archivo
 
+Excepción aprobada por Mateo el 2026-09-25: el desarrollo y las pruebas pueden
+usar `demo-candidates-v1`, definido en `docs/import/candidate-import-v1.md`, con
+datos exclusivamente ficticios. No se infieren columnas históricas: OQ-018 y T069
+siguen abiertos para importar el padrón real. La demo no constituye aprobación municipal.
+
 - Codificación UTF-8; BOM permitido.
 - Separador coma; comillas dobles según CSV estándar; fin de línea CRLF o LF.
 - Primera fila obligatoria con encabezados exactos del `mapping_version` aprobado.

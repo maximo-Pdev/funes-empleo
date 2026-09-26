@@ -213,27 +213,30 @@ approved historical CSV mapping without hidden partial writes.
 every invalid/unmapped/duplicate row without business writes; a valid batch imports completely and a
 forced row failure rolls back the entire batch.
 
-**Blocking dependency**: T069 must be approved before T070–T078. No task may infer historical
-columns or use a real workbook.
+**Blocking dependency**: T069 gates the historical importer. Project exception approved by Mateo
+on 2026-09-25 permits T070–T078 against `demo-candidates-v1` with exclusively fictitious data,
+as recorded in `docs/import/candidate-import-v1.md`. T069 remains pending; no task may infer
+historical columns, use a real workbook, or claim municipal acceptance.
 
 ### Tests for User Story 5
 
 - [ ] T069 [US5] Obtain the anonymized workbook structure and approved written mapping from the Employment Office, record exact headers/transformations/category mappings and approval evidence in `docs/import/candidate-import-v1.md`, and keep US5 blocked if either input is missing
-- [ ] T070 [P] [US5] Write failing parser tests for the approved mapping plus UTF-8/BOM, exact/duplicate/unknown headers, inconsistent columns, empty file, `5 MiB`, `10,000 rows`, `64 KiB` record, invalid fields, intra-file duplicates, and unmapped/deactivated categories in `tests/unit/imports/csv-parser.test.ts`
-- [ ] T071 [P] [US5] Write failing pgTAP tests for admin-only staging, hash/mapping/version preconditions, double confirmation, all three duplicate decisions with mandatory actor/date/reason, false-positive correction/revalidation, complete rollback, failed-batch history, linked reupload/new preview recovery, and sanitized audit summary in `supabase/tests/050_import_atomicity.test.sql`
-- [ ] T072 [US5] Write the failing end-to-end import scenario from Quickstart scenario 6 with only fictitious rows in `tests/e2e/candidate-import.spec.ts`
+- [X] T070 [P] [US5] Write failing parser tests for the approved mapping plus UTF-8/BOM, exact/duplicate/unknown headers, inconsistent columns, empty file, `5 MiB`, `10,000 rows`, `64 KiB` record, invalid fields, intra-file duplicates, and unmapped/deactivated categories in `tests/unit/imports/csv-parser.test.ts`
+- [X] T071 [P] [US5] Write failing pgTAP tests for admin-only staging, hash/mapping/version preconditions, double confirmation, all three duplicate decisions with mandatory actor/date/reason, false-positive correction/revalidation, complete rollback, failed-batch history, linked reupload/new preview recovery, and sanitized audit summary in `supabase/tests/050_import_atomicity.test.sql`
+- [X] T072 [US5] Write the failing end-to-end import scenario from Quickstart scenario 6 with only fictitious rows in `tests/e2e/candidate-import.spec.ts`
 
 ### Implementation for User Story 5
 
-- [ ] T073 [US5] Finalize the placeholder import-batch/import-row schema against the approved mapping without storing the raw file indefinitely in `supabase/migrations/202609190050_import_schema.sql`; retain optional `retry_of_batch_id` for a new batch linked to a failed attempt, statuses exactly `uploaded|preview_ready|blocked|confirming|completed|failed|archived`, and row statuses covering valid, warning, invalid, potential duplicate, unmapped category, and imported
-- [ ] T074 [US5] Implement strict, non-casting, streaming CSV parsing and row normalization for the approved contract in `src/features/imports/parser.ts`, `src/features/imports/mapping.ts`, and `src/validation/candidate-import.ts`
-- [ ] T075 [US5] Implement admin-only preview with zero business writes, masked sensitive values, row/error codes, counts, impact summary, and temporary-file cleanup in `src/features/imports/preview-service.ts` and `src/app/api/admin/imports/preview/route.ts`
-- [ ] T076 [P] [US5] Build the accessible preview and explicit `use_or_update_existing|correct_and_create|reject` duplicate/category resolution UI with reason capture, masked sensitive values, false-positive correction/revalidation, and confirmation disabled while blockers remain in `src/app/(admin)/admin/imports/new/` and `src/features/imports/components/`
-- [ ] T077 [US5] Implement the all-or-nothing confirmation function that revalidates batch ID/hash/mapping/version and every recorded duplicate decision, then writes only expressly approved profile/contact/category changes, observations, and audit in one transaction in `supabase/migrations/202609190051_confirm_import.sql`
-- [ ] T078 [US5] Implement the confirmation handler and batch-history/result pages with safe retry/conflict messages in `src/app/api/admin/imports/[batchId]/confirm/route.ts` and `src/app/(admin)/admin/imports/`; a failed batch must remain auditable with zero partial business writes and require corrected reupload/new preview/new linked batch rather than automatic retry or reuse of a discarded raw CSV
+- [X] T073 [US5] Finalize the placeholder import-batch/import-row schema against the approved mapping without storing the raw file indefinitely in `supabase/migrations/202609190050_import_schema.sql`; retain optional `retry_of_batch_id` for a new batch linked to a failed attempt, statuses exactly `uploaded|preview_ready|blocked|confirming|completed|failed|archived`, and row statuses covering valid, warning, invalid, potential duplicate, unmapped category, and imported
+- [X] T074 [US5] Implement strict, non-casting, streaming CSV parsing and row normalization for the approved contract in `src/features/imports/parser.ts`, `src/features/imports/mapping.ts`, and `src/validation/candidate-import.ts`
+- [X] T075 [US5] Implement admin-only preview with zero business writes, masked sensitive values, row/error codes, counts, impact summary, and temporary-file cleanup in `src/features/imports/preview-service.ts` and `src/app/api/admin/imports/preview/route.ts`
+- [X] T076 [P] [US5] Build the accessible preview and explicit `use_or_update_existing|correct_and_create|reject` duplicate/category resolution UI with reason capture, masked sensitive values, false-positive correction/revalidation, and confirmation disabled while blockers remain in `src/app/(admin)/admin/imports/new/` and `src/features/imports/components/`
+- [X] T077 [US5] Implement the all-or-nothing confirmation function that revalidates batch ID/hash/mapping/version and every recorded duplicate decision, then writes only expressly approved profile/contact/category changes, observations, and audit in one transaction in `supabase/migrations/202609190051_confirm_import.sql`
+- [X] T078 [US5] Implement the confirmation handler and batch-history/result pages with safe retry/conflict messages in `src/app/api/admin/imports/[batchId]/confirm/route.ts` and `src/app/(admin)/admin/imports/`; a failed batch must remain auditable with zero partial business writes and require corrected reupload/new preview/new linked batch rather than automatic retry or reuse of a discarded raw CSV
 
-**Checkpoint**: US5 is complete only with approved anonymized mapping evidence and passing rollback,
-duplicate, authorization, and privacy tests.
+**Checkpoint**: Demo implementation can complete with the approved synthetic mapping and passing
+rollback, duplicate, authorization and privacy tests. Historical US5 acceptance remains blocked
+on T069 and municipal approval; demo completion must not mark T069 complete.
 
 ---
 
@@ -301,8 +304,8 @@ explicit, and the implementation is ready for analysis/review rather than automa
   automation in T034.
 - **Phase 6 — US4**: depends on Phase 2 and reuses candidate/CV/consent services completed in US2;
   schedule after US2 in a two-person team to avoid overlapping files.
-- **Phase 7 — US5**: depends on Phase 2 and the external T069 mapping gate; it does not depend on UI
-  completion in other stories.
+- **Phase 7 — US5**: depends on Phase 2; historical acceptance depends on T069. The 2026-09-25
+  exception permits implementation with the synthetic demo mapping; it does not resolve T069.
 - **Phase 8 — US6**: depends on Phase 2 and meaningful fixture/activity data; schedule after US1–US3
   for realistic acceptance counts.
 - **Phase 9 — Polish**: depends on every story included in the release.
@@ -338,7 +341,7 @@ US6 needs representative activity from the transactional stories; US5 is externa
 - US3 tests T051/T052 and UI T057/T058 can run in parallel around the shared company service; the
   automatic-expiry assertions wait for T034.
 - US4 tests T061/T062 and UI T066 can run in parallel after service contracts are fixed.
-- US5 tests T070/T071 and later parser/UI T074/T076 can run in parallel only after T069.
+- US5 tests T070/T071 and later parser/UI T074/T076 require T069 or the approved demo-only exception.
 - US6 T079 and T082/T083 can run in parallel before dashboard integration.
 - Cross-cutting T087/T088/T090/T091 touch independent paths.
 
@@ -383,7 +386,7 @@ T066: src/app/(admin)/admin/candidates/assisted/
 ### User Story 5
 
 ```text
-After T069 only:
+After T069, or under the approved demo-only exception:
 T070: tests/unit/imports/csv-parser.test.ts
 T071: supabase/tests/050_import_atomicity.test.sql
 T074: src/features/imports/parser.ts
@@ -413,7 +416,7 @@ T083: src/features/participations/contact-service.ts
 
 1. Add US2 and US3 to replace fixtures with candidate/company self-service.
 2. Add US4 for inclusive in-person service after candidate services stabilize.
-3. Add US5 only after its external mapping gate.
+3. Add historical US5 only after its external mapping gate; demo work uses the 2026-09-25 exception.
 4. Add US6 after transactional data exists.
 5. Complete cross-cutting gates, then run `$speckit-analyze` before implementation approval/merge.
 

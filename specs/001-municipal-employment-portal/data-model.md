@@ -448,6 +448,14 @@ eventos anteriores. Una falla al insertar el evento revierte también el cambio 
 
 ## Importaciones
 
+Implementación demo autorizada por Mateo el 2026-09-25: únicamente
+`demo-candidates-v1` de `docs/import/candidate-import-v1.md`. No es el mapeo histórico
+pendiente de OQ-018/T069. En staging, `decision`, `decision_id` (historial privado
+append-only), `target_candidate_id`, `target_version` y `confirmed_fields` conservan
+la resolución explícita y la precondición de actualización. Rechazar excluye esa fila
+de las aceptadas sin agregar un estado de workflow. Nuevos perfiles quedan borradores
+importados, sin cuenta, consentimiento, CV ni confirmación de vigencia inventados.
+
 ### `import_batches`
 
 | Campo | Regla |

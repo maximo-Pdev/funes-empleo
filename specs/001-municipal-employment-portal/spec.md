@@ -202,6 +202,15 @@ los flujos completos de candidatos, empresas y administradores."
 
 ## User Scenarios & Testing *(mandatory)*
 
+### Project decision 2026-09-25: synthetic import demonstration
+
+Mateo authorized implementation and testing of US5 with a written provisional
+mapping and exclusively fictitious data, because the municipal workbook is not
+available. `docs/import/candidate-import-v1.md` records that mapping and evidence.
+This exception permits a demonstration, not historical-data acceptance: FR-060,
+OQ-018 and T069 still require the Office's sample and written approval for real imports.
+No consent, real categories or municipal approval may be inferred from this decision.
+
 ### User Story 1 - Intermediación municipal de una búsqueda laboral (Priority: P1)
 
 Como integrante de la Oficina de Empleo, necesito gestionar una búsqueda desde que una oferta se
