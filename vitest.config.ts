@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
-    include: ["tests/unit/**/*.test.ts", "tests/components/**/*.test.tsx"],
+    include: ["tests/unit/**/*.test.ts", "tests/components/**/*.test.tsx", "tests/integration/**/*.test.ts", "tests/performance/**/*.test.ts"],
     restoreMocks: true,
     coverage: { provider: "v8", include: ["src/lib/env/schema.ts"], reporter: ["text", "lcov"] },
   },

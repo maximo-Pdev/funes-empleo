@@ -283,3 +283,27 @@ Pendientes: revisión del segundo desarrollador, CI, aceptación humana alojada,
 NVDA y controles de fase 9. No acredita merge ni cierra OQ-005/OQ-018.
 Contratos, recuperación y evidencia en
 [validación de fase 8](../../docs/validation/phase-8-metrics.md).
+
+## Actualización 2026-09-27: fase 9, avance de controles transversales
+
+Rama `codex/temp-phase-9-quality` desde `27e7b6e` (PR #31 integrada). Fase 9
+**parcial**, no lista para aceptación final. Mateo confirmó que no hay demo,
+pruebas humanas/NVDA ni revisión del segundo desarrollador de esta fase.
+
+T090/T091 documentadas: README, separación de entornos, recuperación forward-only,
+variables y gates con responsable/límite/etapa/evidencia. Protocolos de aceptación,
+auditoría, accesibilidad y autorización registran expresamente qué falta verificar.
+EXTRA-002 corrige paginación administrativa exigida por el manifiesto: filtro de
+estado empresarial, diez filas por página y orden estable con desempate por ID.
+
+Pruebas agregadas: axe por rol en dos viewports al 100%, páginas cruzadas por rol,
+sesión suspendida, mutación en vuelo, handlers/CV, paginación, invariantes SQL y
+matriz de 28 Server Actions protegidas con sesiones simuladas. No confundir esta
+última con reenvíos HTTP ni concurrencia SQL real. No se modificaron migraciones
+de producto ni se ampliaron permisos/estados/funcionalidades municipales.
+
+Resultados exactos y T095 en [quality-gates](../../docs/validation/quality-gates.md).
+T087/T089/T092 requieren además trabajo y evidencia alojada/humana; T088/T094 aún
+necesitan cobertura HTTP y concurrencia exhaustiva; T093, comprobaciones de eventos
+y rollback por cada clase; T096, revisión de Máximo. Las casillas incompletas se
+conservan sin marcar. No se cerraron OQ ni se hizo merge.
