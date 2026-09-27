@@ -35,7 +35,7 @@ begin
    insert into public.candidate_private_data(candidate_id,dni_normalized,dni_display) values(cid,(90000000+i)::text,(90000000+i)::text);
    insert into public.candidate_contacts(id,candidate_id,kind,value,normalized_value,is_primary,verified_at)
    values(private.fixture_id('contact',i),cid,'email','candidate'||i||'@example.invalid','candidate'||i||'@example.invalid',true,t);
-   insert into public.candidate_categories(candidate_id,category_id,kind) values(cid,private.fixture_id('category',1+(i%2)),'interest');
+   insert into public.candidate_categories(candidate_id,category_id,kind,created_at) values(cid,private.fixture_id('category',1+(i%2)),'interest',t);
    insert into public.candidate_consents(id,candidate_id,policy_version,policy_hash,status,recorded_by,recorded_at,source)
    values(private.fixture_id('consent',i),cid,'demo-not-approved',repeat('0',64),'accepted',aid,t,'self_service');
    insert into public.cv_documents(id,candidate_id,storage_path,original_name_safe,mime_type,byte_size,sha256,status,validation_result,uploaded_by,created_at)
@@ -56,7 +56,7 @@ begin
    values(oid,private.fixture_id('business',1+((i-1)%50)),'Oferta ficticia '||lpad(i::text,3,'0'),'Tareas ficticias','Requisitos ficticios',2,'Localidad de prueba','onsite','Horario de prueba','fixed_term',
     case when i<=80 then '2026-12-31'::date else '2026-09-18'::date end,
     case when i<=80 then 'published'::public.opening_status else 'closed'::public.opening_status end,t-interval '10 days',case when i>80 then t-interval '1 day' end,t-interval '11 days');
-   insert into public.opening_categories(opening_id,category_id) values(oid,private.fixture_id('category',1+(i%2)));
+   insert into public.opening_categories(opening_id,category_id,created_at) values(oid,private.fixture_id('category',1+(i%2)),t-interval '11 days');
  end loop;
  for i in 1..1000 loop
    opening_n:=1+((i-1)/10); slot:=1+((i-1)%10); cid:=private.fixture_id('profile',1+((i-1)%500));

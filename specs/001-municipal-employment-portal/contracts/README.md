@@ -53,3 +53,7 @@ Los siguientes Route Handlers constituyen las únicas interfaces binarias/stream
 
 No se define una REST API pública para perfiles, empresas o administración. Las páginas servidor y
 Server Actions consumen directamente la capa de aplicación y RLS.
+
+Contratos SQL de fase 8 (`admin_metrics`, `export_admin_metrics`,
+`record_metrics_export`, `metrics_history_start`), límites temporales, filas y errores:
+[validación y contratos de métricas](../../../docs/validation/phase-8-metrics.md).

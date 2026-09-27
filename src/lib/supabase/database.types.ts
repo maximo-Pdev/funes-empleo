@@ -1581,6 +1581,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      metrics_history_start: { Args: Record<PropertyKey, never>; Returns: string | null }
+      admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }
+      export_admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }
+      record_metrics_export: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: undefined }
       preview_candidate_import: { Args: { p_hash: string; p_mapping: string; p_rows: Json; p_retry?: string | null }; Returns: string }
       import_batch_preview: { Args: { p_batch: string }; Returns: Json }
       resolve_import_row: { Args: { p_batch: string; p_version: number; p_row: string; p_decision: string; p_reason: string;

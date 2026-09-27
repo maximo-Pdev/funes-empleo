@@ -6,6 +6,9 @@ import { ParticipationActionForm } from "@/features/participations/components/pa
 import { ContactRecordForm } from "@/features/participations/components/contact-record-form";
 import { FeedbackReviewPanel } from "@/features/participations/components/feedback-review-panel";
 import { ParticipationTimeline } from "@/features/participations/components/participation-timeline";
+import { getContactTimeline } from "@/features/participations/contact-service";
+import { ContactTimeline } from "@/features/participations/components/contact-timeline";
+import { ContactTools } from "@/features/participations/components/contact-tools";
 import { adminParticipationAction, confirmFeedbackAction, recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
 
@@ -22,6 +25,7 @@ export default async function AdminParticipationDetailPage({ params }: {
   const { participationId } = await params;
   const { participation, audit, preinterviews, contacts, notes, referral, feedback } =
     await getAdminParticipation(participationId);
+  const contactHistory = await getContactTimeline(participationId);
 
   return <RoleShell role="admin" title="Seguimiento de participación"
     description="Estado vigente, decisiones y registros internos de este caso."
@@ -66,6 +70,8 @@ export default async function AdminParticipationDetailPage({ params }: {
         }))} />
       </div>
       <div className="space-y-6">
+        <ContactTimeline contacts={contactHistory} />
+        <ContactTools />
         <section aria-labelledby="preinterviews-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
           <h2 id="preinterviews-title" className="text-xl font-semibold">Preentrevistas</h2>
           {preinterviews.length === 0 ? <EmptyState title="Sin preentrevistas" description="Todavía no se registró una preentrevista." /> :
@@ -85,12 +91,9 @@ export default async function AdminParticipationDetailPage({ params }: {
           {feedback.some((item) => item.review_status === "pending_admin") && <FeedbackMessage tone="info">Un resultado informado por la empresa no cambia el resultado final hasta la confirmación de la Oficina.</FeedbackMessage>}
         </section>
         <section aria-labelledby="internal-records-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
-          <h2 id="internal-records-title" className="text-xl font-semibold">Contactos y notas internas</h2>
-          {contacts.length === 0 && notes.length === 0 ? <EmptyState title="Sin registros internos" description="No hay contactos ni notas relacionados con este caso." /> : <>
-            <ul className="space-y-3">{contacts.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
-              <p><strong>Contacto {item.channel}</strong> · {localDate(item.occurred_at)}</p>
-              <p className="whitespace-pre-wrap">{item.summary_internal}</p>
-            </li>)}{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
+          <h2 id="internal-records-title" className="text-xl font-semibold">Notas internas</h2>
+          {notes.length === 0 ? <EmptyState title="Sin notas internas" description="No hay notas relacionadas con este caso." /> : <>
+            <ul className="space-y-3">{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
               <p><strong>{item.note_kind === "training_guidance" ? "Orientación y capacitación" : "Nota sobre postulante"}</strong> · {localDate(item.created_at)}</p>
               <p className="whitespace-pre-wrap">{item.body}</p>
             </li>)}</ul>

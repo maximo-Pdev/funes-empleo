@@ -363,6 +363,15 @@ que OQ-001 no se convirtió en TTL de datos ni purga inventados y que el protoco
 
 ### Métricas, logs y recuperación
 
+Complemento técnico de fase 8 (2026-09-26, `EXTRA-001`): para cumplir FR-064 se
+conservan cambios mínimos append-only de estados, disponibilidad, confirmación y
+categorías en tablas privadas con RLS, sin nombres, contactos, notas ni CV. No son
+agregados precalculados: funciones `security invoker` calculan las métricas. Una
+instalación existente conserva una línea base desde la migración, no historia
+retroactiva supuesta; períodos sin cobertura fiable se rechazan explícitamente.
+Los filtros de descarga se guardan en evidencia privada enlazada por UUID a auditoría.
+Contratos, límites, recuperación y pruebas: `docs/validation/phase-8-metrics.md`.
+
 - Vistas o funciones SQL protegidas calculan conteos y tendencias sobre datos autorizados. No hay
   analítica pública ni formatos oficiales adicionales mientras OQ-005 siga abierto.
 - `active_candidate` exige perfil activo, disponibilidad, consentimiento vigente y confirmación en
