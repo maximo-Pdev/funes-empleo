@@ -15,7 +15,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
   const status = params.status ? openingStatusSchema.safeParse(params.status) : null;
   const page = Number(params.page ?? 1);
   const invalid = (status && !status.success) || !Number.isInteger(page) || page < 1 || page > 1000;
-  const result = !invalid ? await listAdminOpenings({ status: status?.success ? status.data : undefined, page }) : null;
+  const result = !invalid ? await listAdminOpenings({ status: status?.success ? status.data : undefined, page, pageSize: 10 }) : null;
   const urlForPage = (target: number) => `/admin/openings?${new URLSearchParams({
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;

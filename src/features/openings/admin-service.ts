@@ -28,7 +28,7 @@ export async function listAdminOpenings(input: unknown) {
   const client = await adminClient();
   let query = client.from("job_openings")
     .select("id,title,status,closing_date,version,created_at,company_profiles!job_openings_company_id_fkey(legal_name)", { count: "exact" })
-    .is("archived_at", null).order("created_at", { ascending: false })
+    .is("archived_at", null).order("created_at", { ascending: false }).order("id")
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (status) query = query.eq("status", status);
   const result = await query;

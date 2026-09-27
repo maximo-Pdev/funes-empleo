@@ -56,6 +56,27 @@ una propuesta en una decisión municipal aprobada.
   Esta entrada no acredita aprobación municipal, revisión humana ni merge.
 - **Referencias:** implementación `1aea6be`, [PR #31](https://github.com/maximo-Pdev/funes-empleo/pull/31).
 
+## EXTRA-002 — Paginación administrativa reproducible
+
+- Fecha/responsable: 2026-09-27, Mateo autoriza fase 9; agente implementa bajo
+  autorización general de extras necesarios. Revisión del compañero pendiente.
+- Estado: implementado y verificado localmente; revisión del compañero pendiente.
+- Origen: T089 / SC-008A y entradas aprobadas de `acceptance-manifest.json`.
+- Evidencia: empresas no acepta filtro de estado y usa 20 filas; ofertas usa 20 por
+  defecto sin exponer tamaño. Ambos ordenan solo por fecha, con empates en el seed.
+- Cambio mínimo: empresas con filtro validado y página de 10 filas; ofertas solicita
+  10 filas; ambas usan UUID como desempate. Se conservan RLS, roles y conteos aprobados.
+- Archivos compartidos: páginas admin de empresas/ofertas y servicio de listado de
+  ofertas, pruebas E2E y documentación. Se anunció al usuario antes de implementar.
+- Riesgos: navegación/filtros y orden; verificar página 2, totales, estado inválido,
+  no duplicación entre páginas y accesibilidad. Sin schema ni nuevos estados.
+- Verificación: E2E falló primero por 20 filas en lugar de 10; tras la corrección
+  pasó con 80 ofertas publicadas, 50 empresas activas, páginas de 10 filas disjuntas
+  y rechazo de filtro inválido. Typecheck, lint y build correctos. Evidencia completa
+  y límites de rendimiento alojado en `docs/validation/quality-gates.md`.
+- Commit/PR: pendiente al registrar esta verificación; consultar historial de esta
+  entrada y PR de `codex/temp-phase-9-quality`. No se acredita revisión ni merge.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
