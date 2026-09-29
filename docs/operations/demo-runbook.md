@@ -45,9 +45,16 @@ El 2026-09-29 el propietario habilitó el acceso al repositorio en Vercel. La AP
 del proyecto confirma conexión GitHub a `maximo-Pdev/funes-empleo` (repo 1376497802),
 con `productionBranch=main`, protección SSO activa y protección de forks. El rechazo
 anterior de `vercel git connect` queda como incidente histórico resuelto de acceso.
-Los despliegues enumerados antes del siguiente push todavía son los manuales del
-runbook: la conexión sola no acredita un preview Git del SHA revisado. T097 requiere
-comprobar ese preview y mantiene la publicación desde main sujeta a revisión/merge;
+El push `0e84bb0f9f7f4214a3a4e590dec9bae5ca8b4b85` generó automáticamente el
+preview Git `dpl_CBRrKSZZF5QKUdhMv35zUy1nHfDW`, READY, target Preview:
+https://funes-empleo-nebstp3fr-pantherium-8487s-projects.vercel.app.
+La API confirmó SHA/rama/source=git. El smoke de cuatro roles pasó navegación,
+aislamiento y CV/hash en ese dominio, usando el script existente con únicamente
+la URL sustituida en una copia ignorada; cookies solo en memoria, sin trazas.
+Este recibo identifica ese despliegue exacto, no todos los commits posteriores.
+La URL canónica y los callbacks siguen apuntando al despliegue de las mediciones;
+no se sustituyó ese despliegue ni se atribuyeron sus tiempos al preview Git.
+T097 conserva pendiente la publicación desde main tras revisión/merge:
 Production no tiene variables de aplicación ni se habilitó producción municipal.
 Referencia: [Vercel git](https://vercel.com/docs/cli/git).
 Vercel selecciona Node 24 por versión mayor; no se acredita el patch exacto local.

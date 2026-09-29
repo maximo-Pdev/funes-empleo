@@ -332,7 +332,8 @@ Detalles y scripts en docs/operations/demo-runbook.md; extras 003–006 rastreab
 Permanecen T069 (mapeo municipal), T087 (accesibilidad humana), T089 (tiempos humanos,
 con siete casos técnicos alojados correctos), T092 (cohortes/quickstart y
 correo alojado), T096 (revisión independiente), T097 (acceso GitHub/Vercel resuelto
-y enlace confirmado; preview Git y entrega tras aprobación/merge pendientes). No se cierran por inferencia. Guía
+y enlace/preview Git `0e84bb0` READY con smoke de cuatro roles confirmados;
+entrega desde main tras aprobación/merge pendiente). No se cierran por inferencia. Guía
 paso a paso: docs/validation/human-validation-guide.md. PR #33 abierto en borrador;
 CI remoto application/database del commit `2974958` PASS, Actions 36596663506.
 Convergencia revisó 54 FR/11 SC, seis historias, 13 decisiones técnicas agrupadas y

@@ -31,8 +31,9 @@ La revisión independiente continúa pendiente; el texto siguiente del 27/09 es 
   mantiene conteos y documenta expresamente la variante; revisar su uso solo en demo.
 - Convergencia: el propietario resolvió el acceso GitHub/Vercel el 29/09 y la API
   confirma el enlace al repositorio correcto, main como rama de publicación y
-  protección SSO/forks. T097 todavía exige preview Git del SHA exacto y entrega
-  desde main tras aprobación/merge; no se atribuye al despliegue manual.
+  protección SSO/forks. Preview automático Git `0e84bb0` READY y smoke de cuatro
+  roles PASS; recibo exacto en runbook. T097 conserva entrega desde main tras
+  aprobación/merge. El preview Git no sustituye las mediciones del despliegue manual.
 - Avisos Supabase del 29/09: 2 funciones públicas anon y 41 funciones authenticated
   SECURITY DEFINER esperadas por la allowlist/RPC con controles internos; no se
   quitaron permisos para silenciar avisos. Protección de contraseñas filtradas

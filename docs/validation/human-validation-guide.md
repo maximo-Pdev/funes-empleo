@@ -169,7 +169,9 @@ catálogo, informes y operación productiva siguen en `docs/discovery/OPEN_QUEST
 3. Conectar ese repositorio al proyecto existente; no crear otro por el error del CLI.
    El propietario resolvió el acceso el 29/09; la API confirma el enlace al repositorio.
    No repetir la conexión ni crear otro proyecto. El rechazo previo es histórico.
-4. Comprobar que el PR #33 genere un preview del SHA correcto, con variables demo
-   separadas, acceso protegido y sin cliente secreto. Ejecutar el smoke de cuatro roles.
+4. El PR #33 ya generó el preview Git `0e84bb0`, READY y cuatro roles PASS; recibo
+   y URL exacta en el runbook. Para un commit nuevo, comprobar nuevamente SHA y
+   configuración antes de atribuirle pruebas anteriores. Usar variables demo
+   separadas, acceso protegido y sin cliente secreto.
 5. Antes de publicar desde main, completar revisión/aprobación y confirmar merge;
    configurar solo el destino de demo. Esto no habilita producción municipal.
