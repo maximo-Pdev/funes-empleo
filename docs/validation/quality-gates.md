@@ -2,8 +2,10 @@
 
 Fecha: 2026-09-29. Rama `codex/temp-mvp-completion`, base `481b9f0` (PR #32
 integrada). Evidencia local del árbol de esta entrega; el commit que contiene este
-documento identifica los archivos verificados. CI y revisión independiente siguen
-pendientes; los controles de demo se distinguen de la aceptación municipal.
+documento identifica los archivos verificados. CI del commit `2974958` aprobado:
+[Actions 36596663506](https://github.com/maximo-Pdev/funes-empleo/actions/runs/36596663506),
+jobs application/database correctos. La revisión independiente sigue pendiente;
+los controles de demo se distinguen de la aceptación municipal.
 
 Entorno: Windows, Node `24.21.0`, npm `11.19.0`, Next `16.3.5`, Supabase CLI
 `2.117.0`, Docker Desktop y Chromium de Playwright `1.63.0`. Solo fixture ficticio
@@ -57,11 +59,20 @@ E2E exige reset completo; `test:db` solo no vuelve a cargar archivos.
 
 ## Alcance y pendientes
 
-T095 registra gates ejecutados, no certifica cobertura exhaustiva. No hay aceptación
-de mediciones alojadas ni pruebas humanas. T087/T089/T092 requieren esa evidencia.
+T095 registra gates ejecutados, no certifica cobertura exhaustiva. Siete casos técnicos
+alojados medidos dentro de sus límites y con integridad posterior; ver performance.md.
+No hay aceptación humana. T087/T089/T092 requieren esa evidencia.
 T088/T094 añaden HTTP real y concurrencia SQL; T093 añade 310 comprobaciones de clases
 de auditoría/rollback. T096 necesita revisión del segundo desarrollador.
 Los dos intentos previos de E2E detectaron supuestos incorrectos del test NOT_FOUND:
 status 404 fijo y un selector ambiguo de robots en streaming. Corregidos, prueba
 focalizada y serie completa pasan. No se omitió la prueba para obtener verde.
 Los checks de requisitos permanecen intactos: no equivalen a tareas implementadas.
+
+Seguimiento 2026-09-29: `npm run lint` PASS y
+`npm run test:unit -- tests/performance/acceptance.test.ts` PASS (5 pruebas existentes)
+para el harness/manifiesto ampliados; `node --check tests/quality/demo-performance.mjs`
+PASS. No se suman esas cinco a las 376 originales. No cambió código de aplicación,
+dependencias ni migraciones productivas en este seguimiento. Los checks del commit
+posterior se registran por su SHA; el PASS de `2974958` no se atribuye automáticamente
+a otra revisión.

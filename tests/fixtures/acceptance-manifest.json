@@ -34,6 +34,14 @@
       "expectedRows": 10
     }
   },
+  "concurrentAdmins": {
+    "variant": "funes-demo-v1-concurrency-v1",
+    "preparation": "tests/fixtures/prepare-demo-concurrency.sql",
+    "openingNumber": 80,
+    "preselectionParticipation": 775,
+    "contactParticipation": 765,
+    "outcomeParticipation": 755
+  },
   "cvDownload": {
     "candidateNumber": 1,
     "file": "cv-fictitious.pdf",

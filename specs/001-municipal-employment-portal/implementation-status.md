@@ -328,8 +328,14 @@ El reset alojado privado restablece conteos/hash y preserva los 500 PDF verifica
 Callbacks de Auth configurados; no se cambiaron SMTP ni permisos del proyecto.
 Detalles y scripts en docs/operations/demo-runbook.md; extras 003–006 rastreables.
 
-91 de 96 tareas marcadas. Permanecen T069 (mapeo municipal), T087 (accesibilidad
-humana), T089 (rendimiento alojado y tiempos humanos), T092 (cohortes/quickstart y
-correo alojado), T096 (revisión independiente). No se cierran por inferencia. Guía
-paso a paso: docs/validation/human-validation-guide.md. CI remoto y PR se registran
-cuando exista evidencia; estos resultados locales no los sustituyen.
+91 de 97 tareas marcadas. La fase 9 tiene seis tareas completas y cuatro abiertas.
+Permanecen T069 (mapeo municipal), T087 (accesibilidad humana), T089 (tiempos humanos,
+con siete casos técnicos alojados correctos), T092 (cohortes/quickstart y
+correo alojado), T096 (revisión independiente), T097 (conexión GitHub/Vercel rechazada
+por acceso). No se cierran por inferencia. Guía
+paso a paso: docs/validation/human-validation-guide.md. PR #33 abierto en borrador;
+CI remoto application/database del commit `2974958` PASS, Actions 36596663506.
+Convergencia revisó 54 FR/11 SC, seis historias, 13 decisiones técnicas agrupadas y
+seis principios; encontró un gap parcial MEDIUM de entrega y agregó T097 en fase 10.
+Los gates humanos son externos/no construibles mediante código: no se duplicaron
+sus tareas ni se declaró conformidad global. Sin cambios de spec/plan/constitución.

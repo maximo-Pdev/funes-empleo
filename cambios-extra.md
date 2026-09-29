@@ -145,6 +145,41 @@ una propuesta en una decisión municipal aprobada.
   de smoke Vercel PASS y 500 PDF verificados por SHA-256/tamaño tras reset alojado.
   Revisión del segundo desarrollador pendiente en el PR de esta rama.
 
+## EXTRA-007 — Precondiciones ficticias para concurrencia de aceptación
+
+- Fecha: 2026-09-29. Origen: T089 / SC-008A. Estado: implementado y verificado; revisión pendiente.
+- Evidencia: el seed tiene 80 ofertas publicadas y ninguna pendiente; todas las
+  participaciones están derivadas o finalizadas. No permite ejecutar las cuatro
+  acciones de aceptación requeridas sin preparar sus estados iniciales.
+- Cambio mínimo: helper SQL de pruebas que, después de un reset autorizado, prepara
+  oferta 80 en `pending_review` y participación 775 en `under_review`, retirando
+  únicamente su derivación ficticia. Conserva 500/50/100/1000 y los 500 PDF.
+  No es una transición de producto ni una migración; su recibo identifica la variante.
+- Archivos: `tests/fixtures/prepare-demo-concurrency.sql`, harness de rendimiento,
+  manifiesto y documentación. No modifica contratos, permisos ni esquema compartidos.
+- Riesgos: ejecutarlo fuera del fixture o ocultar su diferencia con el seed original.
+  Exigir identidades/conteos/estados iniciales exactos, transacción y proyecto demo
+  fijado en el transporte; conservar auditoría previa y registrar variante/baselines.
+- Verificación: cuatro sesiones individuales, barrera común, éxito visible ≤5 s por
+  acción y comprobación posterior de entidades, versiones y cuatro auditorías.
+- Autorización: detalle necesario de la tarea aprobada, anunciado antes de editar;
+  resets de esta demo autorizados expresamente por el usuario. Revisión pendiente
+  en https://github.com/maximo-Pdev/funes-empleo/pull/33.
+- Resultado: barrera común con cuatro admins distintos, inicio separado por menos
+  de 1 ms; 891/891/891/906 ms, todos ≤5000 ms. SQL posterior comprobó las cuatro
+  versiones y sus auditorías con actor/request ID; preselección conserva decisión
+  privada justificada y evento `stage_skipped`. Dos fallos previos de preparación
+  por selector exacto que ignoraba «obligatorio» no enviaron acciones ni midieron.
+- El ejecutor mantiene cookies solo en memoria. Los errores del transporte Vercel
+  se traducen a mensaje genérico para que un fallo no imprima encabezados de acceso.
+
+### Referencias de la entrega
+
+EXTRA-003/004/005/006 están en el commit `2974958b36aefeb603de4a3943c5da7585ab6370`
+y PR #33. Los jobs application/database de GitHub Actions 36596663506 aprobaron
+ese commit. EXTRA-007 y las mediciones posteriores se agregan en el mismo PR;
+ninguna revisión humana ni aprobación municipal está acreditada por esos checks.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

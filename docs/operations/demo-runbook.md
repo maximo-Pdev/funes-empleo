@@ -10,7 +10,8 @@ La demo fue creada por pedido de Máximo en su organización de Supabase.
   `maximo-Pdev's Org`, región `sa-east-1`.
 - Vercel: proyecto `funes-empleo`, equipo `pantherium-8487s-projects`, región `gru1`.
 - Preview vigente verificado: `dpl_Bj7YxDaYcCydVayNAh4GW9kQnHNC`, desde la rama
-  `codex/temp-mvp-completion`; contiene cambios aún sin commit. No atribuirlo a main.
+  `codex/temp-mvp-completion`; se creó con cambios entonces sin commit. Su ID
+  identifica el build, pero no acredita un SHA limpio ni corresponde a main.
 - Variables configuradas exclusivamente para Preview: `APP_ENV=demo`,
   `CONSENT_POLICY_VERSION=demo-not-approved`, URL canónica anterior, URL Supabase
   y clave publicable. No se configuró un cliente secreto en Vercel.
@@ -41,6 +42,10 @@ recuperación alojadas todavía requieren prueba con el usuario. El login precre
 fue probado. Para cohortes, configurar SMTP propio con secretos introducidos por el
 operador en el panel ([Supabase](https://supabase.com/docs/guides/auth/auth-smtp)).
 La integración GitHub→Vercel aún no está conectada: este despliegue se hizo por CLI.
+El 2026-09-29 `vercel git connect` rechazó conectar `maximo-Pdev/funes-empleo` por
+acceso al repositorio; el proyecto sigue con git=null. T097 registra la corrección,
+que requiere acceso del propietario. Pasos en la guía humana; no basta con reintentar
+el CLI ni atribuirle permisos que no se verificaron. Referencia: [Vercel git](https://vercel.com/docs/cli/git).
 Vercel selecciona Node 24 por versión mayor; no se acredita el patch exacto local.
 Las pruebas humanas están en [la guía de ejecución](../validation/human-validation-guide.md).
 
@@ -89,7 +94,23 @@ Evidencia 2026-09-28: reset `8c85617b-56ec-4ef0-9cfe-89aee0768388`,
 22:47:10 UTC, conteos 554/500/50/100/1000/500 correctos; a las 22:50:22 UTC se
 verificaron los 500 PDF de 1426 bytes con el hash del manifiesto. Guard de entorno
 incorrecto rechazado; EXECUTE denegado a anon/authenticated/service_role.
-No acredita todavía todas las mediciones SC-008A ni aceptación humana.
+Mediciones posteriores del 2026-09-29: siete casos técnicos dentro de sus límites,
+siete resets distintos y 500 PDF comprobados antes de cada caso; detalle en
+[performance.md](../validation/performance.md). Aceptación humana pendiente.
+El usuario autorizó expresamente repetir resets de esta demo el 29/09; la revisión
+automática previa que rechazó una repetición quedó resuelta con esa autorización.
+Después de las mediciones, reset final `654236d6-b235-48a0-8438-2e960ffa5afe`
+del 29/09 21:41:13 UTC: 554/500/50/100/1000/500 correctos; verificación de los
+500 PDF/hash completada a las 21:42:36 UTC. Se retiró la variante de preparación
+concurrente mediante ese reset. Esto no acredita registro ni correo alojado.
+
+Concurrencia: ejecutar `tests/fixtures/prepare-demo-concurrency.sql` solo con el
+transporte autenticado fijado al ref demo, después del reset/500 PDF, nunca en datos
+reales. Recibo de variante y estados en EXTRA-007/performance.md. Luego:
+`node tests/quality/demo-performance.mjs concurrent-admins ID_RESET ID_DESPLIEGUE`.
+Para los otros casos usar candidate/openings/companies/cv/import-preview/import-confirm,
+cada uno con reset distinto. El CLI de Vercel mantiene autenticación/cookies en
+memoria; los scripts no imprimen ni versionan encabezados o sesión de navegador.
 
 Variables solo de tests: `LOCAL_MAILPIT_URL` (buzón local ficticio),
 `PLAYWRIGHT_EXTERNAL_SERVER=1` únicamente cuando se inició deliberadamente un servidor

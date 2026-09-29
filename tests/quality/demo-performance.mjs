@@ -3,23 +3,27 @@ import { chromium, expect } from "@playwright/test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { cpus, totalmem, release } from "node:os";
 
 const [scenario, resetId, deployment] = process.argv.slice(2);
-assert(["candidate", "openings", "companies", "cv", "import-preview", "import-confirm"].includes(scenario));
+assert(["candidate", "openings", "companies", "cv", "import-preview", "import-confirm", "concurrent-admins"].includes(scenario));
 assert.match(resetId ?? "", /^[a-f0-9-]{36}$/);
 assert.match(deployment ?? "", /^dpl_[A-Za-z0-9]+$/);
 assert.equal(process.env.APP_ENV, "demo");
 assert.equal(process.env.ACCEPTANCE_DEMO_PROJECT_REF, "kyjycjojzhwggjuqjnki");
 const base = "https://funes-empleo-demo.vercel.app";
 const manifest = JSON.parse(await readFile("tests/fixtures/acceptance-manifest.json", "utf8"));
-const command = "npm exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
-const headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore", "pipe", "pipe"] });
+const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
+let headers;
+try {
+  headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore", "pipe", "pipe"] });
+} catch { throw new Error("VERCEL_TEST_ACCESS_FAILED: revisar la sesión CLI sin publicar encabezados"); }
 const cookies = [...headers.matchAll(/^set-cookie:\s*([^=;\s]+)=([^;\r\n]*)/gim)]
   .map(m => ({ name: m[1], value: m[2], url: base, secure: true, httpOnly: true }));
 assert(cookies.length > 0);
 const id = (kind,n) => { const h=createHash("md5").update(`funes-demo-v1:${kind}:${n}`).digest("hex"); return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`; };
 const browser = await chromium.launch();
-let milliseconds, limit, batchId;
+let milliseconds, limit, batchId, concurrentResults;
 try {
   const context = await browser.newContext({ baseURL: base, viewport: { width:1366,height:768 } });
   await context.addCookies(cookies);
@@ -30,7 +34,51 @@ try {
   await page.getByLabel("Contraseña",{exact:true}).fill("Fictitious-Local-Only-2026!");
   await page.getByRole("button",{name:"Iniciar sesión",exact:true}).click();
   await page.waitForURL("**/account");
-  if (scenario === "candidate") {
+  if (scenario === "concurrent-admins") {
+    const pages=[page];
+    for (let n=2;n<=4;n++) {
+      const individual=await browser.newContext({baseURL:base,viewport:{width:1366,height:768}});
+      await individual.addCookies(cookies);
+      const p=await individual.newPage(); p.setDefaultTimeout(90000);
+      await p.goto("/login");
+      await p.getByLabel("Correo electrónico").fill(`admin${n}@example.invalid`);
+      await p.getByLabel("Contraseña",{exact:true}).fill("Fictitious-Local-Only-2026!");
+      await p.getByRole("button",{name:"Iniciar sesión",exact:true}).click();
+      await p.waitForURL("**/account"); pages.push(p);
+    }
+    const fixture=manifest.concurrentAdmins;
+    await pages[0].goto(`/admin/openings/${id("opening",fixture.openingNumber)}`);
+    await pages[0].waitForLoadState("networkidle");
+    await pages[0].getByLabel("Decisión",{exact:true}).selectOption("approved");
+    await pages[1].goto(`/admin/participations/${id("participation",fixture.preselectionParticipation)}`);
+    await pages[1].waitForLoadState("networkidle");
+    await pages[1].getByLabel("Acción",{exact:true}).selectOption("preselect");
+    await pages[1].getByLabel(/^Motivo interno/).fill("Prueba ficticia concurrente: omisión justificada de preentrevista");
+    await pages[2].goto(`/admin/participations/${id("participation",fixture.contactParticipation)}`);
+    await pages[2].waitForLoadState("networkidle");
+    await pages[2].getByLabel(/^Fecha y hora \(Funes\)/).fill("2026-09-29T12:00");
+    await pages[2].getByLabel(/^Resumen interno/).fill(`Contacto ficticio concurrente ${resetId}`);
+    await pages[3].goto(`/admin/participations/${id("participation",fixture.outcomeParticipation)}`);
+    await pages[3].waitForLoadState("networkidle");
+    await pages[3].getByLabel("Acción",{exact:true}).selectOption("confirm_hired");
+    await pages[3].getByLabel("Motivo interno",{exact:true}).fill("Resultado ficticio confirmado para prueba concurrente");
+    const names=["moderation","preselection","contact","outcome"];
+    // All four prepared forms reach this shared barrier before any final click.
+    const barrier=performance.now();
+    concurrentResults=await Promise.all(pages.map(async (p,n)=>{
+      const start=performance.now();
+      try {
+        await p.getByRole("button",{name:n===0?"Guardar decisión":n===2?"Guardar contacto":"Registrar acción",exact:true}).click();
+        if(n===0) await expect(p.getByText("Estado: published",{exact:true})).toBeVisible();
+        else if(n===2) await expect(p.getByText(`Contacto ficticio concurrente ${resetId}`,{exact:true})).toBeVisible();
+        else await expect(p.getByRole("status").filter({hasText:`Resultado o estado vigente: ${n===1?"Preseleccionada":"Persona contratada"}`})).toBeVisible();
+        const duration=performance.now()-start;
+        return {action:names[n],admin:n+1,startOffset:start-barrier,milliseconds:duration,limit:5000,pass:duration<=5000};
+      } catch { return {action:names[n],admin:n+1,startOffset:start-barrier,milliseconds:performance.now()-start,limit:5000,pass:false,error:"UI_SUCCESS_NOT_OBSERVED"}; }
+    }));
+    milliseconds=Math.max(...concurrentResults.map(r=>r.milliseconds)); limit=5000;
+    if(concurrentResults.some(r=>!r.pass)) process.exitCode=1;
+  } else if (scenario === "candidate") {
     await page.goto("/admin/candidates");
     await page.getByLabel("Término",{exact:true}).fill(manifest.sc008a.candidateSearch.term);
     await page.getByLabel("Categoría",{exact:true}).selectOption({label:"Categoría ficticia B"});
@@ -45,9 +93,12 @@ try {
     const title=scenario==="openings"?"Ofertas: 80":"Empresas: 50";
     await page.goto(`/admin/${route}?status=${status}&page=1`);
     await expect(page.getByRole("heading",{name:title,exact:true})).toBeVisible();
+    const firstPageHref=await page.locator("main li a").first().getAttribute("href");
     const start=performance.now();
     await page.getByRole("link",{name:"Siguiente",exact:true}).click();
     await page.waitForURL(/page=2/);
+    await expect(page.getByText(`Página 2 de ${scenario === "openings" ? 8 : 5}`,{exact:true})).toBeVisible();
+    await expect(page.locator("main li a").first()).not.toHaveAttribute("href",firstPageHref);
     await expect(page.getByRole("heading",{name:title,exact:true})).toBeVisible();
     await expect(page.locator("main li a")).toHaveCount(10);
     milliseconds=performance.now()-start; limit=3000;
@@ -67,6 +118,7 @@ try {
     const previewStart=performance.now();
     await page.getByRole("button",{name:"Previsualizar",exact:true}).click();
     await expect(page.getByText("Listo para confirmar",{exact:true})).toBeVisible({timeout:90000});
+    await expect(page.getByText("Total: 1000. Aceptables: 1000. Inválidas o categorías sin mapear: 0. Duplicadas: 0.",{exact:true})).toBeVisible();
     milliseconds=performance.now()-previewStart; limit=30000;
     batchId=page.url().split("/").pop(); assert.match(batchId,/^[a-f0-9-]{36}$/);
     // Confirmation has its own separately reset run; its prerequisite preview is outside its clock.
@@ -79,7 +131,10 @@ try {
   }
   console.log(JSON.stringify({scenario,resetId,deployment,url:base,at:new Date().toISOString(),
     fixture:manifest.version,seedSha256:manifest.seedSha256,browser:browser.version(),viewport:"1366x768",
-    device:process.platform,connection:"Conexión del operador; sin throttling artificial",milliseconds,limit,
-    pass:milliseconds<=limit,batchId,integrity:"SQL posterior requerido para importaciones; nunca inferirlo del tiempo"}));
+    device:{os:process.platform,release:release(),cpu:cpus()[0]?.model,memoryGiB:Math.round(totalmem()/1024**3)},
+    connection:"Conexión del operador; sin throttling artificial; estabilidad de red no certificada",milliseconds,limit,
+    pass:milliseconds<=limit && !concurrentResults?.some(r=>!r.pass),batchId,concurrentResults,
+    variant:concurrentResults?manifest.concurrentAdmins.variant:undefined,
+    integrity:"SQL posterior requerido para importaciones/concurrencia; nunca inferirlo del tiempo"}));
   if (milliseconds>limit) process.exitCode=1;
 } finally { await browser.close(); }

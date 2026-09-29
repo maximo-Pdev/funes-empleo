@@ -9,7 +9,8 @@ La revisión independiente continúa pendiente; el texto siguiente del 27/09 es 
   typecheck/lint/build correctos. Refuerzo posterior de handlers: focalizado PASS.
 - T088/T093/T094 se cierran por evidencia HTTP/SQL/Storage y matriz de rollback;
   ninguna casilla acredita aceptación municipal ni revisión del compañero.
-- EXTRA-003 asegura fixture y rechaza skips en CI (ejecución remota aún pendiente).
+- EXTRA-003 asegura fixture y rechaza skips en CI (application/database PASS en
+  Actions 36596663506, commit `2974958`).
   EXTRA-004 captura errores públicos de archivo empresarial; EXTRA-005 añade
   NOT_FOUND accesible; EXTRA-006 permite la operación de metadatos necesaria para
   descargar CV en Storage alojado conservando permisos y prohibiendo firma/listado.
@@ -21,10 +22,23 @@ La revisión independiente continúa pendiente; el texto siguiente del 27/09 es 
   reset solo está instalada en demo, fuera de migraciones de producto y sin grants
   para anon/authenticated/service_role; revisar especialmente ese mantenimiento.
 - T069 requiere mapeo real anonimizado aprobado; T087 requiere teclado/zoom/NVDA;
-  T089 todavía necesita mediciones alojadas y humanas; T092 necesita cohortes y
+  T089 tiene siete mediciones técnicas correctas y necesita tiempos humanos;
+  T092 necesita cohortes y
   correo verificado; T096 exige revisión independiente. La guía humana contiene pasos.
 - Persisten advertencias Next de stream cerrado durante navegación, sin fallo de
   aserciones. No se atribuye una causa ni se afirma una corrección sin evidencia.
+- EXTRA-007 prepara dos estados ficticios para las cuatro acciones concurrentes,
+  mantiene conteos y documenta expresamente la variante; revisar su uso solo en demo.
+- Convergencia: T097 registra la integración GitHub/Vercel faltante. El CLI rechazó
+  conectar el repositorio y la configuración tiene git=null; hace falta acceso del
+  propietario. No se considera completada por existir un despliegue manual.
+- Avisos Supabase del 29/09: 2 funciones públicas anon y 41 funciones authenticated
+  SECURITY DEFINER esperadas por la allowlist/RPC con controles internos; no se
+  quitaron permisos para silenciar avisos. Protección de contraseñas filtradas
+  desactivada en el plan Free; decisión futura de operación permanece pendiente.
+  Referencias: [funciones públicas](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable),
+  [funciones autenticadas](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable),
+  [contraseñas](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
 
 ## Registro histórico de la fase 9 inicial
 

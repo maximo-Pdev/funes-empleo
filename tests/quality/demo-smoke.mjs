@@ -8,9 +8,12 @@ const base = "https://funes-empleo-demo.vercel.app";
 assert.equal(process.argv[2], "--confirm-fictitious-demo");
 // Vercel's CLI owns the authentication and bypass credential. Only the resulting
 // scoped browser cookie is held in memory; never write headers/storageState/trace.
-const command = "npm exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
+const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
 assert.equal(process.platform, "win32", "Este smoke usa la sesión local de Vercel en Windows.");
-const headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore","pipe","pipe"] });
+let headers;
+try {
+  headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore","pipe","pipe"] });
+} catch { throw new Error("VERCEL_TEST_ACCESS_FAILED: revisar la sesión CLI sin publicar encabezados"); }
 const cookies = [...headers.matchAll(/^set-cookie:\s*([^=;\s]+)=([^;\r\n]*)/gim)]
   .map(m => ({ name: m[1], value: m[2], url: base, secure: true, httpOnly: true }));
 assert(cookies.length > 0, "Vercel no proporcionó acceso de prueba; no desactivar la protección.");

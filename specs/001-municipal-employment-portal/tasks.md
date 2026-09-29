@@ -439,3 +439,7 @@ T083: src/features/participations/contact-service.ts
 - Do not resolve open municipal/legal questions through code. Stop the affected task at its stated
   gate and update the governing artifact after the authorized decision.
 - Commit after each task or coherent group and preserve second-developer review.
+
+## Phase 10: Convergence
+
+- [ ] T097 Connect the existing isolated demo Vercel project to `maximo-Pdev/funes-empleo` after the owner enables repository access; verify a PR preview for the exact reviewed commit, preserve protected access and demo-only variables, and configure the demo target for `main` only after approval and merge per plan: Entornos y entrega / GitHub–Vercel integration (partial). Evidence: CLI connection rejected repository access on 2026-09-29; no Git provider link exists. Record access decision and deployment checks in `docs/operations/demo-runbook.md` and PR #33. This does not authorize municipal production.

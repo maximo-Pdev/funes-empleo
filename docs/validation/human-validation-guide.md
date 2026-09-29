@@ -1,6 +1,6 @@
 # Validaciones humanas pendientes — guía de ejecución
 
-Fecha: 2026-09-28. Usar exclusivamente datos ficticios. Esta guía no acredita
+Fecha: 2026-09-29. Usar exclusivamente datos ficticios. Esta guía no acredita
 pruebas realizadas ni aprobación municipal. Registrar también los intentos fallidos.
 
 ## Preparar la sesión
@@ -52,12 +52,20 @@ pruebas realizadas ni aprobación municipal. Registrar también los intentos fal
 
 1. Elegir un único administrador sin práctica ni entrenamiento previo. No usar al
    desarrollador que conoce las pantallas. Darle solamente la descripción de tarea.
-2. Con el fixture alojado recién restablecido, pedir: «Encontrá el candidato del
-   caso, registrá su preentrevista y dejalo preseleccionado». Medir desde el inicio
+2. El coordinador restablece/verifica el fixture y prepara la variante documentada
+   con `tests/fixtures/prepare-demo-concurrency.sql`, fuera del reloj. El caso 775
+   queda en revisión para Persona ficticia 275 y Oferta ficticia 078; no ejecutar
+   sus acciones antes de la prueba. Dar solo esta consigna al participante:
+   «Buscá Persona ficticia 275, categoría ficticia B, disponible; registrá una
+   preentrevista y dejala preseleccionada para Oferta ficticia 078». Medir desde el inicio
    de la búsqueda hasta la preselección guardada. Exigir menos de 5 minutos.
 3. Restablecer nuevamente el fixture en el mismo despliegue y conexión estable.
-   Pedir: «Consultá los indicadores del período y categoría indicados y descargá
-   el CSV correspondiente». Medir desde aplicar filtros hasta recibir el archivo
+   No preparar la variante concurrente para este caso. Dar solo la consigna:
+   «Consultá los indicadores del 01/09/2026 al 20/09/2026, categoría ficticia A,
+   y descargá el CSV correspondiente». El coordinador comprueba 200 candidatos
+   activos, 50 empresas, 500 postulaciones y 25 contrataciones, filtros iguales en
+   el CSV y ausencia de datos personales; son los inputs ya probados en admin-metrics.
+   Medir desde aplicar filtros hasta recibir el archivo
    completo y correcto. Exigir menos de 30 segundos.
 4. No dar pistas, practicar antes, reiniciar el reloj ni elegir el mejor tiempo.
    Registrar fecha, URL/commit, hash y comprobante de cada reset, navegador,
@@ -68,6 +76,35 @@ pruebas realizadas ni aprobación municipal. Registrar también los intentos fal
    fronteras de `performance.md`, reset separado, una medición fría, sin promedio.
    El operador prepara la barrera común; luego verifica las cuatro mutaciones y
    auditorías. No sustituir estos resultados por la duración de un test local.
+6. Los siete casos técnicos ya fueron medidos (performance.md). Para una nueva
+   versión, repetir la serie con nuevos recibos; conservar la evidencia anterior.
+   Esta guía es del coordinador: no dar instrucciones de navegación ni práctica
+   previa al participante que debe completar SC-003/SC-008 sin ayuda.
+
+## Correo alojado: verificación y recuperación controladas
+
+1. Realizar esta prueba después de las mediciones que necesitan reset. Una cuenta
+   con un buzón ajeno al fixture hace que el reset aborte; no borrar esa cuenta
+   silenciosamente para recuperar la posibilidad de reset.
+2. El propietario abre la demo con su acceso de Vercel y entra a
+   `/registro/candidato`. Usa nombre/DNI ficticios únicos y el buzón controlado que
+   aportó por canal privado, permitido por el remitente integrado como miembro del
+   equipo de Supabase. No registrar contactos reales de postulantes.
+3. El propietario introduce una contraseña exclusiva de prueba y envía el registro
+   personalmente. No compartirla con Codex ni usar la contraseña pública del seed.
+4. Revisar bandeja y spam. Abrir el enlace de verificación en el mismo navegador
+   que inició el registro, conservando PKCE. Confirmar acceso al panel; registrar
+   únicamente entrega/resultado/fecha, sin dirección real ni enlace/token.
+5. Cerrar sesión, abrir `/recover`, introducir ese mismo correo y solicitar el
+   enlace. Abrirlo en el navegador de origen y completar personalmente la nueva
+   contraseña. Comprobar login con la nueva y rechazo de la anterior.
+6. Probar enlace utilizado/vencido y solicitar uno nuevo: debe explicar el problema
+   sin mostrar claves ni detalles internos. Conservar el fallo si el correo no llega;
+   no contar un mensaje genérico de solicitud como entrega exitosa.
+7. Para las cohortes, el remitente integrado no alcanza. El propietario elige un
+   proveedor SMTP/remitente con dominio verificado y configura sus secretos en
+   Supabase → Authentication → SMTP Settings. Después repetir entrega/verificación/
+   recuperación con buzones controlados de cada evaluador. No enviar claves por chat.
 
 ## T092: registro, recorridos y comprensión
 
@@ -121,3 +158,17 @@ La Oficina debe aportar el mapeo histórico y decisiones de datos. Personas eval
 deben aportar teclado/NVDA, comprensión y tiempos sin entrenamiento. El segundo
 desarrollador debe revisar el PR. Las decisiones municipales de privacidad, retención,
 catálogo, informes y operación productiva siguen en `docs/discovery/OPEN_QUESTIONS.md`.
+
+## T097: conexión GitHub–Vercel
+
+1. El propietario abre el proyecto `funes-empleo` en el equipo
+   `pantherium-8487s-projects` de Vercel, Settings → Git.
+2. Conecta su cuenta de GitHub y habilita el acceso de la integración al repositorio
+   `maximo-Pdev/funes-empleo`. Revisar los permisos pedidos y seleccionar ese
+   repositorio cuando el proveedor permita limitar el alcance.
+3. Conectar ese repositorio al proyecto existente; no crear otro por el error del CLI.
+   El intento del 29/09 fue rechazado por acceso y el enlace siguió vacío.
+4. Comprobar que el PR #33 genere un preview del SHA correcto, con variables demo
+   separadas, acceso protegido y sin cliente secreto. Ejecutar el smoke de cuatro roles.
+5. Antes de publicar desde main, completar revisión/aprobación y confirmar merge;
+   configurar solo el destino de demo. Esto no habilita producción municipal.
