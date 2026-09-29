@@ -1,5 +1,49 @@
 # Revisión final — T096
 
+## Actualización de cierre técnico — 2026-09-29
+
+Rama `codex/temp-mvp-completion`, desde main `481b9f0` (PR #32 integrada).
+La revisión independiente continúa pendiente; el texto siguiente del 27/09 es histórico.
+
+- Evidencia actual: 376 Vitest, 855 pgTAP, 57 E2E sin omisiones y dos carreras SQL;
+  typecheck/lint/build correctos. Refuerzo posterior de handlers: focalizado PASS.
+- T088/T093/T094 se cierran por evidencia HTTP/SQL/Storage y matriz de rollback;
+  ninguna casilla acredita aceptación municipal ni revisión del compañero.
+- EXTRA-003 asegura fixture y rechaza skips en CI (application/database PASS en
+  Actions 36596663506, commit `2974958`).
+  EXTRA-004 captura errores públicos de archivo empresarial; EXTRA-005 añade
+  NOT_FOUND accesible; EXTRA-006 permite la operación de metadatos necesaria para
+  descargar CV en Storage alojado conservando permisos y prohibiendo firma/listado.
+- Demo protegida y nuevo preview comprobados con cuatro roles. Reset privado de
+  datos ficticios y 500 PDF con hash verificados. Scripts y límites en runbook.
+- Auth usa el dominio canónico y dos callbacks exactos. SMTP integrado limitado;
+  entrega a buzón controlado y aceptación por cohortes todavía pendientes.
+- Sin cambios de dependencias, secretos ni correo real versionados. La función de
+  reset solo está instalada en demo, fuera de migraciones de producto y sin grants
+  para anon/authenticated/service_role; revisar especialmente ese mantenimiento.
+- T069 requiere mapeo real anonimizado aprobado; T087 requiere teclado/zoom/NVDA;
+  T089 tiene siete mediciones técnicas correctas y necesita tiempos humanos;
+  T092 necesita cohortes y
+  correo verificado; T096 exige revisión independiente. La guía humana contiene pasos.
+- Persisten advertencias Next de stream cerrado durante navegación, sin fallo de
+  aserciones. No se atribuye una causa ni se afirma una corrección sin evidencia.
+- EXTRA-007 prepara dos estados ficticios para las cuatro acciones concurrentes,
+  mantiene conteos y documenta expresamente la variante; revisar su uso solo en demo.
+- Convergencia: el propietario resolvió el acceso GitHub/Vercel el 29/09 y la API
+  confirma el enlace al repositorio correcto, main como rama de publicación y
+  protección SSO/forks. Preview automático Git `0e84bb0` READY y smoke de cuatro
+  roles PASS; recibo exacto en runbook. T097 conserva entrega desde main tras
+  aprobación/merge. El preview Git no sustituye las mediciones del despliegue manual.
+- Avisos Supabase del 29/09: 2 funciones públicas anon y 41 funciones authenticated
+  SECURITY DEFINER esperadas por la allowlist/RPC con controles internos; no se
+  quitaron permisos para silenciar avisos. Protección de contraseñas filtradas
+  desactivada en el plan Free; decisión futura de operación permanece pendiente.
+  Referencias: [funciones públicas](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable),
+  [funciones autenticadas](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable),
+  [contraseñas](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+## Registro histórico de la fase 9 inicial
+
 2026-09-27. **Revisión automatizada/técnica parcial; revisión de Máximo pendiente**.
 No atribuir al segundo desarrollador resultados de esta sesión. Mateo confirmó que no
 hay evidencia de revisión humana para fase 9.

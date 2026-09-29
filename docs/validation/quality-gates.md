@@ -1,9 +1,11 @@
 # Controles de calidad — fase 9
 
-Fecha: 2026-09-27. Rama `codex/temp-phase-9-quality`, base `27e7b6e` (PR #31
+Fecha: 2026-09-29. Rama `codex/temp-mvp-completion`, base `481b9f0` (PR #32
 integrada). Evidencia local del árbol de esta entrega; el commit que contiene este
-documento identifica los archivos verificados. No acredita CI, demo, aprobación de
-Máximo ni aceptación municipal.
+documento identifica los archivos verificados. CI del commit `2974958` aprobado:
+[Actions 36596663506](https://github.com/maximo-Pdev/funes-empleo/actions/runs/36596663506),
+jobs application/database correctos. La revisión independiente sigue pendiente;
+los controles de demo se distinguen de la aceptación municipal.
 
 Entorno: Windows, Node `24.21.0`, npm `11.19.0`, Next `16.3.5`, Supabase CLI
 `2.117.0`, Docker Desktop y Chromium de Playwright `1.63.0`. Solo fixture ficticio
@@ -18,10 +20,14 @@ Entorno: Windows, Node `24.21.0`, npm `11.19.0`, Next `16.3.5`, Supabase CLI
 | `npm run typecheck` | PASS, tipos de rutas y TypeScript sin errores |
 | `npm run lint` | PASS, sin warnings permitidos |
 | `npm run test:unit` | PASS, 376 pruebas en 23 archivos; incluye integración de servicios y evaluadores de protocolo |
-| `npm run test:db` | PASS, 545 aserciones pgTAP en 11 archivos; reset/migraciones correctos |
+| pgTAP dentro de `npm run test:e2e:full` | PASS, 855 aserciones en 12 archivos; reset/migraciones correctos |
 | `npm run build` | PASS, compilación de producción y tipos correctos |
-| `npm run test:e2e -- --workers=1` | PASS, 45 pruebas, 0 omitidas, 3,0 minutos |
-| `npm audit --json` | PASS, 0 vulnerabilidades informadas; no certifica ausencia de riesgos |
+| `npm run test:e2e:full` | PASS, 57 pruebas, 0 omitidas/fallidas/inestables, 3,8 minutos de Playwright; dos carreras SQL PASS |
+| E2E focalizado de handlers | PASS tras ampliar candidato activo y exigir rechazo de autorización, no error de input |
+| `demo-smoke.mjs --confirm-fictitious-demo` | PASS, cuatro roles contra el nuevo preview protegido |
+| `demo-storage.mjs --confirm-fictitious-demo` | PASS, seis actores; hash/denegaciones/firma/listado |
+| Reset alojado y `verify-demo-cvs.mjs` | PASS, conteos del manifiesto y 500 PDF hash/tamaño; recibo en runbook |
+| `npm audit --json` (2026-09-27) | PASS, 0 vulnerabilidades entonces; no se cambiaron dependencias ni certifica ausencia de riesgos |
 | `git diff --check` | PASS, sin errores de espacios; aviso LF/CRLF de Git no es un fallo |
 
 Preparación E2E ejecutada: `node tests/fixtures/reset-local.mjs --confirm-local-reset`.
@@ -53,9 +59,20 @@ E2E exige reset completo; `test:db` solo no vuelve a cargar archivos.
 
 ## Alcance y pendientes
 
-T095 registra gates ejecutados, no certifica cobertura exhaustiva. No hay mediciones
-alojadas ni pruebas humanas. T087/T089/T092 requieren esa evidencia y trabajo detallado
-en sus documentos. T088/T094 tienen matriz de servicios y E2E representativos, pero
-faltan reenvíos HTTP por acción y concurrencia exhaustiva. T093 requiere completar
-eventos/rollback por cada clase. T096 necesita revisión del segundo desarrollador.
+T095 registra gates ejecutados, no certifica cobertura exhaustiva. Siete casos técnicos
+alojados medidos dentro de sus límites y con integridad posterior; ver performance.md.
+No hay aceptación humana. T087/T089/T092 requieren esa evidencia.
+T088/T094 añaden HTTP real y concurrencia SQL; T093 añade 310 comprobaciones de clases
+de auditoría/rollback. T096 necesita revisión del segundo desarrollador.
+Los dos intentos previos de E2E detectaron supuestos incorrectos del test NOT_FOUND:
+status 404 fijo y un selector ambiguo de robots en streaming. Corregidos, prueba
+focalizada y serie completa pasan. No se omitió la prueba para obtener verde.
 Los checks de requisitos permanecen intactos: no equivalen a tareas implementadas.
+
+Seguimiento 2026-09-29: `npm run lint` PASS y
+`npm run test:unit -- tests/performance/acceptance.test.ts` PASS (5 pruebas existentes)
+para el harness/manifiesto ampliados; `node --check tests/quality/demo-performance.mjs`
+PASS. No se suman esas cinco a las 376 originales. No cambió código de aplicación,
+dependencias ni migraciones productivas en este seguimiento. Los checks del commit
+posterior se registran por su SHA; el PASS de `2974958` no se atribuye automáticamente
+a otra revisión.

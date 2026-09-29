@@ -68,8 +68,9 @@ registro y las migraciones antes de integrar el PR.
 - T069, catálogo/mapeo municipal y demás OQ: no resueltos.
 - Revisión del segundo desarrollador y CI remoto: no se afirman realizados.
 - No se ejecutó aquí la suite E2E completa de otras fases.
-- NVDA, protocolo humano completo y mediciones alojadas de 1.000 filas: pendientes;
-  axe/E2E locales no sustituyen aceptación municipal.
+- Actualización 2026-09-29: preview alojado de 1.000 filas 5,96 s, confirmación
+  9,93 s y SQL de integridad/auditoría correctos; evidencia en performance.md.
+  NVDA y protocolo humano siguen pendientes; automatización no sustituye aceptación municipal.
 - El formato demo y la confirmación de datos ficticios no son un detector de PII;
   el operador nunca debe cargar personas reales.
 

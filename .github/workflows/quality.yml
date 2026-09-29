@@ -15,7 +15,7 @@ concurrency:
 jobs:
   application:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,9 +27,14 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test:coverage
-      - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Start isolated local Supabase
+        run: npx supabase start > /dev/null
+      - name: Build and run every private journey (no skips)
+        run: npm run test:e2e:full
+      - name: Stop local services
+        if: always()
+        run: npx supabase stop --no-backup
 
   database:
     runs-on: ubuntu-latest

@@ -1,7 +1,9 @@
 # Matriz de auditoría — T093 / FR-050 / SC-006
 
-2026-09-27. Estado: consolidación parcial; no se afirma todavía el 100% de clases
-con falla inyectada individual. Tests 070 comprueban invariantes generales, inmutabilidad,
+2026-09-28. Las clases siguientes tienen ejecución SQL e inyección de fallos en
+`072_audit_rollback_matrix.test.sql`: 51 casos de seis aserciones más cuatro controles
+de importación fallida (310 aserciones). Resultado de la suite completa: 855 PASS.
+Tests 070 comprueban invariantes generales, inmutabilidad,
 grants, actor y metadata. `tests/integration/audit/audit-events.test.ts` comprueba
 que las suites vinculadas existen y son transaccionales; **no ejecuta sus comandos SQL**.
 La ejecución SQL real se hace mediante `npm run test:db` y consta en quality-gates.
@@ -40,7 +42,30 @@ transaccionales mantienen entidad, permiso e historia juntas. Los tests 010 y 06
 inyectan fallo al insertar auditoría y comprueban rollback; 050 fuerza error tras una
 primera fila. El test 070 se ejecuta en BEGIN/ROLLBACK y no altera el fixture persistente.
 
-Para completar T093, convertir cada fila en comprobación explícita de campos y falla
-inyectada aplicable, no solo presencia de un archivo o inspección de una función.
-Registrar assertion/test ID y resultado por fila. No marcar SC-006 por el porcentaje
-de cobertura del código ni porque los eventos presentes en el seed sean válidos.
+## Matriz ejecutable añadida (072)
+
+Cada llamada `pg_temp.audit_case` identifica el caso en el TAP. Ejecuta el comando
+real, comprueba evento/actor/fecha/request ID/estados cuando corresponden y metadata
+segura, revierte el caso positivo, luego repite con una falla dirigida al evento
+esperado. Compara snapshots de todas las tablas public/private y Auth users,
+identities y sessions para demostrar ausencia de cambios parciales. La comparación
+es de estado transaccional; no demuestra rollback de un correo externo ya enviado.
+
+| Clase | Etiquetas de casos 072 (PASS) |
+| --- | --- |
+| Cuenta | Aprovisionamiento individual, Verificación cuenta, Suspensión, Reactivación, Archivo empresarial/propio, Restauración empresa/candidato |
+| Perfil y asistencia | Alta asistida, Corrección perfil, Contacto candidato, Vinculación presencial, Disponibilidad, Activación perfil |
+| Consentimiento | Retiro consentimiento, Aceptación consentimiento |
+| Versiones de CV | CV nueva versión, CV reemplazo anterior |
+| Duplicados | Las tres decisiones de vincular, corregir/crear y rechazar |
+| Ofertas | Envío empresarial; aprobación, correcciones, rechazo, pausa, reanudación, cierre, suspensión, restauración y cancelación |
+| Participaciones | Nominación, Postulación propia, retiro/cancelación, preentrevista, salto justificado, preselección y derivación |
+| Seguimiento | Contacto municipal, Nota interna, Entrevista empresarial, Feedback empresarial, contratación/no selección y Corrección tardía |
+| Importación | Importación confirmada; falla en evento final conserva lote fallido y revierte altas; 050 añade falla tras primera fila |
+| Exportación | CSV filtrado; 060 comprueba filtros y ausencia de contenido en auditoría |
+| Automatizaciones | Cron cierre oferta, Cron sin respuesta, Cron 720 horas; actor system sin cuenta |
+
+Los motivos obligatorios, permisos append-only y restricción del actor system se
+comprueban además en 001/010/040/050/070/071. La matriz no sustituye las pruebas de
+Storage real, HTTP ni SMTP: cubre la transacción de base y sus efectos auditables.
+La revisión independiente de estos tests sigue pendiente en T096.

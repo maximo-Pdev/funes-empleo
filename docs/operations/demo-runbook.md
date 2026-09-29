@@ -1,8 +1,64 @@
 # Manual de operación ficticia: local, preview y demo
 
-Fecha: 2026-09-27. Alcance T090. No autoriza producción ni uso de datos reales.
-Mateo confirmó que todavía no hay demo desplegada; los pasos alojados son un
-procedimiento preparado, no evidencia de despliegue ejecutado.
+Fecha: 2026-09-28. Alcance T090. No autoriza producción ni uso de datos reales.
+La demo fue creada por pedido de Máximo en su organización de Supabase.
+
+## Despliegue existente
+
+- URL: https://funes-empleo-demo.vercel.app (preview protegido por Vercel).
+- Supabase: `Funes-empleo`, ref `kyjycjojzhwggjuqjnki`, organización
+  `maximo-Pdev's Org`, región `sa-east-1`.
+- Vercel: proyecto `funes-empleo`, equipo `pantherium-8487s-projects`, región `gru1`.
+- Preview vigente verificado: `dpl_Bj7YxDaYcCydVayNAh4GW9kQnHNC`, desde la rama
+  `codex/temp-mvp-completion`; se creó con cambios entonces sin commit. Su ID
+  identifica el build, pero no acredita un SHA limpio ni corresponde a main.
+- Variables configuradas exclusivamente para Preview: `APP_ENV=demo`,
+  `CONSENT_POLICY_VERSION=demo-not-approved`, URL canónica anterior, URL Supabase
+  y clave publicable. No se configuró un cliente secreto en Vercel.
+- Fixture cargado: 500 candidatos, 50 empresas, 100 ofertas, 1.000 participaciones,
+  554 cuentas (cuatro administradores) y 500 PDF ficticios del manifiesto.
+- Smoke alojado: cuatro roles con navegación/aislamiento/CV; Storage: seis actores
+  con descarga autorizada o denegada, sin firma ni listado. Ver scripts
+  `tests/quality/demo-smoke.mjs` y `demo-storage.mjs`.
+- Cron `municipal-employment-daily` activo a `0 3 * * *`. El fixture puede cambiar
+  por acciones o automatizaciones: estos conteos no sustituyen un reset por medición.
+
+Las migraciones iniciales se aplicaron por MCP usando el nombre original del archivo;
+Supabase asignó versiones remotas distintas de los prefijos locales. La carga ficticia
+consta como `demo_fictitious_fixture_v1`; la corrección de Storage como
+`authenticated_cv_info`. No ejecutar `db push` ni reparar historial automáticamente:
+comparar primero nombres y contenido de ambas historias. El repositorio conserva las
+migraciones fuente; EXTRA-006 documenta recuperación mediante migración posterior.
+
+El preview exige acceso de Vercel. Los evaluadores deben recibir acceso desde el
+despliegue; no compartir la cuenta propietaria ni publicar cookies de bypass.
+Site URL y redirecciones de Auth configuradas y verificadas en el panel:
+`https://funes-empleo-demo.vercel.app`, `/auth/callback` y
+`/auth/callback?next=/update-password` sobre ese dominio exacto, sin wildcard.
+SMTP personalizado está desactivado; el servicio integrado solo admite destinatarios
+miembros del equipo y tiene límites bajos. El propietario aportó un buzón controlado
+para probar correo; no se guarda esa dirección real en el repositorio. La entrega y
+recuperación alojadas todavía requieren prueba con el usuario. El login precreado sí
+fue probado. Para cohortes, configurar SMTP propio con secretos introducidos por el
+operador en el panel ([Supabase](https://supabase.com/docs/guides/auth/auth-smtp)).
+El 2026-09-29 el propietario habilitó el acceso al repositorio en Vercel. La API
+del proyecto confirma conexión GitHub a `maximo-Pdev/funes-empleo` (repo 1376497802),
+con `productionBranch=main`, protección SSO activa y protección de forks. El rechazo
+anterior de `vercel git connect` queda como incidente histórico resuelto de acceso.
+El push `0e84bb0f9f7f4214a3a4e590dec9bae5ca8b4b85` generó automáticamente el
+preview Git `dpl_CBRrKSZZF5QKUdhMv35zUy1nHfDW`, READY, target Preview:
+https://funes-empleo-nebstp3fr-pantherium-8487s-projects.vercel.app.
+La API confirmó SHA/rama/source=git. El smoke de cuatro roles pasó navegación,
+aislamiento y CV/hash en ese dominio, usando el script existente con únicamente
+la URL sustituida en una copia ignorada; cookies solo en memoria, sin trazas.
+Este recibo identifica ese despliegue exacto, no todos los commits posteriores.
+La URL canónica y los callbacks siguen apuntando al despliegue de las mediciones;
+no se sustituyó ese despliegue ni se atribuyeron sus tiempos al preview Git.
+T097 conserva pendiente la publicación desde main tras revisión/merge:
+Production no tiene variables de aplicación ni se habilitó producción municipal.
+Referencia: [Vercel git](https://vercel.com/docs/cli/git).
+Vercel selecciona Node 24 por versión mayor; no se acredita el patch exacto local.
+Las pruebas humanas están en [la guía de ejecución](../validation/human-validation-guide.md).
 
 ## Separación y configuración
 
@@ -17,9 +73,55 @@ Variables de aplicación: `APP_ENV`, `NEXT_PUBLIC_APP_URL`,
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
 `CONSENT_POLICY_VERSION`. La publicable no elude RLS. `SUPABASE_SECRET_KEY` es
 opcional y exclusivamente servidor/aprovisionamiento controlado; jamás prefijo
-`NEXT_PUBLIC_`. `ACCEPTANCE_DEMO_PROJECT_REF` está reservado: no habilita por sí solo
-un reset alojado. No existe aún el comando `acceptance:reset-demo` previsto por el
-plan; T089 no puede aceptarse hasta implementarlo y verificarlo en demo aislada.
+`NEXT_PUBLIC_`. `ACCEPTANCE_DEMO_PROJECT_REF` solo admite `kyjycjojzhwggjuqjnki`.
+El reset alojado usa mantenimiento administrativo, nunca una ruta web.
+
+### Reset alojado (solo fixture ficticio)
+
+1. Detener mediciones y avisar a quienes usen la demo: el reset invalida las sesiones
+   ficticias y descarta cambios de negocio de pruebas. No ejecutarlo durante una
+   prueba de registro con buzón real; aborta ante cualquier identidad adicional.
+2. La función de `tests/fixtures/reset-demo.sql` está instalada únicamente en esta
+   demo como `demo_only_reset_fixture`. No incluirla en migraciones de producto.
+3. En una terminal dedicada, establecer `APP_ENV=demo` y
+   `ACCEPTANCE_DEMO_PROJECT_REF=kyjycjojzhwggjuqjnki`, luego ejecutar:
+   `npm run acceptance:reset-demo -- RESET-FICTITIOUS-DEMO-kyjycjojzhwggjuqjnki --prepare-sql`.
+4. El script verifica el SHA-256 del seed y prepara `test-results/reset-demo-query.sql`.
+   Esto **no ejecuta el reset**. Ejecutar exactamente ese SQL con el conector Supabase
+   autenticado, `execute_sql`, proyecto `kyjycjojzhwggjuqjnki`. Guardar el recibo sin
+   datos personales. No usar claves de servicio del cliente web como sustituto.
+5. La función privada valida entorno/ref/confirmación/hash, toma un bloqueo,
+   rechaza cuentas no pertenecientes al fixture y objetos inesperados, limpia y
+   repone el negocio en una sola transacción. Conserva los 500 objetos inmutables.
+   Ante error, no medir ni relajar las comprobaciones: revisar la causa.
+6. Con URL y clave **publicable** de demo en el proceso, ejecutar
+   `node tests/fixtures/verify-demo-cvs.mjs --confirm-fictitious-demo ID_DEL_RECIBO`.
+   Descarga los 500 PDF y verifica tamaño/hash. Asociar ambas salidas al mismo reset.
+   La comprobación de integridad prepara el fixture; no es una medición de latencia.
+7. Iniciar nuevas sesiones y medir un solo caso sin calentarlo. Repetir el reset para
+   el siguiente caso; no reutilizar recibos entre mediciones.
+
+Evidencia 2026-09-28: reset `8c85617b-56ec-4ef0-9cfe-89aee0768388`,
+22:47:10 UTC, conteos 554/500/50/100/1000/500 correctos; a las 22:50:22 UTC se
+verificaron los 500 PDF de 1426 bytes con el hash del manifiesto. Guard de entorno
+incorrecto rechazado; EXECUTE denegado a anon/authenticated/service_role.
+Mediciones posteriores del 2026-09-29: siete casos técnicos dentro de sus límites,
+siete resets distintos y 500 PDF comprobados antes de cada caso; detalle en
+[performance.md](../validation/performance.md). Aceptación humana pendiente.
+El usuario autorizó expresamente repetir resets de esta demo el 29/09; la revisión
+automática previa que rechazó una repetición quedó resuelta con esa autorización.
+Después de las mediciones, reset final `654236d6-b235-48a0-8438-2e960ffa5afe`
+del 29/09 21:41:13 UTC: 554/500/50/100/1000/500 correctos; verificación de los
+500 PDF/hash completada a las 21:42:36 UTC. Se retiró la variante de preparación
+concurrente mediante ese reset. Esto no acredita registro ni correo alojado.
+
+Concurrencia: ejecutar `tests/fixtures/prepare-demo-concurrency.sql` solo con el
+transporte autenticado fijado al ref demo, después del reset/500 PDF, nunca en datos
+reales. Recibo de variante y estados en EXTRA-007/performance.md. Luego:
+`node tests/quality/demo-performance.mjs concurrent-admins ID_RESET ID_DESPLIEGUE`.
+Para los otros casos usar candidate/openings/companies/cv/import-preview/import-confirm,
+cada uno con reset distinto. El CLI de Vercel mantiene autenticación/cookies en
+memoria; los scripts no imprimen ni versionan encabezados o sesión de navegador.
 
 Variables solo de tests: `LOCAL_MAILPIT_URL` (buzón local ficticio),
 `PLAYWRIGHT_EXTERNAL_SERVER=1` únicamente cuando se inició deliberadamente un servidor

@@ -17,7 +17,9 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:db": "supabase db reset --local && supabase test db",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:full": "node tests/quality/run-local-e2e.mjs --confirm-local-reset",
+    "acceptance:reset-demo": "node tests/fixtures/reset-demo.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

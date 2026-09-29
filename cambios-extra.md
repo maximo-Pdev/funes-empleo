@@ -77,6 +77,109 @@ una propuesta en una decisión municipal aprobada.
 - Commit/PR: pendiente al registrar esta verificación; consultar historial de esta
   entrada y PR de `codex/temp-phase-9-quality`. No se acredita revisión ni merge.
 
+## EXTRA-003 — Ejecución E2E completa y reproducible
+
+- Fecha: 2026-09-27. Estado: implementado y verificado localmente; revisión humana pendiente.
+- Origen: T088/T094/T095 y plan de CI de flujos críticos.
+- Evidencia: el job application no inicia Supabase ni prepara variables, Mailpit o
+  PDF; los tests privados usan skip si falta ese entorno. Un check verde no prueba
+  los recorridos privados.
+- Cambio: ejecutor local/CI que valida destino local, prepara el fixture, carga
+  variables en memoria, compila y ejecuta E2E con un reporte que rechaza omisiones.
+  Se añaden pruebas HTTP y SQL reales de autorización/auditoría.
+- Archivos: workflow Quality, package.json, tests/quality, tests/e2e,
+  supabase/tests y documentación de validación. Sin cambios funcionales previstos.
+- Riesgos: reset de datos de prueba y exposición de credenciales en logs. Guard
+  local estricto; no imprimir configuración, no publicar trazas autenticadas.
+- Autorización: Máximo solicita cerrar todas las tareas ejecutables en esta rama.
+  Ajuste de CI anunciado antes de editar; revisión compartida se realiza por PR.
+- Verificación prevista: tipos, lint, Vitest, pgTAP, build y suite E2E completa;
+  confirmar ejecución del workflow en GitHub antes de afirmar CI verificado.
+- Resultado 2026-09-29: tipos/lint/build PASS, 376 Vitest, 855 pgTAP,
+  57 E2E sin omisiones y dos carreras SQL PASS. CI remoto se registra en el PR.
+
+## EXTRA-004 — Respuesta segura al archivar empresa sin permiso
+
+- Fecha: 2026-09-27. Origen: T088/T094, errores públicos sin detalles internos.
+- La prueba HTTP real descubrió que `archiveCompanyAction` propagaba ACCESS_DENIED
+  como error 500. Se captura con el mismo traductor público que las otras acciones,
+  conservando el redirect exitoso fuera del catch. No cambian permisos ni estados.
+- Autorización: corrección necesaria para terminar las tareas solicitadas, anunciada
+  antes de editar. Revisión del segundo desarrollador pendiente en PR.
+- Verificación: matriz de acciones HTTP y suites de calidad de esta rama.
+- Resultado: las siete combinaciones de actor/estado de la matriz HTTP y el
+  recorrido positivo de archivo empresarial pasan. Revisión independiente pendiente.
+
+## EXTRA-005 — Recurso no encontrado accesible y en español
+
+- Fecha: 2026-09-28. Origen: T087/T088, NFR-002/NFR-008.
+- Evidencia: al consultar una oferta ajena, Next muestra su 404 por defecto en
+  inglés, sin `main#contenido`; el enlace global de salto queda sin destino.
+- Cambio mínimo: `src/app/not-found.tsx` con mensaje genérico en español y navegación
+  pública. No revela si un registro existe ni cambia autorización o contratos.
+- Riesgo: preservar respuesta y contenido indistinguibles para ID ajeno/ausente.
+- Autorización: requisito técnico necesario dentro del cierre solicitado; anunciado
+  antes de implementar. Revisión humana pendiente.
+- Verificación: E2E de propiedad/NOT_FOUND, tipos, lint y build.
+- Resultado: ajeno/ausente con igual contenido, status compatible con streaming
+  y noindex PASS; tipos/lint/build PASS. El skip link tiene destino `main#contenido`.
+
+## EXTRA-006 — Descarga privada compatible con Storage alojado
+
+- Fecha: 2026-09-28. Origen: T094/T089, CV privado autorizado en Vercel/Supabase.
+- Evidencia: RPC de autorización correcto, objeto presente con hash/tamaño de fixture,
+  pero descarga devuelve 400/404. Logs de Storage 1.77.5 identifican la operación
+  `object.get_authenticated_info`, excluida por la política local de solo descarga.
+- Cambio mínimo: permitir `object.get_authenticated_info` junto con
+  `object.get_authenticated`, manteniendo bucket privado y el mismo control de
+  dueño/derivación vigente. Nunca permitir listing, firma, overwrite ni delete.
+- Archivos: nueva migración forward-only, pruebas de Storage y documentación.
+- Riesgo: ampliar accidentalmente operaciones; verificar descarga por cada rol y
+  denegación de objeto ajeno, anónimo, listado y URLs firmadas.
+- Autorización: requisito técnico necesario del despliegue ficticio solicitado;
+  comunicado antes de modificar la política compartida. Revisión humana pendiente.
+- Recuperación: migración posterior que restaure el predicado anterior si fuese
+  necesario; no reescribir historial. El síntoma sería denegación de CV en cloud.
+- Resultado: migración aplicada en demo y reset local; seis actores de Storage
+  alojado PASS (descarga según permiso, firma/listado denegados), cuatro roles
+  de smoke Vercel PASS y 500 PDF verificados por SHA-256/tamaño tras reset alojado.
+  Revisión del segundo desarrollador pendiente en el PR de esta rama.
+
+## EXTRA-007 — Precondiciones ficticias para concurrencia de aceptación
+
+- Fecha: 2026-09-29. Origen: T089 / SC-008A. Estado: implementado y verificado; revisión pendiente.
+- Evidencia: el seed tiene 80 ofertas publicadas y ninguna pendiente; todas las
+  participaciones están derivadas o finalizadas. No permite ejecutar las cuatro
+  acciones de aceptación requeridas sin preparar sus estados iniciales.
+- Cambio mínimo: helper SQL de pruebas que, después de un reset autorizado, prepara
+  oferta 80 en `pending_review` y participación 775 en `under_review`, retirando
+  únicamente su derivación ficticia. Conserva 500/50/100/1000 y los 500 PDF.
+  No es una transición de producto ni una migración; su recibo identifica la variante.
+- Archivos: `tests/fixtures/prepare-demo-concurrency.sql`, harness de rendimiento,
+  manifiesto y documentación. No modifica contratos, permisos ni esquema compartidos.
+- Riesgos: ejecutarlo fuera del fixture o ocultar su diferencia con el seed original.
+  Exigir identidades/conteos/estados iniciales exactos, transacción y proyecto demo
+  fijado en el transporte; conservar auditoría previa y registrar variante/baselines.
+- Verificación: cuatro sesiones individuales, barrera común, éxito visible ≤5 s por
+  acción y comprobación posterior de entidades, versiones y cuatro auditorías.
+- Autorización: detalle necesario de la tarea aprobada, anunciado antes de editar;
+  resets de esta demo autorizados expresamente por el usuario. Revisión pendiente
+  en https://github.com/maximo-Pdev/funes-empleo/pull/33.
+- Resultado: barrera común con cuatro admins distintos, inicio separado por menos
+  de 1 ms; 891/891/891/906 ms, todos ≤5000 ms. SQL posterior comprobó las cuatro
+  versiones y sus auditorías con actor/request ID; preselección conserva decisión
+  privada justificada y evento `stage_skipped`. Dos fallos previos de preparación
+  por selector exacto que ignoraba «obligatorio» no enviaron acciones ni midieron.
+- El ejecutor mantiene cookies solo en memoria. Los errores del transporte Vercel
+  se traducen a mensaje genérico para que un fallo no imprima encabezados de acceso.
+
+### Referencias de la entrega
+
+EXTRA-003/004/005/006 están en el commit `2974958b36aefeb603de4a3943c5da7585ab6370`
+y PR #33. Los jobs application/database de GitHub Actions 36596663506 aprobaron
+ese commit. EXTRA-007 y las mediciones posteriores se agregan en el mismo PR;
+ninguna revisión humana ni aprobación municipal está acreditada por esos checks.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
