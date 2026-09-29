@@ -167,7 +167,8 @@ catálogo, informes y operación productiva siguen en `docs/discovery/OPEN_QUEST
    `maximo-Pdev/funes-empleo`. Revisar los permisos pedidos y seleccionar ese
    repositorio cuando el proveedor permita limitar el alcance.
 3. Conectar ese repositorio al proyecto existente; no crear otro por el error del CLI.
-   El intento del 29/09 fue rechazado por acceso y el enlace siguió vacío.
+   El propietario resolvió el acceso el 29/09; la API confirma el enlace al repositorio.
+   No repetir la conexión ni crear otro proyecto. El rechazo previo es histórico.
 4. Comprobar que el PR #33 genere un preview del SHA correcto, con variables demo
    separadas, acceso protegido y sin cliente secreto. Ejecutar el smoke de cuatro roles.
 5. Antes de publicar desde main, completar revisión/aprobación y confirmar merge;

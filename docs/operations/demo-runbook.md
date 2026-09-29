@@ -41,11 +41,15 @@ para probar correo; no se guarda esa dirección real en el repositorio. La entre
 recuperación alojadas todavía requieren prueba con el usuario. El login precreado sí
 fue probado. Para cohortes, configurar SMTP propio con secretos introducidos por el
 operador en el panel ([Supabase](https://supabase.com/docs/guides/auth/auth-smtp)).
-La integración GitHub→Vercel aún no está conectada: este despliegue se hizo por CLI.
-El 2026-09-29 `vercel git connect` rechazó conectar `maximo-Pdev/funes-empleo` por
-acceso al repositorio; el proyecto sigue con git=null. T097 registra la corrección,
-que requiere acceso del propietario. Pasos en la guía humana; no basta con reintentar
-el CLI ni atribuirle permisos que no se verificaron. Referencia: [Vercel git](https://vercel.com/docs/cli/git).
+El 2026-09-29 el propietario habilitó el acceso al repositorio en Vercel. La API
+del proyecto confirma conexión GitHub a `maximo-Pdev/funes-empleo` (repo 1376497802),
+con `productionBranch=main`, protección SSO activa y protección de forks. El rechazo
+anterior de `vercel git connect` queda como incidente histórico resuelto de acceso.
+Los despliegues enumerados antes del siguiente push todavía son los manuales del
+runbook: la conexión sola no acredita un preview Git del SHA revisado. T097 requiere
+comprobar ese preview y mantiene la publicación desde main sujeta a revisión/merge;
+Production no tiene variables de aplicación ni se habilitó producción municipal.
+Referencia: [Vercel git](https://vercel.com/docs/cli/git).
 Vercel selecciona Node 24 por versión mayor; no se acredita el patch exacto local.
 Las pruebas humanas están en [la guía de ejecución](../validation/human-validation-guide.md).
 

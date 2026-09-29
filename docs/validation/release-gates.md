@@ -3,7 +3,8 @@
 T091 — 2026-09-27. **Todos los gates de esta tabla continúan abiertos** salvo evidencia
 explícita posterior. Actualización 2026-09-28: demo y reset alojado creados/verificados;
 Actualización 2026-09-29: siete mediciones técnicas alojadas dentro de sus límites;
-faltan resultados humanos/NVDA/revisión de fase 9 y acceso GitHub–Vercel.
+faltan resultados humanos/NVDA/revisión de fase 9. El propietario habilitó GitHub–Vercel
+y se verificó el enlace; todavía falta validar el preview Git y la entrega tras merge.
 No exigir un documento oficial adicional si existe evidencia rastreable:
 PR, issue, acta, correo o mensaje capturado en repositorio con decisión, responsable y
 fecha es suficiente. No incorporar PII o secretos al registrar esa evidencia.
@@ -23,7 +24,7 @@ fecha es suficiente. No incorporar PII o secretos al registrar esa evidencia.
 | SMTP/remitente | Operador / Municipalidad | Mailpit local; correo integrado solo pruebas controladas | Entrega real de invitaciones/recuperación | Proveedor, dominio, remitente y responsable verificados; secretos fuera del repo |
 | Visual/accesibilidad municipal | Municipalidad | Español, responsive, teclado y pruebas según spec | Aceptación institucional | Identidad visual y requisitos municipales confirmados |
 | Mediciones alojadas | Desarrolladores / titular de proyectos | Siete casos técnicos medidos; tiempos humanos pendientes | SC-003/008 y aceptación global T089 | Administrador sin práctica, recibos/condiciones revisados y registros completos |
-| GitHub–Vercel/T097 | Propietario de ambas cuentas | Preview manual protegido, enlace Git vacío | Previews automáticos y entrega desde main tras merge | Acceso al repositorio, enlace confirmado y preview del PR/SHA verificado |
+| GitHub–Vercel/T097 | Propietario de ambas cuentas | Enlace Git confirmado, SSO/forks protegidos, variables solo Preview | Verificación del preview Git y entrega desde main tras merge | Preview del PR/SHA verificado y destino demo configurado tras aprobación/merge |
 | Cohortes y NVDA | Equipo coordinador / usuarios por rol | Automatización es apoyo, no sustituto | SC-001/002/003/008/009/010 | Registros seudónimos según protocolo, sin inventar participantes |
 | Segundo desarrollador | Máximo | PR sin merge automático | Integración/aprobación final | Comentarios/hallazgos y resolución rastreables de esta fase |
 
