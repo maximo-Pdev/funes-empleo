@@ -30,10 +30,12 @@ export async function saveCompanyProfileAction(_previous: CompanyActionState, fo
 }
 
 export async function archiveCompanyAction(_previous: CompanyActionState, form: FormData): Promise<CompanyActionState> {
-  const session = await companySession();
-  const result = await changeAccountStatus({ accountId: session.account.id, version: form.get("accountVersion"),
-    command: "archive", reason: "", confirmed: form.get("confirmed") === "on" });
-  if (result.code !== "OK") return { message: result.code === "CONFLICT_STALE_DATA" ?
-    "Los datos cambiaron. Recargá antes de intentar de nuevo." : "No se pudo archivar. Revisá la confirmación.", success: false };
+  try {
+    const session = await companySession();
+    const result = await changeAccountStatus({ accountId: session.account.id, version: form.get("accountVersion"),
+      command: "archive", reason: "", confirmed: form.get("confirmed") === "on" });
+    if (result.code !== "OK") return { message: result.code === "CONFLICT_STALE_DATA" ?
+      "Los datos cambiaron. Recargá antes de intentar de nuevo." : "No se pudo archivar. Revisá la confirmación.", success: false };
+  } catch (error) { return failed(error); }
   redirect("/session-expired");
 }

@@ -1,7 +1,10 @@
 # Resultados quickstart — T092
 
 Fecha: 2026-09-27. Entorno: local ficticio, Node 24.21.0/npm 11.19.0.
-Base: main `27e7b6e`, rama `codex/temp-phase-9-quality`. No demo desplegada ni cohortes.
+Actualización 2026-09-28: main `481b9f0`, rama `codex/temp-mvp-completion`.
+Demo protegida desplegada y smoke por cuatro roles aprobado; cohortes pendientes.
+Pasos humanos en [la guía](human-validation-guide.md). El correo/Auth alojado aún
+requiere configuración y verificación; cuentas precreadas no prueban autorregistro.
 Los resultados de comandos finales se registran en `quality-gates.md`.
 
 | Escenario | Evidencia automática ejecutable | Resultado humano |

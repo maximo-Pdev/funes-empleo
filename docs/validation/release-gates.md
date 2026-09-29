@@ -1,8 +1,9 @@
 # Gates externos de entrega
 
 T091 — 2026-09-27. **Todos los gates de esta tabla continúan abiertos** salvo evidencia
-explícita posterior. Mateo confirmó que no hay demo ni resultados humanos/NVDA/revisión
-de fase 9. No exigir un documento oficial adicional si existe evidencia rastreable:
+explícita posterior. Actualización 2026-09-28: demo y reset alojado creados/verificados;
+faltan mediciones y resultados humanos/NVDA/revisión de fase 9.
+No exigir un documento oficial adicional si existe evidencia rastreable:
 PR, issue, acta, correo o mensaje capturado en repositorio con decisión, responsable y
 fecha es suficiente. No incorporar PII o secretos al registrar esa evidencia.
 
@@ -20,7 +21,7 @@ fecha es suficiente. No incorporar PII o secretos al registrar esa evidencia.
 | Cuatro identidades admin | Oficina / operador | Cuatro usuarios ficticios individuales | Aprovisionamiento municipal | Identidades confirmadas por canal privado y constancia sanitizada; sin claves |
 | SMTP/remitente | Operador / Municipalidad | Mailpit local; correo integrado solo pruebas controladas | Entrega real de invitaciones/recuperación | Proveedor, dominio, remitente y responsable verificados; secretos fuera del repo |
 | Visual/accesibilidad municipal | Municipalidad | Español, responsive, teclado y pruebas según spec | Aceptación institucional | Identidad visual y requisitos municipales confirmados |
-| Demo + reset alojado | Desarrolladores / titular de proyectos | Solo local comprobado | SC-003/008/008A alojados | URL/commit no secreto, proyecto aislado, reset transaccional protegido y conteos/hash |
+| Mediciones alojadas | Desarrolladores / titular de proyectos | Demo y reset verificados, sin aceptación de tiempos | SC-003/008/008A alojados | Medición individual por caso con recibo de reset y despliegue exacto |
 | Cohortes y NVDA | Equipo coordinador / usuarios por rol | Automatización es apoyo, no sustituto | SC-001/002/003/008/009/010 | Registros seudónimos según protocolo, sin inventar participantes |
 | Segundo desarrollador | Máximo | PR sin merge automático | Integración/aprobación final | Comentarios/hallazgos y resolución rastreables de esta fase |
 

@@ -1,5 +1,8 @@
 # Estado de implementación — 2026-09-22
 
+**Estado vigente: ver actualización 2026-09-29 al final.** Los apartados previos son
+registros históricos de cada fase, no una descripción del producto actual.
+
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
 El trabajo anterior ya estaba commiteado y el árbol limpio al retomar. Esta continuación no creó
 commits, push ni PR.
@@ -307,3 +310,26 @@ T087/T089/T092 requieren además trabajo y evidencia alojada/humana; T088/T094 a
 necesitan cobertura HTTP y concurrencia exhaustiva; T093, comprobaciones de eventos
 y rollback por cada clase; T096, revisión de Máximo. Las casillas incompletas se
 conservan sin marcar. No se cerraron OQ ni se hizo merge.
+
+## Actualización 2026-09-29: cierre técnico y demo
+
+Rama `codex/temp-mvp-completion`, desde `481b9f0` (PR #32 integrada).
+Limpieza previa de ramas fusionadas completada; main actualizado antes de crear esta
+rama. No se implementó directamente en main ni se hizo merge automático.
+
+T088/T093/T094 completadas: acciones compiladas por HTTP con sesión/base reales,
+todos los roles suspendidos y handlers, propiedad/NOT_FOUND, dos carreras SQL con
+bloqueo observado y 310 aserciones adicionales de auditoría/rollback por clase.
+Suite total: 376 Vitest, 855 pgTAP, 57 E2E completos y dos carreras PASS; tipos,
+lint y build correctos. Refuerzo posterior de handlers verificado focalizadamente.
+
+Demo Vercel/Supabase creada, protegida y verificada con cuatro roles y Storage.
+El reset alojado privado restablece conteos/hash y preserva los 500 PDF verificados.
+Callbacks de Auth configurados; no se cambiaron SMTP ni permisos del proyecto.
+Detalles y scripts en docs/operations/demo-runbook.md; extras 003–006 rastreables.
+
+91 de 96 tareas marcadas. Permanecen T069 (mapeo municipal), T087 (accesibilidad
+humana), T089 (rendimiento alojado y tiempos humanos), T092 (cohortes/quickstart y
+correo alojado), T096 (revisión independiente). No se cierran por inferencia. Guía
+paso a paso: docs/validation/human-validation-guide.md. CI remoto y PR se registran
+cuando exista evidencia; estos resultados locales no los sustituyen.

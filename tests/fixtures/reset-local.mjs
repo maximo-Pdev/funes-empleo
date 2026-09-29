@@ -35,7 +35,7 @@ if (!["127.0.0.1", "localhost"].includes(api.hostname) || api.port !== "54321" |
   throw new Error("El destino no es el Supabase local esperado.");
 }
 const pdf = await readFile(resolve(fixtureDir, manifest.cvDownload.file));
-if (sha256(await readFile(resolve(root, "supabase/seed.sql"))) !== manifest.seedSha256 ||
+if (sha256((await readFile(resolve(root, "supabase/seed.sql"), "utf8")).replaceAll("\r\n", "\n")) !== manifest.seedSha256 ||
     sha256(pdf) !== manifest.cvSha256 || pdf.length !== manifest.cvDownload.bytes) {
   throw new Error("El fixture cambió: actualizá el manifiesto y sus expectativas antes de reiniciar.");
 }

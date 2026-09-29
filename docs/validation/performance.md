@@ -1,6 +1,8 @@
 # Rendimiento y aceptación — T089
 
-Estado 2026-09-27: **no medido en demo**. No existe despliegue alojado confirmado.
+Estado 2026-09-28: **no medido para aceptación**. Existe una demo protegida en
+https://funes-empleo-demo.vercel.app con el fixture y 500 PDF verificados; el smoke
+funcional no acredita tiempos fríos ni el protocolo de reset por medición.
 Los tests de `tests/performance/acceptance.test.ts` validan protocolo, hashes y
 rechazo de evidencia insuficiente; sus ejemplos `example.invalid` no son resultados
 humanos ni mediciones. pgTAP 071 verifica existencia de índices, no asegura que el
@@ -56,8 +58,10 @@ el mejor resultado. El evaluador puro rechaza resets reutilizados/entornos disti
 
 ## Pendiente antes de aceptar
 
-Demo separada, reset alojado transaccional con guard de entorno/project-ref,
-confirmación/bloqueo/hash/conteos; harness end-to-end para todos los casos SC-008A,
+Demo separada y reset alojado transaccional con guard de entorno/project-ref,
+confirmación/bloqueo/hash/conteos verificados (runbook). `demo-performance.mjs`
+prepara mediciones de búsqueda, listas, CV y CSV; aún no acredita su ejecución.
+Falta completar/ejecutar el harness para todos los casos SC-008A,
 EXPLAIN real, mediciones frías y concurrencia con barrera. El reset local existente
 no cumple el requisito alojado. Sin estas condiciones T089 permanece sin marcar.
 No se evalúa carga por encima de cuatro administradores ni SLA productivo (OQ-006).
