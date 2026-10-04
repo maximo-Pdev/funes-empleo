@@ -1,5 +1,64 @@
 @import "tailwindcss";
 
-:root { color-scheme: light; }
-body { margin: 0; background: #f8fafc; color: #172033; font-family: Arial, Helvetica, sans-serif; }
-:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 4px; }
+@theme {
+  --color-primary-50: #f0f7f3;
+  --color-primary-100: #e3f2e9;
+  --color-primary-400: #69bc88;
+  --color-primary-500: #337f50;
+  --color-primary-600: #006833;
+  --color-primary-700: #004e24;
+  --color-primary-900: #06452b;
+
+  --color-page: #f5f8f6;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f6f3;
+  --color-foreground: #202b26;
+  --color-foreground-secondary: #66756b;
+  --color-border: #dce8e0;
+  --color-accent-violet: #21126f;
+
+  --color-background: var(--color-page);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-foreground);
+  --color-muted: var(--color-surface-muted);
+  --color-muted-foreground: var(--color-foreground-secondary);
+  --color-primary: var(--color-primary-600);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-primary-100);
+  --color-secondary-foreground: var(--color-primary-700);
+  --color-ring: var(--color-accent-violet);
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-card: 0 1px 3px rgb(32 43 38 / 0.06);
+  --shadow-elevated: 0 12px 30px rgb(32 43 38 / 0.10);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #ffffff;
+}
+
+::selection {
+  background: var(--color-primary-400);
+  color: var(--color-primary-700);
+}
