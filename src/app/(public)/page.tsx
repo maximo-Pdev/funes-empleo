@@ -133,7 +133,7 @@ export default async function HomePage() {
                 />
                 <Badge variant="outline">Demo con datos ficticios</Badge>
               </div>
-              <CardTitle className="pt-4 text-2xl text-primary-900">Intermediación municipal protegida</CardTitle>
+              <h2 className="pt-4 text-2xl font-semibold leading-snug text-primary-900">Intermediación municipal protegida</h2>
             </CardHeader>
             <CardContent>
               <p className="leading-7 text-muted-foreground">
@@ -146,7 +146,7 @@ export default async function HomePage() {
                   ["Ofertas", "100"],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-lg bg-secondary p-4">
-                    <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                    <p className="text-sm font-medium text-primary-700">{label}</p>
                     <p className="mt-1 text-2xl font-bold text-primary-700">{value}</p>
                   </div>
                 ))}
@@ -264,7 +264,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-500">Cómo funciona</p>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-600">Cómo funciona</p>
               <h2 id="process-title" className="mt-2 text-3xl font-bold text-primary-900">Simple para usar, cuidadoso con los datos.</h2>
             </div>
             <ol className="grid gap-4">

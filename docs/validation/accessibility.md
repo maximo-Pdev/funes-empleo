@@ -8,6 +8,28 @@ axe, h1, ausencia de desbordamiento y llegada de foco por Tab al 100%.
 No equivale a completar un flujo con teclado ni a un lector de pantalla. No se usa
 CSS zoom ni emulación de escala para afirmar zoom real del navegador al 200%.
 
+## Evidencia enfocada de la portada — rama `fix/home-test-contract`
+
+- Se corrigió localmente el encabezado de «Intermediación municipal protegida» a
+  `h2`, conservando su presentación; las etiquetas de estadísticas usan
+  `text-primary-700` y «Cómo funciona» usa `text-primary-600`. Los otros eyebrows,
+  CSS y componentes compartidos no se modificaron.
+- `npm run test:unit -- tests/components/setup/home.test.tsx`: RED observado
+  (1 fallo y 2 pruebas correctas) al exigir el encabezado de nivel 2 antes del
+  cambio; GREEN observado después (3/3), incluidos los estados vacío y no disponible.
+- RED del smoke: axe detectó `color-contrast` (4.19:1 en estadísticas y
+  4.33:1 en «Cómo funciona») y `heading-order`. Una repetición inicial sirvió
+  un build previo con el `h3` y las clases anteriores.
+- Tras `npm run build` (exit 0), se repitió
+  `npx playwright test tests/e2e/setup.spec.ts --project=chromium --no-deps`:
+  **PASS, 1/1**. El servidor de producción se inició sin reutilizar otro proceso.
+  Idioma, h1, foco del enlace de salto y axe sin violaciones pasaron.
+  La suite completa de unidades pasó 378/378 pruebas en 23 archivos;
+  lint y typecheck terminaron con exit 0. No se debilitaron aserciones ni se
+  ejecutaron resets de base de datos.
+- Esta evidencia es solo de la portada: **no completa T087**, la matriz manual,
+  el zoom real al 200 % ni los recorridos NVDA, que continúan pendientes.
+
 ## Matriz manual obligatoria
 
 Para **cada fila**, repetir las cuatro combinaciones 360×800/1366×768 × 100%/200%
