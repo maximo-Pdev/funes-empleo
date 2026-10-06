@@ -5,9 +5,9 @@
 
 ## 1. Versiones reproducibles del stack
 
-**Decisión**: usar Node.js 24.21.0 LTS con npm 11.19.0, Next.js 16.3.5, React/React DOM
+**Decisión**: usar Node.js 24.21.0 LTS con npm 11.19.0, Next.js 16.3.8, React/React DOM
 19.3.0, TypeScript 6.0.3, Tailwind CSS y `@tailwindcss/postcss` 4.3.3, ESLint 9.39.5,
-`eslint-config-next` 16.3.5, Supabase CLI 2.117.0 y `csv-parse` 7.0.2. Fijar dependencias directas y
+`eslint-config-next` 16.3.8, Supabase CLI 2.117.0 y `csv-parse` 7.0.2. Fijar dependencias directas y
 commitear `package-lock.json`; CI instala con `npm ci`.
 
 Corrección de implementación del 2026-09-22: la versión inicialmente prevista de ESLint 10.10.0
@@ -17,6 +17,89 @@ admitido por `eslint-config-next` 16.3.5 (`eslint >=9`). Se conserva el conjunto
 Limitación: npm marca ESLint 9.39.5 como no mantenido. Es una fijación temporal por compatibilidad;
 se debe reevaluar al publicarse soporte de ESLint 10 en el plugin de React. No se silencia el aviso,
 ni se interpreta un audit sin vulnerabilidades como garantía de seguridad futura.
+
+**Corrección de seguridad step 2 (`EXTRA-008`; resultados históricos previos a EXTRA-010)**: se reemplazan los pins
+Next.js/`eslint-config-next` 16.3.5 por 16.3.8 para GHSA-vcvr-r3jv-pc5j y se
+actualiza `source-map-js` a 1.2.2 para GHSA-68fv-2mgg-jv7q.
+La continuación autorizada repara sharp 0.35.4 (GHSA-wq5f-xc86-pv6w, <0.35.5)
+mediante `npm update sharp`: registry confirma que Next 16.3.8 admite `^0.35.4`
+y sharp 0.35.5 exige Node >=20.9.0. Se resuelve 0.35.5 con binarios asociados
+y libvips 1.3.4, sin dependencia directa ni override.
+Instalación observada con Node 24.21.0/npm 11.19.0 temporales en cache ignorada,
+sin instalación global ni cambios de engines. Audit final exit 1 informa 5 altas,
+0 críticas: `braces` 3.0.3 (GHSA-vfj7-8cjw-p6xm) y cuatro dependientes ESLint
+siguen presentes; la sugerencia force degrada eslint-config-next a 14.2.35 y se
+rechaza. El advisory de sharp ya no figura. Tests/build/clean install/smoke siguen
+pendientes; no se atribuyen resultados funcionales históricos a este parche.
+No se afirma remediación completa ni se cambian arquitectura o dependencias
+directas adicionales. Ver evidencia reproducible en `docs/validation/quality-gates.md`.
+La referencia a 16.3.5 en la corrección ESLint anterior es evidencia histórica.
+
+**Ensayo glob acotado (`EXTRA-009`, 2026-10-06)**: inspección de los módulos
+`get-root-dirs` y `no-html-link-for-pages` del plugin 16.3.8 confirma único uso
+CommonJS `globSync(pattern.replace(/\\\\/g, '/'), { onlyDirectories: true })`.
+Tinyglobby 0.2.17 expone globSync CommonJS, pero `expandDirectories` predeterminado
+true no equivale a fast-glob. Se probó únicamente el override anidado del plugin,
+sin otros overrides, pins directos ni cambios de lint. RED original: 1 fallo de
+identidad y 21 contratos PASS. Ensayo: identidad mantenida PASS, audit cero, pero
+10 fallos de equivalencia por agregar pages/src/src/nested para raíces literales,
+glob, brace, absolutas, separadores Windows y arrays; comparación normalizada
+ignora orden/barras finales. Los diez casos de la regla real rechazaron `<a>`
+interno y permitieron externo/Next Link; esto no basta para equivalencia completa.
+Se rechaza el alias, no se fuerza ni se cambia el plugin para pasar opciones extra.
+Tras retirar override y entradas propias retenidas por npm en lockfile,
+reinstalación restaura fast-glob 3.3.1/micromatch 4.0.8/braces 3.0.3. Audit final:
+5 altas, 0 críticas; pruebas finales de base/rechazo 23/23 PASS. No hubo GREEN de
+mitigación, ni verificación de gates completos posterior. Conservar estas pruebas
+para reevaluar cualquier futura sustitución, API y defaults; revisión del compañero
+pendiente. Comandos exactos y aviso allowScripts sin cambios en quality-gates.md.
+
+**Adaptador y resolución local (`EXTRA-010`, 2026-10-06)**: paquete privado
+`next-eslint-glob-adapter`, tinyglobby 0.2.17 exacto y única API globSync
+con onlyDirectories, expandDirectories false y normalización sin destruir raíces.
+Modo final: ESM síncrono index.mjs con imports node:path/node:fs/tinyglobby y
+exportación nombrada globSync; main/exports apuntan a index.mjs y se expone
+./package.json para inspección. Sin export default ni top-level await. El consumidor
+CommonJS de Next conserva require(): Node 24.21.0 devuelve namespace.globSync.
+La conversión corrige el bloqueo no-require-imports informado por el padre sin
+excluir el adaptador ni modificar reglas. El padre renombró el artefacto propio;
+RED observado después del rename: lint exit 2 y suite sin cargar por main index.cjs
+obsoleto, no repetición de los tres errores originales.
+El override inicial `file:./tools/...` produjo enlace relativo al plugin inválido;
+RED de la continuación reproduce suite sin cargar, 0 tests. El spec portable
+`file:../../../tools/next-eslint-glob-adapter` inicialmente conservó entradas
+fallidas del lockfile. Tras retirar solo esas dos entradas, npm regeneró enlace
+`node_modules/fast-glob → tools/next-eslint-glob-adapter` y registró tinyglobby.
+Pasaron ci y 25 pruebas, pero npm ls --all exit 1 marcó fast-glob inválido: rechazado.
+La alternativa autorizada final usa devDependency raíz
+`next-eslint-glob-adapter: file:tools/next-eslint-glob-adapter` y override anidado
+`fast-glob: $next-eslint-glob-adapter`. Es referencia npm a la dependencia directa,
+no alias registry ni cambio global de todos los consumidores. Instala el paquete
+local y tinyglobby mediante el lockfile del proyecto; no necesita instalación
+separada, lockfile propio, scripts, rutas absolutas ni edición manual de node_modules.
+Con Node 24.21.0/npm 11.19.0 temporales y cache predeterminada fuera de node_modules:
+ci limpio exit 0, ls --all exit 0, 25 pruebas PASS y audit exit 0/cero vulnerabilidades.
+Se comprueban identidad/API/dependencia, enlaces portables, fail-closed, raíz literal,
+los diez casos de raíces y la regla real para enlaces internos/externos/Next Link.
+No se amplía a compatibilidad general fast-glob. Avisos ESLint no mantenido y
+unrs-resolver postinstall sin allowScripts preservados; política intacta.
+Después de convertir a ESM, install y ci PASS; las 25 pruebas PASS antes y después
+de ci confirman require(ESM), metadatos, raíces y regla real. Lint PASS sin warnings,
+audit cero y ls --all exit 0. La verificación independiente final aportada confirma
+Node 24.21.0/npm 11.19.0 exactos; ci previo exit 0 con el mismo package.json/lockfile;
+ls --all exit 0; audit completo y de producción exit 0/cero vulnerabilidades;
+403 pruebas en 24 archivos, incluidas las 25 de compatibilidad; lint sin warnings,
+typecheck y build exit 0; smoke público Chromium 1/1 exit 0. Los errores de tipos
+de guards exclusivamente de prueba fueron corregidos y el PASS final los supersede.
+No son resultados históricos de fase 9 ni comandos repetidos por esta finalización.
+Se observó aviso de lockfile externo del directorio padre ignorado, sin modificarlo;
+el aviso previo unrs-resolver/allowScripts sigue sin cambios y no valida el postinstall.
+Sin actualización global de runtime ni cambios de reglas/supresiones. Validación manual,
+DB/pgTAP, E2E privados completos, otras plataformas y revisión humana pendientes.
+Reevaluar consumidor/defaults y retirar adaptador/override al repararse upstream.
+Fuentes del mecanismo npm: [local paths](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#local-paths)
+y [overrides/referencias $](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#overrides).
+Evidencia empírica y comandos exactos en quality-gates; los ensayos rechazados son históricos.
 
 **Fundamento**: respeta la capacitación, usa parches estables vigentes y evita variación entre
 desarrolladores y CI. TypeScript 6.0.3 se prefiere temporalmente a 7.0.2 porque Next 16.3 todavía
