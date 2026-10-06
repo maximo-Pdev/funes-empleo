@@ -9,6 +9,14 @@ Scope: step 2; minimal stable dependency remediation, exact pins, preserve engin
 - [x] Verify clean install, zero full audit and unchanged lint rule behavior; rerun quality gates.
 - [x] Record mitigation, compatibility evidence and ongoing maintenance constraints.
 
+## Referencia de entrega — 2026-10-06
+
+Step 2 quedó en commit local `93b76fc`, creado posteriormente por el padre;
+sin push ni merge. Step 1 previo: `46c6c0d`. El handoff documental continúa
+sobre step 3 `5d6a51e` en `docs/status-handoff`. Los pendientes/ausencia de commits
+indicados abajo describen cada ejecución histórica, no el historial actual.
+Evidencia final posterior: `docs/validation/quality-gates.md`.
+
 ## Baseline
 
 - npm audit exit 1: 8 vulnerabilities, 1 critical and 7 high.
