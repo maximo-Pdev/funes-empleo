@@ -421,6 +421,111 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   aportada sin repetir gates; resultados actuales en quality-gates.md. Las notas
   anteriores de pendientes/fallos corresponden a sus etapas históricas.
 
+## EXTRA-011 — Salto al contenido y regresión pública local
+
+- Fecha: 2026-10-06. Responsable: agente bajo decisión arquitectónica del padre.
+  Estado final: implementación verificada con pruebas y gates independientes más
+  browser público live; revisión nativa/humana y aceptación pendientes.
+  Las notas posteriores de build/browser pendientes son evidencia de la etapa inicial,
+  supersedida por la finalización documental siguiente.
+- Origen: FR-070 / SC-009, T020/T087 y `odd/tasks/public-browser-readiness.md`.
+- Problema/evidencia: el diagnóstico del padre observa BODY tras activar el salto
+  y enlaces del header de 36/38px. El header está dentro de main, por lo que agregar
+  tabindex sin moverlo no omitiría la navegación.
+- Cambio mínimo: header y main hermanos en un fragmento; main#contenido con
+  tabindex=-1, comenzando en el hero; footer hermano conservando contenido/estilos.
+  Enlaces Ofertas/Ingreso con inline-flex, items-center y min-h-11 (44px).
+  Agregar aserciones de estructura y navegación de teclado y cobertura acotada
+  de páginas públicas con servicios simulados, sin presentarla como integración real.
+- Justificación: cumplir accesibilidad ya requerida sin cambiar reglas de negocio,
+  navegación, textos, CSS compartido, datos, permisos ni dependencias.
+- Archivos/contratos: `src/app/(public)/page.tsx`,
+  `tests/components/setup/home.test.tsx`, `tests/components/setup/public-offers.test.tsx`,
+  `tests/e2e/setup.spec.ts` y este registro. Sin cambios de contratos de datos.
+- Riesgos/límites: estructura/estilo sticky y orden de foco requieren browser real;
+  mocks no prueban Supabase. NVDA/zoom manual y recorridos privados fuera de alcance.
+- Autorización/coordinación: padre autoriza explícitamente el cambio header/main
+  local y estos tests. Revisión/aceptación municipal y commit/PR pendientes.
+- Verificación realizada: comando exacto
+  `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:unit -- tests/components/setup/home.test.tsx tests/components/setup/public-offers.test.tsx"`.
+  RED exit 1: 2 fallos/3 PASS; primero tabindex ausente y clase min-h-11 ausente,
+  segunda ejecución observa header aún dentro del main. GREEN final exit 0:
+  13/13 en 2 archivos, incluyendo listado/detalle, vacíos/fuera de rango,
+  opcionales, notFound y propagación de errores con mocks.
+  Las pruebas opcionales de ofertas caracterizan comportamiento existente:
+  no tienen RED de producto ni acreditan integración real.
+- Checks ordinarios: `npm run lint` exit 0 sin warnings (antes y después de
+  correcciones de tipos). `npm run typecheck` primero exit 2 por tres errores
+  exclusivamente en tests nuevos (índice posiblemente undefined y opciones RTL);
+  corregidos sin supresiones, repetición final exit 0.
+- Limitaciones/resultados pendientes: E2E actualizado con Enter → main enfocado
+  → Tab → CTA principal, reteniendo lang, título y axe; no ejecutado por este worker.
+  Build/browser, NVDA/zoom manual y revisión independientes pendientes; sin commit/PR.
+
+## EXTRA-012 — Compatibilidad de presentación de ofertas públicas
+
+- Fecha: 2026-10-06. Estado final: implementación verificada con pruebas y gates
+  independientes más browser público live; revisión nativa/humana y aceptación
+  pendientes. Los pendientes de build/browser de la etapa inicial se superseden
+  por la finalización documental siguiente.
+- Origen: FR-024/FR-070, T045 y corrección display-only solicitada durante
+  `odd/tasks/public-browser-readiness.md`; interfaz clara en español como restricción fija.
+- Evidencia aportada: pantallas públicas muestran códigos legacy del seed `onsite`,
+  `fixed_term` y fechas ISO sin formato de lectura local.
+- Cambio mínimo: helper central de presentación para `onsite` → `Presencial` y
+  `fixed_term` → `Plazo fijo`; desconocidos verbatim. Fechas calendario estrictas
+  YYYY-MM-DD válidas → DD/MM/YYYY sin UTC ni offsets; entradas inválidas intactas.
+  Aplicar a inicio/listado/detalle, conservando ISO en atributos time.dateTime.
+- Justificación/límites: compatibilidad de presentación, NO catálogo municipal
+  aprobado ni decisión legal. OQ-010/OQ-011 siguen abiertas; sin cambios a
+  DeferredCatalog, formularios, validación de entrada, schema, RPC, auth o datos.
+- Archivos: helper `src/features/openings/public-offer-display.ts`, tres páginas
+  públicas, tests de helper y componentes setup, y este registro.
+- Riesgos: traducir valores no observados o desplazar días por zona horaria;
+  limitar traducción exacta y validar calendario sin objetos Date.
+- Estrategia: RED con fixtures legacy y aserciones de etiquetas/fechas sobre páginas
+  actuales; GREEN con helper, pruebas de bisiestos/invalidos/desconocidos, suite
+  focalizada conjunta, lint y typecheck con toolchain temporal exacto autorizado.
+- Autorización/coordinación: padre autoriza estas superficies exactas; preservados
+  foco/estructura, pruebas y registro previos. Build/browser y revisión quedan al
+  padre; sin commit/push ni aceptación municipal acreditada.
+- Resultado observado con prefijo `npm exec --yes --package=node@24.21.0
+  --package=npm@11.19.0 --call`: componentes RED exit 1 (4 fallos por modalidad
+  cruda, 9 PASS); GREEN exit 0 (13/13), incluyendo contratación y todas las fechas
+  visibles con dateTime ISO intacto. Helper 34/34 PASS; suite conjunta 47/47 PASS;
+  `npm run lint` exit 0 sin warnings y `npm run typecheck` exit 0.
+  Las pruebas del helper triangulan bisiestos (2000/2024 vs 1900/2100), días/meses
+  inválidos, formato estricto y desconocidos verbatim; no tienen RED independiente.
+  Mocks de páginas no prueban integración live, RLS ni Supabase.
+
+### Finalización documental de EXTRA-011/012 — step 3
+
+- Evidencia final aportada, sin repetir checks: verificador independiente fase 1
+  con Node 24.21.0/npm 11.19.0 exactos; build, lint, typecheck y audit exit 0
+  (0 vulnerabilidades), 447 pruebas/26 archivos exit 0 y setup Chromium reforzado
+  1/1 PASS. Helper 34 y componentes públicos 13 son pruebas con mocks/dominio,
+  distintas de la verificación live; no se suman otra vez al total.
+- Browser final: seis rutas públicas en 360×800 y 1366×768, 12 capturas/contact
+  sheets y `report.json` bajo `test-results/public-visual-review-final/` ignorado.
+  Axe 0, overflow 0, idioma/H1/labels correctos. Inicio: main recibe foco tras
+  salto, Tab sigue al CTA candidato; header ≥44px y hero sobre el pliegue.
+- Supabase configurado local: health HTTP 200 y RPC published_offers funciona.
+  Inicio 3 destacadas/listado 10/página 2 con 10/página 999 vacía; detalle live
+  Presencial/Plazo fijo/31/12/2026, ISO machine-readable conservado. CTA anónimo
+  lleva a sesión vencida. No se reparó configuración/datos; indisponibilidad
+  anterior histórica, causa no confirmada.
+- Malformado/desconocido: not-found español con HTTP 200 por streaming, no
+  aserción 404. `page=0`/`page=abc`: error genérico seguro con reintento del
+  boundary existente, no validación específica. Loading observado en desktop
+  a DOMContentLoaded (44 ms), no timing mobile ni todos los estados.
+- Formularios Auth no enviados y pending sin comprobar; sin reset DB. T087,
+  NVDA, zoom real/matriz manual por rol, suite privada/DB actual y revisión
+  nativa/humana siguen pendientes. No se acredita aceptación municipal ni merge.
+- Archivos de esta finalización exclusivamente documental: este registro,
+  `docs/validation/accessibility.md` y `docs/validation/quality-gates.md`.
+  Se preservan evidencias históricas step 1/2 y cambios previos; sin source edits,
+  commit ni push. Las invocaciones completas de gates no aportadas no se inventan.
+
 ## EXTRA-013 — Fixture de mantenimiento alineado con fecha de Buenos Aires
 
 - **Fecha:** 2026-10-06. **Estado:** implementado; regresión/cobertura verificadas,

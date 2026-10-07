@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
 import { getPublicOffer } from "@/features/openings/public-service";
+import { formatPublicClosingDate, publicContractTypeLabel, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { AppError } from "@/lib/errors/public-error";
 
 export const dynamic = "force-dynamic";
@@ -31,11 +32,11 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
 
   const conditions = [
     { label: "Ubicación", value: offer.location, icon: MapPin },
-    { label: "Modalidad", value: offer.modality, icon: BriefcaseBusiness },
+    { label: "Modalidad", value: publicModalityLabel(offer.modality), icon: BriefcaseBusiness },
     { label: "Horario", value: offer.schedule, icon: Clock3 },
-    { label: "Contratación", value: offer.contract_type, icon: FileText },
+    { label: "Contratación", value: publicContractTypeLabel(offer.contract_type), icon: FileText },
     { label: "Vacantes", value: offer.vacancies, icon: Users },
-    { label: "Fecha de cierre", value: <time dateTime={offer.closing_date}>{offer.closing_date}</time>, icon: CalendarDays },
+    { label: "Fecha de cierre", value: <time dateTime={offer.closing_date}>{formatPublicClosingDate(offer.closing_date)}</time>, icon: CalendarDays },
   ];
 
   return (
@@ -172,7 +173,7 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
             </div>
             <div className="flex items-start gap-3 px-5 py-5 sm:px-6">
               <CalendarDays className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-              <p className="text-sm leading-6"><span className="block text-muted-foreground">Fecha de cierre</span><time className="font-semibold" dateTime={offer.closing_date}>{offer.closing_date}</time></p>
+              <p className="text-sm leading-6"><span className="block text-muted-foreground">Fecha de cierre</span><time className="font-semibold" dateTime={offer.closing_date}>{formatPublicClosingDate(offer.closing_date)}</time></p>
             </div>
           </Card>
           <div className="rounded-xl border border-border p-5 sm:p-6">

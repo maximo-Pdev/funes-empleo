@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CalendarDays, ChevronLeft, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "@/components/ui";
 import { listPublicOffers } from "@/features/openings/public-service";
+import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 
 export const dynamic = "force-dynamic";
 
@@ -71,13 +72,13 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                       <p className="flex items-start gap-2 pt-2 text-sm font-semibold text-foreground"><Building2 className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="min-w-0 break-words">{offer.company_name}</span></p>
                     </CardHeader>
                     <CardContent className="flex flex-1 flex-col gap-4">
-                      <p className="flex items-start gap-2 text-sm leading-6 text-muted-foreground"><MapPin className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" /><span className="min-w-0 break-words">{offer.location} · {offer.modality}</span></p>
+                      <p className="flex items-start gap-2 text-sm leading-6 text-muted-foreground"><MapPin className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" /><span className="min-w-0 break-words">{offer.location} · {publicModalityLabel(offer.modality)}</span></p>
                       <div className="flex flex-wrap gap-2" aria-label="Categorías laborales">
                         {offer.categories.length > 0 ? offer.categories.map((category) => <Badge key={category.id} variant="secondary" className="max-w-full leading-5"><span className="min-w-0 break-words">{category.name}</span></Badge>) : <Badge variant="outline" className="leading-5">Sin categorías</Badge>}
                       </div>
                       <div className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border pt-4 text-xs leading-5">
                         <p className="font-semibold text-primary-700">{offer.vacancies} vacante{offer.vacancies === 1 ? "" : "s"}</p>
-                        <p className="flex items-center gap-2 text-muted-foreground"><CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" /><span>Cierre: <time dateTime={offer.closing_date}>{offer.closing_date}</time></span></p>
+                        <p className="flex items-center gap-2 text-muted-foreground"><CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" /><span>Cierre: <time dateTime={offer.closing_date}>{formatPublicClosingDate(offer.closing_date)}</time></span></p>
                       </div>
                     </CardContent>
                   </Card>
