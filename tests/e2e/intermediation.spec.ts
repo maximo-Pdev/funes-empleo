@@ -461,7 +461,7 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await hiredCompany.goto(`/company/openings/${fixtureId("opening", 3)}/referrals?referral=${hiredReferral}`);
     await expect(hiredCompany.getByText("Persona ficticia 021")).toBeVisible();
 
-    const sql = `update public.job_openings set closing_date = current_date - 1 where id = '${opening}';
+    const sql = `update public.job_openings set closing_date = (clock_timestamp() at time zone 'America/Buenos_Aires')::date - 1 where id = '${opening}';
       update public.referrals set post_hire_access_until = clock_timestamp() - interval '1 minute' where id = '${hiredReferral}';
       select private.run_daily_employment_maintenance(clock_timestamp());
       select private.run_daily_employment_maintenance(clock_timestamp());`;
