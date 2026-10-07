@@ -180,6 +180,352 @@ y PR #33. Los jobs application/database de GitHub Actions 36596663506 aprobaron
 ese commit. EXTRA-007 y las mediciones posteriores se agregan en el mismo PR;
 ninguna revisión humana ni aprobación municipal está acreditada por esos checks.
 
+## EXTRA-008 — Parche mínimo de seguridad de dependencias (step 2)
+
+- Fecha: 2026-10-06. Estado: parche dirigido implementado; instalación limpia y
+  gates funcionales verificados por verificador independiente; audit con riesgo
+  residual. Aceptación manual, comprobaciones DB y revisión pendientes.
+- Origen: autorización explícita del usuario para step 2, seguridad de dependencias
+  y versiones reproducibles de T001/T095; `odd/tasks/dependency-security.md`.
+- Problema/evidencia de base aportada: npm audit informa 8 vulnerabilidades,
+  1 crítica y 7 altas. Next 16.3.5 tiene GHSA-vcvr-r3jv-pc5j, corregido en
+  16.3.8; source-map-js <1.2.2 tiene GHSA-68fv-2mgg-jv7q, corregido en 1.2.2.
+  braces <=3.0.3 tiene GHSA-vfj7-8cjw-p6xm; latest 3.0.3 permanece sin parche
+  estable según la investigación de base. No se promete audit cero.
+- Cambio mínimo previsto: instalar Next y eslint-config-next 16.3.8 con pins
+  exactos y actualizar source-map-js en el lockfile; sincronizar plan/research.
+  Continuación autorizada: reparar también sharp <0.35.5 con `npm update sharp`,
+  solo dentro del rango opcional de Next y sin dependencia directa ni override.
+  Usar Node 24.21.0/npm 11.19.0 temporales en cache ignorada y verificar ambos
+  ejecutables antes de instalar; preservar `.npmrc`, engines y packageManager.
+- Justificación: corregir advisories con parches estables del stack aprobado,
+  sin cambiar arquitectura, reglas de negocio ni ampliar dependencias directas.
+- Archivos: `package.json`, `package-lock.json`, este registro,
+  `specs/001-municipal-employment-portal/plan.md`, `research.md` del mismo
+  directorio y `docs/validation/quality-gates.md`. No cambia contratos ni DB.
+- Riesgos/límites: braces puede seguir propagando severidad alta por micromatch,
+  fast-glob y la configuración ESLint de Next. No force, legacy-peer-deps,
+  canary, downgrade mayor, vendoring, upgrades amplios ni debilitamiento de engines.
+- Autorización: usuario autoriza este ajuste exacto y toolchain temporal, sin
+  instalación global. Revisión del compañero/PR y aceptación manual pendientes.
+- Verificación: versiones reales de runtime, instalación dirigida, `npm audit`
+  y `npm ls` focalizado; instalación limpia y gates funcionales posteriores
+  confirmados por el verificador independiente. Los resultados históricos de fase 9
+  no se atribuyen al parche ni sustituyen las comprobaciones DB pendientes.
+- Resultado observado: las tres instalaciones dirigidas finalizaron con exit 0;
+  antes de cada una se observó Node v24.21.0/npm 11.19.0. `npm ls` focalizado
+  exit 0 confirma Next/config/plugin 16.3.8 y source-map-js 1.2.2.
+  Audit intermedio exit 1 informó 6 altas y 0 críticas, incluyendo sharp 0.35.4
+  (GHSA-wq5f-xc86-pv6w). Con autorización posterior se comprobó en registry que
+  Next 16.3.8 admite sharp `^0.35.4` y sharp 0.35.5 requiere Node >=20.9.0,
+  compatible con el runtime exacto. `npm update sharp` exit 0 cambió 2 paquetes
+  instalados; lockfile actualiza sharp/binarios a 0.35.5 y libvips a 1.3.4.
+  `npm ls` exit 0 confirma sharp 0.35.5, sin nuevos pins directos ni overrides.
+  Audit final exit 1 informa **5 altas, 0 críticas**, únicamente braces y cuatro
+  dependientes ESLint; ya no enumera el advisory de sharp.
+  Las instalaciones, incluida la actualización de sharp, advirtieron postinstall
+  no cubierto por allowScripts para unrs-resolver 1.12.2;
+  no se aprobó ni modificó esa política. Comandos exactos en quality-gates.md.
+- Verificación independiente final aportada para este árbol: Node 24.21.0/npm
+  11.19.0 exactos; `npm ci` exit 0; build exit 0; smoke público 1/1, exit 0;
+  unitarias 378 pruebas en 23 archivos, exit 0; lint y typecheck exit 0.
+  Audit exit 1: **5 altas, 0 críticas**, en braces/micromatch/fast-glob/
+  @next/eslint-plugin-next/eslint-config-next. Los gates funcionales pasan;
+  audit no pasa y no se afirma remediación completa.
+  `npm ci` también advierte que el script de instalación de unrs-resolver 1.12.2
+  no está en allowScripts. Política sin cambios; su postinstall no fue validado
+  independientemente. Evidencia actual separada de la histórica e intermedia en
+  `docs/validation/quality-gates.md`.
+- Limitaciones/referencias: aceptación manual, comprobaciones DB/pgTAP y E2E
+  privados completos del árbol parcheado pendientes; no se acredita aceptación
+  ni revisión humana. Esta finalización solo documenta resultados aportados, sin
+  volver a ejecutar comandos. No se creó commit/PR, no se hizo push ni reset de
+  datos. Cambios previos preservados.
+
+## EXTRA-009 — Evaluación de sustitución glob acotada al plugin ESLint de Next
+
+- Fecha: 2026-10-06. Estado: ensayo autorizado por el usuario, rechazado por
+  incompatibilidad verificada y reemplazo retirado; revisión del compañero pendiente.
+  Origen: step 2 / T001/T095 y
+  `odd/tasks/dependency-security.md`; eliminar la cadena vulnerable residual de EXTRA-008.
+- Cambio propuesto: override anidado únicamente bajo `@next/eslint-plugin-next`,
+  `fast-glob: npm:tinyglobby@0.2.17`, sin dependencia directa ni overrides globales.
+  API inspeccionada: el plugin usa exclusivamente CommonJS `globSync(pattern,
+  { onlyDirectories: true })` en `get-root-dirs`, convirtiendo barras Windows a `/`.
+- Contrato: comparar conjuntos de rutas normalizadas (orden y barra final no
+  significativos), raíces literales/glob/brace/absolutas, arrays y separadores Windows;
+  excluir archivos y comprobar la regla real `no-html-link-for-pages` para enlaces
+  internos incorrectos, externos y Next Link. No deshabilitar ni debilitar reglas.
+- Riesgo observado antes de implementar: tinyglobby expone globSync CommonJS pero
+  su `expandDirectories` predeterminado es true; Next no pasa false. La sustitución
+  debe rechazarse si amplía raíces, aunque audit sea cero. No añadir adaptadores
+  ni modificar el plugin para forzar compatibilidad.
+- Archivos: package.json/lock, tests/unit/tooling/next-eslint-glob.test.ts,
+  este registro, plan.md/research.md y docs/validation/quality-gates.md.
+- Verificación prevista: RED con paquete original; instalación exacta con Node
+  24.21.0/npm 11.19.0; GREEN y casos alternativos; npm audit y npm ls focalizados.
+  Si hay incompatibilidad, retirar solo el override propio y reinstalar preservando
+  el trabajo previo; documentar rechazo y riesgo residual. Gates completos pendientes.
+- Mantenimiento: reevaluar API/opciones de ambos paquetes y estas pruebas en cada
+  actualización de Next/tinyglobby; retirar el override cuando upstream repare la
+  cadena. Audit cero no acredita equivalencia, mantenimiento futuro ni aceptación.
+- Autorización: usuario autoriza expresamente correcciones/instalaciones necesarias
+  para esta mitigación acotada. Revisión del compañero, aceptación y PR pendientes;
+  sin commit/push, reset DB, cambios de runtime de aplicación ni instalación global.
+
+- Resultado real: RED 1/22 (identidad fast-glob original), 21 contratos PASS.
+  Con alias instalado: identidad PASS y audit 0, pero 10/22 fallan por raíces
+  adicionales pages/src/src/nested, no por orden ni barras finales; los diez casos
+  ESLint internos/externos/Link pasan. No hubo GREEN de la mitigación.
+- Recuperación: retirado el override. La primera reinstalación conservó el alias
+  en lockfile; se retiraron únicamente las tres entradas agregadas por el ensayo
+  y se reinstaló de nuevo con runtime exacto. Árbol final restaurado a fast-glob
+  3.3.1 → micromatch 4.0.8 → braces 3.0.3. Audit final exit 1: 5 altas,
+  0 críticas. Pins Next/config 16.3.8, sharp 0.35.5 y source-map-js 1.2.2
+  preexistentes preservados. Sin alias residual ni cambios funcionales.
+- Pruebas retenidas como contrato de base y rechazo explícito del candidato:
+  23/23 PASS tras recuperación; no afirman remediación ni audit cero. Fixtures
+  temporales exclusivamente sintéticos, conservados para diagnóstico sin borrar.
+  Gates completos/instalación limpia/revisión posteriores pendientes; comandos
+  y evidencia del ensayo y recuperación en quality-gates.md. Sin commit/PR.
+
+## EXTRA-010 — Adaptador privado de glob para ESLint de Next
+
+- Fecha: 2026-10-06. Estado final: implementado con referencia npm a devDependency
+  local raíz y entrada ESM síncrona index.mjs; verificación independiente final
+  aportada: ci previo sobre mismo package.json/lockfile, ls --all, audits completo/
+  producción, 403 pruebas/24 archivos (25 de compatibilidad), lint sin warnings,
+  typecheck/build y smoke público Chromium 1/1 PASS, todos exit 0.
+  Revisión del compañero, validación manual, DB y E2E privados completos pendientes.
+  El intento inicial detenido y las continuaciones se conservan abajo como
+  evidencia histórica, no como estado del árbol final.
+- Origen: step 2 / T001/T095 y `odd/tasks/dependency-security.md`.
+- Evidencia: EXTRA-009 rechaza el alias directo porque tinyglobby expande directorios;
+  el consumidor real `get-root-dirs` requiere exclusivamente CommonJS
+  `globSync(pattern, { onlyDirectories: true })`. La regla de enlaces usa esas raíces.
+- Cambio mínimo autorizado: paquete local privado `next-eslint-glob-adapter`, dependencia
+  exacta tinyglobby 0.2.17, expansión desactivada y normalización segura de cadenas/rutas;
+  override solo `@next/eslint-plugin-next → fast-glob: file:./tools/next-eslint-glob-adapter`.
+  No se modifica el plugin, las reglas, engines, scripts ni dependencias ajenas.
+- Archivos: tools/next-eslint-glob-adapter/{package.json,index.mjs,README.md},
+  tests/unit/tooling/next-eslint-glob.test.ts, package.json/lock, este registro,
+  plan.md/research.md y docs/validation/quality-gates.md.
+- Riesgos: subconjunto deliberado, no reemplazo general de fast-glob; validar API y defaults
+  en cada actualización upstream, raíces de filesystem y rutas Windows/absolutas.
+  Retirar override al repararse upstream; audit cero no acredita ausencia futura de riesgos.
+- Verificación prevista: RED identidad antes de implementación, GREEN raíces y regla real,
+  casos negativos/opciones no admitidas, instalación npm normal con runtime exacto,
+  audit, árbol focalizado y diff --check. Si npm rechaza override local, detener sin
+  modificar node_modules manualmente. Suites/build/browser/instalación limpia del nuevo
+  árbol quedan al verificador padre; sin DB reset, commit ni push.
+- Autorización: contrato explícito del usuario para esta continuación; no acredita revisión,
+  aceptación ni merge. EXTRA-009 se conserva íntegro como ensayo histórico rechazado.
+- Resultado observado: RED exit 1, identidad original fast-glob frente al adaptador;
+  22/23 pruebas pasan. Instalación normal exit 0 con v24.21.0/npm 11.19.0,
+  1 agregado/16 retirados y audit cero, pero el lockfile enlaza el override a
+  `node_modules/@next/eslint-plugin-next/tools/next-eslint-glob-adapter` en lugar
+  del paquete raíz. GREEN intentado exit 1: suite no carga por Cannot find module
+  'fast-glob'; npm ls exit 1 (ELSPROBLEMS), fast-glob inválido. Audit exit 0 no
+  acredita árbol usable ni remediación compatible. Advertencia allowScripts de
+  unrs-resolver 1.12.2 conservada; no bypass ni cambio de política.
+- Límite aplicado: detener ante override local no soportado, sin hack de node_modules
+  ni rutas alternativas no autorizadas. Se entrega candidato/lockfile fallido como
+  evidencia al padre, no como instalación funcional. Adaptador no ejecutado por las
+  pruebas; normalización/raíces siguen sin verificación. Sin commit/PR/push/DB reset.
+
+### Continuación autorizada de EXTRA-010 — resolución local portable
+
+- El padre autoriza ensayar `file:../../../tools/next-eslint-glob-adapter` relativo
+  al plugin y, si es necesario, devDependency raíz `file:tools/next-eslint-glob-adapter`
+  con referencia override `$next-eslint-glob-adapter`. npm administra instalación,
+  lockfile, enlaces y cache predeterminada fuera de node_modules; no hacks manuales,
+  rutas absolutas, publicación, lockfile independiente ni bypass de scripts.
+- Justificación: corregir el enlace inválido y resolver tinyglobby del paquete local
+  desde el proyecto. Superficies y riesgos siguen siendo los de EXTRA-010.
+- Verificación autorizada: toolchain temporal exacto, install, ci limpio, ls --all,
+  pruebas focalizadas (incluidos fail-closed y enlace portable), audit y diff --check.
+  Si ningún candidato funciona, restaurar con npm la cadena original funcional;
+  suites completas/build/browser y revisión humana siguen pendientes.
+- RED de esta continuación: suite no carga por módulo fast-glob ausente, exit 1,
+  0 tests; reproduce el árbol roto recibido, no un fallo de comportamiento del adaptador.
+- Resultado final: rechazado el spec relativo `file:../../../tools/...`: después
+  de retirar únicamente las dos entradas inválidas del lockfile anterior, npm
+  resolvió el enlace a tools y ci/25 pruebas pasaron, pero ls --all exit 1 lo marcó
+  inválido. No se aceptó ese candidato pese a funcionar en las pruebas.
+- Alternativa implementada: devDependency raíz
+  `next-eslint-glob-adapter: file:tools/next-eslint-glob-adapter` y override anidado
+  `fast-glob: $next-eslint-glob-adapter`. npm administra dos enlaces al mismo
+  paquete tools y tinyglobby exacto 0.2.17 en el lockfile del proyecto; no se
+  añadió tinyglobby como dependencia directa raíz ni lockfile independiente.
+- Verificación final observada: install exit 0 (Node v24.21.0/npm 11.19.0), ci
+  limpio exit 0 (464 paquetes), ls --all exit 0 sin inválidos; 25/25 pruebas
+  focalizadas PASS y audit exit 0, cero vulnerabilidades. Pruebas amplían fail-closed,
+  raíz literal, resolución de tinyglobby desde el adaptador y enlaces/spec portables.
+  Se conserva implementación/API existente, expandDirectories false y reglas sin cambios.
+- Cache predeterminada confirmada fuera de node_modules. Avisos ESLint no mantenido
+  y unrs-resolver postinstall no cubierto por allowScripts conservados sin bypass.
+  Sin rutas absolutas versionadas ni edición manual de node_modules; cambios previos
+  ajenos preservados. Evidencia/comandos en quality-gates. Suites completas, lint,
+  tipos, build, browser, DB y revisión humana del nuevo árbol siguen pendientes.
+  Sin commit/PR/push/DB reset.
+
+### Continuación autorizada de EXTRA-010 — ESM síncrono sin debilitar lint
+
+- Evidencia de origen aportada por el padre: index.cjs contenía tres require imports
+  rechazados por @typescript-eslint/no-require-imports. Se autoriza convertir solo
+  sintaxis/entrada, no deshabilitar la regla ni excluir el paquete de lint.
+- El padre renombró el artefacto propio index.cjs a index.mjs antes de esta ejecución.
+  RED observado: lint exit 2 y suite focalizada sin cargar (0 tests) por main index.cjs
+  obsoleto. No se atribuyen esos resultados a los tres errores originales informados.
+- Implementación: imports ESM node:path/node:fs/tinyglobby y exportación nombrada
+  globSync; main/exports apuntan a index.mjs, ./package.json accesible. Sin top-level
+  await ni default export. Node 24.21.0 permite require(ESM) síncrono y Next recibe
+  namespace.globSync; no cambian normalización, opciones, fail-closed ni API acotada.
+- Pruebas: se conservan las 25, ampliando identidad con main/exports/resolución mjs.
+  GREEN 25/25 antes y después de npm ci: diez variantes de raíces, diez casos con
+  regla real, entradas/opciones negativas y contrato de instalación portable.
+- Verificación real con npm exec Node 24.21.0/npm 11.19.0: install exit 0, ci exit 0
+  (464 paquetes), lint exit 0 sin warnings, audit exit 0/cero vulnerabilidades y
+  ls --all exit 0 sin inválidos. Comandos exactos en quality-gates.md. Se conservan
+  avisos ESLint no mantenido y unrs-resolver postinstall sin allowScripts, sin bypass.
+- Archivos de esta continuación: index.mjs, package.json del adaptador, README,
+  test focalizado y este registro/plan/research/quality-gates. npm install no necesitó
+  nuevos cambios del package.json ni lockfile raíz. Sin cambios de reglas ni DB.
+- Límite: tipos, suite completa, build/browser/DB y revisión siguen pendientes del
+  padre; no se afirma full build ni aceptación. Cambios ajenos preservados, sin
+  commit/push/reset DB ni instalación global. Reevaluar require(ESM)/defaults ante
+  cada actualización; retirar al repararse upstream.
+
+### Finalización documental de EXTRA-010 — verificación independiente final
+
+- Resultados aportados por el verificador independiente con Node 24.21.0 y npm
+  11.19.0 exactos: npm ci previo exit 0 con el mismo package.json/lockfile;
+  npm ls --all exit 0; audit completo y de producción exit 0, cero vulnerabilidades;
+  suite completa 403 pruebas en 24 archivos, exit 0, incluidas las 25 de compatibilidad;
+  lint exit 0 sin warnings; typecheck exit 0; build exit 0; smoke público Chromium
+  1/1 exit 0. No se reconstruyen invocaciones completas no suministradas.
+- Los errores de typecheck de guards exclusivamente de prueba fueron corregidos;
+  los PASS finales superseden los fallos previos, que permanecen como historia.
+  EXTRA-009 sigue rechazado: audit cero de aquel alias no acreditaba compatibilidad.
+- La mitigación actual reemplaza realmente la cadena vulnerable mediante tinyglobby
+  exacto 0.2.17, adaptador ESM síncrono y override limitado al plugin, con referencia
+  a la devDependency local raíz; no es una supresión de audit ni de reglas.
+- Aviso observado: lockfile externo del directorio padre ignorado, sin modificarlo.
+  Aviso previo unrs-resolver/allowScripts sin cambios; política intacta y postinstall
+  no validado independientemente. Sin actualización global de runtime.
+- Límites: audit cero no garantiza mantenimiento futuro. Reevaluar consumidor/API/
+  defaults en cada actualización y retirar adaptador/override al repararse upstream.
+  Manual, DB/pgTAP, E2E privados completos, otras plataformas y revisión del compañero
+  pendientes. Sin aceptación municipal, revisión humana completada, commit ni push.
+- Esta finalización modifica solo documentación autorizada y registra evidencia
+  aportada sin repetir gates; resultados actuales en quality-gates.md. Las notas
+  anteriores de pendientes/fallos corresponden a sus etapas históricas.
+
+## EXTRA-011 — Salto al contenido y regresión pública local
+
+- Fecha: 2026-10-06. Responsable: agente bajo decisión arquitectónica del padre.
+  Estado final: implementación verificada con pruebas y gates independientes más
+  browser público live; revisión nativa/humana y aceptación pendientes.
+  Las notas posteriores de build/browser pendientes son evidencia de la etapa inicial,
+  supersedida por la finalización documental siguiente.
+- Origen: FR-070 / SC-009, T020/T087 y `odd/tasks/public-browser-readiness.md`.
+- Problema/evidencia: el diagnóstico del padre observa BODY tras activar el salto
+  y enlaces del header de 36/38px. El header está dentro de main, por lo que agregar
+  tabindex sin moverlo no omitiría la navegación.
+- Cambio mínimo: header y main hermanos en un fragmento; main#contenido con
+  tabindex=-1, comenzando en el hero; footer hermano conservando contenido/estilos.
+  Enlaces Ofertas/Ingreso con inline-flex, items-center y min-h-11 (44px).
+  Agregar aserciones de estructura y navegación de teclado y cobertura acotada
+  de páginas públicas con servicios simulados, sin presentarla como integración real.
+- Justificación: cumplir accesibilidad ya requerida sin cambiar reglas de negocio,
+  navegación, textos, CSS compartido, datos, permisos ni dependencias.
+- Archivos/contratos: `src/app/(public)/page.tsx`,
+  `tests/components/setup/home.test.tsx`, `tests/components/setup/public-offers.test.tsx`,
+  `tests/e2e/setup.spec.ts` y este registro. Sin cambios de contratos de datos.
+- Riesgos/límites: estructura/estilo sticky y orden de foco requieren browser real;
+  mocks no prueban Supabase. NVDA/zoom manual y recorridos privados fuera de alcance.
+- Autorización/coordinación: padre autoriza explícitamente el cambio header/main
+  local y estos tests. Revisión/aceptación municipal y commit/PR pendientes.
+- Verificación realizada: comando exacto
+  `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:unit -- tests/components/setup/home.test.tsx tests/components/setup/public-offers.test.tsx"`.
+  RED exit 1: 2 fallos/3 PASS; primero tabindex ausente y clase min-h-11 ausente,
+  segunda ejecución observa header aún dentro del main. GREEN final exit 0:
+  13/13 en 2 archivos, incluyendo listado/detalle, vacíos/fuera de rango,
+  opcionales, notFound y propagación de errores con mocks.
+  Las pruebas opcionales de ofertas caracterizan comportamiento existente:
+  no tienen RED de producto ni acreditan integración real.
+- Checks ordinarios: `npm run lint` exit 0 sin warnings (antes y después de
+  correcciones de tipos). `npm run typecheck` primero exit 2 por tres errores
+  exclusivamente en tests nuevos (índice posiblemente undefined y opciones RTL);
+  corregidos sin supresiones, repetición final exit 0.
+- Limitaciones/resultados pendientes: E2E actualizado con Enter → main enfocado
+  → Tab → CTA principal, reteniendo lang, título y axe; no ejecutado por este worker.
+  Build/browser, NVDA/zoom manual y revisión independientes pendientes; sin commit/PR.
+
+## EXTRA-012 — Compatibilidad de presentación de ofertas públicas
+
+- Fecha: 2026-10-06. Estado final: implementación verificada con pruebas y gates
+  independientes más browser público live; revisión nativa/humana y aceptación
+  pendientes. Los pendientes de build/browser de la etapa inicial se superseden
+  por la finalización documental siguiente.
+- Origen: FR-024/FR-070, T045 y corrección display-only solicitada durante
+  `odd/tasks/public-browser-readiness.md`; interfaz clara en español como restricción fija.
+- Evidencia aportada: pantallas públicas muestran códigos legacy del seed `onsite`,
+  `fixed_term` y fechas ISO sin formato de lectura local.
+- Cambio mínimo: helper central de presentación para `onsite` → `Presencial` y
+  `fixed_term` → `Plazo fijo`; desconocidos verbatim. Fechas calendario estrictas
+  YYYY-MM-DD válidas → DD/MM/YYYY sin UTC ni offsets; entradas inválidas intactas.
+  Aplicar a inicio/listado/detalle, conservando ISO en atributos time.dateTime.
+- Justificación/límites: compatibilidad de presentación, NO catálogo municipal
+  aprobado ni decisión legal. OQ-010/OQ-011 siguen abiertas; sin cambios a
+  DeferredCatalog, formularios, validación de entrada, schema, RPC, auth o datos.
+- Archivos: helper `src/features/openings/public-offer-display.ts`, tres páginas
+  públicas, tests de helper y componentes setup, y este registro.
+- Riesgos: traducir valores no observados o desplazar días por zona horaria;
+  limitar traducción exacta y validar calendario sin objetos Date.
+- Estrategia: RED con fixtures legacy y aserciones de etiquetas/fechas sobre páginas
+  actuales; GREEN con helper, pruebas de bisiestos/invalidos/desconocidos, suite
+  focalizada conjunta, lint y typecheck con toolchain temporal exacto autorizado.
+- Autorización/coordinación: padre autoriza estas superficies exactas; preservados
+  foco/estructura, pruebas y registro previos. Build/browser y revisión quedan al
+  padre; sin commit/push ni aceptación municipal acreditada.
+- Resultado observado con prefijo `npm exec --yes --package=node@24.21.0
+  --package=npm@11.19.0 --call`: componentes RED exit 1 (4 fallos por modalidad
+  cruda, 9 PASS); GREEN exit 0 (13/13), incluyendo contratación y todas las fechas
+  visibles con dateTime ISO intacto. Helper 34/34 PASS; suite conjunta 47/47 PASS;
+  `npm run lint` exit 0 sin warnings y `npm run typecheck` exit 0.
+  Las pruebas del helper triangulan bisiestos (2000/2024 vs 1900/2100), días/meses
+  inválidos, formato estricto y desconocidos verbatim; no tienen RED independiente.
+  Mocks de páginas no prueban integración live, RLS ni Supabase.
+
+### Finalización documental de EXTRA-011/012 — step 3
+
+- Evidencia final aportada, sin repetir checks: verificador independiente fase 1
+  con Node 24.21.0/npm 11.19.0 exactos; build, lint, typecheck y audit exit 0
+  (0 vulnerabilidades), 447 pruebas/26 archivos exit 0 y setup Chromium reforzado
+  1/1 PASS. Helper 34 y componentes públicos 13 son pruebas con mocks/dominio,
+  distintas de la verificación live; no se suman otra vez al total.
+- Browser final: seis rutas públicas en 360×800 y 1366×768, 12 capturas/contact
+  sheets y `report.json` bajo `test-results/public-visual-review-final/` ignorado.
+  Axe 0, overflow 0, idioma/H1/labels correctos. Inicio: main recibe foco tras
+  salto, Tab sigue al CTA candidato; header ≥44px y hero sobre el pliegue.
+- Supabase configurado local: health HTTP 200 y RPC published_offers funciona.
+  Inicio 3 destacadas/listado 10/página 2 con 10/página 999 vacía; detalle live
+  Presencial/Plazo fijo/31/12/2026, ISO machine-readable conservado. CTA anónimo
+  lleva a sesión vencida. No se reparó configuración/datos; indisponibilidad
+  anterior histórica, causa no confirmada.
+- Malformado/desconocido: not-found español con HTTP 200 por streaming, no
+  aserción 404. `page=0`/`page=abc`: error genérico seguro con reintento del
+  boundary existente, no validación específica. Loading observado en desktop
+  a DOMContentLoaded (44 ms), no timing mobile ni todos los estados.
+- Formularios Auth no enviados y pending sin comprobar; sin reset DB. T087,
+  NVDA, zoom real/matriz manual por rol, suite privada/DB actual y revisión
+  nativa/humana siguen pendientes. No se acredita aceptación municipal ni merge.
+- Archivos de esta finalización exclusivamente documental: este registro,
+  `docs/validation/accessibility.md` y `docs/validation/quality-gates.md`.
+  Se preservan evidencias históricas step 1/2 y cambios previos; sin source edits,
+  commit ni push. Las invocaciones completas de gates no aportadas no se inventan.
+
 ## EXTRA-013 — Fixture de mantenimiento alineado con fecha de Buenos Aires
 
 - **Fecha:** 2026-10-06. **Estado:** implementado; regresión/cobertura verificadas,
@@ -222,6 +568,60 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   generadas autorizadas únicamente en `.next/`, `coverage/`, `tsconfig.tsbuildinfo`.
 - **Referencias:** tarea `odd/tasks/maintenance-e2e-timezone.md`; commit/PR de esta
   reparación y revisión independiente pendientes, no acreditados por este registro.
+
+## EXTRA-014 — Presupuesto local del recorrido E2E de autogestión
+
+- **Fecha:** 2026-10-06. **Estado:** registrado antes de editar el test e
+  implementado; controles locales PASS, GREEN funcional de CI y revisión pendientes.
+- **Origen:** US2, escenarios de aceptación 1–6, FR-005/010/016/030/054 y T040
+  de `specs/001-municipal-employment-portal/`; recorrido existente de registro,
+  perfil/CV, dos postulaciones, retiro, suspensión/reactivación y archivo/restauración.
+- **Evidencia aportada:** Quality/application de PR #42, run `37680658309`,
+  agota `Test timeout of 30000ms exceeded` en el helper de login (línea 17),
+  llamado desde la línea 151 tras restaurar el perfil; otros 56 E2E pasan.
+  El mismo test pasa en otros PR. Esto no demuestra un defecto de autenticación.
+- **Cambio mínimo implementado:** `test.setTimeout(120_000)` como primera instrucción
+  del único recorrido largo, igual al presupuesto del recorrido asistido.
+  Sin cambios de producción/auth, timeout global, expectativas de URL (5 s),
+  aserciones, skips ni retries; sin nuevas pruebas estructurales de fuente.
+- **Archivos/contratos:** `tests/e2e/candidate-self-service.spec.ts` y este registro;
+  sin modificaciones de contratos, esquema, permisos ni requisitos municipales.
+- **Autorización/coordinación:** usuario autoriza este ajuste acotado sobre
+  `fix/dependency-security` en `d5183b2`; el padre conserva revisión, ODD y entrega
+  Git. Este escritor no cambia de rama ni hace commits/push.
+- **Riesgos/límites:** el presupuesto mayor puede demorar la detección de un bloqueo;
+  no acredita rendimiento ni corrige un defecto funcional probado. Docker/Supabase
+  local ausente impide RED/GREEN E2E significativo; usar el RED de CI aportado y
+  colección/controles locales, sin resets, installs ni lectura de secretos.
+  Node/npm locales 24.16.0/11.13.0 difieren de CI 24.21.0/11.19.0.
+- **Verificación prevista:** colección Playwright antes/después, typecheck, lint,
+  cobertura, build y diff check; resultados observados se registrarán aquí.
+  La colección no ejecuta el cuerpo ni prueba su timeout registrado.
+- **Resultados observados:**
+  - `npx playwright test tests/e2e/candidate-self-service.spec.ts --list`: PASS
+    antes/después (exit 0), mismos 31 tests en 6 archivos con dependencias.
+    El timeout dentro del cuerpo no se ejecuta en colección: no se afirma
+    verificación de metadata registrada ni GREEN E2E por este resultado.
+  - `npm run typecheck`: PASS (exit 0).
+  - `npm run lint`: PASS (exit 0), sin warnings; no reaparece fast-glob ausente.
+  - `npm run test:coverage`: PASS (exit 0), 408 pruebas en 25 archivos;
+    100% de 18 statements/12 branches/3 functions/15 lines solo del módulo
+    configurado `src/lib/env/schema.ts`, no cobertura global ni del recorrido.
+  - `npm run build`: PASS (exit 0); aviso de lockfile externo ignorado conservado.
+    Carga normal de entorno por Next, sin inspección ni exposición de valores.
+  - `git diff --check`: PASS (exit 0), sin errores de whitespace.
+  GREEN funcional y DB pendientes de CI aislado/PR #42; sin aceptación
+  ni revisión humana acreditadas, sin referencia de commit nuevo.
+
+### Cierre verificado de EXTRA-014
+
+- Reparación: `f7ad322`; head publicado/verificado de PR #42: `98d8f4e`.
+- CI [37686615198](https://github.com/maximo-Pdev/funes-empleo/actions/runs/37686615198):
+  application y database PASS; recorrido del candidato 25,2 s; 57 E2E PASS.
+  Vercel y Preview Comments PASS. No se reintentaron ni omitieron tests.
+- Revisión nativa `review-6d2877daf500352c` aprobada y reconocida; observaciones
+  informativas diferidas. Esto no acredita aprobación humana ni merge a main.
+- El commit de este cierre solo modifica documentación; se observará su CI final.
 
 ## Formato para próximas entradas
 

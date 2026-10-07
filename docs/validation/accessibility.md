@@ -30,6 +30,38 @@ CSS zoom ni emulación de escala para afirmar zoom real del navegador al 200%.
 - Esta evidencia es solo de la portada: **no completa T087**, la matriz manual,
   el zoom real al 200 % ni los recorridos NVDA, que continúan pendientes.
 
+## Step 3 — evidencia pública final, 2026-10-06
+
+Rama `fix/public-browser-readiness`; EXTRA-011/012. Resultados observados
+aportados por el padre, registrados sin repetir checks. Revisión nativa y humana
+pendientes; esta evidencia acotada **no completa T087 / SC-009**.
+
+- Seis rutas públicas (inicio, ingreso, registro de candidato, registro de empresa,
+  listado y detalle de ofertas) en 360×800 y 1366×768: 12 capturas finales y
+  contact sheets bajo el directorio ignorado `test-results/public-visual-review-final/`,
+  con recibo `report.json`. Axe: 0 violaciones; desbordamiento horizontal: 0.
+  Comprobaciones de idioma, H1 y etiquetas correctas.
+- En inicio, Enter sobre el enlace de salto enfoca `main#contenido`; Tab continúa
+  al CTA principal de candidato. Enlaces del header ≥44px y hero visible sobre
+  el pliegue en los tamaños comprobados. Smoke Chromium reforzado: 1/1 PASS.
+- Con Supabase local live, inicio muestra 3 ofertas destacadas; listado 10 y
+  página 2 otras 10; página 999 muestra vacío en español. Detalle observado:
+  «Presencial», «Plazo fijo» y «31/12/2026», conservando ISO en `time.dateTime`.
+  El CTA anónimo conduce al estado de sesión vencida, no a una postulación.
+- ID malformado y desconocido muestran recurso no encontrado en español; la
+  respuesta observada por streaming fue HTTP 200, **no** una aserción de HTTP 404.
+  Páginas inválidas `0`/`abc` muestran el error genérico en español con reintento,
+  sin filtraciones: es el boundary existente, no validación específica del parámetro.
+- Loading observado en desktop a DOMContentLoaded (44 ms); no es una medición
+  mobile ni prueba de todos los estados de carga. No se enviaron formularios Auth;
+  estados pending de envío y recorridos autenticados siguen sin comprobar aquí.
+- Las 13 pruebas de componentes públicos usan mocks; las 34 del helper cubren
+  fechas/compatibilidad de presentación. Son evidencia distinta de la verificación
+  live, no pruebas de integración Supabase ni de permisos privados.
+
+NVDA, zoom real al 200 %, matriz manual completa por rol y suite privada/DB del
+árbol actual siguen pendientes. No hubo reset DB ni cambios de configuración/datos.
+
 ## Matriz manual obligatoria
 
 Para **cada fila**, repetir las cuatro combinaciones 360×800/1366×768 × 100%/200%

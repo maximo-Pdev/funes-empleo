@@ -22,9 +22,9 @@ const offers: PublicOffer[] = [
   requirements: "Experiencia en tareas similares.",
   vacancies: index + 1,
   location: "Funes",
-  modality: "presencial",
+  modality: "onsite",
   schedule: "Lunes a viernes de 8 a 16",
-  contract_type: "tiempo_indeterminado",
+  contract_type: "fixed_term",
   closing_date: "2099-12-31",
   salary: null,
   benefits: null,
@@ -38,6 +38,34 @@ beforeEach(() => {
 function expectPreviewRequest() {
   expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith({ page: 1, pageSize: 3 });
 }
+
+it("permite saltar la navegación hacia un main enfocable con el registro como primer enlace", async () => {
+  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
+  const { container } = render(await HomePage());
+
+  const main = screen.getByRole("main");
+  const header = screen.getByRole("banner");
+  expect(main.id).toBe("contenido");
+  expect(main.contains(header)).toBe(false);
+  expect(main.getAttribute("tabindex")).toBe("-1");
+  expect(header.parentElement).toBe(main.parentElement);
+  expect(screen.getByRole("contentinfo").parentElement).toBe(main.parentElement);
+  expect(within(main).getAllByRole("link")[0]?.getAttribute("href")).toBe("/registro/candidato");
+  expect(container.querySelectorAll("#contenido")).toHaveLength(1);
+});
+
+it("mantiene objetivos táctiles locales de 44px en los accesos del header", async () => {
+  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
+  render(await HomePage());
+
+  const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
+  for (const name of ["Ofertas", "Iniciar sesión"]) {
+    const link = within(navigation).getByRole("link", { name });
+    expect(link.classList.contains("min-h-11")).toBe(true);
+    expect(link.classList.contains("inline-flex")).toBe(true);
+    expect(link.classList.contains("items-center")).toBe(true);
+  }
+});
 
 it("muestra tres ofertas públicas con títulos y enlaces sin campos privados", async () => {
   listPublicOffers.mockResolvedValue({ total: 10, page: 1, pageSize: 3, items: offers });
@@ -56,6 +84,13 @@ it("muestra tres ofertas públicas con títulos y enlaces sin campos privados", 
   for (const offer of offers) {
     expect(within(preview).getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.id}`);
     expect(within(preview).getByText(offer.company_name)).toBeTruthy();
+  }
+  expect(within(preview).getAllByText("Funes · Presencial")).toHaveLength(3);
+  const dates = preview.querySelectorAll("time");
+  expect(dates).toHaveLength(3);
+  for (const date of dates) {
+    expect(date.textContent).toBe("31/12/2099");
+    expect(date.getAttribute("datetime")).toBe("2099-12-31");
   }
   expect(within(preview).getByRole("link", { name: "Ver todas" }).getAttribute("href")).toBe("/ofertas");
   expect(container.textContent).not.toMatch(/CUIT|DNI|responsable|contactos privados|notas internas|resultados individuales/i);

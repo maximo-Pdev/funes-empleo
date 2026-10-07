@@ -56,6 +56,17 @@ Use the existing Next.js + Tailwind CSS stack with shadcn/ui-style primitives an
 - Do not use real personal data, real CVs, credentials or production secrets.
 - Do not claim municipal production readiness.
 
+## Evidence pointer — 2026-10-06
+
+Frontend PR #33–39 are integrated in local main/origin snapshot `523ee4a`, previously
+verified by the parent; no fresh remote query. Steps 1–3 remain local commits, with
+final source `5d6a51e`. See [implementation status](../../specs/001-municipal-employment-portal/implementation-status.md)
+and step 3 sections in [quality](../validation/quality-gates.md) /
+[accessibility](../validation/accessibility.md): six public routes, two sizes,
+axe/overflow zero. Auth forms were not submitted; NVDA, real zoom and role-based
+manual acceptance are not established. T087 remains open. The checklist below is
+retained as the original acceptance aid, not silently checked by automated evidence.
+
 ## Acceptance checklist for this slice
 
 - [ ] Home uses the Funes brand assets from `public/brand/`.

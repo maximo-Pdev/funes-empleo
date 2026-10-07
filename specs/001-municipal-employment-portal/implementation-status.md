@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualización 2026-09-29 al final.** Los apartados previos son
+**Estado vigente: ver actualización 2026-10-06 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -340,3 +340,32 @@ Convergencia revisó 54 FR/11 SC, seis historias, 13 decisiones técnicas agrupa
 seis principios; encontró un gap parcial MEDIUM de entrega y agregó T097 en fase 10.
 Los gates humanos son externos/no construibles mediante código: no se duplicaron
 sus tareas ni se declaró conformidad global. Sin cambios de spec/plan/constitución.
+
+## Actualización 2026-10-06: estado vigente y handoff
+
+- Snapshot local de main/origin: `523ee4a`, con frontend PR #33–39 integradas
+  según comprobación previa del padre. El borrador PR #33 del 29/09 arriba es
+  historia fechada; no se consultó estado remoto nuevo en este paso.
+- Commits locales, sin push ni merge: step 1 `46c6c0d` (tests/home), step 2
+  `93b76fc` (seguridad/adaptador ESLint), step 3 `5d6a51e` (browser público).
+  Este step 4 en `docs/status-handoff` solo reconcilia documentación.
+- Evidencia final local del árbol fuente `5d6a51e`: 447 pruebas/26 archivos,
+  lint/typecheck/build y audit 0; Chromium focalizado 1/1. Browser público:
+  seis rutas × dos tamaños (360×800/1366×768), 12 vistas, axe 0 y overflow 0.
+  Fuentes y límites: [calidad](../../docs/validation/quality-gates.md) y
+  [accesibilidad](../../docs/validation/accessibility.md), secciones step 3;
+  reporte/capturas ignorados en `test-results/public-visual-review-final/`.
+- Revisión nativa step 3 `213f13470b861051`: aprobada y reconocida por el padre;
+  no equivale a revisión del segundo desarrollador ni aceptación municipal.
+- Siguen 91/97 tareas marcadas: T069/T087/T089/T092/T096/T097 abiertas.
+  T088/T094 ya estaban cerradas; este handoff no cambia casillas. Fase 9 no completa.
+- Constitución 1.0.0 ratificada el 19/09; spec sigue `Draft`, cuya evidencia de
+  aprobación debe reconciliar su propietario. OQ-010/OQ-011 siguen abiertas:
+  traducciones legacy de presentación no deciden el catálogo ni campos oficiales.
+- No hay suite privada/DB completa actual, envío de formularios Auth, NVDA,
+  zoom real ni aceptación humana acreditados. Node global 24.16/npm 11.13
+  no cambió; se usó temporalmente Node 24.21/npm 11.19 exactos.
+
+Próximo paso: verificación documental independiente; después, coordinar las tareas
+abiertas y follow-ups con superficies disjuntas, sin asignar propietarios por inferencia.
+No se afirma publicación desde main, producción ni aprobación de artefactos.

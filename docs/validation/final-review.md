@@ -1,11 +1,28 @@
 # Revisión final — T096
 
+## Estado vigente — 2026-10-06
+
+T096 sigue pendiente de revisión del segundo desarrollador. La revisión nativa
+step 3 `213f13470b861051`, aprobada y reconocida por el padre, no cierra esa tarea.
+Fuente local `5d6a51e`: 447 pruebas/26 archivos, lint/typecheck/build, audit 0 y
+Chromium público focalizado 1/1; browser de seis rutas/dos tamaños axe 0/overflow 0.
+Ver [calidad](quality-gates.md), [accesibilidad](accessibility.md) y
+[estado de implementación](../../specs/001-municipal-employment-portal/implementation-status.md).
+No es suite privada/DB actual ni aceptación humana. Steps 1–3 no publicados;
+snapshot local main/origin `523ee4a` contiene PR #33–39, sin consulta remota nueva.
+
+Hallazgos del 27/09 conservados abajo: 2 fue supersedido por T088/T093/T094;
+6 por EXTRA-003 y CI histórico del 29/09, no por una ejecución DB actual.
+1 es parcial histórico (demo/reset sí se verificaron después; cohortes/NVDA no).
+5 se reconcilia aquí para AGENTS/PROJECT_CONTEXT, pero `Status: Draft` sigue
+pendiente de decisión del propietario con evidencia. No se cierran 3/4 por inferencia.
+
 ## Actualización de cierre técnico — 2026-09-29
 
 Rama `codex/temp-mvp-completion`, desde main `481b9f0` (PR #32 integrada).
 La revisión independiente continúa pendiente; el texto siguiente del 27/09 es histórico.
 
-- Evidencia actual: 376 Vitest, 855 pgTAP, 57 E2E sin omisiones y dos carreras SQL;
+- Evidencia de esa entrega: 376 Vitest, 855 pgTAP, 57 E2E sin omisiones y dos carreras SQL;
   typecheck/lint/build correctos. Refuerzo posterior de handlers: focalizado PASS.
 - T088/T093/T094 se cierran por evidencia HTTP/SQL/Storage y matriz de rollback;
   ninguna casilla acredita aceptación municipal ni revisión del compañero.
@@ -64,7 +81,7 @@ hay evidencia de revisión humana para fase 9.
 - RLS/grants/Storage y mantenimiento privado verificados mediante tests 001–071.
 - EXTRA-002 corrige paginación/filtro exigidos por SC-008A, sin ampliar roles ni datos.
 
-## Hallazgos / límites abiertos
+## Hallazgos / límites del 2026-09-27 (históricos)
 
 1. No hay demo, reset alojado, cohortes ni NVDA: no cerrar aceptación.
 2. Cobertura HTTP/SQL de Server Actions y auditoría por cada clase aún no es exhaustiva;

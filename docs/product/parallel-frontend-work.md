@@ -2,17 +2,20 @@
 
 This guide lets another AI-assisted developer continue visual work on subpages while this branch is reviewed. It is intentionally narrow: improve presentation and loading states without changing municipal workflow rules, permissions, schema, RLS, or data contracts.
 
-## Current branch and PR intent
+## Current handoff — 2026-10-06
 
-- Branch: `codex/temp-mvp-completion`
-- Visual slice completed here: public landing/home refresh.
-- Primary files already touched: `src/app/(public)/page.tsx`, `src/app/(public)/loading.tsx`, `src/app/globals.css`, `src/components/ui/*`, `public/brand/*`.
-- Next recommended parallel surfaces:
-  1. `src/app/(public)/ofertas/page.tsx`
-  2. `src/app/(public)/ofertas/[openingId]/page.tsx`
-  3. `src/app/(auth)/registro/candidato/page.tsx`
-  4. `src/app/(auth)/registro/empresa/page.tsx`
-  5. `src/app/(auth)/login/page.tsx`
+- Documentation branch: `docs/status-handoff`, source HEAD `5d6a51e`.
+- Local main/origin snapshot `523ee4a` includes frontend PR #33–39 (previously
+  verified by the parent); no fresh remote status queried. Home, offers list/detail,
+  login and both registrations are no longer pending initial visual slices.
+- Steps 1–3 (`46c6c0d`, `93b76fc`, `5d6a51e`) remain local, unpublished/unmerged.
+  See [current status](../../specs/001-municipal-employment-portal/implementation-status.md).
+- Page-by-page suggestions below are reference patterns, not an unbuilt backlog.
+  Future follow-ups require an agreed defect, bounded files and coordinated ownership;
+  do not infer owners or repeat merged work.
+- Latest public browser evidence and remaining manual checks:
+  [quality](../validation/quality-gates.md), [accessibility](../validation/accessibility.md).
+  T087 and human acceptance remain open.
 
 ## Product constraints that must not change
 
@@ -164,9 +167,14 @@ npm run build
 
 If changing tests or behavior, run the relevant focused tests too.
 
-Known environment note: the project pins Node `24.21.0` and npm `11.19.0`. If local `npm install` fails because of `engine-strict=true`, fix the local runtime rather than weakening repository policy. The current branch installed `lucide-react` using an engine-strict override only because the local machine had Node `24.16.0`/npm `11.13.0`; do not repeat that as a normal workflow.
+Known environment note: the project pins Node `24.21.0` and npm `11.19.0`. If local `npm install` fails because of `engine-strict=true`, fix the local runtime rather than weakening repository policy. The historical visual branch installed `lucide-react` using an engine-strict override only because the local machine had Node `24.16.0`/npm `11.13.0`; do not repeat that as a normal workflow.
 
-## PR review notes for this visual slice
+## Historical PR review notes for the initial visual slice
+
+These notes describe the earlier tree, not the current dependency/security result.
+Step 2 supersedes the Next 16.3.5 audit note: Next/config 16.3.8 and the scoped
+ESLint glob adapter pass audit with zero vulnerabilities. Step 3 evidence is linked
+above; private DB/E2E and manual acceptance have not been rerun by this docs handoff.
 
 - `npm run lint`: passed.
 - `npm run typecheck`: passed.

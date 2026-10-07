@@ -28,10 +28,10 @@ datos que siguen asignadas a sus responsables.
 **Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.21.0 LTS con npm 11.19.0; SQL
 PostgreSQL para migraciones, políticas, funciones y pruebas de base de datos.
 
-**Dependencias principales**: Next.js 16.3.5, React y React DOM 19.3.0, Tailwind CSS y
+**Dependencias principales**: Next.js 16.3.8, React y React DOM 19.3.0, Tailwind CSS y
 `@tailwindcss/postcss` 4.3.3, `@supabase/supabase-js` 2.116.0, `@supabase/ssr` 0.12.7, Zod 4.6.5 y
 `csv-parse` 7.0.2. Herramientas: Supabase CLI 2.117.0, ESLint 9.39.5 y `eslint-config-next`
-16.3.5. Todas las versiones directas se fijarán exactamente en `package.json` y el árbol
+16.3.8. Todas las versiones directas se fijarán exactamente en `package.json` y el árbol
 reproducible quedará en `package-lock.json`; no se usarán rangos `^` o `~` para dependencias directas.
 
 **Complemento de implementación (2026-09-22)**: se explicitan dependencias auxiliares del mismo
@@ -46,6 +46,54 @@ segundo desarrollador sigue pendiente en el PR y no se declara realizada por est
 con el plugin resuelto por `eslint-config-next` (`contextOrFilename.getFilename is not a function`).
 `eslint-plugin-react` 7.37.5 declara soporte hasta ESLint 9. Se fija 9.39.5, compatible con el
 peer `eslint >=9` de Next, sin deshabilitar reglas ni usar `--force`/`--legacy-peer-deps`.
+
+**Parche de seguridad step 2 (`EXTRA-008`; evidencia histórica anterior a EXTRA-010)**: Next.js y `eslint-config-next`
+se actualizan exactamente a 16.3.8; el lockfile resuelve `source-map-js` 1.2.2
+sin agregar dependencia directa. Se conserva Node 24.21.0/npm 11.19.0, engines
+estrictos y arquitectura. Audit posterior: 6 altas, 0 críticas; pendientes la
+cadena de `braces` 3.0.3 sin parche estable informado y `sharp` 0.35.4 con fix
+disponible, fuera de esta actualización dirigida. Evidencia y límites en
+`docs/validation/quality-gates.md`; revisión y gates funcionales del parche pendientes.
+
+**Evaluación de mitigación glob (`EXTRA-009`, 2026-10-06)**: rechazado y retirado
+el override anidado `@next/eslint-plugin-next → fast-glob: npm:tinyglobby@0.2.17`.
+Next usa `globSync(pattern, { onlyDirectories: true })`; tinyglobby expande
+subdirectorios por defecto. Fallaron 10 casos de equivalencia de raíces, aunque
+los casos de enlaces y audit cero del ensayo pasaron. No se modifican reglas ni
+se incorpora un adaptador. Se conserva el árbol anterior: audit final 5 altas,
+0 críticas; 23 pruebas focalizadas PASS documentan contrato/rechazo, no remediación.
+Gates completos posteriores y revisión del compañero pendientes. Reevaluar API,
+opciones y pruebas con cada actualización upstream antes de proponer otro override.
+
+**Adaptador local con verificación independiente final (`EXTRA-010`, 2026-10-06)**:
+paquete privado `next-eslint-glob-adapter`, tinyglobby exacto 0.2.17 y
+`expandDirectories: false`; entrada ESM síncrona `index.mjs`, única exportación
+nombrada globSync consumida por require(ESM) de Next en Node 24.21.0, fail-closed para entradas
+u opciones no admitidas. La devDependency raíz `file:tools/next-eslint-glob-adapter`
+y el override anidado `@next/eslint-plugin-next → fast-glob: $next-eslint-glob-adapter`
+permiten a npm administrar enlaces y dependencia sin lockfile independiente ni
+publicación. El spec inicial `file:./tools/...` dejó un enlace roto; el ensayo
+`file:../../../tools/...` resolvió la raíz y pasó pruebas, pero npm ls lo marcó
+inválido, por lo que se rechazó. La referencia raíz final pasa npm ci limpio,
+npm ls --all y 25 pruebas focalizadas; audit final exit 0, cero vulnerabilidades.
+Cache predeterminada fuera de node_modules, runtime temporal Node 24.21.0/npm
+11.19.0 y política de scripts sin cambios. No se modifican reglas ni runtime de
+aplicación. La conversión ESM elimina los require imports del adaptador sin
+exclusiones ni supresiones; main/exports apuntan a index.mjs, sin top-level await.
+Tras la conversión: install/ci/25 pruebas del consumidor real/lint/audit/ls --all PASS.
+La verificación independiente final aportada confirma Node 24.21.0/npm 11.19.0
+exactos, ci previo exit 0 con el mismo package.json/lockfile, ls --all exit 0,
+audit completo y de producción exit 0/cero vulnerabilidades, 403 pruebas en
+24 archivos (incluidas las 25 de compatibilidad), lint sin warnings, typecheck y
+build exit 0, y smoke público Chromium 1/1 exit 0. Los fallos de tipos de guards
+exclusivamente de prueba quedaron corregidos y supersedidos por el PASS final.
+El aviso de lockfile externo del directorio padre ignorado se conserva como hallazgo;
+el aviso previo unrs-resolver/allowScripts y la política no cambian. Sin actualización
+global del runtime ni supresiones de reglas. Validación manual, DB/pgTAP, E2E privados
+completos y revisión del compañero siguen pendientes. EXTRA-009 y los intentos
+iniciales son evidencia histórica separada, no estado actual. Esta finalización
+solo documenta resultados aportados. Reevaluar consumidor/defaults en cada
+actualización y retirar adaptador y override al repararse upstream.
 
 **Persistencia**: Supabase PostgreSQL para datos relacionales, RLS, funciones transaccionales,
 auditoría y vistas de métricas; Supabase Storage en bucket privado para CV; Supabase Auth para
