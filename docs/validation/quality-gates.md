@@ -1,8 +1,20 @@
 # Controles de calidad — fase 9
 
+## Fuente vigente — 2026-10-06
+
+Último árbol fuente verificado localmente: `5d6a51e` (step 3), no el commit futuro
+de `docs/status-handoff`. Las secciones step 3 abajo registran 447 pruebas/26 archivos,
+lint/typecheck/build, audit 0, Chromium focalizado 1/1 y browser público de seis
+rutas/dos tamaños (12 vistas, axe 0/overflow 0). Ver también [accesibilidad](accessibility.md).
+Steps 1–3 son locales sin push/merge; snapshot local main/origin `523ee4a` incluye
+PR #33–39 según comprobación previa del padre, sin consulta remota nueva.
+Este paso documental no vuelve a verificar aplicación, DB ni suite privada;
+NVDA, zoom real, formularios Auth enviados y aceptación humana siguen pendientes.
+
+## Entrega histórica del 2026-09-29
+
 Fecha: 2026-09-29. Rama `codex/temp-mvp-completion`, base `481b9f0` (PR #32
-integrada). Evidencia local del árbol de esta entrega; el commit que contiene este
-documento identifica los archivos verificados. CI del commit `2974958` aprobado:
+integrada). Evidencia local del árbol histórico de esa entrega, no del handoff actual. CI del commit `2974958` aprobado:
 [Actions 36596663506](https://github.com/maximo-Pdev/funes-empleo/actions/runs/36596663506),
 jobs application/database correctos. La revisión independiente sigue pendiente;
 los controles de demo se distinguen de la aceptación municipal.

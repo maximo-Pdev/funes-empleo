@@ -79,7 +79,7 @@ The official course environment guide establishes the following baseline:
 - Git and GitHub for version control and team collaboration.
 - Vercel for publishing the course demonstration.
 
-This baseline is fixed for the training project. Exact versions beyond Node.js 24 LTS, architecture, schema, security model, storage, testing tools, and deployment configuration must be defined during `$speckit-plan`. See `docs/TECHNICAL_BASELINE.md`.
+This baseline is fixed for the training project. Exact versions beyond Node.js 24 LTS, architecture, schema, security model, storage, testing tools, and deployment configuration must be defined during `$speckit-plan`. See `docs/discovery/TECHNICAL_BASELINE.md`.
 
 ## Team delivery model
 
@@ -96,7 +96,9 @@ This baseline is fixed for the training project. Exact versions beyond Node.js 2
 - Managed Spec Kit files pass `specify integration status`.
 - Discovery documentation has been established from the available source material.
 - The course technical stack and demonstration platform are known.
-- The constitution, feature specification, clarification results, architecture plan, checklist, and task breakdown still require review and approval before implementation.
+- As of 2026-10-06, constitution 1.0.0 is ratified (2026-09-19) and the application is implemented; convergence and acceptance are incomplete (91/97 tasks checked).
+- T069, T087, T089, T092, T096 and T097 remain open. The specification still says Draft; its stage owner must reconcile approval evidence, not infer it from implementation.
+- Current local evidence and the distinction between merged frontend work and unpublished steps 1–3 are recorded in `specs/001-municipal-employment-portal/implementation-status.md`.
 - Municipal production hosting, privacy, retention, branding, and reporting requirements remain unresolved.
 
 ## Success direction

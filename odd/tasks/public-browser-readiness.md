@@ -6,6 +6,13 @@ Scope: complete public six-route mobile/desktop browser verification and fix hom
 - [x] Verify real public offers list/detail, empty/invalid/not-found and keyboard behavior at 360x800 and 1366x768; capture loading where observable without changing data.
 - [x] Run unit/lint/type/build/audit and focused browser checks; record final evidence and residual manual limits.
 
+## Referencia de entrega — 2026-10-06
+
+Step 3 quedó en commit local `5d6a51e`, creado por el padre tras la verificación.
+Revisión nativa `213f13470b861051`: aprobada y reconocida por el padre; no acredita
+T096, revisión humana ni aceptación municipal. Sin push ni merge. Step 4 continúa
+en `docs/status-handoff`, exclusivamente documental y sin repetir gates.
+
 ## Baseline
 
 - Prior browser review: home/login/candidate/company render cleanly; list rendered generic error while local service was unreachable. Detail/empty could not be checked.
@@ -27,4 +34,5 @@ Scope: complete public six-route mobile/desktop browser verification and fix hom
 - Unknown/malformed detail render not-found content (HTTP200 streamed; not status404 claim). Invalid page0/abc show safe existing generic boundary, no internal details.
 - Loading observed early desktop only; mobile timing not guaranteed. Auth submission/pending, real zoom, NVDA, private role/DB suites and manual T087 are not claimed.
 - Evidence: ignored test-results/public-visual-review-final/report.json,12PNGs,2contact sheets; tracked accessibility/quality docs updated. No console/page errors in final valid-route browser run.
-- Native review pending; no commit or push requested.
+- Revisión nativa aprobada posteriormente y commit local identificados arriba.
+  Push/merge no realizados; revisión del compañero y aceptación siguen pendientes.

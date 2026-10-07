@@ -31,9 +31,22 @@ fecha es suficiente. No incorporar PII o secretos al registrar esa evidencia.
 
 La aprobación de una fase técnica no cierra otra. Las aclaraciones funcionales de
 spec.md tienen prioridad sobre posiciones antiguas de discovery; no se reabren por
-esta tabla. AGENTS/PROJECT_CONTEXT conservan descripciones iniciales obsoletas de
-ratificación: la constitución vigente es 1.0.0 ratificada 2026-09-19. No se atribuye
+esta tabla. AGENTS/PROJECT_CONTEXT se reconciliaron el 2026-10-06:
+la constitución vigente es 1.0.0 ratificada 2026-09-19; spec sigue Draft,
+pendiente de reconciliación de evidencia por su propietario. No se atribuye
 aprobación municipal por una etiqueta de estado de un artefacto.
+
+## Estado local — 2026-10-06
+
+Este handoff no cierra gates ni cambia tareas: T069/T087/T089/T092/T096/T097
+siguen abiertas (91/97 marcadas). Snapshot local main/origin `523ee4a` incluye
+PR #33–39; no se consultó estado remoto nuevo. Steps 1–3 permanecen locales
+sin push/merge, con fuente final `5d6a51e`.
+[Calidad](quality-gates.md) y [accesibilidad](accessibility.md) registran 447 pruebas,
+gates locales/audit 0 y browser público; no suite privada/DB actual, NVDA, zoom
+real, formularios Auth enviados ni aceptación humana. Revisión nativa step 3
+aprobada no sustituye al segundo desarrollador. OQ-010/OQ-011 siguen abiertas;
+traducciones legacy no ratifican catálogo ni campos municipales.
 
 ## Cómo cerrar un gate
 
