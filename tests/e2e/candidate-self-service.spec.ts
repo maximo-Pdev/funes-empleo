@@ -18,6 +18,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
 }
 
 test("registro, dos postulaciones independientes, retiro, suspensión y archivo restaurable", async ({ page, browser, request }) => {
+  test.setTimeout(120_000);
   const suffix = Date.now().toString().slice(-5);
   const name = `Persona E2E ${suffix}`;
   const email = `candidate-e2e-${suffix}@example.invalid`;

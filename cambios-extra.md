@@ -464,6 +464,50 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Referencias:** tarea `odd/tasks/maintenance-e2e-timezone.md`; commit/PR de esta
   reparación y revisión independiente pendientes, no acreditados por este registro.
 
+## EXTRA-014 — Presupuesto local del recorrido E2E de autogestión
+
+- **Fecha:** 2026-10-06. **Estado:** registrado antes de editar el test e
+  implementado; controles locales PASS, GREEN funcional de CI y revisión pendientes.
+- **Origen:** US2, escenarios de aceptación 1–6, FR-005/010/016/030/054 y T040
+  de `specs/001-municipal-employment-portal/`; recorrido existente de registro,
+  perfil/CV, dos postulaciones, retiro, suspensión/reactivación y archivo/restauración.
+- **Evidencia aportada:** Quality/application de PR #42, run `37680658309`,
+  agota `Test timeout of 30000ms exceeded` en el helper de login (línea 17),
+  llamado desde la línea 151 tras restaurar el perfil; otros 56 E2E pasan.
+  El mismo test pasa en otros PR. Esto no demuestra un defecto de autenticación.
+- **Cambio mínimo implementado:** `test.setTimeout(120_000)` como primera instrucción
+  del único recorrido largo, igual al presupuesto del recorrido asistido.
+  Sin cambios de producción/auth, timeout global, expectativas de URL (5 s),
+  aserciones, skips ni retries; sin nuevas pruebas estructurales de fuente.
+- **Archivos/contratos:** `tests/e2e/candidate-self-service.spec.ts` y este registro;
+  sin modificaciones de contratos, esquema, permisos ni requisitos municipales.
+- **Autorización/coordinación:** usuario autoriza este ajuste acotado sobre
+  `fix/dependency-security` en `d5183b2`; el padre conserva revisión, ODD y entrega
+  Git. Este escritor no cambia de rama ni hace commits/push.
+- **Riesgos/límites:** el presupuesto mayor puede demorar la detección de un bloqueo;
+  no acredita rendimiento ni corrige un defecto funcional probado. Docker/Supabase
+  local ausente impide RED/GREEN E2E significativo; usar el RED de CI aportado y
+  colección/controles locales, sin resets, installs ni lectura de secretos.
+  Node/npm locales 24.16.0/11.13.0 difieren de CI 24.21.0/11.19.0.
+- **Verificación prevista:** colección Playwright antes/después, typecheck, lint,
+  cobertura, build y diff check; resultados observados se registrarán aquí.
+  La colección no ejecuta el cuerpo ni prueba su timeout registrado.
+- **Resultados observados:**
+  - `npx playwright test tests/e2e/candidate-self-service.spec.ts --list`: PASS
+    antes/después (exit 0), mismos 31 tests en 6 archivos con dependencias.
+    El timeout dentro del cuerpo no se ejecuta en colección: no se afirma
+    verificación de metadata registrada ni GREEN E2E por este resultado.
+  - `npm run typecheck`: PASS (exit 0).
+  - `npm run lint`: PASS (exit 0), sin warnings; no reaparece fast-glob ausente.
+  - `npm run test:coverage`: PASS (exit 0), 408 pruebas en 25 archivos;
+    100% de 18 statements/12 branches/3 functions/15 lines solo del módulo
+    configurado `src/lib/env/schema.ts`, no cobertura global ni del recorrido.
+  - `npm run build`: PASS (exit 0); aviso de lockfile externo ignorado conservado.
+    Carga normal de entorno por Next, sin inspección ni exposición de valores.
+  - `git diff --check`: PASS (exit 0), sin errores de whitespace.
+  GREEN funcional y DB pendientes de CI aislado/PR #42; sin aceptación
+  ni revisión humana acreditadas, sin referencia de commit nuevo.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
