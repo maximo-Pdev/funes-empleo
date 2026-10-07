@@ -421,6 +421,49 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   aportada sin repetir gates; resultados actuales en quality-gates.md. Las notas
   anteriores de pendientes/fallos corresponden a sus etapas históricas.
 
+## EXTRA-013 — Fixture de mantenimiento alineado con fecha de Buenos Aires
+
+- **Fecha:** 2026-10-06. **Estado:** implementado; regresión/cobertura verificadas,
+  gates locales incompletos y revisión pendiente.
+- **Origen:** T034 y contrato `contracts/state-machines.md` de
+  `specs/001-municipal-employment-portal/`: vencimiento a las 00:00 del día posterior
+  a `closing_date` en `America/Buenos_Aires`, con ejecución idempotente.
+- **Problema/evidencia:** el fixture de `tests/e2e/intermediation.spec.ts` usa
+  `current_date - 1`; entre 00:00 y 03:00 UTC esa fecha aún no terminó en Buenos
+  Aires. El diagnóstico de CI registra `closedOpenings: 0` en lugar de 1.
+- **Cambio implementado:** derivar ayer de
+  `(clock_timestamp() at time zone 'America/Buenos_Aires')::date - 1` y agregar
+  `tests/unit/maintenance-timezone.test.ts`, vinculado a la expresión real del
+  fixture con instantes deterministas 01:00, 02:59:59.999 y 03:00 UTC.
+- **Justificación/límites:** reparación exclusiva de pruebas para satisfacer T034;
+  conservar contadores e idempotencia. Sin cambios de producción, contratos ni
+  aprobación inferida de la especificación Draft.
+- **Autorización/coordinación:** usuario autoriza expresamente esta reparación y
+  EXTRA-013; escritura delegada solo en los dos tests y este registro. El padre
+  conserva el documento ODD, revisión y acciones Git; el escritor no hace commit/push.
+- **Riesgos:** la comprobación estructural no ejecuta PostgreSQL; E2E completo
+  pendiente de CI aislado porque Docker no está disponible. Node/npm locales
+  24.16.0/11.13.0 difieren de los pins de CI 24.21.0/11.19.0.
+- **Verificación observada:**
+  - `npm run test:unit -- tests/unit/maintenance-timezone.test.ts`: RED, tres
+    fallos con el source anterior (expresión, 01:00 y pre03); GREEN, cinco PASS
+    tras corregir el fixture, incluido el límite exacto y caso negativo UTC.
+  - `npm run test:coverage`: PASS, 24 archivos y 383 pruebas; resumen del runner
+    100% de 18 statements/12 branches/3 functions/15 lines, no cobertura global.
+  - `npm run lint`: FAIL (exit 2), dependencia `fast-glob` ausente al cargar
+    `@next/eslint-plugin-next`. No se instaló ni modificó dependencia alguna.
+  - `npm run typecheck` y `npm run build`: PASS en verificación independiente;
+    carga normal de Next permitida sin inspeccionar ni mostrar valores de entorno.
+  - Verificación independiente: regresión focalizada y `git diff --check` PASS;
+    lint vuelve a fallar por instalación local incompleta (`fast-glob` existe en
+    el lockfile pero falta en `node_modules`). No se ejecutó instalación.
+  - `git diff --check`: PASS; sin errores de whitespace.
+  - Sin resets, ejecución SQL/E2E, commits ni push; CI completo pendiente.
+- **Archivos afectados:** los dos tests anteriores y `cambios-extra.md`; salidas
+  generadas autorizadas únicamente en `.next/`, `coverage/`, `tsconfig.tsbuildinfo`.
+- **Referencias:** tarea `odd/tasks/maintenance-e2e-timezone.md`; commit/PR de esta
+  reparación y revisión independiente pendientes, no acreditados por este registro.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
