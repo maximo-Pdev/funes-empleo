@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { listPublicOffers } from "@/features/openings/public-service";
+import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 import type { PublicOffer } from "@/features/openings/public-service";
 
 export const dynamic = "force-dynamic";
@@ -64,7 +65,7 @@ export default async function HomePage() {
   const featuredOffers = await getFeaturedOffers();
 
   return (
-    <main id="contenido" className="min-h-screen overflow-hidden bg-page text-foreground">
+    <>
       <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
           <Link href="/" className="flex items-center gap-3 font-semibold text-primary-700">
@@ -82,16 +83,17 @@ export default async function HomePage() {
             </span>
           </Link>
           <nav aria-label="Accesos principales" className="flex flex-wrap items-center justify-end gap-2 text-sm font-semibold">
-            <Link className="rounded-lg px-3 py-2 text-primary hover:bg-secondary" href="/ofertas">
+            <Link className="inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-primary hover:bg-secondary" href="/ofertas">
               Ofertas
             </Link>
-            <Link className="rounded-lg border border-border bg-surface px-3 py-2 text-primary hover:bg-secondary" href="/login">
+            <Link className="inline-flex min-h-11 items-center rounded-lg border border-border bg-surface px-3 py-2 text-primary hover:bg-secondary" href="/login">
               Iniciar sesión
             </Link>
           </nav>
         </div>
       </header>
 
+      <main id="contenido" tabIndex={-1} className="min-h-screen overflow-hidden bg-page text-foreground">
       <section className="relative border-b border-border bg-[linear-gradient(135deg,#f5f8f6_0%,#e3f2e9_52%,#f5f8f6_100%)]">
         <div className="absolute -right-28 top-8 h-72 w-72 rounded-full bg-primary-400/20 blur-3xl" aria-hidden="true" />
         <div className="absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-primary-100 blur-3xl" aria-hidden="true" />
@@ -220,11 +222,11 @@ export default async function HomePage() {
                       <p className="font-semibold text-primary-700">{offer.company_name}</p>
                       <p className="flex items-center gap-2 text-sm text-muted-foreground">
                         <MapPin className="h-4 w-4" aria-hidden="true" />
-                        {offer.location} · {offer.modality}
+                        {offer.location} · {publicModalityLabel(offer.modality)}
                       </p>
                       <p className="flex items-center gap-2 text-sm text-muted-foreground">
                         <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
-                        {offer.vacancies} vacante{offer.vacancies === 1 ? "" : "s"} · Cierre: {offer.closing_date}
+                        {offer.vacancies} vacante{offer.vacancies === 1 ? "" : "s"} · Cierre: <time dateTime={offer.closing_date}>{formatPublicClosingDate(offer.closing_date)}</time>
                       </p>
                     </CardContent>
                   </Card>
@@ -281,6 +283,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      </main>
+
       <footer className="bg-primary-900 px-6 py-10 text-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -290,6 +294,6 @@ export default async function HomePage() {
           <p className="text-sm text-white/75">Entorno de demostración con datos ficticios.</p>
         </div>
       </footer>
-    </main>
+    </>
   );
 }

@@ -7,5 +7,9 @@ test("base pública en español sin barreras automáticas detectadas", async ({ 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Un puente claro entre personas que buscan trabajo y empresas de Funes.");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Ir al contenido principal" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("main")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Registrarme como postulante", exact: true })).toBeFocused();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });

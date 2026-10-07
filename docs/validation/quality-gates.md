@@ -77,6 +77,52 @@ dependencias ni migraciones productivas en este seguimiento. Los checks del comm
 posterior se registran por su SHA; el PASS de `2974958` no se atribuye automáticamente
 a otra revisión.
 
+## Step 3 — verificación pública final, 2026-10-06
+
+Rama `fix/public-browser-readiness`; EXTRA-011/012. Evidencia final aportada por
+el padre y verificador independiente (fase 1), documentada **sin repetir gates**.
+Node **24.21.0** y npm **11.19.0** exactos. No se suministraron invocaciones
+completas de esos gates: se identifican los resultados, sin reconstruir comandos.
+Las secciones anteriores y de step 2 conservan su carácter histórico.
+
+| Gate informado | Resultado observado final |
+| --- | --- |
+| Build de producción | Exit 0 |
+| Suite unitarias/componentes | Exit 0; 447 pruebas en 26 archivos |
+| Lint | Exit 0 |
+| Typecheck | Exit 0 |
+| Audit | Exit 0; 0 vulnerabilidades |
+| Smoke setup Chromium reforzado | PASS 1/1 |
+
+Las 34 pruebas del helper de fechas/presentación y 13 de componentes públicos
+con mocks están incluidas en la evidencia de pruebas, no son resultados live ni
+se suman nuevamente al total. RED/GREEN anteriores permanecen en EXTRA-011/012.
+
+### Browser live y estados observados
+
+- Seis rutas públicas × dos viewports (360×800 y 1366×768), 12 capturas finales
+  y contact sheets en `test-results/public-visual-review-final/` (ignorado),
+  recibo `report.json`: axe 0, overflow horizontal 0, idioma/H1/labels correctos.
+- Inicio: salto enfoca main y siguiente Tab alcanza CTA candidato; header ≥44px,
+  hero sobre el pliegue. Inicio con 3 destacadas, listado con 10, página 2 con 10,
+  página 999 vacía. Detalle live muestra Presencial/Plazo fijo/31/12/2026 y
+  mantiene fecha ISO legible por máquina. CTA anónimo lleva a sesión vencida.
+- IDs malformado/desconocido: not-found español, HTTP 200 observado en streaming;
+  no se exige ni se afirma 404. `page=0`/`page=abc`: boundary genérico español
+  con reintento y sin filtración, no mensaje de validación específico.
+- Loading visto en desktop a DOMContentLoaded (44 ms), no timing mobile ni
+  cobertura universal de estados. Formularios Auth no enviados: pending sin probar.
+- Diagnóstico sanitizado del entorno configurado: destino Supabase local,
+  health HTTP 200 y RPC `published_offers` funcional. La indisponibilidad previa
+  es histórica, de causa no confirmada; no se atribuye una reparación de config
+  o datos ni se hizo reset DB.
+
+Alcance: evidencia pública y gates del árbol actual, no aceptación humana ni
+municipal. Revisión nativa/humana, T087 (NVDA, zoom real y matriz manual por rol),
+DB/pgTAP y suite E2E privada completa actuales pendientes. Los 855 pgTAP/57 E2E
+históricos no se transfieren a este árbol. Sin source edits en esta finalización,
+commit, push ni cierre de tareas manuales. Detalle en `accessibility.md`.
+
 ## Step 2 — evidencia de dependencias, 2026-10-06
 
 Rama `fix/dependency-security`; `EXTRA-008`. Esta primera verificación corresponde
