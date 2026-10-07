@@ -18,7 +18,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
       for (const path of journeys[role]) {
         await page.goto(path);
         await expect(page).toHaveURL(new RegExp(path.split("?")[0] + "(?:\\?|$)"));
-        await expect(page.locator("h1")).toBeVisible();
+        await expect(page.locator("h1").first()).toBeVisible();
         await expect(page.getByRole("heading", { name: "Ocurrió un problema", exact: true })).toHaveCount(0);
         expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
