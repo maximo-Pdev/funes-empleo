@@ -9,7 +9,14 @@ Scope: restore home component coverage after async public offer integration and 
 - [x] Correct home-local contrast and heading hierarchy defects.
 - [x] Obtain passing public smoke and rerun unit suite, lint, typecheck and build.
 
-Branch: fix/home-test-contract
+Branch histórica: fix/home-test-contract.
+
+## Referencia de entrega — 2026-10-06
+
+Step 1 quedó en commit local `46c6c0d`, creado posteriormente por el padre.
+Sin push ni merge; continuación en `docs/status-handoff` desde step 3 `5d6a51e`.
+La evidencia siguiente pertenece al step 1, no al árbol final; ver
+`docs/validation/quality-gates.md` para resultados posteriores.
 
 ## Evidence
 
@@ -23,4 +30,5 @@ Branch: fix/home-test-contract
 - Heading regression test RED observed (1 failed/2 passed); GREEN 3/3 after source edits.
 - Final production build exit 0; refreshed production smoke PASS 1/1, no axe violations; full suite 378/378 in 23 files, lint/typecheck exit 0. No tracked generated file changes.
 - Accessibility evidence updated in docs/validation/accessibility.md. This does not close manual T087, NVDA or zoom acceptance.
-- No new npm dependencies required. Commit/push not performed.
+- No new npm dependencies required. Este worker no realizó commit/push;
+  el commit posterior del padre está identificado arriba. Push no realizado.

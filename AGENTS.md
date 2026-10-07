@@ -11,7 +11,7 @@ The product is not a direct marketplace. Companies must not browse the full cand
 Before planning or changing the product, read these files in order:
 
 1. `docs/PROJECT_CONTEXT.md`
-2. `docs/TECHNICAL_BASELINE.md`
+2. `docs/discovery/TECHNICAL_BASELINE.md`
 3. `docs/discovery/CURRENT_PROCESS.md`
 4. `docs/discovery/ACTORS_AND_ROLES.md`
 5. `docs/discovery/REQUIREMENTS.md`
@@ -28,7 +28,7 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - The project constitution governs stable engineering and product principles once ratified.
 - An approved feature `spec.md` governs that feature's scope and acceptance criteria.
 - An approved `plan.md` governs the architecture and technical implementation for that feature.
-- `docs/TECHNICAL_BASELINE.md` records the technologies required by the course but does not replace architecture decisions in the plan.
+- `docs/discovery/TECHNICAL_BASELINE.md` records the technologies required by the course but does not replace architecture decisions in the plan.
 - Discovery documents describe the current shared understanding and must not silently override an approved specification.
 - Items marked open, provisional, inferred, or unconfirmed must not be invented. Record the uncertainty and request a decision.
 - When evidence conflicts, preserve both versions in `OPEN_QUESTIONS.md` and identify the stakeholder who must resolve it.
@@ -47,8 +47,9 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - Spec Kit is initialized with the Codex integration and PowerShell scripts.
 - Product discovery was assembled from the classes, the current municipal site, the group interview transcript, and the official course technology guide.
 - The course-defined technical baseline is Next.js, TypeScript, Tailwind CSS, Node.js with npm, Supabase/PostgreSQL, GitHub, and Vercel.
-- The constitution and first feature specification have not been ratified yet.
-- Do not start application implementation until the team reviews the constitution, specification, clarification results, plan, checklist, tasks, and analysis.
+- As of 2026-10-06, constitution 1.0.0 is ratified (2026-09-19); application implementation exists and convergence remains incomplete.
+- The task ledger has 91/97 checked: T069, T087, T089, T092, T096 and T097 remain open. See `specs/001-municipal-employment-portal/implementation-status.md` for current evidence and local-only commits.
+- The feature specification still says Draft. Its stage owner must reconcile approval evidence before further product changes; existing implementation does not establish artifact approval or waive review gates.
 
 ## Spec Kit collaboration
 

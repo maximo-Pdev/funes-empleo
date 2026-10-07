@@ -5,10 +5,17 @@ No es un padrón público ni un mercado de contacto directo.
 
 ## Estado y límites
 
-Fases 1–8 integradas; fase 9 en validación. Solo datos ficticios. La importación usa
+Al 2026-10-06, existe implementación de fases 1–8 y controles parciales de fase 9;
+convergencia y aceptación no completas: 91/97 tareas marcadas, T069/T087/T089/T092/
+T096/T097 abiertas. La constitución 1.0.0 está ratificada; spec conserva `Draft`,
+pendiente de reconciliación de evidencia por su propietario. Solo datos ficticios. La importación usa
 `demo-candidates-v1`, no el Excel municipal. Producción, catálogo oficial, consentimiento
 y otras aprobaciones siguen bloqueados: [gates](docs/validation/release-gates.md).
 Las pruebas automatizadas no sustituyen aceptación humana ni revisión del compañero.
+[Estado vigente](specs/001-municipal-employment-portal/implementation-status.md):
+snapshot local main/origin `523ee4a` con PR #33–39 integradas; steps 1–3 son commits
+locales sin push/merge. Evidencia local final en [calidad](docs/validation/quality-gates.md)
+y [accesibilidad](docs/validation/accessibility.md); este handoff documental no repite gates.
 
 ## Desarrollo local
 
