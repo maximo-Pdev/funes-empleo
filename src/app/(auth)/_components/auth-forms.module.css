@@ -1,0 +1,22 @@
+.forms { min-width: 0; }
+.forms form { margin-top: 0; }
+.forms > p + form { margin-top: 24px; }
+.forms input:not([type="hidden"]):not([type="checkbox"]), .forms textarea {
+  width: 100%; min-width: 0; min-height: 48px; border-radius: var(--radius-lg);
+  border-color: var(--color-border); background: var(--color-surface); padding: 12px;
+  font-size: 1rem; color: var(--color-foreground); transition: border-color .15s;
+}
+.forms input:hover, .forms textarea:hover { border-color: var(--color-primary-500); }
+.forms input:focus-visible, .forms textarea:focus-visible { border-color: var(--color-primary); }
+.forms label { font-size: .875rem; line-height: 1.5; }
+.forms label:has(input[type="checkbox"]) { min-height: 44px; padding-block: 8px; }
+.forms input[type="checkbox"] { flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--color-primary); }
+.forms p { line-height: 1.75; overflow-wrap: anywhere; }
+.forms button { width: 100%; min-height: 48px; border-radius: var(--radius-lg); background: var(--color-primary); padding: 12px 16px; color: white; font-size: .875rem; font-weight: 600; transition: background-color .15s; }
+.forms button:hover:not(:disabled) { background: var(--color-primary-700); }
+.forms button:disabled { cursor: not-allowed; }
+.forms [role="status"]:not(:empty) { border-radius: var(--radius-lg); padding: 12px; color: var(--color-primary-700); background: var(--color-secondary); }
+.danger form { border-color: #991b1b; border-radius: var(--radius-lg); }
+.danger button { background: #991b1b; }
+.danger button:hover:not(:disabled) { background: #7f1d1d; }
+@media (prefers-reduced-motion: reduce) { .forms button, .forms input, .forms textarea { transition: none; } }
