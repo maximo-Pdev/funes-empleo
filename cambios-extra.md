@@ -508,6 +508,16 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   GREEN funcional y DB pendientes de CI aislado/PR #42; sin aceptación
   ni revisión humana acreditadas, sin referencia de commit nuevo.
 
+### Cierre verificado de EXTRA-014
+
+- Reparación: `f7ad322`; head publicado/verificado de PR #42: `98d8f4e`.
+- CI [37686615198](https://github.com/maximo-Pdev/funes-empleo/actions/runs/37686615198):
+  application y database PASS; recorrido del candidato 25,2 s; 57 E2E PASS.
+  Vercel y Preview Comments PASS. No se reintentaron ni omitieron tests.
+- Revisión nativa `review-6d2877daf500352c` aprobada y reconocida; observaciones
+  informativas diferidas. Esto no acredita aprobación humana ni merge a main.
+- El commit de este cierre solo modifica documentación; se observará su CI final.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
