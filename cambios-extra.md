@@ -757,6 +757,15 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **GREEN observado:** mismo comando exit 0, 55/55 PASS tras seleccionar 11/2 según dataset. Target1 sigue legítimamente referido a company1 y no a company2; el CV negativo existe y está referido a company2 pero no a company1. Se mantienen dos descargas positivas exactas/hash y cuatro negativos estrictos, ahora con mensajes separados. No cambios de políticas, seeds, manifiesto ni ventana de acceso.
 - **Gates observados:** con el mismo prefijo exacto, `"npm run lint"`, `"npm run typecheck"`, `"npm run test:unit"`, `"npm run build"` exit 0; lint sin warnings, unit 478/30 archivos. `git diff --check` exit 0; repetición final tooling 55/55 PASS. `next-env.d.ts` sin diff, sin restauración necesaria. No se ejecutó cobertura instrumentada adicional, DB/E2E, reset real, Docker o hosted/vault. Nuevo CI del siguiente SHA del padre pendiente: database PASS/application FAIL de `37782732227` es evidencia previa aportada, no verificación de esta reparación.
 
+### Corrección acotada de EXTRA-017 — R3-E2E-SEED-MISMATCH
+
+- **Propuesta previa a cambios:** hallazgo nativo aportado por el padre: `test:e2e` público invoca Playwright crudo contra 4/4/8/8, incompatible con T095/SC-003/008/008A (500/50/100/1000).
+- **Cambio necesario:** reutilizar el runner local protegido de `test:e2e:full` y reenviar argumentos al CLI Playwright directo, sin recursión ni duplicar resets. Superficies: package.json, runner, test nativo, guía operativa y esta entrada; datasets/Auth/RLS intactos.
+- **Autorización/límites:** padre autoriza esta corrección de fuente; revisión observada del candidato corregido pendiente, no aprobada. Reset solo local propio; nunca servicio compartido/alojado.
+- **Verificación prevista:** RED/GREEN tooling, lint/typecheck/unit/build con Node 24.21.0/npm 11.19.0; DB/E2E reales pendientes de CI aislado tras corrección de puertos por el padre.
+- **Resultado observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"`: RED 56 PASS/1 FAIL (entrypoint público); GREEN 57/57, sin skips, incluido rechazo de confirmación ausente antes del transporte simulado. Mismo prefijo con `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:unit` (478/30) y `npm run build`: exit 0; lint sin warnings. Build con placeholders públicos ficticios solo en memoria.
+- **Límites:** sin DB/E2E/CI ni aprobación nativa acreditados; guards/datasets/concurrencia intactos. `next-env.d.ts` restaurado byte-idéntico a HEAD; lockfile sin cambios. Diff whitespace PASS; sin acciones Git de escritura. Avisos npm de ESLint sin soporte y postinstall unrs-resolver no autorizado conservados.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

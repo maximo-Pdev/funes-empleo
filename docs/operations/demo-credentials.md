@@ -67,7 +67,12 @@ solo parámetros revisados. Las pruebas nativas rechazan diferencias en SQL/hash
   permanece comprobado separadamente por el generador/manifiesto y los tests nativos.
   El contrato nativo también vincula las 13 consultas SQL reales y sus literales al
   manifiesto de aceptación; no obtiene expectativas de resultados observados en DB.
-- `npm run test:e2e:full` selecciona aceptación, carga/verifica 500 CV y ejecuta
+- `npm run test:e2e` (igual que `test:e2e:full`) es un gate LOCAL que restablece
+  aceptación, no Playwright crudo; nunca ejecutarlo contra datos ajenos o compartidos.
+  Los argumentos después de `--` se reenvían al CLI Playwright directo, tras los guards.
+  Para uso manual/focalizado sin este reset, usar `npx playwright test`; el operador
+  debe preparar el dataset requerido por esos casos, no asumir siempre la demo de 10 cuentas.
+  El gate selecciona aceptación, carga/verifica 500 CV y ejecuta
   todos los recorridos sin skips. El caso final de cuatro admins realiza otro reset
   frío y comprueba las cuatro mutaciones y auditorías después de la barrera común.
 - Los probes Storage usan candidate1 como target positivo para dueño/company1.

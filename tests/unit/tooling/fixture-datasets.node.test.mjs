@@ -161,6 +161,25 @@ test("Storage retains exact positive downloads and all four strict denial probes
   ]) assert(reset.includes(`!(await ${probe}).error`), "Each negative probe must still require rejection");
 });
 
+test("public E2E command selects the guarded acceptance runner without npm recursion", () => {
+  const p = JSON.parse(read("package.json"));
+  assert.equal(p.scripts["test:e2e"], "node tests/quality/run-local-e2e.mjs --confirm-local-reset");
+  assert.equal(p.scripts["test:e2e"], p.scripts["test:e2e:full"]);
+  const runner = read("tests/quality/run-local-e2e.mjs");
+  assert.match(runner, /process\.argv\[2\] !== "--confirm-local-reset"/);
+  assert.match(runner, /run\("tests\/fixtures\/reset-local\.mjs", \["--confirm-local-reset", "--acceptance"\]\)/);
+  assert.match(runner, /const playwrightArgs = process\.argv\.slice\(3\);/);
+  assert.match(runner, /run\("node_modules\/@playwright\/test\/cli\.js", \["test", "--workers=1", "--retries=0", "--reporter=list,json", \.\.\.playwrightArgs\]\)/);
+  assert.doesNotMatch(runner, /npm|test:e2e/);
+});
+test("runner still rejects missing reset confirmation before transport even with Playwright arguments", () => {
+  const r = spawnSync(process.execPath, ["--import", `data:text/javascript,${encodeURIComponent(loader)}`,
+    "tests/quality/run-local-e2e.mjs", "--grep", "manual-case"], { env: {}, encoding: "utf8" });
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /indicá --confirm-local-reset/);
+  assert.doesNotMatch(r.stderr, /SIDE_EFFECT_REACHED/);
+});
+
 test("real CI entrypoints explicitly select acceptance, never default demo seeding", () => {
   const p = JSON.parse(read("package.json"));
   assert.match(p.scripts["test:db"], /reset-local\.mjs --confirm-local-reset --acceptance --database-only/);

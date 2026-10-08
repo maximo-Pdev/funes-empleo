@@ -1,29 +1,67 @@
-# Public repository, consistent demo fixtures, and verified delivery
+# Public repository and credential remediation
 
-## Objective and authorization
-User approved one PR (#50), credential remediation, 10 interactive demo accounts (2 admin / 4 company / 4 candidate), corrections before merging, and PR merge after checks pass. User approved public GitHub visibility and Vercel Production as fictitious-data demo, not municipal production. Session standing permission covers ordinary scoped commits/non-force pushes/PR updates; no bypass of privacy/security/retention, destructive confirmations, branch protection or review consent.
-User wants no active test accounts when real operation begins. This is a real-use gate, not authorization to silently enable municipal production or destroy audit history. Investigate fixture removal safely; preserve the unrelated account and its data. No trigger disabling/history purge authorized.
+## Authorized scope
 
-## Isolation and delivery
-Worktree C:/Users/maxim/Desktop/funes-empleo-credential-remediation; branch fix/demo-credential-publication. Main checkout separately owned by admin styling task: never switch/edit it. Remote maximo-Pdev/funes-empleo; base main; PR https://github.com/maximo-Pdev/funes-empleo/pull/50.
-Delivery single-pr explicitly selected; no chained PRs or repeated size question. Baseline aac526ab979393ba26b0925a818effebd83e97c5; existing commit bdd9362e8982c11a625e7b75be4764af617ba1db contains source remediation plus incomplete fixture reduction. Never claim earlier native review covers later reduction.
+- Keep one PR: [#50](https://github.com/maximo-Pdev/funes-empleo/pull/50), `fix/demo-credential-publication` → `main`.
+- Repair credentials and reduce the **interactive demo** to 2 administrators, 4 companies and 4 candidates. Keep the separate acceptance dataset and all approved quality thresholds.
+- The user authorized corrections and merge after successful checks, followed by safe public GitHub visibility and a Vercel **fictitious-data demo**. This does not authorize municipal production.
+- Preserve the unrelated Supabase user, their records, immutable history and concurrent admin frontend work. Never print credentials, read `.env.local` into model context, rewrite Git history or bypass protections.
+- Irreversible deletion requires fresh human confirmation. YOLO does not override this rule. Real operation requires **zero active fixture accounts** and a resolved synthetic-business-data cleanup plan.
+
+## Workspaces
+
+| Workspace | Purpose |
+| --- | --- |
+| `C:/Users/maxim/Desktop/funes-empleo-credential-remediation` | Authorized feature branch and this parent-owned ledger |
+| `C:/Users/maxim/Desktop/funes-empleo-review-source` | Sequential local source-review branch; not published |
+| `C:/Users/maxim/Desktop/funes-empleo` | Concurrent admin frontend task; do not edit or switch |
+
+Baseline: `aac526ab979393ba26b0925a818effebd83e97c5` (PR #49).
 
 ## Tasks
-- [ ] PC1 (reopened, in progress, delegated writer): Fix complete fixture/credential contract. Keep 10 interactive demo accounts and distinct per-identity hosted passwords; separate synthetic load/acceptance dataset required by approved thresholds (500 candidates / 50 companies / 100 openings / 1000 participations and four-admin concurrency). Restore all affected database/E2E/metrics/audit checks without weakening assertions or marking approved checks unsupported. Test first, focused/full checks, work-unit commit, review exact candidate.
-- [x] PC2 (remote rotation verified; vault reduction separate): 554 known fictitious users rotated independently; installed reset refusal, removed their old sessions/tokens/MFA method claims with explicit user approval. Preserve unrelated account. Ciphertext vault outside Git, current-user DPAPI, 554 entries and 8 prior env mappings. New-password sample logins caused sessions; cleanup restored fixture 0/0/0, unrelated 3/3/3. No plaintext secrets in repo/chat/artifacts. Ciphertext SHA256 010ec460ad0be4f40ad831c77d96a730f50a45e86f0a7cbb0e7949f44f8e84af; prior 974ddf... was decrypted payload hash, not ciphertext.
-- [ ] PC4 (pending, operational executor): Research exact supported retirement/delete options for 544 surplus fixtures, preserve retained10/unrelated account/audit. Remote hard deletion blocked by FK/append-only history; no trigger bypass. Reduce active credentials vault to retained10 with encrypted archival preservation only after safe retirement outcomes. Document zero-active-test-account real-use gate and remaining synthetic-data limitations. Ask only for genuinely destructive/retention choices.
-- [ ] PC3 (pending, independent verifier and parent): Final current/history privacy audit, exact PR native review, CI all required checks pass, then authorized merge and confirm merged SHA. Change GitHub to public only after safe checks and verify visibility; correct main Vercel demo configuration/deploy exact merged SHA; functional public/critical-route checks.
 
-## Existing evidence / limitations
-PC1 original source safeguard native review review-656d32c36c0b70df approved and acknowledged, before later fixture reduction. Original source lint/types/build PASS, 478 unit tests and 28 native tooling tests PASS. These do not establish DB/E2E reduction correctness.
-Current PR50 bdd9362: Quality application FAILURE and database FAILURE (run37728752564); Vercel SUCCESS. Database metrics, old-admin references, session FKs and audit fixtures fail against small seed; manifest incorrectly disables concurrency. Per-role credentials conflict with existing unique-password vault. All must be repaired before merge; no branch-protection override.
-Remote approved demo kyjycjojzhwggjuqjnki ACTIVE_HEALTHY; 555 users=554 old fixtures+1 unrelated. Previous server crypt check0 old-password matches; reset refusal installed with matching fingerprint; historical credential is burned. Deployed has_live_session uses auth.sessions/user/JWTsessionid/not_after; JWT TTL3600 seconds. No new sign-in verification without logout cleanup.
-Official Supabase CLI exists at main node_modules/supabase/dist/supabase.js (invoke via node, not assumed PATH). SQL/auth output must be memory-captured/redacted, secret SQL via stdin. Metadata diagnosis failed on bare CLI PATH; do not misrepresent that as remote permission failure. No .env.local/credential-store model reads.
-Installed Node24.16/npm11.13 mismatches project pins; verified ephemeral npm exec Node24.21.0/npm11.19.0 enables locked npm ci and gates without bypass. Current clone baseline refreshed through PR49; final audit must include latest main before delivery. PDFs/docs/example PII/Git metadata accepted by user.
+- [ ] **PC1 — Finish coherent fixture and credential repair.** In progress: source unit approved; port and exact new CI pending. Interactive seed has 10 identities. Acceptance remains test-only: 4 admins, 500 candidates, 50 companies, 100 openings, 1,000 participations. Preserve unique per-identity hosted credentials, ownership/origin guards, metrics, audit, private journeys and concurrency. Close only after porting the approved correction and observing successful checks.
+- [x] **PC2 — Rotate exposed fixture credentials and revoke sessions.** Previously verified: 554 unique rotations, hosted reset refusal, fixture sessions/tokens/AMR `0/0/0`, unrelated user's `3/3/3` preserved. Current-user DPAPI vault outside Git retains 554 entries and 8 older mappings. Do not discard recovery credentials while surplus accounts exist.
+- [ ] **PC4 — Retire surplus fixtures safely.** Latest read-only preflight: 555 Auth/accounts, all active/not deleted (554 fixtures + 1 unrelated user), 501 candidate profiles and 50 company profiles. Hard deletion conflicts with FKs and immutable history. Supabase soft deletion is irreversible; access/UI/business-data effects remain untested. No deletion, archival or trigger bypass occurred. Obtain the destructive decision before retirement; update the vault only after a verified outcome.
+- [ ] **PC3 — Verify and deliver safely.** Final privacy/readback, required CI and ordinary branch policy; then authorized merge and record SHA. Publish GitHub only after safety prerequisites and verify visibility. Configure/deploy the exact merged `main` to Vercel as a demo, then check alias/SHA, `/ofertas` and critical authentication flows. Repository remains private; PR unmerged; deployment not verified.
 
-## Repair evidence and retirement decision boundary
-Writer PC1 correction observed RED20pass/15fail, GREEN35 then38 native testsPASS. lint/typecheck/build PASS twice; unit478PASS twice. Default interactive10 preserved; separate TEST-ONLY generated acceptance500/50/100/1000/4admins has explicit activation/origin/ownership guards. Required concurrency not disabled; unique ten per-identity hosted credentials restored. Real CI/local entrypoint selects acceptance explicitly. Full DB/E2E not run against unowned shared local services; must pass exact GitHubCI after scoped commit/push. Changes27 files775 additions320 deletions excluding parent tracker; single-pr choice remains.
-Correct explicit Supabase NodeCLI worked: remote555authusers/accountrecords all notdeleted/active,501candidateprofiles50companyprofiles. Earlier statements that surplus were inactive meant historical password invalid/sessionrevoked, NOT account status archived. Hard deletion blocked by accounts.auth_user_id RESTRICT and immutable audit/history dependencies. Supported AuthAdmin soft-delete(id,true) is irreversible; may preserve FK target but backend/UI effects not yet tested. No delete/probe/triggerdisable occurred. Investigateonly authorization and YOLO neverauthorize destructive loss automatically; obtain direct human confirmation before any irreversible account retirement. Real-usegatezeroactivefixture accounts remains mandatory.
+## Repair evidence
 
-## Next step
-Parent commit/nonforcepush repair, independentCI verification and native review of exact candidate; do notmergefailedchecks. Audit thenperformauthorizedpublicGitHub/demoVercelmain delivery only with observed safety prerequisites. Remote retirement/destructive cleanup remains explicit-confirmation blocked, not solved by forcing schema. Update file/fullmemory/todo on transitions; report failed/skipped/pending checks honestly.
+| Commit | Outcome |
+| --- | --- |
+| `bdd9362e8982c11a625e7b75be4764af617ba1db` | Initial incomplete reduction; old CI failures retained as history |
+| `efd15f4e255f140db232b0a7d81ec608a499d5d3` | Separated acceptance data and restored unique hosted identities |
+| `1f24db63ddda617d05d4eab781235565461b2720` | Restored all 13 strict acceptance SQL count assertions |
+| `a8f6a3aa93c8773491c4d59a2c89d70cbde35f71` | Foreign CV probe selects candidate 11 for acceptance, 2 for interactive |
+
+The old candidate-2 negative probe was invalid: company 1 legitimately received that candidate in the large dataset. RLS was not weakened.
+
+Observed tooling RED/GREEN sequences: `20/15 → 38`, `40/12 → 52`, `54/1 → 55` (pass/fail → green count). Writer lint, types, build and 478 unit tests passed. Exact `a8f6a3a` Actions run **37793430977** independently confirmed application/database success. Exact CI journey counts were not extracted. That run does not prove the later correction passed.
+
+## Bounded native source review
+
+The complete 41-path candidate exceeded native context capacity before authority creation. One honest review-unit split preserved **all 40 code, tests, configuration, operational docs and `cambios-extra.md`**; only this passive ODD ledger was separate. No original history, PR or behavior was changed to reduce review size.
+
+- Local source unit: `922093dcab7897563189fa4e3d83e790f5739169`, tree `cfb3d481c96e6a9a16ceb9fbc3edd21b5ae8e629`; 40 normalized blobs matched `a8f6a3a`, with 8 additions relative to baseline.
+- Native lineage: **`review-e52e285c17d8dae6`**. Four reviewers and the refuter confirmed one critical finding: **R3-E2E-SEED-MISMATCH**. Public `npm run test:e2e` bypassed acceptance setup, unlike CI's full runner.
+- Correction: `dd71709f21eab41643a569567563351b104f5531`, tree `70f28517f3454590722b05d6d99cafdca1b0b165`. Five files, **37 additions + 3 deletions = 40 diff lines**, under the accepted 96-line plan and separate frozen 200-logical-correction budget.
+- The public command now invokes the existing confirmed local acceptance runner and forwards Playwright arguments directly. Ownership, loopback, confirmation, four-admin concurrency and no-skips controls remain intact.
+- RED `56 pass / 1 fail`; GREEN and final repetition **57/57**, zero skips. Pinned Node 24.21.0/npm 11.19.0: locked install, lint, typecheck, build (memory-only fictitious configuration) and **478 unit tests** passed. No live DB/E2E, shared Docker, hosted Auth or vault operations ran here.
+- Targeted validator approved. Exact acknowledgement returned **authority burned**, target `sha256:1ae514f2468afc5bda206000548b85dd71588507b5533b27d7c9b5139512b249`, consumed revision `sha256:71fa026ee4930766326923693b3afc69592a22aa028aba630ad56300dcf90699`, evidence `gentle-ai.review-acknowledged/v1`. No STATUS followed the burn.
+
+Approval covers the source unit, **not** the different original tree containing this ledger. Review grants no delivery authority. Fourteen non-blocking advisories remain separate follow-ups; do not reopen the approved candidate to address them.
+
+## Limits and next action
+
+The five-file structural port is complete: 40/40 normalized source blobs match reviewed `dd71709f`; parent ledger bytes were preserved, and tooling passed **57/57** in the original worktree. Original candidate assessment: medium risk, 6 paths/126 diff lines including passive ledger, large runtime writer; self-verification stands, no separate verifier required. Functional CI is still required.
+
+1. Commit only the approved five-file port plus this passive ledger; preserve concurrent work and the one-PR strategy.
+2. Commit/non-force push to the same PR. Assess the exact ported candidate and verify new CI; do not reuse the old green run as evidence.
+3. Close PC1 only after successful checks, then proceed with PC3 under ordinary repository policy.
+4. Keep irreversible retirement and the zero-active-fixture real-use gate explicit. **Rotated passwords and revoked sessions do not mean the accounts are disabled.**
+
+Earlier native attempts are retained, not treated as current approval: `review-999e1e14fb8d9f74` escalated on counts; `review-7582747c459132b2` had a model transport failure; failed start `review-3775c3e08d6dc762` created no lineage and must not be used with STATUS/recovery. The original `review-656d32c36c0b70df` covered older safeguards only.
+
+The DPAPI **ciphertext** checksum is `010ec460ad0be4f40ad831c77d96a730f50a45e86f0a7cbb0e7949f44f8e84af`; the earlier `974ddf…` checksum was for the decrypted payload, not the file. CLI route: `node` plus the main checkout's `node_modules/supabase/dist/supabase.js`, with SQL on stdin and captured/redacted output. Bare CLI PATH failure was not a remote permission failure.
+
+Known notices: unsupported ESLint/unapproved `unrs-resolver` postinstall notice; no policy override. Review-worktree `next-env.d.ts` has no normalized content diff but retains an EOL/stat dirty marker; it was not staged.
