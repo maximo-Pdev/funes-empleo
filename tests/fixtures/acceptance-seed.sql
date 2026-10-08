@@ -1,3 +1,9 @@
+-- GENERATED TEST-ONLY acceptance fixture. Never load into hosted/demo/default environments.
+-- Source: supabase/seed.sql; regenerate with tests/fixtures/generate-acceptance-seed.mjs --write.
+do $guard$ begin
+ if current_setting('funes.fixture_context',true) is distinct from 'isolated-local-acceptance'
+ then raise exception 'LOCAL_ACCEPTANCE_REQUIRED'; end if;
+end $guard$;
 -- T021. EXCLUSIVELY FICTIONAL LOCAL DATA. Never load this fixture into a real-data project.
 -- Stable IDs derive from a public fixture namespace; no municipal category is declared official.
 -- Default interactive dataset: exactly 10 identities. Acceptance is generated from this template, never loaded by default.
@@ -8,9 +14,9 @@ revoke all on function private.fixture_id(text,integer) from public,anon,authent
 do $$
 declare i integer; aid uuid; cid uuid; oid uuid; pid uuid; stat public.participation_status; slot integer; opening_n integer;
  -- Generator replaces only this reviewed parameter block (EXTRA-017).
- administrators integer:=2; candidates integer:=4; companies integer:=4;
- openings integer:=8; participations integer:=8; active_candidates integer:=4;
- published_openings integer:=4; vacancies integer:=1; fully_hired_openings integer:=4; partially_hired_openings integer:=0;
+ administrators integer:=4; candidates integer:=500; companies integer:=50;
+ openings integer:=100; participations integer:=1000; active_candidates integer:=400;
+ published_openings integer:=80; vacancies integer:=2; fully_hired_openings integer:=20; partially_hired_openings integer:=10;
  t timestamptz:='2026-09-19 12:00:00+00'; admin_id uuid:=private.fixture_id('admin',1);
  cuit_base text; checksum integer; weights integer[]:=array[5,4,3,2,7,6,5,4,3,2]; j integer;
 begin

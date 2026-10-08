@@ -1,10 +1,10 @@
--- DEMO ONLY: execute with the authenticated maintenance transport bound to
--- kyjycjojzhwggjuqjnki, immediately after a separately authorized fixture reset.
--- This is test setup, never a product transition or a migration.
+-- TEST-ONLY: isolated LOCAL acceptance dataset, immediately after its cold reset.
+-- Never run on hosted/demo data. This is test setup, not a migration.
 begin;
 do $setup$
 begin
-  if (select count(*) from auth.users)<>554
+  if current_setting('funes.fixture_context',true) is distinct from 'isolated-local-acceptance'
+    or (select count(*) from auth.users)<>554
     or exists(select 1 from auth.users u where not exists(
       select 1 from generate_series(1,554) n where
         u.id=private.fixture_id(case when n<=4 then 'admin' when n<=504 then 'candidate' else 'company' end,
@@ -25,7 +25,7 @@ begin
   delete from public.referrals where id=private.fixture_id('referral',775) and participation_id=private.fixture_id('participation',775);
   update public.participations set status='under_review',feedback_due_at=null where id=private.fixture_id('participation',775);
 end $setup$;
-select jsonb_build_object('variant','funes-demo-v1-concurrency-v1','opening',80,'preselection',775,'contact',765,'outcome',755,
+select jsonb_build_object('variant','funes-acceptance-v2-concurrency','opening',80,'preselection',775,'contact',765,'outcome',755,
   'openingVersion',(select version from public.job_openings where id=private.fixture_id('opening',80)),
   'preselectionVersion',(select version from public.participations where id=private.fixture_id('participation',775)),
   'at',clock_timestamp()) as preparation;

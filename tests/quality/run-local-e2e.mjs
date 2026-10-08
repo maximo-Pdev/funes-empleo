@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 if (process.argv[2] !== "--confirm-local-reset") {
   throw new Error("Este control restablece solo el fixture LOCAL: indicá --confirm-local-reset.");
 }
+const playwrightArgs = process.argv.slice(3);
 const root = process.cwd();
 const cli = resolve(root, "node_modules/supabase/dist/supabase.js");
 const status = spawnSync(process.execPath, [cli, "status", "-o", "json"], { encoding: "utf8" });
@@ -27,10 +28,10 @@ function run(file, args) {
   const result = spawnSync(process.execPath, [resolve(root, file), ...args], { env, stdio: "inherit" });
   if (result.error || result.status !== 0) throw new Error(`Falló el control ${file}.`);
 }
-run("tests/fixtures/reset-local.mjs", ["--confirm-local-reset"]);
+run("tests/fixtures/reset-local.mjs", ["--confirm-local-reset", "--acceptance"]);
 run("node_modules/next/dist/bin/next", ["build"]);
 mkdirSync(resolve(root, "test-results"), { recursive: true });
-run("node_modules/@playwright/test/cli.js", ["test", "--workers=1", "--retries=0", "--reporter=list,json"]);
+run("node_modules/@playwright/test/cli.js", ["test", "--workers=1", "--retries=0", "--reporter=list,json", ...playwrightArgs]);
 run("tests/quality/concurrency.mjs", []);
 const report = JSON.parse(readFileSync(env.PLAYWRIGHT_JSON_OUTPUT_FILE, "utf8"));
 if (!report.stats.expected || report.stats.skipped || report.stats.unexpected || report.stats.flaky) {

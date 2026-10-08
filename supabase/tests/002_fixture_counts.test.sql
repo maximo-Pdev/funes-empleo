@@ -1,3 +1,5 @@
+-- Strict TEST-ONLY acceptance contract, selected explicitly by npm run test:db
+-- and test:e2e:full. The default interactive seed is intentionally a different dataset.
 begin;
 select no_plan();
 select is((select count(*) from public.accounts where role='admin'),4::bigint,'Cuatro administradores ficticios');

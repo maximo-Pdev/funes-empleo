@@ -2,15 +2,17 @@ import { createHash } from "node:crypto";
 import { readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { expect, type Page } from "@playwright/test";
+import { localFixturePassword } from "../../fixtures/credentials.mjs";
 
 export function fixtureId(kind: string, number: number) {
   const h = createHash("md5").update(`funes-demo-v1:${kind}:${number}`).digest("hex");
   return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
 }
 export async function loginFixture(page: Page, role: "candidate" | "company" | "admin", number = 1) {
+  const password = localFixturePassword();
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(`${role}${number}@example.invalid`);
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
 }

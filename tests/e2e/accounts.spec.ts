@@ -1,14 +1,15 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 
 test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ page }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo contra Supabase local ficticio");
+  assertLocalTargets();
   await page.goto("/account");
   await expect(page).toHaveURL(/\/session-expired$/);
   await page.goto("/login");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByLabel("Correo electrónico").fill("candidate1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(page.getByRole("heading", { name: "Mi cuenta", exact: true })).toBeVisible();
@@ -20,7 +21,7 @@ test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ pa
 });
 
 test("recuperación responde igual para correo existente y desconocido", async ({ page }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo contra Supabase local ficticio");
+  assertLocalTargets();
   const responses: string[] = [];
   for (const email of ["candidate2@example.invalid", "no-existe@example.invalid"]) {
     await page.goto("/recover");

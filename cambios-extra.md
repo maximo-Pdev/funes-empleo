@@ -623,6 +623,149 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   informativas diferidas. Esto no acredita aprobación humana ni merge a main.
 - El commit de este cierre solo modifica documentación; se observará su CI final.
 
+## EXTRA-015 — Separación de credenciales locales y alojadas
+
+- **Fecha:** 2026-10-07 (fecha observada del entorno). **Estado histórico de la etapa original:**
+  fuente original verificada independientemente antes de bdd9362; no cubre la
+  reducción posterior ni la reparación actual. Operaciones remotas se registran
+  por el padre en PC2/PC4; revisión/publicación del candidato actual pendientes.
+- **Origen:** PC1 de `odd/tasks/public-repository-credentials.md`, T003/T005/T021/T096
+  y principios II/III/VI de la constitución: privacidad, identidades individuales
+  y preservación del historial. No modifica comportamiento del producto.
+- **Problema/evidencia:** scripts alojados reutilizan la contraseña versionada del
+  seed local; el reset alojado incorpora el seed completo y elimina usuarios Auth.
+  Los guards E2E por prefijo no verifican el destino de la aplicación.
+- **Cambio necesario:** exigir variables privadas por identidad en CV/calidad
+  alojados, resolverlas antes de transporte o navegador, centralizar fixtures E2E
+  con validación estricta de ambos orígenes y bloquear reset MJS/SQL sin borrados.
+- **Superficies:** helper/declaración/prueba Node en tests/fixtures y tests/unit/tooling;
+  scripts CV/reset/calidad demo; ocho consumidores E2E incluido su helper;
+  playwright.config.ts, package.json, workflow Quality, .env.example, quickstart,
+  docs/operations/demo-credentials.md y este registro. Seed/manifiesto sin cambios.
+- **Justificación/riesgos:** requisito de seguridad previo a una eventual publicación,
+  no nueva función municipal. El reset alojado queda indisponible; una sustitución
+  futura debe preservar identidades/contraseñas e historial y tener revisión propia.
+  Bloquear código no invalida contraseñas ni funciones SQL ya instaladas: PC2/PC3
+  siguen siendo necesarios. No se habilita producción ni visibilidad pública.
+- **Autorización/coordinación:** usuario autoriza PC1 en el worktree aislado;
+  checkout principal y cambios administrativos concurrentes intocables. El padre
+  conserva tracker, revisión y entrega Git. Sin commits/push ni acciones remotas.
+- **Verificación prevista:** RED/GREEN Node sin red, negativos de origen/credenciales,
+  transporte simulado, guard SQL estructural y hashes; npm ci con lockfile existente,
+  lint/typecheck/unit/build sin secretos ni Auth alojado. Runtime observado
+  Node 24.16.0/npm 11.13.0 distinto de los pins; no debilitar engines.
+- **Historia de verificación del escritor:**
+  `node --test tests/unit/tooling/fixture-credentials.node.test.mjs`
+  RED 12/12 fallos esperados (transporte alcanzado, generación SQL y destinos
+  inseguros aceptados); GREEN inicial 20/20, triangulación final 28/28 PASS.
+  Transporte/cliente/browser simulados, rechazo de la última identidad ausente,
+  valores vacíos, URLs engañosas y errores de navegador sin credenciales en salida.
+  Sintaxis de ocho .mjs, negativa SQL estructural y hashes normalizados de seed/
+  manifiesto PASS; comparación inicial de bytes del manifiesto difería por CRLF.
+  `npm ci` FAIL EBADENGINE con Node 24.16/npm 11.13 frente a 24.21/11.19:
+  engines intactos, sin bypass ni cambios de lockfile. `npm run lint`,
+  `npm run typecheck`, `npm run test:unit` y `npm run build` FAIL por ejecutables
+  ausentes después de la instalación rechazada; no acreditan gates de aplicación.
+  No se ejecutaron DB/E2E/reset/controles alojados reales ni se generó next-env.
+  El RED fue presenciado por el escritor; no se atribuye al verificador independiente.
+- **Verificación independiente vigente, registrada 2026-10-07:** evidencia
+  aportada por el padre de gentle-ai-verify, con toolchain efímero mediante
+  `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 -- …`.
+  Node 24.21.0/npm 11.19.0 reales comprobados; `npm ci` PASS, 464 paquetes y
+  audit 0; lint/typecheck PASS; `test:unit` PASS, 478 pruebas en 30 archivos;
+  build PASS; tooling nativo PASS, 28/28 con Node exacto. Sin cambios generados
+  rastreados. Estos PASS superseden la indisponibilidad inicial de los gates;
+  se conserva EBADENGINE como historia, no como estado vigente. Este follow-up
+  documental no repite comandos npm/tests ni acredita CI remoto o aceptación.
+- **Prerrequisito operativo PC2, registrado 2026-10-07:** el intento de solo
+  lectura con Supabase CLI oficial 2.117.0, `projects list --output-format json
+  --log-level none`, falló por autenticación ausente. No hubo recuperación de
+  proyecto/clave administrativa ni operación remota. El padre solicitará acceso
+  seguro mediante login de la cuenta autorizada o `SUPABASE_ACCESS_TOKEN` en el
+  proceso local, fuera del chat; nunca secretos en chat, archivos env ni argv.
+  Tras autenticar y verificar alcance, la CLI soporta `projects api-keys` para
+  capturar la clave solo en memoria y `db query` vía Management API para bloquear
+  la función SQL ya instalada. Son capacidades disponibles, no acciones ejecutadas.
+  El repositorio permanece privado hasta verificar invalidación remota, manejo
+  de sesiones y bloqueo de la función instalada. El usuario acepta PDFs, documentos,
+  fixtures sintéticos y metadatos Git para el objetivo público; esa autorización
+  no sustituye los controles de seguridad pendientes.
+- **Unicidad:** EXTRA-015 verificado frente a referencias locales main/origin,
+  según evidencia aportada por el padre; no se afirma consulta del último remoto.
+- **Límites de artefactos/revisión:** quickstart y guía operativa registran el bloqueo;
+  las descripciones históricas de reset en plan/runbook requieren reconciliación
+  por su propietario (fuera de las superficies delegadas). El slice PC1 informado
+  antes de este follow-up documental tiene 550 líneas de diff, por encima de la
+  previsión orientativa de 400; el padre decide entrega/revisión. No se omitieron
+  pruebas para ajustar el presupuesto.
+- **Revisión/aceptación y commit/PR:** pendientes; no acreditados por esta entrada.
+
+## EXTRA-016 — Reducción del fixture demo a 10 identidades
+
+- **Fecha:** 2026-10-08. **Estado histórico:** reducción de fuente bdd9362 incompleta,
+  con checks application/database fallidos; no revisada ni aceptada como solución
+  coherente. Supersedida por EXTRA-017: se conserva el demo pequeño, se rechazan
+  variables por rol y la pérdida de cobertura de aceptación/concurrencia.
+- **Origen:** autorización explícita del usuario para combinar la remediación de credenciales con la reducción del fixture demo; PC1 de `odd/tasks/public-repository-credentials.md` y principios II/III/VI de la constitución.
+- **Problema y evidencia:** el fixture contenía 554 cuentas ficticias (4 admin / 500 candidate / 50 company) que el usuario considera innecesarias para la demo y que aumentan la superficie de credenciales a rotar/controlar.
+- **Cambio implementado:** reducir el seed local y el manifiesto a 10 identidades ficticias (2 admin / 4 candidate / 4 company), con registros de negocio coherentes: 4 perfiles de candidato, 4 empresas, 8 ofertas y 8 participaciones. Conservar el password local determinista protegido por los guards de origen local. Reemplazar las ocho variables de entorno alojadas por tres variables por rol (`DEMO_ADMIN_PASSWORD`, `DEMO_CANDIDATE_PASSWORD`, `DEMO_COMPANY_PASSWORD`). Actualizar el resolver, test nativo, reset local, documentación y `.env.example`.
+- **Justificación:** reduce la superficie de credenciales y cuentas de prueba mantenidas en el demo sin cambiar reglas de negocio ni habilitar producción/publicación.
+- **Archivos y contratos afectados:** `supabase/seed.sql`, `tests/fixtures/acceptance-manifest.json`, `tests/fixtures/credentials.mjs`, `tests/fixtures/credentials.d.mts`, `tests/unit/tooling/fixture-credentials.node.test.mjs`, `tests/fixtures/reset-local.mjs`, `.env.example`, `docs/operations/demo-credentials.md`, `specs/001-municipal-employment-portal/quickstart.md`, `odd/tasks/public-repository-credentials.md` y este registro.
+- **Riesgos y límites:** los tests E2E y pgTAP que esperaban 500/50/100/1000 quedan desactualizados para este PR; el fixture de concurrencia (`prepare-demo-concurrency.sql`) queda marcado como no soportado con 10 cuentas. No se ejecutaron resets ni operaciones remotas; el ajuste remoto (borrado de 544 cuentas sobrantes y actualización de la bóveda DPAPI) es parte de la continuación operativa PC2/PC3.
+- **Autorización y coordinación:** usuario autoriza explícitamente la reducción a 10 cuentas y el PR único; el padre conserva revisión, ODD y acciones Git. Sin commits/push/merge por parte de este escritor.
+- **Verificación prevista:** `node --test tests/unit/tooling/fixture-credentials.node.test.mjs`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`.
+- **Resultados:** pendientes de ejecución en el worktree; se reportarán antes del handoff.
+- **Limitaciones:** no se verifican E2E ni pgTAP en este ámbito; requieren actualización aparte o fixture de concurrencia revisado.
+
+## EXTRA-017 — Reparación coherente de datasets y credenciales de PR #50
+
+- **Fecha:** 2026-10-08. **Estado:** registrado antes de cambios; implementación/verificación pendientes, sin revisión acreditada.
+- **Origen:** PC1 reconciliado, T021/T089/T095, FR-003 y SC-003/008/008A; autorización del usuario para corregir todos los checks en un único PR.
+- **Evidencia:** bdd9362 reduce el seed pero no los contratos de pgTAP/E2E: métricas, referencias a admin3/4, FK de sesiones y rollback de auditoría fallan. Tres variables por rol contradicen las contraseñas únicas ya existentes. La revisión del código previo no cubre esa reducción.
+- **Cambio mínimo previsto:** conservar seed interactivo 2/4/4; generar desde la misma plantilla SQL un fixture TEST-ONLY 4/500/50/100/1000, activado explícitamente solo por aceptación local aislada/CI. Manifiesto con datasets separados, hashes y expectativas. Resolver exactamente las diez identidades alojadas con variables individuales, sin fallback ni rotación. Ejecutar concurrencia de cuatro admins únicamente en aceptación local y diagnosticar la aserción de ofertas restauradas sin bajar expectativas.
+- **Superficies:** seed, fixtures/generador/reset local, credenciales y pruebas tooling; runner local/CI/package; consumidores E2E/performance/demo; pruebas SQL y documentación operativa/quickstart. Solo tests/tooling/docs: no migraciones ni políticas de producto.
+- **Riesgos/límites:** nunca cargar aceptación al demo alojado; exigir destinos exactos y propiedad del servicio aislado antes del reset. Ninguna operación alojada, bóveda, borrado Auth o aceptación municipal. Checks DB/E2E requieren servicio local propio o CI después del push del padre.
+- **Autorización/coordinación:** padre autoriza superficies técnicas ampliadas en worktree aislado; conserva tracker, revisión y commit/push/merge. Checkout principal y sus servicios intactos. PR único; no se reduce el diff omitiendo checks.
+- **Verificación prevista:** RED/GREEN nativo de identidades y datasets/entrypoints, negativos remotos, hashes/SQL generado; Node 24.21.0/npm 11.19.0 efímeros para tooling/lint/typecheck/unit/build. DB/E2E solo en entorno de propiedad verificada; reportar pendientes honestamente.
+- **Supersede EXTRA-016:** la reducción interactiva sigue vigente, pero sus variables por rol y la declaración de concurrencia no soportada se rechazan. Los fallos de checks no se aceptan como limitación permanente. EXTRA-015 conserva evidencia histórica de la fuente anterior, no aprobación del candidato actual.
+- **Implementación:** `supabase/seed.sql` sigue creando exactamente 10 identidades y 4/4/8/8 registros. El generador deriva SQL TEST-ONLY 4/500/50/100/1000 desde el mismo bloque parametrizado; manifiesto separado y hashes normalizados. `test:db` y el runner E2E seleccionan aceptación explícitamente. El último proyecto E2E hace reset frío y prueba cuatro admins/barrera/≤5 s/versiones/auditorías, sin crear admins alojados nuevos. Resolver exacto de diez variables individuales, controles CV interactivos de 4 candidatos y checks de demo sin atribuirles el benchmark grande.
+- **Diagnóstico 030:** el seed pequeño da a company1 una oferta publicada y otra cerrada; esta última se excluye correctamente del archivo/restauración. Aceptación da dos publicadas (1 y 51), más la nueva oferta del test: la expectativa de tres borradores se conserva. Se agregaron precondiciones explícitas y una oferta terminal propia que debe permanecer cerrada/no archivada. Diagnóstico de fuente; confirmación SQL funcional pendiente, sin cambios de políticas.
+- **RED observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"` exit 1, 20 PASS/15 FAIL contra comportamiento de bdd9362: variables individuales rechazadas, datasets/generador ausentes, flags de aceptación sin soporte. Dos ejecuciones intermedias 34/35 fallaron únicamente por hashes aún pendientes; no se presentan como GREEN.
+- **GREEN y triangulación observados:** mismo comando exit 0, primero 35/35 y después de refactor/negativos adicionales 38/38. Cubre los entrypoints reales con transportes interceptados, exactamente diez identidades/variables vacías, rechazo admin3/4 alojados y fallback por rol, aceptación local de cuatro admins sin credenciales alojadas, rechazo de orígenes remotos y servicios sin propiedad, parámetros/conteos/outcomes, hash del PDF y equivalencia de SQL generado. Estos tests no ejecutan SQL real.
+- **Gates observados:** cada comando ejecutado en foreground dos veces, ambas exit 0, con prefijo exacto `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call`: `"npm run lint"` sin warnings; `"npm run typecheck"`; `"npm run test:unit"` 478 pruebas/30 archivos; `"npm run build"`. `git diff --check` PASS. No cambió `next-env.d.ts`; no fue necesario restaurar artefactos rastreados.
+- **Pendientes honestos:** `npm run test:db`, `npm run test:e2e:full` y concurrencia SQL no ejecutados: no se verificó un servicio local de propiedad exclusiva, y el servicio principal/concurrente no se toca. Requieren Quality/application y database del SHA que publique el padre. No afirmar DB/E2E PASS, checks de PR nuevos, aceptación humana o revisión. Sin stage/commit/push/merge, operaciones alojadas, lectura/cambio de bóveda ni cambios al tracker del padre. Referencias de commit/revisión siguen pendientes.
+
+### Continuación funcional de EXTRA-017 — contrato SQL de conteos de aceptación
+
+- **Origen/autorización:** reparación acotada solicitada por el padre después del push de `efd15f4e255f140db232b0a7d81ec608a499d5d3`; no operación de autoridad de revisión.
+- **Evidencia aportada:** Quality `37760793365`: tooling 38 PASS; database 858 tests/10 fallos y application falla durante reset por los mismos diez conteos de `002_fixture_counts.test.sql`. Inspección de fuente: esa prueba aún exige el seed pequeño aunque el runner selecciona aceptación. Sus dos páginas también conservan limit/offset 2, que pueden pasar SQL sin comprobar el protocolo aprobado de 10 filas.
+- **Cambio previsto antes de editar:** restaurar los 13 conteos/consultas estrictos de aceptación conforme a `aac526a` y al manifiesto explícito, incluyendo activos, contrataciones/cobertura y páginas. Agregar contrato nativo contra las consultas SQL reales para impedir nueva divergencia. No derivar expectativas de conteos observados ni cambiar seeds, manifiesto, políticas o cuatro administradores municipales.
+- **Superficies:** `supabase/tests/002_fixture_counts.test.sql`, prueba nativa de datasets, guía de credenciales y esta entrada. Demo interactiva sigue separada y verificada por generador/manifiesto; `supabase test db` después de reset default pequeño no es el comando de aceptación.
+- **Verificación prevista:** RED/GREEN tooling y lint/typecheck/unit/build con Node 24.21.0/npm 11.19.0 efímeros; whitespace. DB/E2E pendientes de nuevo CI: ningún reset de servicios compartidos. No stage/commit/push/merge, operaciones alojadas/bóveda ni manipulación de revisión/tracker.
+- **RED observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"` exit 1: 40 PASS/12 FAIL. Diez fallos por conteos pequeños frente a aceptación, más dos fallos por limit/offset 2 en lugar de 10. La búsqueda de candidato siguió pasando. Esto caracteriza la fuente SQL real sin ejecutar PostgreSQL; los diez fallos funcionales de CI son evidencia aportada por el padre.
+- **Implementación/GREEN:** restaurados los 13 `select is` y sus consultas a la versión estricta de `aac526a` (solo comentarios nuevos de separación). Mismo comando exit 0, 52/52 PASS. Contrato cubre queries/filtros/joins/literales y páginas, junto con los guards/hashes/generador previos. Seed default, fixture/manifiesto y regresión de oferta terminal de 030 intactos.
+- **Gates observados de esta continuación:** con el mismo prefijo efímero exacto y comandos `"npm run lint"`, `"npm run typecheck"`, `"npm run test:unit"`, `"npm run build"`: todos exit 0; lint sin warnings, unit 478 pruebas/30 archivos. `git diff --check` exit 0; repetición final del comando tooling exit 0, 52/52 PASS. `next-env.d.ts` sin diff; ninguna restauración necesaria. No instalación ni cambio de dependencias.
+- **Límites actuales:** no se ejecutan DB/E2E locales porque no hay destino de propiedad exclusiva disponible; ningún reset de servicios compartidos. Nuevo CI del próximo SHA publicado por el padre sigue pendiente. No se acredita CI PASS ni aprobación del candidato reparado; sin operaciones de autoridad de revisión, stage/commit/push/merge, hosted/vault ni tracker.
+
+### Continuación funcional de EXTRA-017 — CV ajeno según dataset
+
+- **Evidencia aportada por el padre:** HEAD `1f24db63ddda617d05d4eab781235565461b2720`, Actions `37782732227`: database PASS, application FAIL en el guard Storage de `reset-local.mjs`. No se atribuye ese resultado a una filtración alojada ni a una política defectuosa: candidate2 tiene derivaciones legítimas para company1 en aceptación (participaciones 2/502, ofertas 1/51).
+- **Cambio previsto antes de editar:** seleccionar candidate11 como CV extranjero para company1 en aceptación y conservar candidate2 en interactivo. Mantener las dos descargas positivas y los cuatro rechazos estrictos (CV ajeno de company1, target de company2, URL firmada y anónimo), con diagnóstico separado. No cambiar RLS, migraciones, criterios ni identidades.
+- **Prueba prevista:** RED/GREEN nativo enlazado a la selección real de `otherPath`; reconstruir independientemente derivaciones activas desde parámetros/fórmulas del seed para ambos datasets, verificando target autorizado y probe verdaderamente extranjero. Guards y hashes previos intactos. SQL/Storage real y E2E pendientes del nuevo CI, sin servicios compartidos, Docker o Auth alojado.
+- **Superficies/autoridad:** solo reset local, test nativo, guía y esta entrada; padre conserva tracker, revisión y entrega. No stage/commit/push/merge ni operaciones de autoridad/bóveda. Gates con Node 24.21.0/npm 11.19.0 efímeros, sin afirmar E2E verde.
+- **RED observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"` exit 1, 54 PASS/1 FAIL: el CV configurado para aceptación tiene una derivación activa a company1. El mismo contrato interactivo y la presencia de todos los probes pasan. Test de contrato sobre selección real y enumeración independiente de parámetros/fórmulas de SQL; no ejecución PostgreSQL/Storage.
+- **GREEN observado:** mismo comando exit 0, 55/55 PASS tras seleccionar 11/2 según dataset. Target1 sigue legítimamente referido a company1 y no a company2; el CV negativo existe y está referido a company2 pero no a company1. Se mantienen dos descargas positivas exactas/hash y cuatro negativos estrictos, ahora con mensajes separados. No cambios de políticas, seeds, manifiesto ni ventana de acceso.
+- **Gates observados:** con el mismo prefijo exacto, `"npm run lint"`, `"npm run typecheck"`, `"npm run test:unit"`, `"npm run build"` exit 0; lint sin warnings, unit 478/30 archivos. `git diff --check` exit 0; repetición final tooling 55/55 PASS. `next-env.d.ts` sin diff, sin restauración necesaria. No se ejecutó cobertura instrumentada adicional, DB/E2E, reset real, Docker o hosted/vault. Nuevo CI del siguiente SHA del padre pendiente: database PASS/application FAIL de `37782732227` es evidencia previa aportada, no verificación de esta reparación.
+
+### Corrección acotada de EXTRA-017 — R3-E2E-SEED-MISMATCH
+
+- **Propuesta previa a cambios:** hallazgo nativo aportado por el padre: `test:e2e` público invoca Playwright crudo contra 4/4/8/8, incompatible con T095/SC-003/008/008A (500/50/100/1000).
+- **Cambio necesario:** reutilizar el runner local protegido de `test:e2e:full` y reenviar argumentos al CLI Playwright directo, sin recursión ni duplicar resets. Superficies: package.json, runner, test nativo, guía operativa y esta entrada; datasets/Auth/RLS intactos.
+- **Autorización/límites:** padre autoriza esta corrección de fuente; revisión observada del candidato corregido pendiente, no aprobada. Reset solo local propio; nunca servicio compartido/alojado.
+- **Verificación prevista:** RED/GREEN tooling, lint/typecheck/unit/build con Node 24.21.0/npm 11.19.0; DB/E2E reales pendientes de CI aislado tras corrección de puertos por el padre.
+- **Resultado observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"`: RED 56 PASS/1 FAIL (entrypoint público); GREEN 57/57, sin skips, incluido rechazo de confirmación ausente antes del transporte simulado. Mismo prefijo con `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:unit` (478/30) y `npm run build`: exit 0; lint sin warnings. Build con placeholders públicos ficticios solo en memoria.
+- **Límites:** sin DB/E2E/CI ni aprobación nativa acreditados; guards/datasets/concurrencia intactos. `next-env.d.ts` restaurado byte-idéntico a HEAD; lockfile sin cambios. Diff whitespace PASS; sin acciones Git de escritura. Avisos npm de ESLint sin soporte y postinstall unrs-resolver no autorizado conservados.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

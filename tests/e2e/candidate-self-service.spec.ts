@@ -1,15 +1,16 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { join } from "node:path";
+import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 
 // One-time local verification links must stay out of traces and screenshots.
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"),
-    "Solo Supabase local con datos ficticios");
+  assertLocalTargets();
 });
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
+  assertLocalTargets();
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
@@ -121,7 +122,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
     const admin = await adminContext.newPage();
-    await signIn(admin, "admin1@example.invalid", "Fictitious-Local-Only-2026!");
+    await signIn(admin, "admin1@example.invalid", localFixturePassword());
     await admin.goto("/admin/candidates");
     await admin.getByLabel("Término").fill(name);
     await admin.getByLabel("Vigencia").selectOption("all");

@@ -1,9 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { loginFixture } from "./fixtures/quality";
-import manifest from "../fixtures/acceptance-manifest.json" with { type: "json" };
+import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
+import { assertLocalTargets } from "../fixtures/credentials.mjs";
+const manifest = fixtures.acceptance;
 test.use({trace:"off",screenshot:"off"});
 test("SC-008A: entradas y conteos de paginación, sin acreditar latencia alojada", async ({page})=>{
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"),"Solo fixture local");
+  assertLocalTargets();
   await loginFixture(page,"admin");
   for (const [route,label,entry] of [
     ["openings","Ofertas",manifest.sc008a.openingList],

@@ -1,50 +1,93 @@
 {
-  "version": "funes-demo-v1",
-  "seedSha256": "ae11e0374459bd64f5f6a7803223d3f74a56fc80966c066be69e13a47eadb7d7",
+  "version": "funes-fixtures-v2-separated-datasets",
   "cvSha256": "1e6751c855dda6e8c69bfc5b4ba6d5efebffef6ea6cb7c3c10d697ed0d9ba397",
-  "counts": {
-    "administrators": 4,
-    "candidates": 500,
-    "activeCandidates": 400,
-    "companies": 50,
-    "offers": 100,
-    "participations": 1000,
-    "confirmedHires": 50,
-    "fullyCoveredOffers": 20
-  },
-  "sc008a": {
-    "candidateSearch": {
-      "term": "Persona ficticia 001",
-      "categoryCode": "DEMO-B",
-      "availability": "available",
-      "expectedTotal": 1
-    },
-    "openingList": {
-      "status": "published",
-      "page": 2,
-      "pageSize": 10,
-      "expectedTotal": 80,
-      "expectedRows": 10
-    },
-    "companyList": {
-      "status": "active",
-      "page": 2,
-      "pageSize": 10,
-      "expectedTotal": 50,
-      "expectedRows": 10
-    }
-  },
-  "concurrentAdmins": {
-    "variant": "funes-demo-v1-concurrency-v1",
-    "preparation": "tests/fixtures/prepare-demo-concurrency.sql",
-    "openingNumber": 80,
-    "preselectionParticipation": 775,
-    "contactParticipation": 765,
-    "outcomeParticipation": 755
-  },
   "cvDownload": {
     "candidateNumber": 1,
     "file": "cv-fictitious.pdf",
     "bytes": 1426
+  },
+  "interactive": {
+    "version": "funes-demo-v2-10-accounts",
+    "seedFile": "supabase/seed.sql",
+    "seedSha256": "13ec9c149d5b9cbe48acf5282aa7bb1c8b69f739c9096450e4f7d457867c57ec",
+    "counts": {
+      "administrators": 2,
+      "candidates": 4,
+      "activeCandidates": 4,
+      "companies": 4,
+      "offers": 8,
+      "participations": 8,
+      "confirmedHires": 4,
+      "fullyCoveredOffers": 4
+    },
+    "sc008a": {
+      "candidateSearch": {
+        "term": "Persona ficticia 001",
+        "categoryCode": "DEMO-B",
+        "availability": "available",
+        "expectedTotal": 1
+      },
+      "openingList": {
+        "status": "published",
+        "page": 1,
+        "pageSize": 10,
+        "expectedTotal": 4,
+        "expectedRows": 4
+      },
+      "companyList": {
+        "status": "active",
+        "page": 1,
+        "pageSize": 10,
+        "expectedTotal": 4,
+        "expectedRows": 4
+      }
+    }
+  },
+  "acceptance": {
+    "version": "funes-acceptance-v2-test-only",
+    "localOnly": true,
+    "seedFile": "tests/fixtures/acceptance-seed.sql",
+    "seedSha256": "88fd1c86d2c97901cce8ea12328988e1b0b1b0e600a5f6034bc9aaeffea798db",
+    "counts": {
+      "administrators": 4,
+      "candidates": 500,
+      "activeCandidates": 400,
+      "companies": 50,
+      "offers": 100,
+      "participations": 1000,
+      "confirmedHires": 50,
+      "fullyCoveredOffers": 20
+    },
+    "sc008a": {
+      "candidateSearch": {
+        "term": "Persona ficticia 001",
+        "categoryCode": "DEMO-B",
+        "availability": "available",
+        "expectedTotal": 1
+      },
+      "openingList": {
+        "status": "published",
+        "page": 2,
+        "pageSize": 10,
+        "expectedTotal": 80,
+        "expectedRows": 10
+      },
+      "companyList": {
+        "status": "active",
+        "page": 2,
+        "pageSize": 10,
+        "expectedTotal": 50,
+        "expectedRows": 10
+      }
+    },
+    "concurrentAdmins": {
+      "administrators": 4,
+      "variant": "funes-acceptance-v2-concurrency",
+      "preparation": "tests/fixtures/prepare-demo-concurrency.sql",
+      "openingNumber": 80,
+      "preselectionParticipation": 775,
+      "contactParticipation": 765,
+      "outcomeParticipation": 755
+    }
   }
 }

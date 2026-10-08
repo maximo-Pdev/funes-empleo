@@ -3,6 +3,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { parse } from "csv-parse/sync";
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
+test.beforeEach(() => assertLocalTargets());
 const fixtureId = (kind: string, n: number) => {
   const h = createHash("md5").update(`funes-demo-v1:${kind}:${n}`).digest("hex");
   return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
@@ -10,14 +12,13 @@ const fixtureId = (kind: string, n: number) => {
 test.use({ trace: "off", screenshot: "off" });
 test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 segundos", async ({ page }) => {
   test.setTimeout(60000);
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local");
   expect(runLocalMaintenanceSql("select (select count(*) from public.candidate_profiles)||','||(select count(*) from public.company_profiles)||','||(select count(*) from public.job_openings)||','||(select count(*) from public.participations)" )).toBe("500,50,100,1000");
   const auditBefore = Number(runLocalMaintenanceSql("select count(*) from private.metrics_exports"));
   runLocalMaintenanceSql(`update public.job_openings set title='=OFERTA FICTICIA' where id='${fixtureId("opening",2)}'`);
   try {
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
   await page.goto("/admin/metrics?from=invalido");
@@ -63,12 +64,11 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
 });
 
 test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ page, request }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local");
   const url = "/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20";
   expect((await request.get(url)).status()).toBe(403);
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill("company1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
   const denied = await page.request.get(url);
@@ -80,7 +80,6 @@ test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ p
 });
 
 test("seguimiento: canales cronológicos y plantillas sin envío", async ({ page }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local");
   runLocalMaintenanceSql(`insert into public.contact_events(participation_id,channel,direction,occurred_at,summary_internal,next_action_at,recorded_by)
     select '${fixtureId("participation",1)}',channel,'outbound','2026-09-20 12:00+00'::timestamptz + n*interval '1 hour',
       'Seguimiento ficticio '||n,'2026-09-28 12:00+00','${fixtureId("admin",1)}'
@@ -88,7 +87,7 @@ test("seguimiento: canales cronológicos y plantillas sin envío", async ({ page
     where not exists(select 1 from public.contact_events c where c.participation_id='${fixtureId("participation",1)}' and c.summary_internal='Seguimiento ficticio '||n)`);
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
   await page.goto(`/admin/participations/${fixtureId("participation",1)}`);
