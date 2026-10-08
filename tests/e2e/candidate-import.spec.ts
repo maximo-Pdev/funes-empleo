@@ -2,14 +2,12 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { assertLocalTargets } from "../fixtures/credentials.mjs";
+import { loginFixture } from "./fixtures/quality";
+test.beforeEach(() => assertLocalTargets());
 test.use({ trace: "off", screenshot: "off" });
 test("importación ficticia: preview sin alta y confirmación explícita", async ({ page }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local");
-  await page.goto("/login");
-  await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await loginFixture(page, "admin");
   await page.goto("/admin/imports/new");
   await expect(page.getByRole("heading", { name: "Importación de demostración" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -29,13 +27,8 @@ test("importación ficticia: preview sin alta y confirmación explícita", async
 });
 
 test("duplicados dentro del archivo: bloqueo, rechazo explícito y confirmación concurrente", async ({ page, request }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local");
   expect((await request.post("/api/admin/imports/preview", { data: "csv" })).ok()).toBe(false);
-  await page.goto("/login");
-  await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await loginFixture(page, "admin");
   await page.goto("/admin/imports/new");
   const dni = `96${Date.now().toString().slice(-6)}`;
   const row = `Persona duplicada ficticia,${dni},csv${dni}@example.invalid,,Funes,DEMO-A,Prueba,available,DEMO_2`;
@@ -66,12 +59,7 @@ test("duplicados dentro del archivo: bloqueo, rechazo explícito y confirmación
 });
 
 test("fallo transaccional visible y nueva carga vinculada recuperable", async ({ page }) => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local");
-  await page.goto("/login");
-  await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await loginFixture(page, "admin");
   await page.goto("/admin/imports/new");
   const suffix = Date.now().toString().slice(-5);
   const firstDni = `95${suffix}1`, secondDni = `95${suffix}2`;

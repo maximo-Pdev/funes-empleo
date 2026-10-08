@@ -65,7 +65,7 @@ async function signedIn(email) {
   return client;
 }
 const targetPath = `${fixtureId("profile", 1)}/${fixtureId("cv", 1)}.pdf`;
-const otherPath = `${fixtureId("profile", 11)}/${fixtureId("cv", 11)}.pdf`;
+const otherPath = `${fixtureId("profile", 2)}/${fixtureId("cv", 2)}.pdf`;
 const candidate = await signedIn("candidate1@example.invalid");
 const companyWithReferral = await signedIn("company1@example.invalid");
 const companyWithoutReferral = await signedIn("company2@example.invalid");

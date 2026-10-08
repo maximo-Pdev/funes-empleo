@@ -4,8 +4,11 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { cpus, totalmem, release } from "node:os";
+import { resolveHostedCredentials } from "../fixtures/credentials.mjs";
 
 const [scenario, resetId, deployment] = process.argv.slice(2);
+const credentials = resolveHostedCredentials(scenario === "concurrent-admins"
+  ? ["admin1", "admin2", "admin3", "admin4"] : ["admin1"]);
 assert(["candidate", "openings", "companies", "cv", "import-preview", "import-confirm", "concurrent-admins"].includes(scenario));
 assert.match(resetId ?? "", /^[a-f0-9-]{36}$/);
 assert.match(deployment ?? "", /^dpl_[A-Za-z0-9]+$/);
@@ -30,8 +33,8 @@ try {
   const page = await context.newPage();
   page.setDefaultTimeout(90000);
   await page.goto("/login");
-  await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
-  await page.getByLabel("Contraseña",{exact:true}).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Correo electrónico").fill(credentials.admin1.email);
+  await page.getByLabel("Contraseña",{exact:true}).fill(credentials.admin1.password);
   await page.getByRole("button",{name:"Iniciar sesión",exact:true}).click();
   await page.waitForURL("**/account");
   if (scenario === "concurrent-admins") {
@@ -41,8 +44,8 @@ try {
       await individual.addCookies(cookies);
       const p=await individual.newPage(); p.setDefaultTimeout(90000);
       await p.goto("/login");
-      await p.getByLabel("Correo electrónico").fill(`admin${n}@example.invalid`);
-      await p.getByLabel("Contraseña",{exact:true}).fill("Fictitious-Local-Only-2026!");
+      await p.getByLabel("Correo electrónico").fill(credentials[`admin${n}`].email);
+      await p.getByLabel("Contraseña",{exact:true}).fill(credentials[`admin${n}`].password);
       await p.getByRole("button",{name:"Iniciar sesión",exact:true}).click();
       await p.waitForURL("**/account"); pages.push(p);
     }
@@ -137,4 +140,7 @@ try {
     variant:concurrentResults?manifest.concurrentAdmins.variant:undefined,
     integrity:"SQL posterior requerido para importaciones/concurrencia; nunca inferirlo del tiempo"}));
   if (milliseconds>limit) process.exitCode=1;
+} catch {
+  // Playwright call logs may include filled credentials; never propagate them.
+  throw new Error("DEMO_CHECK_FAILED: no se completó el control alojado; no publiques trazas ni credenciales.");
 } finally { await browser.close(); }

@@ -26,6 +26,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm run test:tooling
       - run: npm run test:coverage
       - run: npx playwright install --with-deps chromium
       - name: Start isolated local Supabase

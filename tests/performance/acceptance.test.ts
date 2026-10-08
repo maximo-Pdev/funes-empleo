@@ -10,10 +10,10 @@ describe("T089/T092: validadores del protocolo, NO mediciones de aceptación", (
   it("fixture e inputs no cambian sin actualizar manifiesto", () => {
     const seed = readFileSync("supabase/seed.sql", "utf8").replaceAll("\r\n", "\n");
     expect(createHash("sha256").update(seed).digest("hex")).toBe(manifest.seedSha256);
-    expect(manifest.counts).toMatchObject({ candidates:500,companies:50,offers:100,participations:1000 });
+    expect(manifest.counts).toMatchObject({ candidates:4,companies:4,offers:8,participations:8 });
     expect(manifest.sc008a.candidateSearch.expectedTotal).toBe(1);
-    expect(manifest.sc008a.openingList).toMatchObject({page:2,pageSize:10,expectedTotal:80});
-    expect(manifest.sc008a.companyList).toMatchObject({page:2,pageSize:10,expectedTotal:50});
+    expect(manifest.sc008a.openingList).toMatchObject({page:2,pageSize:2,expectedTotal:4});
+    expect(manifest.sc008a.companyList).toMatchObject({page:2,pageSize:2,expectedTotal:4});
   });
   it("respeta límites y rechaza evidencia incompleta o calentada", () => {
     expect(assessMeasurement(example,manifest.seedSha256)).toBe(true);

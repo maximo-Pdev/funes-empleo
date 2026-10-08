@@ -3,14 +3,16 @@ import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture ficticio local");
+  assertLocalTargets();
 });
 async function signIn(page: Page, email = "admin1@example.invalid") {
+  const password = localFixturePassword();
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(email);
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
@@ -93,7 +95,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await candidate.getByLabel("Nombre y apellido").fill(name);
     await candidate.getByLabel("DNI").fill(dni);
     await candidate.getByLabel("Correo electrónico").fill(email);
-    await candidate.getByLabel("Contraseña").fill("Fictitious-Local-Only-2026!");
+    await candidate.getByLabel("Contraseña").fill(localFixturePassword());
     await candidate.getByRole("button", { name: "Crear cuenta candidata" }).click();
     await expect(candidate.getByRole("status")).toContainText("recibirás un enlace");
     let mailId = "";

@@ -2,6 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
+import { resolveHostedCredentials } from "./credentials.mjs";
+
+const credentials = resolveHostedCredentials(["admin1"]);
 
 // One-time bootstrap: only the explicitly authorized, exclusively fictitious demo.
 const ref = "kyjycjojzhwggjuqjnki";
@@ -12,11 +15,11 @@ const pdf = await readFile(`tests/fixtures/${manifest.cvDownload.file}`);
 assert.equal(createHash("sha256").update(pdf).digest("hex"), manifest.cvSha256);
 const client = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   { auth: { persistSession: false, autoRefreshToken: false } });
-const login = await client.auth.signInWithPassword({ email: "admin1@example.invalid", password: "Fictitious-Local-Only-2026!" });
-assert.equal(login.error, null, "No se pudo autenticar la cuenta ficticia de demo.");
+const login = await client.auth.signInWithPassword(credentials.admin1);
+assert(!login.error, "No se pudo autenticar la cuenta ficticia de demo.");
 const { data: docs, error } = await client.from("cv_documents").select("id,storage_path,status,validation_result,sha256").order("id");
 assert.equal(error, null);
-assert.equal(docs.length, 500);
+assert.equal(docs.length, manifest.counts.candidates);
 assert(docs.every(d => d.status === "rejected" && d.validation_result === "upload_pending" && d.sha256 === manifest.cvSha256));
 let done = 0;
 for (const doc of docs) {
@@ -27,7 +30,9 @@ for (const doc of docs) {
     assert.equal(existing.error, null, `No se cargó el PDF ficticio ${done + 1}`);
     assert.equal(createHash("sha256").update(Buffer.from(await existing.data.arrayBuffer())).digest("hex"), manifest.cvSha256);
   }
-  if (++done % 100 === 0) console.log(`${done}/500 PDF ficticios cargados.`);
+  if (++done === manifest.counts.candidates || done % Math.max(1, Math.floor(manifest.counts.candidates / 4)) === 0) {
+    console.log(`${done}/${manifest.counts.candidates} PDF ficticios cargados.`);
+  }
 }
 await client.auth.signOut();
-console.log("Carga terminada; verificar los 500 objetos antes de consolidar metadata del fixture.");
+console.log(`Carga terminada; verificar los ${manifest.counts.candidates} objetos antes de consolidar metadata del fixture.`);

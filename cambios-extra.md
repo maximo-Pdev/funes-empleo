@@ -623,6 +623,96 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   informativas diferidas. Esto no acredita aprobación humana ni merge a main.
 - El commit de este cierre solo modifica documentación; se observará su CI final.
 
+## EXTRA-015 — Separación de credenciales locales y alojadas
+
+- **Fecha:** 2026-10-07 (fecha observada del entorno). **Estado vigente:**
+  implementado y fuente verificada independientemente; revisión, invalidación
+  remota de credenciales/sesiones y publicación pendientes.
+- **Origen:** PC1 de `odd/tasks/public-repository-credentials.md`, T003/T005/T021/T096
+  y principios II/III/VI de la constitución: privacidad, identidades individuales
+  y preservación del historial. No modifica comportamiento del producto.
+- **Problema/evidencia:** scripts alojados reutilizan la contraseña versionada del
+  seed local; el reset alojado incorpora el seed completo y elimina usuarios Auth.
+  Los guards E2E por prefijo no verifican el destino de la aplicación.
+- **Cambio necesario:** exigir variables privadas por identidad en CV/calidad
+  alojados, resolverlas antes de transporte o navegador, centralizar fixtures E2E
+  con validación estricta de ambos orígenes y bloquear reset MJS/SQL sin borrados.
+- **Superficies:** helper/declaración/prueba Node en tests/fixtures y tests/unit/tooling;
+  scripts CV/reset/calidad demo; ocho consumidores E2E incluido su helper;
+  playwright.config.ts, package.json, workflow Quality, .env.example, quickstart,
+  docs/operations/demo-credentials.md y este registro. Seed/manifiesto sin cambios.
+- **Justificación/riesgos:** requisito de seguridad previo a una eventual publicación,
+  no nueva función municipal. El reset alojado queda indisponible; una sustitución
+  futura debe preservar identidades/contraseñas e historial y tener revisión propia.
+  Bloquear código no invalida contraseñas ni funciones SQL ya instaladas: PC2/PC3
+  siguen siendo necesarios. No se habilita producción ni visibilidad pública.
+- **Autorización/coordinación:** usuario autoriza PC1 en el worktree aislado;
+  checkout principal y cambios administrativos concurrentes intocables. El padre
+  conserva tracker, revisión y entrega Git. Sin commits/push ni acciones remotas.
+- **Verificación prevista:** RED/GREEN Node sin red, negativos de origen/credenciales,
+  transporte simulado, guard SQL estructural y hashes; npm ci con lockfile existente,
+  lint/typecheck/unit/build sin secretos ni Auth alojado. Runtime observado
+  Node 24.16.0/npm 11.13.0 distinto de los pins; no debilitar engines.
+- **Historia de verificación del escritor:**
+  `node --test tests/unit/tooling/fixture-credentials.node.test.mjs`
+  RED 12/12 fallos esperados (transporte alcanzado, generación SQL y destinos
+  inseguros aceptados); GREEN inicial 20/20, triangulación final 28/28 PASS.
+  Transporte/cliente/browser simulados, rechazo de la última identidad ausente,
+  valores vacíos, URLs engañosas y errores de navegador sin credenciales en salida.
+  Sintaxis de ocho .mjs, negativa SQL estructural y hashes normalizados de seed/
+  manifiesto PASS; comparación inicial de bytes del manifiesto difería por CRLF.
+  `npm ci` FAIL EBADENGINE con Node 24.16/npm 11.13 frente a 24.21/11.19:
+  engines intactos, sin bypass ni cambios de lockfile. `npm run lint`,
+  `npm run typecheck`, `npm run test:unit` y `npm run build` FAIL por ejecutables
+  ausentes después de la instalación rechazada; no acreditan gates de aplicación.
+  No se ejecutaron DB/E2E/reset/controles alojados reales ni se generó next-env.
+  El RED fue presenciado por el escritor; no se atribuye al verificador independiente.
+- **Verificación independiente vigente, registrada 2026-10-07:** evidencia
+  aportada por el padre de gentle-ai-verify, con toolchain efímero mediante
+  `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 -- …`.
+  Node 24.21.0/npm 11.19.0 reales comprobados; `npm ci` PASS, 464 paquetes y
+  audit 0; lint/typecheck PASS; `test:unit` PASS, 478 pruebas en 30 archivos;
+  build PASS; tooling nativo PASS, 28/28 con Node exacto. Sin cambios generados
+  rastreados. Estos PASS superseden la indisponibilidad inicial de los gates;
+  se conserva EBADENGINE como historia, no como estado vigente. Este follow-up
+  documental no repite comandos npm/tests ni acredita CI remoto o aceptación.
+- **Prerrequisito operativo PC2, registrado 2026-10-07:** el intento de solo
+  lectura con Supabase CLI oficial 2.117.0, `projects list --output-format json
+  --log-level none`, falló por autenticación ausente. No hubo recuperación de
+  proyecto/clave administrativa ni operación remota. El padre solicitará acceso
+  seguro mediante login de la cuenta autorizada o `SUPABASE_ACCESS_TOKEN` en el
+  proceso local, fuera del chat; nunca secretos en chat, archivos env ni argv.
+  Tras autenticar y verificar alcance, la CLI soporta `projects api-keys` para
+  capturar la clave solo en memoria y `db query` vía Management API para bloquear
+  la función SQL ya instalada. Son capacidades disponibles, no acciones ejecutadas.
+  El repositorio permanece privado hasta verificar invalidación remota, manejo
+  de sesiones y bloqueo de la función instalada. El usuario acepta PDFs, documentos,
+  fixtures sintéticos y metadatos Git para el objetivo público; esa autorización
+  no sustituye los controles de seguridad pendientes.
+- **Unicidad:** EXTRA-015 verificado frente a referencias locales main/origin,
+  según evidencia aportada por el padre; no se afirma consulta del último remoto.
+- **Límites de artefactos/revisión:** quickstart y guía operativa registran el bloqueo;
+  las descripciones históricas de reset en plan/runbook requieren reconciliación
+  por su propietario (fuera de las superficies delegadas). El slice PC1 informado
+  antes de este follow-up documental tiene 550 líneas de diff, por encima de la
+  previsión orientativa de 400; el padre decide entrega/revisión. No se omitieron
+  pruebas para ajustar el presupuesto.
+- **Revisión/aceptación y commit/PR:** pendientes; no acreditados por esta entrada.
+
+## EXTRA-016 — Reducción del fixture demo a 10 identidades
+
+- **Fecha:** 2026-10-08. **Estado:** implementado en fuente; revisión, ajuste remoto y publicación pendientes.
+- **Origen:** autorización explícita del usuario para combinar la remediación de credenciales con la reducción del fixture demo; PC1 de `odd/tasks/public-repository-credentials.md` y principios II/III/VI de la constitución.
+- **Problema y evidencia:** el fixture contenía 554 cuentas ficticias (4 admin / 500 candidate / 50 company) que el usuario considera innecesarias para la demo y que aumentan la superficie de credenciales a rotar/controlar.
+- **Cambio implementado:** reducir el seed local y el manifiesto a 10 identidades ficticias (2 admin / 4 candidate / 4 company), con registros de negocio coherentes: 4 perfiles de candidato, 4 empresas, 8 ofertas y 8 participaciones. Conservar el password local determinista protegido por los guards de origen local. Reemplazar las ocho variables de entorno alojadas por tres variables por rol (`DEMO_ADMIN_PASSWORD`, `DEMO_CANDIDATE_PASSWORD`, `DEMO_COMPANY_PASSWORD`). Actualizar el resolver, test nativo, reset local, documentación y `.env.example`.
+- **Justificación:** reduce la superficie de credenciales y cuentas de prueba mantenidas en el demo sin cambiar reglas de negocio ni habilitar producción/publicación.
+- **Archivos y contratos afectados:** `supabase/seed.sql`, `tests/fixtures/acceptance-manifest.json`, `tests/fixtures/credentials.mjs`, `tests/fixtures/credentials.d.mts`, `tests/unit/tooling/fixture-credentials.node.test.mjs`, `tests/fixtures/reset-local.mjs`, `.env.example`, `docs/operations/demo-credentials.md`, `specs/001-municipal-employment-portal/quickstart.md`, `odd/tasks/public-repository-credentials.md` y este registro.
+- **Riesgos y límites:** los tests E2E y pgTAP que esperaban 500/50/100/1000 quedan desactualizados para este PR; el fixture de concurrencia (`prepare-demo-concurrency.sql`) queda marcado como no soportado con 10 cuentas. No se ejecutaron resets ni operaciones remotas; el ajuste remoto (borrado de 544 cuentas sobrantes y actualización de la bóveda DPAPI) es parte de la continuación operativa PC2/PC3.
+- **Autorización y coordinación:** usuario autoriza explícitamente la reducción a 10 cuentas y el PR único; el padre conserva revisión, ODD y acciones Git. Sin commits/push/merge por parte de este escritor.
+- **Verificación prevista:** `node --test tests/unit/tooling/fixture-credentials.node.test.mjs`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`.
+- **Resultados:** pendientes de ejecución en el worktree; se reportarán antes del handoff.
+- **Limitaciones:** no se verifican E2E ni pgTAP en este ámbito; requieren actualización aparte o fixture de concurrencia revisado.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { createHash } from "node:crypto";
 import fixture from "../fixtures/acceptance-manifest.json" with { type: "json" };
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 
 function fixtureId(kind: string, number: number) {
   const hash = createHash("md5").update(`funes-demo-v1:${kind}:${number}`).digest("hex");
@@ -9,9 +10,10 @@ function fixtureId(kind: string, number: number) {
 }
 
 async function signIn(page: import("@playwright/test").Page, email: string) {
+  const password = localFixturePassword();
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(email);
-  await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Local-Only-2026!");
+  await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
@@ -19,8 +21,7 @@ async function signIn(page: import("@playwright/test").Page, email: string) {
 // The business-flow suite uses exclusively the reset local fictitious dataset.
 // It must never be pointed at a shared preview or a real-data project.
 test.beforeEach(() => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"),
-    "Solo contra Supabase local con el fixture ficticio restablecido");
+  assertLocalTargets();
 });
 
 test("una sesión anónima no consulta el padrón administrativo", async ({ page }) => {

@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
+import { assertLocalTargets } from "../fixtures/credentials.mjs";
+import { loginFixture } from "./fixtures/quality";
 
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => {
-  test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"),
-    "Solo Supabase local con datos ficticios");
+  assertLocalTargets();
 });
 
 function fixtureId(kind: string, number: number) {
@@ -14,6 +15,7 @@ function fixtureId(kind: string, number: number) {
 }
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
+  assertLocalTargets();
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
@@ -86,7 +88,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
     const admin = await adminContext.newPage();
-    await signIn(admin, "admin1@example.invalid", "Fictitious-Local-Only-2026!");
+    await loginFixture(admin, "admin");
     await admin.goto(`/admin/openings/${openingId}`);
     await admin.getByLabel("Decisión").selectOption("changes_requested");
     await admin.getByLabel("Explicación para la empresa").fill("Aclarar el horario de atención.");
@@ -150,8 +152,8 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
   try {
     const admin = await adminContext.newPage();
     const company = await companyContext.newPage();
-    await signIn(admin, "admin1@example.invalid", "Fictitious-Local-Only-2026!");
-    await signIn(company, "company3@example.invalid", "Fictitious-Local-Only-2026!");
+    await loginFixture(admin, "admin");
+    await loginFixture(company, "company", 3);
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}`);
     await expect(company.locator("body")).not.toContainText("Oferta ficticia 002");
     await company.goto(`/company/openings/${fixtureId("opening", 2)}/referrals`);
@@ -170,7 +172,7 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
     await admin.getByLabel("Confirmo esta decisión.").check();
     await admin.getByRole("button", { name: "Restaurar empresa" }).click();
     await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
-    await signIn(company, "company3@example.invalid", "Fictitious-Local-Only-2026!");
+    await loginFixture(company, "company", 3);
     await company.goto("/empresa/perfil");
     await expect(company.getByText("Estado:")).toContainText("Incompleto");
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 3)}`);
@@ -180,7 +182,7 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
 });
 
 test("una oferta vencida no aparece públicamente y la empresa ve su cierre", async ({ page }) => {
-  await signIn(page, "company31@example.invalid", "Fictitious-Local-Only-2026!");
+  await loginFixture(page, "company", 31);
   await page.goto(`/empresa/ofertas/${fixtureId("opening", 81)}`);
   await expect(page.getByText("Estado:")).toContainText("closed");
   await expect(page.getByText(/ya no recibe postulaciones/i)).toBeVisible();

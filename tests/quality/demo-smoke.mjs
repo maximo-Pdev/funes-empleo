@@ -3,6 +3,9 @@ import { chromium, expect } from "@playwright/test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { resolveHostedCredentials } from "../fixtures/credentials.mjs";
+
+const credentials = resolveHostedCredentials(["candidate1", "company1", "admin1"]);
 
 const base = "https://funes-empleo-demo.vercel.app";
 assert.equal(process.argv[2], "--confirm-fictitious-demo");
@@ -30,8 +33,8 @@ try {
     await expect(page.locator("body")).toContainText(/Oferta ficticia/, { timeout:30000 });
     if (role !== "anonymous") {
       await page.goto("/login");
-      await page.getByLabel("Correo electrónico").fill(`${role}1@example.invalid`);
-      await page.getByLabel("Contraseña", { exact:true }).fill("Fictitious-Local-Only-2026!");
+      await page.getByLabel("Correo electrónico").fill(credentials[`${role}1`].email);
+      await page.getByLabel("Contraseña", { exact:true }).fill(credentials[`${role}1`].password);
       await page.getByRole("button",{ name:"Iniciar sesión",exact:true }).click();
       await page.waitForURL("**/account");
       const path = role === "admin" ? "/admin/candidates" : role === "candidate" ? "/candidato/perfil" : "/empresa/perfil";
@@ -54,4 +57,7 @@ try {
     console.log(`PASS demo: ${role}, navegación, aislamiento y CV.`);
     await context.close();
   }
+} catch {
+  // Playwright call logs may include filled credentials; never propagate them.
+  throw new Error("DEMO_CHECK_FAILED: no se completó el control alojado; no publiques trazas ni credenciales.");
 } finally { await browser.close(); }

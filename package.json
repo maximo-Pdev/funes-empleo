@@ -15,6 +15,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "test:unit": "vitest run",
+    "test:tooling": "node --test tests/unit/tooling/fixture-credentials.node.test.mjs",
     "test:coverage": "vitest run --coverage",
     "test:db": "supabase db reset --local && supabase test db",
     "test:e2e": "playwright test",

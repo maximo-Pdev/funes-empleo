@@ -1,7 +1,7 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
 Esta guía define cómo comprobar la implementación. El esqueleto de la fase 1 y el fixture local
-ficticio 500/50/100/1.000 de la fase 2 ya existen. Las fases 3 y 4 tienen evidencia automatizada
+ficticio reducido (10 identidades: 2 admin / 4 candidate / 4 company) de la fase 2 ya existe. Las fases 3 y 4 tienen evidencia automatizada
 parcial por escenario, registrada en `implementation-status.md`; los escenarios restantes siguen
 siendo el contrato de aceptación. La validación local de Supabase usa Docker Desktop y WSL2.
 
@@ -43,7 +43,7 @@ npm run dev
 Completar `.env.local` solo con credenciales del entorno local generado. Nunca copiar claves de demo
 o producción a un archivo versionado ni a una conversación.
 El reinicio protegido verifica el proyecto y los puertos locales, los hashes de `seed.sql` y del PDF
-ficticio, los conteos con pgTAP, carga los 500 CV ficticios y comprueba accesos positivos y negativos
+ficticio, los conteos con pgTAP, carga los 4 CV ficticios y comprueba accesos positivos y negativos
 en Storage. Destruye exclusivamente el dataset de la base local. Las entradas y resultados esperados
 de SC-008A se fijan en `tests/fixtures/acceptance-manifest.json`; no representan un catálogo
 municipal aprobado. `npm run test:db` también reconstruye la base local, pero no carga los blobs PDF.
@@ -54,14 +54,20 @@ Resultado esperado:
 - bucket privado y políticas creados por migración;
 - aplicación disponible en `http://localhost:3000`;
 - emails de prueba capturados localmente, sin enviar a personas reales;
-- cuatro identidades administrativas ficticias y separadas para validación.
+- dos identidades administrativas ficticias y separadas, cuatro candidatos y cuatro empresas para validación.
 
-Para SC-003 y SC-008 se utilizará el entorno alojado de demostración, no el entorno local. Antes de
-cada medición se ejecutará el comando previsto `npm run acceptance:reset-demo`, que debe abortar si
-el entorno no es `demo`, si el identificador de proyecto no coincide con el configurado o si falta
-confirmación explícita. El reset transaccional aplica únicamente el fixture ficticio versionado,
-verifica los conteos 500/50/100/1.000 y muestra su versión/hash sin imprimir PII. Nunca puede aceptar
-un proyecto productivo.
+Para SC-003 y SC-008 se utilizará el entorno alojado de demostración, no el entorno local.
+**El reset alojado está bloqueado por EXTRA-015:** `npm run acceptance:reset-demo` y la
+función de `reset-demo.sql` rechazan la ejecución porque el procedimiento anterior recreaba
+credenciales conocidas y eliminaba Auth. No ejecutar SQL generado previamente ni copiar el seed
+local al proyecto alojado. Las mediciones que exigen reset quedan pendientes hasta disponer de
+un procedimiento revisado que preserve identidades y credenciales; no usar una sesión calentada
+como sustituto. Los controles CV/calidad alojados requieren variables privadas por rol
+(admin/candidate/company), resueltas antes de cualquier acceso. Ver [credenciales de demo](../../docs/operations/demo-credentials.md).
+Playwright, incluido `PLAYWRIGHT_EXTERNAL_SERVER=1`, exige Supabase HTTP local en :54321 y
+aplicación HTTP local en :3000, con hostname exacto `127.0.0.1` o `localhost`, sin userinfo,
+rutas, query ni fragmento. Un servidor externo debe usar un build local con la misma configuración;
+no reutilizar un build conectado a Supabase alojado.
 
 ## Gates automatizados previstos
 
@@ -69,6 +75,7 @@ un proyecto productivo.
 npm run typecheck
 npm run lint
 npm run test:unit
+npm run test:tooling
 npm run test:db
 npm run build
 npm run test:e2e
@@ -405,7 +412,9 @@ El `.env.example` futuro documentará nombres sin secretos:
 - `SUPABASE_SECRET_KEY` — solo servidor, si las operaciones acotadas la requieren
 - `NEXT_PUBLIC_APP_URL`
 - `APP_ENV` — valor controlado `local`, `preview` o `demo`; nunca se asume `demo`
-- `ACCEPTANCE_DEMO_PROJECT_REF` — identificador no secreto usado por el guard del reset alojado
+- `ACCEPTANCE_DEMO_PROJECT_REF` — identificador demo no secreto; no desbloquea reset alojado
+- `DEMO_<IDENTIDAD>_PASSWORD` — solo scripts Node alojados, una variable por identidad;
+  lista y consumidores en `docs/operations/demo-credentials.md`, valores vacíos en `.env.example`
 - identificadores/configuración no sensible del consentimiento aprobado
 
 No se incorpora una variable SMTP productiva ni secretos de cron mientras sus decisiones sigan

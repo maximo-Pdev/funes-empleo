@@ -1,4 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
+import { assertLocalTargets } from "./tests/fixtures/credentials.mjs";
+
+// Collection/public smoke can omit Supabase. Private tests and external-server
+// mode must validate BOTH destinations before any browser/server starts.
+if (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.PLAYWRIGHT_EXTERNAL_SERVER === "1") {
+  assertLocalTargets();
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",
