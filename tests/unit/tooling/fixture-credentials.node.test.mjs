@@ -4,17 +4,14 @@ import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { assertLocalTargets, localFixturePassword, resolveHostedCredentials } from "../../fixtures/credentials.mjs";
 
-const syntheticCredentials = {
-  DEMO_ADMIN_PASSWORD: "synthetic-admin",
-  DEMO_CANDIDATE_PASSWORD: "synthetic-candidate",
-  DEMO_COMPANY_PASSWORD: "synthetic-company",
-};
+const identities = ["admin1", "admin2", "candidate1", "candidate2", "candidate3", "candidate4", "company1", "company2", "company3", "company4"];
+const syntheticCredentials = Object.fromEntries(identities.map(id => [`DEMO_${id.toUpperCase()}_PASSWORD`, `synthetic-${id}`]));
 const hostedScripts = [
   ["tests/fixtures/upload-demo-cvs.mjs", ["--confirm-demo=kyjycjojzhwggjuqjnki"]],
   ["tests/fixtures/verify-demo-cvs.mjs", ["--confirm-fictitious-demo", "00000000-0000-4000-8000-000000000001"]],
   ["tests/quality/demo-storage.mjs", ["--confirm-fictitious-demo"]],
   ["tests/quality/demo-smoke.mjs", ["--confirm-fictitious-demo"]],
-  ["tests/quality/demo-performance.mjs", ["concurrent-admins", "00000000-0000-4000-8000-000000000001", "dpl_synthetic"]],
+  ["tests/quality/demo-performance.mjs", ["candidate", "00000000-0000-4000-8000-000000000001", "dpl_synthetic"]],
 ];
 // Native loader intercepts transports before dependencies are installed. No real
 // subprocess, browser, HTTP, SQL, or generated SQL file can be reached by scripts.
@@ -61,8 +58,8 @@ for (const [path, args] of hostedScripts) {
     assert.doesNotMatch(result.stderr, /SIDE_EFFECT_REACHED/);
   });
   test(`${path}: blank or incomplete credentials stop before transport`, () => {
-    const lastRole = path.includes("performance") ? "ADMIN" : path.includes("storage") ? "COMPANY" : path.includes("smoke") ? "COMPANY" : "ADMIN";
-    const result = runIsolated(path, args, { ...syntheticCredentials, [`DEMO_${lastRole}_PASSWORD`]: " " });
+    // admin1 is required by every actual entrypoint, last in smoke/storage.
+    const result = runIsolated(path, args, { ...syntheticCredentials, DEMO_ADMIN1_PASSWORD: " " });
     assert.equal(result.status, 1);
     assert.match(result.stderr, /DEMO_CREDENTIALS_REQUIRED/);
     assert.doesNotMatch(result.stderr, /SIDE_EFFECT_REACHED|synthetic-/);
@@ -98,16 +95,39 @@ test("Playwright accepts a strictly local external-server configuration", () => 
     NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3000", PLAYWRIGHT_EXTERNAL_SERVER: "1" });
   assert.equal(result.status, 0);
 });
-test("hosted resolver uses only the role variable, without echoing inputs", () => {
-  const identities = ["admin1", "admin2", "admin3", "admin4", "candidate1", "candidate2", "candidate3", "candidate4", "company1", "company2", "company3", "company4"];
-  const env = { ...syntheticCredentials };
-  const credentials = resolveHostedCredentials(identities, env);
-  assert(identities.every((id) => credentials[id].password === env[`DEMO_${id.startsWith("admin") ? "ADMIN" : id.startsWith("candidate") ? "CANDIDATE" : "COMPANY"}_PASSWORD`]));
-  for (const value of [undefined, "", " ", "\t\n"]) {
-    const invalid = { ...env, DEMO_ADMIN_PASSWORD: value, DEMO_PASSWORD: "synthetic-shared" };
-    assert.throws(() => resolveHostedCredentials(identities, invalid), { message: /DEMO_CREDENTIALS_REQUIRED/ });
+test("hosted resolver maps exactly ten distinct identities, without role fallback", () => {
+  const credentials = resolveHostedCredentials(identities, syntheticCredentials);
+  assert.equal(new Set(Object.values(credentials).map(c => c.password)).size, 10);
+  for (const id of identities) {
+    assert.deepEqual(credentials[id], { email: `${id}@example.invalid`, password: syntheticCredentials[`DEMO_${id.toUpperCase()}_PASSWORD`] });
+    for (const value of [undefined, "", " ", "\t\n"]) {
+      const invalid = { ...syntheticCredentials, [`DEMO_${id.toUpperCase()}_PASSWORD`]: value,
+        DEMO_ADMIN_PASSWORD: "synthetic-shared", DEMO_CANDIDATE_PASSWORD: "synthetic-shared",
+        DEMO_COMPANY_PASSWORD: "synthetic-shared", DEMO_PASSWORD: "synthetic-shared" };
+      assert.throws(() => resolveHostedCredentials(identities, invalid), { message: /DEMO_CREDENTIALS_REQUIRED/ });
+    }
   }
-  assert.throws(() => resolveHostedCredentials(["unknown"], env), { message: /DEMO_CREDENTIALS_REQUIRED/ });
+  for (const id of ["unknown", "admin3", "admin4", "candidate5", "company5"]) {
+    assert.throws(() => resolveHostedCredentials([id], { ...syntheticCredentials, [`DEMO_${id.toUpperCase()}_PASSWORD`]: "synthetic-extra" }), { message: /DEMO_CREDENTIALS_REQUIRED/ });
+  }
+  const example = readFileSync(".env.example", "utf8");
+  for (const id of identities) assert.match(example, new RegExp(`^DEMO_${id.toUpperCase()}_PASSWORD=$`, "m"));
+  assert.doesNotMatch(example, /^DEMO_(ADMIN|CANDIDATE|COMPANY)_PASSWORD=/m);
+});
+test("hosted four-admin request refuses before any transport, even with all ten credentials", () => {
+  const result = runIsolated("tests/quality/demo-performance.mjs", ["concurrent-admins", "00000000-0000-4000-8000-000000000001", "dpl_synthetic"], syntheticCredentials);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /LOCAL_ACCEPTANCE_REQUIRED/);
+  assert.doesNotMatch(result.stderr, /SIDE_EFFECT_REACHED|synthetic-/);
+});
+test("four local admins resolve only behind exact destinations and ownership guard", () => {
+  const result = runIsolated("tests/quality/demo-performance.mjs", ["concurrent-admins", "00000000-0000-4000-8000-000000000001", "dpl_synthetic"], {
+    APP_ENV: "local", NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321", NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3000",
+    LOCAL_ACCEPTANCE_PROJECT_OWNED: "funes-empleo",
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /SIDE_EFFECT_REACHED/);
+  assert.doesNotMatch(result.stderr, /DEMO_CREDENTIALS_REQUIRED|VERCEL_TEST_ACCESS_FAILED/);
 });
 test("local credentials require exact loopback origins for both destinations", () => {
   const local = { NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321", NEXT_PUBLIC_APP_URL: "http://localhost:3000/" };

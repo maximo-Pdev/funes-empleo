@@ -35,6 +35,8 @@ el sistema bloquea su reemplazo. No cerrar procesos ajenos ni borrar manualmente
 ```powershell
 npm ci
 npx supabase start
+# Solo si verificaste propiedad exclusiva del servicio local (nunca el principal compartido).
+$env:LOCAL_ACCEPTANCE_PROJECT_OWNED = 'funes-empleo'
 node tests/fixtures/reset-local.mjs --confirm-local-reset
 Copy-Item .env.example .env.local
 npm run dev
@@ -46,7 +48,21 @@ El reinicio protegido verifica el proyecto y los puertos locales, los hashes de 
 ficticio, los conteos con pgTAP, carga los 4 CV ficticios y comprueba accesos positivos y negativos
 en Storage. Destruye exclusivamente el dataset de la base local. Las entradas y resultados esperados
 de SC-008A se fijan en `tests/fixtures/acceptance-manifest.json`; no representan un catálogo
-municipal aprobado. `npm run test:db` también reconstruye la base local, pero no carga los blobs PDF.
+municipal aprobado. Esta preparación es solo interactiva, no sustituye aceptación.
+
+Para checks se usa explícitamente el dataset **TEST-ONLY 4 admins / 500 candidatos /
+50 empresas / 100 ofertas / 1000 participaciones**: `npm run test:db` reconstruye solo
+la base local propia sin seed por defecto, carga `tests/fixtures/acceptance-seed.sql`
+y ejecuta pgTAP (sin blobs PDF); `npm run test:e2e:full` carga/verifica 500 PDF,
+compila y ejecuta todos los recorridos sin skips. El último proyecto de Playwright
+restablece otra vez el fixture para medir las cuatro acciones administrativas
+simultáneas y verificar sus auditorías. CI usa servicios aislados del job.
+Nunca cargar aceptación en Supabase alojado ni resetear servicios ajenos.
+
+El manifiesto tiene secciones `interactive`/`acceptance` con conteos, versiones,
+entradas y hashes independientes. `generate-acceptance-seed.mjs --write` regenera
+SQL/hash desde la misma plantilla; revisar el diff y ejecutar tooling después.
+No hay reducción de umbrales ni concurrencia marcada no soportada.
 
 Resultado esperado:
 
@@ -62,8 +78,11 @@ función de `reset-demo.sql` rechazan la ejecución porque el procedimiento ante
 credenciales conocidas y eliminaba Auth. No ejecutar SQL generado previamente ni copiar el seed
 local al proyecto alojado. Las mediciones que exigen reset quedan pendientes hasta disponer de
 un procedimiento revisado que preserve identidades y credenciales; no usar una sesión calentada
-como sustituto. Los controles CV/calidad alojados requieren variables privadas por rol
-(admin/candidate/company), resueltas antes de cualquier acceso. Ver [credenciales de demo](../../docs/operations/demo-credentials.md).
+como sustituto. Los controles CV/calidad alojados requieren variables privadas por identidad
+(`DEMO_ADMIN1_PASSWORD`, etc.), sin fallback por rol, resueltas antes de cualquier acceso.
+El resolver cubre exactamente admin1–2, candidate1–4 y company1–4. El dataset grande
+y sus cuatro admins son exclusivos de aceptación local; el check interactivo alojado
+no acredita los umbrales de aceptación. Ver [credenciales de demo](../../docs/operations/demo-credentials.md).
 Playwright, incluido `PLAYWRIGHT_EXTERNAL_SERVER=1`, exige Supabase HTTP local en :54321 y
 aplicación HTTP local en :3000, con hostname exacto `127.0.0.1` o `localhost`, sin userinfo,
 rutas, query ni fragmento. Un servidor externo debe usar un build local con la misma configuración;

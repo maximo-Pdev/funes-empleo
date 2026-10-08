@@ -1,6 +1,10 @@
 # Rendimiento y aceptación — T089
 
-Actualización 2026-09-29: **siete casos técnicos medidos; aceptación humana pendiente**.
+Estado PC1/EXTRA-017: **datasets separados; aceptación humana y DB/E2E del candidato
+reparado pendientes de CI aislado**. La demo interactiva tiene 10 cuentas (2/4/4),
+4 candidatos, 4 empresas, 8 ofertas y 8 casos; sus checks individuales no prueban
+SC-003/008/008A. El fixture TEST-ONLY local/CI mantiene íntegros los umbrales aprobados.
+Historia 2026-09-29: siete casos técnicos medidos entonces; no evidencia del nuevo SHA.
 Resultados y recibos se registran abajo. Registro histórico 2026-09-28: existía una demo protegida en
 https://funes-empleo-demo.vercel.app con el fixture y 500 PDF verificados; el smoke
 funcional no acredita tiempos fríos ni el protocolo de reset por medición.
@@ -11,9 +15,14 @@ planificador los elija ni sustituye EXPLAIN/latencia.
 
 ## Entradas versionadas
 
-Fuente: `tests/fixtures/acceptance-manifest.json`, fixture `funes-demo-v1`, seed SHA-256
-`ae11e0374459bd64f5f6a7803223d3f74a56fc80966c066be69e13a47eadb7d7`.
-500 candidatos, 50 empresas, 100 ofertas, 1.000 participaciones; cuatro admins.
+Fuente: sección `acceptance` de `tests/fixtures/acceptance-manifest.json`, versión
+`funes-acceptance-v2-test-only`, SQL `tests/fixtures/acceptance-seed.sql`, SHA-256
+`88fd1c86d2c97901cce8ea12328988e1b0b1b0e600a5f6034bc9aaeffea798db`.
+500 candidatos (400 activos), 50 empresas, 100 ofertas, 1.000 participaciones;
+cuatro admins, 50 contrataciones y 20 ofertas completamente cubiertas.
+El generador deriva este SQL de `supabase/seed.sql`, cambiando solo el bloque de
+parámetros. La sección `interactive` tiene su propio hash; no reutilizarlo como
+prueba del benchmark ni instalar el SQL de aceptación en el servidor alojado.
 
 | Caso frío | Entrada | Resultado esperado | Límite |
 | --- | --- | --- | --- |
@@ -39,6 +48,14 @@ hasta terminal visible; integridad/auditoría se comprueban fuera del reloj.
 Validación local de entradas: `tests/e2e/pagination.spec.ts` comprueba los totales,
 estado, páginas 1/2 de diez filas y ausencia de duplicados. Detectó y permitió corregir
 20 filas sin filtro empresarial (EXTRA-002). Su duración no acredita latencia alojada.
+
+Concurrencia vigente en CI/local: el proyecto final `acceptance-concurrency` hace
+su propio reset frío TEST-ONLY y prepara oferta 80, preselección 775, contacto 765 y
+resultado 755. `prepare-demo-concurrency.sql` exige contexto local explícito y
+conteos/identidades/estados exactos. La barrera común del entrypoint real usa cuatro
+admins locales; el test posterior comprueba versiones y cuatro eventos con los
+actores/request IDs correctos. No consultar admin3/admin4 alojados ni declarar este
+requisito no soportado por el pequeño demo.
 
 Concurrencia: preparar cuatro sesiones individuales y cuatro registros distintos,
 sin ejecutar antes la acción. Liberarlas con una barrera común; registrar duración
@@ -111,9 +128,12 @@ company_profiles_pkey en el join. No se forzó un índice ni se cambió esquema.
 
 ## Pendiente antes de aceptar
 
-Demo separada y reset alojado transaccional con guard de entorno/project-ref,
-confirmación/bloqueo/hash/conteos verificados (runbook). `demo-performance.mjs`
-ejecutó los siete casos técnicos anteriores. Faltan SC-003 y SC-008 con el
+El reset alojado está bloqueado; no ejecutar el procedimiento histórico del
+runbook ni SQL generado previamente. Los protocolos humanos requieren un nuevo
+procedimiento revisado con preservación de identidades, contraseñas e historial.
+`demo-performance.mjs` ejecutó los siete casos históricos anteriores; ahora separa
+checks interactivos de la concurrencia TEST-ONLY local. Los gates de código no
+acreditan ejecución remota, tiempos humanos ni los tiempos históricos del candidato. Faltan SC-003 y SC-008 con el
 administrador humano sin práctica, y revisar las condiciones/recibos de aceptación.
 T089 permanece sin marcar: la automatización no acredita comprensión ni tiempos humanos.
 No se evalúa carga por encima de cuatro administradores ni SLA productivo (OQ-006).

@@ -4,26 +4,36 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { cpus, totalmem, release } from "node:os";
-import { resolveHostedCredentials } from "../fixtures/credentials.mjs";
+import { assertLocalTargets, localFixturePassword, resolveHostedCredentials } from "../fixtures/credentials.mjs";
 
 const [scenario, resetId, deployment] = process.argv.slice(2);
-const credentials = resolveHostedCredentials(scenario === "concurrent-admins"
-  ? ["admin1", "admin2", "admin3", "admin4"] : ["admin1"]);
+const localAcceptance = scenario === "concurrent-admins";
+if (localAcceptance && process.env.APP_ENV !== "local") throw new Error("LOCAL_ACCEPTANCE_REQUIRED: cuatro admins se prueban en aceptación local aislada, no en la demo interactiva.");
+if (localAcceptance) {
+  assertLocalTargets();
+  if (process.env.CI !== "true" && process.env.LOCAL_ACCEPTANCE_PROJECT_OWNED !== "funes-empleo") throw new Error("LOCAL_PROJECT_OWNERSHIP_REQUIRED: no mutar servicios compartidos.");
+}
+const credentials = localAcceptance
+  ? Object.fromEntries([1,2,3,4].map(n => [`admin${n}`, { email: `admin${n}@example.invalid`, password: localFixturePassword() }]))
+  : resolveHostedCredentials(["admin1"]);
 assert(["candidate", "openings", "companies", "cv", "import-preview", "import-confirm", "concurrent-admins"].includes(scenario));
 assert.match(resetId ?? "", /^[a-f0-9-]{36}$/);
 assert.match(deployment ?? "", /^dpl_[A-Za-z0-9]+$/);
-assert.equal(process.env.APP_ENV, "demo");
-assert.equal(process.env.ACCEPTANCE_DEMO_PROJECT_REF, "kyjycjojzhwggjuqjnki");
-const base = "https://funes-empleo-demo.vercel.app";
-const manifest = JSON.parse(await readFile("tests/fixtures/acceptance-manifest.json", "utf8"));
+if (!localAcceptance) {
+  assert.equal(process.env.APP_ENV, "demo");
+  assert.equal(process.env.ACCEPTANCE_DEMO_PROJECT_REF, "kyjycjojzhwggjuqjnki");
+}
+const base = localAcceptance ? "http://127.0.0.1:3000" : "https://funes-empleo-demo.vercel.app";
+const fixtures = JSON.parse(await readFile("tests/fixtures/acceptance-manifest.json", "utf8"));
+const manifest = { ...fixtures, ...(localAcceptance ? fixtures.acceptance : fixtures.interactive) };
 const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
-let headers;
+let headers = "";
 try {
-  headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore", "pipe", "pipe"] });
+  if (!localAcceptance) headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore", "pipe", "pipe"] });
 } catch { throw new Error("VERCEL_TEST_ACCESS_FAILED: revisar la sesión CLI sin publicar encabezados"); }
 const cookies = [...headers.matchAll(/^set-cookie:\s*([^=;\s]+)=([^;\r\n]*)/gim)]
   .map(m => ({ name: m[1], value: m[2], url: base, secure: true, httpOnly: true }));
-assert(cookies.length > 0);
+assert(localAcceptance || cookies.length > 0);
 const id = (kind,n) => { const h=createHash("md5").update(`funes-demo-v1:${kind}:${n}`).digest("hex"); return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`; };
 const browser = await chromium.launch();
 let milliseconds, limit, batchId, concurrentResults;
@@ -93,17 +103,17 @@ try {
     milliseconds=performance.now()-start; limit=3000;
   } else if (["openings","companies"].includes(scenario)) {
     const route=scenario==="openings"?"openings":"empresas", status=scenario==="openings"?"published":"active";
-    const title=scenario==="openings"?"Ofertas: 80":"Empresas: 50";
+    const entry = scenario === "openings" ? manifest.sc008a.openingList : manifest.sc008a.companyList;
+    const title = `${scenario === "openings" ? "Ofertas" : "Empresas"}: ${entry.expectedTotal}`;
     await page.goto(`/admin/${route}?status=${status}&page=1`);
     await expect(page.getByRole("heading",{name:title,exact:true})).toBeVisible();
-    const firstPageHref=await page.locator("main li a").first().getAttribute("href");
     const start=performance.now();
-    await page.getByRole("link",{name:"Siguiente",exact:true}).click();
-    await page.waitForURL(/page=2/);
-    await expect(page.getByText(`Página 2 de ${scenario === "openings" ? 8 : 5}`,{exact:true})).toBeVisible();
-    await expect(page.locator("main li a").first()).not.toHaveAttribute("href",firstPageHref);
+    // Interactive lists have only four rows: do not invent a second page or
+    // represent this small demo check as a 500/50/100/1000 benchmark.
+    await page.goto(`/admin/${route}?status=${status}&page=${entry.page}`);
+    await expect(page.getByText(`Página ${entry.page} de ${Math.ceil(entry.expectedTotal / entry.pageSize)}`,{exact:true})).toBeVisible();
     await expect(page.getByRole("heading",{name:title,exact:true})).toBeVisible();
-    await expect(page.locator("main li a")).toHaveCount(10);
+    await expect(page.locator("main li a")).toHaveCount(entry.expectedRows);
     milliseconds=performance.now()-start; limit=3000;
   } else if (scenario === "cv") {
     const start=performance.now();
@@ -133,7 +143,8 @@ try {
     }
   }
   console.log(JSON.stringify({scenario,resetId,deployment,url:base,at:new Date().toISOString(),
-    fixture:manifest.version,seedSha256:manifest.seedSha256,browser:browser.version(),viewport:"1366x768",
+    fixture:manifest.version,seedSha256:manifest.seedSha256,dataset:localAcceptance?"acceptance":"interactive",
+    acceptanceBenchmark:localAcceptance,browser:browser.version(),viewport:"1366x768",
     device:{os:process.platform,release:release(),cpu:cpus()[0]?.model,memoryGiB:Math.round(totalmem()/1024**3)},
     connection:"Conexión del operador; sin throttling artificial; estabilidad de red no certificada",milliseconds,limit,
     pass:milliseconds<=limit && !concurrentResults?.some(r=>!r.pass),batchId,concurrentResults,

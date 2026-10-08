@@ -62,6 +62,20 @@ select ok(not ((public.my_company_offers(1,10,current_setting('test.new_opening'
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,
  'session_id','ee300000-0000-4000-8000-000000000003')::text,true);
+-- Regression diagnosis: company1 owns published openings 1 AND 51 in the
+-- acceptance fixture. In the small demo its second opening is closed, correctly
+-- excluded from archive/restore; substituting that dataset caused actual 2 vs 3.
+select is((select count(*) from public.job_openings where id in (private.fixture_id('opening',1),private.fixture_id('opening',51))
+ and company_id=private.fixture_id('business',1) and status='published'),2::bigint,
+ 'Aceptación prepara dos ofertas publicadas propias antes de suspender');
+-- Add a terminal sibling: it must NOT be restored to draft with the three live
+-- openings (the two fixture openings plus the new correction-requested draft).
+reset role;
+insert into public.job_openings(id,company_id,title,tasks,requirements,vacancies,location,modality,schedule,contract_type,closing_date,status,published_at,closed_at,created_at)
+select private.fixture_id('opening',101),company_id,'Oferta terminal ficticia',tasks,requirements,vacancies,location,modality,schedule,contract_type,
+ '2026-09-18'::date,'closed',published_at,'2026-09-19 12:00:00+00'::timestamptz,created_at
+from public.job_openings where id=private.fixture_id('opening',1);
+set local role authenticated;
 select lives_ok($$select public.change_account_status(private.fixture_id('company',1),1,'suspend',
  'Motivo ficticio de suspensión',true)$$,'Suspensión empresarial administrada');
 select is((select status::text from public.company_profiles where id=private.fixture_id('business',1)),
@@ -95,6 +109,10 @@ select lives_ok($$select public.change_account_status(private.fixture_id('compan
  'Motivo ficticio de restauración',true)$$,'Solo administración restaura con motivo');
 select is((select status::text from public.company_profiles where id=private.fixture_id('business',1)),
  'incomplete','Restauración deja perfil incompleto');
+select is((select status::text from public.job_openings where id=private.fixture_id('opening',101)),
+ 'closed','Restauración no altera la oferta terminal ni la reabre');
+select ok((select archived_at is null from public.job_openings where id=private.fixture_id('opening',101)),
+ 'Oferta terminal nunca fue archivada por la transición empresarial');
 select is((select count(*) from public.job_openings where company_id=private.fixture_id('business',1)
  and archived_at is null and status='draft'),3::bigint,'Ofertas archivadas regresan a borrador');
 select is((select count(*) from public.referrals r join public.participations p on p.id=r.participation_id

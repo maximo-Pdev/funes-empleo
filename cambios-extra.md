@@ -625,9 +625,10 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 
 ## EXTRA-015 — Separación de credenciales locales y alojadas
 
-- **Fecha:** 2026-10-07 (fecha observada del entorno). **Estado vigente:**
-  implementado y fuente verificada independientemente; revisión, invalidación
-  remota de credenciales/sesiones y publicación pendientes.
+- **Fecha:** 2026-10-07 (fecha observada del entorno). **Estado histórico de la etapa original:**
+  fuente original verificada independientemente antes de bdd9362; no cubre la
+  reducción posterior ni la reparación actual. Operaciones remotas se registran
+  por el padre en PC2/PC4; revisión/publicación del candidato actual pendientes.
 - **Origen:** PC1 de `odd/tasks/public-repository-credentials.md`, T003/T005/T021/T096
   y principios II/III/VI de la constitución: privacidad, identidades individuales
   y preservación del historial. No modifica comportamiento del producto.
@@ -701,7 +702,10 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 
 ## EXTRA-016 — Reducción del fixture demo a 10 identidades
 
-- **Fecha:** 2026-10-08. **Estado:** implementado en fuente; revisión, ajuste remoto y publicación pendientes.
+- **Fecha:** 2026-10-08. **Estado histórico:** reducción de fuente bdd9362 incompleta,
+  con checks application/database fallidos; no revisada ni aceptada como solución
+  coherente. Supersedida por EXTRA-017: se conserva el demo pequeño, se rechazan
+  variables por rol y la pérdida de cobertura de aceptación/concurrencia.
 - **Origen:** autorización explícita del usuario para combinar la remediación de credenciales con la reducción del fixture demo; PC1 de `odd/tasks/public-repository-credentials.md` y principios II/III/VI de la constitución.
 - **Problema y evidencia:** el fixture contenía 554 cuentas ficticias (4 admin / 500 candidate / 50 company) que el usuario considera innecesarias para la demo y que aumentan la superficie de credenciales a rotar/controlar.
 - **Cambio implementado:** reducir el seed local y el manifiesto a 10 identidades ficticias (2 admin / 4 candidate / 4 company), con registros de negocio coherentes: 4 perfiles de candidato, 4 empresas, 8 ofertas y 8 participaciones. Conservar el password local determinista protegido por los guards de origen local. Reemplazar las ocho variables de entorno alojadas por tres variables por rol (`DEMO_ADMIN_PASSWORD`, `DEMO_CANDIDATE_PASSWORD`, `DEMO_COMPANY_PASSWORD`). Actualizar el resolver, test nativo, reset local, documentación y `.env.example`.
@@ -712,6 +716,24 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Verificación prevista:** `node --test tests/unit/tooling/fixture-credentials.node.test.mjs`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`.
 - **Resultados:** pendientes de ejecución en el worktree; se reportarán antes del handoff.
 - **Limitaciones:** no se verifican E2E ni pgTAP en este ámbito; requieren actualización aparte o fixture de concurrencia revisado.
+
+## EXTRA-017 — Reparación coherente de datasets y credenciales de PR #50
+
+- **Fecha:** 2026-10-08. **Estado:** registrado antes de cambios; implementación/verificación pendientes, sin revisión acreditada.
+- **Origen:** PC1 reconciliado, T021/T089/T095, FR-003 y SC-003/008/008A; autorización del usuario para corregir todos los checks en un único PR.
+- **Evidencia:** bdd9362 reduce el seed pero no los contratos de pgTAP/E2E: métricas, referencias a admin3/4, FK de sesiones y rollback de auditoría fallan. Tres variables por rol contradicen las contraseñas únicas ya existentes. La revisión del código previo no cubre esa reducción.
+- **Cambio mínimo previsto:** conservar seed interactivo 2/4/4; generar desde la misma plantilla SQL un fixture TEST-ONLY 4/500/50/100/1000, activado explícitamente solo por aceptación local aislada/CI. Manifiesto con datasets separados, hashes y expectativas. Resolver exactamente las diez identidades alojadas con variables individuales, sin fallback ni rotación. Ejecutar concurrencia de cuatro admins únicamente en aceptación local y diagnosticar la aserción de ofertas restauradas sin bajar expectativas.
+- **Superficies:** seed, fixtures/generador/reset local, credenciales y pruebas tooling; runner local/CI/package; consumidores E2E/performance/demo; pruebas SQL y documentación operativa/quickstart. Solo tests/tooling/docs: no migraciones ni políticas de producto.
+- **Riesgos/límites:** nunca cargar aceptación al demo alojado; exigir destinos exactos y propiedad del servicio aislado antes del reset. Ninguna operación alojada, bóveda, borrado Auth o aceptación municipal. Checks DB/E2E requieren servicio local propio o CI después del push del padre.
+- **Autorización/coordinación:** padre autoriza superficies técnicas ampliadas en worktree aislado; conserva tracker, revisión y commit/push/merge. Checkout principal y sus servicios intactos. PR único; no se reduce el diff omitiendo checks.
+- **Verificación prevista:** RED/GREEN nativo de identidades y datasets/entrypoints, negativos remotos, hashes/SQL generado; Node 24.21.0/npm 11.19.0 efímeros para tooling/lint/typecheck/unit/build. DB/E2E solo en entorno de propiedad verificada; reportar pendientes honestamente.
+- **Supersede EXTRA-016:** la reducción interactiva sigue vigente, pero sus variables por rol y la declaración de concurrencia no soportada se rechazan. Los fallos de checks no se aceptan como limitación permanente. EXTRA-015 conserva evidencia histórica de la fuente anterior, no aprobación del candidato actual.
+- **Implementación:** `supabase/seed.sql` sigue creando exactamente 10 identidades y 4/4/8/8 registros. El generador deriva SQL TEST-ONLY 4/500/50/100/1000 desde el mismo bloque parametrizado; manifiesto separado y hashes normalizados. `test:db` y el runner E2E seleccionan aceptación explícitamente. El último proyecto E2E hace reset frío y prueba cuatro admins/barrera/≤5 s/versiones/auditorías, sin crear admins alojados nuevos. Resolver exacto de diez variables individuales, controles CV interactivos de 4 candidatos y checks de demo sin atribuirles el benchmark grande.
+- **Diagnóstico 030:** el seed pequeño da a company1 una oferta publicada y otra cerrada; esta última se excluye correctamente del archivo/restauración. Aceptación da dos publicadas (1 y 51), más la nueva oferta del test: la expectativa de tres borradores se conserva. Se agregaron precondiciones explícitas y una oferta terminal propia que debe permanecer cerrada/no archivada. Diagnóstico de fuente; confirmación SQL funcional pendiente, sin cambios de políticas.
+- **RED observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"` exit 1, 20 PASS/15 FAIL contra comportamiento de bdd9362: variables individuales rechazadas, datasets/generador ausentes, flags de aceptación sin soporte. Dos ejecuciones intermedias 34/35 fallaron únicamente por hashes aún pendientes; no se presentan como GREEN.
+- **GREEN y triangulación observados:** mismo comando exit 0, primero 35/35 y después de refactor/negativos adicionales 38/38. Cubre los entrypoints reales con transportes interceptados, exactamente diez identidades/variables vacías, rechazo admin3/4 alojados y fallback por rol, aceptación local de cuatro admins sin credenciales alojadas, rechazo de orígenes remotos y servicios sin propiedad, parámetros/conteos/outcomes, hash del PDF y equivalencia de SQL generado. Estos tests no ejecutan SQL real.
+- **Gates observados:** cada comando ejecutado en foreground dos veces, ambas exit 0, con prefijo exacto `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call`: `"npm run lint"` sin warnings; `"npm run typecheck"`; `"npm run test:unit"` 478 pruebas/30 archivos; `"npm run build"`. `git diff --check` PASS. No cambió `next-env.d.ts`; no fue necesario restaurar artefactos rastreados.
+- **Pendientes honestos:** `npm run test:db`, `npm run test:e2e:full` y concurrencia SQL no ejecutados: no se verificó un servicio local de propiedad exclusiva, y el servicio principal/concurrente no se toca. Requieren Quality/application y database del SHA que publique el padre. No afirmar DB/E2E PASS, checks de PR nuevos, aceptación humana o revisión. Sin stage/commit/push/merge, operaciones alojadas, lectura/cambio de bóveda ni cambios al tracker del padre. Referencias de commit/revisión siguen pendientes.
 
 ## Formato para próximas entradas
 

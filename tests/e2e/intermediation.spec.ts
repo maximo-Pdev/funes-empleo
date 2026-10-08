@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { createHash } from "node:crypto";
-import fixture from "../fixtures/acceptance-manifest.json" with { type: "json" };
+import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
+const fixture = { ...fixtures, ...fixtures.acceptance };
 import { runLocalMaintenanceSql } from "./local-maintenance";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 

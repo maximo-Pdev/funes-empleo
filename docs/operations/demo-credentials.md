@@ -1,115 +1,97 @@
-# Credenciales de prueba: local y demo alojada
+# Credenciales de prueba: una contraseña privada por identidad
 
-Los scripts alojados exigen contraseñas privadas por rol. No tienen fallback
-al seed local ni una contraseña compartida. El reset alojado está bloqueado;
-esta reparación de código no rota contraseñas ni habilita publicar el repositorio.
+La demo interactiva usa **10 identidades ficticias: 2 admin, 4 candidate y 4 company**.
+Cada identidad alojada conserva su contraseña única existente. Los scripts no rotan
+contraseñas, no leen `.env`, no consultan la bóveda y no usan fallback por rol.
+El dataset de aceptación **4/500/50/100/1000 es TEST-ONLY local/CI**, nunca se instala
+como seed por defecto ni en Supabase alojado.
 
-El fixture actual cuenta con **10 identidades ficticias**: 2 administradores,
-4 candidatos y 4 empresas. Los scripts alojados resuelven la contraseña de cada
-identidad a partir de tres variables por rol.
+## Configuración privada
 
-## Configuración segura
+El operador suministra valores en el entorno del proceso Node mediante un canal
+privado. `.env.example` contiene solo nombres con valores vacíos. No copiar valores,
+cookies, encabezados, traces ni `storageState` a Git, logs, artefactos o chat.
+Todas las identidades requeridas se resuelven antes del primer transporte/navegador.
+Una variable ausente o vacía aborta con un mensaje genérico.
 
-1. El operador autorizado suministra las variables por un canal privado seguro,
-   en el entorno del proceso Node. Los scripts no leen archivos `.env`.
-2. Usar las identidades ficticias existentes del fixture; no introducir correos ni
-   datos personales reales. Las etiquetas siguientes identifican esas cuentas.
-3. Resolver todas las variables requeridas antes de acceder a Supabase, Vercel o
-   un navegador. Una variable ausente o vacía rechaza el control genéricamente.
-   No registrar valores, encabezados, cookies, traces ni `storageState`.
-
-| Control alojado | Variables requeridas | Identidades usadas |
-| --- | --- | --- |
-| Carga y verificación CV | `DEMO_ADMIN_PASSWORD` | `admin1` |
-| Smoke | `DEMO_ADMIN_PASSWORD`, `DEMO_CANDIDATE_PASSWORD`, `DEMO_COMPANY_PASSWORD` | `admin1`, `candidate1`, `company1` |
-| Storage | las tres anteriores | `admin1`, `candidate1`, `candidate2`, `company1`, `company2` |
-| Rendimiento individual | `DEMO_ADMIN_PASSWORD` | `admin1` |
-| Cuatro administradores concurrentes | `DEMO_ADMIN_PASSWORD` | `admin1`, `admin2`, `admin3`, `admin4` |
-
-`.env.example` contiene únicamente valores vacíos. Estas variables son exclusivas
-de herramientas Node, nunca `NEXT_PUBLIC_*` ni configuración cliente del portal.
-La clave publicable Supabase no sustituye una contraseña. Cada cuenta mantiene
-su identidad individual; la variable de rol solo simplifica la configuración
-operativa para el fixture reducido.
-
-## Reset alojado: no ejecutar el procedimiento anterior
-
-`acceptance:reset-demo` aborta sin generar SQL. `reset-demo.sql` reemplaza la función
-histórica por una negativa incondicional, sin borrar Auth ni ejecutar el seed.
-No ejecutar archivos SQL preparados anteriormente ni instalar/copiar el seed local
-al proyecto alojado. Aplicar la negativa a una función ya instalada requiere
-una operación separada autorizada; modificar este repositorio no cambia el servidor.
-
-Un reset futuro requiere revisión propia, conservación de identidades/credenciales,
-alcance ficticio verificable y recibo de integridad. Hasta entonces, las mediciones
-que requieren un reset frío siguen pendientes. La invalidación de credenciales y
-sesiones históricas y la verificación previa a publicación pertenecen a PC2/PC3,
-no a esta reparación ni a una aprobación municipal.
-
-## Acceso administrativo: prerrequisito pendiente
-
-Estado registrado el 2026-10-07 con evidencia aportada por el padre: Supabase CLI
-oficial 2.117.0 no pudo completar `projects list --output-format json --log-level
-none` por falta de autenticación. No se recuperaron claves administrativas ni se
-realizaron operaciones remotas.
-
-El padre solicitará login seguro de la cuenta autorizada o `SUPABASE_ACCESS_TOKEN`
-en el entorno del proceso local, fuera del chat. Nunca copiar secretos al chat,
-archivos env ni argumentos de comandos. Autenticar no demuestra por sí solo acceso
-al proyecto demo: comprobar autorización y aislamiento antes de continuar.
-
-La CLI soporta `projects api-keys` para capturar la clave solo en memoria después
-de autenticar y verificar el destino. `db query` vía Management API permite bloquear
-la función SQL instalada. Estas capacidades no fueron ejecutadas en este paso;
-requieren la operación autorizada y comprobación posterior de PC2/PC3.
-
-El repositorio permanece privado hasta verificar invalidación de credenciales
-históricas, manejo de sesiones y bloqueo de la función instalada. El objetivo público
-y la aceptación del usuario de PDFs, documentos, fixtures sintéticos y metadatos Git
-no sustituyen esos controles ni acreditan revisión o aceptación de la implementación.
-
-## E2E exclusivamente local
-
-El resolver local valida ambos destinos antes de entregar el fixture determinista:
-HTTP, hostname exacto `127.0.0.1` o `localhost`, Supabase :54321 y app :3000.
-Rechaza userinfo, prefijos engañosos, puertos diferentes, destinos remotos y rutas
-adicionales (salvo `/`). Playwright valida también en modo servidor externo.
-El operador debe usar un build local preparado con esos mismos destinos, no un
-build anterior que conserve configuración pública alojada. El seed y sus hashes
-permanecen intactos; `reset-local.mjs` conserva su guard local existente.
-
-## Comprobación sin acceso alojado
-
-`npm run test:tooling` usa el runner nativo Node y transportes simulados, sin red,
-Auth ni SQL real. CI ejecuta este gate aparte de Vitest, que no recoge `.mjs`.
-### Evidencia vigente de fuente, registrada 2026-10-07
-
-Verificación independiente gentle-ai-verify aportada por el padre, con toolchain
-efímero `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 -- …` y
-versiones reales comprobadas:
-
-| Gate | Resultado observado |
+| Identidad alojada (`@example.invalid`) | Variable privada |
 | --- | --- |
-| `npm ci` | PASS, 464 paquetes, audit 0 |
-| Lint y typecheck | PASS |
-| `test:unit` | PASS, 478 pruebas en 30 archivos |
-| Build | PASS |
-| Tooling nativo con Node exacto | PASS, 28/28 |
-| Archivos generados rastreados | Sin cambios |
+| admin1 | `DEMO_ADMIN1_PASSWORD` |
+| admin2 | `DEMO_ADMIN2_PASSWORD` |
+| candidate1 | `DEMO_CANDIDATE1_PASSWORD` |
+| candidate2 | `DEMO_CANDIDATE2_PASSWORD` |
+| candidate3 | `DEMO_CANDIDATE3_PASSWORD` |
+| candidate4 | `DEMO_CANDIDATE4_PASSWORD` |
+| company1 | `DEMO_COMPANY1_PASSWORD` |
+| company2 | `DEMO_COMPANY2_PASSWORD` |
+| company3 | `DEMO_COMPANY3_PASSWORD` |
+| company4 | `DEMO_COMPANY4_PASSWORD` |
 
-Estos resultados superseden la indisponibilidad inicial por EBADENGINE del escritor,
-conservada como historia en EXTRA-015. El RED inicial solo fue presenciado por el
-escritor; no se atribuye al verificador. No se repitieron tests en este follow-up
-pasivo ni se acredita ejecución de gates remotos.
+El resolver admite exactamente estas diez identidades. Rechaza admin3/admin4
+alojados, identidades adicionales y variables compartidas `DEMO_ADMIN_PASSWORD`,
+`DEMO_CANDIDATE_PASSWORD`, `DEMO_COMPANY_PASSWORD` o `DEMO_PASSWORD` como fallback.
+Son variables Node-only: nunca `NEXT_PUBLIC_*` ni configuración cliente del portal.
 
-### Reducción a 10 identidades
+| Control alojado | Identidades requeridas |
+| --- | --- |
+| Carga/verificación de los 4 CV interactivos | admin1 |
+| Smoke | candidate1, company1, admin1 |
+| Storage | candidate1, candidate2, company1, company2, admin1 |
+| Comprobaciones individuales de demo-performance | admin1 |
 
-La fuente fue actualizada a un fixture de 10 cuentas ficticias (2 admin / 4 candidate
-/ 4 company) como parte de este PR. El manifiesto y el hash del seed reflejan los
-nuevos conteos. Las variables de entorno alojadas se redujeron a tres por rol.
+La publicable Supabase no sustituye una contraseña. Los checks interactivos no son
+benchmarks de aceptación: 10 cuentas no prueban el volumen 500/50/100/1000 ni cuatro
+administradores simultáneos. `concurrent-admins` solo se ejecuta con `APP_ENV=local`,
+destinos exactos y propiedad del proyecto aislado; usa cuatro identidades del dataset
+TEST-ONLY con el resolver local, no inventa dos cuentas alojadas.
 
-Estado: implementado y fuente verificada; revisión, rotación/ajuste remota,
-publicación, integración y aceptación pendientes. EXTRA-016 registra el cambio.
+## Local y aceptación aislada
 
-Referencia y autorización: EXTRA-015 y EXTRA-016 en `cambios-extra.md` y PC1/PC2 en
-`odd/tasks/public-repository-credentials.md`. El padre conserva el tracker y la entrega.
+`localFixturePassword` valida **ambos destinos** antes de entregar el literal
+local determinista: HTTP, hostname exacto `127.0.0.1` o `localhost`, Supabase :54321
+y aplicación :3000, sin userinfo, rutas extra, query ni fragmento. No reutilizar
+un build conectado a Supabase alojado. Playwright valida también servidor externo.
+
+`acceptance-manifest.json` separa `interactive` y `acceptance` con versiones,
+conteos, entradas y hashes independientes; el PDF ficticio es común. El generador
+versionado deriva el SQL de aceptación de la plantilla `supabase/seed.sql`, cambiando
+solo parámetros revisados. Las pruebas nativas rechazan diferencias en SQL/hash.
+
+- Seed predeterminado: 2 admins / 4 candidatos / 4 empresas, 8 ofertas y 8 casos.
+- Aceptación explícita: 4 admins / 500 candidatos / 50 empresas / 100 ofertas / 1000 casos.
+- `npm run test:db` selecciona aceptación, ejecuta pgTAP y no carga blobs PDF.
+- `npm run test:e2e:full` selecciona aceptación, carga/verifica 500 CV y ejecuta
+  todos los recorridos sin skips. El caso final de cuatro admins realiza otro reset
+  frío y comprueba las cuatro mutaciones y auditorías después de la barrera común.
+- Fuera de CI aislado se exige `LOCAL_ACCEPTANCE_PROJECT_OWNED=funes-empleo`;
+  establecerlo solo si el operador verificó propiedad exclusiva del servicio local.
+  Loopback no demuestra propiedad. Nunca usarlo sobre el servicio del checkout principal.
+
+## Reset alojado: bloqueado
+
+`acceptance:reset-demo` aborta sin generar SQL. `reset-demo.sql` contiene una negativa
+incondicional sin eliminar Auth ni ejecutar seeds. No ejecutar SQL preparado por
+el procedimiento histórico ni copiar ninguno de los seeds locales al servidor.
+El código no cambia una función ya instalada: el padre registra las operaciones y
+verificaciones remotas autorizadas en PC2/PC4. La rotación individual histórica
+verificada no acredita retiro de las cuentas sobrantes ni aprobación del código actual.
+
+Un reset futuro requiere revisión, conservación de identidades/credenciales e
+historial, alcance verificable y recibo de integridad. Hasta entonces los protocolos
+humanos que requieren reset alojado quedan pendientes, sin sustituirlos por una
+sesión calentada. Antes de uso municipal real deben quedar **cero cuentas de prueba
+activas**, con retiro seguro que preserve cuenta ajena e historial conforme a la
+política pendiente. Este PR no autoriza borrar usuarios, purgar auditoría o modificar
+la bóveda; tampoco habilita producción, publicación o merge.
+
+## Evidencia de código y límites
+
+`npm run test:tooling` usa Node nativo y transportes interceptados sobre los
+entrypoints reales; no ejecuta Auth, SQL, Docker ni Vercel alojados. Vitest no recoge
+`.mjs`, por eso CI ejecuta este gate aparte. Ver EXTRA-017 en `cambios-extra.md` para
+RED/GREEN y gates actuales; la evidencia original de EXTRA-015 precede a la reducción
+bdd9362 y no constituye revisión del candidato reparado. DB/E2E del nuevo candidato
+requieren servicio local propio o CI después del push del padre.
+
+El padre conserva tracker, revisión y entrega de PR #50. No inferir revisión,
+aceptación humana, despliegue o merge de los checks de fuente.

@@ -1,51 +1,93 @@
 {
-  "version": "funes-demo-v1-10-accounts",
-  "seedSha256": "afe57c4b0790840657c94caf1b3516e16c060a92f67b9666dd32aa9a065da72e",
+  "version": "funes-fixtures-v2-separated-datasets",
   "cvSha256": "1e6751c855dda6e8c69bfc5b4ba6d5efebffef6ea6cb7c3c10d697ed0d9ba397",
-  "counts": {
-    "administrators": 2,
-    "candidates": 4,
-    "activeCandidates": 4,
-    "companies": 4,
-    "offers": 8,
-    "participations": 8,
-    "confirmedHires": 4,
-    "fullyCoveredOffers": 4
-  },
-  "sc008a": {
-    "candidateSearch": {
-      "term": "Persona ficticia 001",
-      "categoryCode": "DEMO-B",
-      "availability": "available",
-      "expectedTotal": 1
-    },
-    "openingList": {
-      "status": "published",
-      "page": 2,
-      "pageSize": 2,
-      "expectedTotal": 4,
-      "expectedRows": 2
-    },
-    "companyList": {
-      "status": "active",
-      "page": 2,
-      "pageSize": 2,
-      "expectedTotal": 4,
-      "expectedRows": 2
-    }
-  },
-  "concurrentAdmins": {
-    "variant": "funes-demo-v1-concurrency-unsupported",
-    "preparation": "tests/fixtures/prepare-demo-concurrency.sql",
-    "openingNumber": 1,
-    "preselectionParticipation": 1,
-    "contactParticipation": 1,
-    "outcomeParticipation": 1,
-    "note": "El fixture de 10 cuentas no reproduce el escenario de cuatro administradores concurrentes; requiere el fixture 500/50/100/1000 o una preparación revisada."
-  },
   "cvDownload": {
     "candidateNumber": 1,
     "file": "cv-fictitious.pdf",
     "bytes": 1426
+  },
+  "interactive": {
+    "version": "funes-demo-v2-10-accounts",
+    "seedFile": "supabase/seed.sql",
+    "seedSha256": "13ec9c149d5b9cbe48acf5282aa7bb1c8b69f739c9096450e4f7d457867c57ec",
+    "counts": {
+      "administrators": 2,
+      "candidates": 4,
+      "activeCandidates": 4,
+      "companies": 4,
+      "offers": 8,
+      "participations": 8,
+      "confirmedHires": 4,
+      "fullyCoveredOffers": 4
+    },
+    "sc008a": {
+      "candidateSearch": {
+        "term": "Persona ficticia 001",
+        "categoryCode": "DEMO-B",
+        "availability": "available",
+        "expectedTotal": 1
+      },
+      "openingList": {
+        "status": "published",
+        "page": 1,
+        "pageSize": 10,
+        "expectedTotal": 4,
+        "expectedRows": 4
+      },
+      "companyList": {
+        "status": "active",
+        "page": 1,
+        "pageSize": 10,
+        "expectedTotal": 4,
+        "expectedRows": 4
+      }
+    }
+  },
+  "acceptance": {
+    "version": "funes-acceptance-v2-test-only",
+    "localOnly": true,
+    "seedFile": "tests/fixtures/acceptance-seed.sql",
+    "seedSha256": "88fd1c86d2c97901cce8ea12328988e1b0b1b0e600a5f6034bc9aaeffea798db",
+    "counts": {
+      "administrators": 4,
+      "candidates": 500,
+      "activeCandidates": 400,
+      "companies": 50,
+      "offers": 100,
+      "participations": 1000,
+      "confirmedHires": 50,
+      "fullyCoveredOffers": 20
+    },
+    "sc008a": {
+      "candidateSearch": {
+        "term": "Persona ficticia 001",
+        "categoryCode": "DEMO-B",
+        "availability": "available",
+        "expectedTotal": 1
+      },
+      "openingList": {
+        "status": "published",
+        "page": 2,
+        "pageSize": 10,
+        "expectedTotal": 80,
+        "expectedRows": 10
+      },
+      "companyList": {
+        "status": "active",
+        "page": 2,
+        "pageSize": 10,
+        "expectedTotal": 50,
+        "expectedRows": 10
+      }
+    },
+    "concurrentAdmins": {
+      "administrators": 4,
+      "variant": "funes-acceptance-v2-concurrency",
+      "preparation": "tests/fixtures/prepare-demo-concurrency.sql",
+      "openingNumber": 80,
+      "preselectionParticipation": 775,
+      "contactParticipation": 765,
+      "outcomeParticipation": 755
+    }
   }
 }

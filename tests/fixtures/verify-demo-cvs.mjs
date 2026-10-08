@@ -18,7 +18,7 @@ const id = (kind,n) => { const h=createHash("md5").update(`funes-demo-v1:${kind}
 let next = 1, verified = 0;
 try {
   await Promise.all(Array.from({ length: 4 }, async () => {
-    while (next <= manifest.counts.candidates) {
+    while (next <= manifest.interactive.counts.candidates) {
       const n = next++;
       const { data, error: downloadError } = await client.storage.from("candidate-cvs").download(`${id("profile",n)}/${id("cv",n)}.pdf`);
       assert.equal(downloadError, null, `CV ficticio ${n} no descargable`);
@@ -28,7 +28,7 @@ try {
       verified++;
     }
   }));
-  assert.equal(verified, manifest.counts.candidates);
+  assert.equal(verified, manifest.interactive.counts.candidates);
   console.log(JSON.stringify({ resetId: process.argv[3], at: new Date().toISOString(), cvVerified: verified,
     cvSha256: manifest.cvSha256, bytesEach: manifest.cvDownload.bytes }));
 } finally { await client.auth.signOut({ scope: "local" }); }

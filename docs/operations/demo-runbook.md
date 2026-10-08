@@ -1,15 +1,18 @@
 # Manual de operación ficticia: local, preview y demo
 
-Fecha: 2026-09-28. Alcance T090. No autoriza producción ni uso de datos reales.
-La demo fue creada por pedido de Máximo en su organización de Supabase.
+Alcance T090, actualizado para PC1/EXTRA-017. **Default interactivo: 10 cuentas;
+aceptación: fixture TEST-ONLY local/CI de 4 admins y 500/50/100/1000.** Nunca cargar
+el fixture de aceptación en el demo alojado. Reset alojado bloqueado; credenciales
+individuales existentes, sin variables compartidas por rol ni rotación en scripts.
+No autoriza producción municipal ni uso de datos reales.
 
-## Despliegue existente
+## Despliegue — evidencia histórica 2026-09-28/29
 
 - URL: https://funes-empleo-demo.vercel.app (preview protegido por Vercel).
 - Supabase: `Funes-empleo`, ref `kyjycjojzhwggjuqjnki`, organización
   `maximo-Pdev's Org`, región `sa-east-1`.
 - Vercel: proyecto `funes-empleo`, equipo `pantherium-8487s-projects`, región `gru1`.
-- Preview vigente verificado: `dpl_Bj7YxDaYcCydVayNAh4GW9kQnHNC`, desde la rama
+- Preview verificado entonces: `dpl_Bj7YxDaYcCydVayNAh4GW9kQnHNC`, desde la rama
   `codex/temp-mvp-completion`; se creó con cambios entonces sin commit. Su ID
   identifica el build, pero no acredita un SHA limpio ni corresponde a main.
 - Variables configuradas exclusivamente para Preview: `APP_ENV=demo`,
@@ -74,32 +77,20 @@ Variables de aplicación: `APP_ENV`, `NEXT_PUBLIC_APP_URL`,
 `CONSENT_POLICY_VERSION`. La publicable no elude RLS. `SUPABASE_SECRET_KEY` es
 opcional y exclusivamente servidor/aprovisionamiento controlado; jamás prefijo
 `NEXT_PUBLIC_`. `ACCEPTANCE_DEMO_PROJECT_REF` solo admite `kyjycjojzhwggjuqjnki`.
-El reset alojado usa mantenimiento administrativo, nunca una ruta web.
+El reset alojado está bloqueado por EXTRA-015/017. Variables privadas por identidad
+solo en procesos de tooling: [credenciales de demo](demo-credentials.md). No publicar
+valores ni reutilizar el literal local en el proyecto alojado.
 
-### Reset alojado (solo fixture ficticio)
+### Reset alojado: no ejecutar procedimientos históricos
 
-1. Detener mediciones y avisar a quienes usen la demo: el reset invalida las sesiones
-   ficticias y descarta cambios de negocio de pruebas. No ejecutarlo durante una
-   prueba de registro con buzón real; aborta ante cualquier identidad adicional.
-2. La función de `tests/fixtures/reset-demo.sql` está instalada únicamente en esta
-   demo como `demo_only_reset_fixture`. No incluirla en migraciones de producto.
-3. En una terminal dedicada, establecer `APP_ENV=demo` y
-   `ACCEPTANCE_DEMO_PROJECT_REF=kyjycjojzhwggjuqjnki`, luego ejecutar:
-   `npm run acceptance:reset-demo -- RESET-FICTITIOUS-DEMO-kyjycjojzhwggjuqjnki --prepare-sql`.
-4. El script verifica el SHA-256 del seed y prepara `test-results/reset-demo-query.sql`.
-   Esto **no ejecuta el reset**. Ejecutar exactamente ese SQL con el conector Supabase
-   autenticado, `execute_sql`, proyecto `kyjycjojzhwggjuqjnki`. Guardar el recibo sin
-   datos personales. No usar claves de servicio del cliente web como sustituto.
-5. La función privada valida entorno/ref/confirmación/hash, toma un bloqueo,
-   rechaza cuentas no pertenecientes al fixture y objetos inesperados, limpia y
-   repone el negocio en una sola transacción. Conserva los 500 objetos inmutables.
-   Ante error, no medir ni relajar las comprobaciones: revisar la causa.
-6. Con URL y clave **publicable** de demo en el proceso, ejecutar
-   `node tests/fixtures/verify-demo-cvs.mjs --confirm-fictitious-demo ID_DEL_RECIBO`.
-   Descarga los 500 PDF y verifica tamaño/hash. Asociar ambas salidas al mismo reset.
-   La comprobación de integridad prepara el fixture; no es una medición de latencia.
-7. Iniciar nuevas sesiones y medir un solo caso sin calentarlo. Repetir el reset para
-   el siguiente caso; no reutilizar recibos entre mediciones.
+`npm run acceptance:reset-demo` y `reset-demo.sql` rechazan el reset. No usar SQL
+preparado anteriormente, recrear Auth, copiar seeds locales ni eludir auditoría.
+Cualquier sustitución debe preservar identidades, contraseñas e historial y pasar
+revisión separada. Los recibos siguientes son historia, no instrucciones vigentes ni
+prueba del candidato actual. Los protocolos humanos con reset alojado siguen pendientes.
+Los scripts CV interactivos verifican solo los 4 candidatos retenidos: nunca atribuir
+sus resultados al benchmark de 500 CV. PC4 operativo conserva el retiro seguro de
+sobrantes; no está ejecutado ni autorizado por estos cambios de fuente.
 
 Evidencia 2026-09-28: reset `8c85617b-56ec-4ef0-9cfe-89aee0768388`,
 22:47:10 UTC, conteos 554/500/50/100/1000/500 correctos; a las 22:50:22 UTC se
@@ -115,13 +106,16 @@ del 29/09 21:41:13 UTC: 554/500/50/100/1000/500 correctos; verificación de los
 500 PDF/hash completada a las 21:42:36 UTC. Se retiró la variante de preparación
 concurrente mediante ese reset. Esto no acredita registro ni correo alojado.
 
-Concurrencia: ejecutar `tests/fixtures/prepare-demo-concurrency.sql` solo con el
-transporte autenticado fijado al ref demo, después del reset/500 PDF, nunca en datos
-reales. Recibo de variante y estados en EXTRA-007/performance.md. Luego:
-`node tests/quality/demo-performance.mjs concurrent-admins ID_RESET ID_DESPLIEGUE`.
-Para los otros casos usar candidate/openings/companies/cv/import-preview/import-confirm,
-cada uno con reset distinto. El CLI de Vercel mantiene autenticación/cookies en
-memoria; los scripts no imprimen ni versionan encabezados o sesión de navegador.
+Concurrencia vigente: `acceptance-concurrency.spec.ts` hace un reset frío de aceptación
+local, aplica `prepare-demo-concurrency.sql` con contexto local explícito y ejecuta
+cuatro cuentas administrativas diferentes mediante una barrera común. Cada operación
+debe confirmar éxito visible en ≤5 s; después se verifican cuatro versiones y
+cuatro auditorías con actores individuales/request IDs. Es el último proyecto de
+Playwright para no alterar los recorridos anteriores. Nunca ejecutar esa preparación
+en el servidor alojado. Las mediciones históricas de EXTRA-007 permanecen separadas.
+`demo-performance.mjs` distingue checks interactivos de benchmarks; rechaza
+`concurrent-admins` en `APP_ENV=demo`. Los otros controles individuales no acreditan
+aceptación sobre el dataset grande.
 
 Variables solo de tests: `LOCAL_MAILPIT_URL` (buzón local ficticio),
 `PLAYWRIGHT_EXTERNAL_SERVER=1` únicamente cuando se inició deliberadamente un servidor
@@ -160,16 +154,23 @@ contar una pantalla de error como recorrido correcto.
 1. Verificar rama limpia, Node/npm fijados y Docker activo. Instalar con `npm ci` sin
    procesos que bloqueen `node_modules` en Windows.
 2. Ejecutar `npx supabase start`; copiar variables solo al `.env.local` ignorado.
-3. Ejecutar `node tests/fixtures/reset-local.mjs --confirm-local-reset`: valida destino,
-   hashes, pgTAP, conteos y 500 PDF ficticios con políticas de Storage.
-4. Ejecutar los seis gates del README. Restablecer fixture entre ejecuciones destructivas.
+3. Verificar propiedad exclusiva del proyecto local (no el Docker/servicio del checkout
+   principal). Fuera de CI aislado, establecer `LOCAL_ACCEPTANCE_PROJECT_OWNED=funes-empleo`
+   solo después de verificarlo. El reset sin `--acceptance` prepara la demo de 10 cuentas
+   y 4 PDF. Loopback por sí solo no acredita propiedad.
+4. Para gates, `npm run test:db` elige explícitamente aceptación TEST-ONLY con
+   `--no-seed`, carga SQL generado protegido y ejecuta pgTAP completo sin blobs.
+   `npm run test:e2e:full` prepara aceptación más 500 PDF y exige cero skips/fallos.
+   Manifiesto separado con hashes/inputs/conteos; no reducir expectativas por el seed
+   interactivo. Ejecutar además tooling, tipos, lint, unit y build.
 5. `npm run dev` para revisión; `npm run build` y `npm run start` para validación del build.
 6. `npx supabase stop` cuando nadie dependa del entorno. No usar un borrado general de Docker.
 
 ## Administradores y correo
 
-Cuatro cuentas separadas, nunca una compartida. Local usa las cuatro identidades del
-seed, exclusivamente ficticias. La aplicación no ofrece registro público admin.
+El producto requiere cuatro cuentas municipales separadas, nunca una compartida.
+El seed interactivo usa dos admins ficticios; el fixture TEST-ONLY de aceptación usa
+cuatro para comprobar el requisito, sin crear admin3/admin4 en el demo alojado. La aplicación no ofrece registro público admin.
 `provisionAdministrator` valida un admin activo; `inviteIndividualAdministrator`
 reserva invitación con actor en base y llama Auth Admin, sin exportar el cliente secreto.
 El arranque del primer administrador alojado requiere un operador confirmado y
@@ -227,5 +228,8 @@ por el plan antes de producción.
 Antes de configurar integración GitHub/Vercel: acordar propietarios y permisos,
 proyecto Supabase ficticio independiente, URLs, correo y secretos separados. No hacer
 deploy desde esta tarea sin un destino confirmado. Verificar migraciones, RLS, Storage,
-Cron, seis gates y revisión por PR. Después preparar reset alojado protegido y ejecutar
-protocolos humanos; un build local o preview no acredita esos resultados.
+Cron, gates y revisión del candidato exacto por PR. Los protocolos humanos con reset
+alojado requieren primero un procedimiento nuevo revisado; un build local o preview
+no acredita esos resultados. Antes de operación municipal real: cero cuentas de prueba
+activas y retiro seguro sin purgar historial ni afectar la cuenta ajena. La publicación,
+configuración alojada y merge pertenecen al padre, no a PC1.

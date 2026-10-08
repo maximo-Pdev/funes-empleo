@@ -27,7 +27,7 @@ function run(file, args) {
   const result = spawnSync(process.execPath, [resolve(root, file), ...args], { env, stdio: "inherit" });
   if (result.error || result.status !== 0) throw new Error(`Falló el control ${file}.`);
 }
-run("tests/fixtures/reset-local.mjs", ["--confirm-local-reset"]);
+run("tests/fixtures/reset-local.mjs", ["--confirm-local-reset", "--acceptance"]);
 run("node_modules/next/dist/bin/next", ["build"]);
 mkdirSync(resolve(root, "test-results"), { recursive: true });
 run("node_modules/@playwright/test/cli.js", ["test", "--workers=1", "--retries=0", "--reporter=list,json"]);

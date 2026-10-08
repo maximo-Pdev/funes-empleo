@@ -1,22 +1,16 @@
 // Node-only test tooling. Never import this module into application/client code.
 const hostedIdentities = new Set([
-  "admin1", "admin2", "admin3", "admin4",
+  "admin1", "admin2",
   "candidate1", "candidate2", "candidate3", "candidate4",
   "company1", "company2", "company3", "company4",
 ]);
-function roleOf(identity) {
-  if (identity.startsWith("admin")) return "ADMIN";
-  if (identity.startsWith("candidate")) return "CANDIDATE";
-  if (identity.startsWith("company")) return "COMPANY";
-  return null;
-}
 export function resolveHostedCredentials(identities, env = process.env) {
   const credentials = {};
   for (const identity of identities) {
     if (!hostedIdentities.has(identity)) throw new Error("DEMO_CREDENTIALS_REQUIRED: revisá docs/operations/demo-credentials.md.");
-    const password = env[`DEMO_${roleOf(identity)}_PASSWORD`];
+    const password = env[`DEMO_${identity.toUpperCase()}_PASSWORD`];
     if (typeof password !== "string" || !password.trim()) {
-      throw new Error("DEMO_CREDENTIALS_REQUIRED: configurá las credenciales privadas por rol; revisá docs/operations/demo-credentials.md.");
+      throw new Error("DEMO_CREDENTIALS_REQUIRED: configurá las credenciales privadas por identidad; revisá docs/operations/demo-credentials.md.");
     }
     credentials[identity] = { email: `${identity}@example.invalid`, password };
   }
