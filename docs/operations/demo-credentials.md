@@ -60,6 +60,13 @@ solo parámetros revisados. Las pruebas nativas rechazan diferencias en SQL/hash
 - Seed predeterminado: 2 admins / 4 candidatos / 4 empresas, 8 ofertas y 8 casos.
 - Aceptación explícita: 4 admins / 500 candidatos / 50 empresas / 100 ofertas / 1000 casos.
 - `npm run test:db` selecciona aceptación, ejecuta pgTAP y no carga blobs PDF.
+  `002_fixture_counts.test.sql` exige sus 13 conteos estrictos, incluidos 400 activos,
+  50 contrataciones, 20 ofertas cubiertas, 80 publicadas y páginas de 10 filas.
+  `supabase test db` inmediatamente después del reset default pequeño **no** es el
+  comando de aceptación: esa base no satisface el contrato grande. El dataset pequeño
+  permanece comprobado separadamente por el generador/manifiesto y los tests nativos.
+  El contrato nativo también vincula las 13 consultas SQL reales y sus literales al
+  manifiesto de aceptación; no obtiene expectativas de resultados observados en DB.
 - `npm run test:e2e:full` selecciona aceptación, carga/verifica 500 CV y ejecuta
   todos los recorridos sin skips. El caso final de cuatro admins realiza otro reset
   frío y comprueba las cuatro mutaciones y auditorías después de la barrera común.

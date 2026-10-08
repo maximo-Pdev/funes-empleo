@@ -32,6 +32,48 @@ test("acceptance SQL is generated from the default template and cannot silently 
   assert.match(generated, /LOCAL_ACCEPTANCE_REQUIRED/);
   assert.throws(() => generateAcceptanceSeed("unexpected template"), /FIXTURE_TEMPLATE_CHANGED/);
 });
+// Bind all thirteen actual pgTAP queries and their literal expectations to the
+// explicitly selected acceptance manifest. This is a source contract, not SQL execution.
+const acceptance = JSON.parse(read("tests/fixtures/acceptance-manifest.json")).acceptance;
+const sqlCounts = read("supabase/tests/002_fixture_counts.test.sql");
+const countAssertions = [...sqlCounts.matchAll(/select is\(\(([\s\S]*?)\),(\d+)::bigint,'([^']*)'\);/g)];
+const normalizeSql = sql => sql.replace(/\s+/g, " ").trim();
+const openingPage = acceptance.sc008a.openingList;
+const companyPage = acceptance.sc008a.companyList;
+const search = acceptance.sc008a.candidateSearch;
+const countContracts = [
+  ["administrators", "select count(*) from public.accounts where role='admin'", acceptance.counts.administrators],
+  ["candidates", "select count(*) from public.candidate_profiles", acceptance.counts.candidates],
+  ["active candidates", "select count(*) from public.candidate_profiles where status='active'", acceptance.counts.activeCandidates],
+  ["companies", "select count(*) from public.company_profiles", acceptance.counts.companies],
+  ["openings", "select count(*) from public.job_openings", acceptance.counts.offers],
+  ["participations", "select count(*) from public.participations", acceptance.counts.participations],
+  ["confirmed hires", "select count(*) from public.participations where status='hired'", acceptance.counts.confirmedHires],
+  ["fully covered openings", `select count(*) from public.job_openings o where
+    (select count(*) from public.participations p where p.opening_id=o.id and p.status='hired')>=o.vacancies`, acceptance.counts.fullyCoveredOffers],
+  ["candidate search", `select count(*) from public.candidate_profiles p join public.candidate_categories cc on cc.candidate_id=p.id
+    join public.job_categories jc on jc.id=cc.category_id
+    where p.display_name ilike '%${search.term}%' and jc.code='${search.categoryCode}' and p.availability='${search.availability}'`, search.expectedTotal],
+  ["published openings", `select count(*) from public.job_openings where status='${openingPage.status}'`, openingPage.expectedTotal],
+  ["opening page", `select count(*) from (select id from public.job_openings where status='${openingPage.status}' order by title,id
+    limit ${openingPage.pageSize} offset ${(openingPage.page - 1) * openingPage.pageSize}) q`, openingPage.expectedRows],
+  ["active companies", `select count(*) from public.company_profiles where status='${companyPage.status}'`, companyPage.expectedTotal],
+  ["company page", `select count(*) from (select id from public.company_profiles where status='${companyPage.status}' order by legal_name,id
+    limit ${companyPage.pageSize} offset ${(companyPage.page - 1) * companyPage.pageSize}) q`, companyPage.expectedRows],
+];
+test("pgTAP fixture coverage contains exactly the thirteen acceptance count assertions", () => {
+  assert.equal(countAssertions.length, 13);
+  assert.equal(countContracts.length, 13);
+});
+for (const [index, [name, query, expected]] of countContracts.entries()) {
+  test(`pgTAP acceptance count contract: ${name}`, () => {
+    const actual = countAssertions[index];
+    assert(actual, "Missing strict acceptance count assertion");
+    assert.equal(normalizeSql(actual[1]), normalizeSql(query), "Actual pgTAP query must retain its filters/joins/pagination");
+    assert.equal(Number(actual[2]), expected, "Expected count must match the acceptance manifest, never observed DB counts");
+  });
+}
+
 // Intercept the real reset entrypoint's first subprocess. No Docker/CLI/Auth runs.
 const loader = `import {registerHooks} from 'node:module'; registerHooks({
  resolve(s,c,n) {return s==='node:child_process'?{url:'mock:child',shortCircuit:true}:n(s,c)},
