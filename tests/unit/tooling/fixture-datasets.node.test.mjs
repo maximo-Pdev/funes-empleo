@@ -111,6 +111,56 @@ test("dataset parameter blocks preserve approved volumes and outcome distributio
     assert.match(sql, /slot<=vacancies/);
   }
 });
+// Read the candidate actually used by otherPath, not a duplicated expected selector.
+// Support the old literal too so RED diagnoses its semantic failure in acceptance.
+function configuredForeignCandidate(reset, isAcceptance) {
+  const literal = reset.match(/const otherPath = `\$\{fixtureId\("profile", (\d+)\)\}\/\$\{fixtureId\("cv", \1\)\}\.pdf`;/);
+  if (literal) return Number(literal[1]);
+  assert.match(reset, /const otherPath = `\$\{fixtureId\("profile", foreignCandidateNumber\)\}\/\$\{fixtureId\("cv", foreignCandidateNumber\)\}\.pdf`;/);
+  const selected = reset.match(/const foreignCandidateNumber = acceptance \? (\d+) : (\d+);/);
+  assert(selected, "Foreign candidate selection must be explicit for each dataset");
+  return Number(selected[isAcceptance ? 1 : 2]);
+}
+for (const datasetName of ["interactive", "acceptance"]) {
+  test(`Storage foreign-CV probe is genuinely foreign and target is referred: ${datasetName}`, () => {
+    const manifest = JSON.parse(read("tests/fixtures/acceptance-manifest.json"));
+    const seed = read(manifest[datasetName].seedFile);
+    const p = Object.fromEntries([...seed.matchAll(/(\w+) integer:=(\d+)/g)].map(x => [x[1], Number(x[2])]));
+    // Tie the independent enumeration to the actual seed mapping/access formulas.
+    assert.match(seed, /opening_n:=1\+\(\(i-1\)\/\(participations\/openings\)\)/);
+    assert.match(seed, /private\.fixture_id\('business',1\+\(\(i-1\)%companies\)\)/);
+    assert.match(seed, /cid:=private\.fixture_id\('profile',1\+\(\(i-1\)%candidates\)\)/);
+    assert.match(seed, /case when stat in \('not_selected','withdrawn'\) then 'revoked'/);
+    const referrals = [];
+    for (let n = 0; n < p.participations; n++) {
+      const opening = Math.floor(n / (p.participations / p.openings)) + 1;
+      const slot = n % (p.participations / p.openings) + 1;
+      const hired = (opening <= p.fully_hired_openings && slot <= p.vacancies) ||
+        (opening > p.fully_hired_openings && opening <= p.fully_hired_openings + p.partially_hired_openings && slot === 1);
+      if (hired || (slot !== 3 && slot !== 4)) {
+        referrals.push({ company: (opening - 1) % p.companies + 1, candidate: n % p.candidates + 1 });
+      }
+    }
+    const foreign = configuredForeignCandidate(read("tests/fixtures/reset-local.mjs"), datasetName === "acceptance");
+    assert(foreign >= 1 && foreign <= p.candidates, "Probe must reference an existing CV, not a missing object");
+    assert(referrals.some(r => r.company === 1 && r.candidate === 1), "Positive target must be legitimately referred to company1");
+    assert(!referrals.some(r => r.company === 2 && r.candidate === 1), "Company2 target probe must remain unauthorized");
+    assert(!referrals.some(r => r.company === 1 && r.candidate === foreign), "Foreign CV must have NO active company1 referral");
+    assert(referrals.some(r => r.company === 2 && r.candidate === foreign), "Foreign probe is referred to a different company");
+  });
+}
+test("Storage retains exact positive downloads and all four strict denial probes", () => {
+  const reset = read("tests/fixtures/reset-local.mjs");
+  assert.match(reset, /for \(const client of \[candidate, companyWithReferral\]\)/);
+  assert.match(reset, /sha256\(Buffer\.from\(await data\.arrayBuffer\(\)\)\) !== manifest\.cvSha256/);
+  for (const probe of [
+    'companyWithReferral.storage.from("candidate-cvs").download(otherPath)',
+    'companyWithoutReferral.storage.from("candidate-cvs").download(targetPath)',
+    'companyWithReferral.storage.from("candidate-cvs").createSignedUrl(targetPath, 60)',
+    'createClient(status.API_URL, publicKey).storage.from("candidate-cvs").download(targetPath)',
+  ]) assert(reset.includes(`!(await ${probe}).error`), "Each negative probe must still require rejection");
+});
+
 test("real CI entrypoints explicitly select acceptance, never default demo seeding", () => {
   const p = JSON.parse(read("package.json"));
   assert.match(p.scripts["test:db"], /reset-local\.mjs --confirm-local-reset --acceptance --database-only/);

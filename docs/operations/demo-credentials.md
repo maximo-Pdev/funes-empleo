@@ -70,6 +70,14 @@ solo parámetros revisados. Las pruebas nativas rechazan diferencias en SQL/hash
 - `npm run test:e2e:full` selecciona aceptación, carga/verifica 500 CV y ejecuta
   todos los recorridos sin skips. El caso final de cuatro admins realiza otro reset
   frío y comprueba las cuatro mutaciones y auditorías después de la barrera común.
+- Los probes Storage usan candidate1 como target positivo para dueño/company1.
+  El CV extranjero para company1 es candidate11 en aceptación y candidate2 en
+  interactivo: candidate2 sí tiene derivaciones legítimas a company1 en el fixture
+  grande. Se conservan cuatro rechazos estrictos: ese CV extranjero, target desde
+  company2 sin derivación, URL firmada reutilizable y descarga anónima. Cada fallo
+  tiene diagnóstico separado; no se modifican RLS ni permisos para acomodar pruebas.
+  El test nativo vincula la selección real a las fórmulas del seed; no sustituye
+  comprobación Storage real ni acredita E2E verde.
 - Fuera de CI aislado se exige `LOCAL_ACCEPTANCE_PROJECT_OWNED=funes-empleo`;
   establecerlo solo si el operador verificó propiedad exclusiva del servicio local.
   Loopback no demuestra propiedad. Nunca usarlo sobre el servicio del checkout principal.

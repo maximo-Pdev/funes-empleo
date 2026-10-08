@@ -101,7 +101,10 @@ async function signedIn(email) {
   return client;
 }
 const targetPath = `${fixtureId("profile", 1)}/${fixtureId("cv", 1)}.pdf`;
-const otherPath = `${fixtureId("profile", 2)}/${fixtureId("cv", 2)}.pdf`;
+// Acceptance company1 legitimately receives candidates 1..10 through openings
+// 1/51. Candidate11 belongs to company2; the interactive foreign CV is candidate2.
+const foreignCandidateNumber = acceptance ? 11 : 2;
+const otherPath = `${fixtureId("profile", foreignCandidateNumber)}/${fixtureId("cv", foreignCandidateNumber)}.pdf`;
 const candidate = await signedIn("candidate1@example.invalid");
 const companyWithReferral = await signedIn("company1@example.invalid");
 const companyWithoutReferral = await signedIn("company2@example.invalid");
@@ -111,11 +114,17 @@ for (const client of [candidate, companyWithReferral]) {
     throw new Error("El dueño o la empresa derivada no puede descargar el CV ficticio exacto.");
   }
 }
-if (!(await companyWithReferral.storage.from("candidate-cvs").download(otherPath)).error ||
-    !(await companyWithoutReferral.storage.from("candidate-cvs").download(targetPath)).error ||
-    !(await companyWithReferral.storage.from("candidate-cvs").createSignedUrl(targetPath, 60)).error ||
-    !(await createClient(status.API_URL, publicKey).storage.from("candidate-cvs").download(targetPath)).error) {
-  throw new Error("Storage permitió un CV ajeno, una URL firmada o una descarga anónima.");
+if (!(await companyWithReferral.storage.from("candidate-cvs").download(otherPath)).error) {
+  throw new Error("Storage permitió a company1 descargar el CV extranjero del dataset seleccionado.");
+}
+if (!(await companyWithoutReferral.storage.from("candidate-cvs").download(targetPath)).error) {
+  throw new Error("Storage permitió a company2 descargar el CV target sin derivación propia.");
+}
+if (!(await companyWithReferral.storage.from("candidate-cvs").createSignedUrl(targetPath, 60)).error) {
+  throw new Error("Storage permitió crear una URL firmada reutilizable del CV target.");
+}
+if (!(await createClient(status.API_URL, publicKey).storage.from("candidate-cvs").download(targetPath)).error) {
+  throw new Error("Storage permitió una descarga anónima del CV target.");
 }
 for (const client of [candidate, companyWithReferral, companyWithoutReferral]) await client.auth.signOut({ scope: "local" });
 console.log(`Fixture ${dataset.version} verificado: ${dataset.counts.candidates} candidatos, ${dataset.counts.companies} empresas, ${dataset.counts.offers} ofertas, ${dataset.counts.participations} participaciones; ${dataset.counts.candidates} CV ficticios.`);
