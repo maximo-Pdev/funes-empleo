@@ -3,13 +3,14 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CalendarDays, ChevronLeft, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "@/components/ui";
 import { listPublicOffers } from "@/features/openings/public-service";
+import { getAccountAccess } from "@/features/accounts/navigation";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 
 export const dynamic = "force-dynamic";
 
 export default async function PublicOffersPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const { page } = await searchParams;
-  const result = await listPublicOffers({ page: page ?? 1 });
+  const [result, accountAccess] = await Promise.all([listPublicOffers({ page: page ?? 1 }), getAccountAccess()]);
   const hasPrevious = result.page > 1;
   const hasNext = result.page * result.pageSize < result.total;
 
@@ -22,7 +23,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
             <span className="hidden leading-tight sm:block">Municipalidad de Funes<span className="block text-sm font-medium text-muted-foreground">Portal de Empleo</span></span>
           </Link>
           <nav aria-label="Accesos principales">
-            <Link className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary" href="/login">Iniciar sesión</Link>
+            <Link className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary" href={accountAccess.href}>{accountAccess.label}</Link>
           </nav>
         </div>
       </header>

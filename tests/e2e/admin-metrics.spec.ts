@@ -65,16 +65,20 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
 
 test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ page, request }) => {
   const url = "/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20";
-  expect((await request.get(url)).status()).toBe(403);
+  const anonymous = await request.get(url);
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill("company1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
   const denied = await page.request.get(url);
-  expect(denied.status()).toBe(403);
-  expect(denied.headers()["cache-control"]).toBe("private, no-store");
-  expect(await denied.text()).not.toMatch(/Persona|Oferta ficticia|SELECT|stack/);
+  for (const response of [anonymous, denied]) {
+    expect(response.status()).toBe(403);
+    const directives = (response.headers()["cache-control"] ?? "").split(",").map(directive => directive.trim().toLowerCase());
+    expect(directives).toEqual(expect.arrayContaining(["private", "no-store"]));
+    expect(directives).not.toContain("public");
+    expect(await response.text()).not.toMatch(/Persona|Oferta ficticia|SELECT|stack/);
+  }
   await page.goto("/admin/metrics");
   await expect(page).toHaveURL(/\/account$/);
 });

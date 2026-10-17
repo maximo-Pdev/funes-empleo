@@ -370,6 +370,44 @@ Próximo paso: verificación documental independiente; después, coordinar las t
 abiertas y follow-ups con superficies disjuntas, sin asignar propietarios por inferencia.
 No se afirma publicación desde main, producción ni aprobación de artefactos.
 
+## Incremento A02/A03, 2026-10-17: sesión y navegación
+
+Rama `feat/session-persistence-profile-navigation`, desde el merge del PR #52
+(`da21597`). Mateo autoriza continuar este bloque. El proxy renueva en páginas
+y handlers dinámicos y conserva cookies/opciones y cabeceras de no caché entre
+escrituras. Login/logout invalidan layout. Inicio/listado/detalle públicos muestran
+el perfil de candidato o empresa activos, la cuenta de administración o login,
+consultando identidad y cuenta en servidor sin enviar PII a la navegación.
+No se alteran RLS, guards, vencimientos, cierres de seguridad ni modelo persistido.
+
+RED 18 FAIL/26 PASS; GREEN focalizado 52/52. Regresión 559 pruebas/35 archivos y
+tooling 57/57 PASS; typecheck/lint/build PASS. Supabase local existente, sin reset:
+Chromium 10/10 PASS; seis escenarios por rol de renovación, navegación, recarga y
+logout, tres de contraseñas y smoke público. Los seis de sesión se repiten con
+reutilización de cookies en otra pestaña después del logout: 6/6 PASS, sin acceso.
+Docker se inició y conserva sus servicios; servidor Next de pruebas terminado.
+
+T102–T105 verificadas localmente: ledger 99/105 marcado y seis gates históricos
+abiertos. Entrega por PR desde `feat/session-persistence-profile-navigation`;
+CI completo/pgTAP, revisión del
+compañero y aceptación humana pendientes. Detalle en matriz y EXTRA-019.
+No se ratifica retrospectivamente el Draft global.
+
+PR #53, commit inicial `af7b9aa`: Quality #86 (`39065451675`) aprobó typecheck,
+lint, tooling, cobertura, build y pgTAP (858 pruebas); database PASS. Application
+falló en un E2E que comparaba literalmente `private, no-store` con las directivas
+adicionales del proxy: 2 PASS, 1 FAIL y 64 sin ejecutar por dependencia.
+Corrección focalizada en el mismo PR: comparar tokens completos `private` y
+`no-store` y rechazar `public`, manteniendo 403 y ausencia de contenido sensible
+para anónimo y empresa. RED local reproducido y GREEN 1/1 sin reset ni cambios
+de producto. La nueva ejecución completa de CI y revisión humana siguen pendientes;
+detalle en la continuación de EXTRA-019.
+
+A01 ya fue integrado por PR #52: Quality #84 (`39056857381`) aprobó application
+y database para `5d8cdfb`, 61 E2E completos sin omisiones/fallos/inestables y
+concurrencia SQL. Esto complementa la evidencia local histórica siguiente y no
+acredita revisión humana ni cierra los gates de aceptación externos.
+
 ## Incremento A01, 2026-10-17: registro y controles de contraseña
 
 Mateo autorizó comenzar los arreglos en `feat/portal-functional-adjustments`.

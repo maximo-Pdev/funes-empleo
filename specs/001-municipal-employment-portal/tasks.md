@@ -455,3 +455,17 @@ del compañero ni aceptación global. Evidencia en la matriz y EXTRA-018.
 - [X] T099 [US2/US3] Centralizar la validación y transportar `confirmation` en las Server Actions de registro en `src/validation/`, `src/features/accounts/`, `src/features/candidates/registration-actions.ts` y `src/features/companies/company-actions.ts`; mantener respuesta no enumerativa y metadata sin confirmación.
 - [X] T100 [US2/US3] Agregar controles independientes de mostrar/ocultar y confirmación a formularios de ingreso, registro y actualización; cubrir valor, tipo de botón, nombre accesible y autocomplete en `tests/components/accounts/` y actualizar recorridos E2E de registro.
 - [X] T101 [US2/US3] Ejecutar regresiones, typecheck, lint, build y navegador para A01; registrar resultados y límites en la matriz y `cambios-extra.md`, sin acreditar revisión del compañero ni cerrar aceptación global.
+
+## Phase 12: A02/A03 — sesión y navegación, autorización 2026-10-17
+
+Criterios en la matriz, spec/plan y contrato de autorización. Modelo persistido
+sin cambios; este bloque no cierra gates externos ni acredita revisión humana.
+
+- [X] T102 [US2/US3] Registrar RED de matcher, propagación de cookies/cabeceras, navegación por rol e invalidación de login/logout en `tests/unit/accounts/` y `tests/components/setup/`.
+- [X] T103 [US2/US3] Corregir alcance y adaptador de renovación en `src/proxy.ts` e invalidación en `src/features/accounts/actions.ts`, conservando guards, RLS y cierres de seguridad.
+- [X] T104 [US2/US3] Centralizar proyección segura de navegación en `src/features/accounts/navigation.ts` e integrarla en inicio, listado y detalle público con estilos actuales y sin datos personales.
+- [X] T105 [US2/US3] Verificar unitarias/componentes, tipos, lint y build; agregar E2E por rol de renovación, recarga, navegación pública/privada y logout, registrar evidencia y límites sin atribuir checks no ejecutados.
+
+Evidencia local en matriz y EXTRA-019. Marcas de implementación/verificación,
+no aprobación del compañero ni aceptación global; CI completo/pgTAP del nuevo
+SHA pendientes. Los seis gates externos históricos siguen abiertos.

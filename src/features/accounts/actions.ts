@@ -14,6 +14,7 @@ export async function loginAction(_previous: AccountFormState, form: FormData): 
   catch { return { message: "No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.", success: false }; }
   if (status === "suspended") redirect("/account-suspended");
   if (status !== "active") return { message: "No pudimos iniciar sesión. Revisá el correo, la contraseña y su verificación.", success: false };
+  revalidatePath("/", "layout");
   redirect("/account");
 }
 export async function recoveryAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
@@ -39,6 +40,7 @@ export async function passwordAction(_previous: AccountFormState, form: FormData
 export async function logoutAction() {
   const client = await createServerSupabaseClient();
   await client.auth.signOut({ scope: "local" });
+  revalidatePath("/", "layout");
   redirect("/login");
 }
 export async function accountStatusAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {

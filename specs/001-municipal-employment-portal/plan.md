@@ -198,6 +198,22 @@ que OQ-001 no se convirtió en TTL de datos ni purga inventados y que el protoco
 
 ## Arquitectura y límites
 
+### Incremento A02/A03 autorizado el 2026-10-17
+
+Ampliar el matcher del proxy a rutas dinámicas públicas, privadas y handlers,
+excluyendo assets; conservar getUser y los guards/RLS existentes. El adaptador
+setAll acumula cookies y cabeceras por request antes de devolver la última
+NextResponse: propaga la renovación al request y al navegador sin descartar una
+escritura previa. Se respetan las cabeceras de no caché del SDK 0.12.7.
+Una función server-only obtiene exclusivamente href/label desde la sesión y
+cuenta activa validadas, y las tres páginas públicas la consultan en paralelo
+con las ofertas. No se usan metadatos editables ni caché compartida para el rol.
+Login y logout invalidan el layout raíz; no se alteran vencimientos de Auth,
+modelo persistido, RLS, dependencias ni el cierre global al cambiar contraseña.
+Los enlaces conservan estilos existentes. Pruebas de contrato/acciones y E2E
+por rol cubren renovación, recarga, acceso mínimo y cierre explícito; revisión
+del compañero pendiente.
+
 ### Aplicación y rutas
 
 - App Router con Server Components por defecto. Los Client Components se limitan a interacción que

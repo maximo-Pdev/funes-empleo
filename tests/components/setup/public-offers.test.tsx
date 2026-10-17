@@ -3,11 +3,14 @@ import { beforeEach, expect, it, vi } from "vitest";
 import type { PublicOffer } from "@/features/openings/public-service";
 import { AppError } from "@/lib/errors/public-error";
 
-const { listPublicOffers, getPublicOffer, notFound } = vi.hoisted(() => ({
+const { listPublicOffers, getPublicOffer, notFound, readAccountSession } = vi.hoisted(() => ({
   listPublicOffers: vi.fn<typeof import("@/features/openings/public-service").listPublicOffers>(),
   getPublicOffer: vi.fn<typeof import("@/features/openings/public-service").getPublicOffer>(),
   notFound: vi.fn<() => never>(),
+  readAccountSession: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer }));
 vi.mock("next/navigation", () => ({ notFound }));
 
@@ -28,6 +31,22 @@ const detailPage = () => PublicOfferDetailPage({ params: Promise.resolve({ openi
 
 beforeEach(() => {
   vi.resetAllMocks();
+  readAccountSession.mockResolvedValue(null);
+});
+
+it.each([
+  ["candidate", "/candidato/perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
+])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label) => {
+  readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
+  listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
+  getPublicOffer.mockResolvedValue(offer);
+  for (const Page of [listPage, detailPage]) {
+    const view = render(await Page());
+    const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
+    expect(within(navigation).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+    view.unmount();
+  }
 });
 
 it("renderiza el listado y enlaces de paginación usando la página solicitada", async () => {

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
 import { getPublicOffer } from "@/features/openings/public-service";
+import { getAccountAccess } from "@/features/accounts/navigation";
 import { formatPublicClosingDate, publicContractTypeLabel, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { AppError } from "@/lib/errors/public-error";
 
@@ -26,8 +27,8 @@ export const dynamic = "force-dynamic";
 
 export default async function PublicOfferDetailPage({ params }: { params: Promise<{ openingId: string }> }) {
   const { openingId } = await params;
-  let offer;
-  try { offer = await getPublicOffer(openingId); }
+  let offer, accountAccess;
+  try { [offer, accountAccess] = await Promise.all([getPublicOffer(openingId), getAccountAccess()]); }
   catch (error) { if (error instanceof AppError && error.code === "NOT_FOUND") notFound(); throw error; }
 
   const conditions = [
@@ -57,8 +58,8 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
             </span>
           </Link>
           <nav aria-label="Accesos principales">
-            <Link href="/login" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary">
-              Iniciar sesión
+            <Link href={accountAccess.href} className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary">
+              {accountAccess.label}
             </Link>
           </nav>
         </div>

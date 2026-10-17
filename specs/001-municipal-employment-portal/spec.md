@@ -20,6 +20,15 @@ el estado global Draft ni acredita revisión del segundo desarrollador.
 Municipal de Empleo de Funes, manteniendo a la Oficina de Empleo como intermediaria y cubriendo
 los flujos completos de candidatos, empresas y administradores."
 
+**Continuación autorizada, A02/A03, 2026-10-17**: después del merge del PR #52,
+Mateo solicita implementar persistencia de sesión y acceso al perfil. Navegar,
+recargar y renovar tokens conserva una sesión válida; suspensión, archivo,
+revocación y cambio de contraseña conservan sus efectos de seguridad. Los headers
+de inicio y ofertas públicas reemplazan Iniciar sesión por Mi perfil de candidato
+o empresa activa, o Mi cuenta de administrador activo, sin exponer datos personales.
+Login/logout actualizan esos accesos sin compartir la respuesta entre usuarios.
+Aceptación y límites: A02/A03 en la matriz; sin aprobar retrospectivamente el Draft.
+
 ## Clarifications
 
 ### Session 2026-09-19
