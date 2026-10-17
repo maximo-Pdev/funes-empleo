@@ -1113,6 +1113,7 @@ export type Database = {
           location: string | null
           modality: string | null
           moderation_message_public: string | null
+          public_slug: string
           published_at: string | null
           requirements: string | null
           salary: string | null
@@ -1137,6 +1138,7 @@ export type Database = {
           location?: string | null
           modality?: string | null
           moderation_message_public?: string | null
+          public_slug?: string
           published_at?: string | null
           requirements?: string | null
           salary?: string | null
@@ -1161,6 +1163,7 @@ export type Database = {
           location?: string | null
           modality?: string | null
           moderation_message_public?: string | null
+          public_slug?: string
           published_at?: string | null
           requirements?: string | null
           salary?: string | null
@@ -1748,6 +1751,7 @@ export type Database = {
         Args: { p_id?: string; p_page?: number; p_page_size?: number }
         Returns: Json
       }
+      published_offer_by_slug: { Args: { p_slug: string }; Returns: Json }
       save_company_opening: {
         Args: { p_benefits: string; p_categories: string[]; p_closing_date: string | null;
           p_contract_type: string; p_id: string | null; p_location: string; p_modality: string;

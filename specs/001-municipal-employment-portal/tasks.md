@@ -469,3 +469,19 @@ sin cambios; este bloque no cierra gates externos ni acredita revisión humana.
 Evidencia local en matriz y EXTRA-019. Marcas de implementación/verificación,
 no aprobación del compañero ni aceptación global; CI completo/pgTAP del nuevo
 SHA pendientes. Los seis gates externos históricos siguen abiertos.
+
+## Phase 13: A04, etapa pública — continuación autorizada 2026-10-17
+
+Alcance en matriz/spec/plan/modelo/contrato; no concluye A04 privado.
+
+- [X] T106 [US2] Contrastar contrato de slug estable, compatibilidad UUID, privacidad y recuperación; registrar análisis y EXTRA-020 antes del código.
+- [X] T107 [US2] RED de resolución/validación, enlaces y redirección condicionada; pruebas DB de generación, unicidad, inmutabilidad y visibilidad.
+- [X] T108 [US2] Migración aditiva de `public_slug`, backfill seguro, trigger privado y RPC pública; tipos y documentación de rollout/recovery.
+- [X] T109 [US2] Resolver slugs y enlaces canónicos en inicio/listado/detalle/candidato; UUID internos y compatibilidad antigua sin eludir autorización.
+- [X] T110 [US2] Verificar regresiones, tipos, lint, build, pgTAP y navegador; entregar PR con evidencia/límites, sin acreditar review/aceptación humana.
+
+Evidencia local: 575 pruebas/36 archivos, tooling 57, pgTAP 887/13 archivos,
+typecheck/lint/build y asesor de seguridad PASS; tres E2E de slugs y seis de
+sesión PASS. CI completo y revisión independientes se registran en el PR;
+no se marcan realizados por estos checks locales. Ledger 104/110, seis gates
+históricos abiertos. A04 privado sigue pendiente.

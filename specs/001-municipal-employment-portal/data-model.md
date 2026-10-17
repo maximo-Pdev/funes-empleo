@@ -257,6 +257,7 @@ pueda volver a `active`.
 | Campo | Regla |
 | --- | --- |
 | `id`, `company_id` | Identidad y propietario. |
+| `public_slug` | A04 etapa pública: único, no nulo, generado por DB e inmutable; prefijo normalizado inicial (1–64 caracteres) más guion y 16 hex aleatorios. No es PK ni autorización y no cambia al editar título. Backfill conserva versión/fechas. |
 | `title`, `tasks`, `requirements` | Textos obligatorios y limitados. |
 | `vacancies` | Entero positivo. |
 | `location`, `modality`, `schedule` | Obligatorios; modalidad controlada. |

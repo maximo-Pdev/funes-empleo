@@ -372,6 +372,10 @@ No se afirma publicación desde main, producción ni aprobación de artefactos.
 
 ## Incremento A02/A03, 2026-10-17: sesión y navegación
 
+Recibo posterior: PR #53 mergeado como `52fcae9`. Quality #87 (`39066226501`)
+PASS para `247be29`: application/database, 67 E2E completos sin omisiones y
+858 pgTAP, más concurrencia SQL. No acredita aceptación humana del MVP.
+
 Rama `feat/session-persistence-profile-navigation`, desde el merge del PR #52
 (`da21597`). Mateo autoriza continuar este bloque. El proxy renueva en páginas
 y handlers dinámicos y conserva cookies/opciones y cabeceras de no caché entre
@@ -432,6 +436,37 @@ de 91/97 tareas y sus seis pendientes continúa según la conciliación siguient
 el ledger ampliado suma 95/101 marcadas, manteniendo esos seis pendientes.
 
 ## Actualización 2026-10-17: conciliación informada por Mateo
+
+### A04, primera etapa pública (rama `feat/public-offer-slugs`)
+
+Base actualizada `52fcae9`; rama anterior eliminada local/remota tras verificar
+merge. Slugs públicos estables en inicio/listado/detalle y enlaces de candidato,
+con selección por slug y compatibilidad UUID antigua solo para ofertas públicas.
+UUID/FK y comandos internos intactos; no se rediseña la UI ni se cambia Auth/RLS.
+Modelo, plan, contrato, tareas y runbook de despliegue/recuperación sincronizados.
+
+RED de servicio: 4 FAIL/9 PASS. Focalizado final 41/41; regresión 575/36 archivos,
+tooling 57/57; typecheck/lint/build PASS. pgTAP local completo 887/13 archivos,
+incluidas 29 pruebas nuevas; asesor de seguridad local sin hallazgos.
+Navegador de producción local: tres casos de slugs PASS y seis de sesión PASS en
+ejecuciones focalizadas; colección completa 70/17 archivos, no ejecutada aquí.
+Pruebas iniciales de navegador detectaron presuposición incorrecta de HTTP 308
+sin streaming, borrador no existente y noindex duplicado de Next; se verifican
+destino exacto/noindex, se usa oferta cerrada del fixture y no se cambia producto.
+
+Migración local aditiva aplicada sin reset; el CLI aplicó también la migración
+previa pendiente `20260928143725_authenticated_cv_info.sql` ya existente en el
+repositorio. Checksum de ID/versión/updated_at de ofertas idéntico antes/después.
+No se modificaron entornos alojados ni archivos de secretos. SQL de pruebas usa
+rollback; Docker/Supabase existentes permanecen activos y Next de pruebas terminó.
+
+T106–T110 verificadas localmente: 104/110 marcadas, seis gates históricos abiertos.
+Entrega por PR; CI completo del SHA, revisión del compañero y aceptación humana
+pendientes. A04 **no completo**: códigos privados y demás URL/textos UUID se
+abordan en otra etapa. Aplicar migración del PR antes de desplegar app o validar
+preview; no se infiere publicación en Vercel ni aprobación del Draft global.
+
+### Conciliación de gates históricos
 
 - Mateo informa que T087, T089 y T092 se ejecutaron y sus resultados están documentados.
   Los artefactos rastreados disponibles al sincronizar contradicen ese estado: `accessibility.md`

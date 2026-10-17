@@ -967,6 +967,72 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   mismo PR #53; el resultado remoto se registra en sus checks, sin inferirlo
   del resultado focalizado ni acreditar revisión humana.
 
+## EXTRA-020 — A04, primera etapa: referencias públicas de ofertas
+
+- **Fecha/estado:** 2026-10-17; propuesta registrada antes del código.
+- **Origen/autorización:** Mateo pide borrar la rama anterior, continuar y abrir
+  PR al terminar. PR #53 mergeado como `52fcae9`; Quality #87 PASS para `247be29`
+  (67 E2E, 858 pgTAP y concurrencia SQL). Alcance A04 parcial, no privado.
+- **Problema:** inicio/listado/detalle y enlaces desde candidato usan UUID en URL.
+  `published_offers` limita la proyección pública; no se amplían sus permisos.
+- **Cambio:** `job_openings.public_slug` único, no nulo e inmutable; prefijo del
+  título inicial normalizado (1–64 caracteres, fallback `oferta`) y sufijo de
+  8 bytes criptográficos en 16 hex. Backfill transaccional conservando versión,
+  fechas y estados; trigger privado genera para nuevas ofertas. RPC por slug
+  delega en proyección existente; listado suma slug. UUID y FK intactos.
+- **Compatibilidad:** UUID antiguo redirige solo si la oferta sigue pública.
+  Inexistentes/no públicas no revelan slug. Postulación transporta slug y
+  recupera UUID interno antes del comando existente. No sustituye guards/RLS.
+- **Archivos/contratos:** migración, tipos, servicio público, cuatro páginas,
+  validación, unitarias/componentes/pgTAP/E2E y artefactos A04/T106–T110.
+- **Coordinación:** rama `feat/public-offer-slugs`, propietario funcional Mateo;
+  sin estilos nuevos ni edición concurrente del compañero. Cambio de esquema y
+  contrato explícito en PR; revisión independiente pendiente, Draft sin ratificar.
+- **Riesgos:** colisión, slug elegido por cliente, consulta nula que liste todo,
+  filtrado de borradores y cambio accidental de versiones. Índice único,
+  generación DB, validación y proyección vigente. Sin PII ni nuevos proveedores.
+- **Rollout/recuperación:** migración antes de aplicación. Revertir app y conservar
+  slugs ante fallo para no romper enlaces; sin borrar negocio/historial. No se
+  aplica a servicios alojados; pruebas locales sin reset de base existente.
+- **Verificación prevista:** RED/GREEN servicios/rutas y pgTAP de generación,
+  unicidad, inmutabilidad, grants y estados; navegador antiguo/canónico y
+  postulación; regresiones, tipos, lint, build y PR con evidencia de CI.
+- **Pendiente:** códigos privados, URL/textos UUID de administración, empresas,
+  CV e importación se implementan en otra etapa. No se da A04 por terminado.
+- **Análisis focalizado:** seis criterios (generación estable, unicidad, enlaces,
+  compatibilidad, no divulgación y recuperación), todos cubiertos por T106–T110.
+  Sin requisito de acceso nuevo ni tarea huérfana; modelo/plan/contrato coherentes.
+  Checklists existentes no se alteran. La revisión técnica propia no acredita
+  revisión independiente, aceptación municipal ni aprobación global del Draft.
+- **Observación de navegador:** Next con loading/streaming emite redirección
+  mediante meta refresh (HTTP 200) y NOT_FOUND con noindex, o 308/404 antes de
+  streaming. Se verifica destino exacto/ausencia de redirección, noindex y URL
+  final, según documentación oficial de Next y código instalado. No se elimina
+  loading ni se reduce la autorización para forzar status. El fixture local y
+  el de aceptación tienen ofertas cerradas; no se presupone un borrador.
+- **Implementado:** migración `20261017204435_opening_public_slugs.sql`, servicio,
+  tipos y enlaces de cuatro páginas; compatibilidad en público/candidato.
+  Runbook `docs/operations/public-offer-slugs.md`. Sin cambios visuales ni Auth.
+- **Verificado:** RED de servicio 4 FAIL/9 PASS; focalizado 41/41; regresión
+  575/36 archivos y tooling 57/57, typecheck/lint/build PASS. pgTAP 887/13 archivos,
+  incluidas 29 nuevas, PASS; advisor security local sin hallazgos. Tres E2E de
+  slugs y seis de sesión PASS en ejecuciones focalizadas; se recolectan 70/17,
+  sin afirmar ejecución local completa. Limitación de temporales de Vitest en
+  sandbox resuelta ejecutando fuera del sandbox, no cambiando código o tests.
+- **Base local:** `migration up --local` aplicó este cambio y también la previa
+  `20260928143725_authenticated_cv_info.sql`, pendiente ya existente en el repo.
+  Sin reset; checksum de ID/versión/updated_at de ofertas idéntico antes/después.
+  Los tests SQL revierten cambios con rollback. Sin operaciones alojadas,
+  archivos env, tokens impresos ni trazas/capturas de sesión. Docker/Supabase
+  quedan activos; servidor Next finalizado. Build con Node 24.21/npm 11.19.
+- **Revisión propia:** helpers privados sin EXECUTE, proyección definer acotada
+  con search_path vacío, índice único y permisos anteriores conservados;
+  consultas independientes en paralelo, redirecciones fuera de catch, sin hooks,
+  estado compartido o any nuevo. No sustituye revisión independiente.
+- **Entrega:** T106–T110 implementadas/verificadas localmente; commit y PR desde
+  esta rama. CI completo del SHA y revisión humana pendientes; no se fusiona
+  automáticamente ni se considera A04 privado implementado.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

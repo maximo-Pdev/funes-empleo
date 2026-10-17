@@ -123,6 +123,14 @@ tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de o
 
 ## Controles obligatorios de prueba
 
+A04 etapa pública: resolver slug conserva todas las restricciones de
+`published_offers`: publicada, vigente, no archivada y empresa/cuenta activas.
+Slug no da permisos; no públicas e inexistentes son indistinguibles. Listados
+suman solo `slug`, firma anterior y UUID internos intactos. `/ofertas/<UUID>`
+redirige únicamente después de superar la misma consulta. Candidato transporta
+slug en `oferta`; comandos siguen usando UUID interno con guard/transacción.
+Los códigos privados siguen pendientes.
+
 - Intento anónimo sobre toda ruta privada devuelve rechazo sin datos.
 - Candidato A no lee ni muta candidato B.
 - Empresa A no lee empresa/oferta B ni ninguna persona no derivada a una oferta A.

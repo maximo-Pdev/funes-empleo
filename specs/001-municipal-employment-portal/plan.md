@@ -41,6 +41,26 @@ sensibles se validarán en servidor y se respaldarán con RLS, funciones transac
 inmutable. El plan no define operación productiva municipal ni cierra las decisiones legales o de
 datos que siguen asignadas a sus responsables.
 
+### A04, etapa pública: slugs estables (2026-10-17)
+
+Cambio aditivo: `public_slug` generado en DB con prefijo normalizado del título
+inicial y 8 bytes aleatorios (`extensions.gen_random_bytes` existente), único e
+inmutable. PK/FK y comandos intactos. Backfill bajo bloqueo transaccional con
+suspensión temporal solo del trigger de versión, conservando versión/updated_at;
+se rehabilita antes del commit y un fallo revierte toda la transacción.
+`published_offers` conserva firma/permisos y suma `slug`. Nueva RPC pública
+`published_offer_by_slug(text)` busca por índice único y delega en esa proyección;
+un slug ausente devuelve lista vacía, nunca consulta con ID nulo que liste todo.
+Security definer con search_path vacío exclusivamente para proyección pública;
+sin grants SELECT nuevos ni PII. Helpers privados sin EXECUTE público.
+Servicio valida formato/longitud y respuesta; UUID heredado usa consulta anterior.
+Página pública usa `permanentRedirect` solo tras validar vigencia: 308 antes de
+streaming o meta refresh de Next después de comenzar streaming. No se modifica
+el loading global para forzar un status HTTP. Candidato normaliza el
+parámetro `oferta` tras su guard. Migración antes de app; rollback de aplicación
+conserva columna/RPC. Sin dependencias ni variables nuevas. T106–T110/EXTRA-020;
+resto de A04 y revisión independiente pendientes, sin aprobar el Draft global.
+
 ## Contexto técnico
 
 **Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.21.0 LTS con npm 11.19.0; SQL

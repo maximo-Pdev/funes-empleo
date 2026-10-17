@@ -24,9 +24,9 @@ analizar sus contratos antes de modificar los subsistemas afectados.
 | ID | Alcance y decisión confirmada | Estado inicial / dependencia |
 | --- | --- | --- |
 | A01 | Confirmación de contraseña en ambos registros y botón para mostrar/ocultar en registro, ingreso y cambio de contraseña. Validación también en servidor. | Integrado por PR #52; Quality #84 application/database PASS. No acredita aceptación global. |
-| A02 | Mantener la sesión al navegar y recargar. Cierre voluntario desde el perfil; conservar bloqueos por suspensión, archivo, revocación y seguridad de la cuenta. | Implementado y verificado localmente en `feat/session-persistence-profile-navigation`; revisión del compañero pendiente. |
-| A03 | Mostrar acceso al perfil desde la navegación y no ofrecer iniciar sesión cuando ya existe una sesión activa. | Implementado con estilos existentes; recorridos por los tres roles PASS, revisión del compañero pendiente. |
-| A04 | UUID fuera de textos visibles y URL: slug para ofertas y códigos aleatorios para registros privados. | Diseñar referencias únicas, migración y compatibilidad; nunca sustituir autorización por opacidad. |
+| A02 | Mantener la sesión al navegar y recargar. Cierre voluntario desde el perfil; conservar bloqueos por suspensión, archivo, revocación y seguridad de la cuenta. | Integrado por PR #53; Quality #87 application/database PASS (67 E2E). No acredita aceptación global. |
+| A03 | Mostrar acceso al perfil desde la navegación y no ofrecer iniciar sesión cuando ya existe una sesión activa. | Integrado por PR #53 con estilos existentes; tres roles verificados. |
+| A04 | UUID fuera de textos visibles y URL: slug para ofertas y códigos aleatorios para registros privados. | Etapa pública implementada en `feat/public-offer-slugs`; códigos y superficies privadas pendientes. Nunca sustituye autorización por opacidad. |
 | A05 | Foto de perfil JPG, PNG o WebP de hasta 5 MiB; visible al candidato, Municipalidad y empresa únicamente después de derivación autorizada. Mateo informa aprobación municipal para compartirla. | Diseñar Storage privado, validación real de imagen y revocación; aprobación técnica pendiente. |
 | A06 | CV PDF de hasta 20 MB, límite confirmado por Mateo. | Pendiente actualizar plan, servidor, bucket y pruebas; concretar bytes y límites de transporte antes de implementar. |
 | A07 | Búsqueda pública de ofertas por texto, rubro, localidad y modalidad. | Pendiente contrato de filtros y consultas autorizadas. |
@@ -97,6 +97,29 @@ Verificación local:
 T102–T105 verificadas localmente. Quedan revisión del compañero, suite completa
 de CI/pgTAP y aceptación humana para este incremento. Entrega por PR desde
 `feat/session-persistence-profile-navigation`, sin integración directa a `main`.
+
+Recibo posterior: PR #53 mergeado como `52fcae9`. Quality #87 (`39066226501`)
+para `247be29`: application/database PASS, 67 E2E sin omisiones/fallos/inestables,
+858 pgTAP y concurrencia SQL PASS. No acredita revisión o aceptación humana.
+
+## A04: primera etapa pública
+
+Continuación solicitada por Mateo tras PR #53. Alcance: enlaces nuevos de ofertas
+en inicio/listado/detalle y panel candidato, más parámetro de selección `oferta`.
+Slug único e inmutable con prefijo inicial normalizado y sufijo aleatorio;
+no cambia al editar título. UUID/FK y payload de comandos siguen internos.
+
+Compatibilidad: referencias UUID antiguas resuelven usando la proyección pública
+vigente antes de redirigir. Cerradas, vencidas, borradores o empresas bloqueadas
+no revelan slug. Next utiliza 308 o meta refresh si comenzó streaming; NOT_FOUND
+mantiene UI/noindex, con 404 o 200 según streaming. No se alteran loading/estilos.
+
+Migración antes de desplegar app. Rollback de app preserva slugs; sin borrado de
+negocio ni cambios alojados automáticos. Plan/modelo/contrato y T106–T110 detallan
+alcance y verificación; EXTRA-020 conserva evidencia y límites.
+
+**A04 no está completo:** faltan códigos, URL y textos de registros privados,
+administración, empresas, CV e importación. No se marca aceptado por este PR.
 
 ## Catálogo de rubros confirmado
 

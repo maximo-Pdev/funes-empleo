@@ -29,6 +29,16 @@ o empresa activa, o Mi cuenta de administrador activo, sin exponer datos persona
 Login/logout actualizan esos accesos sin compartir la respuesta entre usuarios.
 Aceptación y límites: A02/A03 en la matriz; sin aprobar retrospectivamente el Draft.
 
+**Continuación A04, etapa pública, 2026-10-17:** Mateo solicita continuar tras
+el merge del PR #53. Inicio, listado, detalle público y enlaces de ofertas desde
+candidato usan slug estable, único y generado por servidor, sin UUID en las URL
+nuevas de esas superficies. Editar título no rompe el slug. URL UUID antiguas
+solo redirigen cuando la oferta sigue pública; inexistentes, vencidas y no
+públicas conservan NOT_FOUND sin revelar referencias. Postulación usa slug y
+conserva validación/permisos. UUID/FK internos intactos. Los códigos privados y
+demás UUID visibles siguen pendientes; no se acredita A04 completo ni se
+ratifica retrospectivamente el Draft global.
+
 ## Clarifications
 
 ### Session 2026-09-19
