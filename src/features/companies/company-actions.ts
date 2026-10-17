@@ -4,15 +4,18 @@ import { redirect } from "next/navigation";
 import { publicErrorFrom } from "@/lib/errors/public-error";
 import { changeAccountStatus } from "@/features/accounts/service";
 import { companySession, registerCompany, saveCompanyProfile } from "./service";
+import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/validation/password";
 
 export type CompanyActionState = { message: string; success: boolean };
 const failed = (error: unknown): CompanyActionState => ({ message: publicErrorFrom(error).message, success: false });
 
 export async function registerCompanyAction(_previous: CompanyActionState, form: FormData): Promise<CompanyActionState> {
+  const passwords = passwordConfirmationSchema.safeParse({ password: form.get("password"), confirmation: form.get("confirmation") });
+  if (!passwords.success) return { message: passwordConfirmationMessage, success: false };
   try {
     await registerCompany({ legalName: form.get("legalName"), cuit: form.get("cuit"),
       responsibleName: form.get("responsibleName"), email: form.get("email"), phone: form.get("phone"),
-      activity: form.get("activity"), locality: form.get("locality"), password: form.get("password") });
+      activity: form.get("activity"), locality: form.get("locality"), ...passwords.data });
     return { message: "Si los datos son válidos, recibirás un enlace para verificar el correo. Revisá también spam.", success: true };
   } catch {
     return { message: "Revisá los datos de empresa, contacto y contraseña. Si el problema continúa, contactá a la Oficina.", success: false };

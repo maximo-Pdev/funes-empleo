@@ -11,6 +11,17 @@ autorizan integraciones nuevas.
 
 ## Convenciones compartidas
 
+### Confirmación de contraseña (A01, 2026-10-17)
+
+Los autorregistros de candidato, empresa y cuenta genérica reciben `password` y
+`confirmation` iguales, de 6 a 128 caracteres, además de sus campos vigentes.
+La acción servidor y el servicio rechazan entradas inválidas antes de invocar Auth.
+Un error de confirmación devuelve un mensaje español sin consultar si la cuenta
+existe; el alta válida conserva la respuesta externa genérica ante duplicados o
+fallos del proveedor. `confirmation` no forma parte del payload de Supabase Auth,
+metadata, logs ni esquema persistido. La actualización de contraseña reutiliza
+esta validación sin cambiar sus controles de sesión y revocación existentes.
+
 - Toda operación privada requiere sesión vigente, cuenta `active`, rol y propiedad autorizados.
 - Las acciones de UI se implementarán como Server Actions salvo archivos, descargas, exportaciones y
   callbacks, que requieren Route Handlers.

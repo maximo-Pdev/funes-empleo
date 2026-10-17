@@ -443,3 +443,15 @@ T083: src/features/participations/contact-service.ts
 ## Phase 10: Convergence
 
 - [ ] T097 Connect the existing isolated demo Vercel project to `maximo-Pdev/funes-empleo` after the owner enables repository access; verify a PR preview for the exact reviewed commit, preserve protected access and demo-only variables, and configure the demo target for `main` only after approval and merge per plan: Entornos y entrega / GitHub–Vercel integration (partial). Evidence: owner enabled access on 2026-09-29; API confirms GitHub link to repository 1376497802, productionBranch main, SSO/fork protection and Preview-only variables. Git push 0e84bb0 produced READY preview dpl_CBRrKSZZF5QKUdhMv35zUy1nHfDW with exact SHA; four-role smoke PASS. Remaining: configure/publish the demo-only main target after review/merge. Deployment receipt in `docs/operations/demo-runbook.md` and PR #33. This does not authorize municipal production.
+
+## Phase 11: Incremento funcional A01 — autorización de Mateo, 2026-10-17
+
+Origen y aceptación: `docs/implementation/functional-adjustments.md` A01 y ajuste
+acotado en spec/plan/contracts. No reemplaza los gates externos del MVP.
+Las marcas siguientes acreditan implementación y verificación local, no revisión
+del compañero ni aceptación global. Evidencia en la matriz y EXTRA-018.
+
+- [X] T098 [US2/US3] Registrar RED de confirmación obligatoria, igualdad y límites en validadores y servicios de registro; comprobar en `tests/unit/accounts/` que una entrada inválida no llama a Auth ni filtra credenciales.
+- [X] T099 [US2/US3] Centralizar la validación y transportar `confirmation` en las Server Actions de registro en `src/validation/`, `src/features/accounts/`, `src/features/candidates/registration-actions.ts` y `src/features/companies/company-actions.ts`; mantener respuesta no enumerativa y metadata sin confirmación.
+- [X] T100 [US2/US3] Agregar controles independientes de mostrar/ocultar y confirmación a formularios de ingreso, registro y actualización; cubrir valor, tipo de botón, nombre accesible y autocomplete en `tests/components/accounts/` y actualizar recorridos E2E de registro.
+- [X] T101 [US2/US3] Ejecutar regresiones, typecheck, lint, build y navegador para A01; registrar resultados y límites en la matriz y `cambios-extra.md`, sin acreditar revisión del compañero ni cerrar aceptación global.

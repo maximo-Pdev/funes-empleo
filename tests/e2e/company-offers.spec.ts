@@ -39,7 +39,8 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Actividad").fill("Servicios ficticios");
   await page.getByLabel("Localidad").fill("Funes");
-  await page.getByLabel("Contraseña").fill(password);
+  await page.getByLabel("Contraseña", { exact: true }).fill(password);
+  await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Crear cuenta de empresa" }).click();
   await expect(page.getByRole("status")).toContainText("recibirás un enlace");
 

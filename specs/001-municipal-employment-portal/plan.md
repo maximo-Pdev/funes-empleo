@@ -6,6 +6,24 @@
 
 ## Resumen
 
+### Incremento A01 autorizado el 2026-10-17
+
+La [matriz de arreglos](../../docs/implementation/functional-adjustments.md) registra
+el alcance confirmado por Mateo. Para A01 se reutilizan Supabase Auth, Server
+Actions, Zod y los formularios actuales. Un esquema compartido de contraseña y
+confirmación se aplica a ambos registros, al registro genérico y a la actualización
+existente; las acciones validan antes de invocar sus servicios y estos revalidan
+antes de llamar al proveedor. Un componente cliente pequeño controla únicamente
+la visibilidad de cada input, sin manejar credenciales en estado persistente.
+También actualiza la validez nativa de confirmación cuando cambia cualquiera de
+los dos campos, para evitar el envío y reinicio del formulario ante discordancia;
+esta ayuda del navegador no sustituye la validación independiente del servidor.
+La confirmación se descarta antes del transporte a Auth; no cambia el modelo
+persistido, RLS, sesiones, roles ni dependencias. Tests de acciones/servicios y
+componentes cubren los límites; los recorridos E2E existentes se adaptan al nuevo
+campo obligatorio. Revisión del compañero pendiente; no se declara aprobada la
+totalidad de los artefactos históricos.
+
 El MVP será una aplicación web única con tres experiencias protegidas —candidato, empresa y
 administración municipal— y una consulta pública limitada a ofertas aprobadas. La Oficina de Empleo
 mantiene la intermediación: modera ofertas, evalúa y preselecciona personas, decide derivaciones y

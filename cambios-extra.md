@@ -766,6 +766,85 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Resultado observado:** `npm exec --yes --package=node@24.21.0 --package=npm@11.19.0 --call "npm run test:tooling"`: RED 56 PASS/1 FAIL (entrypoint público); GREEN 57/57, sin skips, incluido rechazo de confirmación ausente antes del transporte simulado. Mismo prefijo con `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:unit` (478/30) y `npm run build`: exit 0; lint sin warnings. Build con placeholders públicos ficticios solo en memoria.
 - **Límites:** sin DB/E2E/CI ni aprobación nativa acreditados; guards/datasets/concurrencia intactos. `next-env.d.ts` restaurado byte-idéntico a HEAD; lockfile sin cambios. Diff whitespace PASS; sin acciones Git de escritura. Avisos npm de ESLint sin soporte y postinstall unrs-resolver no autorizado conservados.
 
+## EXTRA-018 — Confirmación y visibilidad de contraseña (A01)
+
+- **Fecha/responsable/estado:** 2026-10-17, Mateo; registrado antes de implementar,
+  ahora implementado y verificado localmente. Revisión del compañero pendiente.
+- **Origen y autorización:** arreglos.txt, decisiones directas y solicitud de Mateo
+  de comenzar en `feat/portal-functional-adjustments`; A01/T098–T101 y FR-001/010/020.
+  Alcance confirmado incorporado a spec, plan, contratos y matriz. La autorización
+  acotada no acredita aprobación retrospectiva del Draft global ni revisión del compañero.
+- **Problema/evidencia:** ambos formularios de autorregistro carecen de confirmación
+  y de control de visibilidad; sus esquemas servidor aceptan el alta con una única
+  contraseña. La actualización ya compara dos campos, pero no permite mostrarlos.
+- **Cambio mínimo:** esquema compartido de 6–128 caracteres y coincidencia exacta,
+  validación de acciones y servicios previa a Auth, componente cliente reutilizable
+  para mostrar/ocultar, confirmación en ambos registros y ajuste de sus recorridos.
+- **Superficies:** validadores, acciones y componentes de accounts/candidates/companies;
+  pruebas unitarias, componentes y E2E; página de registro candidato para corregir
+  la indicación de cuatro campos; artefactos citados y este registro.
+- **Contratos/modelo:** confirmación transitoria descartada antes de Auth/metadata;
+  sin migración, secretos, paquetes, roles, RLS ni cambios al diseño visual global.
+- **Coordinación:** Mateo toma las funciones y su compañero lo visual según la
+  distribución informada. El componente conserva estilos existentes y no modifica
+  cimientos globales. Revisión del otro desarrollador mediante PR pendiente.
+- **Riesgos y recuperación:** el campo se vuelve obligatorio también en servidor;
+  adaptar clientes de pruebas que registran cuentas. Recuperación por reversión del
+  incremento sin operaciones de base. No alterar el comportamiento de sesiones en A01.
+- **Verificación prevista:** RED/GREEN de ausencia, discordancia, tamaño, acciones y
+  payload de Auth; mostrar/ocultar sin envío ni pérdida de valor; tests existentes,
+  typecheck, lint, build y navegador con datos ficticios. Resultados pendientes.
+- **Revisión, aceptación y commit/PR:** pendientes; no acreditados.
+
+### Resultados locales finales de EXTRA-018
+
+- RED inicial: 30 FAIL / 10 PASS; recuperación nativa: 2 FAIL / 7 PASS. GREEN
+  final: 520 pruebas/32 archivos con `npm run test:unit -- --maxWorkers=4`.
+- `npm run typecheck`, `npm run lint` y `npm run build`: exit 0, Node 24.21.0/npm
+  11.19.0. Se corrigieron un acceso opcional de mock y claves JSX de la prueba;
+  sin desactivar reglas. El build TypeScript final también pasó.
+- Dos builds se detuvieron en compilación dentro del sandbox y se cancelaron;
+  la ejecución ampliada del mismo comando compiló correctamente. Vitest usó
+  TEMP/TMP en `test-results/auth-tmp` tras un ENOENT de temporales del sandbox.
+  Solo variables de proceso; sin cambios de configuración ni secretos.
+- Chromium final: 3/3 PASS con teclado Enter/Espacio, confirmación independiente,
+  conservación de datos en validación nativa y rechazo servidor ante bypass.
+  Axe sin violaciones en ambos registros, sin desbordes a 360×800. El primer
+  intento tuvo ambigüedad entre el alert del formulario y el anunciador de Next;
+  se acotó el selector al formulario. El flag CLI de captura no soportado se
+  retiró; no se modificó la política de capturas/trazas de la suite.
+- Revisión técnica propia con guía React realizada; no equivale a revisión del
+  compañero. Sin dependencias, migraciones, secretos ni datos reales agregados.
+  `git diff --check` PASS. No se ejecutaron pgTAP ni recorridos completos privados
+  con Auth/correo/DB. El cambio autenticado de contraseña se cubre en componentes
+  y validación, no con un usuario real en navegador.
+- T098–T101 verificadas; detalle en `docs/implementation/functional-adjustments.md`.
+  Entrega mediante el PR de `feat/portal-functional-adjustments`; revisión del
+  compañero y aceptación siguen pendientes.
+
+### Detalle necesario de A01 — ancho del control en AuthSurface
+
+- **Evidencia previa a editar:** `auth-forms.module.css` asigna `width: 100%` a todos
+  los botones del formulario. Aplicado al nuevo control junto al input, puede
+  ocupar el ancho de la fila y comprimir el campo en actualización de contraseña.
+- **Cambio mínimo:** acotar `width: auto` a botones `type=button` con `aria-controls`
+  dentro de esa superficie. Es compatibilidad del control funcional, sin cambiar
+  paleta, layout global ni propiedad del diseño. Cobertura: build, tipos y revisión
+  del componente; recorrido autenticado de actualización con DB pendiente.
+
+### Detalle necesario de A01 — prevenir reinicio ante discordancia
+
+- **Evidencia previa a editar:** el recorrido Chromium muestra el mensaje servidor
+  correcto, pero React reinicia los campos no controlados después de la acción.
+  Agregar la confirmación vuelve frecuente ese error y obliga a recargar datos.
+- **Cambio mínimo:** el control actualiza la validez nativa de confirmación al
+  editar cualquiera de las dos contraseñas. El navegador impide enviar valores
+  distintos sin reiniciar campos; el servidor conserva la misma validación ante
+  bypass o ausencia de JavaScript. No se almacenan valores en React ni en storage.
+- **RED observado:** prueba adicional de componentes, 7 PASS / 2 FAIL, porque la
+  discordancia no establece `validity.customError`. Verificar recuperación por
+  edición de cualquiera de los campos y bypass de `novalidate` en Chromium.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
