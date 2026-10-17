@@ -95,7 +95,8 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await candidate.getByLabel("Nombre y apellido").fill(name);
     await candidate.getByLabel("DNI").fill(dni);
     await candidate.getByLabel("Correo electrónico").fill(email);
-    await candidate.getByLabel("Contraseña").fill(localFixturePassword());
+    await candidate.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
+    await candidate.getByLabel("Confirmar contraseña", { exact: true }).fill(localFixturePassword());
     await candidate.getByRole("button", { name: "Crear cuenta candidata" }).click();
     await expect(candidate.getByRole("status")).toContainText("recibirás un enlace");
     let mailId = "";

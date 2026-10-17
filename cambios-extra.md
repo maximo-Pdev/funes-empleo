@@ -845,6 +845,37 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   discordancia no establece `validity.customError`. Verificar recuperación por
   edición de cualquiera de los campos y bypass de `novalidate` en Chromium.
 
+### Continuación de EXTRA-018 — fallos de application en PR #52
+
+- **Fecha/origen/autorización:** 2026-10-17; Mateo solicita reparar el job
+  application del PR #52, commit `9392144`, Quality `39055781126`, job
+  `117463342954`. Database, typecheck, lint, tooling y coverage aprobaron.
+- **Evidencia previa a editar:** el alta de reclamante en
+  `tests/e2e/assisted-candidate.spec.ts:98` usa `getByLabel("Contraseña")`, que
+  ahora coincide con cuatro controles, y no completa confirmación. La prueba
+  `candidate-self-service.spec.ts:118` recibe experiencia concatenada en lugar
+  de la corrección exacta; su guardado anterior se sigue inmediatamente de
+  `reload`, sin esperar la confirmación de la acción. No se atribuye todavía
+  la concatenación a una causa de producto demostrada.
+- **Cambio mínimo previsto:** adaptar el registro restante a coincidencia exacta
+  y confirmación; comprobar el valor editado antes de enviar y esperar mensaje
+  de éxito y botón habilitado antes de recargar. Mantener intacta la aserción
+  del texto persistido y todos los recorridos, sin sleeps, retries ni skips.
+- **Superficies/contratos/riesgos:** solo los dos E2E y evidencia documental de
+  A01/T100–T101. Sin código de producto, permisos, esquema, dependencias o datos
+  reales. El nuevo CI determinará si queda un problema adicional; no debilitar
+  las expectativas para obtener un PASS.
+- **Verificación prevista:** lint, typecheck, suite unitaria y recolección de E2E;
+  nuevo commit y push al mismo PR para ejecutar los jobs aislados completos.
+  Docker local no está iniciado; no se realizan resets ni cambios alojados.
+- **Resultado local:** ambos E2E corregidos según el alcance anterior; typecheck y
+  lint exit 0; unitarias 520/32 PASS; Playwright descubre 61 pruebas/15 archivos;
+  whitespace PASS. El código de producto y el build anterior permanecen intactos.
+- **Entrega/verificación funcional:** continuación en el mismo PR #52. El resultado
+  remoto del SHA de corrección se conserva en sus checks Quality; esta entrada
+  registra los resultados locales previos al push y no los sustituye. Revisión
+  del compañero y aceptación global siguen pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

@@ -113,7 +113,10 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
 
   await page.goto("/candidato/perfil");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia corregida directamente");
+  await expect(page.getByLabel("Habilidades y experiencia")).toHaveValue("Experiencia ficticia corregida directamente");
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
+  await expect(page.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Guardar correcciones" })).toBeEnabled();
   await page.reload();
   await expect(page.getByLabel("Habilidades y experiencia")).toHaveValue("Experiencia ficticia corregida directamente");
   await page.locator('select[name="availability"]').selectOption("unavailable");

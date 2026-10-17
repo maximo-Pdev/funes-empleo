@@ -104,3 +104,15 @@ compañero, aceptación humana y T069/T087/T089/T092/T096/T097 siguen separadas.
 Entrega de A01 mediante el PR de `feat/portal-functional-adjustments`; revisión
 del compañero y aceptación pendientes. Próximo bloque: A02/A03 (persistencia
 de sesión y acceso al perfil), con su análisis y trazabilidad antes de editar.
+
+### Continuación de CI en PR #52
+
+El run `39055781126` del commit `9392144` aprobó database y los controles
+application de tipos, lint, tooling y coverage, pero falló en dos E2E: el alta de
+reclamante asistido no completaba la nueva confirmación y usaba una etiqueta
+ambigua; la corrección de experiencia recargaba sin esperar éxito. Se adaptan
+ambos recorridos conservando la comprobación exacta del dato persistido.
+Verificación local de la reparación: 520 unitarias PASS, typecheck/lint PASS,
+61 E2E recolectados y whitespace PASS. Docker local apagado; los recorridos
+funcionales completos se verifican en el job aislado del nuevo SHA del PR #52.
+La evidencia local previa no implica aprobación de los checks remotos.
