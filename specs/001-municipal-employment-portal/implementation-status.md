@@ -369,3 +369,21 @@ sus tareas ni se declaró conformidad global. Sin cambios de spec/plan/constituc
 Próximo paso: verificación documental independiente; después, coordinar las tareas
 abiertas y follow-ups con superficies disjuntas, sin asignar propietarios por inferencia.
 No se afirma publicación desde main, producción ni aprobación de artefactos.
+
+## Actualización 2026-10-17: conciliación informada por Mateo
+
+- Mateo informa que T087, T089 y T092 se ejecutaron y sus resultados están documentados.
+  Los artefactos rastreados disponibles al sincronizar contradicen ese estado: `accessibility.md`
+  mantiene pendientes la matriz manual completa, el zoom real al 200 % y NVDA; `performance.md`
+  mantiene pendientes los tiempos humanos de SC-003/SC-008; y `quickstart-results.md` mantiene
+  pendientes los resultados humanos y cohortes. Por ello las casillas siguen abiertas y el total
+  respaldado por los artefactos del repositorio sigue en 91/97. Reconciliar los recibos/resultados
+  con esos artefactos antes de cambiar las casillas; esta nota no descarta el reporte de Mateo.
+- T069 continúa abierta: Mateo no sabe todavía si estará disponible la estructura anonimizada del
+  libro y el mapeo aprobado. No inferir columnas ni cerrar la importación histórica sin esa evidencia.
+- T096 continúa pendiente de la revisión independiente del segundo desarrollador.
+- T097 continúa pendiente de verificación con el compañero que controla la cuenta de Vercel y de
+  confirmar la publicación del destino demo desde `main` después de la revisión y fusión. El preview
+  READY y su smoke previo no prueban por sí solos ese paso final.
+- Esta actualización registra el estado comunicado en la conversación y la discrepancia documental;
+  no acredita nuevos resultados, aceptación humana, publicación ni revisión.
