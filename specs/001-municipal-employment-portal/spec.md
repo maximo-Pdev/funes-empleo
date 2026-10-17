@@ -6,6 +6,16 @@
 
 **Status**: Draft
 
+**Ajuste acotado autorizado, 2026-10-17**: Mateo solicita comenzar los arreglos
+funcionales registrados en [la matriz](../../docs/implementation/functional-adjustments.md).
+El primer incremento A01 exige confirmar la contraseña en ambos autorregistros
+y permite mostrar/ocultar cada contraseña en registro, ingreso y actualización.
+El servidor rechaza contraseñas ausentes o distintas antes de llamar a Auth;
+la confirmación no se persiste ni se envía al proveedor. Se conservan los límites
+vigentes de 6 a 128 caracteres y las respuestas que no revelan cuentas existentes.
+Esta autorización es específica del incremento y no ratifica retroactivamente
+el estado global Draft ni acredita revisión del segundo desarrollador.
+
 **Input**: User description: "Crear una única especificación integral para el MVP del Portal
 Municipal de Empleo de Funes, manteniendo a la Oficina de Empleo como intermediaria y cubriendo
 los flujos completos de candidatos, empresas y administradores."

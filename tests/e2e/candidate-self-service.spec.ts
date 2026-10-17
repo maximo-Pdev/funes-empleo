@@ -35,7 +35,8 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.getByLabel("Nombre y apellido").fill(name);
   await page.getByLabel("DNI").fill(dni);
   await page.getByLabel("Correo electrónico").fill(email);
-  await page.getByLabel("Contraseña").fill(password);
+  await page.getByLabel("Contraseña", { exact: true }).fill(password);
+  await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Crear cuenta candidata" }).click();
   await expect(page.getByRole("status")).toContainText("recibirás un enlace");
 
@@ -112,7 +113,10 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
 
   await page.goto("/candidato/perfil");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia corregida directamente");
+  await expect(page.getByLabel("Habilidades y experiencia")).toHaveValue("Experiencia ficticia corregida directamente");
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
+  await expect(page.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Guardar correcciones" })).toBeEnabled();
   await page.reload();
   await expect(page.getByLabel("Habilidades y experiencia")).toHaveValue("Experiencia ficticia corregida directamente");
   await page.locator('select[name="availability"]').selectOption("unavailable");

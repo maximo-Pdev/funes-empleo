@@ -26,7 +26,7 @@ const categoryB = "0a000000-0000-4000-8000-000000000002";
 describe("autogestión candidata", () => {
   it("normaliza el DNI y exige los campos mínimos del autorregistro", () => {
     expect(candidateRegistrationSchema.parse({ name: " Persona Ficticia ", dni: "90.000.001",
-      email: "test@example.invalid", password: "Fictitious-123" }).dni).toBe("90000001");
+      email: "test@example.invalid", password: "Fictitious-123", confirmation: "Fictitious-123" }).dni).toBe("90000001");
     expect(candidateRegistrationSchema.safeParse({ name: "A", dni: "abc", email: "invalid", password: "1" }).success).toBe(false);
     render(<CandidateRegistrationForm />);
     expect(screen.getByLabelText("Nombre y apellido")).toBeTruthy();

@@ -1,14 +1,14 @@
 import { z } from "zod";
+import { passwordConfirmationSchema, passwordSchema } from "@/validation/password";
 
 // Account-specific input contracts; shared normalization/catalogs remain owned by T019.
 export const credentialsInput = z.object({
   email: z.email().max(320).transform((value) => value.trim().toLowerCase()),
-  password: z.string().min(6).max(128),
+  password: passwordSchema,
 });
-export const registrationInput = credentialsInput.extend({ role: z.enum(["candidate", "company"]) });
+export const registrationInput = credentialsInput.extend({ role: z.enum(["candidate", "company"]) }).and(passwordConfirmationSchema);
 export const emailInput = credentialsInput.pick({ email: true });
-export const passwordInput = z.object({ password: z.string().min(6).max(128), confirmation: z.string() })
-  .refine((value) => value.password === value.confirmation, { path: ["confirmation"], message: "Las contraseñas deben coincidir." });
+export const passwordInput = passwordConfirmationSchema;
 export const accountCommandInput = z.object({
   accountId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
   version: z.coerce.number().int().positive(),

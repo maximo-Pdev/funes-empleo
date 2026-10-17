@@ -370,6 +370,29 @@ Próximo paso: verificación documental independiente; después, coordinar las t
 abiertas y follow-ups con superficies disjuntas, sin asignar propietarios por inferencia.
 No se afirma publicación desde main, producción ni aprobación de artefactos.
 
+## Incremento A01, 2026-10-17: registro y controles de contraseña
+
+Mateo autorizó comenzar los arreglos en `feat/portal-functional-adjustments`.
+Decisiones, criterios y pendientes compartidos:
+`docs/implementation/functional-adjustments.md`. A01/T098–T101 agrega confirmación
+obligatoria en ambos registros, validación independiente previa a Auth y controles
+de mostrar/ocultar en registro, ingreso y actualización, con validez nativa que
+evita perder datos ante discordancia. La confirmación no se persiste ni se envía
+a Auth/metadata. Sin dependencias, migraciones ni cambios de permisos.
+
+Verificación local final: 520 pruebas/32 archivos PASS, typecheck/lint/build PASS,
+Chromium focalizado 3/3 PASS con teclado, bypass de validez nativa y axe sin
+violaciones en ambos registros, sin desbordes a 360×800. Transporte Auth simulado
+en unitarias; no se ejecutaron los recorridos completos de alta con correo/DB,
+pgTAP ni el cambio de contraseña autenticado en navegador. Evidencia y límites
+en la matriz y EXTRA-018. Entrega mediante el PR de
+`feat/portal-functional-adjustments`; revisión del compañero pendiente.
+
+T098–T101 se marcan por implementación/verificación; no acreditan revisión del
+compañero, aprobación global del Draft ni aceptación municipal. La base histórica
+de 91/97 tareas y sus seis pendientes continúa según la conciliación siguiente;
+el ledger ampliado suma 95/101 marcadas, manteniendo esos seis pendientes.
+
 ## Actualización 2026-10-17: conciliación informada por Mateo
 
 - Mateo informa que T087, T089 y T092 se ejecutaron y sus resultados están documentados.

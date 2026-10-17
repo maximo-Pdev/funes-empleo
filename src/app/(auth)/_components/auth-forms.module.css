@@ -13,6 +13,7 @@
 .forms input[type="checkbox"] { flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px; accent-color: var(--color-primary); }
 .forms p { line-height: 1.75; overflow-wrap: anywhere; }
 .forms button { width: 100%; min-height: 48px; border-radius: var(--radius-lg); background: var(--color-primary); padding: 12px 16px; color: white; font-size: .875rem; font-weight: 600; transition: background-color .15s; }
+.forms button[type="button"][aria-controls] { width: auto; }
 .forms button:hover:not(:disabled) { background: var(--color-primary-700); }
 .forms button:disabled { cursor: not-allowed; }
 .forms [role="status"]:not(:empty) { border-radius: var(--radius-lg); padding: 12px; color: var(--color-primary-700); background: var(--color-secondary); }

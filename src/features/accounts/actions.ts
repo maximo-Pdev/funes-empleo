@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { signIn, requestRecovery, resendVerification, updatePassword, changeAccountStatus, registerAccount } from "./service";
 import type { AccountFormState } from "./form-state";
+import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/validation/password";
 
 const genericRenewal = { message: "Si corresponde, recibirás un enlace en tu correo. Revisá también la carpeta de correo no deseado.", success: true };
 
@@ -24,7 +25,9 @@ export async function verificationAction(_previous: AccountFormState, form: Form
   return genericRenewal;
 }
 export async function registerAccountAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
-  try { await registerAccount({ email: form.get("email"), password: form.get("password"), role: form.get("role") }); } catch { /* same safe response */ }
+  const passwords = passwordConfirmationSchema.safeParse({ password: form.get("password"), confirmation: form.get("confirmation") });
+  if (!passwords.success) return { message: passwordConfirmationMessage, success: false };
+  try { await registerAccount({ email: form.get("email"), ...passwords.data, role: form.get("role") }); } catch { /* same safe response */ }
   return genericRenewal;
 }
 export async function passwordAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
