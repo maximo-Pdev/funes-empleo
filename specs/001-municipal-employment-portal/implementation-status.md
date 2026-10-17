@@ -393,6 +393,16 @@ CI completo/pgTAP, revisión del
 compañero y aceptación humana pendientes. Detalle en matriz y EXTRA-019.
 No se ratifica retrospectivamente el Draft global.
 
+PR #53, commit inicial `af7b9aa`: Quality #86 (`39065451675`) aprobó typecheck,
+lint, tooling, cobertura, build y pgTAP (858 pruebas); database PASS. Application
+falló en un E2E que comparaba literalmente `private, no-store` con las directivas
+adicionales del proxy: 2 PASS, 1 FAIL y 64 sin ejecutar por dependencia.
+Corrección focalizada en el mismo PR: comparar tokens completos `private` y
+`no-store` y rechazar `public`, manteniendo 403 y ausencia de contenido sensible
+para anónimo y empresa. RED local reproducido y GREEN 1/1 sin reset ni cambios
+de producto. La nueva ejecución completa de CI y revisión humana siguen pendientes;
+detalle en la continuación de EXTRA-019.
+
 A01 ya fue integrado por PR #52: Quality #84 (`39056857381`) aprobó application
 y database para `5d8cdfb`, 61 E2E completos sin omisiones/fallos/inestables y
 concurrencia SQL. Esto complementa la evidencia local histórica siguiente y no

@@ -937,6 +937,36 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   actualizados. Entrega por PR desde `feat/session-persistence-profile-navigation`;
   revisión del compañero e integración a `main` pendientes.
 
+### Corrección de CI del PR #53 — contrato semántico de caché
+
+- **Fecha/autorización:** 2026-10-17; Mateo solicita solucionar `application`.
+  Continuación de EXTRA-019/T105 en la misma rama y PR, sin ampliar el producto.
+- **Evidencia:** Quality #86, run `39065451675`, job `117492041374`: typecheck,
+  lint, tooling, cobertura y build PASS; pgTAP 858 PASS y job database PASS.
+  El E2E de métricas exige literalmente `private, no-store`, pero el proxy
+  entrega `private, no-cache, no-store, must-revalidate, max-age=0`.
+  Dos E2E PASS, uno FAIL y 64 no ejecutados por dependencia; no es un PASS global.
+- **Cambio propuesto antes de implementar:** comprobar directivas `private` y
+  `no-store`, rechazando `public`, tanto en el rechazo anónimo como empresarial
+  del CSV en `tests/e2e/admin-metrics.spec.ts`. Mantener 403 y ausencia de datos;
+  no reducir cabeceras, controles de acceso ni expectativas para ocultar fallos.
+- **Justificación/alcance:** el contrato exige privacidad y no almacenamiento,
+  no un orden o cantidad exacta de directivas. No cambia spec, plan, permisos,
+  datos, dependencias, variables ni arquitectura. Revisión del compañero pendiente.
+- **Riesgos/recuperación:** evitar aceptar directivas parecidas o una respuesta
+  pública; separar por comas y comparar tokens completos. Reversión del test,
+  sin migración ni recuperación de datos.
+- **Verificación prevista:** reproducir el E2E actual contra servicios locales
+  existentes sin reset; repetir corregido, typecheck/lint y nueva ejecución
+  completa de Quality mediante commit/push al mismo PR.
+- **Resultado local:** RED reproducido con el mismo error de Quality #86;
+  GREEN 1/1 contra Next de producción y Supabase local existente, sin reset.
+  El test ahora comprueba rechazo, privacidad, no almacenamiento y ausencia
+  de datos para ambos actores; el código de producto permanece intacto.
+  Typecheck, lint y `git diff --check` PASS. Se entrega la corrección por el
+  mismo PR #53; el resultado remoto se registra en sus checks, sin inferirlo
+  del resultado focalizado ni acreditar revisión humana.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
