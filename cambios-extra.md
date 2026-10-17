@@ -876,6 +876,67 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   registra los resultados locales previos al push y no los sustituye. Revisión
   del compañero y aceptación global siguen pendientes.
 
+## EXTRA-019 — Persistencia de sesión y navegación por cuenta (A02/A03)
+
+- **Fecha/estado:** 2026-10-17; registrado antes de implementar.
+- **Origen/autorización:** Mateo solicita continuar A02/A03 tras el merge del PR
+  #52, en `feat/session-persistence-profile-navigation`; T102–T105 y FR-001/004.
+- **Problema/evidencia:** proxy solo cubre account/update-password; los Server
+  Components no pueden persistir cookies renovadas. Tres headers públicos
+  muestran login de forma incondicional. El callback setAll recrea la respuesta
+  y omite cabeceras del SDK: 0.12.7 entrega cache headers solo en la primera
+  escritura, que no debe perderse ante una segunda escritura.
+- **Cambio mínimo:** matcher para páginas/handlers dinámicos y acumulación por
+  request de cookies/cabeceras; función server-only de enlace por cuenta activa;
+  tres headers con sus clases existentes; invalidación de layout al login/logout.
+- **Justificación/contratos:** conservar sesión válida al navegar, sin cambiar
+  duración de Auth ni eludir revocación, suspensión, archivo, guards o RLS.
+  El header recibe href/label sin PII. Modelo persistido y variables sin cambios.
+- **Archivos:** proxy, accounts/actions/navigation, tres páginas públicas,
+  pruebas unitarias/componentes/E2E y artefactos de trazabilidad citados.
+- **Coordinación:** Mateo conserva funcionalidad y su compañero lo visual;
+  no se rediseña ni cambia UI global. Revisión del compañero mediante PR pendiente.
+- **Riesgos/recuperación:** identidad/cookies no deben entrar a caché compartida;
+  conservar opciones y chunks eliminados, respuesta final y controles de seguridad.
+  Reversión del código, sin recuperación de base ni migraciones.
+- **Verificación prevista:** RED/GREEN matcher real de Next, setAll múltiple,
+  relectura por request, visibilidad por rol, logout explícito y caché; regresiones,
+  typecheck/lint/build y E2E local ficticio por rol con expiración de metadata
+  de sesión sin falsificar firma JWT ni registrar tokens.
+- **Fuentes técnicas:** documentación oficial Supabase SSR y código/tipos
+  instalados de @supabase/ssr 0.12.7; sin cambios de dependencia. Checklists
+  requirements 16/16 y mvp-readiness 77/77, sin edición de sus marcas.
+- **Implementación:** `src/proxy.ts` amplía matcher y conserva cookies/opciones y
+  cabeceras entre callbacks; `accounts/actions.ts` invalida layout al login/logout;
+  `accounts/navigation.ts` proyecta solo href/label después de validar sesión/cuenta.
+  Inicio/listado/detalle consultan proyección y ofertas en paralelo. Sin cambios
+  de esquema, permisos, Auth expiry, dependencias, secretos o estilos globales.
+- **RED/GREEN:** 18 FAIL / 26 PASS con el comportamiento anterior; focalizado
+  final 52/52. Regresión final: 559 pruebas/35 archivos PASS; tooling 57/57;
+  typecheck/lint/build exit 0. El primer typecheck del E2E detectó propiedad
+  expires_at de tipo unknown; se proyecta como número tras validarla, sin any.
+- **Navegador/consulta real:** tres cuentas ficticias activas verificadas mediante
+  un conteo SQL de solo lectura. Chromium contra Supabase local existente:
+  10/10 PASS; seis escenarios de renovación en rutas públicas/privadas por rol,
+  enlaces correctos, recarga, restauración de cookies y logout; tres de contraseña
+  y smoke público. Repetición de los seis de sesión incluyendo reutilización de
+  cookies en otra pestaña después del logout: 6/6 PASS, acceso revocado y header
+  público sin enlace privado. No se falsifica JWT; solo expires_at local del SDK.
+- **Entorno:** Docker Desktop iniciado desde su instalación por usuario; el intento
+  de la ruta global inexistente falló sin efectos. Contenedores locales existentes
+  consultados, sin reset, cambios de negocio, migraciones ni operaciones alojadas.
+  Configuración publicable local capturada en memoria desde CLI; no se imprimen
+  tokens o claves ni se crean archivos env. Servidor Next de Playwright finalizado;
+  Docker y servicios existentes permanecen activos. Build requirió ejecución
+  ampliada por la limitación de Turbopack del sandbox ya observada en A01.
+- **Observaciones/límites:** avisos Next “destination stream closed early” durante
+  navegación, sin fallos del runner; no se investiga ni cambia streaming en este
+  bloque. Colección completa 67 pruebas/16 archivos, sin afirmar su ejecución:
+  CI completo, pgTAP, revisión del compañero y aceptación global pendientes.
+- **Trazabilidad:** T102–T105 verificadas localmente; matriz y estado de implementación
+  actualizados. Entrega por PR desde `feat/session-persistence-profile-navigation`;
+  revisión del compañero e integración a `main` pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

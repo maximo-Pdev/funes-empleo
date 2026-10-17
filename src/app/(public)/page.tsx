@@ -15,6 +15,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/components/ui
 import { listPublicOffers } from "@/features/openings/public-service";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 import type { PublicOffer } from "@/features/openings/public-service";
+import { getAccountAccess } from "@/features/accounts/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +63,7 @@ const processSteps = [
 ];
 
 export default async function HomePage() {
-  const featuredOffers = await getFeaturedOffers();
+  const [featuredOffers, accountAccess] = await Promise.all([getFeaturedOffers(), getAccountAccess()]);
 
   return (
     <>
@@ -86,8 +87,8 @@ export default async function HomePage() {
             <Link className="inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-primary hover:bg-secondary" href="/ofertas">
               Ofertas
             </Link>
-            <Link className="inline-flex min-h-11 items-center rounded-lg border border-border bg-surface px-3 py-2 text-primary hover:bg-secondary" href="/login">
-              Iniciar sesión
+            <Link className="inline-flex min-h-11 items-center rounded-lg border border-border bg-surface px-3 py-2 text-primary hover:bg-secondary" href={accountAccess.href}>
+              {accountAccess.label}
             </Link>
           </nav>
         </div>

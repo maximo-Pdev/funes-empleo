@@ -23,9 +23,9 @@ analizar sus contratos antes de modificar los subsistemas afectados.
 
 | ID | Alcance y decisión confirmada | Estado inicial / dependencia |
 | --- | --- | --- |
-| A01 | Confirmación de contraseña en ambos registros y botón para mostrar/ocultar en registro, ingreso y cambio de contraseña. Validación también en servidor. | Implementado y verificado localmente; revisión del compañero pendiente. |
-| A02 | Mantener la sesión al navegar y recargar. Cierre voluntario desde el perfil; conservar bloqueos por suspensión, archivo, revocación y seguridad de la cuenta. | Revisar renovación de cookies y pruebas de navegación. |
-| A03 | Mostrar acceso al perfil desde la navegación y no ofrecer iniciar sesión cuando ya existe una sesión activa. | Coordinar enlaces funcionales con el propietario visual; depende de A02. |
+| A01 | Confirmación de contraseña en ambos registros y botón para mostrar/ocultar en registro, ingreso y cambio de contraseña. Validación también en servidor. | Integrado por PR #52; Quality #84 application/database PASS. No acredita aceptación global. |
+| A02 | Mantener la sesión al navegar y recargar. Cierre voluntario desde el perfil; conservar bloqueos por suspensión, archivo, revocación y seguridad de la cuenta. | Implementado y verificado localmente en `feat/session-persistence-profile-navigation`; revisión del compañero pendiente. |
+| A03 | Mostrar acceso al perfil desde la navegación y no ofrecer iniciar sesión cuando ya existe una sesión activa. | Implementado con estilos existentes; recorridos por los tres roles PASS, revisión del compañero pendiente. |
 | A04 | UUID fuera de textos visibles y URL: slug para ofertas y códigos aleatorios para registros privados. | Diseñar referencias únicas, migración y compatibilidad; nunca sustituir autorización por opacidad. |
 | A05 | Foto de perfil JPG, PNG o WebP de hasta 5 MiB; visible al candidato, Municipalidad y empresa únicamente después de derivación autorizada. Mateo informa aprobación municipal para compartirla. | Diseñar Storage privado, validación real de imagen y revocación; aprobación técnica pendiente. |
 | A06 | CV PDF de hasta 20 MB, límite confirmado por Mateo. | Pendiente actualizar plan, servidor, bucket y pruebas; concretar bytes y límites de transporte antes de implementar. |
@@ -40,6 +40,63 @@ analizar sus contratos antes de modificar los subsistemas afectados.
 | A15 | Simplificar menús administrativos, contacto municipal, derivación desde oferta, perfil asistido, importación y consulta de derivaciones empresariales. | Pendiente relevar recorridos y separar cambios funcionales de la propuesta visual. |
 | A16 | Retirar el enlace “Ir al contenido principal”, según solicitud de Mateo. | Pendiente resolver acceso equivalente por teclado conforme a la constitución; no se retira sin verificar accesibilidad. |
 | A17 | Revisar ausencia de any, límites cliente/servidor y seguridad de lo generado para Supabase. TanStack Query es opcional y se omite si no hace falta. | Revisiones técnicas por incremento. Supabase Auth conserva contraseñas y tokens; no se almacenan contraseñas en JWT propios. |
+
+## A02/A03: sesión y acceso desde la navegación
+
+Mateo autoriza continuar este bloque después del merge del PR #52. La autorización
+es específica de A02/A03 y no sustituye revisión independiente ni aprobación
+retrospectiva del Draft global. La distribución funcional/visual sigue vigente.
+
+Criterios:
+
+1. Navegar por páginas públicas o privadas, recargar y renovar un token no debe
+   cerrar una sesión válida. Supabase sigue administrando cookies y expiración;
+   no se extienden sesiones revocadas o bloqueadas.
+2. El proxy cubre páginas y handlers dinámicos, excluyendo assets de Next, favicon,
+   robots, sitemap e imágenes estáticas. No reemplaza guards ni RLS.
+3. Las cookies renovadas llegan tanto al request usado por Server Components como
+   al navegador, conservando opciones, eliminación de chunks y cabeceras de no caché,
+   incluso si el SDK realiza más de una escritura.
+4. Inicio, listado y detalle público de oferta muestran “Mi perfil” para candidato
+   activo (`/candidato/perfil`) y empresa activa (`/empresa/perfil`), “Mi cuenta”
+   para administración activa (`/account`) o “Iniciar sesión” si no existe una
+   cuenta activa validada. El menú solo recibe enlace y etiqueta, nunca datos personales.
+5. Login y logout invalidan la navegación previa. El cierre voluntario se ejecuta
+   desde el control existente de Mi cuenta; visitar una página no llama signOut.
+6. Se conservan revocación, suspensión, archivo, autorización por rol y el cierre
+   global de seguridad tras cambiar la contraseña. No se agregan esquemas, paquetes,
+   almacenamiento de tokens en el cliente ni cambios visuales globales.
+
+Análisis focalizado: criterios cubiertos por T102–T105; checklists existentes
+16/16 y 77/77, sin modificar marcas. El contrato ya exige identidad validada y
+no caché privada; este bloque completa su cobertura. Modelo persistido sin cambios.
+Verificación local:
+
+- RED: 18 FAIL / 26 PASS antes del cambio. GREEN focalizado: 52/52.
+- Regresión: `npm run test:unit -- --maxWorkers=4`, 559 pruebas/35 archivos PASS;
+  `npm run test:tooling`, 57/57 PASS; typecheck/lint/build PASS.
+- Chromium con Supabase local existente y sin reset: 10/10 pruebas PASS (seis
+  escenarios de sesión, tres de contraseñas y smoke público). Se repitieron los
+  seis escenarios de sesión con reutilización de cookies después del logout:
+  6/6 PASS. Se recolectan 67 pruebas/16 archivos para la suite completa.
+- Cada rol renueva primero en ruta pública y luego, en otra ejecución, en privada;
+  recorre inicio/listado/detalle, accede a su perfil o cuenta, recarga y conserva
+  sesión al restaurar cookies en otro contexto. El logout invalida ambos contextos
+  y el header vuelve a ofrecer login. Se comprueba no-store en la respuesta.
+- No se falsifica el JWT: se vence únicamente `expires_at` del almacenamiento
+  local del SDK para exigir una renovación real. Tokens/claves solo en memoria;
+  sin capturas/trazas de estas sesiones ni archivos de credenciales.
+- Docker Desktop se inició para acceder al servicio local existente. No hubo
+  resets, migraciones, cambios de negocio ni operaciones alojadas. El servidor
+  Next de pruebas finalizó; Docker/Supabase existentes se conservan activos.
+- Revisión técnica propia de React: consultas independientes paralelas, solo
+  Server Components, sin estados/hooks ni estilos globales nuevos; no sustituye
+  revisión del compañero. Los tests de proxy comprueban opciones de cookies,
+  chunks eliminados, cabeceras y aislamiento por request.
+
+T102–T105 verificadas localmente. Quedan revisión del compañero, suite completa
+de CI/pgTAP y aceptación humana para este incremento. Entrega por PR desde
+`feat/session-persistence-profile-navigation`, sin integración directa a `main`.
 
 ## Catálogo de rubros confirmado
 

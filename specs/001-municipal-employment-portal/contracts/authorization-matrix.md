@@ -13,6 +13,16 @@ también deniega acceso interactivo.
 
 ## Fuentes de autorización por superficie
 
+A02/A03 (2026-10-17): la navegación pública obtiene href/label en servidor desde
+Auth y la cuenta de aplicación activa. Candidato: `/candidato/perfil`; empresa:
+`/empresa/perfil`; administrador: `/account`. Cuenta ausente, bloqueada o identidad
+no verificable: `/login`. Esta proyección no contiene nombres, IDs, tokens ni
+datos privados, y el enlace nunca sustituye autorización al acceder al destino.
+Las respuestas de navegación personalizadas y renovación de cookies no se
+comparten en caché. El proxy renueva en páginas y handlers dinámicos; no extiende
+sesiones revocadas ni levanta suspensión/archivo. Login/logout invalidan enlaces
+anteriores; el cierre de seguridad por cambio de contraseña se conserva.
+
 | Superficie | Fuente y reevaluación obligatoria |
 | --- | --- |
 | Página y layout protegidos | Sesión validada en servidor contra Auth y cuenta de aplicación vigente; comprueban rol y estado en cada petición, sin caché privada compartida. El layout no reemplaza los controles de acción ni RLS. |

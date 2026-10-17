@@ -2,11 +2,14 @@ import { render, screen, within } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { PublicOffer } from "@/features/openings/public-service";
 
-const { listPublicOffers } = vi.hoisted(() => ({
+const { listPublicOffers, readAccountSession } = vi.hoisted(() => ({
   listPublicOffers: vi.fn<typeof import("@/features/openings/public-service").listPublicOffers>(),
+  readAccountSession: vi.fn(),
 }));
 
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers }));
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 
 import HomePage from "@/app/(public)/page";
 
@@ -33,6 +36,18 @@ const offers: PublicOffer[] = [
 
 beforeEach(() => {
   listPublicOffers.mockReset();
+  readAccountSession.mockReset().mockResolvedValue(null);
+});
+
+it.each([
+  ["candidate", "/candidato/perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
+])("muestra el acceso de %s en lugar de iniciar sesión", async (role, href, label) => {
+  readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
+  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
+  render(await HomePage());
+  const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
+  expect(within(navigation).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+  expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
 });
 
 function expectPreviewRequest() {
