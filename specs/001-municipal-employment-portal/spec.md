@@ -4,7 +4,11 @@
 
 **Created**: 2026-09-19
 
-**Status**: Draft
+**Status**: Approved
+
+**Approval record**: Máximo approved the current scope and business rules on 2026-10-17.
+This approval does not establish final product acceptance, close open questions or pending
+validation tasks, or constitute municipal approval.
 
 **Ajuste acotado autorizado, 2026-10-17**: Mateo solicita comenzar los arreglos
 funcionales registrados en [la matriz](../../docs/implementation/functional-adjustments.md).
@@ -637,6 +641,13 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   los haya informado. NO DEBE mostrar CUIT, persona responsable, contactos privados de la empresa,
   candidatos, participaciones ni resultados individuales. El cierre automático NO DEBE cerrar ni
   eliminar las participaciones existentes, que continúan disponibles para gestión administrativa.
+- **FR-024A**: Cada oferta DEBE recibir un slug público único al publicarse por primera vez,
+  formado por su título normalizado y un sufijo aleatorio. El slug NO DEBE cambiar al editar el
+  título ni en transiciones posteriores. Los enlaces públicos y el enlace hacia la selección de
+  oferta del candidato DEBEN usar ese slug, conservando UUID como identidad interna. Las ofertas
+  ya publicadas DEBEN recibir slug sin eliminar datos. No se exige conservar las URLs públicas
+  anteriores basadas en UUID. Las reglas de visibilidad de FR-024 siguen aplicándose. Cambio
+  autorizado por Máximo el 2026-10-17; trazabilidad en EXTRA-020.
 - **FR-025**: Los administradores DEBEN poder suspender o reactivar empresas y ofertas abusivas,
   engañosas, ilegales, duplicadas o inapropiadas, conservando su historial. La suspensión de una
   empresa DEBE impedir nuevas postulaciones y derivaciones en sus ofertas y revocar su

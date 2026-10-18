@@ -9,6 +9,15 @@ autorizan integraciones nuevas.
   flujos críticos.
 - [csv-import.md](./csv-import.md): contrato de archivo y protocolo de previsualización/confirmación.
 
+## Enlaces públicos de ofertas
+
+FR-024A / EXTRA-020: `/ofertas/{slug}` resuelve un slug persistido de título más sufijo
+aleatorio; no acepta UUID como localizador público. El enlace de selección del candidato
+usa el mismo slug y la postulación conserva el UUID interno. `published_offers` mantiene
+su firma y agrega `slug` a los resultados; `published_offer_by_slug(p_slug text)` retorna
+el mismo sobre paginado, limitado a una oferta y con las mismas reglas de visibilidad.
+Contrato detallado y recuperación: [public-offer-slugs](../../../docs/validation/public-offer-slugs.md).
+
 ## Convenciones compartidas
 
 ### Confirmación de contraseña (A01, 2026-10-17)
