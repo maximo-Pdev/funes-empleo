@@ -1113,6 +1113,7 @@ export type Database = {
           location: string | null
           modality: string | null
           moderation_message_public: string | null
+          slug: string | null
           published_at: string | null
           requirements: string | null
           salary: string | null
@@ -1137,6 +1138,7 @@ export type Database = {
           location?: string | null
           modality?: string | null
           moderation_message_public?: string | null
+          slug?: string | null
           published_at?: string | null
           requirements?: string | null
           salary?: string | null
@@ -1161,6 +1163,7 @@ export type Database = {
           location?: string | null
           modality?: string | null
           moderation_message_public?: string | null
+          slug?: string | null
           published_at?: string | null
           requirements?: string | null
           salary?: string | null
@@ -1744,6 +1747,10 @@ export type Database = {
         Returns: Json
       }
       my_company_profile: { Args: never; Returns: Json }
+      published_offer_by_slug: {
+        Args: { p_slug: string }
+        Returns: Json
+      }
       published_offers: {
         Args: { p_id?: string; p_page?: number; p_page_size?: number }
         Returns: Json

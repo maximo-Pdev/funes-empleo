@@ -3,7 +3,15 @@ import { createHash } from "node:crypto";
 import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
 const fixture = { ...fixtures, ...fixtures.acceptance };
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { expectUnavailablePublicOffer } from "./fixtures/public-offer";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
+
+function openingSlug(id: string) {
+  expect(id).toMatch(/^[0-9a-f-]{36}$/);
+  const slug = runLocalMaintenanceSql(`select slug from public.job_openings where id='${id}';`).trim();
+  expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{12}$/);
+  return slug;
+}
 
 function fixtureId(kind: string, number: number) {
   const hash = createHash("md5").update(`funes-demo-v1:${kind}:${number}`).digest("hex");
@@ -339,8 +347,10 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Retirada");
 
-    await candidate.goto(`/ofertas/${fixtureId("opening", 4)}`);
+    const publicSlug = openingSlug(fixtureId("opening", 4));
+    await candidate.goto(`/ofertas/${publicSlug}`);
     await candidate.getByRole("link", { name: "Postularme con mi cuenta" }).click();
+    await expect(candidate).toHaveURL(new RegExp(`/candidato/ofertas\\?oferta=${publicSlug}$`));
     const chosenOffer = candidate.getByRole("region", { name: "Oferta elegida" });
     await expect(chosenOffer).toContainText("Oferta ficticia 004");
     await chosenOffer.getByRole("button", { name: "Postularme" }).click();
@@ -477,7 +487,8 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(admin.getByText("Sistema").first()).toBeVisible();
     await offerCompany.goto(`/empresa/ofertas/${opening}`);
     await expect(offerCompany.getByText("Estado:")).toContainText("closed");
-    await offerCompany.goto(`/ofertas/${opening}`);
+    await offerCompany.goto(`/ofertas/${openingSlug(opening)}`);
+    await expectUnavailablePublicOffer(offerCompany, "Oferta ficticia 080");
     await expect(offerCompany.getByText("Oferta ficticia 080")).toHaveCount(0);
 
     await company.reload();

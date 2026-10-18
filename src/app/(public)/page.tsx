@@ -214,7 +214,7 @@ export default async function HomePage() {
                         ))}
                       </div>
                       <CardTitle>
-                        <Link className="hover:underline" href={`/ofertas/${offer.id}`}>
+                        <Link className="hover:underline" href={`/ofertas/${offer.slug}`}>
                           {offer.title}
                         </Link>
                       </CardTitle>

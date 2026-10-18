@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { databaseUuidSchema } from "./common";
 
+export const publicOfferSlugSchema = z.string().max(250)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{12}$/)
+  .refine((value) => !databaseUuidSchema.safeParse(value).success);
+
 const optionalText = (limit: number) => z.string().trim().max(limit);
 export const openingDraftSchema = z.object({
   id: databaseUuidSchema.optional(),

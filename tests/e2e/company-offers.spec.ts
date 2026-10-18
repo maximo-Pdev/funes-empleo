@@ -3,6 +3,15 @@ import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { assertLocalTargets } from "../fixtures/credentials.mjs";
 import { loginFixture } from "./fixtures/quality";
+import { expectUnavailablePublicOffer } from "./fixtures/public-offer";
+import { runLocalMaintenanceSql } from "./local-maintenance";
+
+function openingSlug(id: string) {
+  expect(id).toMatch(/^[0-9a-f-]{36}$/);
+  const slug = runLocalMaintenanceSql(`select slug from public.job_openings where id='${id}';`).trim();
+  expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{12}$/);
+  return slug;
+}
 
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => {
@@ -107,16 +116,26 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByLabel("Decisión").selectOption("approved");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
     await expect(admin.getByText("Estado:")).toContainText("published");
-    await page.goto(`/ofertas/${openingId}`);
+    const publicSlug = openingSlug(openingId);
+    await page.goto(`/ofertas/${publicSlug}`);
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    await page.goto(`/ofertas/${openingId}`);
+    await expectUnavailablePublicOffer(page, title);
     await admin.getByLabel("Decisión").selectOption("paused");
     await admin.getByLabel("Motivo interno").fill("Pausa operativa ficticia");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
     await page.goto(`/empresa/ofertas/${openingId}`);
     await expect(page.getByText("Estado:")).toContainText("paused");
     await expect(page.locator("body")).not.toContainText("Pausa operativa ficticia");
+    await page.goto(`/ofertas/${publicSlug}`);
+    await expectUnavailablePublicOffer(page, title);
+    await expect(page.locator("body")).not.toContainText("Pausa operativa ficticia");
     await admin.getByLabel("Decisión").selectOption("resumed");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
+    await expect(admin.getByText("Estado:")).toContainText("published");
+    expect(openingSlug(openingId)).toBe(publicSlug);
+    await page.goto(`/ofertas/${publicSlug}`);
+    await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
     await admin.goto("/admin/empresas");
     await admin.getByRole("link", { name }).click();
@@ -187,6 +206,7 @@ test("una oferta vencida no aparece públicamente y la empresa ve su cierre", as
   await page.goto(`/empresa/ofertas/${fixtureId("opening", 81)}`);
   await expect(page.getByText("Estado:")).toContainText("closed");
   await expect(page.getByText(/ya no recibe postulaciones/i)).toBeVisible();
-  await page.goto(`/ofertas/${fixtureId("opening", 81)}`);
+  await page.goto(`/ofertas/${openingSlug(fixtureId("opening", 81))}`);
+  await expectUnavailablePublicOffer(page, "Oferta ficticia 081");
   await expect(page.getByText("Oferta ficticia 081")).toHaveCount(0);
 });

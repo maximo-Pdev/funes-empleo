@@ -20,6 +20,13 @@ mark checklist items on behalf of the reviewer.
 **Organization**: Tasks are grouped by user story so each story can be implemented and validated as
 an independent increment after the shared foundation.
 
+## Follow-up autorizado 2026-10-17 — FR-024A
+
+El cambio de URLs públicas a slugs estables se sigue por separado en
+[public-offer-slugs](../../odd/tasks/public-offer-slugs.md), tareas T1–T3. No altera las
+casillas ni acredita el cierre de tareas originales de aceptación del MVP. EXTRA-020
+registra autorización, superficies, riesgos y comprobaciones.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel because it changes different files and has no dependency on another

@@ -19,6 +19,7 @@ const offers: PublicOffer[] = [
   "Operario de mantenimiento ficticio",
 ].map((title, index) => ({
   id: `00000000-0000-4000-8000-00000000000${index + 1}`,
+  slug: `titulo-original-ficticio-a1b2c3d4e5f${index + 1}`,
   company_name: `Empresa ficticia ${index + 1}`,
   title,
   tasks: "Organizar las tareas del sector de demostración.",
@@ -97,7 +98,7 @@ it("muestra tres ofertas públicas con títulos y enlaces sin campos privados", 
   const preview = screen.getByRole("region", { name: "Búsquedas aprobadas por la Oficina de Empleo" });
   expect(within(preview).getAllByRole("listitem")).toHaveLength(3);
   for (const offer of offers) {
-    expect(within(preview).getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.id}`);
+    expect(within(preview).getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.slug}`);
     expect(within(preview).getByText(offer.company_name)).toBeTruthy();
   }
   expect(within(preview).getAllByText("Funes · Presencial")).toHaveLength(3);

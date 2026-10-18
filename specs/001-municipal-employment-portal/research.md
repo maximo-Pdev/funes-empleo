@@ -10,6 +10,13 @@
 `eslint-config-next` 16.3.8, Supabase CLI 2.117.0 y `csv-parse` 7.0.2. Fijar dependencias directas y
 commitear `package-lock.json`; CI instala con `npm ci`.
 
+**Actualización autorizada 2026-10-17 (EXTRA-021)**: el runtime vigente pasa a Node.js
+24.22.0 LTS con npm 11.19.1, publicados en el índice oficial de Node el 2026-10-14.
+Se conserva Node 24 LTS y el resto del stack. Manifiestos, `.node-version`, CI y guías
+activas se sincronizan; las versiones mencionadas en evidencia histórica no se reescriben.
+La distribución portable local se verifica con SHA-256 oficial; `npm ci --ignore-scripts`
+recrea los enlaces del adaptador ESLint sin habilitar scripts de instalación no aprobados.
+
 Corrección de implementación del 2026-09-22: la versión inicialmente prevista de ESLint 10.10.0
 falló al cargar `react/display-name` por la retirada de `context.getFilename`. El paquete resuelto
 `eslint-plugin-react` 7.37.5 declara peers hasta ESLint 9. Se verificó en npm y se fijó 9.39.5,
