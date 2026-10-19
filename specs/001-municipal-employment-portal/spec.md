@@ -33,6 +33,41 @@ o empresa activa, o Mi cuenta de administrador activo, sin exponer datos persona
 Login/logout actualizan esos accesos sin compartir la respuesta entre usuarios.
 Aceptación y límites: A02/A03 en la matriz; sin aprobar retrospectivamente el Draft.
 
+## Incremento A08 autorizado — 2026-10-19
+
+Mateo solicita implementar el catálogo amplio de quince rubros registrado en la
+matriz, cuya aprobación municipal fue informada por él. Ocupaciones e intereses
+del candidato y categorías de ofertas siguen siendo multiselección. Desde una
+oferta publicada o pausada y vigente de una empresa activa, solo administración
+puede consultar candidatos aptos para derivación con al menos un rubro activo
+compartido (OR, no todos). Mostrar rubros coincidentes, ordenar por nombre e ID
+sin puntaje y paginar después de filtrar/contar. No duplicar candidatos por
+múltiples coincidencias. No crear nominaciones ni derivaciones al consultar.
+
+Ampliación solicitada por Mateo el 2026-10-19: excluir antes del total/paginación
+cualquier participación no archivada en la oferta (incluye nominación/postulación
+previa, cualquiera sea su estado); sus casos siguen en Participaciones. Fichas
+compactas en dos columnas desde md y una en móvil, doce por página. El bloque de
+candidatos se ubica debajo de la información/moderación e historial de la oferta,
+conservando todo el ancho (ajuste solicitado por Mateo el 2026-10-19). Abrir el perfil
+laboral en diálogo accesible sin abandonar la oferta y nominar explícitamente a
+esa misma oferta desde allí, sin selector de otra búsqueda. Preview autorizado
+bajo demanda, con rubros, experiencia, localidad, disponibilidad, vigencia y enlace
+al CV actual, sin DNI, contactos ni notas. Mostrar la oferta destino; conservar
+versiones de candidato/oferta y revalidación transaccional del comando existente.
+Éxito cierra diálogo, retira la ficha y actualiza total/página sin redirigir.
+Conflicto/error no crea otra participación y permite recargar el perfil. Cerrar
+con botón o Escape devuelve foco; no mostrar datos de una respuesta tardía tras
+cerrar/cambiar de candidato. Nominación nunca equivale a derivación empresarial.
+
+Aptitud: perfil activo, disponible, no archivado, vigente, cuenta activa si está
+vinculada, último consentimiento aceptado y CV válido no archivado. La consulta
+no altera estados ni sustituye la revalidación transaccional de las mutaciones.
+El catálogo v2 se incorpora sin borrar/desactivar categorías previas ni reasignar
+personas u ofertas. No inferir equivalencias; importación sintética v1 sin cambios.
+OQ-010 solo se resuelve para el catálogo amplio aprobado, no para equivalencias
+históricas o un catálogo exhaustivo de ocupaciones; OQ-018 permanece abierta.
+
 ## Clarifications
 
 ### Session 2026-09-19

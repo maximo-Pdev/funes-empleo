@@ -489,3 +489,33 @@ Marcas locales de implementación/verificación: 603 pruebas/39 archivos, toolin
 pgTAP951/14 archivos, tipos/lint/build y advisor PASS; navegador focal9/9. Ledger
 T001–T110: 104/110, sin cerrar los seis gates históricos. FR-024A mantiene su
 ledger separado; CI completo/revisión del nuevo SHA se registran en el PR.
+
+## Phase 14: A08 — rubros y matching municipal (2026-10-19)
+
+- [X] T111 [US1/US2] Contrastar matriz/spec/plan/modelo/contrato y registrar EXTRA-024; preservar categorías históricas sin equivalencias inventadas.
+- [X] T112 [US1/US2] RED SQL de catálogo/RPC y cobertura de servicio/componente: OR sin duplicados, elegibilidad, privacidad, estados de oferta y paginación; catálogo completo y referencias conservadas.
+- [X] T113 [US1/US2] Migración de catálogo v2 y RPC administrativa de coincidencias; no tocar importador v1 ni permisos empresariales.
+- [X] T114 [US1] Integrar servicio tipado y lista paginada en detalle de oferta con rubros coincidentes, evaluación municipal y estados de error/carga/vacío.
+- [X] T115 [US1/US2] Verificar tipos/lint/unitarias/tooling/build/SQL/E2E, documentar rollout, evidencia y límites; no atribuir aceptación ni despliegue alojado.
+
+Evidencia local A08: 655 pruebas/42 archivos, tooling57, tipos/lint/build,
+pgTAP986/15 archivos (35 nuevas), security advisor sin hallazgos y navegador12/12
+(3 A08 + 3 A07 + 6 sesiones) PASS. Colección73/18 no equivale a ejecutar toda
+la suite. Ledger T001–T115:109/115; los seis gates externos siguen abiertos.
+Migración aplicada/registrada solo localmente, sin reset ni cambios alojados.
+CI completo, PR, revisión independiente y aceptación pendientes.
+
+## Phase 15: A08 — perfil modal y nominación en contexto (2026-10-19)
+
+- [X] T116 [US1] Registrar EXTRA-025 y ajustar spec/plan/contrato a popup, exclusión y layout compacto sin modificar migración ya aplicada.
+- [X] T117 [US1] RED SQL de exclusión previa al total; migración forward-only con pool común y preview administrativo protegido; pruebas de nominación/duplicados/conflictos.
+- [X] T118 [US1] Servicio/action de preview mínimo validado, errores seguros y revalidación del detalle en nominación; cubrir autorización HTTP directa.
+- [X] T119 [US1] Diálogo nativo con carga/error/foco/Escape, nominación fija a la oferta actual, anti doble envío y respuestas tardías; tarjetas de dos columnas y doce por página.
+- [X] T120 [US1] Verificar SQL/unitarias/UI/tooling/tipos/lint/build y navegador de nominación, exclusión, responsive y accesibilidad; actualizar evidencia/rollout sin atribuir despliegue remoto.
+
+Verificación local de la ampliación:689 pruebas/43 archivos, tooling57,
+pgTAP1007/16 archivos, tipos/lint/build y advisor PASS. Navegador13/13 (A08×4,
+A07×3, sesiones×6) y autorización HTTP8/8 PASS; colección74/18, no suite completa.
+Ledger T001–T120:114/120; seis gates históricos abiertos. Migración nueva solo
+local; primera A08 alojada según recibo de Mateo. Rollout, revisión, CI completo
+y aceptación pendientes; fixture local conserva una nominación ficticia adicional.

@@ -1,18 +1,22 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
 import { getAdminOpening } from "@/features/openings/admin-service";
 import { moderateOpeningAction } from "@/features/openings/admin-actions";
 import { ModerationForm } from "@/features/openings/components/moderation-form";
 import { requireActiveAccount } from "@/lib/auth/guards";
+import { OpeningCandidateMatches } from "@/features/participations/components/opening-candidate-matches";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOpeningDetailPage({ params }: {
+export default async function AdminOpeningDetailPage({ params, searchParams }: {
   params: Promise<{ openingId: string }>;
+  searchParams: Promise<{ matchPage?: string | string[] }>;
 }) {
   await requireActiveAccount(["admin"]);
   const { openingId } = await params;
+  const { matchPage } = await searchParams;
   const { opening, events } = await getAdminOpening(openingId);
 
   return <AdminShell active="/admin/openings" title={opening.title ?? "Oferta sin título"}
@@ -48,5 +52,9 @@ export default async function AdminOpeningDetailPage({ params }: {
           </li>)}</ol>}
       </section>
     </div>
+    <Suspense key={Array.isArray(matchPage) ? matchPage.join(",") : matchPage ?? "1"}
+      fallback={<p role="status">Buscando candidatos con rubros coincidentes…</p>}>
+      <OpeningCandidateMatches openingId={opening.id} page={matchPage} />
+    </Suspense>
   </AdminShell>;
 }

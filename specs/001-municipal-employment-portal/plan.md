@@ -4,6 +4,48 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## A08 — diseño focalizado, 2026-10-19
+
+Fuente única: `public.job_categories`, sin catálogo paralelo en componentes.
+Nueva migración forward-only inserta quince códigos estables en versión 2 y
+agrega `match_opening_candidates(uuid,integer,integer) returns jsonb`.
+RPC SECURITY DEFINER con search_path vacío: deriva actor/sesión mediante
+`private.require_workflow_actor()` y exige admin. Solo EXECUTE a authenticated;
+sin nuevos permisos de tablas. Cruzar candidate_categories/opening_categories
+por rubro activo y deduplicar antes de contar/paginar (20, máximo 50).
+Comprobar elegibilidad y visibilidad de oferta; devolver datos laborales mínimos
+y rubros coincidentes. La ampliación siguiente excluye participaciones previas
+no archivadas antes del conteo; participationId queda null por compatibilidad.
+Consulta sin escrituras ni rankings, orden por nombre/ID.
+
+Detalle administrativo: Server Component bajo Suspense, servicio y entrada/salida
+validados con Zod; estados de error/vacío/carga y paginación accesible. Estilos
+existentes sin rediseño global. Categorías anteriores y referencias intactas,
+sin backfill semántico ni cambios al importador v1. Pruebas locales ficticias y
+CI fresco. SQL antes de app; revertir app conserva catálogo/RPC compatibles.
+Recuperación SQL por migración posterior, nunca borrando categorías referenciadas
+ni normalizando el historial alojado con db push/repair masivos.
+
+### Ampliación modal A08 — 2026-10-19
+
+La migración A08 original ya fue aplicada por Mateo: no editarla. Nueva migración
+define pool privado invocador sin EXECUTE cliente, con elegibilidad/intersección
+y NOT EXISTS de participaciones no archivadas; lista y nueva RPC
+`preview_opening_candidate(uuid,uuid)` comparten ese predicado. Ambas entradas
+públicas derivan actor/sesión y exigen admin. Lista conserva firma/envelope;
+participationId queda null por compatibilidad. Preview mínimo validado incluye
+versiones, título/ID de oferta y CV actual. Sin tablas ni nuevos roles/estados.
+
+Server Action de lectura sanea errores; no usar service-role ni serializar notas.
+Client Component acotado administra diálogo HTML nativo, loading/errores y guardia
+de respuestas fuera de orden. Reutiliza createAdminNominationAction y revalida el
+detalle de oferta. No navegar al caso tras éxito; refresh para conteo/página y
+desaparición. Bloquear doble envío; mantener conflictos optimistas de versiones.
+Doce fichas en grid md:grid-cols-2 y una columna móvil, bloque de ancho completo
+después del grid de información/moderación e historial de oferta, según ajuste
+solicitado por Mateo el2026-10-19. Native dialog con showModal/Escape, etiquetas y foco devuelto.
+Pruebas SQL de lista/preview/roles/nominación y tests UI/HTTP/E2E.
+
 ## Resumen
 
 ### Incremento A01 autorizado el 2026-10-17

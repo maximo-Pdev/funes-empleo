@@ -3,6 +3,22 @@
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 
+## A08 — catálogo y proyección administrativa (2026-10-19)
+
+Quince filas nuevas en `job_categories(version=2)`; IDs generados en servidor,
+códigos estables y nombres del catálogo de la matriz. No nuevas tablas ni cambios
+a relaciones existentes. Se conservan v1 y sus referencias, sin equivalencias
+inferidas. Ambos tipos de candidate_categories (occupation/interest) participan
+en el cruce con opening_categories por category_id activo.
+Proyección: id, displayName, locality, matchedCategories (code/name),
+participationId null por compatibilidad: se excluyen participaciones no archivadas
+antes del total/paginación. Sin listas persistidas ni puntajes o selecciones.
+Ampliación modal: pool privado de lectura compartido por lista y preview, sin
+permisos cliente. Preview laboral incorpora experiencia, disponibilidad/vigencia,
+rubros, ID del CV vigente y versiones de candidato/oferta; no incorpora DNI,
+contactos ni notas. Nominación sigue creando una participación bajo el comando
+transaccional y auditoría existentes, sin tablas nuevas ni derivación implícita.
+
 ## Convenciones
 
 - Identificadores: UUID generados por servidor.
