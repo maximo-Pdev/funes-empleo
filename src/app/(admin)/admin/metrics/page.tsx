@@ -1,4 +1,4 @@
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { FeedbackMessage } from "@/components/ui";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { publicErrorFrom } from "@/lib/errors/public-error";
@@ -20,7 +20,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
   } catch (e) {
     error = e instanceof MetricsHistoryUnavailable ? `No hay evidencia histórica suficiente para ese período. ${e.message ? `El historial fiable comienza el ${new Date(e.message).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}; elegí fechas desde el día siguiente.` : "Elegí un período posterior al inicio del historial."} No se sustituyen datos históricos por valores actuales.` : publicErrorFrom(e).message;
   }
-  return <RoleShell role="admin" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
+  return <AdminShell active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Seguimiento" }, { href: "/account", label: "Mi cuenta" }]}>
     <form method="get" className="mb-6 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
       <label>Desde<input className="mt-1 block rounded border p-2" name="from" type="date" required max={today} defaultValue={parsed.success ? parsed.data.from : ""} /></label>
@@ -42,5 +42,5 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
       <a href={`/api/admin/exports/operations.csv?${metricsQuery(result.filters)}`} className="mb-6 inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar CSV filtrado</a>
       <Dashboard rows={result.rows} />
     </>}
-  </RoleShell>;
+  </AdminShell>;
 }

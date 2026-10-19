@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState, FeedbackMessage } from "@/components/ui";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
 import { listCandidateSearchCategories, searchCandidates } from "@/features/candidates/search-service";
@@ -25,7 +25,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
     return `/admin/candidates?${params.toString()}`;
   };
 
-  return <RoleShell role="admin" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
+  return <AdminShell active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/admin/imports", label: "Importaciones" }, { href: "/admin/metrics", label: "Métricas" }, { href: "/account", label: "Mi cuenta" }]}>
     <Link href="/admin/candidates/assisted" className="inline-block rounded bg-blue-800 p-3 text-white">Nueva atención presencial</Link>
     <CandidateSearchForm categories={categories.map((category) => ({ id: category.id, name: category.name }))}
@@ -48,5 +48,5 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
         {results.page < results.pageCount && <Link className="text-blue-800 underline" href={pageUrl(results.page + 1)}>Siguiente</Link>}
       </nav>}
     </section>}
-  </RoleShell>;
+  </AdminShell>;
 }

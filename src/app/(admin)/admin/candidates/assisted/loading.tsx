@@ -1,1 +1,3 @@
-export default function Loading() { return <p role="status" className="p-6">Cargando atención presencial…</p>; }
+import { AdminLoading } from "@/app/(admin)/_components/admin-loading";
+
+export default function Loading() { return <AdminLoading title="Cargando atención presencial" active="/admin/candidates" />; }

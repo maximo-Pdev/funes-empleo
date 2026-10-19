@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
 import { getAdminCandidate } from "@/features/candidates/search-service";
 import { candidateAccountDecisionAction } from "@/features/candidates/admin-actions";
@@ -23,7 +23,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
   const nominationOpenings = candidate.status === "active" ? await listNominationOpenings() : [];
 
-  return <RoleShell role="admin" title={candidate.display_name}
+  return <AdminShell active="/admin/candidates" title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
     navigation={[{ href: "/admin/candidates", label: "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     {candidate.status !== "archived" && <Link className="inline-block rounded bg-blue-800 p-3 text-white" href={`/admin/candidates/assisted/${candidate.id}`}>Mantener perfil y atención presencial</Link>}
@@ -91,5 +91,5 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       </section>
       </div>
     </div>
-  </RoleShell>;
+  </AdminShell>;
 }

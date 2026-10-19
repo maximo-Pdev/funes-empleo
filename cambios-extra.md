@@ -1091,6 +1091,31 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   independiente pendientes al entregar. No se acredita aceptación municipal ni
   se cierran gates históricos; A04 privado, A05, A06 y A08 conservan pendientes.
 
+## EXTRA-023 — Continuidad visual de Mi cuenta administrativa
+
+- **Fecha y autorización:** 2026-10-19, Mateo solicita que el recorrido Inicio →
+  Mi cuenta de administración muestre el menú lateral, como las páginas de `(admin)`.
+- **Problema/evidencia:** `getAccountAccess()` dirige administradores a `/account`,
+  pero esa ruta compartida usa AuthShell y pierde la navegación administrativa.
+- **Origen:** ajuste visual explícito del diseño administrativo, sin cambiar A03,
+  roles, rutas, acceso ni las reglas de cuentas individuales.
+- **Cambio mínimo propuesto:** elegir AdminShell exclusivamente para el rol admin
+  en la presentación de `/account` y marcar Mi cuenta como sección activa. Los
+  otros roles conservan AuthShell. Guardias, consulta de otros administradores,
+  exclusión de la propia cuenta, acciones y confirmaciones permanecen intactas.
+- **Archivos/contratos:** `src/app/(auth)/account/page.tsx`, AdminShell local,
+  tests de cuenta y documentación de diseño. No cambia contrato ni esquema.
+- **Riesgos y verificación prevista:** evitar dos H1, comprobar navegación activa,
+  aislamiento por rol, exclusión propia y controles de suspensión/reactivación;
+  revisar responsive/axe/foco con fixtures ficticios; lint, tipos, suite y build.
+- **Estado:** implementado y verificado localmente en `codex/frontend-admin-design`;
+  autorizado por la instrucción explícita; revisión independiente pendiente.
+- **Resultados:** 27 pruebas focalizadas y suite completa 620/40 aprobadas;
+  lint, tipos y build aprobados. Nueve vistas ficticias de Mi cuenta por rol
+  a 360/768/1366 px sin hallazgos axe, desbordamientos ni pérdida de foco en
+  el recorrido muestreado. Un H1 y menú activo solo para admin. No se acredita
+  sesión real ni cambios de cuentas contra backend; T087 sigue pendiente.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
