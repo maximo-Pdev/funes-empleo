@@ -3,15 +3,16 @@ import { beforeEach, expect, it, vi } from "vitest";
 import type { PublicOffer } from "@/features/openings/public-service";
 import { AppError } from "@/lib/errors/public-error";
 
-const { listPublicOffers, getPublicOffer, notFound, readAccountSession } = vi.hoisted(() => ({
+const { listPublicOffers, listPublicOfferFilters, getPublicOffer, notFound, readAccountSession } = vi.hoisted(() => ({
   listPublicOffers: vi.fn<typeof import("@/features/openings/public-service").listPublicOffers>(),
+  listPublicOfferFilters: vi.fn(),
   getPublicOffer: vi.fn<typeof import("@/features/openings/public-service").getPublicOffer>(),
   notFound: vi.fn<() => never>(),
   readAccountSession: vi.fn(),
 }));
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
-vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer }));
+vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer, listPublicOfferFilters }));
 vi.mock("next/navigation", () => ({ notFound }));
 
 import PublicOffersPage from "@/app/(public)/ofertas/page";
@@ -33,6 +34,7 @@ const detailPage = () => PublicOfferDetailPage({ params: Promise.resolve({ openi
 beforeEach(() => {
   vi.resetAllMocks();
   readAccountSession.mockResolvedValue(null);
+  listPublicOfferFilters.mockResolvedValue({ categories: [], localities: [], modalities: [] });
 });
 
 it.each([
@@ -57,7 +59,7 @@ it("renderiza el listado y enlaces de paginación usando la página solicitada",
   const date = container.querySelector("time");
   expect(date?.textContent).toBe("31/12/2099");
   expect(date?.getAttribute("datetime")).toBe("2099-12-31");
-  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith({ page: "2" });
+  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 2, q: "", rubro: "", localidad: "", modalidad: "" }));
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Ofertas laborales vigentes");
   expect(screen.getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.slug}`);
   const pagination = screen.getByRole("navigation", { name: "Páginas de ofertas" });
@@ -68,7 +70,7 @@ it("renderiza el listado y enlaces de paginación usando la página solicitada",
 it("distingue un listado vacío sin inventar ofertas ni paginación", async () => {
   listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 10, items: [] });
   render(await listPage());
-  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith({ page: 1 });
+  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 1 }));
   expect(screen.getByText("No hay ofertas vigentes en esta página.")).toBeTruthy();
   expect(screen.queryByRole("list")).toBeNull();
   expect(screen.queryByRole("navigation", { name: "Páginas de ofertas" })).toBeNull();
@@ -83,11 +85,41 @@ it("ofrece volver al inicio del listado ante una página fuera de rango", async 
   expect(screen.queryByRole("link", { name: "Siguiente" })).toBeNull();
 });
 
-it("propaga errores del listado, incluida validación, al boundary de la ruta", async () => {
-  const error = new AppError("VALIDATION_ERROR");
+it("propaga errores técnicos del listado al boundary de la ruta", async () => {
+  const error = new AppError("INTERNAL_ERROR");
   listPublicOffers.mockRejectedValue(error);
-  await expect(listPage("inválida")).rejects.toBe(error);
-  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith({ page: "inválida" });
+  await expect(listPage()).rejects.toBe(error);
+  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 1 }));
+});
+
+it("entrada inválida muestra mensaje sin consultar ni ampliar resultados", async () => {
+  render(await listPage("inválida"));
+  expect(screen.getByRole("alert").textContent).toContain("Revisá los filtros");
+  expect(listPublicOffers).not.toHaveBeenCalled();
+});
+
+it("conserva filtros y opciones, pagina sin UUID y reinicia página al buscar", async () => {
+  listPublicOfferFilters.mockResolvedValue({ categories: [{ value: "ADMIN", label: "Administración" }], localities: [{ value: "funes", label: "Funes" }], modalities: [{ value: "onsite", label: "onsite" }] });
+  listPublicOffers.mockResolvedValue({ total: 25, page: 2, pageSize: 10, items: [offer] });
+  render(await PublicOffersPage({ searchParams: Promise.resolve({ page: "2", q: "auxiliar", rubro: "ADMIN", localidad: "Funes", modalidad: "onsite" }) }));
+  expect(screen.getByLabelText("Buscar por texto")).toHaveProperty("value", "auxiliar");
+  expect(screen.getByLabelText("Rubro")).toHaveProperty("value", "ADMIN");
+  expect(screen.getByLabelText("Localidad")).toHaveProperty("value", "funes");
+  expect(screen.getByLabelText("Modalidad")).toHaveProperty("value", "onsite");
+  const form = screen.getByRole("form", { name: "Buscar ofertas laborales" });
+  expect(form.getAttribute("method")).toBe("get");
+  expect(form.querySelector('[name="page"]')).toBeNull();
+  const pagination = screen.getByRole("navigation", { name: "Páginas de ofertas" });
+  expect(within(pagination).getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe("/ofertas?q=auxiliar&rubro=ADMIN&localidad=funes&modalidad=onsite&page=3");
+  expect(screen.getByRole("link", { name: "Limpiar filtros" }).getAttribute("href")).toBe("/ofertas");
+});
+
+it("conserva rubro retirado como opción no disponible sin ignorar filtro", async () => {
+  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 10, items: [] });
+  render(await PublicOffersPage({ searchParams: Promise.resolve({ rubro: "RETIRADO" }) }));
+  expect(screen.getByLabelText("Rubro")).toHaveProperty("value", "RETIRADO");
+  expect(screen.getByText("No encontramos ofertas con esos filtros.")).toBeTruthy();
+  expect(listPublicOffers).toHaveBeenCalledWith(expect.objectContaining({ rubro: "RETIRADO" }));
 });
 
 it.each([false, true])("renderiza detalle y campos opcionales solo si existen (%s)", async (optional) => {

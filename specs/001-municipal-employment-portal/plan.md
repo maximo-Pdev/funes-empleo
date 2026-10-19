@@ -52,6 +52,24 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 
 ## Contexto técnico
 
+### A07 / FR-024B (2026-10-19)
+
+Formulario GET servidor en `/ofertas`, sin estado cliente ni paquetes nuevos.
+Zod compartido normaliza/limita filtros; `URLSearchParams` conserva valores y
+pagina. Validación fallida no consulta ofertas ni presenta un listado sin filtrar;
+las opciones y el acceso por cuenta siguen siendo proyecciones seguras.
+Vista privada invocadora con security barrier `public_offer_rows` centraliza exactamente la proyección y
+visibilidad existentes; sin SELECT cliente. RPC `search_published_offers` filtra
+antes de total/página; `published_offers` conserva firma/defaults y delega sin
+filtros, manteniendo `p_id`. Lookup por slug existente sigue delegando en ella.
+RPC `public_offer_filter_options` devuelve códigos/nombres activos y valores de
+localidad/modalidad solo de filas públicas. No hay backfill/tablas nuevas ni
+cambios de Auth, estados, slugs, RLS o dependencias. Funciones definer con
+search_path vacío y grants explícitos anon/authenticated para lectura pública;
+vista privada sin permisos cliente. SQL estático con `strpos`, sin SQL dinámico.
+Aplicar migración antes de app; recuperación de app anterior conserva SQL
+compatible y no borra datos. T106–T110/EXTRA-022 detallan verificación y límites.
+
 **Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.22.0 LTS con npm 11.19.1; SQL
 PostgreSQL para migraciones, políticas, funciones y pruebas de base de datos.
 

@@ -476,3 +476,16 @@ sin cambios; este bloque no cierra gates externos ni acredita revisión humana.
 Evidencia local en matriz y EXTRA-019. Marcas de implementación/verificación,
 no aprobación del compañero ni aceptación global; CI completo/pgTAP del nuevo
 SHA pendientes. Los seis gates externos históricos siguen abiertos.
+
+## Phase 13: A07 — búsqueda pública (2026-10-19)
+
+- [X] T106 [US2] Contrastar A07/FR-024B con spec/plan/contrato y registrar EXTRA-022 antes del código; conservar FR-024/024A y catálogo actual.
+- [X] T107 [US2] RED de normalización, límites, URL/paginación y transporte de filtros; pruebas de formulario/vacíos/entrada inválida y pgTAP de privacidad.
+- [X] T108 [US2] Migración de lectura: proyección privada centralizada, RPC de búsqueda y opciones; conservar firma/defaults de published_offers y lookup por slug, sin backfill.
+- [X] T109 [US2] Integrar validación en servicio y formulario GET del listado con filtros persistentes, limpiar y paginar; errores seguros, controles accesibles y estilos existentes.
+- [X] T110 [US2] Verificar unitarias/componentes, pgTAP, tipos/lint/build y navegador; abrir PR con evidencia y rollout/recuperación, sin atribuir review ni aceptación humana.
+
+Marcas locales de implementación/verificación: 603 pruebas/39 archivos, tooling57,
+pgTAP951/14 archivos, tipos/lint/build y advisor PASS; navegador focal9/9. Ledger
+T001–T110: 104/110, sin cerrar los seis gates históricos. FR-024A mantiene su
+ledger separado; CI completo/revisión del nuevo SHA se registran en el PR.

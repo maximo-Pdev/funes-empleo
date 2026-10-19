@@ -4,9 +4,9 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { AppError } from "@/lib/errors/public-error";
 import { databaseUuidSchema } from "@/validation/common";
 import { publicOfferSlugSchema } from "@/validation/opening";
+import { publicOfferSearchSchema } from "@/validation/public-offer-search";
+import { hasPublicOfferFilters } from "./public-search";
 
-const listInput = z.object({ page: z.coerce.number().int().min(1).max(10000).default(1),
-  pageSize: z.coerce.number().int().min(1).max(30).default(10) });
 export interface PublicOffer {
   id: string; slug: string; company_name: string; title: string; tasks: string; requirements: string;
   vacancies: number; location: string; modality: string; schedule: string;
@@ -24,14 +24,33 @@ const responseSchema = z.object({ total: z.number().int().nonnegative(), page: z
   pageSize: z.number().int(), items: z.array(publicOfferSchema) });
 
 export async function listPublicOffers(input: unknown) {
-  const parsed = listInput.safeParse(input);
+  const parsed = publicOfferSearchSchema.safeParse(input);
   if (!parsed.success) throw new AppError("VALIDATION_ERROR");
   const client = await createServerSupabaseClient();
-  const result = await client.rpc("published_offers", {
-    p_page: parsed.data.page, p_page_size: parsed.data.pageSize,
-  });
+  const filters = parsed.data;
+  const pagination = { p_page: filters.page, p_page_size: filters.pageSize };
+  const result = hasPublicOfferFilters(filters)
+    ? await client.rpc("search_published_offers", { ...pagination, p_q: filters.q, p_rubro: filters.rubro,
+      p_localidad: filters.localidad, p_modalidad: filters.modalidad })
+    : await client.rpc("published_offers", pagination);
   if (result.error) throw new AppError("INTERNAL_ERROR");
   const response = responseSchema.safeParse(result.data);
+  if (!response.success) throw new AppError("INTERNAL_ERROR");
+  return response.data;
+}
+
+const filterOption = z.object({ value: z.string().min(1), label: z.string().min(1) });
+const filterOptionsSchema = z.object({
+  categories: z.array(filterOption.extend({ value: z.string().min(1).max(50), label: z.string().min(1).max(150) })),
+  localities: z.array(filterOption.extend({ value: z.string().min(1).max(200), label: z.string().min(1).max(200) })),
+  modalities: z.array(filterOption.extend({ value: z.string().min(1).max(100), label: z.string().min(1).max(100) })),
+});
+export type PublicOfferFilterOptions = z.infer<typeof filterOptionsSchema>;
+export async function listPublicOfferFilters(): Promise<PublicOfferFilterOptions> {
+  const client = await createServerSupabaseClient();
+  const result = await client.rpc("public_offer_filter_options");
+  if (result.error) throw new AppError("INTERNAL_ERROR");
+  const response = filterOptionsSchema.safeParse(result.data);
   if (!response.success) throw new AppError("INTERNAL_ERROR");
   return response.data;
 }

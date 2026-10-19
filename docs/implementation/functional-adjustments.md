@@ -24,12 +24,12 @@ analizar sus contratos antes de modificar los subsistemas afectados.
 | ID | Alcance y decisión confirmada | Estado inicial / dependencia |
 | --- | --- | --- |
 | A01 | Confirmación de contraseña en ambos registros y botón para mostrar/ocultar en registro, ingreso y cambio de contraseña. Validación también en servidor. | Integrado por PR #52; Quality #84 application/database PASS. No acredita aceptación global. |
-| A02 | Mantener la sesión al navegar y recargar. Cierre voluntario desde el perfil; conservar bloqueos por suspensión, archivo, revocación y seguridad de la cuenta. | Implementado y verificado localmente en `feat/session-persistence-profile-navigation`; revisión del compañero pendiente. |
-| A03 | Mostrar acceso al perfil desde la navegación y no ofrecer iniciar sesión cuando ya existe una sesión activa. | Implementado con estilos existentes; recorridos por los tres roles PASS, revisión del compañero pendiente. |
-| A04 | UUID fuera de textos visibles y URL: slug para ofertas y códigos aleatorios para registros privados. | Diseñar referencias únicas, migración y compatibilidad; nunca sustituir autorización por opacidad. |
+| A02 | Mantener la sesión al navegar y recargar. Cierre voluntario desde el perfil; conservar bloqueos por suspensión, archivo, revocación y seguridad de la cuenta. | Integrado por PR #53; Quality #87 PASS. No acredita aceptación global. |
+| A03 | Mostrar acceso al perfil desde la navegación y no ofrecer iniciar sesión cuando ya existe una sesión activa. | Integrado por PR #53 con estilos existentes; tres roles verificados. |
+| A04 | UUID fuera de textos visibles y URL: slug para ofertas y códigos aleatorios para registros privados. | Solución pública de Máximo integrada por PR #55/#56/#57 (43b94a7); PR #54 descartado. Códigos privados pendientes; no se reintroduce la solución descartada. |
 | A05 | Foto de perfil JPG, PNG o WebP de hasta 5 MiB; visible al candidato, Municipalidad y empresa únicamente después de derivación autorizada. Mateo informa aprobación municipal para compartirla. | Diseñar Storage privado, validación real de imagen y revocación; aprobación técnica pendiente. |
 | A06 | CV PDF de hasta 20 MB, límite confirmado por Mateo. | Pendiente actualizar plan, servidor, bucket y pruebas; concretar bytes y límites de transporte antes de implementar. |
-| A07 | Búsqueda pública de ofertas por texto, rubro, localidad y modalidad. | Pendiente contrato de filtros y consultas autorizadas. |
+| A07 | Búsqueda pública de ofertas por texto, rubro, localidad y modalidad. | Implementado y verificado localmente en feat/public-offer-search; SQL de lectura, CI/revisión del PR pendientes al entregar. |
 | A08 | Rubros seleccionables y múltiples; matching por al menos un rubro compartido, selección final municipal. | Catálogo autorizado por Mateo; pendiente diseño de migración y consultas. |
 | A09 | Empresa puede editar ofertas propias donde el flujo lo permita y cancelar también las publicadas. Cancelación cierra casos abiertos, revoca accesos y conserva resultados e historial previos. | Pendiente definir estados editables y adaptar comando transaccional, permisos y pruebas. |
 | A10 | Quitar formulario empresarial de entrevista; conservar informe de resultado y motivo obligatorio de no contratación, en texto libre breve. Empresa informa, Municipalidad consulta; candidato ve solo resultado. | Pendiente diseño del contrato y preservación de entrevistas históricas. |
@@ -98,7 +98,27 @@ T102–T105 verificadas localmente. Quedan revisión del compañero, suite compl
 de CI/pgTAP y aceptación humana para este incremento. Entrega por PR desde
 `feat/session-persistence-profile-navigation`, sin integración directa a `main`.
 
-## Catálogo de rubros confirmado
+## A07: búsqueda pública (2026-10-19)
+
+Continuación solicitada por Mateo desde main actualizado. Se prioriza este bloque
+independiente mientras A05/A06 conservan diseño técnico pendiente; sin tocar la
+implementación de slugs del compañero ni introducir el catálogo pendiente de A08.
+GET `/ofertas` combina texto literal en título/tareas/requisitos, rubro por código,
+localidad y modalidad completas. Texto/campos no distinguen mayúsculas; tildes se
+conservan y código de rubro es exacto. Filtros antes de contar/paginar, formulario
+reinicia página, enlaces conservan filtros y limpiar vuelve al listado.
+Opciones solo de ofertas públicas actuales; entrada inválida no amplía resultados.
+Spec FR-024B, plan, contratos, T106–T110 y EXTRA-022 mantienen trazabilidad.
+
+Verificación local: 603 unitarias/componentes, 57 tooling, 951 pgTAP/14 archivos,
+typecheck/lint/build y advisor security PASS. Navegador 9/9: tres casos A07 y seis
+de sesión; axe sin violaciones y sin desborde a 360×800. Colección 70/17, no prueba
+local completa. CI/revisión se acreditan por el SHA del PR, no por este resumen.
+Migración de lectura antes de desplegar: `20261019124218_public_offer_search.sql`.
+Sin cambios alojados ni reset local; limitaciones de la base local y recuperación
+en EXTRA-022 y `docs/operations/public-offer-search.md`.
+
+## Catálogo de rubros confirmado (A08, sin implementar por A07)
 
 Administración; atención al cliente y ventas; comercio; gastronomía y hotelería;
 limpieza; construcción y oficios; mantenimiento; producción e industria;
