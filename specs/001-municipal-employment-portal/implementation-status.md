@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualización 2026-10-06 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-19 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -448,3 +448,36 @@ el ledger ampliado suma 95/101 marcadas, manteniendo esos seis pendientes.
   READY y su smoke previo no prueban por sí solos ese paso final.
 - Esta actualización registra el estado comunicado en la conversación y la discrepancia documental;
   no acredita nuevos resultados, aceptación humana, publicación ni revisión.
+
+## A07 / FR-024B — búsqueda pública, 2026-10-19
+
+Main actualizado `43b94a7` integra la solución de slugs de Máximo (PR #55/#56/#57),
+no el PR #54 descartado. Rama `feat/public-offer-search`: cuatro filtros públicos,
+formulario GET, paginación persistente, limpiar, vacío y validación segura. Filtros
+se aplican en SQL antes de contar/paginar; opciones solo de ofertas públicas.
+La vista privada invocadora con barrera centraliza los mismos predicados; RPC
+anterior y slug conservan contrato. Sin tablas/backfill, Auth o estados nuevos.
+No se implementan A04 privado/A05/A06/A08; A07 es independiente de esas tareas.
+
+Evidencia: RED10 FAIL/4 PASS; final603 unitarias/componentes/39 archivos y tooling57,
+tipos/lint/build PASS. SQL final951/14 archivos, incluidas38 nuevas y la defensa
+invoker/barrier. CI completo se acredita por el SHA del PR. Navegador9/9
+(tres A07 y seis sesiones), teclado y axe sin violaciones,
+sin overflow360×800. Colección70/17 no equivale a ejecución local completa.
+El primer SQL072 se solapó con logins de navegador y falló dos snapshots; repetido
+solo y sin cambiar SQL aprobó todo. No se quitaron controles ni se reseteó la base.
+
+Local: Node24.22/npm11.19.1 portable con SHA verificado y global intacto. CLI no
+pudo aplicar por el residuo local descartado `20261017204435`; se conservaron
+su registro/columnas. Se instalaron transaccionalmente solo SQL integrado de
+slugs y A07, reemplazando la RPC descartada en conflicto tras precondiciones.
+Versiones/fechas de ofertas conservaron checksum. Se registraron applied solo
+tras éxito. No se cambió SQL del compañero ni se reintrodujo el PR descartado.
+Pruebas SQL usan rollback, sesiones solo ficticias locales; Docker activo y
+Next de pruebas finalizado, sin cambios alojados ni nuevos archivos env.
+
+T106–T110 implementadas/verificadas localmente; ledger T001–T110104/110, seis gates
+históricos pendientes. FR-024A conserva ledger separado. Revisión independiente
+y aceptación humana no se infieren; CI completo del SHA se acredita en el PR.
+Aplicar `20261019124218_public_offer_search.sql` antes de desplegar o validar
+preview en DB compartida; procedimiento en `docs/operations/public-offer-search.md`.

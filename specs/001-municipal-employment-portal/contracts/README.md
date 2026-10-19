@@ -20,6 +20,20 @@ Contrato detallado y recuperación: [public-offer-slugs](../../../docs/validatio
 
 ## Convenciones compartidas
 
+### Consulta pública A07 / FR-024B
+
+`GET /ofertas` recibe q (120 caracteres), rubro (código50), localidad (200),
+modalidad (100) y page (entero1–10000). Ausencia/vacío desactiva un filtro.
+Todos combinan con AND; texto literal en título/tareas/requisitos, insensible a
+mayúsculas y sensible a tildes; localidad/modalidad exactas tras trim/lower.
+Se filtra antes del conteo/paginación (tamaño1–30, default10), orden previo.
+Opciones solo de ofertas públicas actuales, rubros activos del catálogo vigente.
+Las RPC `search_published_offers` y `public_offer_filter_options` no amplían
+datos públicos ni conceden acceso a tablas; `published_offers` conserva contrato.
+URLs de paginación conservan filtros codificados y no agregan UUID. Arrays,
+longitudes excesivas o página inválida no se convierten en búsqueda ampliada;
+UI devuelve error claro. Sin cambios a FR-024A ni aceptación del catálogo A08.
+
 ### Confirmación de contraseña (A01, 2026-10-17)
 
 Los autorregistros de candidato, empresa y cuenta genérica reciben `password` y

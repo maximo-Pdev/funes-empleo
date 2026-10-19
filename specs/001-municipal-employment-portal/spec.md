@@ -648,6 +648,16 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   ya publicadas DEBEN recibir slug sin eliminar datos. No se exige conservar las URLs públicas
   anteriores basadas en UUID. Las reglas de visibilidad de FR-024 siguen aplicándose. Cambio
   autorizado por Máximo el 2026-10-17; trazabilidad en EXTRA-020.
+- **FR-024B**: A07, continuación solicitada por Mateo el 2026-10-19: el listado
+  público DEBE permitir combinar texto, rubro, localidad y modalidad. Texto busca
+  literalmente en título/tareas/requisitos sin distinguir mayúsculas; localidad
+  y modalidad coinciden completas sin mayúsculas/espacios exteriores; rubro usa
+  código del catálogo activo actual. Tildes se conservan. Filtros se aplican
+  antes de contar/paginar y se conservan en URL y paginación; nueva búsqueda
+  comienza en página uno y limpiar restablece el listado. Solo ofertas y opciones
+  actualmente públicas según FR-024; no se revelan datos de ofertas ocultas.
+  Entrada inválida muestra error español sin ejecutar búsqueda ampliada. No se
+  cambia el catálogo municipal pendiente de A08 ni los slugs de FR-024A.
 - **FR-025**: Los administradores DEBEN poder suspender o reactivar empresas y ofertas abusivas,
   engañosas, ilegales, duplicadas o inapropiadas, conservando su historial. La suspensión de una
   empresa DEBE impedir nuevas postulaciones y derivaciones en sus ofertas y revocar su

@@ -1755,6 +1755,12 @@ export type Database = {
         Args: { p_id?: string; p_page?: number; p_page_size?: number }
         Returns: Json
       }
+      search_published_offers: {
+        Args: { p_page?: number; p_page_size?: number; p_q?: string; p_rubro?: string;
+          p_localidad?: string; p_modalidad?: string; p_id?: string }
+        Returns: Json
+      }
+      public_offer_filter_options: { Args: never; Returns: Json }
       save_company_opening: {
         Args: { p_benefits: string; p_categories: string[]; p_closing_date: string | null;
           p_contract_type: string; p_id: string | null; p_location: string; p_modality: string;

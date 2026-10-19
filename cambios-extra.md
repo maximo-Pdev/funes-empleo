@@ -1003,6 +1003,94 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Verificación/estado:** controles previos de aplicación correctos; comprobar nuevamente recuperación sobre main y CI del commit exacto. Publicación autorizada; resultados y referencias en el ledger de entrega.
 - **Compatibilidad alojada (2026-10-18, propuesta previa):** preview `6dcff5d` rechazado con EBADENGINE: Vercel ofrece Node24.21.0/npm11.19.0 y solo permite seleccionar Node por mayor. Mantener `.node-version`24.22.0 y CI exactos; expresar Node24LTS como `24.x` en engines/lock y fijar npm11.19.1 antes de `npm ci` en installCommand de Vercel. Se conserva engine-strict y no cambia el grafo. Agregar regresión del contrato de configuración; verificar preview real antes del merge.
 
+## EXTRA-022 — A07: búsqueda pública de ofertas
+
+- **Fecha/estado:** 2026-10-19; registrado antes de implementar. Mateo solicita
+  continuar y abrir PR desde main actualizado (`43b94a7`); rama
+  `feat/public-offer-search`. A04 público de Máximo se conserva; PR #54 descartado.
+- **Origen/evidencia:** A07 de la matriz confirma texto/rubro/localidad/modalidad.
+  El listado actual solo pagina. A05/A06 requieren diseño propio de carga privada;
+  este bloque independiente no los implementa ni reabre la solución de slugs.
+- **Cambio propuesto:** GET `/ofertas?q=&rubro=&localidad=&modalidad=&page=`;
+  texto literal en título/tareas/requisitos, sin distinguir mayúsculas pero sí
+  tildes; rubro por código del catálogo actual (no UUID), localidad/modalidad por
+  valor completo sin distinguir mayúsculas/espacios exteriores. Filtros combinan
+  con AND, se aplican antes de contar/paginar, orden actual intacto.
+- **Contrato técnico:** vista `private.public_offer_rows` sin grants cliente
+  centraliza la proyección y los mismos predicados vigentes. RPC nueva de búsqueda
+  y de opciones; `published_offers` conserva firma y delega en la misma consulta.
+  Opciones solo derivadas de ofertas visibles (rubros activos); sin catálogo
+  municipal nuevo ni datos privados. Slugs y lookup del compañero intactos.
+- **Entrada/UI:** Zod en servidor y servicio; q120, rubro50, localidad200,
+  modalidad100, página1–10000 y tamaño1–30. Duplicados/arrays y excesos se rechazan
+  sin consultar ofertas; mensaje español y filtros seguros. Formulario nativo GET,
+  reinicia página al buscar; paginación conserva filtros y limpiar vuelve a listado.
+- **Archivos/contratos:** migración de lectura sin backfill/tablas nuevas, servicio,
+  validación/utilidad de URL, formulario/listado, pruebas, spec/plan/tasks y matriz.
+- **Coordinación:** Mateo funcional, compañero visual/revisor; controles mínimos
+  con estilos existentes, sin rediseño global. Revisión independiente del SQL/PR
+  pendiente; no se afirma aprobación municipal o cierre de gates históricos.
+- **Riesgos/recuperación:** filtrar antes de paginar; opciones no deben revelar
+  borradores/suspendidas. SQL parametrizado y texto literal, sin wildcard/inyección.
+  Helpers/vista privados, grants explícitos solo RPC de proyección. Aplicar base
+  antes de app; rollback de app conserva funciones compatibles, sin borrar datos.
+- **Verificación prevista:** RED/GREEN validación, transporte y componentes;
+  pgTAP de filtros, total/páginas, equivalencia de proyección, grants y privacidad;
+  navegador público/teclado/empty/URL/slugs, regresiones, tipos, lint, build y CI.
+  Solo datos ficticios y destinos locales; sin reset de base existente ni cambios
+  alojados. No se reutiliza la migración local descartada del PR #54.
+- **Análisis focalizado previo:** seis criterios (cuatro filtros combinables,
+  paginación/URL, opciones públicas, validación, compatibilidad y privacidad),
+  cubiertos por T106–T110; sin cambios al modelo persistido, slugs o transiciones.
+  Prerrequisitos Spec Kit resueltos contra la feature existente. Checklists
+  históricos sin alterar; revisión propia no equivale a revisión independiente.
+  RED inicial del servicio: 10 FAIL/4 PASS, comportamiento anterior ignora filtros.
+- **Prerrequisito local detectado:** CLI `migration up --local` rechaza el historial
+  por `20261017204435`, residuo ya informado del PR #54 descartado. No se borra ni
+  se marca revertido, ni se recupera su código. Para validar sin reset se aplican
+  exclusivamente los SQL revisados `20261018000000` (base integrada del compañero)
+  y `20261019124218` (lectura A07) con psql transaccional/ON_ERROR_STOP contra el
+  contenedor local exacto; después se registran como applied con repair solo si
+  finalizaron. Se compara checksum de versiones/fechas. Historial previo intacto;
+  CI fresco verifica únicamente las migraciones rastreadas y no este residuo.
+- **Colisión local adicional:** el primer intento transaccional del SQL integrado
+  revirtió completo: la RPC `published_offer_by_slug(text)` del PR #54 ya existe.
+  Se reemplaza únicamente esa definición descartada por la del compañero dentro
+  de la misma transacción de instalación, después de comprobar columna/helper
+  exclusivos del residuo y ausencia del nuevo `slug`. No se borran columnas,
+  referencias, registros ni historial. El SQL rastreado del compañero no se edita.
+- **Resultado local:** instalación de ambas migraciones y registro applied
+  correctos; checksum ID/versión/updated_at de ofertas idéntico antes/después.
+  La migración A07 por sí sola no escribe negocio; pgTAP usa rollback.
+  La vista usa security_invoker/security_barrier como defensa adicional; solo
+  las RPC definer de proyección autorizada pueden leerla. Sin nuevos grants.
+- **Implementado/verificado:** servicio y Zod, vista/RPC, formulario servidor con
+  labels explícitos y GET, URLs/filtros/paginación/limpiar, error y vacío seguro.
+  RED10 FAIL/4 PASS; focal49/49 antes del endurecimiento final de arrays/booleanos;
+  regresión final603/39 archivos, tooling57/57, tipos/lint/build PASS.
+  SQL final951/14 archivos (38 nuevas) PASS y advisor security sin hallazgos.
+  Navegador final9/9: tres A07 y seis sesiones; teclado, persistencia, slug12hex,
+  axe sin violaciones y sin overflow360×800. Se recolectan70/17, no se afirma
+  ejecución local completa. Avisos de streaming Next existentes sin fallo final.
+- **Incidencias de validación:** SQL072 comparó snapshots mientras el navegador
+  hacía login (dos fallos de snapshot); sin cambios SQL, repetición secuencial
+  completa PASS. No se redujeron sus aserciones ni se reseteó la base. El primer
+  E2E detectó labels implícitos ambiguos por incluir opciones; se separaron labels
+  y selects mediante id/htmlFor, no se eludió la verificación. Se aisla el alert
+  de validación del anunciador de rutas de Next y se eligen opciones reales del
+  fixture en vez de suponer Funes. Un pipe Zod rechazado por TS se reemplazó por
+  transformación explícita string/number; no se introdujo any ni dependencia.
+  E2E A07 final repetido3/3 usando una combinación pública con más de diez
+  resultados, no primeras opciones independientes que podrían no coincidir.
+- **Entorno/privacidad:** Node24.22/npm11.19.1 portable oficial verificado por SHA;
+  global intacto. Sin tokens/claves en código, capturas/trazas de sesión ni nuevos
+  env. Consultas y Auth solo locales/ficticios. Docker permanece activo; servidor
+  Next de pruebas finalizado. No se aplicó SQL ni se desplegó a servicios alojados.
+- **Entrega/límites:** T106–T110 verificadas localmente; runbook/matriz/artefactos
+  actualizados. PR desde feat/public-offer-search; CI completo del SHA y revisión
+  independiente pendientes al entregar. No se acredita aceptación municipal ni
+  se cierran gates históricos; A04 privado, A05, A06 y A08 conservan pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
