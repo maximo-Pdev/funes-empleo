@@ -4,6 +4,16 @@ Registro de requisitos derivados y ajustes técnicos necesarios para cumplir tar
 aprobadas. No sustituye la constitución ni los artefactos de Spec Kit, y no convierte
 una propuesta en una decisión municipal aprobada.
 
+## EXTRA-023 — Estabilizar el escenario E2E de mantenimiento
+
+- **Fecha/autorización:** 2026-10-18, Máximo: «Bueno, entonces encontramos un bug no? Bien, arreglalo».
+- **Problema/evidencia:** los CI39179308511/39179314605 esperan dos derivaciones vencidas y obtienen745; el mantenimiento usa el reloj real sobre fixtures de septiembre. Main52fcae9 pasó el17 de octubre, antes del vencimiento18 de octubre12UTC; seed, mantenimiento y aserción no cambiaron.
+- **Origen:** corrección necesaria para completar los controles de publicación de ofertas; se entrega como prerrequisito independiente, sin incluir slugs.
+- **Cambio:** aislar los instantes del escenario en `tests/e2e/intermediation.spec.ts`, mantener activo el permiso inicial respecto del reloj real y conservar todas las expectativas exactas. Incluye el aislamiento pgTAP010 ya comprobado en los jobs de base de datos.
+- **Límites/riesgo:** solo fixtures de prueba; sin cambios de seed, reglas, contratos ni datos alojados. Se mantiene la limitación cronológica preexistente entre consentimientos y derivaciones ficticias, sin ampliar este arreglo.
+- **Verificación/recuperación:** RED remoto documentado; tipos/lint y CI completos del SHA corregido pendientes. Docker local apagado: no se atribuye una ejecución local. Reversión limitada a los fixtures; revisión independiente antes de integrar.
+- **Corrección dependiente:** CI39181435054/39181499292/39181504654 detectó cuatro fallos en `tests/unit/maintenance-timezone.test.ts`, que exigía el literal anterior. Se actualiza el contrato al reloj inyectado, conservando todos los límites de Buenos Aires y agregando la comprobación del instante real del escenario. RED local reproducido antes del ajuste; no modifica el cálculo de producción.
+
 ## Autorización de trabajo
 
 - **Responsable:** Mateo.
@@ -14,6 +24,14 @@ una propuesta en una decisión municipal aprobada.
 - **Alcance:** incorporar extras necesarios para cumplir la tarea aprobada, con
   justificación y trazabilidad; los límites y controles están en `AGENTS.md`.
 - **Revisión:** esta instrucción no acredita revisión de Máximo ni aceptación municipal.
+
+## EXTRA-022 — Aislar el reloj de la prueba de vencimiento poscontratación
+
+- **Origen/autorización:** entrega de slugs solicitada por Máximo, 2026-10-18; requisito técnico para completar CI sin cambiar el producto.
+- **Evidencia:** Quality39178555606 falla en pgTAP010 casos97/110–112; maintenance(clock_timestamp()) vence derivaciones del seed de septiembre al llegar octubre. Archivo y reglas de mantenimiento no cambiaron respecto de52fcae9.
+- **Cambio mínimo:** solo tres instantes del fixture poscontratación en `supabase/tests/010_intermediation_rls.test.sql`; usar el reloj histórico determinista del escenario. Conservar todas las expectativas, seed/hashes, permisos y reglas de producción.
+- **Riesgo/recuperación:** aislamiento de pruebas; se revierte únicamente el fixture. No toca datos alojados ni cambia plazos de negocio.
+- **Verificación:** RED observado en ambos jobs remotos; reproducción local bloqueada por Docker apagado. Recheck exacto por CI y revisión independiente pendientes antes del merge.
 
 ## EXTRA-001 — Evidencia histórica para métricas al cierre del período
 
