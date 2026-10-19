@@ -15,6 +15,14 @@ una propuesta en una decisión municipal aprobada.
   justificación y trazabilidad; los límites y controles están en `AGENTS.md`.
 - **Revisión:** esta instrucción no acredita revisión de Máximo ni aceptación municipal.
 
+## EXTRA-022 — Aislar el reloj de la prueba de vencimiento poscontratación
+
+- **Origen/autorización:** entrega de slugs solicitada por Máximo, 2026-10-18; requisito técnico para completar CI sin cambiar el producto.
+- **Evidencia:** Quality39178555606 falla en pgTAP010 casos97/110–112; maintenance(clock_timestamp()) vence derivaciones del seed de septiembre al llegar octubre. Archivo y reglas de mantenimiento no cambiaron respecto de52fcae9.
+- **Cambio mínimo:** solo tres instantes del fixture poscontratación en `supabase/tests/010_intermediation_rls.test.sql`; usar el reloj histórico determinista del escenario. Conservar todas las expectativas, seed/hashes, permisos y reglas de producción.
+- **Riesgo/recuperación:** aislamiento de pruebas; se revierte únicamente el fixture. No toca datos alojados ni cambia plazos de negocio.
+- **Verificación:** RED observado en ambos jobs remotos; reproducción local bloqueada por Docker apagado. Recheck exacto por CI y revisión independiente pendientes antes del merge.
+
 ## EXTRA-001 — Evidencia histórica para métricas al cierre del período
 
 - **Fecha de detección:** 2026-09-26.
