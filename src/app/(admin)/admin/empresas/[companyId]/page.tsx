@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { databaseUuidSchema } from "@/validation/common";
 import { AdminCompanyDecision } from "@/features/companies/components/admin-company-decision";
@@ -19,15 +19,16 @@ export default async function AdminCompanyPage({ params }: { params: Promise<{ c
   ]);
   if (account.error || !account.data || offers.error) notFound();
   const command = account.data.status === "suspended" ? "reactivate" : account.data.status === "archived" ? "restore" : "suspend";
-  return <RoleShell role="admin" title={profile.data.legal_name || "Empresa incompleta"}
+  return <AdminShell active="/admin/empresas" title={profile.data.legal_name || "Empresa incompleta"}
     navigation={[{ href: "/admin/empresas", label: "Empresas" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <p>Cuenta: {account.data.status}. Perfil: {profile.data.status}. {profile.data.archived_at ? "Archivada." : ""}</p>
     <p className="mt-2">Una reactivación deja el perfil incompleto. Restaurar deja las ofertas archivadas en borrador; ninguna decisión recupera accesos revocados.</p>
+    <h2 className="mt-6 text-xl font-semibold">Gestión de acceso</h2>
     <AdminCompanyDecision accountId={account.data.id} version={account.data.version} command={command} />
     {account.data.status !== "archived" && <AdminCompanyDecision accountId={account.data.id} version={account.data.version} command="archive" />}
     <h2 className="mt-8 text-xl font-semibold">Ofertas de la empresa</h2>
     {offers.data?.length === 0 ? <p>No hay ofertas.</p> : <ul className="mt-3 grid gap-2">{offers.data?.map((offer) => <li key={offer.id}>
       <Link href={`/admin/openings/${offer.id}`} className="text-blue-800 underline">{offer.title || "Borrador sin título"}</Link> · {offer.status}{offer.archived_at ? " · archivada" : ""}
     </li>)}</ul>}
-  </RoleShell>;
+  </AdminShell>;
 }

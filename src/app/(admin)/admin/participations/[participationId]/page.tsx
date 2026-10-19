@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState, FeedbackMessage } from "@/components/ui";
 import { getAdminParticipation } from "@/features/participations/admin-query";
 import { ParticipationActionForm } from "@/features/participations/components/participation-action-form";
@@ -27,7 +27,7 @@ export default async function AdminParticipationDetailPage({ params }: {
     await getAdminParticipation(participationId);
   const contactHistory = await getContactTimeline(participationId);
 
-  return <RoleShell role="admin" title="Seguimiento de participación"
+  return <AdminShell active="/admin/participations" title="Seguimiento de participación"
     description="Estado vigente, decisiones y registros internos de este caso."
     navigation={[{ href: "/admin/participations", label: "Volver a casos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <div className="grid gap-6 lg:grid-cols-2">
@@ -101,5 +101,5 @@ export default async function AdminParticipationDetailPage({ params }: {
         </section>
       </div>
     </div>
-  </RoleShell>;
+  </AdminShell>;
 }

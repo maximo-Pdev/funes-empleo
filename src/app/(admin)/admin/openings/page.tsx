@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { OPENING_STATUSES, openingStatusSchema } from "@/domain/states";
 import { listAdminOpenings } from "@/features/openings/admin-service";
@@ -20,7 +20,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;
 
-  return <RoleShell role="admin" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
+  return <AdminShell active="/admin/openings" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Mi cuenta" }]}>
     <form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       <div className="space-y-1"><label htmlFor="opening-status" className="block font-semibold">Estado de la oferta</label>
@@ -44,5 +44,5 @@ export default async function AdminOpeningsPage({ searchParams }: {
         {result.page < result.pageCount && <Link href={urlForPage(result.page + 1)} className="text-blue-800 underline">Siguiente</Link>}
       </nav>}
     </section>}
-  </RoleShell>;
+  </AdminShell>;
 }

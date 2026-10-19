@@ -1,1 +1,3 @@
-export default function Loading() { return <p role="status">Cargando importaciones…</p>; }
+import { AdminLoading } from "@/app/(admin)/_components/admin-loading";
+
+export default function Loading() { return <AdminLoading title="Cargando importaciones" active="/admin/imports" />; }

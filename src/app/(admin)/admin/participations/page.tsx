@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { PARTICIPATION_STATUSES, participationStatusSchema } from "@/domain/states";
 import { listAdminParticipations } from "@/features/participations/admin-query";
@@ -31,7 +31,7 @@ export default async function AdminParticipationsPage({ searchParams }: {
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;
 
-  return <RoleShell role="admin" title="Participaciones" description="La Oficina evalúa cada caso y conserva su historial."
+  return <AdminShell active="/admin/participations" title="Participaciones" description="La Oficina evalúa cada caso y conserva su historial."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       {openingId && <input type="hidden" name="openingId" value={openingId} />}
@@ -57,5 +57,5 @@ export default async function AdminParticipationsPage({ searchParams }: {
         {result.page < result.pageCount && <Link href={pageHref(result.page + 1)} className="text-blue-800 underline">Siguiente</Link>}
       </nav>}
     </section>}
-  </RoleShell>;
+  </AdminShell>;
 }

@@ -1,5 +1,3 @@
-import { LoadingState } from "@/components/ui";
+import { AdminLoading } from "@/app/(admin)/_components/admin-loading";
 
-export default function AdminLoading() {
-  return <div className="mx-auto max-w-6xl px-4 py-8"><LoadingState message="Cargando información de la Oficina de Empleo…" /></div>;
-}
+export default function Loading() { return <AdminLoading title="Cargando gestión municipal" active="" />; }

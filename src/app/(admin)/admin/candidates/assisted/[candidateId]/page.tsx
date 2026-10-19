@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { getAssistedWorkspace } from "@/features/candidates/assisted-service";
 import { AssistedProfileForm, AssistedCommands, ClaimForm } from "@/features/candidates/components/assisted/assisted-forms";
@@ -13,7 +13,7 @@ export default async function AssistedDetailPage({ params }: { params: Promise<{
   const { categories, workspace } = await getAssistedWorkspace(candidateId);
   if (!workspace) return null;
   const { profile, data, requests, consent, policy } = workspace;
-  return <RoleShell role="admin" title={`Atención de ${profile.display_name}`} description="Mantenimiento presencial, consentimiento y vinculación de cuenta."
+  return <AdminShell active="/admin/candidates" title={`Atención de ${profile.display_name}`} description="Mantenimiento presencial, consentimiento y vinculación de cuenta."
     navigation={[{ href: `/admin/candidates/${candidateId}`, label: "Perfil, CV e historial" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <p role="status">Estado: {candidateProfileStatusLabels[profile.status]}. {profile.account_id ? "Cuenta vinculada." : "Sin cuenta vinculada."}</p>
     <div className="grid gap-6 lg:grid-cols-2"><AssistedProfileForm key={`${candidateId}:${profile.version}`} candidateId={candidateId} version={profile.version} categories={categories} initial={data} />
@@ -22,5 +22,5 @@ export default async function AssistedDetailPage({ params }: { params: Promise<{
         <Link className="block rounded border bg-white p-4 text-blue-800 underline" href={`/admin/candidates/${candidateId}`}>Cargar CV, consultar notas e historial y nominar a una oferta</Link>
         {profile.origin === "assisted" && !profile.account_id && <ClaimForm candidateId={candidateId} version={profile.version} requests={requests} />}
       </div></div>
-  </RoleShell>;
+  </AdminShell>;
 }
