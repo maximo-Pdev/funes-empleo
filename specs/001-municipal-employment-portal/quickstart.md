@@ -8,7 +8,7 @@ siendo el contrato de aceptación. La validación local de Supabase usa Docker D
 ## Prerrequisitos
 
 - Git.
-- Node.js 24.21.0 LTS con npm 11.19.0.
+- Node.js 24.22.0 LTS con npm 11.19.1.
 - Docker Desktop activo y Supabase CLI instalado como dependencia de desarrollo del proyecto.
 - Acceso individual al repositorio, al proyecto Supabase de demostración y a Vercel.
 - Solo datos y archivos ficticios o correctamente anonimizados.

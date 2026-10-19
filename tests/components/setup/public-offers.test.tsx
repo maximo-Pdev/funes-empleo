@@ -20,6 +20,7 @@ import PublicOfferDetailPage from "@/app/(public)/ofertas/[openingId]/page";
 // Async page/component contracts only: these mocks do not verify RPC, RLS or live data.
 const offer: PublicOffer = {
   id: "00000000-0000-4000-8000-000000000001",
+  slug: "titulo-original-a1b2c3d4e5f6",
   title: "Auxiliar ficticio", company_name: "Empresa ficticia", tasks: "Organizar depósito ficticio.",
   requirements: "Experiencia ficticia.", vacancies: 2, location: "Funes", modality: "onsite",
   schedule: "Lunes a viernes", contract_type: "fixed_term", closing_date: "2099-12-31",
@@ -27,7 +28,7 @@ const offer: PublicOffer = {
   categories: [{ id: "00000000-0000-4000-8000-000000000010", name: "Categoría ficticia" }],
 };
 const listPage = (page?: string) => PublicOffersPage({ searchParams: Promise.resolve({ page }) });
-const detailPage = () => PublicOfferDetailPage({ params: Promise.resolve({ openingId: offer.id }) });
+const detailPage = () => PublicOfferDetailPage({ params: Promise.resolve({ openingId: offer.slug }) });
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -58,7 +59,7 @@ it("renderiza el listado y enlaces de paginación usando la página solicitada",
   expect(date?.getAttribute("datetime")).toBe("2099-12-31");
   expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith({ page: "2" });
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Ofertas laborales vigentes");
-  expect(screen.getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.id}`);
+  expect(screen.getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.slug}`);
   const pagination = screen.getByRole("navigation", { name: "Páginas de ofertas" });
   expect(within(pagination).getByRole("link", { name: "Anterior" }).getAttribute("href")).toBe("/ofertas?page=1");
   expect(within(pagination).getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe("/ofertas?page=3");
@@ -100,13 +101,13 @@ it.each([false, true])("renderiza detalle y campos opcionales solo si existen (%
     expect(date.textContent).toBe("31/12/2099");
     expect(date.getAttribute("datetime")).toBe("2099-12-31");
   }
-  expect(getPublicOffer).toHaveBeenCalledExactlyOnceWith(offer.id);
+  expect(getPublicOffer).toHaveBeenCalledExactlyOnceWith(offer.slug);
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(offer.title);
   expect(screen.getByText(offer.tasks)).toBeTruthy();
   expect(screen.getByText(offer.requirements)).toBeTruthy();
   expect(Boolean(screen.queryByRole("heading", { name: "Salario" }))).toBe(optional);
   expect(Boolean(screen.queryByRole("heading", { name: "Beneficios" }))).toBe(optional);
-  expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/candidato/ofertas?oferta=${offer.id}`);
+  expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/candidato/ofertas?oferta=${offer.slug}`);
 });
 
 it("traduce solo NOT_FOUND a navegación notFound", async () => {

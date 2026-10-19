@@ -985,6 +985,24 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   mismo PR #53; el resultado remoto se registra en sus checks, sin inferirlo
   del resultado focalizado ni acreditar revisión humana.
 
+## EXTRA-020 — Slugs públicos al publicar ofertas (FR-024A)
+
+- **Fecha/responsable:** Máximo autoriza el 2026-10-17; ratifica publicar nuestra implementación el 2026-10-18 tras cierre sin merge del PR #54.
+- **Problema/origen:** UUID visibles en enlaces públicos; se requieren URLs legibles, compartibles y estables sin cambiar identidad ni permisos.
+- **Cambio:** `job_openings.slug` único, asignado en primera publicación y protegido contra cambios; título normalizado y sufijo aleatorio con reintentos/bloqueo. Backfill de publicación histórica, consulta pública por slug y enlaces asociados; UUID interno y RPC existente conservados.
+- **Superficies:** migración `20261018000000_opening_public_slugs.sql`, pgTAP021, servicio/validación/tipos, páginas públicas y selección del candidato, pruebas y artefactos FR-024A. Sin rediseños de portada/administración ni alteración de navegación por sesión de PR #53.
+- **Riesgos/recuperación:** migración, privacidad y concurrencia; aplicar base antes que aplicación. Recuperación preferida: revertir app y conservar slugs/RPC; nunca resetear demo ni regenerar enlaces. Contratos: `docs/validation/public-offer-slugs.md`.
+- **Verificación/estado:** evidencia previa local y nueva entrega separadas en `odd/tasks/public-offer-slugs.md`. Checks del candidato recuperado, revisión independiente, historial remoto, migración y publicación pendientes; no afirmar aceptación municipal ni despliegue antes de lectura de retorno.
+- **Autorización:** sesiones existentes GitHub/Vercel/Supabase, destino demo exacto autorizado; sin reset alojado, secretos publicados ni producción municipal. Identificadores EXTRA020/021 reconciliados con los EXTRA018/019 ya integrados.
+
+## EXTRA-021 — Node 24 LTS y recuperación reproducible del entorno
+
+- **Fecha/responsable/origen:** Máximo autoriza reparación local y actualización del runtime el 2026-10-17, necesarias para verificar y publicar FR-024A.
+- **Cambio/evidencia:** Node24.22.0 LTS/npm11.19.1 oficiales, checksum verificado; manifiestos, `.node-version`, CI y guías activas alineados. `npm ci --ignore-scripts` corrigió junctions del adaptador ESLint hacia la ubicación anterior, sin cambiar el grafo de dependencias ni instalar globalmente.
+- **Riesgos/recuperación:** entorno/CI; conservar engine-strict, scripts no aprobados desactivados, versiones históricas documentadas y Node global. Reversión de pins posible sin cambio de datos.
+- **Verificación/estado:** controles previos de aplicación correctos; comprobar nuevamente recuperación sobre main y CI del commit exacto. Publicación autorizada; resultados y referencias en el ledger de entrega.
+- **Compatibilidad alojada (2026-10-18, propuesta previa):** preview `6dcff5d` rechazado con EBADENGINE: Vercel ofrece Node24.21.0/npm11.19.0 y solo permite seleccionar Node por mayor. Mantener `.node-version`24.22.0 y CI exactos; expresar Node24LTS como `24.x` en engines/lock y fijar npm11.19.1 antes de `npm ci` en installCommand de Vercel. Se conserva engine-strict y no cambia el grafo. Agregar regresión del contrato de configuración; verificar preview real antes del merge.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

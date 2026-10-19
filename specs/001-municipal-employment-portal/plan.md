@@ -41,10 +41,23 @@ sensibles se validarán en servidor y se respaldarán con RLS, funciones transac
 inmutable. El plan no define operación productiva municipal ni cierra las decisiones legales o de
 datos que siguen asignadas a sus responsables.
 
+### Cambio autorizado 2026-10-17 — URLs públicas de ofertas
+
+FR-024A agrega un slug persistido y único a `job_openings`, asignado una vez al publicar
+y estable frente a cambios posteriores. No cambia identidades UUID, permisos ni estados.
+La consulta por slug es aditiva; se conserva la firma previa de `published_offers` para
+los consumidores internos. No se agregan dependencias. Contrato, despliegue y recuperación:
+[public-offer-slugs](../../docs/validation/public-offer-slugs.md); tareas y evidencia:
+[public-offer-slugs](../../odd/tasks/public-offer-slugs.md). EXTRA-020 registra la autorización.
+
 ## Contexto técnico
 
-**Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.21.0 LTS con npm 11.19.0; SQL
+**Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.22.0 LTS con npm 11.19.1; SQL
 PostgreSQL para migraciones, políticas, funciones y pruebas de base de datos.
+
+Desarrollo y CI usan `.node-version` 24.22.0. `engines.node` expresa la línea 24 LTS
+como `24.x` porque Vercel administra el parche disponible; su instalación fija npm 11.19.1
+antes de `npm ci`, sin desactivar engine-strict. No se atribuye a Vercel el parche local exacto.
 
 **Dependencias principales**: Next.js 16.3.8, React y React DOM 19.3.0, Tailwind CSS y
 `@tailwindcss/postcss` 4.3.3, `@supabase/supabase-js` 2.116.0, `@supabase/ssr` 0.12.7, Zod 4.6.5 y

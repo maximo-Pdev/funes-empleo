@@ -39,7 +39,7 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - Before implementing an addition, record it in the root `cambios-extra.md` with a stable ID, date, problem/evidence, originating approved requirement/task, proposed change, justification, affected files/contracts, risks, verification plan, and authorization/review status. Tell the user what will change and why.
 - Keep the specification, plan, data model, contracts, and tasks consistent where affected. The log is traceability, not a replacement for those artifacts or for the constitution. Follow existing Spec Kit review and analysis gates for architectural changes.
 - This authorization covers necessary implementation details and derived requirements; it does not authorize inventing municipal/legal decisions, resolving open questions, adding excluded MVP features, changing approved functional behavior, or bypassing privacy, security, the required stack, or quality gates. Record such proposals as pending and request the responsible stakeholder's decision before implementing them.
-- Preserve shared-file ownership and coordinate changes to shared contracts, schema, authentication, authorization, states, and global UI before implementation. Recording an entry alone is not coordination or approval by the second developer.
+- An explicit instruction from the requesting developer authorizes the requested work, including changes to shared contracts, schema, authentication, authorization, states, and global UI. The developers coordinate continuously outside the agent session; do not require separate confirmation or approval from the second developer before proceeding. Preserve unrelated work and raise concrete conflicts in concurrently edited files rather than assuming a conflict from the affected subsystem alone.
 - After implementation, update the entry with actual files, verification results, remaining limitations, and commit/PR references when available. Distinguish proposed, implemented, verified, and reviewed work; never mark review or acceptance complete without evidence.
 
 ## Current project phase
@@ -49,7 +49,7 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - The course-defined technical baseline is Next.js, TypeScript, Tailwind CSS, Node.js with npm, Supabase/PostgreSQL, GitHub, and Vercel.
 - As of 2026-10-06, constitution 1.0.0 is ratified (2026-09-19); application implementation exists and convergence remains incomplete.
 - The task ledger has 91/97 checked: T069, T087, T089, T092, T096 and T097 remain open. See `specs/001-municipal-employment-portal/implementation-status.md` for current evidence and local-only commits.
-- The feature specification still says Draft. Its stage owner must reconcile approval evidence before further product changes; existing implementation does not establish artifact approval or waive review gates.
+- Máximo approved the current feature specification scope and business rules on 2026-10-17; `spec.md` records this approval. This does not establish final product acceptance, close open questions or pending validation tasks, constitute municipal approval, or waive other review gates.
 
 ## Spec Kit collaboration
 
@@ -77,7 +77,7 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - Use pull requests for every change to `main`.
 - Before editing, check the current branch and working tree. Do not overwrite unrelated or uncommitted work.
 - Avoid having both developers edit the same files concurrently.
-- Changes to shared contracts, database schema, authentication, authorization, application states, or global UI foundations require coordination before implementation.
+- Do not block explicitly requested implementation on an additional coordination or second-developer approval step. Pull request, security, verification, and product-approval requirements still apply; preserve unrelated working-tree changes.
 - Keep commits focused and explain behavior changes in the pull request.
 - A pull request approval is not a merge. Confirm that the pull request was merged before both developers update their local `main` branches.
 
