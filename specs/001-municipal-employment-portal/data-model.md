@@ -256,7 +256,8 @@ pueda volver a `active`.
 
 | Campo | Regla |
 | --- | --- |
-| `id`, `company_id` | Identidad y propietario. |
+| `id`, `company_id` | Identidad UUID interna y propietario; no se sustituyen por el slug. |
+| `slug` | Identificador público único: título normalizado más sufijo aleatorio; nulo antes de la primera publicación, obligatorio al publicarse e inmutable después de asignarlo. Las ofertas ya publicadas reciben slug mediante migración aditiva. FR-024A / EXTRA-020. |
 | `title`, `tasks`, `requirements` | Textos obligatorios y limitados. |
 | `vacancies` | Entero positivo. |
 | `location`, `modality`, `schedule` | Obligatorios; modalidad controlada. |

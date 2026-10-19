@@ -19,7 +19,7 @@ y [accesibilidad](docs/validation/accessibility.md); este handoff documental no 
 
 ## Desarrollo local
 
-Node **24.21.0**, npm **11.19.0**, Git y Docker Desktop activo. Supabase CLI es dependencia
+Node **24.22.0**, npm **11.19.1**, Git y Docker Desktop activo. Supabase CLI es dependencia
 local; no instalar otro gestor. Ver [quickstart](specs/001-municipal-employment-portal/quickstart.md).
 
 ```powershell

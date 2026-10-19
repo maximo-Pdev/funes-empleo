@@ -65,7 +65,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                         <span className="text-xs font-semibold text-primary-700">Búsqueda vigente</span>
                       </div>
                       <h3 className="text-xl font-bold leading-snug text-primary-900">
-                        <Link href={`/ofertas/${offer.id}`} className="group flex min-h-11 items-start justify-between gap-3 rounded-sm break-words hover:underline hover:underline-offset-4">
+                        <Link href={`/ofertas/${offer.slug}`} className="group flex min-h-11 items-start justify-between gap-3 rounded-sm break-words hover:underline hover:underline-offset-4">
                           <span className="min-w-0">{offer.title}</span>
                           <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-primary transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
                         </Link>
