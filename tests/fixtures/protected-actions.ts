@@ -31,6 +31,7 @@ add("participations/evaluation-actions", "admin", "recordEvaluationAction", { pa
 add("participations/evaluation-actions", "admin", "adminParticipationAction", { participationId: id, version: 1, command: "start_review" });
 add("participations/evaluation-actions", "admin", "confirmFeedbackAction", { participationId: id, feedbackId: id, version: 1, outcome: "hired", reason: "", lateCorrection: false });
 add("participations/nomination-actions", "admin", "createAdminNominationAction", { candidateId: id, openingId: id, candidateVersion: 1, openingVersion: 1 });
+add("candidates/matching-actions", "admin", "openingCandidatePreviewAction", { candidateId: id, openingId: id });
 add("openings/admin-actions", "admin", "moderateOpeningAction", { openingId: id, version: 1, decision: "approved" });
 add("openings/company-actions", "company", "saveCompanyOpeningAction", { title: "", tasks: "", requirements: "", location: "", modality: "", schedule: "", contractType: "", closingDate: "", salary: "", benefits: "" }, true);
 add("openings/company-actions", "company", "submitCompanyOpeningAction", {}, true);

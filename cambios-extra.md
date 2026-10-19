@@ -1116,6 +1116,143 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   el recorrido muestreado. Un H1 y menú activo solo para admin. No se acredita
   sesión real ni cambios de cuentas contra backend; T087 sigue pendiente.
 
+## EXTRA-024 — A08: catálogo amplio y coincidencias por oferta
+
+- **Fecha/autorización:** 2026-10-19. Mateo solicita implementar A08 en
+  `feat/job-categories-matching`; catálogo y coincidencia por al menos un rubro
+  aprobados en la matriz. No acredita aceptación del producto.
+- **Evidencia:** el seed solo incluye DEMO-A/B; no existe consulta de coincidencias
+  desde la oferta. Las asociaciones múltiples y la nominación municipal ya existen.
+- **Cambio necesario:** insertar quince rubros en `job_categories`, versión 2,
+  y una RPC administrativa paginada que cruza ocupaciones/intereses activos
+  con rubros de la oferta. Reutilizar la evaluación/nominación vigente.
+- **Integridad:** conservar códigos, IDs, estado y asociaciones previas; no inferir
+  equivalencias entre categorías anteriores y rubros nuevos. El importador
+  sintético v1 permanece intacto. El catálogo persistido sigue siendo fuente única.
+- **Archivos/contratos:** migración nueva, servicio/validación de matching, detalle
+  de oferta y componente, tipos SQL, pruebas SQL/unitarias/UI/E2E y artefactos A08.
+- **Privacidad/riesgos:** solo administrador activo con sesión vigente; sin DNI,
+  contactos, CV, notas, ranking ni escritura al consultar. La empresa no recibe
+  acceso. Revalidar estados al nominar/derivar con comandos existentes.
+- **Verificación prevista:** RED/GREEN; OR sin duplicados, consentimiento,
+  vigencia, disponibilidad, cuentas, CV y oferta; total antes de página; catálogo
+  sin pérdida de referencias; permisos negativos; tipos/lint/build y navegador.
+- **Análisis focalizado:** requirements16/16 y mvp-readiness77/77 sin editar sus
+  marcas. Spec/plan/modelo/contrato y T111–T115 consistentes. Constitución: solo
+  lectura municipal, permisos servidor/SQL, historial preservado, interfaz
+  accesible y stack actual sin dependencias ni excepciones. Revisión técnica
+  propia React: Server Components, Suspense, sin hooks/cachés privados compartidos.
+- **Estado:** implementado y verificado localmente. Migración
+  `20261019203041_job_categories_matching.sql` aplicada en transacción sobre
+  Docker local y registrada solo tras comprobar SQL. Sin reset, migración remota,
+  cambios de variables ni reparación de historias anteriores.
+- **Resultados:** RED SQL: dos fallos intencionales (RPC ausente y cero rubros v2).
+  Final: 655 unitarias/componentes/42 archivos; tooling57; tipos/lint/build PASS;
+  pgTAP986/15 archivos, incluidas35 nuevas; advisor security sin hallazgos.
+  Navegador12/12: tres A08, tres búsqueda pública y seis sesiones por rol.
+  Axe del bloque sin violaciones y sin overflow a360×800. Un primer selector
+  E2E ambiguo incluía el anunciador de Next; se acotó al main sin relajar el texto.
+- **Archivos reales adicionales:** matriz, OPEN_QUESTIONS, implementation-status y
+  runbooks A08/A07 (evidencia posterior aportada por Mateo). No se modifican
+  seed, importador, Auth, estilos globales ni código visual del compañero.
+- **Entrega/límites:** colección73 E2E/18 archivos, no suite completa ejecutada.
+  Cobertura configurada del proyecto100% solo para env/schema, no del nuevo
+  matching. Commit/PR, CI completo, revisión y aceptación pendientes.
+  Avisos de cierre temprano de stream de Next observados en navegación, sin fallos
+  en los doce recorridos; no se atribuye una causa ni se cambia código ajeno.
+
+## EXTRA-025 — A08: perfil modal y nominación desde la oferta
+
+- **Fecha/autorización:** 2026-10-19, solicitud explícita de Mateo: perfil en popup,
+  nominación a la oferta actual, ocultar personas ya nominadas y tarjetas compactas
+  en dos columnas. Amplía A08; no autoriza derivación automática ni cambios de roles.
+- **Evidencia:** el primer A08 obliga a salir al perfil, lista casos existentes y
+  ocupa una sola columna en la mitad del detalle. Mateo ya aplicó/registró
+  `20261019203041` en Supabase alojado, con catálogo15, función presente y anon
+  bloqueado; captura de CLI y resultados aportados por el operador, no inspección
+  remota del agente.
+- **Cambio mínimo:** diálogo nativo accesible, consulta laboral administrativa
+  bajo demanda y nominación explícita con el comando existente/versiones vigentes.
+  Dos columnas desde md y doce fichas por página, una columna en móvil. Excluir
+  antes de contar/paginar cualquier participación no archivada en esa oferta,
+  también postulaciones: el comando existente prohíbe duplicarlas, sin importar
+  origen/estado. Las participaciones siguen consultables en su pantalla propia.
+- **Contrato/seguridad:** perfil laboral, rubros y CV vigente, sin DNI/contactos/
+  notas; comprobar sesión/rol/aptitud/empresa/oferta y coincidencia al abrirlo.
+  Nominar revalida cuenta, oferta, consentimiento y versiones transaccionalmente;
+  no concede acceso empresarial. Carga/error/duplicado/conflicto, Escape, foco y
+  solicitudes tardías cubiertos. Sin reintento automático de nominación tras
+  refrescar versiones; actualizar la lista sí requiere revalidación/refresh.
+- **Migración:** nueva forward-only para consultas; no editar SQL ya aplicado ni
+  catálogo. Pool privado invocador compartido por lista y preview, sin permisos
+  clientes. RPC pública de preview exige administrador; no nuevas tablas.
+- **Archivos:** migración nueva, matching-service/validation/action, componentes
+  de lista/diálogo, detalle de oferta, revalidación de nomination-actions, tipos,
+  contratos/spec/plan/tareas y tests SQL/unitarios/UI/E2E/HTTP.
+- **Verificación prevista:** RED exclusión; igualdad conteo/página, permisos y
+  preview; nominación real con auditoría y no duplicación en SQL; navegador
+  apertura/cierre/foco/columnas/nominar/desaparición/recarga y móvil/axe;
+  tipos/lint/suites/build.
+- **Estado/resultados:** implementado y verificado localmente; review pendiente.
+  689 unitarias/componentes/43 archivos, tooling57, tipos/lint/build PASS;
+  pgTAP1007/16 archivos (21 nuevos y35 de matching actualizados), advisor security
+  sin hallazgos. Navegador13/13 (A08×4, A07×3, sesiones×6), autorización HTTP8/8
+  PASS incluyendo preview. Colección74/18, no ejecución completa ni CI remoto.
+  Cobertura configurada100% solo de env/schema, no del feature completo.
+- **Verificación funcional:** popup bajo demanda, CV, Escape/foco, dos columnas,
+  doce fichas, paginación, móvil360×800/axe; nominación real a la oferta actual,
+  exclusión tras recarga, un único caso under_review/admin_nomination y cero
+  derivaciones nuevas. SQL1007 se ejecutó primero; el navegador dejó después una
+  participación ficticia adicional (1001 total), preservada con su auditoría.
+- **Revisión técnica propia:** predicado SQL compartido, guards de actor/sesión y
+  rol, ACL cerradas, validación de entradas/salidas, conflictos de versiones,
+  sin caché privada compartida. Server Component bajo Suspense y cliente acotado,
+  diálogo nativo, guardia de respuestas tardías y doble envío; sin nuevos any,
+  dependencias ni cambios globales de estilo. No equivale a revisión independiente.
+- **Operación:** migración20261019205940 aplicada/registrada solo localmente;
+  primera A08 alojada según recibo del operador, ampliación alojada pendiente.
+  Se cerró el next dev identificado con autorización expresa de Mateo y se usó
+  build/servidor propio con destinos locales explícitos, sin editar `.env.local`.
+  Servidor de pruebas cerrado al finalizar, puerto3000 libre y Docker conservado.
+  Continúan avisos de stream de Next durante navegación pese a los recorridos
+  PASS; sin atribuir causa ni corregir framework ajeno. Se restaura la variación
+  generada dev de next-env que ya existía antes de la intervención.
+- **Límites:** sin aplicar SQL remoto ni commit/PR en este paso. Preservar cambios
+  anteriores de A08 y `next-env.d.ts`, modificado fuera de esta intervención.
+
+## EXTRA-026 — A08: candidatos debajo de la oferta
+
+- **Fecha/autorización:** 2026-10-19, Mateo solicita únicamente mover los candidatos
+  debajo de la información de la oferta; informa que la migración anterior funciona.
+- **Evidencia/origen:** A08/T119 coloca el bloque de coincidencias antes del detalle.
+  El ajuste solicitado es de orden visual, no del contrato ni del flujo municipal.
+- **Cambio mínimo:** mover el Suspense de coincidencias después del grid existente
+  de información/moderación e historial. Conservar todo el ancho, dos columnas de
+  fichas y el popup con nominación; no tocar SQL, servicios ni permisos.
+- **Archivos:** página administrativa de oferta, test de orden en admin-pages,
+  spec/plan y este registro. Sin nuevos estados, dependencias ni variables.
+- **Riesgos/verificación:** proteger el orden DOM y ubicación fuera del grid con
+  prueba de componente; comprobar regresión UI, tipos/lint/build y whitespace.
+  Preservar cambios anteriores de la rama y next-env generado fuera del ajuste.
+- **Estado/resultados:** implementado; RED1/17PASS del orden anterior y GREEN33/33
+  de página/popup. Suite690/43 archivos, tipos/lint y whitespace PASS. Revisión
+  propia: solo reordenamiento del Server Component, Suspense conservado, sin
+  hooks, permisos ni datos adicionales. No se repiten SQL/E2E en este ajuste.
+- **Límites:** build nuevo pendiente para no interferir con el next dev activo
+  del usuario en puerto3000; no se detuvo ni reinició su proceso. El build previo
+  no se acredita como nuevo. Revisión y PR pendientes; no acredita despliegue
+  ni inspección remota del agente. next-env conserva sus imports dev previos.
+- **Entrega posterior solicitada:** Mateo pide revisar/actualizar el PR. GitHub
+  confirma PR60 mergeado, ningún PR abierto ni rama remota A08: corresponde crear
+  uno nuevo, no modificar el PR60. Build final PASS con Node24.22/npm11.19.1,
+  destinos loopback y clave publicable ficticia. Se verificó en el Next instalado
+  que la limpieza de build conserva dev; no se detuvo el servidor del usuario.
+  Este resultado reemplaza el pendiente de build anterior, no acredita CI remoto.
+- **Referencia de entrega:** implementación `11be483`, publicada en
+  [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61), abierto contra main.
+  Incluye EXTRA024–026; próximo paso: checks del SHA publicado y revisión humana.
+  Se conserva solo next-env generado como cambio local fuera del commit.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

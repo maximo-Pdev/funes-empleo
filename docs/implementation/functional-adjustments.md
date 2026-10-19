@@ -29,8 +29,8 @@ analizar sus contratos antes de modificar los subsistemas afectados.
 | A04 | UUID fuera de textos visibles y URL: slug para ofertas y códigos aleatorios para registros privados. | Solución pública de Máximo integrada por PR #55/#56/#57 (43b94a7); PR #54 descartado. Códigos privados pendientes; no se reintroduce la solución descartada. |
 | A05 | Foto de perfil JPG, PNG o WebP de hasta 5 MiB; visible al candidato, Municipalidad y empresa únicamente después de derivación autorizada. Mateo informa aprobación municipal para compartirla. | Diseñar Storage privado, validación real de imagen y revocación; aprobación técnica pendiente. |
 | A06 | CV PDF de hasta 20 MB, límite confirmado por Mateo. | Pendiente actualizar plan, servidor, bucket y pruebas; concretar bytes y límites de transporte antes de implementar. |
-| A07 | Búsqueda pública de ofertas por texto, rubro, localidad y modalidad. | Implementado y verificado localmente en feat/public-offer-search; SQL de lectura, CI/revisión del PR pendientes al entregar. |
-| A08 | Rubros seleccionables y múltiples; matching por al menos un rubro compartido, selección final municipal. | Catálogo autorizado por Mateo; pendiente diseño de migración y consultas. |
+| A07 | Búsqueda pública de ofertas por texto, rubro, localidad y modalidad. | Integrado por PR #59. Mateo informó aplicación/registro de la migración alojada y funcionamiento local el 2026-10-19; no se reinspeccionó el entorno alojado desde A08. |
+| A08 | Rubros seleccionables y múltiples; matching por al menos un rubro compartido, selección final municipal. | Implementado en feat/job-categories-matching: quince rubros v2, coincidencias compactas, perfil modal y nominación a la oferta actual; excluye participaciones previas no archivadas. Primera migración alojada según recibo de Mateo; ampliación SQL pendiente allí. Verificación local y rollout en docs/operations/job-category-matching.md; revisión/entrega pendientes. |
 | A09 | Empresa puede editar ofertas propias donde el flujo lo permita y cancelar también las publicadas. Cancelación cierra casos abiertos, revoca accesos y conserva resultados e historial previos. | Pendiente definir estados editables y adaptar comando transaccional, permisos y pruebas. |
 | A10 | Quitar formulario empresarial de entrevista; conservar informe de resultado y motivo obligatorio de no contratación, en texto libre breve. Empresa informa, Municipalidad consulta; candidato ve solo resultado. | Pendiente diseño del contrato y preservación de entrevistas históricas. |
 | A11 | Registro municipal básico de derivación a curso, separado de postulaciones: nombre del curso, fecha y nota en historial. | Pendiente modelo, contrato, auditoría y pruebas. Sustituye la decisión anterior de registrar solo notas. |
@@ -118,7 +118,28 @@ Migración de lectura antes de desplegar: `20261019124218_public_offer_search.sq
 Sin cambios alojados ni reset local; limitaciones de la base local y recuperación
 en EXTRA-022 y `docs/operations/public-offer-search.md`.
 
-## Catálogo de rubros confirmado (A08, sin implementar por A07)
+## A08: catálogo y coincidencias municipales (2026-10-19)
+
+Quince rubros v2 en la base existente, sin hardcodes paralelos ni reasignación de
+categorías anteriores. La multiselección ya existente los consulta automáticamente.
+El detalle de oferta agrega coincidencias OR por ocupación/interés activo, sin
+duplicar personas, con total/páginas posteriores a filtros y orden por nombre/ID.
+Solo administración activa; perfil apto, CV/consentimiento/vigencia y empresa
+activos. Permite evaluación de ofertas publicadas o pausadas vigentes; excluye
+cerradas. La ampliación solicitada excluye participaciones previas no archivadas
+antes de contar/paginar; sus casos siguen en Participaciones. Doce fichas por
+página, dos columnas desde md y una en móvil. El popup carga perfil laboral y CV
+bajo demanda, sin DNI/contactos/notas; nomina solo a esa oferta con las versiones
+vigentes. Éxito cierra y actualiza el listado sin navegar fuera de la oferta.
+Consultar no crea participación, derivación, puntaje ni acceso empresarial;
+nominar crea solo la participación municipal, nunca una derivación automática.
+
+Diseño/spec/modelo/contratos, T111–T120 y EXTRA-024/025 trazan el incremento.
+Los rubros históricos siguen visibles y referenciados: la aprobación del catálogo
+amplio no autoriza inventar su mapeo ni modificar el importador sintético v1.
+Recuperación forward-only y despliegue previo del SQL en el runbook A08.
+
+## Catálogo de rubros confirmado
 
 Administración; atención al cliente y ventas; comercio; gastronomía y hotelería;
 limpieza; construcción y oficios; mantenimiento; producción e industria;
@@ -126,7 +147,8 @@ logística y depósito; transporte y reparto; salud y cuidados; educación;
 tecnología; seguridad; agro.
 
 Mateo confirmó aprobación municipal para fijar este catálogo amplio y simple.
-Falta diseñar su versión persistida y la transición desde los datos existentes.
+A08 lo agrega como versión 2; no se autorizó una equivalencia automática con
+categorías históricas. Esa transición semántica sigue pendiente de definición.
 
 ## A01: criterios del primer incremento
 

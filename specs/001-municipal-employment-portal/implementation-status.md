@@ -481,3 +481,68 @@ históricos pendientes. FR-024A conserva ledger separado. Revisión independient
 y aceptación humana no se infieren; CI completo del SHA se acredita en el PR.
 Aplicar `20261019124218_public_offer_search.sql` antes de desplegar o validar
 preview en DB compartida; procedimiento en `docs/operations/public-offer-search.md`.
+
+## A08 — rubros y coincidencias municipales (2026-10-19)
+
+Base main `efdeff2` (PR59 y PR60 integrados). Rama `feat/job-categories-matching`.
+Quince rubros nuevos en catálogo v2, categorías/referencias anteriores intactas
+sin mapeos inferidos. Multiselección existente sin duplicar catálogo en UI.
+RPC administrativa con actor/sesión vigente, OR de ocupaciones/intereses activos,
+aptitud de derivación, empresa/oferta vigentes, orden por nombre/ID y total antes
+de página. No ranking ni nominaciones/derivaciones al consultar. Participaciones
+existentes llevan a evaluación, perfiles sin participación a nominación manual.
+
+T111–T115 implementadas/verificadas localmente; ledger109/115 sin cerrar seis
+gates históricos ni ledger independiente FR-024A. Checklists16/16 y77/77 intactas.
+Constitución/spec/plan/modelo/contrato y EXTRA-024 sincronizados; OQ-010 precisa
+aprobación del catálogo amplio, sin resolver equivalencias/ocupaciones históricas.
+
+RED SQL (catálogo/RPC ausentes) observado. GREEN:655 unitarias/componentes/42
+archivos, tooling57, tipos/lint/build PASS; pgTAP986/15 (35 nuevas), advisor
+security sin hallazgos. Navegador12/12 (A08×3, A07×3, sesión×6), teclado y axe
+sin violaciones en bloque, sin overflow360×800. Colección73/18; no ejecución
+completa. Cobertura configurada100% de env/schema, no de toda la funcionalidad.
+
+Migración20261019203041 aplicada transaccionalmente/registrada solo en Docker
+local, sin reset ni modificaciones de historiales previos. No cambios alojados,
+dependencias o env persistidos. Se conserva Docker; servidor de prueba finalizado.
+Runbook: `docs/operations/job-category-matching.md`. CI completo, commit/PR,
+revisión independiente y aceptación pendientes; no se acredita producción municipal.
+
+Predecesor A07: Mateo aportó resultado exitoso de ejecución, verificación JSON,
+registro applied de20261019124218 y funcionamiento local contra la base alojada.
+Runbook A07 distingue esta operación del operador de la entrega original del agente;
+no se reinspeccionó remotamente, no acredita Vercel ni sanea la historia divergente.
+
+### Ampliación A08 — perfil modal y nominación desde la oferta
+
+Solicitud explícita de Mateo del2026-10-19; EXTRA-025 y T116–T120. Sustituye el
+comportamiento inicial de mostrar participaciones previas: ahora todo caso no
+archivado se excluye antes del conteo/paginación, con el mismo pool de elegibilidad
+para listado y preview. Perfil laboral/CV mínimo bajo demanda, dos columnas,
+doce fichas/página y nominación exclusivamente a la oferta actual. Éxito cierra,
+retira y actualiza sin redirección ni derivación/acceso empresarial automáticos.
+Roles, comando transaccional de nominación y catálogo original no se alteran.
+
+689 unitarias/componentes/43 archivos, tooling57, tipos/lint/build PASS.
+pgTAP1007/16 archivos (21 nuevos, matching35 actualizado), advisor sin hallazgos;
+ejecutados antes de Auth/navegador. Navegador13/13 (A08×4, A07×3, sesiones×6),
+HTTP8/8 del inventario privado completo PASS. Axe modal/bloque sin violaciones,
+desktop dos columnas y móvil360×800 sin overflow, foco/Escape y nominación real
+persistida comprobados. Colección74/18; no ejecución E2E completa ni nuevo CI.
+La nominación deja un caso ficticio local adicional y su auditoría (1001 total),
+sin nuevas derivaciones: no se borró ni reseteó para recuperar el fixture original.
+
+`20261019205940_opening_candidate_preview.sql` aplicada/registrada solo Docker
+local. Primera A08 `20261019203041` alojada según SQL/registro que aportó Mateo;
+no repetirla ni editarla. La ampliación modal sigue pendiente allí antes de app.
+Sin cambios persistentes de entorno, dependencias o permisos empresariales.
+Ledger114/120: seis gates históricos permanecen abiertos; commit/PR, CI completo,
+revisión independiente, despliegue y aceptación no se acreditan con pruebas locales.
+
+Entrega posterior: `11be483` en [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61),
+abierto contra main; PR60 ya estaba mergeado y no había PR A08 previo. Incluye
+el ajuste EXTRA026: candidatos debajo de información/historial, nueva regresión
+de orden DOM; final690/43 archivos, tipos/lint y build PASS. Se conserva el dev
+activo sin detenerlo y next-env generado fuera del commit. CI del nuevo SHA y
+revisión/aceptación pendientes; no implica merge ni despliegue.

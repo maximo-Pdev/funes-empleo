@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({ guard: vi.fn(), search: vi.fn(), categories: v
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/candidates/search-service", () => ({ searchCandidates: mocks.search, listCandidateSearchCategories: mocks.categories, getAdminCandidate: mocks.candidate }));
 vi.mock("@/features/participations/nomination-service", () => ({ listNominationOpenings: mocks.nominations }));
+vi.mock("@/features/participations/components/opening-candidate-matches", () => ({ OpeningCandidateMatches: () => <section aria-label="Candidatos coincidentes de prueba" /> }));
 vi.mock("@/features/candidates/assisted-service", () => ({ getAssistedWorkspace: mocks.assisted }));
 vi.mock("@/features/openings/admin-service", () => ({ listAdminOpenings: mocks.openings, getAdminOpening: mocks.opening }));
 vi.mock("@/features/participations/admin-query", () => ({ listAdminParticipations: mocks.participations, getAdminParticipation: mocks.participation }));
@@ -79,8 +80,17 @@ it("no ofrece carga de CV ni mantenimiento para un perfil archivado", async () =
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, status: "archived", account_id: null }, referralEligible: false, participations: [], notes: [], audit: [] });
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) })); expect(screen.queryByLabelText("Archivo PDF")).toBeNull(); expect(mocks.nominations).not.toHaveBeenCalled();
 });
+it("muestra candidatos después de la información e historial de oferta y fuera del grid", async () => {
+ render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
+ const details = screen.getByRole("region", { name: "Oferta y empresa" });
+ const history = screen.getByRole("region", { name: "Historial de moderación" });
+ const matches = screen.getByRole("region", { name: "Candidatos coincidentes de prueba" });
+ expect(details.compareDocumentPosition(matches) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(history.compareDocumentPosition(matches) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(matches.closest(".grid")).toBeNull();
+});
 it("conserva validación y confirmación al suspender una oferta", async () => {
- render(await Opening({ params: Promise.resolve({ openingId: id }) })); fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "suspended" } });
+ render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) })); fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "suspended" } });
  fireEvent.change(screen.getByRole("textbox", { name: /Motivo interno/ }), { target: { value: "Motivo ficticio" } }); fireEvent.click(screen.getByRole("button", { name: "Guardar decisión" }));
  expect(screen.getByRole("alert").textContent).toContain("Confirmá expresamente"); expect(mocks.moderate).not.toHaveBeenCalled();
 });

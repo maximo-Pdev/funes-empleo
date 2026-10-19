@@ -19,6 +19,7 @@ import * as consent from "@/features/candidates/consent-actions";
 import * as participation from "@/features/participations/candidate-actions";
 import * as evaluation from "@/features/participations/evaluation-actions";
 import * as nomination from "@/features/participations/nomination-actions";
+import * as matching from "@/features/candidates/matching-actions";
 import * as openingAdmin from "@/features/openings/admin-actions";
 import * as openingCompany from "@/features/openings/company-actions";
 import * as company from "@/features/companies/company-actions";
@@ -27,7 +28,7 @@ import * as accounts from "@/features/accounts/actions";
 import * as imports from "@/features/imports/actions";
 import * as feedback from "@/features/referrals/feedback-actions";
 const actions = { ...candidateAdmin, ...assisted, ...claim, ...duplicate, ...candidateProfile,
-  ...consent, ...participation, ...evaluation, ...nomination, ...openingAdmin, ...openingCompany,
+  ...consent, ...participation, ...evaluation, ...nomination, ...matching, ...openingAdmin, ...openingCompany,
   ...company, ...companyAdmin, ...accounts, ...imports, ...feedback };
 
 const id = "00000000-0000-4000-8000-000000000001";
@@ -62,6 +63,7 @@ add("participations/evaluation-actions", "admin", "recordEvaluationAction", { pa
 add("participations/evaluation-actions", "admin", "adminParticipationAction", { participationId: id, version: 1, command: "start_review" });
 add("participations/evaluation-actions", "admin", "confirmFeedbackAction", { participationId: id, feedbackId: id, version: 1, outcome: "hired", reason: "", lateCorrection: false });
 add("participations/nomination-actions", "admin", "createAdminNominationAction", { candidateId: id, openingId: id, candidateVersion: 1, openingVersion: 1 });
+add("candidates/matching-actions", "admin", "openingCandidatePreviewAction", { candidateId: id, openingId: id });
 add("openings/admin-actions", "admin", "moderateOpeningAction", { openingId: id, version: 1, decision: "approved" });
 add("openings/company-actions", "company", "saveCompanyOpeningAction", { title: "", tasks: "", requirements: "", location: "", modality: "", schedule: "", contractType: "", closingDate: "", salary: "", benefits: "" }, true);
 add("openings/company-actions", "company", "submitCompanyOpeningAction", {}, true);

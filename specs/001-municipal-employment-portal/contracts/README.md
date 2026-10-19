@@ -18,6 +18,28 @@ su firma y agrega `slug` a los resultados; `published_offer_by_slug(p_slug text)
 el mismo sobre paginado, limitado a una oferta y con las mismas reglas de visibilidad.
 Contrato detallado y recuperación: [public-offer-slugs](../../../docs/validation/public-offer-slugs.md).
 
+## A08 — coincidencias administrativas por rubro
+
+`match_opening_candidates(p_opening uuid,p_page integer=1,p_page_size integer=20)`
+requiere sesión vigente y cuenta administrativa activa, incluso por RPC directa.
+Entrada: UUID, página 1–10000, tamaño 1–50; nulos/ilegales rechazados.
+Resultado `{available,total,page,pageSize,items}`; items:
+`{id,displayName,locality,matchedCategories:[{code,name}],participationId}`.
+Oferta inexistente/archivada: NOT_FOUND. Oferta no publicada/pausada o vencida,
+empresa/cuenta inactiva: available=false sin candidatos. Oferta vigente sin
+rubros/coincidencias: available=true y lista vacía. Cruce OR de rubros activos de
+ambas clases del perfil, candidatos aptos, orden nombre/ID y total antes de página.
+Ampliación de Mateo 2026-10-19: participaciones no archivadas quedan excluidas
+antes de contar/paginar; participationId se conserva null por compatibilidad.
+`preview_opening_candidate(p_opening uuid,p_candidate uuid)` exige admin/sesión
+y pertenencia al mismo pool elegible/sin participación. Devuelve perfil laboral,
+rubros, CV actual, versiones de candidato y oferta/título; sin DNI/contactos/notas.
+Inexistencia, inaptitud o participación previa responde NOT_FOUND. Se consulta
+bajo demanda mediante Server Action sin escrituras. Nominar usa el comando
+existente con ambas versiones; éxito revalida detalle y quita ficha, nunca deriva.
+No amplía acceso empresarial
+ni sustituye comandos municipales, sus bloqueos optimistas o su auditoría.
+
 ## Convenciones compartidas
 
 ### Consulta pública A07 / FR-024B

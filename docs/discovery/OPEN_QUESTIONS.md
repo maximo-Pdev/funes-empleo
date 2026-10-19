@@ -28,6 +28,15 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ## Resolved by the MVP clarifications of 2026-09-19
 
+### A08 — actualización acotada de OQ-010, 2026-10-19
+
+Mateo confirmó aprobación municipal para los quince rubros amplios de
+`docs/implementation/functional-adjustments.md` y solicita implementarlos.
+Se incorporan como catálogo v2; no se infieren equivalencias con categorías
+anteriores ni se reasignan candidatos/ofertas. OQ-010 permanece abierta para
+ocupaciones más específicas y mapeo histórico; no impide usar la lista amplia
+expresamente aprobada. El importador sintético v1 y OQ-018 siguen separados.
+
 | ID | Previous provisional position | Clarified MVP decision | Source |
 |---|---|---|---|
 | OQ-012 | Confirm candidate interest before each referral. | Administrators may nominate and refer a candidate without offer-specific confirmation while the candidate profile is active and the general consent remains valid; the municipal referral decision is still mandatory. | `specs/001-municipal-employment-portal/spec.md` — Clarifications, FR-031 and FR-037 |

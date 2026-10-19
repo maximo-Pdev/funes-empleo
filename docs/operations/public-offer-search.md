@@ -23,6 +23,16 @@ tablas nuevas, cambios de estados, Auth, bucket, dependencias o variables.
 Un preview que use la base anterior carecerá de las RPC y no valida A07; aprobar
 el build no significa que el entorno haya recibido la migración.
 
+### Operación posterior informada por Mateo — 2026-10-19
+
+Tras el PR #59, el operador ejecutó el SQL completo entre BEGIN/COMMIT en el
+proyecto alojado; informó Success y ambas RPC devolvieron JSON de tipo object.
+La captura de CLI confirma registro `20261019124218 => applied` y Mateo informó
+funcionamiento local contra esa base. Es evidencia aportada por el operador,
+no ejecución ni inspección remota del agente; tampoco acredita Vercel.
+El listado remoto confirmó versiones iniciales generadas por MCP distintas
+de los archivos locales. Esa divergencia histórica continúa sin reparar.
+
 ## Recuperación
 
 Revertir aplicación conserva el SQL nuevo: la RPC anterior es compatible y las
