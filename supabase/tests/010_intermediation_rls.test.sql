@@ -287,7 +287,9 @@ select is((select access_status::text from public.referrals where id=private.fix
   'revoked','El contacto tardío no reactiva acceso empresarial');
 
 reset role;
-update public.referrals set post_hire_access_until=clock_timestamp()-interval '1 second'
+-- The maintenance RPC also checks referral deadlines. Use the scenario's
+-- historical clock so this assertion never ages unrelated seeded referrals.
+update public.referrals set post_hire_access_until='2026-09-20 02:59:59+00'::timestamptz
 where id=private.fixture_id('referral',1);
 set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
@@ -295,11 +297,11 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_
 select ok(not private.can_company_read_referral(private.fixture_id('referral',1)),
   'El límite poscontratación niega esta derivación antes de que Cron materialice revocación');
 reset role;
-select is(private.run_daily_employment_maintenance(clock_timestamp())->>'expiredPostHireAccess','1',
+select is(private.run_daily_employment_maintenance('2026-09-20 03:00:00+00')->>'expiredPostHireAccess','1',
   'Cron materializa una revocación poscontratación vencida');
 select is((select access_change_reason from public.referrals where id=private.fixture_id('referral',1)),
   'post_hire_window_ended','La revocación lleva el motivo aprobado');
-select is(private.run_daily_employment_maintenance(clock_timestamp())->>'expiredPostHireAccess','0',
+select is(private.run_daily_employment_maintenance('2026-09-20 03:00:00+00')->>'expiredPostHireAccess','0',
   'No duplica eventos de vencimiento poscontratación');
 
 set local role authenticated;
