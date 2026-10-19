@@ -46,7 +46,7 @@ export function AdminShell({ title, description, active, navigation: pageLinks =
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />{label}
               </Link></li>)}
             </ul>
-            <Link href="/account" className="mt-3 flex min-h-12 items-center gap-2 rounded-lg border border-border px-3 py-3 text-sm font-semibold text-primary-700 hover:bg-secondary"><Settings className="h-4 w-4" aria-hidden="true" />Mi cuenta</Link>
+            <Link href="/account" aria-current={active === "/account" ? "page" : undefined} className={`mt-3 flex min-h-12 items-center gap-2 rounded-lg border px-3 py-3 text-sm font-semibold ${active === "/account" ? "border-primary bg-primary text-white" : "border-border text-primary-700 hover:bg-secondary"}`}><Settings className="h-4 w-4" aria-hidden="true" />Mi cuenta</Link>
           </nav>
         </aside>
         <main id="contenido" tabIndex={-1} className="min-w-0 px-4 py-7 sm:px-6 sm:py-9 lg:px-8">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, KeyRound, LogOut, ShieldCheck, UserRound, ShieldAlert } from "lucide-react";
 import { Card } from "@/components/ui";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { AuthShell } from "../_components/auth-surface";
 import styles from "../_components/auth-forms.module.css";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -15,8 +16,8 @@ export default async function AccountPage() {
   ] : account.role === "company" ? [
     { href: "/empresa", label: "Panel de empresa" }, { href: "/empresa/perfil", label: "Perfil" }, { href: "/empresa/ofertas", label: "Ofertas" },
   ] : [{ href: "/admin/empresas", label: "Administrar empresas" }, { href: "/admin/openings", label: "Moderar ofertas" }];
-  return <AuthShell>
-    <div className="flex items-start gap-4"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary" aria-hidden="true"><UserRound className="h-6 w-6" /></span><div><p className="text-sm font-semibold text-primary-700">Tu acceso al portal</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-primary-900 sm:text-4xl">Mi cuenta</h1></div></div>
+  const content = <>
+    {account.role !== "admin" && <div className="flex items-start gap-4"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary" aria-hidden="true"><UserRound className="h-6 w-6" /></span><div><p className="text-sm font-semibold text-primary-700">Tu acceso al portal</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-primary-900 sm:text-4xl">Mi cuenta</h1></div></div>}
     <p className="mt-4 inline-flex items-start gap-2 text-sm leading-6 text-muted-foreground"><ShieldCheck className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Acceso individual activo. Rol: {account.role === "admin" ? "Administración" : account.role === "candidate" ? "Candidato" : "Empresa"}.</p>
     <Card className="mt-7 p-6 sm:p-8"><h2 className="text-xl font-bold text-primary-900">Continuar en el portal</h2><nav aria-label="Accesos de mi cuenta" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{navigation.map(link => <Link key={link.href} href={link.href} className="inline-flex min-h-12 items-center justify-between gap-3 rounded-lg border border-border px-4 py-3 text-sm font-semibold text-primary hover:bg-secondary">{link.label}<ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></Link>)}</nav></Card>
     <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -28,5 +29,8 @@ export default async function AccountPage() {
       {peers?.error && <p role="alert" className="mt-4 rounded-xl border border-red-300 bg-red-50 p-5 leading-7 text-red-900">No se pudo cargar la lista. Recargá la página.</p>}
       <div className="mt-5 grid gap-5 md:grid-cols-2">{peers?.data?.map(peer => <Card key={peer.id} className="min-w-0 p-6"><h3 className="break-all text-base font-semibold text-primary-900">Cuenta {peer.id}</h3><p className="mt-3 text-sm leading-6">Estado: {peer.status}</p>{(peer.status === "active" || peer.status === "suspended") && <div className={`${styles.forms} ${styles.danger} mt-5`}><AccountChangeForm id={peer.id} version={peer.version} command={peer.status === "active" ? "suspend" : "reactivate"} /></div>}</Card>)}</div>
     </section>}
-  </AuthShell>;
+  </>;
+  return account.role === "admin"
+    ? <AdminShell title="Mi cuenta" active="/account">{content}</AdminShell>
+    : <AuthShell>{content}</AuthShell>;
 }

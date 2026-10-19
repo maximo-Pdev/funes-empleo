@@ -89,3 +89,18 @@ nativo de calendario del campo de fecha/hora. Se corrigió con `:focus-within`
 exclusivamente en los campos de fecha de este módulo CSS; se comprobó el avance
 por segmentos, calendario y control siguiente en Chromium. No se modificó el
 componente funcional compartido.
+
+## Continuidad de Mi cuenta — 2026-10-19 (EXTRA-023)
+
+El recorrido Inicio → Mi cuenta conserva ahora la navegación administrativa para
+el rol admin. `/account` elige AdminShell para este rol y marca Mi cuenta activa;
+candidatos y empresas mantienen AuthShell. Hay un único H1. Se mantienen la
+consulta de pares, exclusión de la propia cuenta, cambio de contraseña, cierre
+de sesión, motivos y confirmaciones. Sin cambios de rutas ni acceso.
+
+Archivos adicionales: `src/app/(auth)/account/page.tsx`,
+`tests/components/accounts/auth-pages.test.tsx` y `cambios-extra.md`; también se
+actualizan el AdminShell local y este documento. Lint, tipos, build y 620 pruebas
+aprobados. Nueve vistas adicionales (tres roles × tres tamaños) sin hallazgos axe,
+desbordamientos ni pérdidas de foco en el recorrido muestreado. Son vistas con
+datos ficticios, sin acreditar sesión real ni operaciones de cuenta en backend.

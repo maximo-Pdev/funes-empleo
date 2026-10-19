@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), neq: vi.fn(), order: vi.fn(), logout: vi.fn() }));
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: mocks.logout, accountStatusAction: vi.fn() }));
@@ -39,6 +39,8 @@ it("conserva la guardia y los campos de contraseña nueva y confirmación", asyn
 });
 it.each(["candidate", "company"])("conserva archivo confirmado para %s", async role => {
  mocks.guard.mockResolvedValue(session(role)); render(await Account());
+ expect(screen.queryByRole("navigation", { name: "Navegación de Oficina de Empleo" })).toBeNull();
+ expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
  expect(screen.getByRole("checkbox")).toHaveProperty("required", true);
  expect(screen.getByRole("button", { name: "Archivar mi cuenta" })).toBeTruthy();
  expect(screen.queryByRole("region", { name: "Cuentas administrativas" })).toBeNull();
@@ -46,6 +48,10 @@ it.each(["candidate", "company"])("conserva archivo confirmado para %s", async r
 });
 it("no ofrece archivo a administración y mantiene la exclusión del propio administrador", async () => {
  mocks.guard.mockResolvedValue(session("admin")); render(await Account());
+ const navigation = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
+ expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("aria-current")).toBe("page");
+ expect(within(navigation).getAllByRole("link")).toHaveLength(7);
+ expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
  expect(mocks.neq).toHaveBeenCalledWith("id", "cuenta-ficticia");
  expect(screen.queryByRole("button", { name: "Archivar mi cuenta" })).toBeNull();
  expect(screen.getByRole("button", { name: "Suspender cuenta" })).toBeTruthy();
