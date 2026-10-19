@@ -99,6 +99,9 @@ Luego del ajuste de posición bajo información/historial:690 pruebas/43 archivo
 tipos/lint y build final PASS. Mateo informa funcionamiento contra su entorno
 tras el procedimiento manual; sin recibo adicional del registro ni inspección
 remota del agente. Antes de desplegar comprobar esquema e historial reales.
+Entrega `11be483` en [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61),
+abierto contra main. Actualiza el pendiente de commit/PR previo; CI del SHA,
+revisión independiente, despliegue y aceptación continúan pendientes.
 Al finalizar se cerró el servidor propio de pruebas y se comprobó puerto3000
 libre; Docker se conserva. Persistieron avisos de stream de Next durante las
 navegaciones, sin fallos en los recorridos; no se atribuye causa ni se ocultan.

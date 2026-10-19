@@ -1248,6 +1248,10 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   destinos loopback y clave publicable ficticia. Se verificó en el Next instalado
   que la limpieza de build conserva dev; no se detuvo el servidor del usuario.
   Este resultado reemplaza el pendiente de build anterior, no acredita CI remoto.
+- **Referencia de entrega:** implementación `11be483`, publicada en
+  [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61), abierto contra main.
+  Incluye EXTRA024–026; próximo paso: checks del SHA publicado y revisión humana.
+  Se conserva solo next-env generado como cambio local fuera del commit.
 
 ## Formato para próximas entradas
 

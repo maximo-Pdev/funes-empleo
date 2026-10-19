@@ -539,3 +539,10 @@ no repetirla ni editarla. La ampliación modal sigue pendiente allí antes de ap
 Sin cambios persistentes de entorno, dependencias o permisos empresariales.
 Ledger114/120: seis gates históricos permanecen abiertos; commit/PR, CI completo,
 revisión independiente, despliegue y aceptación no se acreditan con pruebas locales.
+
+Entrega posterior: `11be483` en [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61),
+abierto contra main; PR60 ya estaba mergeado y no había PR A08 previo. Incluye
+el ajuste EXTRA026: candidatos debajo de información/historial, nueva regresión
+de orden DOM; final690/43 archivos, tipos/lint y build PASS. Se conserva el dev
+activo sin detenerlo y next-env generado fuera del commit. CI del nuevo SHA y
+revisión/aceptación pendientes; no implica merge ni despliegue.
