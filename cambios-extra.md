@@ -983,6 +983,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Cambio/evidencia:** Node24.22.0 LTS/npm11.19.1 oficiales, checksum verificado; manifiestos, `.node-version`, CI y guías activas alineados. `npm ci --ignore-scripts` corrigió junctions del adaptador ESLint hacia la ubicación anterior, sin cambiar el grafo de dependencias ni instalar globalmente.
 - **Riesgos/recuperación:** entorno/CI; conservar engine-strict, scripts no aprobados desactivados, versiones históricas documentadas y Node global. Reversión de pins posible sin cambio de datos.
 - **Verificación/estado:** controles previos de aplicación correctos; comprobar nuevamente recuperación sobre main y CI del commit exacto. Publicación autorizada; resultados y referencias en el ledger de entrega.
+- **Compatibilidad alojada (2026-10-18, propuesta previa):** preview `6dcff5d` rechazado con EBADENGINE: Vercel ofrece Node24.21.0/npm11.19.0 y solo permite seleccionar Node por mayor. Mantener `.node-version`24.22.0 y CI exactos; expresar Node24LTS como `24.x` en engines/lock y fijar npm11.19.1 antes de `npm ci` en installCommand de Vercel. Se conserva engine-strict y no cambia el grafo. Agregar regresión del contrato de configuración; verificar preview real antes del merge.
 
 ## Formato para próximas entradas
 

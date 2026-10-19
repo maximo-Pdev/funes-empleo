@@ -55,6 +55,10 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 **Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.22.0 LTS con npm 11.19.1; SQL
 PostgreSQL para migraciones, políticas, funciones y pruebas de base de datos.
 
+Desarrollo y CI usan `.node-version` 24.22.0. `engines.node` expresa la línea 24 LTS
+como `24.x` porque Vercel administra el parche disponible; su instalación fija npm 11.19.1
+antes de `npm ci`, sin desactivar engine-strict. No se atribuye a Vercel el parche local exacto.
+
 **Dependencias principales**: Next.js 16.3.8, React y React DOM 19.3.0, Tailwind CSS y
 `@tailwindcss/postcss` 4.3.3, `@supabase/supabase-js` 2.116.0, `@supabase/ssr` 0.12.7, Zod 4.6.5 y
 `csv-parse` 7.0.2. Herramientas: Supabase CLI 2.117.0, ESLint 9.39.5 y `eslint-config-next`

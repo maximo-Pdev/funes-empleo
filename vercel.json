@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "installCommand": "npm install --global npm@11.19.1 && npm ci",
   "regions": ["gru1"]
 }

@@ -17,6 +17,11 @@ activas se sincronizan; las versiones mencionadas en evidencia histórica no se 
 La distribución portable local se verifica con SHA-256 oficial; `npm ci --ignore-scripts`
 recrea los enlaces del adaptador ESLint sin habilitar scripts de instalación no aprobados.
 
+Compatibilidad de despliegue verificada el 2026-10-18: Vercel solo selecciona Node por
+mayor y ofrecía 24.21.0/npm 11.19.0, causando EBADENGINE con el parche exacto. Se conserva
+el pin local/CI 24.22.0 y npm 11.19.1; engines admite 24.x y installCommand instala npm
+exacto antes del lockfile. No cambia la línea LTS, engine-strict ni el grafo de dependencias.
+
 Corrección de implementación del 2026-09-22: la versión inicialmente prevista de ESLint 10.10.0
 falló al cargar `react/display-name` por la retirada de `context.getFilename`. El paquete resuelto
 `eslint-plugin-react` 7.37.5 declara peers hasta ESLint 9. Se verificó en npm y se fijó 9.39.5,
