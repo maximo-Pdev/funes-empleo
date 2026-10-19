@@ -12,6 +12,7 @@ una propuesta en una decisión municipal aprobada.
 - **Cambio:** aislar los instantes del escenario en `tests/e2e/intermediation.spec.ts`, mantener activo el permiso inicial respecto del reloj real y conservar todas las expectativas exactas. Incluye el aislamiento pgTAP010 ya comprobado en los jobs de base de datos.
 - **Límites/riesgo:** solo fixtures de prueba; sin cambios de seed, reglas, contratos ni datos alojados. Se mantiene la limitación cronológica preexistente entre consentimientos y derivaciones ficticias, sin ampliar este arreglo.
 - **Verificación/recuperación:** RED remoto documentado; tipos/lint y CI completos del SHA corregido pendientes. Docker local apagado: no se atribuye una ejecución local. Reversión limitada a los fixtures; revisión independiente antes de integrar.
+- **Corrección dependiente:** CI39181435054/39181499292/39181504654 detectó cuatro fallos en `tests/unit/maintenance-timezone.test.ts`, que exigía el literal anterior. Se actualiza el contrato al reloj inyectado, conservando todos los límites de Buenos Aires y agregando la comprobación del instante real del escenario. RED local reproducido antes del ajuste; no modifica el cálculo de producción.
 
 ## Autorización de trabajo
 
