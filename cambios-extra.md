@@ -4,6 +4,15 @@ Registro de requisitos derivados y ajustes técnicos necesarios para cumplir tar
 aprobadas. No sustituye la constitución ni los artefactos de Spec Kit, y no convierte
 una propuesta en una decisión municipal aprobada.
 
+## EXTRA-023 — Estabilizar el escenario E2E de mantenimiento
+
+- **Fecha/autorización:** 2026-10-18, Máximo: «Bueno, entonces encontramos un bug no? Bien, arreglalo».
+- **Problema/evidencia:** los CI39179308511/39179314605 esperan dos derivaciones vencidas y obtienen745; el mantenimiento usa el reloj real sobre fixtures de septiembre. Main52fcae9 pasó el17 de octubre, antes del vencimiento18 de octubre12UTC; seed, mantenimiento y aserción no cambiaron.
+- **Origen:** corrección necesaria para completar los controles de publicación de ofertas; se entrega como prerrequisito independiente, sin incluir slugs.
+- **Cambio:** aislar los instantes del escenario en `tests/e2e/intermediation.spec.ts`, mantener activo el permiso inicial respecto del reloj real y conservar todas las expectativas exactas. Incluye el aislamiento pgTAP010 ya comprobado en los jobs de base de datos.
+- **Límites/riesgo:** solo fixtures de prueba; sin cambios de seed, reglas, contratos ni datos alojados. Se mantiene la limitación cronológica preexistente entre consentimientos y derivaciones ficticias, sin ampliar este arreglo.
+- **Verificación/recuperación:** RED remoto documentado; tipos/lint y CI completos del SHA corregido pendientes. Docker local apagado: no se atribuye una ejecución local. Reversión limitada a los fixtures; revisión independiente antes de integrar.
+
 ## Autorización de trabajo
 
 - **Responsable:** Mateo.
