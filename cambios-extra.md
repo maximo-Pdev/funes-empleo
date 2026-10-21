@@ -1750,6 +1750,17 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   actualizados; reemplaza el pendiente de rollout alojado de EXTRA035/036.
   Sin commit/PR nuevo, despliegue de aplicación, CI ni revisión independiente.
 
+## Entrega de EXTRA035–037 — 2026-10-21
+
+Mateo solicita crear el PR. Commit funcional28c6a25, rama
+codex/feat-withdraw-consent-on-hire desde main15ec4e7 actualizado:
+[PR63](https://github.com/maximo-Pdev/funes-empleo/pull/63), abierto hacia main,
+sin merge. Incluye las dos migraciones ya aplicadas/verificadas en Supabase
+compartido, pruebas y trazabilidad de la decisión global. next-env.d.ts conserva
+su modificación local y queda excluido; sin logs/fixtures privados/secretos.
+Verificaciones previas consignadas en EXTRA035–037; cambios de esta entrega solo
+documentales, diff-check PASS. CI/revisión independiente y aceptación pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

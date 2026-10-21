@@ -751,3 +751,13 @@ confirmaciones normales/tardías; no se ejecutaron contrataciones, backfill,
 fixtures, E2E ni pgTAP alojados. No cambia código/variables/secretos ni acredita
 despliegue de aplicación, nuevo CI, PR, revisión o aceptación. Las verificaciones
 funcionales locales previas siguen siendo la evidencia de los recorridos.
+
+### Entrega mediante PR — 2026-10-21
+
+Solicitud de Mateo: commit funcional28c6a25 en
+codex/feat-withdraw-consent-on-hire, publicado en
+[PR63](https://github.com/maximo-Pdev/funes-empleo/pull/63) hacia main15ec4e7.
+Abierto sin merge; incluye migraciones ya aplicadas, pruebas y EXTRA035–037.
+next-env.d.ts permanece como cambio local fuera del commit. Evidencia de calidad
+anterior conservada; entrega documental adicional con diff-check PASS. CI,
+revisión independiente y aceptación siguen pendientes, sin cerrar otros gates.
