@@ -1562,8 +1562,9 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Estado/límites:** implementado/verificado localmente, T132 completo. Solo
   presentación: sin migración, dependencias, env persistido, reset, alta/envío ni
   cambios alojados. Pruebas en3001 sin detener servidor ajeno; no se repitió suite
-  E2E privada/HTTP, NVDA o zoom real. Sin commit/PR nuevos, revisión independiente,
-  CI, aceptación global o cierre de gates históricos acreditados.
+  E2E privada/HTTP, NVDA o zoom real. Entrega de EXTRA027–033: commit `1b93a9f`,
+  [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto sin merge.
+  Revisión independiente, CI, aceptación global y cierre de gates históricos pendientes.
 
 ## Formato para próximas entradas
 

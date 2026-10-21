@@ -651,5 +651,7 @@ no implica cobertura100% de toda la aplicación. Tipos/lint/build y navegador11/
 del último ajuste PASS; la evidencia de recorridos privados/HTTP anteriores está
 en EXTRA028. No se reseteó la base ni repitió la suite E2E completa en esta entrega.
 `next-env.d.ts` conserva su cambio local generado y se excluye del commit.
-Commit/PR, CI y revisión se registrarán cuando estén disponibles; no hay merge
-ni aceptación global acreditados.
+Commit funcional: `1b93a9f` (`feat(forms): improve validation and registration experience`).
+Entrega: [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto
+hacia `main` con EXTRA027–033 y sin merge. CI y revisión independiente pendientes;
+no acredita aceptación global ni cierre de los seis gates históricos.
