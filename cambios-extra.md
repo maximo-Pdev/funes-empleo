@@ -1566,6 +1566,35 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto sin merge.
   Revisión independiente, CI, aceptación global y cierre de gates históricos pendientes.
 
+## EXTRA-034 — PR62: actualizar regresión de retiro al contrato de errores por campo
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo solicita corregir el check
+  fallido del PR62; continuación de EXTRA028/T125, sin cambio funcional adicional.
+- **Problema/evidencia:** Quality117/run39525712466, application falla en
+  intermediation.spec.ts:335: espera el aviso general anterior al retiro. El
+  selector de solicitud ahora es required y Form bloquea antes de onSubmit,
+  mostrando “Elegí una opción.” junto al campo.94 E2E pasan,1 falla y1 no corre;
+  database y controles previos de application pasan. No es fallo de despliegue.
+- **Cambio/justificación:** T133; ajustar la aserción al error asociado al selector,
+  foco, aria-invalid, motivo retenido y estado aún Derivada; conservar el resto
+  del recorrido que registra contacto entrante y retira con evidencia. Añadir
+  regresión de componente que prueba bloqueo sin callback y envío con contacto
+  entrante válido. No quitar validación ni relajar reglas para pasar el CI.
+- **Archivos/contratos/riesgos:** pruebas E2E/componente de intermediación,
+  tareas/estado y este registro. Sin cambios de aplicación, SQL, entorno, roles
+  o contratos; verificar asociación del mensaje y no ocultar un retiro sin prueba.
+- **Verificación prevista:** componentes, suite unitaria/cobertura, tipos/lint,
+  push al mismo PR y ejecución completa del CI aislado. No resetear datos locales
+  existentes ni usar servicios alojados. Revertir solo tests/documentación.
+- **Implementación/verificación local:** E2E ahora verifica el error asociado al
+  selector, foco, motivo retenido y participación aún Derivada; el recorrido
+  positivo con contacto entrante se conserva. Nueva regresión de componente
+  comprueba bloqueo sin callback, exclusión de contactos salientes, corrección
+  del campo y payload de retiro con evidencia. Componentes11/11, cobertura736
+  tests/51 archivos, tipos/lint y diff-check PASS. Sin cambios de producción.
+- **Estado:** corrección implementada/verificada localmente; pendiente CI completo
+  en el mismo PR62. No reset local, cambios alojados, merge ni aceptación global.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

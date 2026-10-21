@@ -66,6 +66,37 @@ describe("intermediación administrativa", () => {
     expect(submit).toHaveBeenCalledWith(expect.objectContaining({ command: "refer", reason: "Evaluación municipal suficiente" }));
   });
 
+  it("bloquea retiro sin solicitud, señala el selector y conserva el motivo hasta elegir contacto entrante", async () => {
+    const submit = vi.fn().mockResolvedValue({ code: "OK" });
+    render(<ParticipationActionForm participationId="case-withdrawal" version={4} status="referred"
+      contacts={[
+        { id: "contact-inbound", label: "Pedido ficticio de retiro", direction: "inbound" },
+        { id: "contact-outbound", label: "Llamada saliente ficticia", direction: "outbound" },
+      ]} onSubmit={submit} />);
+    fireEvent.change(screen.getByLabelText("Acción"), { target: { value: "withdraw_on_request" } });
+    const reason = screen.getByRole("textbox", { name: /^Motivo interno/ });
+    fireEvent.change(reason, { target: { value: "Pedido de retiro ficticio." } });
+    const request = screen.getByLabelText("Solicitud del candidato");
+    expect(request).toHaveProperty("required", true);
+    expect(screen.queryByRole("option", { name: "Llamada saliente ficticia" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
+    expect(submit).not.toHaveBeenCalled();
+    expect(request.getAttribute("aria-invalid")).toBe("true");
+    expect(document.activeElement).toBe(request);
+    const errorId = request.getAttribute("aria-describedby")!;
+    expect(document.getElementById(errorId)?.textContent).toBe("Elegí una opción.");
+    expect(reason).toHaveProperty("value", "Pedido de retiro ficticio.");
+    fireEvent.change(request, { target: { value: "contact-inbound" } });
+    expect(request.getAttribute("aria-invalid")).not.toBe("true");
+    expect(screen.queryByText("Elegí una opción.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
+    expect(submit).toHaveBeenCalledWith(expect.objectContaining({
+      participationId: "case-withdrawal", version: 4, command: "withdraw_on_request",
+      reason: "Pedido de retiro ficticio.", contactId: "contact-inbound", candidateRequestId: "contact-inbound",
+    }));
+  });
+
   it("destaca la suspensión y exige confirmación expresa; restaurar no promete reactivar casos", () => {
     const submit = vi.fn();
     const { rerender } = render(<SafetyDecisionForm resource="candidate_account" resourceId="account-1" version={1} action="suspend" onSubmit={submit} />);

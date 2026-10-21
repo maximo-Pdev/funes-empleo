@@ -655,3 +655,18 @@ Commit funcional: `1b93a9f` (`feat(forms): improve validation and registration e
 Entrega: [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto
 hacia `main` con EXTRA027–033 y sin merge. CI y revisión independiente pendientes;
 no acredita aceptación global ni cierre de los seis gates históricos.
+
+## Corrección del check application de PR62 — 2026-10-20
+
+EXTRA034/T133: Quality117 (run39525712466) falla por una expectativa E2E antigua
+del retiro administrativo: Form ahora bloquea el selector requerido y muestra el
+error junto a él, antes del mensaje general previo.94 E2E pasan,1 falla y1 no
+corre; database, tipos/lint/tooling/cobertura y build pasan en ese run.
+
+Se ajusta solo el contrato esperado por tests: error asociado al selector/foco,
+motivo retenido y estado aún Derivada; luego se registra contacto y se verifica
+el retiro. Nuevo test de componente prueba callback bloqueado sin evidencia,
+filtrado de contacto saliente y payload correcto al elegir contacto entrante.
+Componentes11/11, suite/cobertura736 tests/51 archivos, tipos/lint/diff-check
+PASS local. Sin cambios de aplicación, DB o entorno ni reset local; ejecución
+completa del CI corregido pendiente. No relaja la evidencia de retiro requerida.
