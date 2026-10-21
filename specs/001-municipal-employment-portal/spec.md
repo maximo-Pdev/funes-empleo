@@ -68,6 +68,48 @@ personas u ofertas. No inferir equivalencias; importación sintética v1 sin cam
 OQ-010 solo se resuelve para el catálogo amplio aprobado, no para equivalencias
 históricas o un catálogo exhaustivo de ocupaciones; OQ-018 permanece abierta.
 
+## Formularios — ajuste autorizado 2026-10-20
+
+Todos los formularios indican requisitos vigentes con asterisco rojo y semántica
+required. Enviar incompletos/incorrectos marca cada campo, explica en español
+cómo corregirlo, anuncia un resumen y enfoca el primer error. Al corregir se
+actualizan los errores. Incluye inputs, selects, textareas, confirmaciones,
+grupos requeridos y archivos; opcionales y borradores conservan sus reglas.
+Un fallo de validación, servidor o red no borra los valores ni archivos elegidos
+de la página actual. No persistir datos sensibles en storage, logs o URLs para
+conservarlos; no reenviar contraseñas en respuestas. Solo reiniciar tras éxito
+explícito o decisión del usuario. Mantener validación/autorización servidor y
+respuestas que no revelan cuentas existentes. No promete conservar una página
+cerrada/recargada ni restaurar archivos después de una navegación.
+
+### Registro compacto — ajuste autorizado 2026-10-20
+
+Mateo pide tarjetas simétricas y formularios de registro compactos. En escritorio
+las tarjetas informativa y de registro tendrán el mismo ancho y alto; el estado
+inicial de ambos registros cabe sin scroll en1920×1080. Mantener controles legibles
+y operables, todos los campos/avisos y errores visibles. Móvil, zoom y errores
+pueden extender el documento; no ocultar contenido ni forzar scroll interno.
+El criterio de simetría/compacidad guía estas pantallas, no autoriza rediseñar
+otras páginas ni cambiar campos, validación, registro o autenticación.
+
+Mateo amplía este ajuste con navegación directa entre registro de postulantes y
+de empresas (2026-10-20). Ambos destinos se muestran como enlaces con tipo actual
+identificado, sin enviar el formulario ni mezclar datos/contraseñas entre roles.
+
+Mateo aplica el mismo criterio al inicio de sesión (2026-10-20), refinado con el
+esquema de EXTRA033: información de la Oficina en la columna izquierda; a la
+derecha, “¿Todavía no tenés cuenta?” con destinos candidato/empresa arriba del
+inicio de sesión. Columnas de igual ancho y extremos superior/inferior alineados:
+la tarjeta informativa ocupa la altura del conjunto de las dos tarjetas derechas.
+Esta disposición sustituye el registro de ancho completo de EXTRA031 y la igualdad
+de altura entre tarjetas individuales de EXTRA032. Último refinamiento de Mateo:
+el conjunto queda centrado verticalmente en el espacio disponible, con altura
+determinada por el contenido, sin estirar las tarjetas para llenar la página.
+Formulario compacto, sin scroll inicial1920×1080; en móvil,
+registro, login e información en una columna. La página crece si es necesario,
+sin recortar errores/contenido o forzar scroll interno. No cambiar credenciales,
+autenticación, sesiones ni recuperación.
+
 ## Clarifications
 
 ### Session 2026-09-19

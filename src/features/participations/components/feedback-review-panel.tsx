@@ -1,4 +1,5 @@
 "use client";
+import { Form } from "@/components/forms/form";
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -48,7 +49,7 @@ export function FeedbackReviewPanel({ participationId, version, currentStatus, f
         const result = await onConfirm({ participationId, version, feedbackId: latest.id, outcome,
           reason: reason.trim(), lateCorrection: currentStatus === "no_company_response" });
         const message = adminMutationError(result);
-        if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
+        if (message) { setError(message); return; }
         router.refresh();
       } catch { setError("No se pudo guardar. Recargá la página e intentá nuevamente."); }
     });
@@ -60,10 +61,10 @@ export function FeedbackReviewPanel({ participationId, version, currentStatus, f
     {latest.message && <p className="rounded-md bg-slate-100 p-3">{latest.message}</p>}
     {currentStatus === "no_company_response" && <FeedbackMessage tone="info">La corrección tardía conserva el cierre automático anterior y no restaura el acceso empresarial revocado.</FeedbackMessage>}
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
-    {outcome ? <form onSubmit={submit} className="space-y-4" noValidate>
+    {outcome ? <Form onSubmit={submit} className="space-y-4" noValidate>
       {(outcome === "cancelled" || currentStatus === "no_company_response") &&
         <TextField id="feedback-reason" label="Motivo interno" value={reason} onChange={(event) => setReason(event.target.value)} maxLength={1000} required />}
       <Button type="submit" busy={pending}>Confirmar resultado</Button>
-    </form> : <p>La Oficina debe registrar la evidencia correspondiente antes de elegir un resultado.</p>}
+    </Form> : <p>La Oficina debe registrar la evidencia correspondiente antes de elegir un resultado.</p>}
   </section>;
 }

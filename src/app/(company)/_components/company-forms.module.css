@@ -31,5 +31,6 @@
 @media (min-width: 768px) {
   .workspace > div > form:first-of-type { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workspace > div > form:first-of-type > p, .workspace > div > form:first-of-type > button,
-  .workspace > div > form:first-of-type > fieldset, .workspace > div > form:first-of-type > label:has(textarea) { grid-column: 1 / -1; }
+  .workspace > div > form:first-of-type > fieldset, .workspace > div > form:first-of-type > label:has(textarea),
+  .workspace > div > form:first-of-type > [data-form-field]:has(textarea) { grid-column: 1 / -1; }
 }

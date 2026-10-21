@@ -40,6 +40,18 @@ existente con ambas versiones; éxito revalida detalle y quita ficha, nunca deri
 No amplía acceso empresarial
 ni sustituye comandos municipales, sus bloqueos optimistas o su auditoría.
 
+## Validación de formularios — 2026-10-20
+
+Errores de entrada se asocian a los controles con texto/aria-describedby y
+aria-invalid, asterisco para requisitos vigentes y resumen con foco al primer
+error. No se llama la mutación si la validación cliente falla; servidor revalida
+siempre. Resultado fallido no reinicia controles ni archivos. Solo conservar en
+la página actual; nunca serializar contraseñas de vuelta o guardar PII en storage.
+POST /api/candidate/cv mantiene 303 para navegación nativa. Con Accept
+application/json responde JSON `{status}`: ok/200, invalid/422, conflict/409 o
+denied/403 para cliente que conserva el archivo en error, con private, no-store
+y misma autorización. El aviso de éxito espera la versión actualizada del perfil.
+
 ## Convenciones compartidas
 
 ### Consulta pública A07 / FR-024B

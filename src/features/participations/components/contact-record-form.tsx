@@ -1,4 +1,5 @@
 "use client";
+import { Form } from "@/components/forms/form";
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -27,24 +28,24 @@ export function ContactRecordForm({ participationId, version, onSubmit }: {
         const result = await onSubmit({ command: "record_contact", participationId, version,
           channel, direction, occurredAtLocal, summary: summary.trim() });
         const message = adminMutationError(result);
-        if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
+        if (message) { setError(message); return; }
         router.refresh();
       } catch { setError("No se pudo guardar el contacto. Recargá e intentá nuevamente."); }
     });
   }
-  return <form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
+  return <Form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
     <h2 className="text-lg font-semibold">Registrar contacto municipal</h2>
     <p className="text-sm text-slate-700">El resumen es interno. Un contacto entrante puede respaldar un retiro pedido por el candidato.</p>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
-    <SelectField id="contact-channel" label="Canal" value={channel} onChange={(event) => setChannel(event.target.value)}
+    <SelectField id="contact-channel" label="Canal" required value={channel} onChange={(event) => setChannel(event.target.value)}
       options={[{ value: "phone", label: "Teléfono" }, { value: "email", label: "Correo" },
         { value: "whatsapp", label: "WhatsApp" }, { value: "in_person", label: "Presencial" }]} />
-    <SelectField id="contact-direction" label="Dirección" value={direction} onChange={(event) => setDirection(event.target.value)}
+    <SelectField id="contact-direction" label="Dirección" required value={direction} onChange={(event) => setDirection(event.target.value)}
       options={[{ value: "inbound", label: "Recibido" }, { value: "outbound", label: "Realizado" }]} />
     <TextField id="contact-date" label="Fecha y hora (Funes)" type="datetime-local"
       value={occurredAtLocal} onChange={(event) => setOccurredAtLocal(event.target.value)} required />
     <TextField id="contact-summary" label="Resumen interno" value={summary}
       onChange={(event) => setSummary(event.target.value)} maxLength={5000} required />
     <Button type="submit" busy={pending}>Guardar contacto</Button>
-  </form>;
+  </Form>;
 }

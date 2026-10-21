@@ -332,7 +332,12 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.getByLabel("Acción").selectOption("withdraw_on_request");
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Pedido de retiro ficticio.");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
-    await expect(admin.getByText("Seleccioná el contacto entrante donde el candidato pidió el retiro.")).toBeVisible();
+    const requestContact = admin.getByLabel("Solicitud del candidato", { exact: true });
+    await expect(requestContact).toHaveAttribute("aria-invalid", "true");
+    await expect(requestContact).toBeFocused();
+    await expect(admin.locator("[data-form-field]").filter({ has: requestContact }).locator("[data-field-error]")).toHaveText("Elegí una opción.");
+    await expect(admin.getByRole("textbox", { name: "Motivo interno" })).toHaveValue("Pedido de retiro ficticio.");
+    await expect(currentStatus).toContainText("Derivada");
     await admin.getByLabel("Canal", { exact: true }).selectOption("phone");
     await admin.getByLabel("Dirección").selectOption("inbound");
     await admin.getByLabel("Fecha y hora (Funes)").fill("2026-09-24T14:00");
@@ -391,7 +396,8 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     await candidate.reload();
     await candidate.getByLabel("Elegir PDF").setInputFiles("tests/fixtures/cv-fictitious.pdf");
     await candidate.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-    await expect(candidate).toHaveURL(/\/candidato\/perfil\?cv=ok$/);
+    await expect(candidate).toHaveURL(/\/candidato\/perfil$/);
+    await expect(candidate.getByText("CV guardado.", { exact: true })).toBeVisible();
     await expect(candidate.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", snapshotCv!);
     await company.reload();
     await expect(company.getByText("3415550015")).toBeVisible();

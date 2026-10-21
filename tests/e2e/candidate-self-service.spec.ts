@@ -74,9 +74,21 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByText("Consentimiento registrado.", { exact: false })).toBeVisible();
   await page.reload();
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
+  let releaseRefresh!: () => void;
+  const refreshGate = new Promise<void>(resolve => { releaseRefresh = resolve; });
+  await page.route("**/candidato/perfil*", async route => {
+    if (route.request().method() === "GET" && route.request().headers().rsc === "1") await refreshGate;
+    await route.continue();
+  });
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page).toHaveURL(/\/candidato\/perfil\?cv=ok$/);
+  try {
+    await expect(page.getByText("CV guardado; actualizando el perfil…", { exact: true })).toBeVisible();
+    await expect(page.getByText("CV guardado.", { exact: true })).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Cargando CV…" })).toBeDisabled();
+  } finally { releaseRefresh(); }
+  await expect(page).toHaveURL(/\/candidato\/perfil$/);
   await expect(page.getByText("CV guardado.")).toBeVisible();
+  await page.unroute("**/candidato/perfil*");
   await page.getByRole("button", { name: "Activar perfil" }).click();
   await expect(page.getByText("Estado del perfil:")).toContainText("Activo");
   const originalCv = await page.getByRole("link", { name: "Descargar mi CV" }).getAttribute("href");
@@ -84,12 +96,12 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     name: "rechazado.pdf", mimeType: "application/pdf", buffer: Buffer.from("PDF ficticio dañado"),
   });
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page).toHaveURL(/\/candidato\/perfil\?cv=invalid$/);
+  await expect(page).toHaveURL(/\/candidato\/perfil$/);
   await expect(page.getByText("El PDF fue rechazado.", { exact: false })).toBeVisible();
   await expect(page.getByRole("link", { name: "Descargar mi CV" })).toHaveAttribute("href", originalCv!);
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page).toHaveURL(/\/candidato\/perfil\?cv=ok$/);
+  await expect(page).toHaveURL(/\/candidato\/perfil$/);
   await expect(page.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", originalCv!);
 
   await page.goto("/candidato/ofertas");

@@ -1,4 +1,5 @@
 "use client";
+import { Form } from "@/components/forms/form";
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -110,28 +111,33 @@ export function ParticipationActionForm({ participationId, version, status, cont
           feedbackId: feedbackId || undefined, contactId: contactId || undefined,
           candidateRequestId: command === "withdraw_on_request" ? contactId || undefined : undefined });
         const message = adminMutationError(result);
-        if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
+        if (message) { setError(message); return; }
         router.refresh();
       } catch { setError("No se pudo guardar. Recargá la página e intentá nuevamente."); }
     });
   }
 
   if (choices.length === 0) return <p>Este caso tiene un resultado final y no admite nuevas acciones.</p>;
-  return <form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
+  return <Form onSubmit={submit} requirements={command === "record_preinterview"
+    ? [{ names: ["scheduledAtLocal", "heldAtLocal"], message: "Indicá la fecha programada o realizada de la preentrevista." }]
+    : command.startsWith("correct_") ? [{ names: ["feedbackId", "contactId"], message: "Seleccioná feedback o un contacto municipal como evidencia." }]
+      : command === "confirm_hired" || command === "confirm_not_selected"
+        ? [{ names: ["feedbackId", "contactId", "reason"], message: "Registrá un motivo o seleccioná la evidencia del resultado." }] : []}
+    className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
     <h2 className="text-lg font-semibold">Acciones sobre la participación</h2>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
-    <SelectField id="participation-command" label="Acción" value={command} onChange={(event) => {
+    <SelectField id="participation-command" label="Acción" required value={command} onChange={(event) => {
       setCommand(event.target.value as ParticipationCommand | ""); setError("");
     }} options={choices} />
     {command === "record_preinterview" && <>
-      <SelectField id="preinterview-channel" label="Canal de preentrevista" value={channel}
+      <SelectField id="preinterview-channel" label="Canal de preentrevista" required value={channel}
         onChange={(event) => setChannel(event.target.value)}
         options={PREINTERVIEW_CHANNELS.map((value) => ({ value, label: ({ phone: "Teléfono", email: "Correo", whatsapp: "WhatsApp", in_person: "Presencial", video: "Video" })[value] }))} />
-      <TextField id="preinterview-summary" label="Resumen interno" value={summary}
+      <TextField id="preinterview-summary" label="Resumen interno" required value={summary}
         onChange={(event) => setSummary(event.target.value)} maxLength={5000} />
-      <TextField id="preinterview-scheduled" label="Fecha programada" type="datetime-local"
+      <TextField id="preinterview-scheduled" name="scheduledAtLocal" label="Fecha programada" type="datetime-local"
         value={scheduledAtLocal} onChange={(event) => setScheduledAtLocal(event.target.value)} />
-      <TextField id="preinterview-held" label="Fecha realizada" type="datetime-local"
+      <TextField id="preinterview-held" name="heldAtLocal" label="Fecha realizada" type="datetime-local"
         value={heldAtLocal} onChange={(event) => setHeldAtLocal(event.target.value)} />
       <SelectField id="preinterview-recommendation" label="Recomendación" value={recommendation}
         onChange={(event) => setRecommendation(event.target.value as ParticipationActionPayload["recommendation"])}
@@ -139,16 +145,16 @@ export function ParticipationActionForm({ participationId, version, status, cont
           { value: "do_not_preselect", label: "No preseleccionar" }]} />
     </>}
     {(requiresStageReason(command, status) || command === "confirm_hired" || command === "confirm_not_selected") &&
-      <TextField id="participation-reason" label="Motivo interno" value={reason}
+      <TextField id="participation-reason" name="reason" label="Motivo interno" value={reason}
         onChange={(event) => setReason(event.target.value)} maxLength={1000}
         required={requiresStageReason(command, status)} />}
     {(command === "withdraw_on_request" || command?.startsWith("correct_") ||
       command === "confirm_hired" || command === "confirm_not_selected") && <>
       {feedback.length > 0 && command !== "withdraw_on_request" &&
-        <SelectField id="action-feedback" label="Feedback empresarial (opcional)" value={feedbackId}
+        <SelectField id="action-feedback" name="feedbackId" label="Feedback empresarial (opcional)" value={feedbackId}
           onChange={(event) => setFeedbackId(event.target.value)}
           options={[{ value: "", label: "Sin seleccionar" }, ...feedback.map((item) => ({ value: item.id, label: item.label }))]} />}
-      <SelectField id="action-contact" label={command === "withdraw_on_request" ? "Solicitud del candidato" : "Contacto municipal (opcional)"}
+      <SelectField id="action-contact" name="contactId" required={command === "withdraw_on_request"} label={command === "withdraw_on_request" ? "Solicitud del candidato" : "Contacto municipal (opcional)"}
         value={contactId} onChange={(event) => setContactId(event.target.value)}
         options={[{ value: "", label: "Sin seleccionar" }, ...contacts
           .filter((item) => command !== "withdraw_on_request" || item.direction === "inbound")
@@ -158,5 +164,5 @@ export function ParticipationActionForm({ participationId, version, status, cont
     {command?.startsWith("skip_") && <p className="text-sm text-slate-700">La derivación requiere una decisión explícita posterior.</p>}
     {command?.startsWith("correct_") && <FeedbackMessage tone="info">El cierre automático anterior quedará en el historial y el acceso empresarial revocado no se reactivará.</FeedbackMessage>}
     <Button type="submit" busy={pending}>Registrar acción</Button>
-  </form>;
+  </Form>;
 }

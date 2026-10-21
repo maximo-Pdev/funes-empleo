@@ -1,4 +1,5 @@
 "use client";
+import { Form } from "@/components/forms/form";
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -22,19 +23,19 @@ export function InternalNoteForm({ candidateId, version, onSubmit }: {
       try {
         const result = await onSubmit({ command, candidateId, version, body: body.trim() });
         const message = adminMutationError(result);
-        if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
+        if (message) { setError(message); return; }
         router.refresh();
       } catch { setError("No se pudo guardar la nota. Recargá e intentá nuevamente."); }
     });
   }
-  return <form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
+  return <Form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
     <h2 className="text-lg font-semibold">Nota interna de la Oficina</h2>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
-    <SelectField id="note-kind" label="Tipo" value={command} onChange={(event) => setCommand(event.target.value)}
+    <SelectField id="note-kind" label="Tipo" required value={command} onChange={(event) => setCommand(event.target.value)}
       options={[{ value: "record_applicant_note", label: "Nota sobre postulante" },
         { value: "record_training_guidance", label: "Orientación o capacitación" }]} />
     <TextField id="note-body" label="Contenido interno" value={body}
       onChange={(event) => setBody(event.target.value)} maxLength={5000} required />
     <Button type="submit" busy={pending}>Guardar nota</Button>
-  </form>;
+  </Form>;
 }

@@ -1253,6 +1253,348 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   Incluye EXTRA024–026; próximo paso: checks del SHA publicado y revisión humana.
   Se conserva solo next-env generado como cambio local fuera del commit.
 
+## EXTRA-027 — diagnóstico y reparación del registro/verificación
+
+- **Fecha/autorización:** 2026-10-20. Mateo informa que dejó de funcionar el
+  registro y que el correo abre una versión antigua; solicita limitar el arreglo
+  a esos fallos y reemplazar la rama anterior.
+- **Base/seguridad:** PR61 mergeado confirmado; main6607854 actualizado, rama
+  anterior local/remota borrada tras verificar inclusión. Nueva rama
+  codex/fix-registration-verification; next-env generado previo se conserva.
+- **Evidencia inicial:** candidato/empresa ignoran el error devuelto por signUp
+  y muestran respuesta genérica por diseño no enumerativo. Ambos usan
+  NEXT_PUBLIC_APP_URL/auth/callback; callback también redirige a esa base.
+  Configuración pública local: origen localhost3000 y Supabase alojado.
+  Consulta pública de Auth confirma registro/email habilitados y confirmación
+  exigida; no se enviaron correos ni crearon cuentas alojadas para diagnosticar.
+  No se conoce todavía el error concreto ni URL final deseada del operador.
+- **Propuesta/verificación:** reproducir registro y verificación de ambos roles
+  en Supabase Docker/mailbox local, sin reset; contrastar el destino del correo,
+  callback y sesión. Revisar configuración URL/allowlist/plantilla del entorno
+  afectado con evidencia antes de modificarla. Preservar no enumeración, PKCE,
+  confirmación obligatoria, roles y RLS; no desactivar controles ni eludir cuotas.
+- **Archivos/contratos previstos:** pruebas de registro/callback, servicios Auth
+  y documentación operativa según causa comprobada; sin autorizar cambios de
+  campos o rediseño. Una modificación derivada se detalla aquí antes del código.
+- **Riesgos/límites:** no recibir enlaces de correo con tokens ni datos reales;
+  no inventar dominio nuevo ni inspección remota. No cambiar variables alojadas,
+  SMTP ni datos compartidos sin diagnóstico y destino confirmado. Solo pruebas
+  ficticias locales; build/tipos/lint y suites relevantes tras la corrección.
+- **Estado:** diagnóstico en curso; causa y reparación aún no acreditadas.
+- **Diagnóstico confirmado:** Mateo prueba https://funes-empleo.vercel.app y
+  reporta ausencia de mensaje. Prueba publicada con datos ficticios inválidos
+  devuelve el mensaje seguro esperado, sin alta ni correo. Callback público sin
+  token redirige al mismo dominio actual (307/no-store), no al demo anterior.
+  Dashboard Supabase con sesión del operador muestra Site URL del demo antiguo
+  y solo sus dos callbacks permitidos; custom SMTP desactivado y plantillas
+  predeterminadas. No se atribuye todavía el fallo de alta a una cuota concreta.
+- **Cambio operativo propuesto:** Site URL al dominio actual y agregar callback
+  de verificación/recuperación actual, conservando ambos anteriores. Pendiente
+  confirmación específica solicitada antes de guardar destinos de autenticación.
+  Sin tocar SMTP, confirmación, sesiones ni cuentas. Vercel conectado no expone
+  este proyecto; no se realizaron cambios allí ni se intentó otro acceso.
+- **Prueba local nueva:** registration-verification.spec.ts cubre ambos roles:
+  alta, correo con destino exacto, bloqueo antes de verificar, callback, sesión,
+  bootstrap del perfil y recarga. 2/2 PASS sin cambiar código de aplicación.
+  Primera ejecución falló solo por esperar el texto antiguo de Rol; el correo y
+  la sesión ya funcionaban. Se corrigió la expectativa al texto real, sin quitar
+  comprobación del rol. Deja cuentas ficticias locales; no se borra ni resetea.
+- **Respuesta posterior:** Mateo confirma URLs antiguas, informa que el formulario
+  candidato borra los datos (empresa no probada) y que no tienen SMTP/remitente.
+  Pregunta el motivo del cambio de URL: no constituye aprobación para guardarlo.
+  Configuración alojada aún intacta. El registro público general queda limitado
+  por SMTP integrado; no se elige proveedor ni se habilita Resend de oficio.
+- **Verificación final del diagnóstico:**690 unitarias/43 archivos, tipos/lint y
+  build PASS; E2E2/2 con reuso de enlace rechazado sin tokens en destino. Solo
+  pruebas/documentación nuevas, código de aplicación intacto. El servidor propio
+  quedó cerrado y puerto3000 libre; Docker e identidades ficticias conservados.
+  Sin commit/PR ni nueva migración. Corregir el destino requiere confirmación y
+  correo público requiere configuración SMTP; no se declara el incidente resuelto.
+
+- **Autorización operativa posterior:** Mateo responde «cambialas entonces» el
+  2026-10-20, confirmando Site URL actual y sus dos callbacks exactos propuestos.
+  Se verificó nuevamente el proyecto y los valores antiguos antes de guardar;
+  conservar ambos destinos anteriores. Esta autorización no incluye SMTP,
+  envío de correos, alta de usuarios, cambio de credenciales ni despliegue.
+- **Operación ejecutada/verificada:** guardado en dashboard Site URL
+  https://funes-empleo.vercel.app; toast Successfully updated site URL. Agregados
+  los callbacks exactos de verificación y recuperación actuales; toast Successfully
+  added 2 URLs. Lectura posterior muestra Site URL actual y cuatro destinos:
+  ambos anteriores conservados y ambos nuevos. Captura de evidencia guardada
+  fuera del repositorio. Sin SMTP, nuevas cuentas, correos, SQL ni deploy.
+  Queda corregida la configuración de destino; entrega real de correo y registro
+  público general siguen pendientes de SMTP y prueba autorizada del entorno.
+
+## EXTRA-028 — validación visible y conservación de formularios
+
+- **Fecha/autorización:** 2026-10-20. Mateo pide en todos los formularios asterisco
+  rojo para obligatorios, bordes rojos y explicación junto a cada campo incorrecto,
+  instrucciones claras y conservar lo cargado ante cualquier error. Incluye
+  registro, acceso, perfiles, empresa, administración, búsqueda y archivos.
+- **Evidencia:** 29 archivos contienen formularios, con validación nativa, manual
+  y Server Actions mezcladas. React reinicia inputs no controlados después de
+  resolver una Action aunque su resultado informe error. TextField/SelectField
+  muestran obligatorio como texto y muchos labels no tienen aviso ni error local.
+- **Cambio mínimo compartido:** Form y Field declarativos con contexto de errores,
+  asterisco accesible, mensajes españoles por restricción, foco al primer error,
+  resumen y limpieza del error al corregir; no manipular DOM de React ni duplicar
+  validadores del servidor. Integrar todos los forms/labels y componentes comunes.
+  Evitar reset automático en fallo y permitirlo solo tras éxito explícito; datos
+  y archivos permanecen en el DOM de esa página, nunca en storage/logs/URL nuevos.
+- **Validación:** mantener opcionales y borradores incompletos existentes; reflejar
+  requisitos condicionales/confirmaciones y grupos de al menos un contacto/fecha.
+  Mantener mensajes no enumerativos y permisos/validación servidor. El color no
+  es el único indicador: aria-invalid, descripciones y texto junto al control.
+- **Archivo/CV:** evitar navegación destructiva en fallo de carga, mediante
+  respuesta JSON opt-in del handler existente y cliente acotado. Mantener el
+  POST/303 previo como compatibilidad, límites PDF y autorización intactos.
+  La regresión completa detectó una carrera entre aviso de carga y refresh de
+  versión del perfil: el éxito definitivo espera las props actualizadas, con
+  prueba que retiene deliberadamente la respuesta RSC antes de activar. También
+  se evitan refresh automáticos en conflictos y períodos invertidos de métricas.
+- **Archivos/contratos:** componentes/forms, TextField/SelectField/PasswordField,
+  29 consumidores, endpoint CV solo respuesta opt-in, estilos acotados, pruebas
+  UI/E2E/unitarias y artefactos de especificación. Sin dependencias ni migración.
+  Ajustar los dos selectores de hijos directos de formularios candidato/empresa
+  para que el nuevo contenedor Field conserve el ancho completo de textareas;
+  no cambiar columnas, tamaños ni dirección visual existentes.
+- **Riesgos/verificación:** límites cliente/servidor, filtros GET, campos dinámicos,
+  radio/checkbox/select, confirmación de contraseña, archivos, Enter/foco/lector,
+  error servidor y doble envío. RED/GREEN, inventario sin forms aislados, suites,
+  tipos/lint/build, navegador por rol y axe/responsive con datos ficticios locales.
+- **Análisis/gates:** checklists requirements16/16 y mvp-readiness77/77 PASS,
+  leídas sin cambiar marcas; sin hooks registrados. Constitución: simplicidad,
+  privacidad, accesibilidad y controles servidor conservados. User autoriza el
+  cambio transversal; no altera requisitos municipales ni diseño global ajeno.
+- **Implementación real:** Form/Field/validation/identifier-fields y CSS común;
+  TextField/SelectField/PasswordField; 40 usos de Form en 29 archivos de consumidores
+  candidatos, empresas, acceso, administración, participaciones, derivaciones e
+  importación; CvUploadForm y respuesta opt-in del handler. Dos selectores CSS
+  conservan el ancho existente. Spec/plan/contrato/tareas y guía de formularios
+  alineados; matriz A18 agregada. Sin dependencias, tablas o migración.
+- **Verificación real:** RED inicial4/4; GREEN final729 tests/49 archivos,
+  tooling57, typecheck/lint/build PASS. Inventario AST sin forms/labels aislados
+  ni controles sin Field. Navegador20/20: validación por campo, corrección, foco,
+  contraseña y registro real local, rechazo de Action/login, grupos, métricas,
+  CSV/PDF retenidos, CV válido con RSC retenida y activación posterior, candidato
+  y empresa completos, filtros y sesiones. HTTP privado8/8 aislado PASS. Axe sin
+  violaciones en recorridos comprobados; teclado y móvil360×800 sin overflow.
+  Revisión React: hooks en nivel superior, IDs/ayudas estables, sin any ni
+  persistencia de datos personales, sin cambiar reglas de negocio o permisos.
+- **Incidencias corregidas:** la prueba de carga/activación reveló aviso de éxito
+  antes de refrescar versión; se agrega guardia y regresión determinista. Un
+  intento de ejecutar HTTP y UI simultáneamente alteró el conteo global de
+  auditoría de los tests HTTP; la repetición aislada8/8 pasa sin relajar aserciones.
+  Mantener el orden de proyectos de Playwright; no mezclar con --no-deps.
+- **Estado/límites:** implementado y verificado localmente; T121–T125 completos.
+  Sin commit, PR, CI nuevo, revisión independiente, NVDA o aceptación acreditados.
+  No se ejecutó la suite E2E completa ni se cerraron gates históricos. Pruebas
+  solo contra Supabase local, sin reset; quedan datos y auditoría ficticios.
+  Se conserva EXTRA027, la modificación previa de next-env y Docker activo.
+  Este incremento no toca servicios alojados ni SMTP: el correo público continúa
+  bloqueado por proveedor/remitente pendientes. Datos conservados solo mientras
+  permanece la página abierta; límites CV5MiB y A06 pendiente se mantienen.
+
+- **Ajuste de texto solicitado por Mateo, 2026-10-20:** quitar del resumen de
+  errores la frase sobre conservación; mantener “Revisá el campo indicado.” o
+  “Revisá los N campos indicados.” sin cambiar validación ni retención. Afecta
+  Form y su regresión de texto exacto; 12 pruebas focalizadas, ESLint de ambos
+  archivos y diff --check PASS. Solo cambia el aviso; conservación intacta.
+
+## EXTRA-029 — registros compactos y tarjetas simétricas
+
+- **Fecha/autorización:** 2026-10-20. Mateo pide simetría entre tarjetas de
+  registro y evitar scroll innecesario en1920×1080, reduciendo componentes y
+  espacios sobredimensionados sin ocultar contenido simple.
+- **Evidencia:** ambas páginas duplican estructura, usan columnas0.95/1.05 con
+  items-start, padding de40px, controles48px y otra tarjeta solo bajo el formulario.
+  Esto produce alturas/anchos diferentes y exceso vertical, especialmente empresa.
+- **Cambio propuesto:** layout servidor común solo para ambos registros, columnas
+  iguales y stretch en escritorio, espacios/títulos más compactos, controles44px,
+  campos distribuidos en dos columnas donde haya espacio y ayuda de verificación
+  integrada en la tarjeta. Conservar todos los campos, mensajes, enlaces y avisos
+  de intermediación/verificación documental. Sin alturas fijas, overflow oculto ni
+  scroll interno; móvil, zoom y errores pueden extender la página naturalmente.
+- **Origen/archivos:** solicitud directa, formularios EXTRA028; páginas de ambos
+  registros, nuevo RegistrationLayout/CSS local, tests visuales/componentes y
+  spec/plan/tareas/guía Auth. Sin tocar acciones, contratos de datos, permisos,
+  catálogo, base, dependencias, SMTP o estilos de otros formularios.
+- **Riesgos/verificación:** medir tarjetas y ausencia de scroll inicial1920×1080,
+  controles≥44px, móvil360×800, ancho intermedio/zoom equivalente, errores completos,
+  orden de teclado y axe; regresiones de registro, tipos/lint/build. Revertir solo
+  layout/páginas/estilos restaura presentación anterior sin tocar datos.
+- **Constitución/análisis:** reutiliza React/Next/Tailwind/tokens y SVG existentes;
+  no añade servicios ni resuelve decisiones municipales. Cambios previos y rama
+  dedicada se conservan; revisión visual autorizada por Mateo, sin requerir nueva
+  aprobación del compañero para ejecutarla. Revisión/aceptación global pendientes.
+- **Implementación real:** RegistrationLayout servidor con configuración por rol,
+  registration.module.css y dos páginas consumidoras; se mantienen los componentes
+  funcionales de registro sin modificarlos. Guía Auth/spec/plan/tareas alineados,
+  matriz A19. Controles44px, gaps8px, columnas iguales y ayuda dentro de la tarjeta.
+- **Verificación:** RED2/3 en regresión de estructura; GREEN732 pruebas/50 archivos,
+  tipos/lint/build PASS. Navegador6/6: tarjetas de igual ancho/alto e inicio sin
+  scroll1920×1080 y1920×960, controles≥44px, móvil360×800 y reflow960×540 sin
+  overflow horizontal, campos/ayuda alcanzables, errores visibles y teclado de
+  contraseña. Axe sin violaciones; capturas vacías de ambos registros revisadas.
+  Primera medición requirió esperar visibilidad/clic estable antes de foco y
+  reducir separación para el margen vertical960; no se ocultó contenido.
+- **Estado/límites:** implementado y verificado localmente; T126–T128 completos.
+  Servidor propio de pruebas en3001 para preservar el servidor ajeno en3000;
+  sin altas, correos ni cambios alojados en este ajuste visual. No se repitieron
+  recorridos Auth con envío real, suite E2E completa, NVDA o zoom real200%.
+  No acredita aceptación global, CI, revisión independiente, commit ni PR.
+  Sin migración, dependencias o variables persistidas nuevas. Presentación local
+  a registros; contenido puede crecer con errores/móvil/zoom sin scroll interno.
+
+## EXTRA-030 — alternar tipo de registro
+
+- **Fecha/autorización:** 2026-10-20. Mateo solicita cambiar desde el registro de
+  postulantes al de empresas y viceversa sin volver al inicio.
+- **Problema/origen:** EXTRA029 comparte layout pero no ofrece navegación directa
+  entre ambos tipos. Ajuste explícito de acceso a los registros existentes.
+- **Cambio mínimo:** selector con enlaces “Soy postulante”/“Soy empresa” en la fila
+  superior del layout, activo con aria-current. Navegación normal, sin enviar
+  formulario ni compartir/persistir contraseñas o datos entre roles.
+- **Archivos/riesgos:** RegistrationLayout, tests de páginas y navegador, guía Auth
+  y artefactos. Conservar simetría y encaje1920×1080/960; envolver en móvil sin
+  overflow, controles≥44px y teclado accesible. Sin acciones/Auth/SQL nuevos.
+- **Verificación prevista:** destinos y estado activo por rol, cambio de ida/vuelta
+  con campos del formulario destino, medidas/responsive/axe, tipos/lint/build.
+- **Resultado:** implementado en el layout común; enlaces a ambas rutas y tipo
+  activo, sin añadir estado cliente. Regresiones de páginas3/3, navegador7/7,
+  tipos/lint/build PASS. Se probó ida/vuelta sin POST, encaje1920×1080/960,
+  simetría, móvil/reflow, errores, teclado y axe. No se repitió la suite completa.
+- **Estado:** verificado localmente; T129 completo. Cambiar de página puede
+  descartar borradores; no implica conservación entre registros. Sin cambios
+  alojados, datos, migración o dependencias. Commit/PR/revisión pendientes.
+
+## EXTRA-031 — inicio de sesión compacto y acceso al registro arriba
+
+- **Fecha/autorización:** 2026-10-20. Mateo pide subir la tarjeta “¿Todavía no
+  tenés cuenta?” y aplicar al login la simetría y ausencia de scroll innecesario
+  verificadas en los registros.
+- **Evidencia:** login mantiene columnas0.95/1.05/items-start, paddings40px,
+  controles48px y tarjeta de registro debajo, fuera del primer bloque de acceso.
+- **Cambio mínimo:** tarjeta de registro de ancho completo antes del grid de
+  información/acceso; debajo dos tarjetas iguales/stretch y contenido compacto.
+  Reutilizar estilos locales de entrada, con variante login de una columna para
+  credenciales. Conservar todos los accesos, mensajes, formulario y avisos.
+- **Archivos/contratos:** login/page, módulo CSS de entrada, pruebas de página y
+  navegador, guía Auth y spec/plan/tareas. Sin tocar AuthForm, acciones, contraseña,
+  sesiones, permisos, contratos de datos, SQL, SMTP, dependencias o env persistido.
+- **Riesgos/verificación:** no recortar contenido ni fijar alto/scroll interno;
+  medir encaje1920×1080/960 y tarjetas simétricas, móvil360×800/reflow960×540,
+  controles≥44px, orden DOM del registro, enlaces reales, errores/retención,
+  teclado/axe y regresiones de registros; tipos/lint/build. Revertir presentación
+  restaura el login anterior sin afectar datos ni autenticación.
+- **Implementación:** tarjeta de registro superior de ancho completo y dos
+  tarjetas principales iguales. Login reutiliza las bases compactas locales con
+  credenciales en una columna. AuthForm/acciones intactos; estilos nuevos solo
+  mediante clases específicas de login. Guía/spec/plan/tareas y matriz A21 al día.
+- **Verificación:** RED1/3 por orden DOM; GREEN735 tests/51 archivos, tipos/lint/build
+  PASS. Navegador11/11 (login4, registros7): orden/dimensiones, sin scroll inicial
+  1920×1080/960, controles≥44px, móvil360×800/reflow960×540 sin overflow, teclado,
+  axe y errores/retención, enlaces de alta reales. Captura vacía revisada. La
+  medición excluye inputs ocultos internos de Actions; no se ocultaron controles.
+- **Estado/límites:** implementado/verificado localmente, T130 completo. Pruebas
+  visuales en3001 sin detener servidor ajeno; sin alta/envío/cambios alojados.
+  No se repitió toda la suite E2E, Auth privado/HTTP, NVDA ni zoom real200%.
+  Sin migración, dependencias, variables persistidas, commit o PR nuevos. Gates
+  históricos, revisión independiente, CI y aceptación global siguen pendientes.
+
+## EXTRA-032 — Login: aprovechar la altura disponible
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo; solicitud explícita de
+  ampliar en altura ambas tarjetas principales del login, conservando lo aprobado.
+- **Problema/evidencia/origen:** EXTRA031/T130 deja espacio libre bajo las tarjetas
+  en escritorio1920×1080; el usuario pide aprovecharlo manteniendo su simetría.
+- **Propuesta/justificación:** T131; distribuir la altura mínima de la página con
+  flex y estirar la grilla solo en escritorio. Sin alturas fijas, recortes ni scroll
+  interno; móvil y contenido largo conservan crecimiento natural.
+- **Archivos/contratos/riesgos:** página login, CSS compartido con clases específicas
+  de login, E2E de layout y documentación. Sin cambios de Auth, datos, dependencias,
+  contratos o entorno. Evitar afectar los registros o esconder errores en pantallas bajas.
+- **Verificación prevista:** medir crecimiento entre1080/960, simetría, ausencia de
+  scroll innecesario, móvil/reflow/errores/teclado/axe y regresión de registros;
+  tests unitarios, tipos, lint y build. Revertir las clases restaura la presentación.
+- **Implementación/verificación:** clases de página/contenido/grilla exclusivas
+  del login; tarjetas de817px en1080 y697px en960, mismo ancho/alto y sin scroll
+  inicial.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS. Registros,
+  móvil360×800, reflow960×540, escritorio bajo1280×540, errores/retención, teclado
+  y axe sin regresiones. Captura1920×1080 revisada.
+- **Estado/límites:** implementado y verificado localmente; T131 completo. Pruebas
+  visuales en3001 sin detener servidor ajeno, sin alta/envío/cambios alojados ni
+  reset de datos. No se repitió suite E2E privada, NVDA o zoom real. Sin commit/PR,
+  revisión independiente, CI, aceptación nueva ni cierre de gates históricos.
+
+## EXTRA-033 — Login: información a la izquierda, registro e ingreso a la derecha
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo; disposición solicitada
+  mediante esquema adjunto. Sustituye la ubicación a todo el ancho de EXTRA031
+  y la igualdad de altura entre tarjetas individuales de EXTRA032.
+- **Problema/origen:** T132; el usuario prefiere una tarjeta informativa alta a
+  la izquierda, junto a una columna con registro arriba e inicio de sesión debajo.
+- **Refinamiento antes de verificar:** Mateo observa demasiado espacio vacío en
+  la captura y solicita centrar el conjunto sin estirar las tarjetas. Sustituye
+  el aprovechamiento forzado de altura de EXTRA032 y de la propuesta inicial.
+- **Propuesta/justificación:** mover el registro a la grilla existente y definir
+  áreas CSS locales; información ocupa ambas filas en escritorio, con bordes
+  superior/inferior alineados con la columna derecha. Mantener anchos iguales,
+  altura según contenido y conjunto centrado verticalmente cuando haya espacio,
+  sin expandir la grilla al viewport. Estética actual y controles compactos. En móvil: registro,
+  login e información, sin ocultar contenido ni scroll interno.
+- **Archivos/contratos/riesgos:** página login, CSS Module de entrada, pruebas
+  de componentes/E2E, spec/plan/tareas y guía/matriz/estado. Sin cambios de Auth,
+  datos, contratos, dependencias o configuración. Evitar afectar los registros,
+  el orden de teclado o la visibilidad de errores en pantallas pequeñas.
+- **Verificación prevista:** estructura y medidas de las dos columnas y filas,
+  encaje1920×1080/960, móvil/reflow/escritorio bajo, errores/retención, enlaces,
+  teclado/axe, regresión de registros, tipos/lint/tests/build y captura revisada.
+  Recuperación: revertir presentación sin cambios de datos.
+- **Implementación/verificación:** registro dentro de la grilla, guía abarcando
+  ambas filas; filas automáticas y conjunto centrado sin flex-grow de la grilla.
+  Alturas estables entre1080/960, límites alineados y sin scroll inicial. RED1/3
+  de estructura; GREEN735 tests/51 archivos, tipos/lint/build y navegador11/11
+  PASS. Incluye móvil360×800/reflow960×540/escritorio bajo1280×540, errores y
+  retención, teclado/axe/enlaces y regresión de registros. Captura1920×1080 revisada.
+  Se corrigieron los accesos de prueba posiblemente undefined y la medición antes
+  de visibilidad; tipos se repitió secuencialmente tras una colisión con el build.
+- **Estado/límites:** implementado/verificado localmente, T132 completo. Solo
+  presentación: sin migración, dependencias, env persistido, reset, alta/envío ni
+  cambios alojados. Pruebas en3001 sin detener servidor ajeno; no se repitió suite
+  E2E privada/HTTP, NVDA o zoom real. Entrega de EXTRA027–033: commit `1b93a9f`,
+  [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto sin merge.
+  Revisión independiente, CI, aceptación global y cierre de gates históricos pendientes.
+
+## EXTRA-034 — PR62: actualizar regresión de retiro al contrato de errores por campo
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo solicita corregir el check
+  fallido del PR62; continuación de EXTRA028/T125, sin cambio funcional adicional.
+- **Problema/evidencia:** Quality117/run39525712466, application falla en
+  intermediation.spec.ts:335: espera el aviso general anterior al retiro. El
+  selector de solicitud ahora es required y Form bloquea antes de onSubmit,
+  mostrando “Elegí una opción.” junto al campo.94 E2E pasan,1 falla y1 no corre;
+  database y controles previos de application pasan. No es fallo de despliegue.
+- **Cambio/justificación:** T133; ajustar la aserción al error asociado al selector,
+  foco, aria-invalid, motivo retenido y estado aún Derivada; conservar el resto
+  del recorrido que registra contacto entrante y retira con evidencia. Añadir
+  regresión de componente que prueba bloqueo sin callback y envío con contacto
+  entrante válido. No quitar validación ni relajar reglas para pasar el CI.
+- **Archivos/contratos/riesgos:** pruebas E2E/componente de intermediación,
+  tareas/estado y este registro. Sin cambios de aplicación, SQL, entorno, roles
+  o contratos; verificar asociación del mensaje y no ocultar un retiro sin prueba.
+- **Verificación prevista:** componentes, suite unitaria/cobertura, tipos/lint,
+  push al mismo PR y ejecución completa del CI aislado. No resetear datos locales
+  existentes ni usar servicios alojados. Revertir solo tests/documentación.
+- **Implementación/verificación local:** E2E ahora verifica el error asociado al
+  selector, foco, motivo retenido y participación aún Derivada; el recorrido
+  positivo con contacto entrante se conserva. Nueva regresión de componente
+  comprueba bloqueo sin callback, exclusión de contactos salientes, corrección
+  del campo y payload de retiro con evidencia. Componentes11/11, cobertura736
+  tests/51 archivos, tipos/lint y diff-check PASS. Sin cambios de producción.
+- **Estado:** corrección implementada/verificada localmente; pendiente CI completo
+  en el mismo PR62. No reset local, cambios alojados, merge ni aceptación global.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
