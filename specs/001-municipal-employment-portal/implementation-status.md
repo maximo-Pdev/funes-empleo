@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-19 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-20 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -546,3 +546,110 @@ el ajuste EXTRA026: candidatos debajo de información/historial, nueva regresió
 de orden DOM; final690/43 archivos, tipos/lint y build PASS. Se conserva el dev
 activo sin detenerlo y next-env generado fuera del commit. CI del nuevo SHA y
 revisión/aceptación pendientes; no implica merge ni despliegue.
+
+## Actualización — formularios, 2026-10-20
+
+Rama `codex/fix-registration-verification`, base main6607854 (PR61 mergeado al
+iniciar la rama). Mateo solicita asteriscos rojos, error junto a cada campo,
+bordes rojos y conservación ante fallos en todos los formularios. EXTRA028,
+matriz A18 y T121–T125 registran el incremento; spec/plan/contrato alineados.
+
+Form/Field compartidos integran 40 usos en 29 archivos, incluidas primitivas,
+grupos alternativos, confirmaciones, períodos y requisitos dinámicos. No hay
+forms/labels nativos aislados ni controles visibles sin Field según inventario AST.
+Se bloquea el reset automático de React Actions fallidas; las respuestas públicas
+no enumerativas conservan datos incluso ante supuesto éxito. Conflictos no
+recargan y descartan ediciones. CV usa JSON opt-in sin navegar en error, conserva
+303 para otros clientes y espera versión actualizada antes de anunciar éxito.
+No cambia validación servidor, RLS, permisos, estados o límites de archivos.
+
+Resultados locales:729 unitarias/componentes en49 archivos y tooling57 PASS;
+tipos/lint/build PASS. Navegador20/20 y HTTP privado8/8 aislado PASS; incluyen
+altas verificadas de candidato/empresa con buzón local, perfiles/ofertas,
+moderación, sesiones, CSV/PDF rechazados sin pérdida, carga válida/activación
+con respuesta RSC deliberadamente demorada y filtros. Axe/teclado/foco y
+responsive360×800 comprobados; un selector verifica ancho completo de textarea.
+No es la suite E2E completa ni prueba humana NVDA/aceptación. Respetar el orden
+de proyectos: ejecutar HTTP junto con flujos que mutan auditoría produjo
+interferencia en contadores; la ejecución aislada pasa sin modificar aserciones.
+
+Sin migración, dependencias o entorno persistido nuevos; pruebas contra Docker
+local sin reset, con identidades/casos/auditoría ficticios adicionales. Se mantiene
+Docker y la modificación previa de next-env; no se hizo commit/PR para este ajuste.
+Seis gates históricos, CI nuevo, revisión independiente, despliegue y aceptación
+siguen pendientes. Guía: `docs/product/form-validation.md`.
+
+El ajuste operativo previo EXTRA027 ya actualizó Site URL/callbacks de Supabase,
+según `docs/operations/registration-verification.md`. Este incremento de formularios
+no cambia el entorno alojado ni habilita SMTP. Proveedor y remitente propios
+siguen pendientes: la confirmación genérica no acredita envío de correo público.
+
+### Registros compactos y simétricos — 2026-10-20
+
+Solicitud de Mateo, EXTRA029 y T126–T128: layout servidor común a candidato y
+empresa, tarjetas de igual ancho/alto en escritorio, controles44px y separación
+compacta. La ayuda de correo se integra en la tarjeta. Sin alterar los formularios
+funcionales, avisos municipales, validación, acciones, autenticación ni permisos.
+Móvil/errores/zoom pueden extender el documento; no se oculta contenido ni hay
+scroll interno para simular encaje.
+
+732 unitarias/componentes en50 archivos, tipos/lint/build PASS. Navegador6/6:
+medidas simétricas y sin scroll inicial1920×1080 y1920×960, controles≥44px,
+móvil360×800/reflow960×540 sin overflow horizontal, errores completos, teclado
+y axe sin violaciones. Capturas vacías de ambos registros revisadas visualmente.
+No acredita zoom real200%, NVDA ni alta/envío Auth repetidos en este ajuste.
+Servidor de prueba propio3001 separado del servidor existente3000; sin cambios
+alojados, altas, correos, reset, migración o dependencias. Próxima entrega/revisión
+mediante PR pendientes; los seis gates históricos se conservan abiertos.
+Guía actualizada: `docs/product/auth-frontend.md`.
+
+Ampliación EXTRA030/T129: navegación “Soy postulante”/“Soy empresa” en la fila
+superior, activa con aria-current, sin enviar formularios ni compartir datos
+entre roles. Mateo la autoriza2026-10-20. Regresiones focalizadas3/3 y navegador7/7,
+tipos/lint/build PASS; ida/vuelta sin POST, simetría/encaje y accesibilidad intactos.
+No se repite suite completa ni Auth con alta/envío; sin cambios de datos o entorno
+alojado. Commit/PR, revisión, CI y aceptación global pendientes.
+
+Ampliación EXTRA031/T130: login compacto con tarjeta de registro de ancho completo
+arriba y dos tarjetas principales iguales; estilos locales reutilizados de los
+registros con variante de credenciales en una columna. AuthForm, acciones y reglas
+no se alteran.735 unitarias/componentes/51 archivos, tipos/lint/build PASS;
+navegador11/11 (login4+registros7), simetría/no scroll1920×1080/960, móvil/reflow,
+errores/retención, teclado, enlaces y axe PASS. Captura vacía revisada; pruebas en
+3001 sin alta/envío o cambios alojados. Sin migración/dependencias, nueva aceptación,
+CI o revisión independiente acreditados; no es suite E2E completa/NVDA/zoom real.
+
+Refinamiento EXTRA032/T131: tarjetas del login estiradas por igual para aprovechar
+la altura disponible en escritorio, sin fijar alturas o recortar contenido.735
+tests/51 archivos, tipos/lint/build y navegador11/11 PASS: crecimiento1080/960,
+sin scroll inicial, móvil/reflow/escritorio bajo, teclado/axe y regresión de
+registros/errores/retención. Captura revisada. Solo presentación; sin reset,
+alta/envío o cambios alojados. Revisión/CI/aceptación y gates previos pendientes;
+no acredita suite E2E privada, NVDA ni zoom real.
+
+EXTRA033/T132 sustituye la disposición/estiramiento de EXTRA031/032 por el esquema
+de Mateo y su refinamiento: información a la izquierda, registro sobre ingreso a
+la derecha y conjunto compacto centrado, sin crecer para llenar el viewport.735
+tests/51 archivos, tipos/lint/build y navegador11/11 PASS: alineación/centrado y
+alturas estables1080/960 sin scroll, móvil/reflow/escritorio bajo, errores/retención,
+teclado/axe/enlaces y registros. Captura revisada. Solo presentación, sin reset,
+altas/envíos, cambios alojados, migraciones o dependencias. Sin nueva revisión/CI/
+aceptación/gates cerrados ni suite privada/HTTP/NVDA/zoom real repetidos.
+
+## Preparación de entrega — 2026-10-20
+
+Mateo solicita crear el PR de `codex/fix-registration-verification`, desde main
+6607854 (PR61 mergeado). Incluye EXTRA027–033: diagnóstico/destino de verificación,
+validación compartida y retención de datos, carga de CV sin pérdida ante error,
+registros compactos con navegación entre roles y disposición compacta/centrada
+del login. El SMTP/remitente continúa pendiente; no se declara resuelto el correo
+público general. Sin SQL, dependencias, nuevas variables o cambios de permisos.
+
+Verificación final adicional: tooling57/57 y test:coverage735 tests/51 archivos
+PASS; la cobertura configurada solo mide el módulo seleccionado por el proyecto,
+no implica cobertura100% de toda la aplicación. Tipos/lint/build y navegador11/11
+del último ajuste PASS; la evidencia de recorridos privados/HTTP anteriores está
+en EXTRA028. No se reseteó la base ni repitió la suite E2E completa en esta entrega.
+`next-env.d.ts` conserva su cambio local generado y se excluye del commit.
+Commit/PR, CI y revisión se registrarán cuando estén disponibles; no hay merge
+ni aceptación global acreditados.

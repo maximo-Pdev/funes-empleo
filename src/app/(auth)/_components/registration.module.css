@@ -1,0 +1,51 @@
+.container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 16px; }
+.content { padding-block: 8px 12px; }
+.cards { display: grid; gap: 20px; margin-top: 8px; align-items: stretch; }
+.guide { display: flex; flex-direction: column; min-width: 0; order: 2; border: 1px solid var(--color-primary-900); border-radius: var(--radius-xl); background: var(--color-primary-900); color: white; padding: 20px; }
+.formSection { min-width: 0; order: 1; }
+.formCard { height: 100%; padding: 20px; }
+.form { min-width: 0; margin-top: 12px; }
+.form form { margin-top: 0; gap: 8px; }
+.form form > p, .form form > button { grid-column: 1 / -1; }
+.form form > p:empty { display: none; }
+.form label { min-width: 0; font-size: .875rem; line-height: 20px; font-weight: 600; color: var(--color-foreground); }
+.form input { width: 100%; min-width: 0; min-height: 44px; border-radius: var(--radius-lg); border-color: var(--color-border); padding: 8px 12px; font-size: 1rem; color: var(--color-foreground); }
+.form input:hover { border-color: var(--color-primary-500); }
+.form input:focus-visible { border-color: var(--color-primary); }
+.form button { min-height: 44px; border-radius: var(--radius-lg); background: var(--color-primary); padding: 8px 12px; font-size: .875rem; color: white; }
+.form button:hover:not(:disabled) { background: var(--color-primary-700); }
+.form button:disabled { cursor: not-allowed; }
+.form p { font-size: .75rem; line-height: 18px; color: var(--color-muted-foreground); overflow-wrap: anywhere; }
+.form [data-field-error] { font-size: .875rem; line-height: 20px; }
+.form [role="alert"]:not(:empty) { border: 1px solid #b91c1c; border-radius: var(--radius-lg); padding: 8px; color: #991b1b; }
+.form [role="status"]:not(:empty) { border-radius: var(--radius-lg); background: var(--color-secondary); padding: 8px; color: var(--color-primary-700); }
+.access { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; margin-top: 12px; border-top: 1px solid var(--color-border); padding-top: 8px; }
+.link { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; border-radius: 4px; font-size: .875rem; font-weight: 600; color: var(--color-primary); text-decoration: underline; text-underline-offset: 4px; }
+.link:hover { color: var(--color-primary-900); }
+.mailHelp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 8px; border-top: 1px solid var(--color-border); padding-top: 8px; }
+.mailHelp p { flex: 1; min-width: 140px; }
+.signupCard { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 16px; }
+.signupLinks { display: flex; flex-wrap: wrap; gap: 8px; }
+.loginCards { grid-template-areas: "signup" "form" "guide"; }
+.loginSignup { grid-area: signup; min-width: 0; }
+.loginCards > .guide { grid-area: guide; }
+.loginCards > .formSection { grid-area: form; }
+@media (min-width: 640px) {
+  .container { padding-inline: 24px; }
+  .guide, .formCard { padding: 24px; }
+  .form form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .candidate form > [data-form-field]:has(input[name="email"]),
+  .company form > [data-form-field]:has(input[name="locality"]) { grid-column: 1 / -1; }
+}
+@media (min-width: 1024px) {
+  .loginPage { display: flex; flex-direction: column; }
+  .loginContent { display: flex; flex: 1; flex-direction: column; justify-content: center; }
+  .loginContent > * { flex-shrink: 0; }
+  .loginCards { grid-template-areas: "guide signup" "guide form"; grid-template-rows: auto auto; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide { order: 1; }
+  .formSection { order: 2; }
+}
+.loginForm form { grid-template-columns: minmax(0, 1fr); }
+.loginCard { display: flex; flex-direction: column; }
+.loginCard .access { margin-top: 12px; }

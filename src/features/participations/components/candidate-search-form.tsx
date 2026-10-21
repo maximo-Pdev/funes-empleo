@@ -1,4 +1,5 @@
 "use client";
+import { Form } from "@/components/forms/form";
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -31,7 +32,7 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
     router.push(`/admin/candidates?${params.toString()}`);
   }
 
-  return <form onSubmit={submit} className="grid gap-4 rounded-lg border border-slate-300 bg-white p-5 sm:grid-cols-2" role="search">
+  return <Form onSubmit={submit} className="grid gap-4 rounded-lg border border-slate-300 bg-white p-5 sm:grid-cols-2" role="search">
     <TextField id="candidate-term" label="Término" value={term} onChange={(event) => setTerm(event.target.value)} maxLength={100} />
     <SelectField id="candidate-category" label="Categoría" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}
       options={categories.map((category) => ({ value: category.id, label: category.name }))} placeholder="Todas las categorías" />
@@ -43,5 +44,5 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
     <SelectField id="candidate-eligibility" label="Aptitud para derivación" value={eligibility} onChange={(event) => setEligibility(event.target.value as SearchValues["eligibility"])}
       options={[{ value: "eligible", label: "Aptos" }, { value: "ineligible", label: "No aptos" }, { value: "all", label: "Todos" }]} />
     <div className="flex items-end"><Button type="submit">Buscar candidatos</Button></div>
-  </form>;
+  </Form>;
 }

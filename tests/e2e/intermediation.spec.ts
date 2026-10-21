@@ -391,7 +391,8 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     await candidate.reload();
     await candidate.getByLabel("Elegir PDF").setInputFiles("tests/fixtures/cv-fictitious.pdf");
     await candidate.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-    await expect(candidate).toHaveURL(/\/candidato\/perfil\?cv=ok$/);
+    await expect(candidate).toHaveURL(/\/candidato\/perfil$/);
+    await expect(candidate.getByText("CV guardado.", { exact: true })).toBeVisible();
     await expect(candidate.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", snapshotCv!);
     await company.reload();
     await expect(company.getByText("3415550015")).toBeVisible();

@@ -92,7 +92,8 @@ it("muestra candidatos después de la información e historial de oferta y fuera
 it("conserva validación y confirmación al suspender una oferta", async () => {
  render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) })); fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "suspended" } });
  fireEvent.change(screen.getByRole("textbox", { name: /Motivo interno/ }), { target: { value: "Motivo ficticio" } }); fireEvent.click(screen.getByRole("button", { name: "Guardar decisión" }));
- expect(screen.getByRole("alert").textContent).toContain("Confirmá expresamente"); expect(mocks.moderate).not.toHaveBeenCalled();
+ expect(screen.getByRole("checkbox").getAttribute("aria-invalid")).toBe("true");
+ expect(screen.getByText("Confirmá esta opción para continuar.")).toBeTruthy(); expect(mocks.moderate).not.toHaveBeenCalled();
 });
 it("no consulta ofertas con estado inválido", async () => {
  render(await Openings({ searchParams: Promise.resolve({ status: "invalido" }) })); expect(mocks.openings).not.toHaveBeenCalled(); expect(screen.getByRole("alert")).toBeTruthy();

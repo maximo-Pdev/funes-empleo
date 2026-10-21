@@ -519,3 +519,38 @@ A07×3, sesiones×6) y autorización HTTP8/8 PASS; colección74/18, no suite com
 Ledger T001–T120:114/120; seis gates históricos abiertos. Migración nueva solo
 local; primera A08 alojada según recibo de Mateo. Rollout, revisión, CI completo
 y aceptación pendientes; fixture local conserva una nominación ficticia adicional.
+
+## Phase 16: Formularios accesibles y conservación — 2026-10-20
+
+- [x] T121 Registrar EXTRA028, inventariar formularios y alinear spec/plan/contrato sin modificar reglas ni permisos.
+- [x] T122 RED de obligatorios, errores locales/descripciones/foco, restricciones/grupos y conservación ante fallo Action/reset; implementar Form/Field comunes.
+- [x] T123 Integrar todos los formularios y componentes de campo; requisitos dinámicos/contraseñas/grupos, mantener opcionales, filtros y borradores.
+- [x] T124 Preservar archivo CV ante fallo con JSON opt-in y cliente de carga, manteniendo POST/303, validación y autorización; cubrir tests de handler/UI.
+- [x] T125 Ejecutar regresiones, tipos/lint/build e inventario; navegador por rol/archivo/servidor y accesibilidad. Registrar límites sin acreditar CI/revisión/despliegue.
+
+Verificación local:729 tests/49 archivos, tooling57, tipos/lint/build PASS;
+20 recorridos de navegador y HTTP8/8 aislado PASS. Axe/foco/teclado, móvil360×800,
+filtros GET, CV/CSV retenidos y versión CV/RSC demorada comprobados. Inventario:
+40 usos Form/29 archivos; sin forms/labels nativos aislados ni controles sin Field.
+Detalle y límites: docs/product/form-validation.md, EXTRA028 e implementation-status.md.
+Sin migración, dependencias, reset ni cambios alojados en este incremento.
+No acredita CI/revisión independiente, NVDA, aceptación ni los seis gates previos.
+
+## Phase 17: Registros compactos y simétricos — 2026-10-20
+
+- [x] T126 Registrar EXTRA029, criterios de simetría/no scroll1920×1080 y regresiones de campos/avisos accesibles sin cambiar reglas.
+- [x] T127 Compartir layout de registro y compactar tarjetas/campos con estilos locales, conservando contenidos y todos los enlaces/acciones.
+- [x] T128 Verificar medidas1920×1080, móvil/zoom equivalente/errores/teclado/axe, regresiones de registro, tipos/lint/build y documentar resultados/límites.
+
+EXTRA029:732 tests/50 archivos, tipos/lint/build PASS; navegador6/6 con tarjetas
+iguales y sin scroll inicial1920×1080/960, móvil360×800/reflow960×540, errores,
+teclado y axe PASS. Sin migración/cambios de Auth. No acredita NVDA/zoom real,
+CI, revisión o aceptación. Guía: docs/product/auth-frontend.md.
+
+- [x] T129 EXTRA030: enlaces accesibles entre ambos registros, tipo actual y pruebas de ida/vuelta sin enviar datos; conservar simetría/encaje y verificar calidad. Regresión páginas3/3, navegador7/7, tipos/lint/build PASS; sin POST/altas ni cambios de Auth. Revisión/CI/aceptación pendientes.
+
+- [x] T130 EXTRA031: tarjeta de registro arriba del login, tarjetas principales simétricas y diseño compacto; conservar formulario/enlaces/errores y verificar medidas, móvil, teclado, axe, regresiones, tipos/lint/build.735 tests/51 archivos, navegador11/11 (login4+registros7), tipos/lint/build PASS. Sin cambiar Auth; límites en EXTRA031/guía Auth, sin acreditar CI/revisión/aceptación.
+
+- [x] T131 EXTRA032: ampliar por igual las tarjetas principales del login usando la altura disponible del escritorio; mantener crecimiento natural, sin scroll innecesario ni regresiones de registros.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS: medidas1080/960, móvil/reflow/escritorio bajo/errores/teclado/axe. Límites en EXTRA032; no acredita revisión/CI/aceptación.
+
+- [x] T132 EXTRA033: adaptar login al esquema de Mateo: información a la izquierda y registro sobre ingreso a la derecha; último refinamiento: centrar el conjunto y usar altura de contenido, sin expandir tarjetas al viewport. Sustituye disposición T130/T131, no Auth.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS: alineación/centrado/altura estable/encaje1080/960, móvil/reflow/escritorio bajo, errores/retención/teclado/axe/enlaces y registros. Límites en EXTRA033; sin acreditar revisión/CI/aceptación.

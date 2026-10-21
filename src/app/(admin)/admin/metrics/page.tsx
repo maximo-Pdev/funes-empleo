@@ -1,3 +1,5 @@
+import { Form } from "@/components/forms/form";
+import { Field } from "@/components/forms/field";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { FeedbackMessage } from "@/components/ui";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -22,13 +24,13 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
   }
   return <AdminShell active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Seguimiento" }, { href: "/account", label: "Mi cuenta" }]}>
-    <form method="get" className="mb-6 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
-      <label>Desde<input className="mt-1 block rounded border p-2" name="from" type="date" required max={today} defaultValue={parsed.success ? parsed.data.from : ""} /></label>
-      <label>Hasta<input className="mt-1 block rounded border p-2" name="to" type="date" required max={today} defaultValue={parsed.success ? parsed.data.to : ""} /></label>
-      <label>Categoría<select className="mt-1 block max-w-full rounded border p-2" name="category" defaultValue={parsed.success ? parsed.data.category ?? "" : ""}>
+    <Form method="get" requirements={[{ names: ["from", "to"], rule: "date-order", message: "La fecha Hasta debe ser igual o posterior a Desde." }]} className="mb-6 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
+      <Field>Desde<input className="mt-1 block rounded border p-2" name="from" type="date" required max={today} defaultValue={typeof raw.from === "string" ? raw.from : `${today.slice(0, 7)}-01`} /></Field>
+      <Field>Hasta<input className="mt-1 block rounded border p-2" name="to" type="date" required max={today} defaultValue={typeof raw.to === "string" ? raw.to : today} /></Field>
+      <Field>Categoría<select className="mt-1 block max-w-full rounded border p-2" name="category" defaultValue={parsed.success ? parsed.data.category ?? "" : ""}>
         <option value="">Todas las categorías</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.code}, v{c.version})</option>)}
-      </select></label><button className="rounded bg-blue-800 px-4 py-2 text-white" type="submit">Aplicar filtros</button>
-    </form>
+      </select></Field><button className="rounded bg-blue-800 px-4 py-2 text-white" type="submit">Aplicar filtros</button>
+    </Form>
     <section aria-labelledby="definitions" className="mb-6 space-y-2 rounded border border-blue-300 bg-blue-50 p-4">
       <h2 id="definitions" className="font-semibold">Cómo se calculan</h2>
       <p>Candidato activo: perfil activo, disponible, con consentimiento vigente y confirmado durante los últimos seis meses; no exige CV.</p>

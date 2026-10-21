@@ -46,6 +46,50 @@ después del grid de información/moderación e historial de oferta, según ajus
 solicitado por Mateo el2026-10-19. Native dialog con showModal/Escape, etiquetas y foco devuelto.
 Pruebas SQL de lista/preview/roles/nominación y tests UI/HTTP/E2E.
 
+## Formularios compartidos — 2026-10-20
+
+Form cliente y Field declarativo contextualizan errores sin observers ni cambios
+imperativos a labels/árboles React. Field conserva nombres/IDs/ayudas y agrega
+asterisco/aria-invalid/error local. Form valida restricciones y grupos antes de
+onSubmit/Action, mantiene GET/nombres/valores, y bloquea reset automático de
+Actions fallidas; resultado explícito de éxito permite limpieza. Sin guardar
+datos fuera del DOM ni envolver dispatchers de useActionState como si retornaran
+promesas. Integrar TextField/SelectField/PasswordField y todos los consumidores.
+Conservar también ante conflicto de versión, sin refresh automático en fallo.
+Registro/recuperación/reenvío usan preserveOnSuccess: su respuesta no enumerativa
+no garantiza que el proveedor haya completado la operación. Declarar orden de
+fechas en métricas y conservar filtros válidos recibidos aunque el rango falle.
+CV: fetch multipart opt-in Accept application/json, respuesta de códigos segura
+del handler existente, sin salir ante fallo; POST/303 nativo sigue compatible.
+No nuevos proveedores, dependencias, tablas, estados ni reglas de autorización.
+T121–T125 y EXTRA028 detallan tests y trazabilidad; no cierra gates históricos.
+
+### Registro compacto — 2026-10-20
+
+RegistrationLayout servidor compartido por los dos registros, con configuración
+de textos por rol, Card/Link/Image/Lucide y CSS Module local. Grid de columnas
+iguales/stretch desde escritorio; controles≥44px y separación/tipografía
+compactas, distribución de campos en dos columnas cuando sea viable. Ayuda de
+correo dentro de la tarjeta para alinear sus límites. Sin alturas fijas ni
+overflow oculto: admitir crecimiento por errores, móvil y zoom. Mantener Form,
+Field, PasswordField, acciones y avisos de negocio. EXTRA029/T126–T128 registran
+medidas en navegador y calidad, sin cambios SQL/contratos o dependencias.
+
+El layout incluye navegación “Soy postulante”/“Soy empresa” en su fila superior,
+con Link a cada ruta y aria-current para la activa (EXTRA030). Sin estado cliente,
+almacenamiento cruzado o cambios de Auth; verificar ida/vuelta y conservar encaje.
+
+Login reutiliza las bases compactas del CSS Module de entrada, con variante de
+una columna para credenciales. EXTRA033/T132 sustituye la disposición previa
+EXTRA031/T130–EXTRA032/T131: registro, guía y formulario son áreas de una grilla.
+En escritorio, columnas iguales; guía a la izquierda abarcando ambas filas,
+registro a la derecha en fila automática y formulario debajo en otra fila automática.
+En móvil, registro/login/guía apilados. Página y contenido flex vertical centran
+el conjunto cuando sobra espacio, sin expandir la grilla al viewport, alturas
+fijas o recortes. Clases exclusivas
+de login; AuthForm, enlaces, registros y reglas de acceso intactos. Verificar
+alineación, encaje, dimensiones, accesibilidad y mensajes/retención existentes.
+
 ## Resumen
 
 ### Incremento A01 autorizado el 2026-10-17
