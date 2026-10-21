@@ -13,6 +13,14 @@ también deniega acceso interactivo.
 
 ## Fuentes de autorización por superficie
 
+EXTRA035: toda nueva contratación administrativa normal/tardía retira el
+consentimiento global y revoca todos los permisos empresariales dependientes,
+sin cambiar estados de otras participaciones. El admin confirmante es actor;
+`system` no es el actor del retiro ni se simula acción del candidato. Las
+referencias720h siguientes solo aplican a permisos históricos sin revocar.
+Nueva aceptación afirmativa no restaura un permiso revocado. No cambia el
+flujo manual de retiro, que sigue cerrando los casos abiertos.
+
 A02/A03 (2026-10-17): la navegación pública obtiene href/label en servidor desde
 Auth y la cuenta de aplicación activa. Candidato: `/candidato/perfil`; empresa:
 `/empresa/perfil`; administrador: `/account`. Cuenta ausente, bloqueada o identidad
@@ -117,7 +125,8 @@ La empresa nunca recibe:
 Una empresa activa cuyo permiso fue revocado conserva únicamente el identificador de la derivación,
 el identificador y título de su propia oferta y la fecha de derivación para comunicar feedback
 tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de otras participaciones.
-`hired` conserva un permiso todavía activo solo hasta 720 horas desde la confirmación administrativa;
+Las nuevas confirmaciones `hired` retiran el consentimiento global y revocan todos sus permisos;
+solo las contrataciones históricas anteriores a EXTRA035 conservaban acceso hasta 720 horas.
 `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo revocan. Una corrección tardía a
 `hired`, un consentimiento posterior, una reactivación o una restauración no revierten la revocación.
 
@@ -138,8 +147,9 @@ tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de o
   y no repone ofertas, participaciones, derivaciones ni permisos relacionados.
 - Retirar postulación o consentimiento revoca inmediatamente todos los permisos afectados; aceptar
   nuevamente o restaurar no los repone.
-- `hired` conserva acceso si seguía activo, por un máximo de 720 horas desde la confirmación;
-  incluso antes de que la tarea materialice `revoked`, toda lectura posterior al plazo se deniega.
+- `hired` nuevo retira el consentimiento global y revoca todos los permisos activos sin cambiar
+  otras participaciones. Para permisos históricos previos a EXTRA035 se conserva la prueba del
+  límite720h: aun antes de que la tarea materialice `revoked`, se deniega toda lectura vencida.
   `not_selected`, `withdrawn`, `cancelled` y
   `no_company_response` lo revocan atómicamente. El feedback tardío sigue permitido sin datos y no
   reactiva el acceso, incluso si luego el resultado real se corrige a `hired`.

@@ -54,6 +54,15 @@ y misma autorización. El aviso de éxito espera la versión actualizada del per
 
 ## Convenciones compartidas
 
+EXTRA035 (2026-10-21): nuevas confirmaciones `hire`/`late_hire` en
+`transition_participation` retiran el consentimiento global y revocan todos los
+permisos del candidato en la misma transacción. Otros casos conservan estados,
+versiones y resultados. Firma, rol admin, sesión/evidencia/versiones sin cambios;
+no se llama a otro endpoint ni al retiro manual. Evento append-only con fuente
+hiring_workflow, admin/fecha/política/hash, motivo hired en auditoría y decisión
+privada ligada al caso. La ventana720h restante de estos contratos solo describe
+permisos históricos anteriores, sin backfill ni reactivación al corregir/reconsentir.
+
 ### Consulta pública A07 / FR-024B
 
 `GET /ofertas` recibe q (120 caracteres), rubro (código50), localidad (200),

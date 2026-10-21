@@ -15,6 +15,40 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ## Must be resolved during specification and clarification
 
+### OQ-020 — Retiro automático del consentimiento al contratar (2026-10-21)
+
+**Resuelta para el cambio solicitado:** Mateo, 2026-10-21, confirma expresamente
+la primera opción original: retiro del consentimiento **global** y revocación de
+todos los accesos empresariales. Descarta su comentario posterior sobre limitar
+el objetivo al matching. No acredita aprobación municipal para datos reales.
+
+Solicitud nueva: al confirmar `hired` —normal o tardío— retirar el consentimiento
+vigente y los permisos que dependan de él atómicamente, con actor/fecha/motivo e
+historial, sin alterar otros resultados ni participaciones y sin reaceptación
+automática posterior. Alcance confirmado: global, no consentimiento por oferta.
+
+Reglas aprobadas previas que deben preservarse como evidencia del conflicto:
+
+- `spec.md`, Clarifications 2026-09-19 y `data-model.md/candidate_consents`: único
+  consentimiento general por candidato, no uno por derivación.
+- Clarifications 2026-09-21 y contrato de estados: retirar ese consentimiento cierra
+  todas sus participaciones abiertas y revoca los accesos; reconsentir no los repone.
+- FR-036/FR-037 y contratos: contratación normal conserva un permiso todavía activo
+  hasta720 horas; contratación tardía no revive permisos revocados.
+
+Alternativas consultadas (histórico): **A**, retirar el consentimiento global y revocar los accesos
+de todas las empresas, impidiendo nuevas derivaciones hasta consentimiento afirmativo;
+o **B**, revocar solo el acceso de la derivación contratada sin retirar el global
+(no existe actualmente un consentimiento individual por derivación).
+En ambos casos la solicitud exige preservar estados de las demás participaciones:
+la opción A confirmada es una excepción explícita al cierre por retiro global manual,
+no autorización para cambiar silenciosamente ese flujo existente.
+
+La contratación normal/tardía realizada tras la nueva migración reemplaza la
+ventana720h por retiro y revocación inmediatos, conservando las otras participaciones.
+El retiro manual mantiene su cierre de casos abiertos. Sin backfill automático
+de contrataciones anteriores ni reaceptación implícita por corregir un resultado.
+
 | ID | Question | Current safe position | Decision owner |
 |---|---|---|---|
 | OQ-010 | What is the final controlled category and occupation catalog? | Start from the existing catalog, remove duplicates, and allow multiple selections. | Employment Office |

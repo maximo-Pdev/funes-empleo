@@ -1,4 +1,5 @@
 import "server-only";
+import { revalidatePath } from "next/cache";
 import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
 import { adminOutcomeInput, companyFeedbackInput, companyInterviewInput } from "@/validation/referral-feedback";
@@ -66,5 +67,9 @@ export async function confirmReportedOutcome(input: unknown) {
     p_contact: contactId ?? null,
   });
   if (error) throw databaseError(error.message);
+  if (outcome === "hired") {
+    for (const path of ["/admin/candidates", "/admin/candidates/[candidateId]", "/admin/openings/[openingId]",
+      "/candidato/perfil", "/company/openings/[openingId]/referrals"]) revalidatePath(path, "page");
+  }
   return { version: data };
 }

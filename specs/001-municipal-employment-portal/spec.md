@@ -112,6 +112,15 @@ autenticación, sesiones ni recuperación.
 
 ## Clarifications
 
+### Session 2026-10-21 — contratación y consentimiento (EXTRA035)
+
+- Q: ¿El retiro automático por contratación afecta solo una derivación o el consentimiento global? → A: Mateo confirma el global y todos sus accesos empresariales, descartando la alternativa de solo matching. La transacción administrativa normal o tardía registra el retiro append-only con actor/fecha/causa, revoca todos los permisos activos y conserva los estados y resultados de las demás participaciones. El retiro manual sigue cerrando casos abiertos. No hay aceptación automática por corregir resultados; cualquier aceptación posterior exige el flujo afirmativo vigente y no revive permisos. Aplica a nuevas confirmaciones tras migración, sin backfill de contrataciones previas.
+
+Esta decisión sustituye la conservación720h para nuevas contrataciones de FR-036/
+FR-038 y la generalización del cierre de otros casos al retiro global automático.
+Las aclaraciones previas quedan como evidencia histórica: la ventana720h solo
+se conserva para permisos históricos que no hayan sido revocados.
+
 ### Session 2026-09-19
 
 - Q: Después de una derivación municipal, ¿qué información del candidato podrá ver la empresa? →
@@ -574,12 +583,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   `hired`, `not_selected` o `cancelled`. La vista muestra el resultado vigente y conserva
   `no_company_response` como antecedente automático reemplazado, sin eliminarlo del historial.
 - Una participación finaliza como no seleccionada o cancelada; se revoca inmediatamente el acceso
-  empresarial al perfil, los contactos y el CV. Si finaliza con una contratación confirmada, la
-  empresa conserva un permiso todavía vigente por un máximo de 720 horas desde la confirmación
-  administrativa, salvo retiro de consentimiento, suspensión o archivo previo. Al vencer, no puede
-  iniciar nuevas consultas o descargas. Esta revocación predeterminada con una excepción temporal
-  para contratación es un límite seguro provisional de acceso desde el portal, no una política de
-  retención aprobada: el plazo de conservación de los datos continúa pendiente en OQ-001.
+  empresarial al perfil, los contactos y el CV. Una nueva contratación confirmada, normal o tardía,
+  retira el consentimiento global y revoca todos los accesos empresariales sin alterar las demás
+  participaciones. Solo los permisos históricos anteriores a EXTRA035 conservan el límite de
+  720 horas desde la confirmación administrativa, salvo revocación previa; al vencer no permiten
+  nuevas consultas o descargas. Ese límite histórico no es una política de retención aprobada:
+  el plazo de conservación de los datos continúa pendiente en OQ-001.
 - Un CV tiene tipo o tamaño no admitido, está dañado o intenta contener contenido ejecutable; se
   rechaza con un mensaje claro sin sustituir el CV vigente.
 - Un perfil asistido todavía no tiene CV PDF; puede mantenerse y evaluarse internamente, pero todo
@@ -767,8 +776,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   automáticamente y reemplazar el CV solo afecta derivaciones posteriores. La empresa NO DEBE ver
   su DNI, domicilio ni notas internas. El acceso DEBE revocarse inmediatamente si el resultado final
   es no selección, cancelación o falta de respuesta empresarial. Si un administrador confirma una
-  contratación y el permiso no había sido revocado, el acceso DEBE mantenerse como máximo 30 días
-  exactos (720 horas) desde esa confirmación, sujeto al consentimiento vigente y a la ausencia de
+  contratación (normal o tardía), DEBE retirarse el consentimiento global vigente
+  y revocarse todo acceso empresarial dependiente en la misma transacción, con
+  fecha, actor administrativo y causa, conservando aceptación previa e historial.
+  Las demás participaciones no cambian de estado ni resultado. La ventana de 30 días
+  exactos (720 horas) solo sigue para contrataciones históricas previas al cambio, sujeta al consentimiento vigente y a la ausencia de
   suspensión o archivo de cuentas y registros relacionados. Al cumplirse el plazo DEBEN denegarse
   de inmediato nuevas consultas y descargas y quedar registrada la expiración; nunca se repone un
   permiso revocado. Este plazo solo limita el acceso empresarial y NO define la retención o purga
@@ -786,8 +798,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **FR-038**: Los resultados finales DEBEN distinguir contratación, no selección, retiro,
   cancelación y cierre por falta de respuesta empresarial. El retiro, la no selección, la
   cancelación y la falta de respuesta DEBEN revocar inmediatamente el acceso empresarial a los
-  datos derivados; únicamente la contratación confirmada PUEDE conservar por 720 horas un permiso
-  que siga vigente, bajo las condiciones de FR-036. El candidato DEBE poder retirar cualquier
+  datos derivados. La nueva contratación confirmada retira el consentimiento global
+  y revoca todos los permisos del candidato según FR-036, sin cerrar otros casos;
+  una aceptación afirmativa posterior nunca revive permisos revocados. El candidato DEBE poder retirar cualquier
   participación propia todavía abierta, sea
   postulación o nominación administrativa. Un administrador solo DEBE registrar un retiro a pedido
   del candidato; PUEDE cancelar una participación individual abierta con motivo operativo, sin
@@ -959,9 +972,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   de CV asociada a esa derivación, excluyendo DNI, domicilio y notas internas.
   El retiro posterior de la postulación o del consentimiento general revoca inmediatamente ese
   acceso sin borrar el historial administrativo ni permitir su restauración automática. La no
-  selección, cancelación o falta de respuesta también lo revocan; una contratación confirmada debe
-  conservarlo solo hasta 720 horas desde su confirmación mientras se mantengan las condiciones de
-  FR-036. Ese límite de acceso no define cuánto tiempo se conservan perfil, CV o historial.
+  selección, cancelación o falta de respuesta también lo revocan. Una nueva contratación confirmada
+  retira el consentimiento global y revoca todos los permisos, sin cambiar otros casos; la ventana
+  de 720 horas de FR-036 solo corresponde a permisos históricos previos a EXTRA035.
+  Ese límite de acceso no define cuánto tiempo se conservan perfil, CV o historial.
 - **Entrevista y resultado**: Información comunicada por la empresa o recabada por el personal; solo
   un administrador confirma el resultado comunicado por la empresa, con excepción del retiro
   directo del candidato o asistido a su pedido.
