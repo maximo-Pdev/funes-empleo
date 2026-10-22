@@ -824,3 +824,82 @@ Commit70ae1ea publicado en PR64 (abierto, sin merge):
 https://github.com/maximo-Pdev/funes-empleo/pull/64.
 CI y revisión pendientes. Pendiente aplicar20261022202940 en Supabase compartido antes
 de desplegar app; guía docs/validation/profile-self-archival.md. OQ-001/002 abiertos.
+
+## Perfil candidato: consentimiento y activación — EXTRA040, 2026-10-22
+
+PR64 confirmado mergeado en5b15b24. main actualizado y nueva rama
+codex/feat-candidate-consent-activation-ui; anterior borrada local/remoto.
+next-env.d.ts preexistente preservado fuera del incremento.
+
+Primera tarjeta con estado/vigencia. active muestra Perfil activo sin botón;
+draft/needs_update/unavailable/consent_withdrawn muestran Activar perfil solo con
+localidad/resumen/categoría, disponibilidad available, consentimiento accepted
+y CV válido guardados. Incompletos enumeran pasos; archived/desconocidos no
+ofrecen activación. Predicado visual derivado del RPC vigente, sin modificar
+servidor/DB ni sustituir sus controles de concurrencia, propiedad y sesión.
+
+Consentimiento explica uso laboral por la Oficina, acceso empresarial solo tras
+derivación y exclusión de DNI/domicilio/notas internas. Contratación normal o
+tardía confirmada retira el global y revoca todos los accesos dependientes, sin
+alterar otros casos/finales. Corregir resultado no reconsiente; nueva aceptación
+afirmativa no revive accesos. Retiro manual diferenciado y política demo íntegra
+con advertencia de no aprobación municipal. No se decide otra retención/uso legal.
+
+CSS local semántico y tarjetas de ancho completo evitan estirar contacto junto
+al aviso; datos laborales mantienen dos columnas internas en escritorio y una
+en móvil. Sin reordenamiento visual distinto del DOM. Guía:
+docs/product/candidate-profile-presentation.md.
+
+| Verificación local | Resultado |
+| --- | --- |
+| RED/GREEN focal | Presentación15/15 RED; tres archivos candidatos28/28 GREEN. Una importación temporal de Vitest en sandbox se resolvió ejecutando fuera, sin modificar tests/configuración para ocultarla. |
+| Unitarias/componentes/integración/cobertura | 745/54 PASS; cobertura configurada solo env/schema, no toda la app. |
+| Tooling, tipos, lint y build | 57/57 y PASS. |
+| Navegador final | 12/12 PASS, sin reintentos: candidato1, formularios9 y contrataciones normal/tardía2. |
+| Presentación/accesibilidad | Orden y teclado de activación, indicador, ancho de tarjetas, móvil360×800/escritorio1920×1080, axe y sin overflow PASS; capturas ficticias revisadas visualmente. |
+| Integridad | Diff-check PASS; sin servidor/DB/migración/contratos nuevos ni cambios alojados. Base local conservada sin reset. |
+
+T144–147 completos para el alcance solicitado; análisis acotado sin gaps nuevos
+construibles o conflictos de constitución. Checklists existentes sin cambios,
+no acredita revisión independiente o aceptación municipal. Servidor next dev
+cerrado con autorización de Mateo para las pruebas; servidor de pruebas cerrado
+al terminar, next-env.d.ts ajeno restaurado. Sin commit/PR nuevo, CI, suite E2E/SQL
+completa o NVDA en este incremento. El rollout de EXTRA039 no se ejecuta aquí y
+OQ-001/002 siguen abiertas; no hay una decisión nueva pendiente para esta interfaz.
+
+### Reorganización de tarjetas — EXTRA041, 2026-10-22
+
+Rama actual feat/candidate-consent-activation-ui: renombrada sin prefijo codex
+por pedido de Mateo, quien también pide commits sin firmas ni atribuciones
+automáticas. Sin commit/PR todavía; modificaciones EXTRA040 y next-env.d.ts ajeno
+preservados.
+
+Teléfono opcional dentro de Datos laborales y personales, sin tarjeta/título
+Contacto adicional. Guardar teléfono conserva comando/versión/formulario propio,
+hermano del formulario de datos en una única tarjeta, sin anidarlos ni simular
+guardado atómico de dos operaciones distintas. CV queda antes del consentimiento.
+Cartel amarillo retirado de la vista inicial; texto literal, versión y advertencia
+demo consultables en Ver política de consentimiento, desplegable cerrado con
+acceso por teclado. Sin cambiar política/hash, autorización o regla de negocio.
+
+RED2/16 y GREEN29/29 focales;746 pruebas/54 archivos, tooling57/57, tipos/lint/build
+y diff-check PASS. Navegador11/11 sin reintentos: recorrido candidato, formularios9
+y prueba existente de snapshot/contactos/retiro y reaceptación. Rechazo de teléfono
+inválido, persistencia/relectura, vaciado opcional y conservación de correcciones
+no guardadas PASS. Empresa derivada ve contacto nuevo, mantiene CV vinculado y no
+recupera acceso tras retiro/reaceptación. Revisión visual de captura sintética,
+móvil/escritorio, teclado y axe; sin aprobación humana o NVDA inferidas.
+
+Guía docs/product/candidate-profile-presentation.md actualizada. Sin migración,
+backend, dependencias, reset local o cambios alojados. El fixture15 se comprobó
+apto antes de ejecutar su recorrido existente; sin restablecer casos previos.
+Servidor de desarrollo cerrado con permiso explícito para probar, servidores de
+prueba finalizados y next-env.d.ts preexistente restaurado. No acredita CI, suite
+E2E/SQL completa, aceptación o cierre de OQ-001/002. No cambia el carácter demo de
+la política ni habilita datos reales por quitar su cartel inicial.
+
+Entrega solicitada por Mateo: commitc228d2c publicado sin firma ni atribución
+automática en PR65, abierto hacia main desde feat/candidate-consent-activation-ui:
+https://github.com/maximo-Pdev/funes-empleo/pull/65.
+next-env.d.ts ajeno excluido. Sin nuevas migraciones/cambios alojados, CI y
+revisión pendientes; sin merge o aceptación acreditados.

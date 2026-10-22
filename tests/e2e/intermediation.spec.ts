@@ -391,7 +391,7 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
 
     await candidate.goto("/candidato/perfil");
     await candidate.getByLabel("Teléfono (opcional)").fill("3415550015");
-    await candidate.getByRole("button", { name: "Guardar contacto" }).click();
+    await candidate.getByRole("button", { name: "Guardar teléfono" }).click();
     await expect(candidate.getByText("Contacto actualizado.")).toBeVisible();
     await candidate.reload();
     await candidate.getByLabel("Elegir PDF").setInputFiles("tests/fixtures/cv-fictitious.pdf");

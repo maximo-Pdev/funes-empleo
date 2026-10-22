@@ -53,7 +53,7 @@ describe("autogestión candidata", () => {
     expect(screen.getByLabelText("Categoría A")).toHaveProperty("checked", true);
     expect(screen.getByLabelText("Categoría B")).toHaveProperty("checked", true);
     expect(screen.getByText(/no es texto municipal aprobado/i)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Activar perfil" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Activar perfil" })).toBeNull();
     expect(screen.queryByRole("button", { name: /archivar|eliminar/i })).toBeNull();
     expect(screen.queryByLabelText(/Confirmo que quiero archivar/)).toBeNull();
   });
