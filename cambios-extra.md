@@ -1761,6 +1761,40 @@ su modificación local y queda excluido; sin logs/fixtures privados/secretos.
 Verificaciones previas consignadas en EXTRA035–037; cambios de esta entrega solo
 documentales, diff-check PASS. CI/revisión independiente y aceptación pendientes.
 
+## EXTRA-038 — PR63: aislar fixtures de contratación y matching
+
+- **Fecha/origen/autorización:** 2026-10-21, Mateo solicita corregir el error de
+  GitHub del PR63; derivado de T138 y de la obligación de regresión sin saltos.
+- **Evidencia:** Quality121/run39688659768: database PASS; application falla
+  exclusivamente en dos E2E de job-category-matching,95 pasan y1 no corre. Las
+  dos contrataciones nuevas pasan, pero copian ofertas publicadas sin sus rubros.
+  El selector de matching elige cualquier primera oferta pública por UUID: puede
+  elegir una de esas ofertas aleatorias sin categorías y encontrar cero candidatos.
+  No es fallo de migración ni razón para relajar consentimiento o matching.
+- **Cambio mínimo propuesto:** ofertas de contratación ficticias en paused (los
+  permisos de derivación admiten ese estado), aserción de que no aparecen en
+  public_offer_rows, y selector del fixture de matching con categorías explícitas
+  como precondición. Conservar expectativas de12 tarjetas/paginación/nominación,
+  rechazo/ausencia de acceso, auditoría, locks y demás casos intactos.
+- **Archivos/contratos/riesgos:** tests/e2e/hiring-consent.spec.ts,
+  tests/e2e/job-category-matching.spec.ts, tareas/estado y este registro. Solo
+  fixtures/selección de prueba; sin cambios de producto, arquitectura, migraciones,
+  dependencias, configuración, permisos o datos alojados. No borrar/restablecer
+  datos locales para forzar verde ni omitir pruebas.
+- **Verificación prevista:** RED de aislamiento antes del fix, E2E de ambas
+  contrataciones y matching, tipos/lint/tooling/cobertura/build, diff-check;
+  publicar en el mismo PR y comprobar CI completo aislado. Autoriza el pedido y
+  AGENTS.md para prerrequisito técnico; no implica nueva aceptación del producto.
+- **Implementación/verificación local:** aserción de aislamiento RED (esperaba0
+  ofertas públicas, recibía2) y GREEN tras usar paused. Helper de matching exige
+  categorías, sin elegir por cantidad de coincidencias ni bajar expectativas.
+  Navegador6/6 PASS ejecutando contratación antes de matching; ambas contrataciones
+  y las cuatro regresiones de modal/paginación/nominación/roles se conservan.
+  Cobertura741 tests/52 archivos, tooling57, tipos/lint/build y diff-check PASS.
+  Docker/base existentes iniciados sin reset; solo se cerró el servidor de pruebas
+  propio. next-env.d.ts mantiene el cambio local y se excluye del commit.
+  Corrección en el mismo PR63, pendiente nueva ejecución CI completa/revisión.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

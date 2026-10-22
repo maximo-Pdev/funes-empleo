@@ -35,7 +35,7 @@ for (const late of [false, true]) {
       values('${cvId}','${candidateId}','${candidateId}/${cvId}.pdf','cv-ficticio.pdf','application/pdf',608,repeat('0',64),'valid','fictitious_fixture',private.fixture_id('admin',1));
       insert into public.job_openings
       select (jsonb_populate_record(null::public.job_openings,to_jsonb(template)||jsonb_build_object(
-        'id',chosen.id,'slug',null,'title','Oferta ficticia contratación','closing_date',(now()+interval '1 month')::date,
+        'id',chosen.id,'slug',null,'title','Oferta ficticia contratación','status','paused','closing_date',(now()+interval '1 month')::date,
         'company_id',(select id from public.company_profiles where account_id=private.fixture_id('company',chosen.company))))).*
       from public.job_openings template cross join (values('${openingId}'::uuid,1),('${otherOpeningId}'::uuid,2)) chosen(id,company)
       where template.id=private.fixture_id('opening',1);
@@ -48,6 +48,7 @@ for (const late of [false, true]) {
         '${consentId}','${cvId}',now()+interval '29 days',now(),'account',private.fixture_id('admin',1),'referral_created'
       from (values('${participationId}'::uuid,'${late ? "revoked" : "active"}'),('${otherParticipationId}'::uuid,'active')) chosen(id,access);
       commit;`);
+    expect(runLocalMaintenanceSql(`select count(*) from private.public_offer_rows where id in ('${openingId}','${otherOpeningId}');`)).toBe("0");
     const otherCaseBefore = runLocalMaintenanceSql(`select to_jsonb(part)::text from public.participations part where id='${otherParticipationId}';`);
     const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
     const companyContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });

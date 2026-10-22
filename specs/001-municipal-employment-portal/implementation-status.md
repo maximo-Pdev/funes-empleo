@@ -761,3 +761,20 @@ Abierto sin merge; incluye migraciones ya aplicadas, pruebas y EXTRA035–037.
 next-env.d.ts permanece como cambio local fuera del commit. Evidencia de calidad
 anterior conservada; entrega documental adicional con diff-check PASS. CI,
 revisión independiente y aceptación siguen pendientes, sin cerrar otros gates.
+
+### Corrección de application en PR63 — EXTRA038, 2026-10-21
+
+Quality121/run39688659768: database PASS, application falla solo por dos E2E de
+matching,95 pasan y1 no corre. Las ofertas aleatorias creadas por contratación
+copiaban published sin categorías y el selector de matching podía elegirlas.
+No se modifica el matching real ni el retiro global: solo fixtures en paused,
+aserción explícita de que no son públicos y selector de prueba con categorías.
+Mantiene12 tarjetas, paginación/modal/nominación y todas las comprobaciones de
+contratación, evidencia, revocación, atomicidad y otras participaciones intactas.
+
+Regresión de aislamiento RED0 esperado/2 recibidas; GREEN y navegador6/6 PASS
+en orden contratación→matching. Cobertura741/52, tooling57, tipos/lint/build y
+diff-check PASS; base local preservada sin reset, sin repetir SQL alojado ni
+migraciones. next-env.d.ts conserva su cambio local fuera del commit. Nueva
+ejecución completa CI en el mismo PR y revisión humana pendientes; no se relajan
+gates ni se declara resuelto el backlog del producto.

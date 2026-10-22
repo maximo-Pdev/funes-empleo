@@ -569,3 +569,5 @@ Actualización de despliegue2026-10-21, EXTRA037: Mateo solicita aplicar ambas
 migraciones alojadas; aplicadas y verificadas en Funes-empleo con versiones
 originales, sin alterar historia previa ni ejecutar pruebas/datos de negocio.
 El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
+
+- [x] T139 EXTRA038: aislar ofertas ficticias de contratación fuera del listado público y exigir categorías en la selección de fixture de matching. RED0 esperado/2 recibidas y GREEN; E2E6/6, cobertura741/52, tooling57, tipos/lint/build/diff-check PASS. Conserva12 tarjetas/paginación/nominación y contratación normal/tardía; sin reset local ni cambios alojados. Publicación en PR63 con CI completo y revisión como gates pendientes, no aceptación global.
