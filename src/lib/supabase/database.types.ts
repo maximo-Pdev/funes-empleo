@@ -1113,6 +1113,7 @@ export type Database = {
           location: string | null
           modality: string | null
           moderation_message_public: string | null
+          slug: string | null
           published_at: string | null
           requirements: string | null
           salary: string | null
@@ -1137,6 +1138,7 @@ export type Database = {
           location?: string | null
           modality?: string | null
           moderation_message_public?: string | null
+          slug?: string | null
           published_at?: string | null
           requirements?: string | null
           salary?: string | null
@@ -1161,6 +1163,7 @@ export type Database = {
           location?: string | null
           modality?: string | null
           moderation_message_public?: string | null
+          slug?: string | null
           published_at?: string | null
           requirements?: string | null
           salary?: string | null
@@ -1744,10 +1747,32 @@ export type Database = {
         Returns: Json
       }
       my_company_profile: { Args: never; Returns: Json }
+      published_offer_by_slug: {
+        Args: { p_slug: string }
+        Returns: Json
+      }
       published_offers: {
         Args: { p_id?: string; p_page?: number; p_page_size?: number }
         Returns: Json
       }
+      match_opening_candidates: {
+        Args: {
+          p_opening: string
+          p_page?: number
+          p_page_size?: number
+        }
+        Returns: Json
+      }
+      preview_opening_candidate: {
+        Args: { p_opening: string; p_candidate: string }
+        Returns: Json
+      }
+      search_published_offers: {
+        Args: { p_page?: number; p_page_size?: number; p_q?: string; p_rubro?: string;
+          p_localidad?: string; p_modalidad?: string; p_id?: string }
+        Returns: Json
+      }
+      public_offer_filter_options: { Args: never; Returns: Json }
       save_company_opening: {
         Args: { p_benefits: string; p_categories: string[]; p_closing_date: string | null;
           p_contract_type: string; p_id: string | null; p_location: string; p_modality: string;

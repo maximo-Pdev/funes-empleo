@@ -57,15 +57,15 @@ describe("Home access panel", () => {
     const cuit = screen.getByLabelText("CUIT");
     const responsible = screen.getByLabelText("Persona responsable");
     const email = screen.getByLabelText("Correo electrónico");
-    expect(responsible.closest("label")?.parentElement?.tagName).toBe("DIV");
-    expect(responsible.closest("label")?.parentElement?.contains(email)).toBe(true);
-    expect(responsible.closest("label")?.parentElement?.children).toHaveLength(2);
-    const row = phone.closest("label")?.parentElement;
+    expect(responsible.closest("[data-form-field]")?.parentElement?.tagName).toBe("DIV");
+    expect(responsible.closest("[data-form-field]")?.parentElement?.contains(email)).toBe(true);
+    expect(responsible.closest("[data-form-field]")?.parentElement?.children).toHaveLength(2);
+    const row = phone.closest("[data-form-field]")?.parentElement;
     expect(row?.tagName).toBe("DIV");
     expect(row?.contains(locality)).toBe(true);
     expect(row?.children).toHaveLength(2);
-    expect(cuit.closest("label")?.parentElement?.contains(activity)).toBe(true);
-    expect(cuit.closest("label")?.parentElement?.children).toHaveLength(2);
+    expect(cuit.closest("[data-form-field]")?.parentElement?.contains(activity)).toBe(true);
+    expect(cuit.closest("[data-form-field]")?.parentElement?.children).toHaveLength(2);
     expect([...phone.form!.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])')].map(input => input.name)).toEqual([
       "legalName", "responsibleName", "email", "cuit", "activity", "locality", "phone", "password", "confirmation",
     ]);
@@ -90,18 +90,16 @@ describe("Home access panel", () => {
     expect(panel.getAttribute("data-mode")).toBe("login");
   });
 
-  it("preserves login and password-change guidance while removing only the registration privacy hint", () => {
+  it("preserves the shared password guidance across login, password change and registration", () => {
+    const help = "Entre 6 y 128 caracteres. No compartas tu contraseña.";
     const view = render(<AuthForm mode="login" />);
-    expect(screen.getByText("No compartas tu contraseña.")).toBeTruthy();
-    expect(screen.queryByText(/Entre 6 y 128 caracteres/)).toBeNull();
+    expect(screen.getByText(help)).toBeTruthy();
     view.rerender(<AuthForm mode="password" />);
-    expect(screen.getByText("Entre 6 y 128 caracteres. No compartas tu contraseña.")).toBeTruthy();
+    expect(screen.getByText(help)).toBeTruthy();
     view.rerender(<CandidateRegistrationForm />);
-    expect(screen.queryByText(/No compartas tu contraseña/)).toBeNull();
-    expect(screen.getByText("Entre 6 y 128 caracteres.")).toBeTruthy();
+    expect(screen.getByText(help)).toBeTruthy();
     view.rerender(<CompanyRegistrationForm />);
-    expect(screen.queryByText(/No compartas tu contraseña/)).toBeNull();
-    expect(screen.getByText("Entre 6 y 128 caracteres.")).toBeTruthy();
+    expect(screen.getByText(help)).toBeTruthy();
   });
 
   it("shows the sign-in form by default", () => {

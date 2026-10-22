@@ -20,6 +20,13 @@ mark checklist items on behalf of the reviewer.
 **Organization**: Tasks are grouped by user story so each story can be implemented and validated as
 an independent increment after the shared foundation.
 
+## Follow-up autorizado 2026-10-17 — FR-024A
+
+El cambio de URLs públicas a slugs estables se sigue por separado en
+[public-offer-slugs](../../odd/tasks/public-offer-slugs.md), tareas T1–T3. No altera las
+casillas ni acredita el cierre de tareas originales de aceptación del MVP. EXTRA-020
+registra autorización, superficies, riesgos y comprobaciones.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel because it changes different files and has no dependency on another
@@ -469,3 +476,105 @@ sin cambios; este bloque no cierra gates externos ni acredita revisión humana.
 Evidencia local en matriz y EXTRA-019. Marcas de implementación/verificación,
 no aprobación del compañero ni aceptación global; CI completo/pgTAP del nuevo
 SHA pendientes. Los seis gates externos históricos siguen abiertos.
+
+## Phase 13: A07 — búsqueda pública (2026-10-19)
+
+- [X] T106 [US2] Contrastar A07/FR-024B con spec/plan/contrato y registrar EXTRA-022 antes del código; conservar FR-024/024A y catálogo actual.
+- [X] T107 [US2] RED de normalización, límites, URL/paginación y transporte de filtros; pruebas de formulario/vacíos/entrada inválida y pgTAP de privacidad.
+- [X] T108 [US2] Migración de lectura: proyección privada centralizada, RPC de búsqueda y opciones; conservar firma/defaults de published_offers y lookup por slug, sin backfill.
+- [X] T109 [US2] Integrar validación en servicio y formulario GET del listado con filtros persistentes, limpiar y paginar; errores seguros, controles accesibles y estilos existentes.
+- [X] T110 [US2] Verificar unitarias/componentes, pgTAP, tipos/lint/build y navegador; abrir PR con evidencia y rollout/recuperación, sin atribuir review ni aceptación humana.
+
+Marcas locales de implementación/verificación: 603 pruebas/39 archivos, tooling57,
+pgTAP951/14 archivos, tipos/lint/build y advisor PASS; navegador focal9/9. Ledger
+T001–T110: 104/110, sin cerrar los seis gates históricos. FR-024A mantiene su
+ledger separado; CI completo/revisión del nuevo SHA se registran en el PR.
+
+## Phase 14: A08 — rubros y matching municipal (2026-10-19)
+
+- [X] T111 [US1/US2] Contrastar matriz/spec/plan/modelo/contrato y registrar EXTRA-024; preservar categorías históricas sin equivalencias inventadas.
+- [X] T112 [US1/US2] RED SQL de catálogo/RPC y cobertura de servicio/componente: OR sin duplicados, elegibilidad, privacidad, estados de oferta y paginación; catálogo completo y referencias conservadas.
+- [X] T113 [US1/US2] Migración de catálogo v2 y RPC administrativa de coincidencias; no tocar importador v1 ni permisos empresariales.
+- [X] T114 [US1] Integrar servicio tipado y lista paginada en detalle de oferta con rubros coincidentes, evaluación municipal y estados de error/carga/vacío.
+- [X] T115 [US1/US2] Verificar tipos/lint/unitarias/tooling/build/SQL/E2E, documentar rollout, evidencia y límites; no atribuir aceptación ni despliegue alojado.
+
+Evidencia local A08: 655 pruebas/42 archivos, tooling57, tipos/lint/build,
+pgTAP986/15 archivos (35 nuevas), security advisor sin hallazgos y navegador12/12
+(3 A08 + 3 A07 + 6 sesiones) PASS. Colección73/18 no equivale a ejecutar toda
+la suite. Ledger T001–T115:109/115; los seis gates externos siguen abiertos.
+Migración aplicada/registrada solo localmente, sin reset ni cambios alojados.
+CI completo, PR, revisión independiente y aceptación pendientes.
+
+## Phase 15: A08 — perfil modal y nominación en contexto (2026-10-19)
+
+- [X] T116 [US1] Registrar EXTRA-025 y ajustar spec/plan/contrato a popup, exclusión y layout compacto sin modificar migración ya aplicada.
+- [X] T117 [US1] RED SQL de exclusión previa al total; migración forward-only con pool común y preview administrativo protegido; pruebas de nominación/duplicados/conflictos.
+- [X] T118 [US1] Servicio/action de preview mínimo validado, errores seguros y revalidación del detalle en nominación; cubrir autorización HTTP directa.
+- [X] T119 [US1] Diálogo nativo con carga/error/foco/Escape, nominación fija a la oferta actual, anti doble envío y respuestas tardías; tarjetas de dos columnas y doce por página.
+- [X] T120 [US1] Verificar SQL/unitarias/UI/tooling/tipos/lint/build y navegador de nominación, exclusión, responsive y accesibilidad; actualizar evidencia/rollout sin atribuir despliegue remoto.
+
+Verificación local de la ampliación:689 pruebas/43 archivos, tooling57,
+pgTAP1007/16 archivos, tipos/lint/build y advisor PASS. Navegador13/13 (A08×4,
+A07×3, sesiones×6) y autorización HTTP8/8 PASS; colección74/18, no suite completa.
+Ledger T001–T120:114/120; seis gates históricos abiertos. Migración nueva solo
+local; primera A08 alojada según recibo de Mateo. Rollout, revisión, CI completo
+y aceptación pendientes; fixture local conserva una nominación ficticia adicional.
+
+## Phase 16: Formularios accesibles y conservación — 2026-10-20
+
+- [x] T121 Registrar EXTRA028, inventariar formularios y alinear spec/plan/contrato sin modificar reglas ni permisos.
+- [x] T122 RED de obligatorios, errores locales/descripciones/foco, restricciones/grupos y conservación ante fallo Action/reset; implementar Form/Field comunes.
+- [x] T123 Integrar todos los formularios y componentes de campo; requisitos dinámicos/contraseñas/grupos, mantener opcionales, filtros y borradores.
+- [x] T124 Preservar archivo CV ante fallo con JSON opt-in y cliente de carga, manteniendo POST/303, validación y autorización; cubrir tests de handler/UI.
+- [x] T125 Ejecutar regresiones, tipos/lint/build e inventario; navegador por rol/archivo/servidor y accesibilidad. Registrar límites sin acreditar CI/revisión/despliegue.
+
+Verificación local:729 tests/49 archivos, tooling57, tipos/lint/build PASS;
+20 recorridos de navegador y HTTP8/8 aislado PASS. Axe/foco/teclado, móvil360×800,
+filtros GET, CV/CSV retenidos y versión CV/RSC demorada comprobados. Inventario:
+40 usos Form/29 archivos; sin forms/labels nativos aislados ni controles sin Field.
+Detalle y límites: docs/product/form-validation.md, EXTRA028 e implementation-status.md.
+Sin migración, dependencias, reset ni cambios alojados en este incremento.
+No acredita CI/revisión independiente, NVDA, aceptación ni los seis gates previos.
+
+## Phase 17: Registros compactos y simétricos — 2026-10-20
+
+- [x] T126 Registrar EXTRA029, criterios de simetría/no scroll1920×1080 y regresiones de campos/avisos accesibles sin cambiar reglas.
+- [x] T127 Compartir layout de registro y compactar tarjetas/campos con estilos locales, conservando contenidos y todos los enlaces/acciones.
+- [x] T128 Verificar medidas1920×1080, móvil/zoom equivalente/errores/teclado/axe, regresiones de registro, tipos/lint/build y documentar resultados/límites.
+
+EXTRA029:732 tests/50 archivos, tipos/lint/build PASS; navegador6/6 con tarjetas
+iguales y sin scroll inicial1920×1080/960, móvil360×800/reflow960×540, errores,
+teclado y axe PASS. Sin migración/cambios de Auth. No acredita NVDA/zoom real,
+CI, revisión o aceptación. Guía: docs/product/auth-frontend.md.
+
+- [x] T129 EXTRA030: enlaces accesibles entre ambos registros, tipo actual y pruebas de ida/vuelta sin enviar datos; conservar simetría/encaje y verificar calidad. Regresión páginas3/3, navegador7/7, tipos/lint/build PASS; sin POST/altas ni cambios de Auth. Revisión/CI/aceptación pendientes.
+
+- [x] T130 EXTRA031: tarjeta de registro arriba del login, tarjetas principales simétricas y diseño compacto; conservar formulario/enlaces/errores y verificar medidas, móvil, teclado, axe, regresiones, tipos/lint/build.735 tests/51 archivos, navegador11/11 (login4+registros7), tipos/lint/build PASS. Sin cambiar Auth; límites en EXTRA031/guía Auth, sin acreditar CI/revisión/aceptación.
+
+- [x] T131 EXTRA032: ampliar por igual las tarjetas principales del login usando la altura disponible del escritorio; mantener crecimiento natural, sin scroll innecesario ni regresiones de registros.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS: medidas1080/960, móvil/reflow/escritorio bajo/errores/teclado/axe. Límites en EXTRA032; no acredita revisión/CI/aceptación.
+
+- [x] T132 EXTRA033: adaptar login al esquema de Mateo: información a la izquierda y registro sobre ingreso a la derecha; último refinamiento: centrar el conjunto y usar altura de contenido, sin expandir tarjetas al viewport. Sustituye disposición T130/T131, no Auth.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS: alineación/centrado/altura estable/encaje1080/960, móvil/reflow/escritorio bajo, errores/retención/teclado/axe/enlaces y registros. Límites en EXTRA033; sin acreditar revisión/CI/aceptación.
+
+- [ ] T133 EXTRA034: corregir E2E de retiro del PR62 para exigir error por campo, foco, motivo retenido y estado sin retirar; agregar regresión de bloqueo sin evidencia y envío con contacto entrante. Sin cambios funcionales. Verificar tests/tipos/lint y CI completo en el mismo PR, sin reset local.
+
+## Contratación y consentimiento — solicitud 2026-10-21
+
+- [x] T134 EXTRA035/OQ-020: Mateo confirma primera opción original (global), descarta alternativa de solo matching. Spec/plan/modelo/contratos y checklist acotados alineados; análisis previo sin bloqueos de alcance, resultados en EXTRA035. Regla nueva sustituye ventana720h solo en nuevas contrataciones; excepción al retiro manual que cierra casos.
+- [x] T135 RED SQL: contratación normal/tardía, revocación multiderivación, historia/actor/causa, otros casos/finales intactos, rechazo por rol/versión/evidencia y rollback de auditoría. RED22/37; final55/55 PASS en024.
+- [x] T136 Migración forward-only: source hiring_workflow restringido, bloqueo candidato primero y retiro/revocación dentro del RPC existente; grants y firmas intactos, sin backfill ni cambios de retiro manual.20261021220623 y EXTRA036/20261021221414 aplicadas/verificadas solo localmente.
+- [x] T137 Servidor y regresiones: cubrir ambos comandos en servicios/acciones, invalidación de vistas afectadas tras éxito; actualizar expectativas E2E/SQL solo donde cambia la regla, conservando cobertura de permisos históricos. Cinco tests nuevos de servicio y dos E2E propios; suite SQL histórica intacta.
+- [x] T138 Verificar SQL/rollback/concurrencia, unitarios/servidor/E2E pertinentes, tipos/lint/build; sin reset local ni servicios alojados. Documentar despliegue y recuperación sin reaceptación de consentimiento ni restauración de permisos. SQL1062/17, cobertura741/52, tooling57, E2E13, tipos/lint/build y advisor seguridad PASS; guía docs/validation/hiring-consent.md. CI/revisión humana/rollout y gates históricos pendientes.
+
+Actualización de despliegue2026-10-21, EXTRA037: Mateo solicita aplicar ambas
+migraciones alojadas; aplicadas y verificadas en Funes-empleo con versiones
+originales, sin alterar historia previa ni ejecutar pruebas/datos de negocio.
+El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
+
+- [x] T139 EXTRA038: aislar ofertas ficticias de contratación fuera del listado público y exigir categorías en la selección de fixture de matching. RED0 esperado/2 recibidas y GREEN; E2E6/6, cobertura741/52, tooling57, tipos/lint/build/diff-check PASS. Conserva12 tarjetas/paginación/nominación y contratación normal/tardía; sin reset local ni cambios alojados. Publicación en PR63 con CI completo y revisión como gates pendientes, no aceptación global.
+
+## Retirar autoarchivo — EXTRA039, 2026-10-22
+
+- [x] T140 Registrar petición/alcance y alinear spec/plan/modelo/contratos/checklist; análisis acotado, sin arquitectura nueva o decisiones legales inferidas.
+- [x] T141 RED UI/servidor7/33 y SQL10/12 de autoarchivo candidato/empresa. Conservar archivo empresarial/restauración históricos; no agregar archivo administrativo candidato. Operaciones de perfil/consentimiento intactas.
+- [x] T142 Formularios/Actions/props exclusivas retirados, admin exigido en servicio/RPC mediante20261022202940, misma firma/grants; no cambia datos ni SQL anterior. Migración verificada solo localmente.
+- [x] T143 SQL/HTTP/E2E ajustados a denegación de autoarchivo y restauración legada, sin omitir pruebas: SQL1072/18,730 tests/53 archivos, tooling57, navegador12/12 (HTTP8), tipos/lint/build/diff-check y advisor PASS. Guía docs/validation/profile-self-archival.md; sin reset local ni cambios alojados. CI/revisión/rollout y aceptación pendientes.

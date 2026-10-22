@@ -1,5 +1,6 @@
+import { CvUploadForm } from "@/features/candidates/components/cv-upload-form";
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
 import { getAdminCandidate } from "@/features/candidates/search-service";
 import { candidateAccountDecisionAction } from "@/features/candidates/admin-actions";
@@ -23,7 +24,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
   const nominationOpenings = candidate.status === "active" ? await listNominationOpenings() : [];
 
-  return <RoleShell role="admin" title={candidate.display_name}
+  return <AdminShell active="/admin/candidates" title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
     navigation={[{ href: "/admin/candidates", label: "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     {candidate.status !== "archived" && <Link className="inline-block rounded bg-blue-800 p-3 text-white" href={`/admin/candidates/assisted/${candidate.id}`}>Mantener perfil y atención presencial</Link>}
@@ -54,11 +55,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         <h2 id="candidate-cv" className="text-xl font-semibold">CV PDF del candidato</h2>
         <p>La carga conserva las versiones anteriores usadas en derivaciones.</p>
         {cv && <p role={cv === "ok" ? "status" : "alert"}>{cv === "ok" ? "CV guardado." : cv === "conflict" ? "El perfil cambió. Recargá antes de cargarlo." : "El PDF fue rechazado; el CV vigente no cambió."}</p>}
-        <form action="/api/candidate/cv" method="post" encType="multipart/form-data" className="grid gap-3">
-          <input type="hidden" name="candidateId" value={candidate.id} /><input type="hidden" name="version" value={candidate.version} />
-          <label className="grid gap-1">Archivo PDF<input type="file" name="cv" accept=".pdf,application/pdf" required className="rounded border p-2" /></label>
-          <button className="rounded bg-blue-800 p-3 text-white">Cargar CV</button>
-        </form>
+        <CvUploadForm candidateId={candidate.id} version={candidate.version} label="Archivo PDF" buttonLabel="Cargar CV" />
       </section>}
       <section aria-labelledby="candidate-history" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-history" className="text-xl font-semibold">Historial de cuenta y perfil</h2>
@@ -91,5 +88,5 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       </section>
       </div>
     </div>
-  </RoleShell>;
+  </AdminShell>;
 }

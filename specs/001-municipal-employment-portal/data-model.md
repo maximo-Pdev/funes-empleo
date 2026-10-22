@@ -3,6 +3,22 @@
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 
+## A08 — catálogo y proyección administrativa (2026-10-19)
+
+Quince filas nuevas en `job_categories(version=2)`; IDs generados en servidor,
+códigos estables y nombres del catálogo de la matriz. No nuevas tablas ni cambios
+a relaciones existentes. Se conservan v1 y sus referencias, sin equivalencias
+inferidas. Ambos tipos de candidate_categories (occupation/interest) participan
+en el cruce con opening_categories por category_id activo.
+Proyección: id, displayName, locality, matchedCategories (code/name),
+participationId null por compatibilidad: se excluyen participaciones no archivadas
+antes del total/paginación. Sin listas persistidas ni puntajes o selecciones.
+Ampliación modal: pool privado de lectura compartido por lista y preview, sin
+permisos cliente. Preview laboral incorpora experiencia, disponibilidad/vigencia,
+rubros, ID del CV vigente y versiones de candidato/oferta; no incorpora DNI,
+contactos ni notas. Nominación sigue creando una participación bajo el comando
+transaccional y auditoría existentes, sin tablas nuevas ni derivación implícita.
+
 ## Convenciones
 
 - Identificadores: UUID generados por servidor.
@@ -53,7 +69,7 @@ Representa la identidad de aplicación vinculada a Supabase Auth.
 | `status` | `pending_verification`, `active`, `suspended` o `archived`. |
 | `suspended_reason` | Solo administración; obligatorio cuando `status = suspended`. |
 | `suspended_at`, `suspended_by` | Completos juntos. |
-| `archived_at`, `archived_by` | Archivo recuperable; en autogestión puede iniciarlo el titular. |
+| `archived_at`, `archived_by` | Marcas recuperables históricas. Desde EXTRA039, nuevos archivos empresariales solo por admin; sin autoarchivo ni archivo administrativo candidato nuevo. |
 | `last_sign_in_at` | Referencia operativa; no reemplaza datos de Auth. |
 | `created_at`, `updated_at`, `version` | Auditoría técnica y concurrencia. |
 
@@ -72,9 +88,10 @@ Reglas:
   reactivación modifican por sí mismas `candidate_profiles.status`, que conserva el estado anterior.
   Cada operación posterior revalida estado, frescura, disponibilidad, consentimiento y CV cuando
   corresponda; no se reactivan ofertas, participaciones, derivaciones ni permisos relacionados.
-- La solicitud de eliminación del candidato archiva inmediatamente cuenta y perfil; no elimina el
-  usuario de Auth. Solo administración restaura con motivo y sin reactivar relaciones.
-- Una empresa puede archivar su propia cuenta/perfil y un administrador puede archivarlos con motivo.
+- Administración restaura cuentas/perfiles candidatos históricos con motivo y confirmación;
+  no elimina el usuario de Auth ni reactiva relaciones. Sin autoarchivo desde EXTRA039
+  ni nuevo permiso administrativo de archivo candidato.
+- Solo un administrador puede archivar cuenta/perfil empresarial con motivo y confirmación.
   La operación registra actor y fecha, bloquea acceso, marca con archivo recuperable las ofertas no
   finales y revoca permisos empresariales sin borrar historial ni resultados. Solo administración
   restaura con motivo: cuenta a `active`, perfil empresarial a `incomplete` y ofertas a `draft`, sin
@@ -115,8 +132,8 @@ Reglas de activación y uso:
   búsqueda de candidatos activos.
 - La métrica `active_candidate` usa la misma vigencia de seis meses, pero no exige CV: estado activo,
   disponibilidad activa, consentimiento vigente y `last_confirmed_at` dentro del período.
-- El titular corrige sus datos directamente. Solicitar eliminación archiva cuenta/perfil en la misma
-  operación; restaurar exige administración, motivo y devuelve el perfil a `draft`.
+- El titular corrige sus datos directamente, sin autoarchivo/eliminación de cuenta.
+  Restaurar registros históricos exige administración y motivo; devuelve el perfil a `draft`.
 - Suspender o reactivar la cuenta vinculada no modifica por sí mismo `candidate_profiles.status`: al
   reactivar, el perfil conserva el estado anterior y sus condiciones vigentes se vuelven a validar
   antes de cada operación. La reactivación no repone participaciones, derivaciones ni permisos.
@@ -188,14 +205,20 @@ Registro append-only del consentimiento general.
 | `policy_hash` | Huella del texto presentado. |
 | `status` | `accepted` o `withdrawn`. |
 | `recorded_by` | Cuenta candidata o admin responsable de atención asistida. |
-| `recorded_at` | Fecha efectiva. |
-| `source` | `self_service` o `assisted`. |
+| `recorded_at` | Fecha efectiva, default clock_timestamp(); no fecha de inicio de transacción. |
+| `source` | `self_service`, `assisted` o `hiring_workflow` (solo withdrawn). |
 
 El consentimiento vigente es el último evento aceptado no seguido por retiro. Su retiro bloquea
 nuevas derivaciones y tratamientos que dependan de él, cierra como `withdrawn` con motivo
 `consent_withdrawn` todas las participaciones aún no finales y revoca en la misma transacción el
 acceso de todas las derivaciones vigentes, sin borrar historia legítima ni alterar resultados ya
-finales. Una aceptación posterior no reactiva automáticamente participaciones ni derivaciones.
+finales. Excepción EXTRA035: el retiro global automático por contratación normal/
+tardía revoca todos los permisos, pero conserva estados de otros casos y resultados.
+Se registra por el admin confirmante como hiring_workflow, copiando política/hash
+del aceptado anterior, con fecha posterior y motivo hired en auditoría enlazada
+a una decisión privada de la participación. Perfil consent_withdrawn salvo archivado;
+versión actualizada. Sin backfill de contrataciones históricas. Una aceptación
+posterior no reactiva automáticamente participaciones ni derivaciones.
 
 ### `cv_documents`
 
@@ -256,7 +279,8 @@ pueda volver a `active`.
 
 | Campo | Regla |
 | --- | --- |
-| `id`, `company_id` | Identidad y propietario. |
+| `id`, `company_id` | Identidad UUID interna y propietario; no se sustituyen por el slug. |
+| `slug` | Identificador público único: título normalizado más sufijo aleatorio; nulo antes de la primera publicación, obligatorio al publicarse e inmutable después de asignarlo. Las ofertas ya publicadas reciben slug mediante migración aditiva. FR-024A / EXTRA-020. |
 | `title`, `tasks`, `requirements` | Textos obligatorios y limitados. |
 | `vacancies` | Entero positivo. |
 | `location`, `modality`, `schedule` | Obligatorios; modalidad controlada. |
@@ -362,7 +386,7 @@ Todo contenido es interno. Puede haber varias instancias y el historial no se so
 | `access_status` | `active` permite la proyección empresarial solo si también se cumple el plazo poscontratación; `revoked` la deniega de forma persistente; `expired_by_policy` queda reservado a OQ-001. |
 | `consent_event_id`, `cv_document_id` | Evidencia vigente al derivar. |
 | `feedback_due_at` | Exactamente 30 días desde `referred_at`. |
-| `post_hire_access_until` | Nulo hasta confirmar `hired` con permiso todavía activo; luego instante de confirmación administrativa +720 horas. No se rellena para un permiso revocado ni se reinicia por corrección tardía. |
+| `post_hire_access_until` | Solo histórico: antes de EXTRA035 se fijaba a confirmación administrativa +720 horas si el permiso seguía activo. Nuevas contrataciones no lo fijan ni lo reinician; revocan los permisos por retiro global. |
 | `access_changed_at` | Fecha del último cambio de autorización. |
 | `access_changed_actor_type` | `account` o `system`; coherente con el evento que cambió el acceso. |
 | `access_changed_by_account_id` | Cuenta responsable; nula únicamente para actor `system`. |
@@ -372,14 +396,14 @@ La autorización de la empresa exige que su empresa sea dueña de la oferta, las
 no estén suspendidos ni archivados, exista consentimiento vigente, `access_status = active`, el
 plazo `post_hire_access_until` no haya vencido cuando exista y el recurso solicitado sea
 la proyección permitida. La proyección incluye todos los contactos vigentes y exactamente
-`cv_document_id`, aunque el candidato haya reemplazado después su CV. El acceso posterior a `hired`
+`cv_document_id`, aunque el candidato haya reemplazado después su CV. El acceso histórico posterior a `hired`
 se deniega desde el instante exacto `post_hire_access_until`, aun si la tarea programada todavía no
 materializó `revoked` y el evento de auditoría; esa tarea registra actor `system`, plazo y ejecución
 sin copiar datos personales. El límite de acceso de 720 horas no elimina ni purga datos. Retiro de postulación o
 consentimiento, no selección, cancelación, falta de respuesta, suspensión o archivo cambian el acceso
-a `revoked` de forma atómica y auditada. Confirmar `hired` lo mantiene solo durante esa ventana; una corrección tardía desde
-`no_company_response` a `hired` no vuelve a activarlo, porque la contratación solo conserva un
-permiso que no había sido revocado. Reactivar una cuenta, restaurar un registro o aceptar nuevamente
+a `revoked` de forma atómica y auditada. Desde EXTRA035, confirmar `hired` normal o tardío retira
+el consentimiento global y revoca todos los permisos activos sin alterar otras participaciones.
+No conserva ni vuelve a activar permisos. Reactivar una cuenta, restaurar un registro o aceptar nuevamente
 el consentimiento tampoco repone acceso automáticamente. El
 valor `expired_by_policy` queda reservado y no se usa hasta resolver OQ-001; la evidencia histórica
 permanece disponible solo para administración. `unavailable` y `needs_update` afectan nuevas
@@ -600,10 +624,11 @@ no_company_response -> hired | not_selected | cancelled (admin, respuesta tardí
   acceso a la empresa.
 - `hired`, `not_selected`, `withdrawn`, `cancelled` y `no_company_response` son finales para la vista
   del candidato. El override de respuesta tardía conserva el evento anterior.
-- `hired` mantiene `referrals.access_status = active` cuando ya estaba activo y no existe otro
-  bloqueo, con `post_hire_access_until` fijado a confirmación +720 horas. La autorización deniega
-  nuevas lecturas desde ese instante aunque la materialización del estado ocurra después; el
-  vencimiento pasa el permiso a `revoked` y conserva historia.
+- Confirmar `hired` normal/tardío retira el consentimiento global y revoca todos los permisos
+  activos del candidato en la misma transacción, conservando los demás casos. Para permisos
+  históricos anteriores a EXTRA035, la autorización deniega nuevas lecturas desde
+  `post_hire_access_until` aunque la materialización del estado ocurra después; el vencimiento
+  pasa el permiso a `revoked` y conserva historia.
   `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo cambian a `revoked` dentro de la
   misma transacción. Corregir tardíamente `no_company_response` a `hired` conserva la revocación y el
   evento automático previo.

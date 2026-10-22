@@ -18,7 +18,6 @@ export const phoneSchema = z.object({
   phone: z.string().trim().max(50).refine((value) => !value || /^[+0-9() -]{6,50}$/.test(value)),
 });
 export const candidateVersionSchema = z.object({ version: z.coerce.number().int().positive() });
-export const candidateArchiveSchema = candidateVersionSchema.extend({ confirmed: z.literal(true) });
 export const candidateRestoreSchema = z.object({
   accountId: uuid, version: z.coerce.number().int().positive(),
   reason: z.string().trim().min(1).max(500), confirmed: z.literal(true),

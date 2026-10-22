@@ -4,7 +4,11 @@
 
 **Created**: 2026-09-19
 
-**Status**: Draft
+**Status**: Approved
+
+**Approval record**: Máximo approved the current scope and business rules on 2026-10-17.
+This approval does not establish final product acceptance, close open questions or pending
+validation tasks, or constitute municipal approval.
 
 **Ajuste acotado autorizado, 2026-10-17**: Mateo solicita comenzar los arreglos
 funcionales registrados en [la matriz](../../docs/implementation/functional-adjustments.md).
@@ -29,7 +33,105 @@ o empresa activa, o Mi cuenta de administrador activo, sin exponer datos persona
 Login/logout actualizan esos accesos sin compartir la respuesta entre usuarios.
 Aceptación y límites: A02/A03 en la matriz; sin aprobar retrospectivamente el Draft.
 
+## Incremento A08 autorizado — 2026-10-19
+
+Mateo solicita implementar el catálogo amplio de quince rubros registrado en la
+matriz, cuya aprobación municipal fue informada por él. Ocupaciones e intereses
+del candidato y categorías de ofertas siguen siendo multiselección. Desde una
+oferta publicada o pausada y vigente de una empresa activa, solo administración
+puede consultar candidatos aptos para derivación con al menos un rubro activo
+compartido (OR, no todos). Mostrar rubros coincidentes, ordenar por nombre e ID
+sin puntaje y paginar después de filtrar/contar. No duplicar candidatos por
+múltiples coincidencias. No crear nominaciones ni derivaciones al consultar.
+
+Ampliación solicitada por Mateo el 2026-10-19: excluir antes del total/paginación
+cualquier participación no archivada en la oferta (incluye nominación/postulación
+previa, cualquiera sea su estado); sus casos siguen en Participaciones. Fichas
+compactas en dos columnas desde md y una en móvil, doce por página. El bloque de
+candidatos se ubica debajo de la información/moderación e historial de la oferta,
+conservando todo el ancho (ajuste solicitado por Mateo el 2026-10-19). Abrir el perfil
+laboral en diálogo accesible sin abandonar la oferta y nominar explícitamente a
+esa misma oferta desde allí, sin selector de otra búsqueda. Preview autorizado
+bajo demanda, con rubros, experiencia, localidad, disponibilidad, vigencia y enlace
+al CV actual, sin DNI, contactos ni notas. Mostrar la oferta destino; conservar
+versiones de candidato/oferta y revalidación transaccional del comando existente.
+Éxito cierra diálogo, retira la ficha y actualiza total/página sin redirigir.
+Conflicto/error no crea otra participación y permite recargar el perfil. Cerrar
+con botón o Escape devuelve foco; no mostrar datos de una respuesta tardía tras
+cerrar/cambiar de candidato. Nominación nunca equivale a derivación empresarial.
+
+Aptitud: perfil activo, disponible, no archivado, vigente, cuenta activa si está
+vinculada, último consentimiento aceptado y CV válido no archivado. La consulta
+no altera estados ni sustituye la revalidación transaccional de las mutaciones.
+El catálogo v2 se incorpora sin borrar/desactivar categorías previas ni reasignar
+personas u ofertas. No inferir equivalencias; importación sintética v1 sin cambios.
+OQ-010 solo se resuelve para el catálogo amplio aprobado, no para equivalencias
+históricas o un catálogo exhaustivo de ocupaciones; OQ-018 permanece abierta.
+
+## Formularios — ajuste autorizado 2026-10-20
+
+Todos los formularios indican requisitos vigentes con asterisco rojo y semántica
+required. Enviar incompletos/incorrectos marca cada campo, explica en español
+cómo corregirlo, anuncia un resumen y enfoca el primer error. Al corregir se
+actualizan los errores. Incluye inputs, selects, textareas, confirmaciones,
+grupos requeridos y archivos; opcionales y borradores conservan sus reglas.
+Un fallo de validación, servidor o red no borra los valores ni archivos elegidos
+de la página actual. No persistir datos sensibles en storage, logs o URLs para
+conservarlos; no reenviar contraseñas en respuestas. Solo reiniciar tras éxito
+explícito o decisión del usuario. Mantener validación/autorización servidor y
+respuestas que no revelan cuentas existentes. No promete conservar una página
+cerrada/recargada ni restaurar archivos después de una navegación.
+
+### Registro compacto — ajuste autorizado 2026-10-20
+
+Mateo pide tarjetas simétricas y formularios de registro compactos. En escritorio
+las tarjetas informativa y de registro tendrán el mismo ancho y alto; el estado
+inicial de ambos registros cabe sin scroll en1920×1080. Mantener controles legibles
+y operables, todos los campos/avisos y errores visibles. Móvil, zoom y errores
+pueden extender el documento; no ocultar contenido ni forzar scroll interno.
+El criterio de simetría/compacidad guía estas pantallas, no autoriza rediseñar
+otras páginas ni cambiar campos, validación, registro o autenticación.
+
+Mateo amplía este ajuste con navegación directa entre registro de postulantes y
+de empresas (2026-10-20). Ambos destinos se muestran como enlaces con tipo actual
+identificado, sin enviar el formulario ni mezclar datos/contraseñas entre roles.
+
+Mateo aplica el mismo criterio al inicio de sesión (2026-10-20), refinado con el
+esquema de EXTRA033: información de la Oficina en la columna izquierda; a la
+derecha, “¿Todavía no tenés cuenta?” con destinos candidato/empresa arriba del
+inicio de sesión. Columnas de igual ancho y extremos superior/inferior alineados:
+la tarjeta informativa ocupa la altura del conjunto de las dos tarjetas derechas.
+Esta disposición sustituye el registro de ancho completo de EXTRA031 y la igualdad
+de altura entre tarjetas individuales de EXTRA032. Último refinamiento de Mateo:
+el conjunto queda centrado verticalmente en el espacio disponible, con altura
+determinada por el contenido, sin estirar las tarjetas para llenar la página.
+Formulario compacto, sin scroll inicial1920×1080; en móvil,
+registro, login e información en una columna. La página crece si es necesario,
+sin recortar errores/contenido o forzar scroll interno. No cambiar credenciales,
+autenticación, sesiones ni recuperación.
+
 ## Clarifications
+
+### Session 2026-10-22 — sin autoarchivo de perfiles (EXTRA039)
+
+Mateo solicita quitar archivar/eliminar cuenta en candidatos y empresas. Se
+retira del autoservicio (perfiles y Mi cuenta) y se rechaza también en servidor/
+DB. Administración conserva archivo empresarial y restauración de registros
+históricos con motivo/confirmación; no se añade archivo administrativo candidato.
+No afecta archivo de ofertas propias, edición, disponibilidad, consentimiento,
+postulaciones ni cierre de sesión. No borra datos ni modifica registros archivados.
+Esta decisión sustituye las aclaraciones históricas de autoarchivo y las partes
+correspondientes de FR-016/054; no resuelve políticas legales OQ-001/002 ni añade
+un flujo alternativo de solicitudes de eliminación.
+
+### Session 2026-10-21 — contratación y consentimiento (EXTRA035)
+
+- Q: ¿El retiro automático por contratación afecta solo una derivación o el consentimiento global? → A: Mateo confirma el global y todos sus accesos empresariales, descartando la alternativa de solo matching. La transacción administrativa normal o tardía registra el retiro append-only con actor/fecha/causa, revoca todos los permisos activos y conserva los estados y resultados de las demás participaciones. El retiro manual sigue cerrando casos abiertos. No hay aceptación automática por corregir resultados; cualquier aceptación posterior exige el flujo afirmativo vigente y no revive permisos. Aplica a nuevas confirmaciones tras migración, sin backfill de contrataciones previas.
+
+Esta decisión sustituye la conservación720h para nuevas contrataciones de FR-036/
+FR-038 y la generalización del cierre de otros casos al retiro global automático.
+Las aclaraciones previas quedan como evidencia histórica: la ventana720h solo
+se conserva para permisos históricos que no hayan sido revocados.
 
 ### Session 2026-09-19
 
@@ -296,9 +398,9 @@ seleccionando varias categorías, cargando un CV válido y postulándose a dos o
 5. **Given** una participación en curso, **When** el candidato consulta su estado, **Then** ve la
    recepción y, cuando exista, el resultado final, pero no las etapas de evaluación ni las notas
    internas.
-6. **Given** un candidato autenticado, **When** corrige sus datos propios o solicita la eliminación
-   de su perfil, **Then** la corrección se aplica directamente o el perfil se archiva de inmediato,
-   respectivamente, sin borrar su historial de manera permanente.
+6. **Given** un candidato autenticado, **When** corrige sus datos propios, **Then** la corrección
+   se aplica directamente; no se ofrece ni permite archivar/eliminar su cuenta por autoservicio.
+   La restauración administrativa de registros históricos conserva el historial.
 7. **Given** una participación todavía abierta creada por postulación o nominación administrativa,
    **When** el candidato la retira directamente o pide al personal registrar su retiro, **Then**
    queda `withdrawn`, se revoca el acceso empresarial de esa derivación y se conserva su historia.
@@ -316,7 +418,7 @@ preservar la confianza, la privacidad y el rol municipal.
 
 **Independent Test**: Puede probarse registrando una empresa ficticia, creando un borrador,
 enviándolo a revisión, respondiendo a una solicitud de cambios, consultando solo una derivación
-autorizada y recorriendo el archivo propio o administrativo más la restauración administrativa sin
+autorizada y recorriendo el archivo exclusivamente administrativo más la restauración administrativa sin
 reactivar ofertas, participaciones ni accesos relacionados.
 
 **Acceptance Scenarios**:
@@ -472,10 +574,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   perfil, contactos y CV. Sus participaciones todavía abiertas se cierran como `withdrawn` en la
   misma operación, con motivo `consent_withdrawn`; las ya finalizadas conservan su resultado e
   historial. Ni participaciones ni accesos se reabren automáticamente al aceptar de nuevo.
-- Un candidato solicita eliminar sus datos; el perfil se archiva o desactiva inmediatamente sin
-  revisión administrativa, deja de participar en nuevas búsquedas, postulaciones y derivaciones, y
-  conserva de forma recuperable el historial sujeto a la política de retención pendiente.
-- Una empresa archiva su propia cuenta/perfil, o un administrador los archiva con motivo; la
+- Un candidato o empresa intenta archivar/eliminar su cuenta por un formulario antiguo o un RPC
+  directo; se rechaza sin cambiar datos, sesiones, accesos o historial. Solo un administrador
+  activo puede archivar una empresa de forma recuperable con motivo y confirmación;
+  no se agrega un comando administrativo nuevo para archivar candidatos.
+- Un administrador archiva cuenta/perfil empresarial con motivo; la
   operación bloquea inmediatamente el acceso empresarial, marca sus ofertas no finales como
   archivadas de forma recuperable y revoca sus permisos de derivación, sin borrar ni convertir casos
   existentes en resultados finales. Solo un administrador puede restaurar esos registros.
@@ -493,12 +596,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   `hired`, `not_selected` o `cancelled`. La vista muestra el resultado vigente y conserva
   `no_company_response` como antecedente automático reemplazado, sin eliminarlo del historial.
 - Una participación finaliza como no seleccionada o cancelada; se revoca inmediatamente el acceso
-  empresarial al perfil, los contactos y el CV. Si finaliza con una contratación confirmada, la
-  empresa conserva un permiso todavía vigente por un máximo de 720 horas desde la confirmación
-  administrativa, salvo retiro de consentimiento, suspensión o archivo previo. Al vencer, no puede
-  iniciar nuevas consultas o descargas. Esta revocación predeterminada con una excepción temporal
-  para contratación es un límite seguro provisional de acceso desde el portal, no una política de
-  retención aprobada: el plazo de conservación de los datos continúa pendiente en OQ-001.
+  empresarial al perfil, los contactos y el CV. Una nueva contratación confirmada, normal o tardía,
+  retira el consentimiento global y revoca todos los accesos empresariales sin alterar las demás
+  participaciones. Solo los permisos históricos anteriores a EXTRA035 conservan el límite de
+  720 horas desde la confirmación administrativa, salvo revocación previa; al vencer no permiten
+  nuevas consultas o descargas. Ese límite histórico no es una política de retención aprobada:
+  el plazo de conservación de los datos continúa pendiente en OQ-001.
 - Un CV tiene tipo o tamaño no admitido, está dañado o intenta contener contenido ejecutable; se
   rechaza con un mensaje claro sin sustituir el CV vigente.
 - Un perfil asistido todavía no tiene CV PDF; puede mantenerse y evaluarse internamente, pero todo
@@ -590,10 +693,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   perfiles sin confirmar o actualizar durante seis meses DEBEN marcarse para actualización y quedar
   fuera de los resultados activos predeterminados sin ser eliminados.
 - **FR-016**: El sistema DEBE permitir que un candidato retire una postulación activa, desactive su
-  disponibilidad y corrija directamente sus propios datos. Cuando solicite la eliminación, el
-  sistema DEBE archivar o desactivar su perfil de inmediato y sin revisión administrativa, impedir
-  nuevas búsquedas, postulaciones y derivaciones, y conservar el historial de forma recuperable
-  mientras no exista una política de retención aprobada. Si la postulación retirada ya tenía una
+  disponibilidad y corrija directamente sus propios datos. No DEBE ofrecer ni permitir el
+  autoarchivo/eliminación de cuenta o perfil. Los registros ya archivados conservan el historial
+  de forma recuperable mientras no exista una política de retención aprobada. Si la postulación retirada ya tenía una
   derivación, el sistema DEBE revocar inmediatamente el acceso empresarial al perfil, los contactos
   y el CV, conservar el historial administrativo y NO DEBE restaurar ese acceso automáticamente.
 - **FR-017 (Should)**: El sistema DEBERÍA permitir vincular un perfil asistido con la cuenta personal
@@ -637,6 +739,23 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   los haya informado. NO DEBE mostrar CUIT, persona responsable, contactos privados de la empresa,
   candidatos, participaciones ni resultados individuales. El cierre automático NO DEBE cerrar ni
   eliminar las participaciones existentes, que continúan disponibles para gestión administrativa.
+- **FR-024A**: Cada oferta DEBE recibir un slug público único al publicarse por primera vez,
+  formado por su título normalizado y un sufijo aleatorio. El slug NO DEBE cambiar al editar el
+  título ni en transiciones posteriores. Los enlaces públicos y el enlace hacia la selección de
+  oferta del candidato DEBEN usar ese slug, conservando UUID como identidad interna. Las ofertas
+  ya publicadas DEBEN recibir slug sin eliminar datos. No se exige conservar las URLs públicas
+  anteriores basadas en UUID. Las reglas de visibilidad de FR-024 siguen aplicándose. Cambio
+  autorizado por Máximo el 2026-10-17; trazabilidad en EXTRA-020.
+- **FR-024B**: A07, continuación solicitada por Mateo el 2026-10-19: el listado
+  público DEBE permitir combinar texto, rubro, localidad y modalidad. Texto busca
+  literalmente en título/tareas/requisitos sin distinguir mayúsculas; localidad
+  y modalidad coinciden completas sin mayúsculas/espacios exteriores; rubro usa
+  código del catálogo activo actual. Tildes se conservan. Filtros se aplican
+  antes de contar/paginar y se conservan en URL y paginación; nueva búsqueda
+  comienza en página uno y limpiar restablece el listado. Solo ofertas y opciones
+  actualmente públicas según FR-024; no se revelan datos de ofertas ocultas.
+  Entrada inválida muestra error español sin ejecutar búsqueda ampliada. No se
+  cambia el catálogo municipal pendiente de A08 ni los slugs de FR-024A.
 - **FR-025**: Los administradores DEBEN poder suspender o reactivar empresas y ofertas abusivas,
   engañosas, ilegales, duplicadas o inapropiadas, conservando su historial. La suspensión de una
   empresa DEBE impedir nuevas postulaciones y derivaciones en sus ofertas y revocar su
@@ -669,8 +788,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   automáticamente y reemplazar el CV solo afecta derivaciones posteriores. La empresa NO DEBE ver
   su DNI, domicilio ni notas internas. El acceso DEBE revocarse inmediatamente si el resultado final
   es no selección, cancelación o falta de respuesta empresarial. Si un administrador confirma una
-  contratación y el permiso no había sido revocado, el acceso DEBE mantenerse como máximo 30 días
-  exactos (720 horas) desde esa confirmación, sujeto al consentimiento vigente y a la ausencia de
+  contratación (normal o tardía), DEBE retirarse el consentimiento global vigente
+  y revocarse todo acceso empresarial dependiente en la misma transacción, con
+  fecha, actor administrativo y causa, conservando aceptación previa e historial.
+  Las demás participaciones no cambian de estado ni resultado. La ventana de 30 días
+  exactos (720 horas) solo sigue para contrataciones históricas previas al cambio, sujeta al consentimiento vigente y a la ausencia de
   suspensión o archivo de cuentas y registros relacionados. Al cumplirse el plazo DEBEN denegarse
   de inmediato nuevas consultas y descargas y quedar registrada la expiración; nunca se repone un
   permiso revocado. Este plazo solo limita el acceso empresarial y NO define la retención o purga
@@ -688,8 +810,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **FR-038**: Los resultados finales DEBEN distinguir contratación, no selección, retiro,
   cancelación y cierre por falta de respuesta empresarial. El retiro, la no selección, la
   cancelación y la falta de respuesta DEBEN revocar inmediatamente el acceso empresarial a los
-  datos derivados; únicamente la contratación confirmada PUEDE conservar por 720 horas un permiso
-  que siga vigente, bajo las condiciones de FR-036. El candidato DEBE poder retirar cualquier
+  datos derivados. La nueva contratación confirmada retira el consentimiento global
+  y revoca todos los permisos del candidato según FR-036, sin cerrar otros casos;
+  una aceptación afirmativa posterior nunca revive permisos revocados. El candidato DEBE poder retirar cualquier
   participación propia todavía abierta, sea
   postulación o nominación administrativa. Un administrador solo DEBE registrar un retiro a pedido
   del candidato; PUEDE cancelar una participación individual abierta con motivo operativo, sin
@@ -745,10 +868,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   corrección o rechazo, pero no las notas ni razones internas de moderación o suspensión.
 - **FR-054**: Los registros de negocio DEBEN archivarse o desactivarse de forma recuperable y NO
   DEBEN eliminarse permanentemente de manera automática mientras la Municipalidad no apruebe una
-  política de retención. La solicitud de eliminación de un candidato DEBE archivar o desactivar su
-  perfil inmediatamente, sin revisión administrativa, y conservar el historial relacionado. Una
-  empresa autenticada DEBE poder archivar su propia cuenta y perfil; un administrador también DEBE
-  poder archivarlos, registrando el motivo. En ambos casos se DEBEN marcar sus ofertas no finales
+  política de retención. Candidatos y empresas NO DEBEN archivar/eliminar sus propias cuentas
+  o perfiles por autoservicio. Se conserva el archivo empresarial exclusivo de
+  administrador activo, con motivo y confirmación, sin añadir archivo administrativo candidato.
+  El archivo empresarial DEBE marcar sus ofertas no finales
   como archivadas de forma recuperable, sin crear un estado alternativo de desactivación, bloquear el
   acceso empresarial y revocar los permisos de derivación, sin borrar historial ni alterar
   resultados finales. Solo un administrador DEBE poder restaurar un registro
@@ -861,9 +984,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   de CV asociada a esa derivación, excluyendo DNI, domicilio y notas internas.
   El retiro posterior de la postulación o del consentimiento general revoca inmediatamente ese
   acceso sin borrar el historial administrativo ni permitir su restauración automática. La no
-  selección, cancelación o falta de respuesta también lo revocan; una contratación confirmada debe
-  conservarlo solo hasta 720 horas desde su confirmación mientras se mantengan las condiciones de
-  FR-036. Ese límite de acceso no define cuánto tiempo se conservan perfil, CV o historial.
+  selección, cancelación o falta de respuesta también lo revocan. Una nueva contratación confirmada
+  retira el consentimiento global y revoca todos los permisos, sin cambiar otros casos; la ventana
+  de 720 horas de FR-036 solo corresponde a permisos históricos previos a EXTRA035.
+  Ese límite de acceso no define cuánto tiempo se conservan perfil, CV o historial.
 - **Entrevista y resultado**: Información comunicada por la empresa o recabada por el personal; solo
   un administrador confirma el resultado comunicado por la empresa, con excepción del retiro
   directo del candidato o asistido a su pedido.

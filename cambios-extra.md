@@ -4,6 +4,16 @@ Registro de requisitos derivados y ajustes técnicos necesarios para cumplir tar
 aprobadas. No sustituye la constitución ni los artefactos de Spec Kit, y no convierte
 una propuesta en una decisión municipal aprobada.
 
+## EXTRA-023 — Estabilizar el escenario E2E de mantenimiento
+
+- **Fecha/autorización:** 2026-10-18, Máximo: «Bueno, entonces encontramos un bug no? Bien, arreglalo».
+- **Problema/evidencia:** los CI39179308511/39179314605 esperan dos derivaciones vencidas y obtienen745; el mantenimiento usa el reloj real sobre fixtures de septiembre. Main52fcae9 pasó el17 de octubre, antes del vencimiento18 de octubre12UTC; seed, mantenimiento y aserción no cambiaron.
+- **Origen:** corrección necesaria para completar los controles de publicación de ofertas; se entrega como prerrequisito independiente, sin incluir slugs.
+- **Cambio:** aislar los instantes del escenario en `tests/e2e/intermediation.spec.ts`, mantener activo el permiso inicial respecto del reloj real y conservar todas las expectativas exactas. Incluye el aislamiento pgTAP010 ya comprobado en los jobs de base de datos.
+- **Límites/riesgo:** solo fixtures de prueba; sin cambios de seed, reglas, contratos ni datos alojados. Se mantiene la limitación cronológica preexistente entre consentimientos y derivaciones ficticias, sin ampliar este arreglo.
+- **Verificación/recuperación:** RED remoto documentado; tipos/lint y CI completos del SHA corregido pendientes. Docker local apagado: no se atribuye una ejecución local. Reversión limitada a los fixtures; revisión independiente antes de integrar.
+- **Corrección dependiente:** CI39181435054/39181499292/39181504654 detectó cuatro fallos en `tests/unit/maintenance-timezone.test.ts`, que exigía el literal anterior. Se actualiza el contrato al reloj inyectado, conservando todos los límites de Buenos Aires y agregando la comprobación del instante real del escenario. RED local reproducido antes del ajuste; no modifica el cálculo de producción.
+
 ## Autorización de trabajo
 
 - **Responsable:** Mateo.
@@ -14,6 +24,14 @@ una propuesta en una decisión municipal aprobada.
 - **Alcance:** incorporar extras necesarios para cumplir la tarea aprobada, con
   justificación y trazabilidad; los límites y controles están en `AGENTS.md`.
 - **Revisión:** esta instrucción no acredita revisión de Máximo ni aceptación municipal.
+
+## EXTRA-022 — Aislar el reloj de la prueba de vencimiento poscontratación
+
+- **Origen/autorización:** entrega de slugs solicitada por Máximo, 2026-10-18; requisito técnico para completar CI sin cambiar el producto.
+- **Evidencia:** Quality39178555606 falla en pgTAP010 casos97/110–112; maintenance(clock_timestamp()) vence derivaciones del seed de septiembre al llegar octubre. Archivo y reglas de mantenimiento no cambiaron respecto de52fcae9.
+- **Cambio mínimo:** solo tres instantes del fixture poscontratación en `supabase/tests/010_intermediation_rls.test.sql`; usar el reloj histórico determinista del escenario. Conservar todas las expectativas, seed/hashes, permisos y reglas de producción.
+- **Riesgo/recuperación:** aislamiento de pruebas; se revierte únicamente el fixture. No toca datos alojados ni cambia plazos de negocio.
+- **Verificación:** RED observado en ambos jobs remotos; reproducción local bloqueada por Docker apagado. Recheck exacto por CI y revisión independiente pendientes antes del merge.
 
 ## EXTRA-001 — Evidencia histórica para métricas al cierre del período
 
@@ -967,7 +985,896 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   mismo PR #53; el resultado remoto se registra en sus checks, sin inferirlo
   del resultado focalizado ni acreditar revisión humana.
 
-## EXTRA-020 — Referencia visual municipal compartida
+## EXTRA-020 — Slugs públicos al publicar ofertas (FR-024A)
+
+- **Fecha/responsable:** Máximo autoriza el 2026-10-17; ratifica publicar nuestra implementación el 2026-10-18 tras cierre sin merge del PR #54.
+- **Problema/origen:** UUID visibles en enlaces públicos; se requieren URLs legibles, compartibles y estables sin cambiar identidad ni permisos.
+- **Cambio:** `job_openings.slug` único, asignado en primera publicación y protegido contra cambios; título normalizado y sufijo aleatorio con reintentos/bloqueo. Backfill de publicación histórica, consulta pública por slug y enlaces asociados; UUID interno y RPC existente conservados.
+- **Superficies:** migración `20261018000000_opening_public_slugs.sql`, pgTAP021, servicio/validación/tipos, páginas públicas y selección del candidato, pruebas y artefactos FR-024A. Sin rediseños de portada/administración ni alteración de navegación por sesión de PR #53.
+- **Riesgos/recuperación:** migración, privacidad y concurrencia; aplicar base antes que aplicación. Recuperación preferida: revertir app y conservar slugs/RPC; nunca resetear demo ni regenerar enlaces. Contratos: `docs/validation/public-offer-slugs.md`.
+- **Verificación/estado:** evidencia previa local y nueva entrega separadas en `odd/tasks/public-offer-slugs.md`. Checks del candidato recuperado, revisión independiente, historial remoto, migración y publicación pendientes; no afirmar aceptación municipal ni despliegue antes de lectura de retorno.
+- **Autorización:** sesiones existentes GitHub/Vercel/Supabase, destino demo exacto autorizado; sin reset alojado, secretos publicados ni producción municipal. Identificadores EXTRA020/021 reconciliados con los EXTRA018/019 ya integrados.
+
+## EXTRA-021 — Node 24 LTS y recuperación reproducible del entorno
+
+- **Fecha/responsable/origen:** Máximo autoriza reparación local y actualización del runtime el 2026-10-17, necesarias para verificar y publicar FR-024A.
+- **Cambio/evidencia:** Node24.22.0 LTS/npm11.19.1 oficiales, checksum verificado; manifiestos, `.node-version`, CI y guías activas alineados. `npm ci --ignore-scripts` corrigió junctions del adaptador ESLint hacia la ubicación anterior, sin cambiar el grafo de dependencias ni instalar globalmente.
+- **Riesgos/recuperación:** entorno/CI; conservar engine-strict, scripts no aprobados desactivados, versiones históricas documentadas y Node global. Reversión de pins posible sin cambio de datos.
+- **Verificación/estado:** controles previos de aplicación correctos; comprobar nuevamente recuperación sobre main y CI del commit exacto. Publicación autorizada; resultados y referencias en el ledger de entrega.
+- **Compatibilidad alojada (2026-10-18, propuesta previa):** preview `6dcff5d` rechazado con EBADENGINE: Vercel ofrece Node24.21.0/npm11.19.0 y solo permite seleccionar Node por mayor. Mantener `.node-version`24.22.0 y CI exactos; expresar Node24LTS como `24.x` en engines/lock y fijar npm11.19.1 antes de `npm ci` en installCommand de Vercel. Se conserva engine-strict y no cambia el grafo. Agregar regresión del contrato de configuración; verificar preview real antes del merge.
+
+## EXTRA-022 — A07: búsqueda pública de ofertas
+
+- **Fecha/estado:** 2026-10-19; registrado antes de implementar. Mateo solicita
+  continuar y abrir PR desde main actualizado (`43b94a7`); rama
+  `feat/public-offer-search`. A04 público de Máximo se conserva; PR #54 descartado.
+- **Origen/evidencia:** A07 de la matriz confirma texto/rubro/localidad/modalidad.
+  El listado actual solo pagina. A05/A06 requieren diseño propio de carga privada;
+  este bloque independiente no los implementa ni reabre la solución de slugs.
+- **Cambio propuesto:** GET `/ofertas?q=&rubro=&localidad=&modalidad=&page=`;
+  texto literal en título/tareas/requisitos, sin distinguir mayúsculas pero sí
+  tildes; rubro por código del catálogo actual (no UUID), localidad/modalidad por
+  valor completo sin distinguir mayúsculas/espacios exteriores. Filtros combinan
+  con AND, se aplican antes de contar/paginar, orden actual intacto.
+- **Contrato técnico:** vista `private.public_offer_rows` sin grants cliente
+  centraliza la proyección y los mismos predicados vigentes. RPC nueva de búsqueda
+  y de opciones; `published_offers` conserva firma y delega en la misma consulta.
+  Opciones solo derivadas de ofertas visibles (rubros activos); sin catálogo
+  municipal nuevo ni datos privados. Slugs y lookup del compañero intactos.
+- **Entrada/UI:** Zod en servidor y servicio; q120, rubro50, localidad200,
+  modalidad100, página1–10000 y tamaño1–30. Duplicados/arrays y excesos se rechazan
+  sin consultar ofertas; mensaje español y filtros seguros. Formulario nativo GET,
+  reinicia página al buscar; paginación conserva filtros y limpiar vuelve a listado.
+- **Archivos/contratos:** migración de lectura sin backfill/tablas nuevas, servicio,
+  validación/utilidad de URL, formulario/listado, pruebas, spec/plan/tasks y matriz.
+- **Coordinación:** Mateo funcional, compañero visual/revisor; controles mínimos
+  con estilos existentes, sin rediseño global. Revisión independiente del SQL/PR
+  pendiente; no se afirma aprobación municipal o cierre de gates históricos.
+- **Riesgos/recuperación:** filtrar antes de paginar; opciones no deben revelar
+  borradores/suspendidas. SQL parametrizado y texto literal, sin wildcard/inyección.
+  Helpers/vista privados, grants explícitos solo RPC de proyección. Aplicar base
+  antes de app; rollback de app conserva funciones compatibles, sin borrar datos.
+- **Verificación prevista:** RED/GREEN validación, transporte y componentes;
+  pgTAP de filtros, total/páginas, equivalencia de proyección, grants y privacidad;
+  navegador público/teclado/empty/URL/slugs, regresiones, tipos, lint, build y CI.
+  Solo datos ficticios y destinos locales; sin reset de base existente ni cambios
+  alojados. No se reutiliza la migración local descartada del PR #54.
+- **Análisis focalizado previo:** seis criterios (cuatro filtros combinables,
+  paginación/URL, opciones públicas, validación, compatibilidad y privacidad),
+  cubiertos por T106–T110; sin cambios al modelo persistido, slugs o transiciones.
+  Prerrequisitos Spec Kit resueltos contra la feature existente. Checklists
+  históricos sin alterar; revisión propia no equivale a revisión independiente.
+  RED inicial del servicio: 10 FAIL/4 PASS, comportamiento anterior ignora filtros.
+- **Prerrequisito local detectado:** CLI `migration up --local` rechaza el historial
+  por `20261017204435`, residuo ya informado del PR #54 descartado. No se borra ni
+  se marca revertido, ni se recupera su código. Para validar sin reset se aplican
+  exclusivamente los SQL revisados `20261018000000` (base integrada del compañero)
+  y `20261019124218` (lectura A07) con psql transaccional/ON_ERROR_STOP contra el
+  contenedor local exacto; después se registran como applied con repair solo si
+  finalizaron. Se compara checksum de versiones/fechas. Historial previo intacto;
+  CI fresco verifica únicamente las migraciones rastreadas y no este residuo.
+- **Colisión local adicional:** el primer intento transaccional del SQL integrado
+  revirtió completo: la RPC `published_offer_by_slug(text)` del PR #54 ya existe.
+  Se reemplaza únicamente esa definición descartada por la del compañero dentro
+  de la misma transacción de instalación, después de comprobar columna/helper
+  exclusivos del residuo y ausencia del nuevo `slug`. No se borran columnas,
+  referencias, registros ni historial. El SQL rastreado del compañero no se edita.
+- **Resultado local:** instalación de ambas migraciones y registro applied
+  correctos; checksum ID/versión/updated_at de ofertas idéntico antes/después.
+  La migración A07 por sí sola no escribe negocio; pgTAP usa rollback.
+  La vista usa security_invoker/security_barrier como defensa adicional; solo
+  las RPC definer de proyección autorizada pueden leerla. Sin nuevos grants.
+- **Implementado/verificado:** servicio y Zod, vista/RPC, formulario servidor con
+  labels explícitos y GET, URLs/filtros/paginación/limpiar, error y vacío seguro.
+  RED10 FAIL/4 PASS; focal49/49 antes del endurecimiento final de arrays/booleanos;
+  regresión final603/39 archivos, tooling57/57, tipos/lint/build PASS.
+  SQL final951/14 archivos (38 nuevas) PASS y advisor security sin hallazgos.
+  Navegador final9/9: tres A07 y seis sesiones; teclado, persistencia, slug12hex,
+  axe sin violaciones y sin overflow360×800. Se recolectan70/17, no se afirma
+  ejecución local completa. Avisos de streaming Next existentes sin fallo final.
+- **Incidencias de validación:** SQL072 comparó snapshots mientras el navegador
+  hacía login (dos fallos de snapshot); sin cambios SQL, repetición secuencial
+  completa PASS. No se redujeron sus aserciones ni se reseteó la base. El primer
+  E2E detectó labels implícitos ambiguos por incluir opciones; se separaron labels
+  y selects mediante id/htmlFor, no se eludió la verificación. Se aisla el alert
+  de validación del anunciador de rutas de Next y se eligen opciones reales del
+  fixture en vez de suponer Funes. Un pipe Zod rechazado por TS se reemplazó por
+  transformación explícita string/number; no se introdujo any ni dependencia.
+  E2E A07 final repetido3/3 usando una combinación pública con más de diez
+  resultados, no primeras opciones independientes que podrían no coincidir.
+- **Entorno/privacidad:** Node24.22/npm11.19.1 portable oficial verificado por SHA;
+  global intacto. Sin tokens/claves en código, capturas/trazas de sesión ni nuevos
+  env. Consultas y Auth solo locales/ficticios. Docker permanece activo; servidor
+  Next de pruebas finalizado. No se aplicó SQL ni se desplegó a servicios alojados.
+- **Entrega/límites:** T106–T110 verificadas localmente; runbook/matriz/artefactos
+  actualizados. PR desde feat/public-offer-search; CI completo del SHA y revisión
+  independiente pendientes al entregar. No se acredita aceptación municipal ni
+  se cierran gates históricos; A04 privado, A05, A06 y A08 conservan pendientes.
+
+## EXTRA-023 — Continuidad visual de Mi cuenta administrativa
+
+- **Fecha y autorización:** 2026-10-19, Mateo solicita que el recorrido Inicio →
+  Mi cuenta de administración muestre el menú lateral, como las páginas de `(admin)`.
+- **Problema/evidencia:** `getAccountAccess()` dirige administradores a `/account`,
+  pero esa ruta compartida usa AuthShell y pierde la navegación administrativa.
+- **Origen:** ajuste visual explícito del diseño administrativo, sin cambiar A03,
+  roles, rutas, acceso ni las reglas de cuentas individuales.
+- **Cambio mínimo propuesto:** elegir AdminShell exclusivamente para el rol admin
+  en la presentación de `/account` y marcar Mi cuenta como sección activa. Los
+  otros roles conservan AuthShell. Guardias, consulta de otros administradores,
+  exclusión de la propia cuenta, acciones y confirmaciones permanecen intactas.
+- **Archivos/contratos:** `src/app/(auth)/account/page.tsx`, AdminShell local,
+  tests de cuenta y documentación de diseño. No cambia contrato ni esquema.
+- **Riesgos y verificación prevista:** evitar dos H1, comprobar navegación activa,
+  aislamiento por rol, exclusión propia y controles de suspensión/reactivación;
+  revisar responsive/axe/foco con fixtures ficticios; lint, tipos, suite y build.
+- **Estado:** implementado y verificado localmente en `codex/frontend-admin-design`;
+  autorizado por la instrucción explícita; revisión independiente pendiente.
+- **Resultados:** 27 pruebas focalizadas y suite completa 620/40 aprobadas;
+  lint, tipos y build aprobados. Nueve vistas ficticias de Mi cuenta por rol
+  a 360/768/1366 px sin hallazgos axe, desbordamientos ni pérdida de foco en
+  el recorrido muestreado. Un H1 y menú activo solo para admin. No se acredita
+  sesión real ni cambios de cuentas contra backend; T087 sigue pendiente.
+
+## EXTRA-024 — A08: catálogo amplio y coincidencias por oferta
+
+- **Fecha/autorización:** 2026-10-19. Mateo solicita implementar A08 en
+  `feat/job-categories-matching`; catálogo y coincidencia por al menos un rubro
+  aprobados en la matriz. No acredita aceptación del producto.
+- **Evidencia:** el seed solo incluye DEMO-A/B; no existe consulta de coincidencias
+  desde la oferta. Las asociaciones múltiples y la nominación municipal ya existen.
+- **Cambio necesario:** insertar quince rubros en `job_categories`, versión 2,
+  y una RPC administrativa paginada que cruza ocupaciones/intereses activos
+  con rubros de la oferta. Reutilizar la evaluación/nominación vigente.
+- **Integridad:** conservar códigos, IDs, estado y asociaciones previas; no inferir
+  equivalencias entre categorías anteriores y rubros nuevos. El importador
+  sintético v1 permanece intacto. El catálogo persistido sigue siendo fuente única.
+- **Archivos/contratos:** migración nueva, servicio/validación de matching, detalle
+  de oferta y componente, tipos SQL, pruebas SQL/unitarias/UI/E2E y artefactos A08.
+- **Privacidad/riesgos:** solo administrador activo con sesión vigente; sin DNI,
+  contactos, CV, notas, ranking ni escritura al consultar. La empresa no recibe
+  acceso. Revalidar estados al nominar/derivar con comandos existentes.
+- **Verificación prevista:** RED/GREEN; OR sin duplicados, consentimiento,
+  vigencia, disponibilidad, cuentas, CV y oferta; total antes de página; catálogo
+  sin pérdida de referencias; permisos negativos; tipos/lint/build y navegador.
+- **Análisis focalizado:** requirements16/16 y mvp-readiness77/77 sin editar sus
+  marcas. Spec/plan/modelo/contrato y T111–T115 consistentes. Constitución: solo
+  lectura municipal, permisos servidor/SQL, historial preservado, interfaz
+  accesible y stack actual sin dependencias ni excepciones. Revisión técnica
+  propia React: Server Components, Suspense, sin hooks/cachés privados compartidos.
+- **Estado:** implementado y verificado localmente. Migración
+  `20261019203041_job_categories_matching.sql` aplicada en transacción sobre
+  Docker local y registrada solo tras comprobar SQL. Sin reset, migración remota,
+  cambios de variables ni reparación de historias anteriores.
+- **Resultados:** RED SQL: dos fallos intencionales (RPC ausente y cero rubros v2).
+  Final: 655 unitarias/componentes/42 archivos; tooling57; tipos/lint/build PASS;
+  pgTAP986/15 archivos, incluidas35 nuevas; advisor security sin hallazgos.
+  Navegador12/12: tres A08, tres búsqueda pública y seis sesiones por rol.
+  Axe del bloque sin violaciones y sin overflow a360×800. Un primer selector
+  E2E ambiguo incluía el anunciador de Next; se acotó al main sin relajar el texto.
+- **Archivos reales adicionales:** matriz, OPEN_QUESTIONS, implementation-status y
+  runbooks A08/A07 (evidencia posterior aportada por Mateo). No se modifican
+  seed, importador, Auth, estilos globales ni código visual del compañero.
+- **Entrega/límites:** colección73 E2E/18 archivos, no suite completa ejecutada.
+  Cobertura configurada del proyecto100% solo para env/schema, no del nuevo
+  matching. Commit/PR, CI completo, revisión y aceptación pendientes.
+  Avisos de cierre temprano de stream de Next observados en navegación, sin fallos
+  en los doce recorridos; no se atribuye una causa ni se cambia código ajeno.
+
+## EXTRA-025 — A08: perfil modal y nominación desde la oferta
+
+- **Fecha/autorización:** 2026-10-19, solicitud explícita de Mateo: perfil en popup,
+  nominación a la oferta actual, ocultar personas ya nominadas y tarjetas compactas
+  en dos columnas. Amplía A08; no autoriza derivación automática ni cambios de roles.
+- **Evidencia:** el primer A08 obliga a salir al perfil, lista casos existentes y
+  ocupa una sola columna en la mitad del detalle. Mateo ya aplicó/registró
+  `20261019203041` en Supabase alojado, con catálogo15, función presente y anon
+  bloqueado; captura de CLI y resultados aportados por el operador, no inspección
+  remota del agente.
+- **Cambio mínimo:** diálogo nativo accesible, consulta laboral administrativa
+  bajo demanda y nominación explícita con el comando existente/versiones vigentes.
+  Dos columnas desde md y doce fichas por página, una columna en móvil. Excluir
+  antes de contar/paginar cualquier participación no archivada en esa oferta,
+  también postulaciones: el comando existente prohíbe duplicarlas, sin importar
+  origen/estado. Las participaciones siguen consultables en su pantalla propia.
+- **Contrato/seguridad:** perfil laboral, rubros y CV vigente, sin DNI/contactos/
+  notas; comprobar sesión/rol/aptitud/empresa/oferta y coincidencia al abrirlo.
+  Nominar revalida cuenta, oferta, consentimiento y versiones transaccionalmente;
+  no concede acceso empresarial. Carga/error/duplicado/conflicto, Escape, foco y
+  solicitudes tardías cubiertos. Sin reintento automático de nominación tras
+  refrescar versiones; actualizar la lista sí requiere revalidación/refresh.
+- **Migración:** nueva forward-only para consultas; no editar SQL ya aplicado ni
+  catálogo. Pool privado invocador compartido por lista y preview, sin permisos
+  clientes. RPC pública de preview exige administrador; no nuevas tablas.
+- **Archivos:** migración nueva, matching-service/validation/action, componentes
+  de lista/diálogo, detalle de oferta, revalidación de nomination-actions, tipos,
+  contratos/spec/plan/tareas y tests SQL/unitarios/UI/E2E/HTTP.
+- **Verificación prevista:** RED exclusión; igualdad conteo/página, permisos y
+  preview; nominación real con auditoría y no duplicación en SQL; navegador
+  apertura/cierre/foco/columnas/nominar/desaparición/recarga y móvil/axe;
+  tipos/lint/suites/build.
+- **Estado/resultados:** implementado y verificado localmente; review pendiente.
+  689 unitarias/componentes/43 archivos, tooling57, tipos/lint/build PASS;
+  pgTAP1007/16 archivos (21 nuevos y35 de matching actualizados), advisor security
+  sin hallazgos. Navegador13/13 (A08×4, A07×3, sesiones×6), autorización HTTP8/8
+  PASS incluyendo preview. Colección74/18, no ejecución completa ni CI remoto.
+  Cobertura configurada100% solo de env/schema, no del feature completo.
+- **Verificación funcional:** popup bajo demanda, CV, Escape/foco, dos columnas,
+  doce fichas, paginación, móvil360×800/axe; nominación real a la oferta actual,
+  exclusión tras recarga, un único caso under_review/admin_nomination y cero
+  derivaciones nuevas. SQL1007 se ejecutó primero; el navegador dejó después una
+  participación ficticia adicional (1001 total), preservada con su auditoría.
+- **Revisión técnica propia:** predicado SQL compartido, guards de actor/sesión y
+  rol, ACL cerradas, validación de entradas/salidas, conflictos de versiones,
+  sin caché privada compartida. Server Component bajo Suspense y cliente acotado,
+  diálogo nativo, guardia de respuestas tardías y doble envío; sin nuevos any,
+  dependencias ni cambios globales de estilo. No equivale a revisión independiente.
+- **Operación:** migración20261019205940 aplicada/registrada solo localmente;
+  primera A08 alojada según recibo del operador, ampliación alojada pendiente.
+  Se cerró el next dev identificado con autorización expresa de Mateo y se usó
+  build/servidor propio con destinos locales explícitos, sin editar `.env.local`.
+  Servidor de pruebas cerrado al finalizar, puerto3000 libre y Docker conservado.
+  Continúan avisos de stream de Next durante navegación pese a los recorridos
+  PASS; sin atribuir causa ni corregir framework ajeno. Se restaura la variación
+  generada dev de next-env que ya existía antes de la intervención.
+- **Límites:** sin aplicar SQL remoto ni commit/PR en este paso. Preservar cambios
+  anteriores de A08 y `next-env.d.ts`, modificado fuera de esta intervención.
+
+## EXTRA-026 — A08: candidatos debajo de la oferta
+
+- **Fecha/autorización:** 2026-10-19, Mateo solicita únicamente mover los candidatos
+  debajo de la información de la oferta; informa que la migración anterior funciona.
+- **Evidencia/origen:** A08/T119 coloca el bloque de coincidencias antes del detalle.
+  El ajuste solicitado es de orden visual, no del contrato ni del flujo municipal.
+- **Cambio mínimo:** mover el Suspense de coincidencias después del grid existente
+  de información/moderación e historial. Conservar todo el ancho, dos columnas de
+  fichas y el popup con nominación; no tocar SQL, servicios ni permisos.
+- **Archivos:** página administrativa de oferta, test de orden en admin-pages,
+  spec/plan y este registro. Sin nuevos estados, dependencias ni variables.
+- **Riesgos/verificación:** proteger el orden DOM y ubicación fuera del grid con
+  prueba de componente; comprobar regresión UI, tipos/lint/build y whitespace.
+  Preservar cambios anteriores de la rama y next-env generado fuera del ajuste.
+- **Estado/resultados:** implementado; RED1/17PASS del orden anterior y GREEN33/33
+  de página/popup. Suite690/43 archivos, tipos/lint y whitespace PASS. Revisión
+  propia: solo reordenamiento del Server Component, Suspense conservado, sin
+  hooks, permisos ni datos adicionales. No se repiten SQL/E2E en este ajuste.
+- **Límites:** build nuevo pendiente para no interferir con el next dev activo
+  del usuario en puerto3000; no se detuvo ni reinició su proceso. El build previo
+  no se acredita como nuevo. Revisión y PR pendientes; no acredita despliegue
+  ni inspección remota del agente. next-env conserva sus imports dev previos.
+- **Entrega posterior solicitada:** Mateo pide revisar/actualizar el PR. GitHub
+  confirma PR60 mergeado, ningún PR abierto ni rama remota A08: corresponde crear
+  uno nuevo, no modificar el PR60. Build final PASS con Node24.22/npm11.19.1,
+  destinos loopback y clave publicable ficticia. Se verificó en el Next instalado
+  que la limpieza de build conserva dev; no se detuvo el servidor del usuario.
+  Este resultado reemplaza el pendiente de build anterior, no acredita CI remoto.
+- **Referencia de entrega:** implementación `11be483`, publicada en
+  [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61), abierto contra main.
+  Incluye EXTRA024–026; próximo paso: checks del SHA publicado y revisión humana.
+  Se conserva solo next-env generado como cambio local fuera del commit.
+
+## EXTRA-027 — diagnóstico y reparación del registro/verificación
+
+- **Fecha/autorización:** 2026-10-20. Mateo informa que dejó de funcionar el
+  registro y que el correo abre una versión antigua; solicita limitar el arreglo
+  a esos fallos y reemplazar la rama anterior.
+- **Base/seguridad:** PR61 mergeado confirmado; main6607854 actualizado, rama
+  anterior local/remota borrada tras verificar inclusión. Nueva rama
+  codex/fix-registration-verification; next-env generado previo se conserva.
+- **Evidencia inicial:** candidato/empresa ignoran el error devuelto por signUp
+  y muestran respuesta genérica por diseño no enumerativo. Ambos usan
+  NEXT_PUBLIC_APP_URL/auth/callback; callback también redirige a esa base.
+  Configuración pública local: origen localhost3000 y Supabase alojado.
+  Consulta pública de Auth confirma registro/email habilitados y confirmación
+  exigida; no se enviaron correos ni crearon cuentas alojadas para diagnosticar.
+  No se conoce todavía el error concreto ni URL final deseada del operador.
+- **Propuesta/verificación:** reproducir registro y verificación de ambos roles
+  en Supabase Docker/mailbox local, sin reset; contrastar el destino del correo,
+  callback y sesión. Revisar configuración URL/allowlist/plantilla del entorno
+  afectado con evidencia antes de modificarla. Preservar no enumeración, PKCE,
+  confirmación obligatoria, roles y RLS; no desactivar controles ni eludir cuotas.
+- **Archivos/contratos previstos:** pruebas de registro/callback, servicios Auth
+  y documentación operativa según causa comprobada; sin autorizar cambios de
+  campos o rediseño. Una modificación derivada se detalla aquí antes del código.
+- **Riesgos/límites:** no recibir enlaces de correo con tokens ni datos reales;
+  no inventar dominio nuevo ni inspección remota. No cambiar variables alojadas,
+  SMTP ni datos compartidos sin diagnóstico y destino confirmado. Solo pruebas
+  ficticias locales; build/tipos/lint y suites relevantes tras la corrección.
+- **Estado:** diagnóstico en curso; causa y reparación aún no acreditadas.
+- **Diagnóstico confirmado:** Mateo prueba https://funes-empleo.vercel.app y
+  reporta ausencia de mensaje. Prueba publicada con datos ficticios inválidos
+  devuelve el mensaje seguro esperado, sin alta ni correo. Callback público sin
+  token redirige al mismo dominio actual (307/no-store), no al demo anterior.
+  Dashboard Supabase con sesión del operador muestra Site URL del demo antiguo
+  y solo sus dos callbacks permitidos; custom SMTP desactivado y plantillas
+  predeterminadas. No se atribuye todavía el fallo de alta a una cuota concreta.
+- **Cambio operativo propuesto:** Site URL al dominio actual y agregar callback
+  de verificación/recuperación actual, conservando ambos anteriores. Pendiente
+  confirmación específica solicitada antes de guardar destinos de autenticación.
+  Sin tocar SMTP, confirmación, sesiones ni cuentas. Vercel conectado no expone
+  este proyecto; no se realizaron cambios allí ni se intentó otro acceso.
+- **Prueba local nueva:** registration-verification.spec.ts cubre ambos roles:
+  alta, correo con destino exacto, bloqueo antes de verificar, callback, sesión,
+  bootstrap del perfil y recarga. 2/2 PASS sin cambiar código de aplicación.
+  Primera ejecución falló solo por esperar el texto antiguo de Rol; el correo y
+  la sesión ya funcionaban. Se corrigió la expectativa al texto real, sin quitar
+  comprobación del rol. Deja cuentas ficticias locales; no se borra ni resetea.
+- **Respuesta posterior:** Mateo confirma URLs antiguas, informa que el formulario
+  candidato borra los datos (empresa no probada) y que no tienen SMTP/remitente.
+  Pregunta el motivo del cambio de URL: no constituye aprobación para guardarlo.
+  Configuración alojada aún intacta. El registro público general queda limitado
+  por SMTP integrado; no se elige proveedor ni se habilita Resend de oficio.
+- **Verificación final del diagnóstico:**690 unitarias/43 archivos, tipos/lint y
+  build PASS; E2E2/2 con reuso de enlace rechazado sin tokens en destino. Solo
+  pruebas/documentación nuevas, código de aplicación intacto. El servidor propio
+  quedó cerrado y puerto3000 libre; Docker e identidades ficticias conservados.
+  Sin commit/PR ni nueva migración. Corregir el destino requiere confirmación y
+  correo público requiere configuración SMTP; no se declara el incidente resuelto.
+
+- **Autorización operativa posterior:** Mateo responde «cambialas entonces» el
+  2026-10-20, confirmando Site URL actual y sus dos callbacks exactos propuestos.
+  Se verificó nuevamente el proyecto y los valores antiguos antes de guardar;
+  conservar ambos destinos anteriores. Esta autorización no incluye SMTP,
+  envío de correos, alta de usuarios, cambio de credenciales ni despliegue.
+- **Operación ejecutada/verificada:** guardado en dashboard Site URL
+  https://funes-empleo.vercel.app; toast Successfully updated site URL. Agregados
+  los callbacks exactos de verificación y recuperación actuales; toast Successfully
+  added 2 URLs. Lectura posterior muestra Site URL actual y cuatro destinos:
+  ambos anteriores conservados y ambos nuevos. Captura de evidencia guardada
+  fuera del repositorio. Sin SMTP, nuevas cuentas, correos, SQL ni deploy.
+  Queda corregida la configuración de destino; entrega real de correo y registro
+  público general siguen pendientes de SMTP y prueba autorizada del entorno.
+
+## EXTRA-028 — validación visible y conservación de formularios
+
+- **Fecha/autorización:** 2026-10-20. Mateo pide en todos los formularios asterisco
+  rojo para obligatorios, bordes rojos y explicación junto a cada campo incorrecto,
+  instrucciones claras y conservar lo cargado ante cualquier error. Incluye
+  registro, acceso, perfiles, empresa, administración, búsqueda y archivos.
+- **Evidencia:** 29 archivos contienen formularios, con validación nativa, manual
+  y Server Actions mezcladas. React reinicia inputs no controlados después de
+  resolver una Action aunque su resultado informe error. TextField/SelectField
+  muestran obligatorio como texto y muchos labels no tienen aviso ni error local.
+- **Cambio mínimo compartido:** Form y Field declarativos con contexto de errores,
+  asterisco accesible, mensajes españoles por restricción, foco al primer error,
+  resumen y limpieza del error al corregir; no manipular DOM de React ni duplicar
+  validadores del servidor. Integrar todos los forms/labels y componentes comunes.
+  Evitar reset automático en fallo y permitirlo solo tras éxito explícito; datos
+  y archivos permanecen en el DOM de esa página, nunca en storage/logs/URL nuevos.
+- **Validación:** mantener opcionales y borradores incompletos existentes; reflejar
+  requisitos condicionales/confirmaciones y grupos de al menos un contacto/fecha.
+  Mantener mensajes no enumerativos y permisos/validación servidor. El color no
+  es el único indicador: aria-invalid, descripciones y texto junto al control.
+- **Archivo/CV:** evitar navegación destructiva en fallo de carga, mediante
+  respuesta JSON opt-in del handler existente y cliente acotado. Mantener el
+  POST/303 previo como compatibilidad, límites PDF y autorización intactos.
+  La regresión completa detectó una carrera entre aviso de carga y refresh de
+  versión del perfil: el éxito definitivo espera las props actualizadas, con
+  prueba que retiene deliberadamente la respuesta RSC antes de activar. También
+  se evitan refresh automáticos en conflictos y períodos invertidos de métricas.
+- **Archivos/contratos:** componentes/forms, TextField/SelectField/PasswordField,
+  29 consumidores, endpoint CV solo respuesta opt-in, estilos acotados, pruebas
+  UI/E2E/unitarias y artefactos de especificación. Sin dependencias ni migración.
+  Ajustar los dos selectores de hijos directos de formularios candidato/empresa
+  para que el nuevo contenedor Field conserve el ancho completo de textareas;
+  no cambiar columnas, tamaños ni dirección visual existentes.
+- **Riesgos/verificación:** límites cliente/servidor, filtros GET, campos dinámicos,
+  radio/checkbox/select, confirmación de contraseña, archivos, Enter/foco/lector,
+  error servidor y doble envío. RED/GREEN, inventario sin forms aislados, suites,
+  tipos/lint/build, navegador por rol y axe/responsive con datos ficticios locales.
+- **Análisis/gates:** checklists requirements16/16 y mvp-readiness77/77 PASS,
+  leídas sin cambiar marcas; sin hooks registrados. Constitución: simplicidad,
+  privacidad, accesibilidad y controles servidor conservados. User autoriza el
+  cambio transversal; no altera requisitos municipales ni diseño global ajeno.
+- **Implementación real:** Form/Field/validation/identifier-fields y CSS común;
+  TextField/SelectField/PasswordField; 40 usos de Form en 29 archivos de consumidores
+  candidatos, empresas, acceso, administración, participaciones, derivaciones e
+  importación; CvUploadForm y respuesta opt-in del handler. Dos selectores CSS
+  conservan el ancho existente. Spec/plan/contrato/tareas y guía de formularios
+  alineados; matriz A18 agregada. Sin dependencias, tablas o migración.
+- **Verificación real:** RED inicial4/4; GREEN final729 tests/49 archivos,
+  tooling57, typecheck/lint/build PASS. Inventario AST sin forms/labels aislados
+  ni controles sin Field. Navegador20/20: validación por campo, corrección, foco,
+  contraseña y registro real local, rechazo de Action/login, grupos, métricas,
+  CSV/PDF retenidos, CV válido con RSC retenida y activación posterior, candidato
+  y empresa completos, filtros y sesiones. HTTP privado8/8 aislado PASS. Axe sin
+  violaciones en recorridos comprobados; teclado y móvil360×800 sin overflow.
+  Revisión React: hooks en nivel superior, IDs/ayudas estables, sin any ni
+  persistencia de datos personales, sin cambiar reglas de negocio o permisos.
+- **Incidencias corregidas:** la prueba de carga/activación reveló aviso de éxito
+  antes de refrescar versión; se agrega guardia y regresión determinista. Un
+  intento de ejecutar HTTP y UI simultáneamente alteró el conteo global de
+  auditoría de los tests HTTP; la repetición aislada8/8 pasa sin relajar aserciones.
+  Mantener el orden de proyectos de Playwright; no mezclar con --no-deps.
+- **Estado/límites:** implementado y verificado localmente; T121–T125 completos.
+  Sin commit, PR, CI nuevo, revisión independiente, NVDA o aceptación acreditados.
+  No se ejecutó la suite E2E completa ni se cerraron gates históricos. Pruebas
+  solo contra Supabase local, sin reset; quedan datos y auditoría ficticios.
+  Se conserva EXTRA027, la modificación previa de next-env y Docker activo.
+  Este incremento no toca servicios alojados ni SMTP: el correo público continúa
+  bloqueado por proveedor/remitente pendientes. Datos conservados solo mientras
+  permanece la página abierta; límites CV5MiB y A06 pendiente se mantienen.
+
+- **Ajuste de texto solicitado por Mateo, 2026-10-20:** quitar del resumen de
+  errores la frase sobre conservación; mantener “Revisá el campo indicado.” o
+  “Revisá los N campos indicados.” sin cambiar validación ni retención. Afecta
+  Form y su regresión de texto exacto; 12 pruebas focalizadas, ESLint de ambos
+  archivos y diff --check PASS. Solo cambia el aviso; conservación intacta.
+
+## EXTRA-029 — registros compactos y tarjetas simétricas
+
+- **Fecha/autorización:** 2026-10-20. Mateo pide simetría entre tarjetas de
+  registro y evitar scroll innecesario en1920×1080, reduciendo componentes y
+  espacios sobredimensionados sin ocultar contenido simple.
+- **Evidencia:** ambas páginas duplican estructura, usan columnas0.95/1.05 con
+  items-start, padding de40px, controles48px y otra tarjeta solo bajo el formulario.
+  Esto produce alturas/anchos diferentes y exceso vertical, especialmente empresa.
+- **Cambio propuesto:** layout servidor común solo para ambos registros, columnas
+  iguales y stretch en escritorio, espacios/títulos más compactos, controles44px,
+  campos distribuidos en dos columnas donde haya espacio y ayuda de verificación
+  integrada en la tarjeta. Conservar todos los campos, mensajes, enlaces y avisos
+  de intermediación/verificación documental. Sin alturas fijas, overflow oculto ni
+  scroll interno; móvil, zoom y errores pueden extender la página naturalmente.
+- **Origen/archivos:** solicitud directa, formularios EXTRA028; páginas de ambos
+  registros, nuevo RegistrationLayout/CSS local, tests visuales/componentes y
+  spec/plan/tareas/guía Auth. Sin tocar acciones, contratos de datos, permisos,
+  catálogo, base, dependencias, SMTP o estilos de otros formularios.
+- **Riesgos/verificación:** medir tarjetas y ausencia de scroll inicial1920×1080,
+  controles≥44px, móvil360×800, ancho intermedio/zoom equivalente, errores completos,
+  orden de teclado y axe; regresiones de registro, tipos/lint/build. Revertir solo
+  layout/páginas/estilos restaura presentación anterior sin tocar datos.
+- **Constitución/análisis:** reutiliza React/Next/Tailwind/tokens y SVG existentes;
+  no añade servicios ni resuelve decisiones municipales. Cambios previos y rama
+  dedicada se conservan; revisión visual autorizada por Mateo, sin requerir nueva
+  aprobación del compañero para ejecutarla. Revisión/aceptación global pendientes.
+- **Implementación real:** RegistrationLayout servidor con configuración por rol,
+  registration.module.css y dos páginas consumidoras; se mantienen los componentes
+  funcionales de registro sin modificarlos. Guía Auth/spec/plan/tareas alineados,
+  matriz A19. Controles44px, gaps8px, columnas iguales y ayuda dentro de la tarjeta.
+- **Verificación:** RED2/3 en regresión de estructura; GREEN732 pruebas/50 archivos,
+  tipos/lint/build PASS. Navegador6/6: tarjetas de igual ancho/alto e inicio sin
+  scroll1920×1080 y1920×960, controles≥44px, móvil360×800 y reflow960×540 sin
+  overflow horizontal, campos/ayuda alcanzables, errores visibles y teclado de
+  contraseña. Axe sin violaciones; capturas vacías de ambos registros revisadas.
+  Primera medición requirió esperar visibilidad/clic estable antes de foco y
+  reducir separación para el margen vertical960; no se ocultó contenido.
+- **Estado/límites:** implementado y verificado localmente; T126–T128 completos.
+  Servidor propio de pruebas en3001 para preservar el servidor ajeno en3000;
+  sin altas, correos ni cambios alojados en este ajuste visual. No se repitieron
+  recorridos Auth con envío real, suite E2E completa, NVDA o zoom real200%.
+  No acredita aceptación global, CI, revisión independiente, commit ni PR.
+  Sin migración, dependencias o variables persistidas nuevas. Presentación local
+  a registros; contenido puede crecer con errores/móvil/zoom sin scroll interno.
+
+## EXTRA-030 — alternar tipo de registro
+
+- **Fecha/autorización:** 2026-10-20. Mateo solicita cambiar desde el registro de
+  postulantes al de empresas y viceversa sin volver al inicio.
+- **Problema/origen:** EXTRA029 comparte layout pero no ofrece navegación directa
+  entre ambos tipos. Ajuste explícito de acceso a los registros existentes.
+- **Cambio mínimo:** selector con enlaces “Soy postulante”/“Soy empresa” en la fila
+  superior del layout, activo con aria-current. Navegación normal, sin enviar
+  formulario ni compartir/persistir contraseñas o datos entre roles.
+- **Archivos/riesgos:** RegistrationLayout, tests de páginas y navegador, guía Auth
+  y artefactos. Conservar simetría y encaje1920×1080/960; envolver en móvil sin
+  overflow, controles≥44px y teclado accesible. Sin acciones/Auth/SQL nuevos.
+- **Verificación prevista:** destinos y estado activo por rol, cambio de ida/vuelta
+  con campos del formulario destino, medidas/responsive/axe, tipos/lint/build.
+- **Resultado:** implementado en el layout común; enlaces a ambas rutas y tipo
+  activo, sin añadir estado cliente. Regresiones de páginas3/3, navegador7/7,
+  tipos/lint/build PASS. Se probó ida/vuelta sin POST, encaje1920×1080/960,
+  simetría, móvil/reflow, errores, teclado y axe. No se repitió la suite completa.
+- **Estado:** verificado localmente; T129 completo. Cambiar de página puede
+  descartar borradores; no implica conservación entre registros. Sin cambios
+  alojados, datos, migración o dependencias. Commit/PR/revisión pendientes.
+
+## EXTRA-031 — inicio de sesión compacto y acceso al registro arriba
+
+- **Fecha/autorización:** 2026-10-20. Mateo pide subir la tarjeta “¿Todavía no
+  tenés cuenta?” y aplicar al login la simetría y ausencia de scroll innecesario
+  verificadas en los registros.
+- **Evidencia:** login mantiene columnas0.95/1.05/items-start, paddings40px,
+  controles48px y tarjeta de registro debajo, fuera del primer bloque de acceso.
+- **Cambio mínimo:** tarjeta de registro de ancho completo antes del grid de
+  información/acceso; debajo dos tarjetas iguales/stretch y contenido compacto.
+  Reutilizar estilos locales de entrada, con variante login de una columna para
+  credenciales. Conservar todos los accesos, mensajes, formulario y avisos.
+- **Archivos/contratos:** login/page, módulo CSS de entrada, pruebas de página y
+  navegador, guía Auth y spec/plan/tareas. Sin tocar AuthForm, acciones, contraseña,
+  sesiones, permisos, contratos de datos, SQL, SMTP, dependencias o env persistido.
+- **Riesgos/verificación:** no recortar contenido ni fijar alto/scroll interno;
+  medir encaje1920×1080/960 y tarjetas simétricas, móvil360×800/reflow960×540,
+  controles≥44px, orden DOM del registro, enlaces reales, errores/retención,
+  teclado/axe y regresiones de registros; tipos/lint/build. Revertir presentación
+  restaura el login anterior sin afectar datos ni autenticación.
+- **Implementación:** tarjeta de registro superior de ancho completo y dos
+  tarjetas principales iguales. Login reutiliza las bases compactas locales con
+  credenciales en una columna. AuthForm/acciones intactos; estilos nuevos solo
+  mediante clases específicas de login. Guía/spec/plan/tareas y matriz A21 al día.
+- **Verificación:** RED1/3 por orden DOM; GREEN735 tests/51 archivos, tipos/lint/build
+  PASS. Navegador11/11 (login4, registros7): orden/dimensiones, sin scroll inicial
+  1920×1080/960, controles≥44px, móvil360×800/reflow960×540 sin overflow, teclado,
+  axe y errores/retención, enlaces de alta reales. Captura vacía revisada. La
+  medición excluye inputs ocultos internos de Actions; no se ocultaron controles.
+- **Estado/límites:** implementado/verificado localmente, T130 completo. Pruebas
+  visuales en3001 sin detener servidor ajeno; sin alta/envío/cambios alojados.
+  No se repitió toda la suite E2E, Auth privado/HTTP, NVDA ni zoom real200%.
+  Sin migración, dependencias, variables persistidas, commit o PR nuevos. Gates
+  históricos, revisión independiente, CI y aceptación global siguen pendientes.
+
+## EXTRA-032 — Login: aprovechar la altura disponible
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo; solicitud explícita de
+  ampliar en altura ambas tarjetas principales del login, conservando lo aprobado.
+- **Problema/evidencia/origen:** EXTRA031/T130 deja espacio libre bajo las tarjetas
+  en escritorio1920×1080; el usuario pide aprovecharlo manteniendo su simetría.
+- **Propuesta/justificación:** T131; distribuir la altura mínima de la página con
+  flex y estirar la grilla solo en escritorio. Sin alturas fijas, recortes ni scroll
+  interno; móvil y contenido largo conservan crecimiento natural.
+- **Archivos/contratos/riesgos:** página login, CSS compartido con clases específicas
+  de login, E2E de layout y documentación. Sin cambios de Auth, datos, dependencias,
+  contratos o entorno. Evitar afectar los registros o esconder errores en pantallas bajas.
+- **Verificación prevista:** medir crecimiento entre1080/960, simetría, ausencia de
+  scroll innecesario, móvil/reflow/errores/teclado/axe y regresión de registros;
+  tests unitarios, tipos, lint y build. Revertir las clases restaura la presentación.
+- **Implementación/verificación:** clases de página/contenido/grilla exclusivas
+  del login; tarjetas de817px en1080 y697px en960, mismo ancho/alto y sin scroll
+  inicial.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS. Registros,
+  móvil360×800, reflow960×540, escritorio bajo1280×540, errores/retención, teclado
+  y axe sin regresiones. Captura1920×1080 revisada.
+- **Estado/límites:** implementado y verificado localmente; T131 completo. Pruebas
+  visuales en3001 sin detener servidor ajeno, sin alta/envío/cambios alojados ni
+  reset de datos. No se repitió suite E2E privada, NVDA o zoom real. Sin commit/PR,
+  revisión independiente, CI, aceptación nueva ni cierre de gates históricos.
+
+## EXTRA-033 — Login: información a la izquierda, registro e ingreso a la derecha
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo; disposición solicitada
+  mediante esquema adjunto. Sustituye la ubicación a todo el ancho de EXTRA031
+  y la igualdad de altura entre tarjetas individuales de EXTRA032.
+- **Problema/origen:** T132; el usuario prefiere una tarjeta informativa alta a
+  la izquierda, junto a una columna con registro arriba e inicio de sesión debajo.
+- **Refinamiento antes de verificar:** Mateo observa demasiado espacio vacío en
+  la captura y solicita centrar el conjunto sin estirar las tarjetas. Sustituye
+  el aprovechamiento forzado de altura de EXTRA032 y de la propuesta inicial.
+- **Propuesta/justificación:** mover el registro a la grilla existente y definir
+  áreas CSS locales; información ocupa ambas filas en escritorio, con bordes
+  superior/inferior alineados con la columna derecha. Mantener anchos iguales,
+  altura según contenido y conjunto centrado verticalmente cuando haya espacio,
+  sin expandir la grilla al viewport. Estética actual y controles compactos. En móvil: registro,
+  login e información, sin ocultar contenido ni scroll interno.
+- **Archivos/contratos/riesgos:** página login, CSS Module de entrada, pruebas
+  de componentes/E2E, spec/plan/tareas y guía/matriz/estado. Sin cambios de Auth,
+  datos, contratos, dependencias o configuración. Evitar afectar los registros,
+  el orden de teclado o la visibilidad de errores en pantallas pequeñas.
+- **Verificación prevista:** estructura y medidas de las dos columnas y filas,
+  encaje1920×1080/960, móvil/reflow/escritorio bajo, errores/retención, enlaces,
+  teclado/axe, regresión de registros, tipos/lint/tests/build y captura revisada.
+  Recuperación: revertir presentación sin cambios de datos.
+- **Implementación/verificación:** registro dentro de la grilla, guía abarcando
+  ambas filas; filas automáticas y conjunto centrado sin flex-grow de la grilla.
+  Alturas estables entre1080/960, límites alineados y sin scroll inicial. RED1/3
+  de estructura; GREEN735 tests/51 archivos, tipos/lint/build y navegador11/11
+  PASS. Incluye móvil360×800/reflow960×540/escritorio bajo1280×540, errores y
+  retención, teclado/axe/enlaces y regresión de registros. Captura1920×1080 revisada.
+  Se corrigieron los accesos de prueba posiblemente undefined y la medición antes
+  de visibilidad; tipos se repitió secuencialmente tras una colisión con el build.
+- **Estado/límites:** implementado/verificado localmente, T132 completo. Solo
+  presentación: sin migración, dependencias, env persistido, reset, alta/envío ni
+  cambios alojados. Pruebas en3001 sin detener servidor ajeno; no se repitió suite
+  E2E privada/HTTP, NVDA o zoom real. Entrega de EXTRA027–033: commit `1b93a9f`,
+  [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto sin merge.
+  Revisión independiente, CI, aceptación global y cierre de gates históricos pendientes.
+
+## EXTRA-034 — PR62: actualizar regresión de retiro al contrato de errores por campo
+
+- **Fecha/responsable/autorización:** 2026-10-20, Mateo solicita corregir el check
+  fallido del PR62; continuación de EXTRA028/T125, sin cambio funcional adicional.
+- **Problema/evidencia:** Quality117/run39525712466, application falla en
+  intermediation.spec.ts:335: espera el aviso general anterior al retiro. El
+  selector de solicitud ahora es required y Form bloquea antes de onSubmit,
+  mostrando “Elegí una opción.” junto al campo.94 E2E pasan,1 falla y1 no corre;
+  database y controles previos de application pasan. No es fallo de despliegue.
+- **Cambio/justificación:** T133; ajustar la aserción al error asociado al selector,
+  foco, aria-invalid, motivo retenido y estado aún Derivada; conservar el resto
+  del recorrido que registra contacto entrante y retira con evidencia. Añadir
+  regresión de componente que prueba bloqueo sin callback y envío con contacto
+  entrante válido. No quitar validación ni relajar reglas para pasar el CI.
+- **Archivos/contratos/riesgos:** pruebas E2E/componente de intermediación,
+  tareas/estado y este registro. Sin cambios de aplicación, SQL, entorno, roles
+  o contratos; verificar asociación del mensaje y no ocultar un retiro sin prueba.
+- **Verificación prevista:** componentes, suite unitaria/cobertura, tipos/lint,
+  push al mismo PR y ejecución completa del CI aislado. No resetear datos locales
+  existentes ni usar servicios alojados. Revertir solo tests/documentación.
+- **Implementación/verificación local:** E2E ahora verifica el error asociado al
+  selector, foco, motivo retenido y participación aún Derivada; el recorrido
+  positivo con contacto entrante se conserva. Nueva regresión de componente
+  comprueba bloqueo sin callback, exclusión de contactos salientes, corrección
+  del campo y payload de retiro con evidencia. Componentes11/11, cobertura736
+  tests/51 archivos, tipos/lint y diff-check PASS. Sin cambios de producción.
+- **Estado:** corrección implementada/verificada localmente; pendiente CI completo
+  en el mismo PR62. No reset local, cambios alojados, merge ni aceptación global.
+
+## EXTRA-035 — Contratación y retiro de consentimiento: clarificación previa
+
+- **Fecha/responsable/origen:** 2026-10-21, Mateo solicita retiro automático al
+  confirmar contratación normal/tardía, atomicidad, auditoría y conservación de
+  otras participaciones e historial; exige resolver alcance antes de implementar.
+- **Evidencia:** `spec.md` Clarifications 2026-09-19/20/21, FR-036/037,
+  `data-model.md/candidate_consents`, contratos de estados/autorización: un único
+  consentimiento general; retiro manual cierra casos abiertos; contratación normal
+  conserva acceso hasta720 horas y la tardía no revive permisos revocados.
+  Servidor `adminParticipationAction` -> `confirmReportedOutcome` -> RPC
+  `transition_participation` (`hire`/`late_hire`) confirma ambos resultados en DB.
+  El RPC no retira consentimiento; `change_candidate_consent` sí lo retira pero
+  también cierra otras participaciones, por lo que no se puede reutilizar sin más.
+- **Decisión/autorización:** OQ-020 resuelta por Mateo el2026-10-21: confirma la
+  primera opción original, retiro global y revocación a todas las empresas; descarta
+  su comentario posterior sobre solo matching. Conserva estados de otros casos,
+  como excepción al retiro manual. No se inventa consentimiento por oferta, aprobación
+  municipal, cierre de otros casos ni reversión automática de consentimientos.
+- **Propuesta técnica condicionada:** luego de responder, actualizar spec,
+  plan/modelo/contratos, checklist/tareas y análisis antes del código. Migración
+  forward-only que centralice en la transacción de contratación normal/tardía el
+  evento append-only de retiro, actor/fecha/motivo y revocación aprobada; sin cambios
+  parciales, cierre de otros casos ni reactivación por corrección/reconsentimiento.
+  El alcance individual requiere distinguir revocación de acceso y consentimiento
+  global; no implementar una segunda clase de consentimiento por inferencia.
+- **Archivos/contratos previstos:** funciones SQL de transición/consentimiento y
+  autorización, Server Actions/servicios de resultados si corresponde; tests SQL
+  de flujo/RLS/auditoría/rollback, unitarios/servidor y E2E; Spec Kit y guía de
+  despliegue/recuperación. No editar migraciones ya aplicadas ni usar service-role
+  para operaciones ordinarias. Al registrar esta propuesta aún no se había
+  creado/aplicado una migración; resultados de implementación al final de la entrada.
+- **Riesgos/verificación prevista:** ventana720h y retiro manual global son reglas
+  anteriores a reconciliar expresamente; bloqueo/orden de locks e idempotencia;
+  actor y causa fieles (no fingir acción afirmativa del candidato); historial de
+  consentimiento intacto y permisos jamás resucitados. Contratación normal/tardía,
+  permisos de varias empresas, otros casos/finales inalterados, fallo forzado de
+  auditoría con rollback integral, concurrencia, nueva aceptación explícita,
+  roles negativos, tipos/lint/tests/build y recuperación sin restaurar permisos.
+- **Diseño técnico mínimo autorizado:** reemplazar la función RPC de transición
+  manteniendo firma y grants. Bloquear candidato antes de participación y sus
+  permisos para serializar contratación con aceptación/retiro/derivación; no
+  llamar al retiro manual que cierra otros casos. En `hire`/`late_hire`, agregar
+  evento de retiro solo si el último consentimiento es accepted, copiar política/
+  hash y atribuir al admin confirmante. Fuente nueva `hiring_workflow`, restringida
+  a withdrawn (requisito técnico necesario para no fingir autoservicio/atención
+  presencial); motivo `hired` en auditoría y decisión privada ligada a la
+  participación. Revocar todos sus permisos activos, sin tocar otros casos.
+  Perfil pasa a consent_withdrawn salvo si está archivado; versión se incrementa
+  para impedir envíos obsoletos. No crear ventana720h nueva; conservar soporte
+  para contrataciones históricas sin backfill ni restauración de permisos.
+- **Recuperación:** migración correctiva posterior, nunca reaceptar ni reabrir
+  permisos como rollback; copias previas e integridad revisadas en entorno alojado
+  antes de despliegue. No reset de la base local existente para validar.
+- **Evidencia local previa:** regresión nueva RED22/37 contra el RPC anterior.
+  `migration up --local` se detiene por la versión local histórica20261017204435,
+  ajena a este cambio y ausente del checkout. No se reparará/eliminará esa historia:
+  aplicar exclusivamente el SQL nuevo por psql al contenedor local confirmado,
+  registrando solo la nueva versión en la misma transacción y conservando las
+  versiones previas. Documentar el bloqueo del CLI para quien despliegue.
+- **Aislamiento de verificación:** local024 GREEN49/49 y unitarios741/52 PASS.
+  Las suites010/072 requieren versiones iniciales de ofertas; en la base ya usada
+  encuentran versiones9/estados draft y fallan por CONFLICT_STALE_DATA. No corregir
+  esos datos ni resetearlos. Preparar una instancia Supabase efímera separada
+  `funes-empleo-hiring-check` en puertos553xx dentro de test-results (ignorado),
+  con copias de migraciones/tests y fixture ficticio de aceptación, sin .env.local.
+  Solo para pruebas SQL; detener esa instancia al terminar, preservando la original.
+- **Implementado:** migración20261021220623, constraint de fuente restringida,
+  RPC atómico con bloqueo candidato primero, retiro/auditoría/revocación global
+  y ninguna modificación de otros casos. feedback-service conserva un RPC e
+  invalida vistas tras éxito. Tests SQL024, unitario hiring-consent y E2E propio;
+  guía `docs/validation/hiring-consent.md`, especificación/modelo/contratos,
+  plan/checklist/tasks y estado actualizados. EXTRA036 cubre fecha efectiva.
+- **Verificado:** SQL55/55 y suite aislada1062/17 archivos, cobertura741 tests/52
+  archivos, tooling57, tipos/lint/build, E2E13/13 (dos contrataciones con lock
+  real más once regresiones Auth), advisor seguridad sin warn/error y diff-check
+  PASS. Cobertura configurada solo para env/schema, no de toda la aplicación.
+  Se repitió cobertura fuera del sandbox tras un ENOENT de archivos temporales
+  del runner; no exigió cambios de código. Sin reset de la base original.
+- **Gates/estado:** clarify aprobado por Mateo; spec/plan/modelo/contratos,
+  checklist10/10, tareas y análisis acotados antes de implementar. Reanálisis
+  final armoniza referencias antiguas720h como históricas; sin bloqueos de alcance
+  o arquitectónicos nuevos, sin ampliar la arquitectura. Convergencia acotada
+  T134–138 cubierta; no acredita revisión humana, CI, despliegue ni aceptación.
+  PR62 mergeado; rama desde main15ec4e7 `codex/feat-withdraw-consent-on-hire`.
+  Cambio local `next-env.d.ts` preservado, sin commit/PR nuevos ni cambios alojados.
+  Ambas migraciones aplicadas solo localmente; rollout compartido pendiente.
+
+## EXTRA-036 — Fecha efectiva de eventos de consentimiento
+
+- **Fecha/origen/autorización:** 2026-10-21; requisito técnico derivado de
+  EXTRA035/T138: nueva aceptación afirmativa válida después del retiro. Autorizado
+  por la delegación de requisitos técnicos necesarios de AGENTS.md y el pedido.
+- **Evidencia:** pgTAP024 pasa48/49; la aceptación asistida devuelve éxito pero
+  current_consent sigue false dentro de la misma transacción. recorded_at usa
+  now() (inicio de transacción), mientras el retiro automático usa reloj efectivo.
+- **Cambio mínimo:** nueva migración forward-only cambia únicamente el default
+  de candidate_consents.recorded_at a clock_timestamp(). No reescribe filas ni
+  modifica la migración ya aplicada localmente20261021220623. Mantiene fecha
+  efectiva coherente en eventos sucesivos; no simula una aceptación automática.
+- **Archivos/contratos:** nueva migración, modelo/plan, pgTAP024 y guía de despliegue.
+  Ninguna firma RPC ni permiso se amplía; fuentes, actores y afirmación explícita
+  siguen iguales. Riesgo: orden temporal al insertar múltiples eventos; verificar
+  retiro y reaceptación asistida con permisos revocados y perfil draft.
+- **Verificación prevista:**49 pruebas SQL iniciales, suite de consentimiento, servidor,
+  tipos/lint/build. Recuperación solo de default mediante otra migración, sin
+  reordenar historia ni reactivar accesos. Propuesta registrada antes del SQL.
+- **Implementación/verificación:** migración20261021221414 y default comprobado
+  en ambas instancias locales. SQL final55/55 y suite completa1062 PASS, incluida
+  aceptación asistida posterior en la misma transacción, perfil draft y permisos
+  revocados; tipos/lint/build, cobertura741 y E2E13 PASS. Modelo/plan/guía alineados.
+  Implementado/verificado localmente, no revisión humana ni despliegue alojado.
+
+## EXTRA-037 — Aplicación alojada de las dos migraciones de contratación
+
+- **Fecha/origen/autorización:** 2026-10-21, Mateo solicita expresamente
+  “aplicalas” después de explicar EXTRA035/036. Alcance exclusivo: las versiones
+  20261021220623 y20261021221414, sin backfill ni cambios de datos de negocio.
+- **Evidencia previa:** CLI autenticado identifica el proyecto enlazado
+  Funes-empleo/kyjycjojzhwggjuqjnki como ACTIVE_HEALTHY. El conector MCP no tiene
+  acceso a ese proyecto; se usa la sesión CLI autorizada ya existente, sin pedir
+  claves. Consulta de catálogo confirma función idéntica al cuerpo de la versión
+  base, grants esperados, source self_service/assisted y default now(). Ambas
+  versiones nuevas están ausentes. Snapshot de función/constraints/default/grants
+  guardado en test-results/hiring-remote-before.json (ignorado, sin datos personales).
+- **Obstáculo técnico:** migration list y db push --dry-run --skip-vault confirman
+  versiones remotas históricas con timestamps distintos de los archivos locales.
+  No reparar, revertir, renombrar ni volver a ejecutar esa historia para aplicar
+  dos cambios nuevos; no se modifica Vault ni se ejecutan seeds o tests alojados.
+- **Cambio mínimo propuesto:** ejecutar por CLI db query --linked únicamente el
+  contenido revisado de ambas migraciones, en una transacción común con límites
+  de espera/ejecución, guardia contra cambios concurrentes del cuerpo de función
+  y registro de sus propias versiones/nombres/statements en la misma transacción.
+  Los archivos de migración quedan intactos; no se registra éxito antes del DDL.
+  El registro guarda ambos SQL originales para trazabilidad. No modifica versiones
+  previas, configuración, datos de candidatos, permisos existentes ni resultados.
+- **Riesgo/recuperación/verificación:** breves locks DDL; ante conflicto/timeout
+  rollback total y revisar, sin bucles de reintento. Copia previa de definiciones,
+  recuperación forward-only según guía, nunca restaurar consentimiento/permisos.
+  Verificar cuerpos SQL/default/constraints/grants/versiones y advisors antes/
+  después mediante consultas de catálogo sin PII; no crear contrataciones reales.
+  Actualizar guía/estado con resultado real. Estado: procedimiento registrado
+  antes de ejecutar el DDL alojado; no implica CI, PR, revisión ni aceptación.
+- **Resultado alojado:** ambas migraciones aplicadas en una única transacción,
+  incluidas sus versiones originales y SQL registrado. Verificación posterior:
+  cuerpo remoto igual al archivo, ambos constraints correctos, default
+  clock_timestamp(), SECURITY DEFINER/search_path y grants conservados (anon y
+  service_role sin ejecución; authenticated sí). Hash de toda la historia previa
+  idéntico antes/después y hashes del SQL registrado iguales a los archivos.
+  Advisor remoto:52 WARN previos y52 posteriores, cero nuevos; no se declara
+  resuelto ese backlog ni se relajan permisos. No se ejecutaron pruebas/fixtures,
+  contrataciones ni backfill alojados. Evidencia técnica ignorada en test-results/
+  hiring-remote-{before,apply,after}.json y logs de advisors. Guía y estado
+  actualizados; reemplaza el pendiente de rollout alojado de EXTRA035/036.
+  Sin commit/PR nuevo, despliegue de aplicación, CI ni revisión independiente.
+
+## Entrega de EXTRA035–037 — 2026-10-21
+
+Mateo solicita crear el PR. Commit funcional28c6a25, rama
+codex/feat-withdraw-consent-on-hire desde main15ec4e7 actualizado:
+[PR63](https://github.com/maximo-Pdev/funes-empleo/pull/63), abierto hacia main,
+sin merge. Incluye las dos migraciones ya aplicadas/verificadas en Supabase
+compartido, pruebas y trazabilidad de la decisión global. next-env.d.ts conserva
+su modificación local y queda excluido; sin logs/fixtures privados/secretos.
+Verificaciones previas consignadas en EXTRA035–037; cambios de esta entrega solo
+documentales, diff-check PASS. CI/revisión independiente y aceptación pendientes.
+
+## EXTRA-038 — PR63: aislar fixtures de contratación y matching
+
+- **Fecha/origen/autorización:** 2026-10-21, Mateo solicita corregir el error de
+  GitHub del PR63; derivado de T138 y de la obligación de regresión sin saltos.
+- **Evidencia:** Quality121/run39688659768: database PASS; application falla
+  exclusivamente en dos E2E de job-category-matching,95 pasan y1 no corre. Las
+  dos contrataciones nuevas pasan, pero copian ofertas publicadas sin sus rubros.
+  El selector de matching elige cualquier primera oferta pública por UUID: puede
+  elegir una de esas ofertas aleatorias sin categorías y encontrar cero candidatos.
+  No es fallo de migración ni razón para relajar consentimiento o matching.
+- **Cambio mínimo propuesto:** ofertas de contratación ficticias en paused (los
+  permisos de derivación admiten ese estado), aserción de que no aparecen en
+  public_offer_rows, y selector del fixture de matching con categorías explícitas
+  como precondición. Conservar expectativas de12 tarjetas/paginación/nominación,
+  rechazo/ausencia de acceso, auditoría, locks y demás casos intactos.
+- **Archivos/contratos/riesgos:** tests/e2e/hiring-consent.spec.ts,
+  tests/e2e/job-category-matching.spec.ts, tareas/estado y este registro. Solo
+  fixtures/selección de prueba; sin cambios de producto, arquitectura, migraciones,
+  dependencias, configuración, permisos o datos alojados. No borrar/restablecer
+  datos locales para forzar verde ni omitir pruebas.
+- **Verificación prevista:** RED de aislamiento antes del fix, E2E de ambas
+  contrataciones y matching, tipos/lint/tooling/cobertura/build, diff-check;
+  publicar en el mismo PR y comprobar CI completo aislado. Autoriza el pedido y
+  AGENTS.md para prerrequisito técnico; no implica nueva aceptación del producto.
+- **Implementación/verificación local:** aserción de aislamiento RED (esperaba0
+  ofertas públicas, recibía2) y GREEN tras usar paused. Helper de matching exige
+  categorías, sin elegir por cantidad de coincidencias ni bajar expectativas.
+  Navegador6/6 PASS ejecutando contratación antes de matching; ambas contrataciones
+  y las cuatro regresiones de modal/paginación/nominación/roles se conservan.
+  Cobertura741 tests/52 archivos, tooling57, tipos/lint/build y diff-check PASS.
+  Docker/base existentes iniciados sin reset; solo se cerró el servidor de pruebas
+  propio. next-env.d.ts mantiene el cambio local y se excluye del commit.
+  Corrección en el mismo PR63, pendiente nueva ejecución CI completa/revisión.
+
+## EXTRA-039 — Retirar autoarchivo de candidatos y empresas
+
+- **Fecha/origen/autorización:** 2026-10-22, Mateo solicita eliminar archivar/
+  eliminar cuenta en perfiles candidatos y empresas, tras merge de PR63. Alcance
+  comunicado: autoservicio, manteniendo archivo/restauración administrativos y
+  todo el historial; no elimina derechos legales ni decide OQ-001/002.
+- **Evidencia/conflicto:** paneles CandidateProfilePanel/CompanyProfileForm y
+  /account ofrecen archivo propio. FR-016/054 y contratos antiguos lo permiten;
+  service changeAccountStatus y RPC público delegan incluso para titulares.
+  Ocultar solo tarjetas dejaría la operación disponible por requests antiguos.
+  La petición expresa sustituye ese permiso de autoservicio; no afecta archivo
+  de ofertas propias, disponibilidad, retiro de postulaciones o consentimiento.
+- **Cambio técnico mínimo necesario:** quitar formularios/estado/props/Actions/
+  servicio exclusivo de autoarchivo; conservar comandos administrativos. Exigir
+  admin activo en servicio común y wrapper público change_account_status, con
+  nueva migración forward-only, misma firma/grants, sesión bloqueada y delegación
+  privada/auditoría existentes. Sin nuevos estados, tablas, triggers o paquetes.
+- **Archivos/contratos:** perfiles y /account, features/accounts/candidates/
+  companies, validadores solo del flujo removido; spec/plan/modelo/contratos,
+  tareas/checklist; pruebas UI, servidor/HTTP, SQL/RLS/rollback y E2E actuales.
+- **Riesgos/recuperación:** no borrar cuentas/eventos, preservar recursos ya
+  archivados y restauración administrativa. No reutilizar sesiones de titulares
+  como si fueran admin en pruebas. No editar migraciones aplicadas. Recuperación
+  forward-only sin reactivar permisos ni autoarchivo por rollback implícito.
+  Aplicar SQL antes de app en el rollout; alojado no se modifica en esta tarea.
+- **Gates/verificación prevista:** alinear artefactos y checklist/tareas/análisis
+  acotados antes de implementar; RED UI/servicio/SQL, roles negativos y cero
+  cambios ante denegación, archivo/restauración admin positivos con motivo e
+  historial, consentimiento/edición/logout intactos; tipos/lint/pruebas/build y
+  E2E ficticios sin reset local. Misma arquitectura/constitución, sin nueva
+  decisión municipal ni aprobación/revisión independiente inferidas.
+- **Rama/estado inicial:** main actualizado a a75bfc8 (PR63 mergeado), rama
+  codex/feat-remove-profile-self-archival; anterior borrada local/remoto. Cambio
+  local next-env.d.ts preservado. Quality122 del PR63 pasó application/database,
+  98 E2E y carreras SQL, Vercel success. Esta entrada precede a la implementación.
+- **Precisión detectada en pruebas:** el privado anterior rechaza archivar
+  candidatos por admin, aunque sí permite archivo empresarial administrativo y
+  restauración de candidatos. No se añade un permiso administrativo nuevo para
+  sustituir el autoarchivo; se preserva exactamente ese alcance previo. Los tests
+  de restauración preparan archivos candidatos históricos como propietario de la
+  DB ficticia, nunca como permiso público nuevo. Artefactos ajustados a este límite.
+- **Prerrequisitos de pruebas:** inventario Form pasa de41 usos a38 por retirar
+  tres formularios; se actualiza su mínimo manteniendo el escaneo estricto de
+  campos. En navegador local11/12 pasan inicialmente; el recorrido candidato
+  encuentra cuatro ofertas ficticias anteriores con título idéntico. Seleccionar
+  dos títulos únicos disponibles y ubicar sus textos exactos, sin reset/borrar
+  fixtures ni cambiar lógica de postulaciones, para comprobar ambos casos nuevos.
+  La ejecución siguiente conserva11/12 y encuentra concatenación del textarea al
+  rellenarlo inmediatamente tras navegar; probar la sustitución con foco y
+  selección total por teclado, manteniendo la aserción exacta y sin sleeps,
+  reintentos de escritura, cambios de producto o resets.
+- **Implementado:** sin tarjetas de archivo en ambos perfiles o /account; Actions
+  exclusivas/servicio/validador/props retirados, guardia admin en servicio común y
+  migración20261022202940 del wrapper público, misma firma/grants/locks. Archivo
+  empresarial y restauraciones históricas siguen igual; ninguna habilitación de
+  archivo administrativo candidato. Migración aplicada solo localmente, sin tocar
+  la anterior historia local divergente ni editar archivos SQL ya aplicados.
+- **Verificado:** UI/servidor RED7/33, SQL RED10/12; final unitarias/componentes/
+  integración/cobertura730 tests/53 archivos, tooling57, SQL1072/18 archivos,
+  navegador12/12 (incluye HTTP real8/8), tipos/lint/build, diff-check y advisor
+  local sin warn/error PASS. Cobertura configurada mide env/schema, no toda la app.
+  SQL073 final14 casos, snapshot sin cambios por denegación y sin nuevo permiso
+  candidato; se conserva rollback administrativo y restauración de datos legados.
+  React: hooks no condicionales, estado/props sin uso retirados, Form/Field y
+  efectos/validación restantes conservados; edición, logout, teclado/axe y
+  permisos comprobados en recorridos pertinentes. No son revisión externa/NVDA.
+- **Gates/estado final:** spec→plan/modelo/contratos→checklist9/9→tareas→análisis
+  acotado→implementación→verificación/convergencia del incremento. La precisión de
+  permisos candidata descubierta en tests se alinea sin ampliar arquitectura o
+  permisos; sin gaps construibles nuevos dentro de T140–143. No converge ni acepta
+  globalmente el MVP. Guía docs/validation/profile-self-archival.md.
+  Instancia SQL efímera detenida/descartada y servidor propio cerrado; base local
+  original sin reset y next-env.d.ts preservado. Datos de prueba nuevos ficticios;
+  sin cambios alojados, CI, revisión o aceptación acreditados.
+  Commit funcional70ae1ea publicado en PR64:
+  https://github.com/maximo-Pdev/funes-empleo/pull/64 (abierto, sin merge).
+  Pendiente aplicar únicamente20261022202940 en Supabase compartido antes del
+  despliegue de app y revisión mediante PR; gates históricos/OQ-001/002 intactos.
+
+## EXTRA-040 — Referencia visual municipal compartida
 
 - **Fecha/estado:** 2026-10-20; autorizado por Maxi en la rama visual, registrado
   antes de implementar. No acredita aceptación municipal ni revisión del compañero.
@@ -1014,7 +1921,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   privadas ni se ejecuta el E2E que resetea datos. Revisión humana/municipal y PR
   pendientes. Sin commit ni publicación en esta tarea.
 
-## EXTRA-021 — Acceso a ofertas sin superposición al centrar Empresa
+## EXTRA-041 — Acceso a ofertas sin superposición al centrar Empresa
 
 - **Fecha/estado:** 2026-10-21; implementado y verificado técnicamente; registrado
   antes de implementar como detalle necesario
@@ -1044,7 +1951,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   Advertencia externa de lockfile conocida/no bloqueante. Sin cambios de datos,
   envíos de formularios, commit ni publicación. Revisión humana/PR pendientes.
 
-## EXTRA-022 — Espacio de navbar para el SVG ampliado de portada
+## EXTRA-042 — Espacio de navbar para el SVG ampliado de portada
 
 - **Fecha/estado:** 2026-10-21; registrado antes de implementar, revisión pendiente.
 - **Origen:** pedido de Maxi de quitar el título de la portada y reemplazar el
@@ -1074,7 +1981,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   Advertencia de lockfile externa preexistente/no bloqueante. Sin commit/PR ni
   aceptación humana; revisión pendiente.
 
-## EXTRA-023 — Integración local de Canvas Ribbons y restauración informativa
+## EXTRA-043 — Integración local de Canvas Ribbons y restauración informativa
 
 - **Fecha/estado:** 2026-10-21; registrado antes de implementar, revisión pendiente.
 - **Origen:** pedido explícito de reemplazar el slideshow por `bsehovac/LQVzxJ`
@@ -1116,7 +2023,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   sesiones, paquetes, envíos reales, commit ni publicación. Advertencia de
   lockfile externa preexistente/no bloqueante; revisión humana/PR pendientes.
 
-## EXTRA-024 — Retorno de CV y actualización del panel de cuenta
+## EXTRA-044 — Retorno de CV y actualización del panel de cuenta
 
 - **Fecha/estado:** 2026-10-21; implementado y verificado técnicamente;
   revisión humana pendiente. Prerrequisito registrado antes del cambio de retorno.
@@ -1151,7 +2058,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   La sidebar local adapta la composición no colapsable de shadcn, no instala el
   registro completo ni cambia primitivas ajenas. Revisión humana/PR pendientes.
 
-## EXTRA-025 — Componentes oficiales de shadcn con identidad municipal
+## EXTRA-045 — Componentes oficiales de shadcn con identidad municipal
 
 - **Fecha/estado:** 2026-10-22; criterio solicitado por el usuario y documentado;
   migración de código, coordinación y revisión pendientes.
@@ -1174,7 +2081,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   tipos, build y comparación visual desktop/móvil. Por ahora solo documentación;
   no se afirma instalación, migración o verificación funcional. Sin commit/PR.
 
-## EXTRA-026 — Foto de candidato y logo de empresa
+## EXTRA-046 — Foto de candidato y logo de empresa
 
 - **Fecha/estado:** 2026-10-22; solicitud y privacidad del candidato registradas;
   diseño técnico, coordinación, implementación y revisión pendientes.
@@ -1199,6 +2106,7 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
   revocación según contrato aprobado; pruebas, lint, tipos, build y navegador.
   Aún no implementado ni probado; sin migraciones aplicadas, commit o PR.
 
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
@@ -1210,3 +2118,50 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
 5. Autorización y coordinación, distinguiendo decisiones pendientes de aprobadas.
 6. Verificación prevista y resultados reales.
 7. Limitaciones, revisión y referencias de commit/PR cuando existan.
+
+## EXTRA-047 — Integración de la rama visual con `main` (40 commits)
+
+- **Fecha/estado:** 2026-10-22; implementado y verificado técnicamente; revisión
+  del compañero y PR pendientes. Registrado al resolver el merge.
+- **Origen:** pedido explícito de Maxi de poner al día el proyecto con las ramas
+  del compañero antes de publicar el trabajo visual.
+- **Problema/evidencia:** la rama `feature/landing-page-visuals` partía de un
+  `main` anterior y sus 7 commits no tenían equivalente remoto. Al sincronizar,
+  14 archivos quedaron en conflicto, incluidos `src/app/(public)/page.tsx`,
+  los formularios de registro, `CandidateProfilePanel` y la portada de pruebas.
+  Ambos lados habían evolucionado en paralelo: el compañero creó los componentes
+  compartidos `Form`/`Field` con validación inline, retiró el autoarchivo y unificó
+  la ayuda de contraseña; esta rama extrajo los cuerpos de página a
+  `candidato/_components/*-content.tsx`, agregó la variante de portada y el retorno
+  de CV hacia `Mi cuenta`.
+- **Cambio mínimo/justificación:** conservar ambos aportes donde son compatibles y
+  preferir `main` en el comportamiento funcional ya publicado. Resoluciones:
+  `TextField`/`SelectField` adoptan `Field` manteniendo las clases municipales y
+  los ids de descripción que `Field` ya calcula; los formularios de registro
+  conservan la validación inline del compañero y la variante `homepageLayout` de
+  portada; `CandidateProfilePanel` mantiene el retiro del autoarchivo y recibe
+  `cvReturnTo`, que se propaga a `CvUploadForm` como campo oculto para el envío sin
+  JavaScript; las ofertas enlazan por `slug`; los radios de tipo de cuenta y el
+  formulario de cierre de sesión usan los componentes compartidos que exige
+  `form-inventory`; los botones llevan `type="submit"` explícito.
+- **Decisiones que requieren revisión:** (1) la portada de esta rama no muestra la
+  vista previa de ofertas que `main` mantiene; se conserva el rediseño aprobado y
+  su enlace a `#ofertas-disponibles`, por lo que el PR debe confirmarlo; (2) se
+  adoptó el texto unificado «Entre 6 y 128 caracteres. No compartas tu contraseña.»
+  en los registros, revirtiendo su ausencia previa; (3) el autoarchivo sigue
+  retirado, sin reintroducir `archiveAction`.
+- **Superficies/contratos:** los 14 archivos en conflicto, `candidate-account.tsx`,
+  `home-access-panel.tsx`, `cv-upload-form.tsx`, `home.module.css`,
+  `docs/UI_GUIDELINES.md` y `tests/components/home-access-panel.test.tsx`.
+  Las entradas de esta rama se renumeraron a EXTRA-040..EXTRA-046 porque `main`
+  ya usaba EXTRA-020..EXTRA-039; las referencias en la guía visual se actualizaron.
+- **Riesgos/recuperación:** los conflictos mezclan capa visual y comportamiento; la
+  recuperación es revertir el merge y volver a resolverlo con este registro. No hay
+  migraciones nuevas ni cambios de variables de entorno en esta resolución.
+- **Verificación:** `npm run typecheck` exit 0, `npm run lint` exit 0 (sin warnings),
+  `npm run test:unit` 773 pruebas en 58 archivos PASS, `npm run test:tooling`
+  57 pruebas PASS, `npm run build` exit 0. Los 602 tests previos de la rama pasaron
+  a 773 por la suite del compañero. No se ejecutó E2E ni el reset de datos.
+- **Entorno:** Node observado 26.7.0, distinto del 24 LTS requerido; no se modifica
+  el entorno local. Revisión visual en navegador de la portada tras el cambio de
+  marcado de `Field` y aprobación del PR pendientes.

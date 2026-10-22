@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { KeyRound } from "lucide-react";
 import { AuthForm } from "@/features/accounts/components/auth-form";
+import { Field } from "@/components/forms/field";
 import { CandidateRegistrationForm } from "@/features/candidates/components/candidate-registration-form";
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
 import styles from "./home.module.css";
@@ -39,8 +40,8 @@ export function HomeAccessPanel() {
               <legend className="sr-only">Tipo de cuenta</legend>
               <div className={styles.roleOptions}>
                 <span aria-hidden="true">Tipo de cuenta</span>
-                <label><input type="radio" name="accountType" value="candidate" checked={role === "candidate"} onChange={() => setRole("candidate")} />Postulante</label>
-                <label><input type="radio" name="accountType" value="company" checked={role === "company"} onChange={() => setRole("company")} />Empresa</label>
+                <Field><input type="radio" name="accountType" value="candidate" checked={role === "candidate"} onChange={() => setRole("candidate")} />Postulante</Field>
+                <Field><input type="radio" name="accountType" value="company" checked={role === "company"} onChange={() => setRole("company")} />Empresa</Field>
               </div>
             </fieldset>
           )}

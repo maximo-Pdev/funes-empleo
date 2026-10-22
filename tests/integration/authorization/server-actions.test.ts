@@ -19,6 +19,7 @@ import * as consent from "@/features/candidates/consent-actions";
 import * as participation from "@/features/participations/candidate-actions";
 import * as evaluation from "@/features/participations/evaluation-actions";
 import * as nomination from "@/features/participations/nomination-actions";
+import * as matching from "@/features/candidates/matching-actions";
 import * as openingAdmin from "@/features/openings/admin-actions";
 import * as openingCompany from "@/features/openings/company-actions";
 import * as company from "@/features/companies/company-actions";
@@ -27,7 +28,7 @@ import * as accounts from "@/features/accounts/actions";
 import * as imports from "@/features/imports/actions";
 import * as feedback from "@/features/referrals/feedback-actions";
 const actions = { ...candidateAdmin, ...assisted, ...claim, ...duplicate, ...candidateProfile,
-  ...consent, ...participation, ...evaluation, ...nomination, ...openingAdmin, ...openingCompany,
+  ...consent, ...participation, ...evaluation, ...nomination, ...matching, ...openingAdmin, ...openingCompany,
   ...company, ...companyAdmin, ...accounts, ...imports, ...feedback };
 
 const id = "00000000-0000-4000-8000-000000000001";
@@ -35,7 +36,7 @@ const profile = { name: "Persona ficticia", dni: "99000001", locality: "Funes", 
   availability: "available", detail: "", address: "", categories: [], phone: "", email: "fixture@example.invalid", interests: [] };
 const common = { version: "1", candidateVersion: "1", expectedVersion: "1", accountVersion: "1",
   id, accountId: id, candidateId: id, openingId: id, participationId: id, referralId: id,
-  confirmed: "on", reason: "Prueba ficticia", command: "suspend" };
+  confirmed: "on", reason: "Prueba ficticia", command: "archive" };
 const state = { success: false, message: "", status: "idle" };
 function form(values: Record<string, unknown>) {
   const result = new FormData();
@@ -55,22 +56,20 @@ add("candidates/assisted-actions", "admin", "saveAssistedAction", { candidateId:
 add("candidates/assisted-actions", "admin", "assistedCommandAction", { candidateId: id, version: 1, command: "activate", confirmed: true });
 add("candidates/claim-actions", "admin", "claimAssistedAction", { candidateId: id, accountId: id, version: 1, dni: profile.dni, verifiedInPerson: true });
 add("candidates/duplicate-actions", "admin", "screenDuplicatesAction", profile);
-for (const name of ["saveProfileAction", "savePhoneAction", "activateProfileAction", "archiveProfileAction"]) add("candidates/profile-actions", "candidate", name, profile, true);
+for (const name of ["saveProfileAction", "savePhoneAction", "activateProfileAction"]) add("candidates/profile-actions", "candidate", name, profile, true);
 add("candidates/consent-actions", "candidate", "changeConsentAction", { status: "withdrawn" }, true);
 for (const name of ["applyToOfferAction", "withdrawParticipationAction"]) add("participations/candidate-actions", "candidate", name, {}, true);
 add("participations/evaluation-actions", "admin", "recordEvaluationAction", { participationId: id, version: 1, command: "start_review" });
 add("participations/evaluation-actions", "admin", "adminParticipationAction", { participationId: id, version: 1, command: "start_review" });
 add("participations/evaluation-actions", "admin", "confirmFeedbackAction", { participationId: id, feedbackId: id, version: 1, outcome: "hired", reason: "", lateCorrection: false });
 add("participations/nomination-actions", "admin", "createAdminNominationAction", { candidateId: id, openingId: id, candidateVersion: 1, openingVersion: 1 });
+add("candidates/matching-actions", "admin", "openingCandidatePreviewAction", { candidateId: id, openingId: id });
 add("openings/admin-actions", "admin", "moderateOpeningAction", { openingId: id, version: 1, decision: "approved" });
 add("openings/company-actions", "company", "saveCompanyOpeningAction", { title: "", tasks: "", requirements: "", location: "", modality: "", schedule: "", contractType: "", closingDate: "", salary: "", benefits: "" }, true);
 add("openings/company-actions", "company", "submitCompanyOpeningAction", {}, true);
 add("companies/company-actions", "company", "saveCompanyProfileAction", { legalName: "Empresa ficticia", cuit: "30999999991", responsibleName: "Contacto ficticio", email: "fixture@example.invalid", phone: "", activity: "Prueba", locality: "Funes" }, true);
-add("companies/company-actions", "company", "archiveCompanyAction", {}, true);
-// Shared account command permits self-archive. Target/role is checked by the SQL
-// command, not an admin-only server guard: active cross-role cases belong to pgTAP.
-add("companies/admin-actions", "admin", "adminCompanyAction", {}, true, true);
-add("accounts/actions", "active", "accountStatusAction", {}, true, true);
+add("companies/admin-actions", "admin", "adminCompanyAction", {}, true);
+add("accounts/actions", "admin", "accountStatusAction", {}, true);
 add("accounts/actions", "active", "passwordAction", { password: "Fictitious-Test-Only!", confirmation: "Fictitious-Test-Only!" }, true);
 add("imports/actions", "admin", "resolveImportAction", {});
 add("referrals/feedback-actions", "company", "submitFeedbackAction", { reportedOutcome: "hired" }, true);

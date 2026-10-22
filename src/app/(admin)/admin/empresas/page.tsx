@@ -1,5 +1,7 @@
+import { Form } from "@/components/forms/form";
+import { Field } from "@/components/forms/field";
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { COMPANY_PROFILE_STATUSES, companyProfileStatusSchema } from "@/domain/states";
 
@@ -16,12 +18,12 @@ export default async function AdminCompaniesPage({ searchParams }: { searchParam
   const result = invalid ? null : await query.range((page - 1) * 10, page * 10 - 1);
   const pageUrl = (target: number) => `/admin/empresas?${new URLSearchParams({page:String(target), ...(status?.success ? {status:status.data} : {})})}`;
   const labels = { incomplete: "Incompleta", active: "Activa", suspended: "Suspendida", archived: "Archivada" };
-  return <RoleShell role="admin" title="Empresas" navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }, { href: "/account", label: "Mi cuenta" }]}>
-    <form method="get" className="mb-5 flex flex-wrap items-end gap-3 rounded border bg-white p-4">
-      <label>Estado de la empresa<select name="status" defaultValue={status?.success ? status.data : ""} className="block min-h-11 rounded border p-2">
+  return <AdminShell active="/admin/empresas" title="Empresas" navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }, { href: "/account", label: "Mi cuenta" }]}>
+    <Form method="get" className="mb-5 flex flex-wrap items-end gap-3 rounded border bg-white p-4">
+      <Field>Estado de la empresa<select name="status" defaultValue={status?.success ? status.data : ""} className="block min-h-11 rounded border p-2">
         <option value="">Todos</option>{COMPANY_PROFILE_STATUSES.map(value=><option key={value} value={value}>{labels[value]}</option>)}
-      </select></label><button className="rounded bg-blue-800 px-4 py-3 text-white">Filtrar empresas</button>
-    </form>
+      </select></Field><button className="rounded bg-blue-800 px-4 py-3 text-white">Filtrar empresas</button>
+    </Form>
     {invalid && <p role="alert">Revisá el estado o la página solicitada.</p>}
     {result && <><h2 className="mb-4 text-xl font-semibold">Empresas: {result.count ?? 0}</h2>
     {result.error ? <p role="alert">No se pudo cargar la lista. Recargá la página.</p> : result.data?.length === 0 ? <p>No hay empresas en esta página.</p> :
@@ -35,5 +37,5 @@ export default async function AdminCompaniesPage({ searchParams }: { searchParam
       {page * 10 < (result.count ?? 0) && <Link href={pageUrl(page + 1)} className="text-blue-800 underline">Siguiente</Link>}
     </nav>
     </>}
-  </RoleShell>;
+  </AdminShell>;
 }

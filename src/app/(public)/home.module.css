@@ -393,7 +393,7 @@
   gap: var(--form-field-gap);
 }
 
-.form [data-company-field-row] > label {
+.form [data-company-field-row] > [data-form-field] {
   min-width: 0;
   row-gap: var(--form-label-gap);
 }

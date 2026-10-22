@@ -85,7 +85,7 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_
 select * from pg_temp.audit_case('Corrección perfil', $$select public.save_candidate_profile(1,'Persona ficticia 001','90000001','Funes','Prueba ficticia','available','','',array[private.fixture_id('category',1)])$$,'profile_updated',private.fixture_id('candidate',1));
 select * from pg_temp.audit_case('Contacto candidato', $$select public.set_candidate_phone(1,'3410000000')$$,'profile_updated',private.fixture_id('candidate',1));
 select * from pg_temp.audit_case('Retiro consentimiento', $$select public.change_candidate_consent(1,'withdrawn','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'consent_withdrawn',private.fixture_id('candidate',1));
-select * from pg_temp.audit_case('Archivo propio', $$select public.change_account_status(private.fixture_id('candidate',1),1,'archive',null,true)$$,'account_archived',private.fixture_id('candidate',1),'active','archived');
+select throws_ok($$select public.change_account_status(private.fixture_id('candidate',1),1,'archive',null,true)$$,'P0001','FORBIDDEN','Autoarchivo rechazado antes de cualquier auditoría');
 select * from pg_temp.audit_case('Retiro postulación', $$select public.transition_participation(private.fixture_id('participation',501),1,'withdraw')$$,'outcome_confirmed',private.fixture_id('candidate',1),'referred','withdrawn');
 select public.change_candidate_consent(1,'withdrawn','demo-not-approved',(select policy_hash from public.candidate_consent_policy()));
 select * from pg_temp.audit_case('Aceptación consentimiento', $$select public.change_candidate_consent(2,'accepted','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'consent_accepted',private.fixture_id('candidate',1));
@@ -108,9 +108,11 @@ select public.change_account_status(private.fixture_id('candidate',10),1,'suspen
 select * from pg_temp.audit_case('Reactivación', $$select public.change_account_status(private.fixture_id('candidate',10),2,'reactivate','Motivo ficticio',true)$$,'account_reactivated',private.fixture_id('admin',1),'suspended','active');
 select public.change_account_status(private.fixture_id('company',10),1,'archive','Motivo ficticio',true);
 select * from pg_temp.audit_case('Restauración empresa', $$select public.change_account_status(private.fixture_id('company',10),2,'restore','Motivo ficticio',true)$$,'account_restored',private.fixture_id('admin',1),'archived','active');
+reset role;
 select set_config('request.jwt.claim.sub',private.fixture_id('candidate',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('candidate',1),'session_id','ee720000-0000-4000-8000-000000000002')::text,true);
-select public.change_account_status(private.fixture_id('candidate',1),1,'archive',null,true);
+select private.change_account_status(private.fixture_id('candidate',1),1,'archive',null,true);
+set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1),'session_id','ee720000-0000-4000-8000-000000000001')::text,true);
 select * from pg_temp.audit_case('Restauración candidato', $$select public.change_account_status(private.fixture_id('candidate',1),2,'restore','Motivo ficticio',true)$$,'account_restored',private.fixture_id('admin',1),'archived','active');

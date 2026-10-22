@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualización 2026-10-06 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-20 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -448,3 +448,379 @@ el ledger ampliado suma 95/101 marcadas, manteniendo esos seis pendientes.
   READY y su smoke previo no prueban por sí solos ese paso final.
 - Esta actualización registra el estado comunicado en la conversación y la discrepancia documental;
   no acredita nuevos resultados, aceptación humana, publicación ni revisión.
+
+## A07 / FR-024B — búsqueda pública, 2026-10-19
+
+Main actualizado `43b94a7` integra la solución de slugs de Máximo (PR #55/#56/#57),
+no el PR #54 descartado. Rama `feat/public-offer-search`: cuatro filtros públicos,
+formulario GET, paginación persistente, limpiar, vacío y validación segura. Filtros
+se aplican en SQL antes de contar/paginar; opciones solo de ofertas públicas.
+La vista privada invocadora con barrera centraliza los mismos predicados; RPC
+anterior y slug conservan contrato. Sin tablas/backfill, Auth o estados nuevos.
+No se implementan A04 privado/A05/A06/A08; A07 es independiente de esas tareas.
+
+Evidencia: RED10 FAIL/4 PASS; final603 unitarias/componentes/39 archivos y tooling57,
+tipos/lint/build PASS. SQL final951/14 archivos, incluidas38 nuevas y la defensa
+invoker/barrier. CI completo se acredita por el SHA del PR. Navegador9/9
+(tres A07 y seis sesiones), teclado y axe sin violaciones,
+sin overflow360×800. Colección70/17 no equivale a ejecución local completa.
+El primer SQL072 se solapó con logins de navegador y falló dos snapshots; repetido
+solo y sin cambiar SQL aprobó todo. No se quitaron controles ni se reseteó la base.
+
+Local: Node24.22/npm11.19.1 portable con SHA verificado y global intacto. CLI no
+pudo aplicar por el residuo local descartado `20261017204435`; se conservaron
+su registro/columnas. Se instalaron transaccionalmente solo SQL integrado de
+slugs y A07, reemplazando la RPC descartada en conflicto tras precondiciones.
+Versiones/fechas de ofertas conservaron checksum. Se registraron applied solo
+tras éxito. No se cambió SQL del compañero ni se reintrodujo el PR descartado.
+Pruebas SQL usan rollback, sesiones solo ficticias locales; Docker activo y
+Next de pruebas finalizado, sin cambios alojados ni nuevos archivos env.
+
+T106–T110 implementadas/verificadas localmente; ledger T001–T110104/110, seis gates
+históricos pendientes. FR-024A conserva ledger separado. Revisión independiente
+y aceptación humana no se infieren; CI completo del SHA se acredita en el PR.
+Aplicar `20261019124218_public_offer_search.sql` antes de desplegar o validar
+preview en DB compartida; procedimiento en `docs/operations/public-offer-search.md`.
+
+## A08 — rubros y coincidencias municipales (2026-10-19)
+
+Base main `efdeff2` (PR59 y PR60 integrados). Rama `feat/job-categories-matching`.
+Quince rubros nuevos en catálogo v2, categorías/referencias anteriores intactas
+sin mapeos inferidos. Multiselección existente sin duplicar catálogo en UI.
+RPC administrativa con actor/sesión vigente, OR de ocupaciones/intereses activos,
+aptitud de derivación, empresa/oferta vigentes, orden por nombre/ID y total antes
+de página. No ranking ni nominaciones/derivaciones al consultar. Participaciones
+existentes llevan a evaluación, perfiles sin participación a nominación manual.
+
+T111–T115 implementadas/verificadas localmente; ledger109/115 sin cerrar seis
+gates históricos ni ledger independiente FR-024A. Checklists16/16 y77/77 intactas.
+Constitución/spec/plan/modelo/contrato y EXTRA-024 sincronizados; OQ-010 precisa
+aprobación del catálogo amplio, sin resolver equivalencias/ocupaciones históricas.
+
+RED SQL (catálogo/RPC ausentes) observado. GREEN:655 unitarias/componentes/42
+archivos, tooling57, tipos/lint/build PASS; pgTAP986/15 (35 nuevas), advisor
+security sin hallazgos. Navegador12/12 (A08×3, A07×3, sesión×6), teclado y axe
+sin violaciones en bloque, sin overflow360×800. Colección73/18; no ejecución
+completa. Cobertura configurada100% de env/schema, no de toda la funcionalidad.
+
+Migración20261019203041 aplicada transaccionalmente/registrada solo en Docker
+local, sin reset ni modificaciones de historiales previos. No cambios alojados,
+dependencias o env persistidos. Se conserva Docker; servidor de prueba finalizado.
+Runbook: `docs/operations/job-category-matching.md`. CI completo, commit/PR,
+revisión independiente y aceptación pendientes; no se acredita producción municipal.
+
+Predecesor A07: Mateo aportó resultado exitoso de ejecución, verificación JSON,
+registro applied de20261019124218 y funcionamiento local contra la base alojada.
+Runbook A07 distingue esta operación del operador de la entrega original del agente;
+no se reinspeccionó remotamente, no acredita Vercel ni sanea la historia divergente.
+
+### Ampliación A08 — perfil modal y nominación desde la oferta
+
+Solicitud explícita de Mateo del2026-10-19; EXTRA-025 y T116–T120. Sustituye el
+comportamiento inicial de mostrar participaciones previas: ahora todo caso no
+archivado se excluye antes del conteo/paginación, con el mismo pool de elegibilidad
+para listado y preview. Perfil laboral/CV mínimo bajo demanda, dos columnas,
+doce fichas/página y nominación exclusivamente a la oferta actual. Éxito cierra,
+retira y actualiza sin redirección ni derivación/acceso empresarial automáticos.
+Roles, comando transaccional de nominación y catálogo original no se alteran.
+
+689 unitarias/componentes/43 archivos, tooling57, tipos/lint/build PASS.
+pgTAP1007/16 archivos (21 nuevos, matching35 actualizado), advisor sin hallazgos;
+ejecutados antes de Auth/navegador. Navegador13/13 (A08×4, A07×3, sesiones×6),
+HTTP8/8 del inventario privado completo PASS. Axe modal/bloque sin violaciones,
+desktop dos columnas y móvil360×800 sin overflow, foco/Escape y nominación real
+persistida comprobados. Colección74/18; no ejecución E2E completa ni nuevo CI.
+La nominación deja un caso ficticio local adicional y su auditoría (1001 total),
+sin nuevas derivaciones: no se borró ni reseteó para recuperar el fixture original.
+
+`20261019205940_opening_candidate_preview.sql` aplicada/registrada solo Docker
+local. Primera A08 `20261019203041` alojada según SQL/registro que aportó Mateo;
+no repetirla ni editarla. La ampliación modal sigue pendiente allí antes de app.
+Sin cambios persistentes de entorno, dependencias o permisos empresariales.
+Ledger114/120: seis gates históricos permanecen abiertos; commit/PR, CI completo,
+revisión independiente, despliegue y aceptación no se acreditan con pruebas locales.
+
+Entrega posterior: `11be483` en [PR61](https://github.com/maximo-Pdev/funes-empleo/pull/61),
+abierto contra main; PR60 ya estaba mergeado y no había PR A08 previo. Incluye
+el ajuste EXTRA026: candidatos debajo de información/historial, nueva regresión
+de orden DOM; final690/43 archivos, tipos/lint y build PASS. Se conserva el dev
+activo sin detenerlo y next-env generado fuera del commit. CI del nuevo SHA y
+revisión/aceptación pendientes; no implica merge ni despliegue.
+
+## Actualización — formularios, 2026-10-20
+
+Rama `codex/fix-registration-verification`, base main6607854 (PR61 mergeado al
+iniciar la rama). Mateo solicita asteriscos rojos, error junto a cada campo,
+bordes rojos y conservación ante fallos en todos los formularios. EXTRA028,
+matriz A18 y T121–T125 registran el incremento; spec/plan/contrato alineados.
+
+Form/Field compartidos integran 40 usos en 29 archivos, incluidas primitivas,
+grupos alternativos, confirmaciones, períodos y requisitos dinámicos. No hay
+forms/labels nativos aislados ni controles visibles sin Field según inventario AST.
+Se bloquea el reset automático de React Actions fallidas; las respuestas públicas
+no enumerativas conservan datos incluso ante supuesto éxito. Conflictos no
+recargan y descartan ediciones. CV usa JSON opt-in sin navegar en error, conserva
+303 para otros clientes y espera versión actualizada antes de anunciar éxito.
+No cambia validación servidor, RLS, permisos, estados o límites de archivos.
+
+Resultados locales:729 unitarias/componentes en49 archivos y tooling57 PASS;
+tipos/lint/build PASS. Navegador20/20 y HTTP privado8/8 aislado PASS; incluyen
+altas verificadas de candidato/empresa con buzón local, perfiles/ofertas,
+moderación, sesiones, CSV/PDF rechazados sin pérdida, carga válida/activación
+con respuesta RSC deliberadamente demorada y filtros. Axe/teclado/foco y
+responsive360×800 comprobados; un selector verifica ancho completo de textarea.
+No es la suite E2E completa ni prueba humana NVDA/aceptación. Respetar el orden
+de proyectos: ejecutar HTTP junto con flujos que mutan auditoría produjo
+interferencia en contadores; la ejecución aislada pasa sin modificar aserciones.
+
+Sin migración, dependencias o entorno persistido nuevos; pruebas contra Docker
+local sin reset, con identidades/casos/auditoría ficticios adicionales. Se mantiene
+Docker y la modificación previa de next-env; no se hizo commit/PR para este ajuste.
+Seis gates históricos, CI nuevo, revisión independiente, despliegue y aceptación
+siguen pendientes. Guía: `docs/product/form-validation.md`.
+
+El ajuste operativo previo EXTRA027 ya actualizó Site URL/callbacks de Supabase,
+según `docs/operations/registration-verification.md`. Este incremento de formularios
+no cambia el entorno alojado ni habilita SMTP. Proveedor y remitente propios
+siguen pendientes: la confirmación genérica no acredita envío de correo público.
+
+### Registros compactos y simétricos — 2026-10-20
+
+Solicitud de Mateo, EXTRA029 y T126–T128: layout servidor común a candidato y
+empresa, tarjetas de igual ancho/alto en escritorio, controles44px y separación
+compacta. La ayuda de correo se integra en la tarjeta. Sin alterar los formularios
+funcionales, avisos municipales, validación, acciones, autenticación ni permisos.
+Móvil/errores/zoom pueden extender el documento; no se oculta contenido ni hay
+scroll interno para simular encaje.
+
+732 unitarias/componentes en50 archivos, tipos/lint/build PASS. Navegador6/6:
+medidas simétricas y sin scroll inicial1920×1080 y1920×960, controles≥44px,
+móvil360×800/reflow960×540 sin overflow horizontal, errores completos, teclado
+y axe sin violaciones. Capturas vacías de ambos registros revisadas visualmente.
+No acredita zoom real200%, NVDA ni alta/envío Auth repetidos en este ajuste.
+Servidor de prueba propio3001 separado del servidor existente3000; sin cambios
+alojados, altas, correos, reset, migración o dependencias. Próxima entrega/revisión
+mediante PR pendientes; los seis gates históricos se conservan abiertos.
+Guía actualizada: `docs/product/auth-frontend.md`.
+
+Ampliación EXTRA030/T129: navegación “Soy postulante”/“Soy empresa” en la fila
+superior, activa con aria-current, sin enviar formularios ni compartir datos
+entre roles. Mateo la autoriza2026-10-20. Regresiones focalizadas3/3 y navegador7/7,
+tipos/lint/build PASS; ida/vuelta sin POST, simetría/encaje y accesibilidad intactos.
+No se repite suite completa ni Auth con alta/envío; sin cambios de datos o entorno
+alojado. Commit/PR, revisión, CI y aceptación global pendientes.
+
+Ampliación EXTRA031/T130: login compacto con tarjeta de registro de ancho completo
+arriba y dos tarjetas principales iguales; estilos locales reutilizados de los
+registros con variante de credenciales en una columna. AuthForm, acciones y reglas
+no se alteran.735 unitarias/componentes/51 archivos, tipos/lint/build PASS;
+navegador11/11 (login4+registros7), simetría/no scroll1920×1080/960, móvil/reflow,
+errores/retención, teclado, enlaces y axe PASS. Captura vacía revisada; pruebas en
+3001 sin alta/envío o cambios alojados. Sin migración/dependencias, nueva aceptación,
+CI o revisión independiente acreditados; no es suite E2E completa/NVDA/zoom real.
+
+Refinamiento EXTRA032/T131: tarjetas del login estiradas por igual para aprovechar
+la altura disponible en escritorio, sin fijar alturas o recortar contenido.735
+tests/51 archivos, tipos/lint/build y navegador11/11 PASS: crecimiento1080/960,
+sin scroll inicial, móvil/reflow/escritorio bajo, teclado/axe y regresión de
+registros/errores/retención. Captura revisada. Solo presentación; sin reset,
+alta/envío o cambios alojados. Revisión/CI/aceptación y gates previos pendientes;
+no acredita suite E2E privada, NVDA ni zoom real.
+
+EXTRA033/T132 sustituye la disposición/estiramiento de EXTRA031/032 por el esquema
+de Mateo y su refinamiento: información a la izquierda, registro sobre ingreso a
+la derecha y conjunto compacto centrado, sin crecer para llenar el viewport.735
+tests/51 archivos, tipos/lint/build y navegador11/11 PASS: alineación/centrado y
+alturas estables1080/960 sin scroll, móvil/reflow/escritorio bajo, errores/retención,
+teclado/axe/enlaces y registros. Captura revisada. Solo presentación, sin reset,
+altas/envíos, cambios alojados, migraciones o dependencias. Sin nueva revisión/CI/
+aceptación/gates cerrados ni suite privada/HTTP/NVDA/zoom real repetidos.
+
+## Preparación de entrega — 2026-10-20
+
+Mateo solicita crear el PR de `codex/fix-registration-verification`, desde main
+6607854 (PR61 mergeado). Incluye EXTRA027–033: diagnóstico/destino de verificación,
+validación compartida y retención de datos, carga de CV sin pérdida ante error,
+registros compactos con navegación entre roles y disposición compacta/centrada
+del login. El SMTP/remitente continúa pendiente; no se declara resuelto el correo
+público general. Sin SQL, dependencias, nuevas variables o cambios de permisos.
+
+Verificación final adicional: tooling57/57 y test:coverage735 tests/51 archivos
+PASS; la cobertura configurada solo mide el módulo seleccionado por el proyecto,
+no implica cobertura100% de toda la aplicación. Tipos/lint/build y navegador11/11
+del último ajuste PASS; la evidencia de recorridos privados/HTTP anteriores está
+en EXTRA028. No se reseteó la base ni repitió la suite E2E completa en esta entrega.
+`next-env.d.ts` conserva su cambio local generado y se excluye del commit.
+Commit funcional: `1b93a9f` (`feat(forms): improve validation and registration experience`).
+Entrega: [PR #62](https://github.com/maximo-Pdev/funes-empleo/pull/62), abierto
+hacia `main` con EXTRA027–033 y sin merge. CI y revisión independiente pendientes;
+no acredita aceptación global ni cierre de los seis gates históricos.
+
+## Corrección del check application de PR62 — 2026-10-20
+
+EXTRA034/T133: Quality117 (run39525712466) falla por una expectativa E2E antigua
+del retiro administrativo: Form ahora bloquea el selector requerido y muestra el
+error junto a él, antes del mensaje general previo.94 E2E pasan,1 falla y1 no
+corre; database, tipos/lint/tooling/cobertura y build pasan en ese run.
+
+Se ajusta solo el contrato esperado por tests: error asociado al selector/foco,
+motivo retenido y estado aún Derivada; luego se registra contacto y se verifica
+el retiro. Nuevo test de componente prueba callback bloqueado sin evidencia,
+filtrado de contacto saliente y payload correcto al elegir contacto entrante.
+Componentes11/11, suite/cobertura736 tests/51 archivos, tipos/lint/diff-check
+PASS local. Sin cambios de aplicación, DB o entorno ni reset local; ejecución
+completa del CI corregido pendiente. No relaja la evidencia de retiro requerida.
+
+## Contratación y retiro global — 2026-10-21
+
+Mateo confirma el alcance global (OQ-020/EXTRA035), descartando la alternativa de
+solo matching. Trabajo desde main15ec4e7, PR62 ya mergeado, en
+`codex/feat-withdraw-consent-on-hire`; rama anterior eliminada y cambio local de
+`next-env.d.ts` preservado. No hay commit/PR nuevo ni despliegue alojado.
+
+Confirmar `hire` o `late_hire` agrega el retiro si corresponde, con admin, fecha,
+fuente restringida, política/hash y auditoría/causa enlazada al caso. Revoca todos
+los permisos activos sin cambiar otros casos/versiones/resultados. Una única
+transacción y bloqueo candidato primero; no se usa el retiro manual que cierra
+otros casos. Confirmación tardía no restaura accesos y la empresa no confirma por
+sí sola una contratación. Reaceptar requiere acción afirmativa y tampoco restaura
+permisos. Sin backfill: soporte720h/Cron permanece solo para permisos históricos.
+
+T134–T138 implementadas/verificadas localmente. Migraciones nuevas
+20261021220623/20261021221414 (EXTRA036: default de fecha efectiva) aplicadas solo
+localmente. Servidor conserva firma/RPC/grants, invalida vistas tras éxito; no hay
+dependencias, nuevas variables ni cambios de UI. Rollout/recuperación y comandos
+seguros en `docs/validation/hiring-consent.md`.
+
+| Verificación | Evidencia local |
+| --- | --- |
+| SQL específico | RED22/37 contra implementación anterior; final55/55 PASS. |
+| SQL completo | 17 archivos/1062 pruebas PASS, Supabase efímero con fixture ficticio limpio, sin reset de la base original. |
+| Unitarias/componentes/integración y cobertura | 52 archivos/741 tests PASS; incluye5 nuevos de servicio. Cobertura configurada limitada a env/schema. |
+| Tooling | 57/57 PASS. |
+| Tipos/lint/build | PASS con Node24.22.0 y destinos locales, sin editar .env.local. |
+| Navegador | 13/13 PASS: normal/tardía, bloqueo entre conexiones, retiro/permisos/CV y otros casos intactos; once regresiones login/registro. |
+| Seguridad | Advisor local aislado sin warn/error; grants, roles negativos, acceso a CV/perfil, append-only y rollback auditados en SQL. |
+| Integridad de cambios | diff-check PASS; sin datos reales/secretos. next-env local excluido del cambio funcional. |
+
+Se preservó la discrepancia histórica local20261017204435 sin reparar ni eliminar
+versiones. Las suites010/072 inicialmente fallaron sobre ofertas ya modificadas
+del fixture usado; la suite limpia aislada completa pasa. La cobertura inicialmente
+en sandbox falló por ENOENT de archivos temporales del runner; repetición fuera de
+ese sandbox pasa sin cambios funcionales. Fixtures E2E nuevos son ficticios y no
+borran datos existentes.
+
+### Análisis y convergencia acotados
+
+Secuencia aplicada: clarificar alcance → alinear spec → diseño/plan/modelo/
+contratos → checklist de requisitos10/10 → tareas → análisis previo → implementar
+→ verificar → convergencia acotada. La autorización expresa de Mateo cubre este
+cambio; no equivale a revisión independiente ni aprobación municipal/legal.
+
+FR-036/038 y conservación de otros casos se trazan a T135/136 y SQL024; servidor/
+invalidation a T137 y5 unitarias; atomicidad/roles/CV/lock/aceptación a T138 y SQL/
+E2E. EXTRA036 queda cubierto por aceptación posterior en la misma transacción.
+Reanálisis armoniza referencias operativas antiguas a720h como históricas y
+mantiene los antecedentes de decisión. Sin nuevos conflictos de arquitectura o
+constitución ni tareas construibles faltantes dentro de T134–138; no se genera
+una fase de convergencia vacía ni se marca completa la convergencia global.
+
+Límites: no se ejecutó la suite E2E completa ni NVDA/aceptación con personas;
+sin CI, revisión humana o validación alojada de este cambio. Despliegue compartido
+de ambas migraciones y revisión mediante PR siguen pendientes. Los seis gates
+históricos del producto permanecen abiertos; OQ-001 no se resuelve con este cambio.
+
+### Aplicación alojada posterior — EXTRA037, 2026-10-21
+
+Mateo solicita expresamente aplicar las migraciones. CLI autenticado confirma
+proyecto Funes-empleo/kyjycjojzhwggjuqjnki, función base sin cambios concurrentes
+y versiones nuevas ausentes. Se guardan definiciones previas de función/grants/
+constraints/default sin datos personales en test-results ignorado. El dry-run
+confirma el desfase histórico de timestamps; no se repara ni repite esa historia.
+
+Se aplican exclusivamente20261021220623/20261021221414 por db query --linked,
+en una transacción común con guardia de cuerpo previo y límites de espera,
+registrando las versiones/SQL originales en la misma transacción. Verificación
+posterior PASS: cuerpo de función igual al archivo, hashes del SQL registrado,
+ambos constraints/default clock_timestamp(), firma/grants/search_path y hash
+de toda la historia anterior sin cambios. Advisor remoto52 WARN antes/después,
+cero nuevos; no confundirlo con la instancia local aislada sin hallazgos.
+
+Esto reemplaza el pendiente de rollout SQL anterior. Aplica a futuras
+confirmaciones normales/tardías; no se ejecutaron contrataciones, backfill,
+fixtures, E2E ni pgTAP alojados. No cambia código/variables/secretos ni acredita
+despliegue de aplicación, nuevo CI, PR, revisión o aceptación. Las verificaciones
+funcionales locales previas siguen siendo la evidencia de los recorridos.
+
+### Entrega mediante PR — 2026-10-21
+
+Solicitud de Mateo: commit funcional28c6a25 en
+codex/feat-withdraw-consent-on-hire, publicado en
+[PR63](https://github.com/maximo-Pdev/funes-empleo/pull/63) hacia main15ec4e7.
+Abierto sin merge; incluye migraciones ya aplicadas, pruebas y EXTRA035–037.
+next-env.d.ts permanece como cambio local fuera del commit. Evidencia de calidad
+anterior conservada; entrega documental adicional con diff-check PASS. CI,
+revisión independiente y aceptación siguen pendientes, sin cerrar otros gates.
+
+### Corrección de application en PR63 — EXTRA038, 2026-10-21
+
+Quality121/run39688659768: database PASS, application falla solo por dos E2E de
+matching,95 pasan y1 no corre. Las ofertas aleatorias creadas por contratación
+copiaban published sin categorías y el selector de matching podía elegirlas.
+No se modifica el matching real ni el retiro global: solo fixtures en paused,
+aserción explícita de que no son públicos y selector de prueba con categorías.
+Mantiene12 tarjetas, paginación/modal/nominación y todas las comprobaciones de
+contratación, evidencia, revocación, atomicidad y otras participaciones intactas.
+
+Regresión de aislamiento RED0 esperado/2 recibidas; GREEN y navegador6/6 PASS
+en orden contratación→matching. Cobertura741/52, tooling57, tipos/lint/build y
+diff-check PASS; base local preservada sin reset, sin repetir SQL alojado ni
+migraciones. next-env.d.ts conserva su cambio local fuera del commit. Nueva
+ejecución completa CI en el mismo PR y revisión humana pendientes; no se relajan
+gates ni se declara resuelto el backlog del producto.
+
+## Retiro de autoarchivo en perfiles — EXTRA039, 2026-10-22
+
+Mateo solicita quitar archivar/eliminar cuenta en candidatos y empresas. Se
+confirma PR63 mergeado (a75bfc8) y Quality122 PASS con98 E2E; main actualizado,
+anterior rama borrada local/remoto y nueva codex/feat-remove-profile-self-archival.
+Se conserva el cambio local next-env.d.ts sin incluirlo en el cambio funcional.
+
+Desaparecen tarjetas de ambos perfiles y Mi cuenta y se retiran Actions, estado,
+props y validador exclusivos. Servicio común exige admin antes de RPC. Migración
+20261022202940 reemplaza solo wrapper público con sesión/cuenta activa/admin,
+manteniendo firma/grants y comando privado serializado/auditado. Aplicada solo
+localmente, sin modificar SQL anterior o datos alojados. El archivo empresarial
+administrativo y restauración siguen; no se agrega archivo administrativo
+candidato, antes rechazado por el privado. Se preparan archivos candidatos
+legados solo como fixtures de DB propietaria para probar restauración histórica.
+
+No cambia edición, activación, disponibilidad, consentimiento, participaciones,
+contraseña/logout ni archivo/cancelación de ofertas propias. No borra eventos,
+perfiles, cuentas o registros archivados, ni inventa otra política/canal legal.
+
+| Verificación local | Resultado |
+| --- | --- |
+| Regresiones RED | UI/servidor7/33 fallan contra flujo previo; SQL10/12 fallan al permitir autoarchivo. |
+| Unitarias/componentes/integración y cobertura | 730/53 PASS; elimina solo casos de Actions retiradas y agrega guardias por rol. Cobertura configurada limitada a env/schema. |
+| SQL completo aislado | 18 archivos/1072 PASS; incluye14 nuevos de rechazo/snapshot y no ampliación del archivo candidato. |
+| Navegador/HTTP | 12/12 PASS: HTTP real8, registro/perfil/postulaciones/archivo legado/restauración candidata y gestión empresarial3. |
+| Tipos/lint/tooling/build | PASS, tooling57/57. |
+| Seguridad e integridad | Advisor local aislado sin warn/error y diff-check PASS; grants/rol/versión/auditoría/rollback conservados. |
+
+Prerrequisitos locales encontrados y documentados: títulos duplicados de ofertas
+ficticias previas, selección exacta sin reset; entrada del textarea con foco y
+selección por teclado para sustituir el valor tras navegar. Inventario Form38
+tras retirar tres usos, manteniendo escaneo estricto de campos/componentes.
+React sin hooks condicionales ni estado/props nuevos; mantiene validación/foco y
+las comprobaciones axe de los recorridos existentes.
+
+Análisis/convergencia acotados T140–143: alcance/contratos y comportamiento
+coherentes, sin nueva arquitectura/permiso candidato o gaps construibles en el
+incremento. No acredita revisión independiente, suite E2E completa, CI nuevo,
+NVDA, aceptación ni cierre de gates históricos. Instancia SQL efímera y servidor
+propio cerrados; base original preservada sin reset, fixtures nuevos ficticios.
+Commit70ae1ea publicado en PR64 (abierto, sin merge):
+https://github.com/maximo-Pdev/funes-empleo/pull/64.
+CI y revisión pendientes. Pendiente aplicar20261022202940 en Supabase compartido antes
+de desplegar app; guía docs/validation/profile-self-archival.md. OQ-001/002 abiertos.

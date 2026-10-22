@@ -1,8 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { publicErrorFrom } from "@/lib/errors/public-error";
-import { archiveCandidate, activateCandidate, saveCandidateProfile, setCandidatePhone } from "./profile-service";
+import { activateCandidate, saveCandidateProfile, setCandidatePhone } from "./profile-service";
 
 export type CandidateActionState = { message: string; success: boolean };
 function errorState(error: unknown): CandidateActionState {
@@ -33,9 +32,4 @@ export async function activateProfileAction(_previous: CandidateActionState, for
     revalidatePath("/account");
     return { message: "Perfil activo. Ya podés postularte a ofertas vigentes.", success: true };
   } catch (error) { return errorState(error); }
-}
-export async function archiveProfileAction(_previous: CandidateActionState, form: FormData): Promise<CandidateActionState> {
-  try { await archiveCandidate({ version: form.get("version"), confirmed: form.get("confirmed") === "on" }); }
-  catch (error) { return errorState(error); }
-  redirect("/session-expired");
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useId, useState, type ChangeEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { Field } from "@/components/forms/field";
 
 type PasswordFieldProps = {
   name: "password" | "confirmation";
@@ -23,13 +24,11 @@ export function PasswordField({ name, label, autoComplete, help }: PasswordField
   const inputId = useId();
   const [visible, setVisible] = useState(false);
   const description = name === "confirmation" ? "confirmación de contraseña" : "contraseña";
-  return <div>
-    <label className="block font-semibold" htmlFor={inputId}>{label}</label>
+  return <Field label={label} hint={help} className="block font-semibold">
     <div className="mt-1 flex items-stretch gap-2">
       <input id={inputId} name={name} type={visible ? "text" : "password"}
         required minLength={6} maxLength={128} autoComplete={autoComplete}
         onChange={updateConfirmationValidity}
-        aria-describedby={help ? `${inputId}-help` : undefined}
         className="min-w-0 w-full rounded border border-slate-500 bg-white p-3" />
       <button type="button" aria-controls={inputId} aria-pressed={visible}
         aria-label={`${visible ? "Ocultar" : "Mostrar"} ${description}`}
@@ -38,6 +37,5 @@ export function PasswordField({ name, label, autoComplete, help }: PasswordField
         {visible ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
       </button>
     </div>
-    {help && <p id={`${inputId}-help`} className="mt-1 text-sm">{help}</p>}
-  </div>;
+  </Field>;
 }

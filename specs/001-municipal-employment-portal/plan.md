@@ -4,6 +4,92 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## A08 — diseño focalizado, 2026-10-19
+
+Fuente única: `public.job_categories`, sin catálogo paralelo en componentes.
+Nueva migración forward-only inserta quince códigos estables en versión 2 y
+agrega `match_opening_candidates(uuid,integer,integer) returns jsonb`.
+RPC SECURITY DEFINER con search_path vacío: deriva actor/sesión mediante
+`private.require_workflow_actor()` y exige admin. Solo EXECUTE a authenticated;
+sin nuevos permisos de tablas. Cruzar candidate_categories/opening_categories
+por rubro activo y deduplicar antes de contar/paginar (20, máximo 50).
+Comprobar elegibilidad y visibilidad de oferta; devolver datos laborales mínimos
+y rubros coincidentes. La ampliación siguiente excluye participaciones previas
+no archivadas antes del conteo; participationId queda null por compatibilidad.
+Consulta sin escrituras ni rankings, orden por nombre/ID.
+
+Detalle administrativo: Server Component bajo Suspense, servicio y entrada/salida
+validados con Zod; estados de error/vacío/carga y paginación accesible. Estilos
+existentes sin rediseño global. Categorías anteriores y referencias intactas,
+sin backfill semántico ni cambios al importador v1. Pruebas locales ficticias y
+CI fresco. SQL antes de app; revertir app conserva catálogo/RPC compatibles.
+Recuperación SQL por migración posterior, nunca borrando categorías referenciadas
+ni normalizando el historial alojado con db push/repair masivos.
+
+### Ampliación modal A08 — 2026-10-19
+
+La migración A08 original ya fue aplicada por Mateo: no editarla. Nueva migración
+define pool privado invocador sin EXECUTE cliente, con elegibilidad/intersección
+y NOT EXISTS de participaciones no archivadas; lista y nueva RPC
+`preview_opening_candidate(uuid,uuid)` comparten ese predicado. Ambas entradas
+públicas derivan actor/sesión y exigen admin. Lista conserva firma/envelope;
+participationId queda null por compatibilidad. Preview mínimo validado incluye
+versiones, título/ID de oferta y CV actual. Sin tablas ni nuevos roles/estados.
+
+Server Action de lectura sanea errores; no usar service-role ni serializar notas.
+Client Component acotado administra diálogo HTML nativo, loading/errores y guardia
+de respuestas fuera de orden. Reutiliza createAdminNominationAction y revalida el
+detalle de oferta. No navegar al caso tras éxito; refresh para conteo/página y
+desaparición. Bloquear doble envío; mantener conflictos optimistas de versiones.
+Doce fichas en grid md:grid-cols-2 y una columna móvil, bloque de ancho completo
+después del grid de información/moderación e historial de oferta, según ajuste
+solicitado por Mateo el2026-10-19. Native dialog con showModal/Escape, etiquetas y foco devuelto.
+Pruebas SQL de lista/preview/roles/nominación y tests UI/HTTP/E2E.
+
+## Formularios compartidos — 2026-10-20
+
+Form cliente y Field declarativo contextualizan errores sin observers ni cambios
+imperativos a labels/árboles React. Field conserva nombres/IDs/ayudas y agrega
+asterisco/aria-invalid/error local. Form valida restricciones y grupos antes de
+onSubmit/Action, mantiene GET/nombres/valores, y bloquea reset automático de
+Actions fallidas; resultado explícito de éxito permite limpieza. Sin guardar
+datos fuera del DOM ni envolver dispatchers de useActionState como si retornaran
+promesas. Integrar TextField/SelectField/PasswordField y todos los consumidores.
+Conservar también ante conflicto de versión, sin refresh automático en fallo.
+Registro/recuperación/reenvío usan preserveOnSuccess: su respuesta no enumerativa
+no garantiza que el proveedor haya completado la operación. Declarar orden de
+fechas en métricas y conservar filtros válidos recibidos aunque el rango falle.
+CV: fetch multipart opt-in Accept application/json, respuesta de códigos segura
+del handler existente, sin salir ante fallo; POST/303 nativo sigue compatible.
+No nuevos proveedores, dependencias, tablas, estados ni reglas de autorización.
+T121–T125 y EXTRA028 detallan tests y trazabilidad; no cierra gates históricos.
+
+### Registro compacto — 2026-10-20
+
+RegistrationLayout servidor compartido por los dos registros, con configuración
+de textos por rol, Card/Link/Image/Lucide y CSS Module local. Grid de columnas
+iguales/stretch desde escritorio; controles≥44px y separación/tipografía
+compactas, distribución de campos en dos columnas cuando sea viable. Ayuda de
+correo dentro de la tarjeta para alinear sus límites. Sin alturas fijas ni
+overflow oculto: admitir crecimiento por errores, móvil y zoom. Mantener Form,
+Field, PasswordField, acciones y avisos de negocio. EXTRA029/T126–T128 registran
+medidas en navegador y calidad, sin cambios SQL/contratos o dependencias.
+
+El layout incluye navegación “Soy postulante”/“Soy empresa” en su fila superior,
+con Link a cada ruta y aria-current para la activa (EXTRA030). Sin estado cliente,
+almacenamiento cruzado o cambios de Auth; verificar ida/vuelta y conservar encaje.
+
+Login reutiliza las bases compactas del CSS Module de entrada, con variante de
+una columna para credenciales. EXTRA033/T132 sustituye la disposición previa
+EXTRA031/T130–EXTRA032/T131: registro, guía y formulario son áreas de una grilla.
+En escritorio, columnas iguales; guía a la izquierda abarcando ambas filas,
+registro a la derecha en fila automática y formulario debajo en otra fila automática.
+En móvil, registro/login/guía apilados. Página y contenido flex vertical centran
+el conjunto cuando sobra espacio, sin expandir la grilla al viewport, alturas
+fijas o recortes. Clases exclusivas
+de login; AuthForm, enlaces, registros y reglas de acceso intactos. Verificar
+alineación, encaje, dimensiones, accesibilidad y mensajes/retención existentes.
+
 ## Resumen
 
 ### Incremento A01 autorizado el 2026-10-17
@@ -30,8 +116,9 @@ mantiene la intermediación: modera ofertas, evalúa y preselecciona personas, d
 confirma los resultados finales. Las empresas nunca acceden al padrón general y solo ven datos
 laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
 Ese acceso se calcula en cada lectura: se revoca ante retiro de postulación o consentimiento, no
-selección, cancelación o falta de respuesta; una contratación confirmada conserva un permiso todavía
-vigente solo hasta 720 horas desde la confirmación administrativa, salvo bloqueo anterior. Esta
+selección, cancelación o falta de respuesta; una nueva contratación normal/tardía
+retira el consentimiento global y revoca todos los permisos atómicamente, sin
+alterar otros casos. Solo permisos históricos anteriores conservan el límite de720 horas. Esta
 ventana de consulta no decide la retención de registros pendiente en OQ-001.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
@@ -41,10 +128,85 @@ sensibles se validarán en servidor y se respaldarán con RLS, funciones transac
 inmutable. El plan no define operación productiva municipal ni cierra las decisiones legales o de
 datos que siguen asignadas a sus responsables.
 
+### Cambio autorizado 2026-10-17 — URLs públicas de ofertas
+
+FR-024A agrega un slug persistido y único a `job_openings`, asignado una vez al publicar
+y estable frente a cambios posteriores. No cambia identidades UUID, permisos ni estados.
+La consulta por slug es aditiva; se conserva la firma previa de `published_offers` para
+los consumidores internos. No se agregan dependencias. Contrato, despliegue y recuperación:
+[public-offer-slugs](../../docs/validation/public-offer-slugs.md); tareas y evidencia:
+[public-offer-slugs](../../odd/tasks/public-offer-slugs.md). EXTRA-020 registra la autorización.
+
 ## Contexto técnico
 
-**Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.21.0 LTS con npm 11.19.0; SQL
+### EXTRA039 — retirar autoarchivo, 2026-10-22
+
+Eliminar tarjetas y Actions exclusivas de autoarchivo en perfiles y /account,
+incluyendo props/versiones sin uso. changeAccountStatus exige admin activo antes
+de RPC. Migración forward-only reemplaza solo wrapper público
+change_account_status: conserva bloqueo de sesión, añade private.is_admin() y
+delega al comando privado existente. Firma/grants, locks internos, efectos de
+archivo/restauración administrativos y auditoría permanecen. No se añade archivo
+administrativo candidato: el privado previo lo rechaza; solo se conserva su
+restauración histórica y el archivo empresarial administrativo. No nuevos triggers,
+tablas, estados, dependencias o alternativas de eliminación. Preservar retiro
+de consentimiento, edición, disponibilidad, logout y archivo de ofertas propias.
+Actualizar pruebas a archivo por admin y rechazos explícitos de ambos titulares,
+incluidos HTTP/RPC directo y cero efectos laterales. SQL antes de app; no tocar
+alojado sin solicitud posterior. Recuperar con migración correctiva, no reactivar
+autoarchivo o permisos automáticamente. Gates acotados conservan arquitectura y
+constitución; OQ-001/002 y revisión humana siguen pendientes.
+
+### EXTRA035 — retiro global por contratación, autorización2026-10-21
+
+Mantener RPC `transition_participation` y su firma/grants: `hire` y `late_hire`
+comparten la rama de resultado. Bloqueo candidato FOR UPDATE antes de participación/
+derivaciones, serializando con aceptación/retiro y creación de participaciones.
+No llamar `change_candidate_consent`: su retiro manual cierra otros casos.
+Ampliar solo source de candidate_consents con `hiring_workflow`, válido únicamente
+para withdrawn. Añadir retiro append-only si el último evento sigue accepted,
+copiando política/hash, admin confirmante y fecha posterior al evento anterior;
+actualizar perfil a consent_withdrawn salvo archivado, incrementando versión.
+Motivo de auditoría hired y decisión privada ligada a la participación. Revocar
+permisos activos en orden de ID con el helper existente. No modificar otras
+participaciones, cerrar ofertas ni crear nuevas ventanas720h. Sin trigger ni
+acción UI/postproceso: todos los flujos autorizados usan esta RPC transaccional.
+Helpers privados/grants, sesión, evidencia y versiones siguen siendo obligatorios.
+
+Conservar soporte de lectura/Cron para permisos históricos, sin backfill. Una
+nueva aceptación solo usa el flujo afirmativo vigente, no reabre permisos/casos.
+EXTRA036: recorded_at usa clock_timestamp() como default, no inicio de transacción,
+para que una nueva aceptación explícita suceda al retiro también en una transacción.
+Recuperación por migración forward-only, nunca reaceptar datos o permisos. Tests
+SQL normal/tardío, revocación multiderivación, auditoría/rollback/concurrencia,
+preservación de otros casos, aceptación explícita, servidor y E2E; tipos/lint/build.
+Constitución: mismo stack, autorización en servidor/DB, privacidad reducida,
+historial append-only, sin purgas/secretos ni aprobación municipal inferida.
+
+### A07 / FR-024B (2026-10-19)
+
+Formulario GET servidor en `/ofertas`, sin estado cliente ni paquetes nuevos.
+Zod compartido normaliza/limita filtros; `URLSearchParams` conserva valores y
+pagina. Validación fallida no consulta ofertas ni presenta un listado sin filtrar;
+las opciones y el acceso por cuenta siguen siendo proyecciones seguras.
+Vista privada invocadora con security barrier `public_offer_rows` centraliza exactamente la proyección y
+visibilidad existentes; sin SELECT cliente. RPC `search_published_offers` filtra
+antes de total/página; `published_offers` conserva firma/defaults y delega sin
+filtros, manteniendo `p_id`. Lookup por slug existente sigue delegando en ella.
+RPC `public_offer_filter_options` devuelve códigos/nombres activos y valores de
+localidad/modalidad solo de filas públicas. No hay backfill/tablas nuevas ni
+cambios de Auth, estados, slugs, RLS o dependencias. Funciones definer con
+search_path vacío y grants explícitos anon/authenticated para lectura pública;
+vista privada sin permisos cliente. SQL estático con `strpos`, sin SQL dinámico.
+Aplicar migración antes de app; recuperación de app anterior conserva SQL
+compatible y no borra datos. T106–T110/EXTRA-022 detallan verificación y límites.
+
+**Lenguaje y runtime**: TypeScript 6.0.3 en modo estricto; Node.js 24.22.0 LTS con npm 11.19.1; SQL
 PostgreSQL para migraciones, políticas, funciones y pruebas de base de datos.
+
+Desarrollo y CI usan `.node-version` 24.22.0. `engines.node` expresa la línea 24 LTS
+como `24.x` porque Vercel administra el parche disponible; su instalación fija npm 11.19.1
+antes de `npm ci`, sin desactivar engine-strict. No se atribuye a Vercel el parche local exacto.
 
 **Dependencias principales**: Next.js 16.3.8, React y React DOM 19.3.0, Tailwind CSS y
 `@tailwindcss/postcss` 4.3.3, `@supabase/supabase-js` 2.116.0, `@supabase/ssr` 0.12.7, Zod 4.6.5 y

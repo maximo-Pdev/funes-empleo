@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BriefcaseBusiness, ClipboardList, KeyRound, LogOut, UserRound } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+import { Form } from "@/components/forms/form";
 import { logoutAction } from "@/features/accounts/actions";
 import { getCandidateWorkspace } from "@/features/candidates/profile-service";
 import { renderCandidateProfileContent } from "../../(candidate)/candidato/_components/profile-content";
@@ -31,7 +32,7 @@ export async function renderCandidateAccount({ params, email }: { params: Accoun
     ? await renderCandidateOffersContent({ workspace, page: params.page, oferta: params.oferta, profileHref: "/account?section=perfil", offersHref: "/account?section=ofertas" })
     : section === "postulaciones"
       ? await renderCandidateParticipationsContent({ offersHref: "/account?section=ofertas" })
-      : await renderCandidateProfileContent({ workspace, cvMessage: params.cv, showArchive: false, cvReturnTo: "/account?section=perfil" });
+      : await renderCandidateProfileContent({ workspace, cvMessage: params.cv, cvReturnTo: "/account?section=perfil" });
 
   return <div className={styles.page}>
     <HomeNavbar alwaysVisible />
@@ -50,9 +51,9 @@ export async function renderCandidateAccount({ params, email }: { params: Accoun
         </SidebarContent>
         <SidebarFooter className={styles.footer}>
           <Link href="/update-password" className={styles.secondaryLink}><KeyRound className="h-4 w-4" aria-hidden="true" />Cambiar contraseña</Link>
-          <form action={logoutAction} className={styles.logoutForm}>
+          <Form action={logoutAction} className={styles.logoutForm}>
             <button type="submit" className={styles.logout}><LogOut className="h-4 w-4" aria-hidden="true" />Cerrar sesión</button>
-          </form>
+          </Form>
           <div className={styles.identity}>
             <span role="img" aria-label="Foto de perfil de ejemplo" className={styles.avatar}><UserRound className="h-6 w-6" aria-hidden="true" /></span>
             <div className={styles.identityText}><p className={styles.name}>{name}</p><SidebarEmail email={email || "Correo no disponible"} /></div>

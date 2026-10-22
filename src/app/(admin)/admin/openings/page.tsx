@@ -1,5 +1,7 @@
+import { Form } from "@/components/forms/form";
+import { Field } from "@/components/forms/field";
 import Link from "next/link";
-import { RoleShell } from "@/components/layouts";
+import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { OPENING_STATUSES, openingStatusSchema } from "@/domain/states";
 import { listAdminOpenings } from "@/features/openings/admin-service";
@@ -20,16 +22,15 @@ export default async function AdminOpeningsPage({ searchParams }: {
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;
 
-  return <RoleShell role="admin" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
+  return <AdminShell active="/admin/openings" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Mi cuenta" }]}>
-    <form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
-      <div className="space-y-1"><label htmlFor="opening-status" className="block font-semibold">Estado de la oferta</label>
-        <select id="opening-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">
+    <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
+      <div className="space-y-1"><Field className="block font-semibold" label={<>Estado de la oferta</>}><select id="opening-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">
           <option value="">Todos</option>
           {OPENING_STATUSES.map((value) => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}
-        </select></div>
+        </select></Field></div>
       <Button type="submit">Filtrar ofertas</Button>
-    </form>
+    </Form>
     {invalid && <div className="mt-5"><FeedbackMessage tone="error">Revisá el estado o la página solicitada.</FeedbackMessage></div>}
     {result && <section className="mt-8 space-y-4" aria-label="Listado de ofertas">
       <h2 className="text-xl font-semibold">Ofertas: {result.total}</h2>
@@ -44,5 +45,5 @@ export default async function AdminOpeningsPage({ searchParams }: {
         {result.page < result.pageCount && <Link href={urlForPage(result.page + 1)} className="text-blue-800 underline">Siguiente</Link>}
       </nav>}
     </section>}
-  </RoleShell>;
+  </AdminShell>;
 }

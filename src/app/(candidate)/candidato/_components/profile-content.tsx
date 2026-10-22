@@ -5,9 +5,9 @@ import type { getCandidateWorkspace } from "@/features/candidates/profile-servic
 import { getDemoConsentPolicy } from "@/features/candidates/consent-service";
 import { CandidateProfilePanel } from "@/features/candidates/components/candidate-profile-panel";
 
-export async function renderCandidateProfileContent({ workspace, cvMessage, showArchive = true, cvReturnTo }: {
+export async function renderCandidateProfileContent({ workspace, cvMessage, cvReturnTo }: {
   workspace: Awaited<ReturnType<typeof getCandidateWorkspace>>;
-  cvMessage?: string; showArchive?: boolean; cvReturnTo?: string;
+  cvMessage?: string; cvReturnTo?: string;
 }) {
   if (workspace.bootstrap !== "ready" || !workspace.profile) {
     const message = workspace.bootstrap === "pending_in_person_claim" ?
@@ -22,7 +22,7 @@ export async function renderCandidateProfileContent({ workspace, cvMessage, show
     <div className={`${styles.forms} ${styles.profile}`}><CandidateProfilePanel profile={workspace.profile} dni={workspace.privateData.dni_display}
       address={workspace.privateData.address} phone={workspace.contacts.find((item) => item.kind === "phone")?.value ?? null}
       categories={workspace.allCategories} selectedCategories={workspace.categories.map((item) => item.category_id)}
-      consent={workspace.consent} cv={workspace.cv} policy={policy} accountVersion={workspace.account.version}
-      cvMessage={cvMessage} showArchive={showArchive} cvReturnTo={cvReturnTo} /></div>
+      consent={workspace.consent} cv={workspace.cv} policy={policy}
+      cvMessage={cvMessage} cvReturnTo={cvReturnTo} /></div>
   </>;
 }

@@ -47,8 +47,8 @@ photos must follow full-profile visibility: the candidate's own account, the
 Employment Office, and a company only after an Office referral to that company.
 Never publish candidate photos through a public bucket or unrestricted URL.
 Company-logo visibility is not implicitly the same as candidate-photo visibility
-and must be established before implementing a read contract. See EXTRA-025 and
-EXTRA-026 in `cambios-extra.md`; neither image flow is implemented yet.
+and must be established before implementing a read contract. See EXTRA-045 and
+EXTRA-046 in `cambios-extra.md`; neither image flow is implemented yet.
 
 Observed on 2026-10-20:
 
@@ -182,7 +182,7 @@ view; public offer-detail links still open the existing detailed offer route.
 Archive controls are absent from this candidate account screen, including the
 embedded profile; standalone profile and other account roles remain unchanged.
 CV uploads may return only to the exact account profile destination or the existing
-legacy/admin destinations. See EXTRA-024 for compatibility and review status.
+legacy/admin destinations. See EXTRA-044 for compatibility and review status.
 
 ## Homepage ribbons and offers shortcut
 
@@ -308,4 +308,4 @@ The 2026-10-20 alignment replaces Arial, maps legacy primary `#006833` to
 `#074A1F`, maps the general foreground to `#262B35`, introduces the observed
 medium gray, replaces shared blue buttons/focus, and changes boxed fields to
 underlined fields. Functional behavior and page composition are unchanged.
-See `cambios-extra.md`, EXTRA-020, for checks and remaining review status.
+See `cambios-extra.md`, EXTRA-040, for checks and remaining review status.

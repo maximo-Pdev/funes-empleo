@@ -9,7 +9,7 @@ import { validatePdf } from "@/lib/files/pdf-validation";
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/candidates/profile-actions", () => ({
-  saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn(), archiveProfileAction: vi.fn(),
+  saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn(),
 }));
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({
@@ -42,20 +42,20 @@ describe("autogestión candidata", () => {
     expect(candidateProfileSchema.safeParse({ ...base, categories: [categoryA, categoryA] }).success).toBe(false);
   });
 
-  it("muestra DNI enmascarado, consentimiento de prueba y archivo explícito", () => {
+  it("muestra DNI enmascarado y consentimiento sin autoarchivo", () => {
     render(<CandidateProfilePanel profile={{ id: categoryA, display_name: "Persona Ficticia", locality: "Funes",
       skills_experience_summary: "Experiencia ficticia", availability: "available", availability_detail: null,
       status: "draft", version: 3, refresh_due_at: null }} dni="90000001" address={null} phone={null}
       categories={[{ id: categoryA, name: "Categoría A", code: "A" }, { id: categoryB, name: "Categoría B", code: "B" }]}
-      selectedCategories={[categoryA, categoryB]} consent={null} cv={null} accountVersion={1}
+      selectedCategories={[categoryA, categoryB]} consent={null} cv={null}
       policy={{ version: "demo-not-approved", policy_text: "Texto ficticio de prueba", policy_hash: "0".repeat(64) }} />);
     expect(screen.getByLabelText(/DNI/)).toHaveProperty("type", "password");
     expect(screen.getByLabelText("Categoría A")).toHaveProperty("checked", true);
     expect(screen.getByLabelText("Categoría B")).toHaveProperty("checked", true);
     expect(screen.getByText(/no es texto municipal aprobado/i)).toBeTruthy();
     expect(screen.getByRole("button", { name: "Activar perfil" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Archivar ahora" })).toBeTruthy();
-    expect(screen.getByLabelText(/Confirmo que quiero archivar/)).toHaveProperty("required", true);
+    expect(screen.queryByRole("button", { name: /archivar|eliminar/i })).toBeNull();
+    expect(screen.queryByLabelText(/Confirmo que quiero archivar/)).toBeNull();
   });
 
   it("muestra solo recepción o resultado final y permite retirar una nominación abierta", () => {

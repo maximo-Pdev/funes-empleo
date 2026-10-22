@@ -8,7 +8,12 @@ import { databaseUuidSchema } from "@/validation/common";
 export const dynamic = "force-dynamic";
 const versionSchema = z.coerce.number().int().positive();
 
-function result(status: "ok" | "invalid" | "conflict" | "denied", target: string) {
+type CvStatus = "ok" | "invalid" | "conflict" | "denied";
+function respond(status: CvStatus, target: string, json: boolean) {
+  if (json) return NextResponse.json({ status }, {
+    status: { ok: 200, invalid: 422, conflict: 409, denied: 403 }[status],
+    headers: { "Cache-Control": "private, no-store" },
+  });
   const url = new URL(target, getClientEnvironment().NEXT_PUBLIC_APP_URL);
   url.searchParams.set("cv", status);
   const response = NextResponse.redirect(url, { status: 303 });
@@ -17,6 +22,8 @@ function result(status: "ok" | "invalid" | "conflict" | "denied", target: string
 }
 
 export async function POST(request: Request) {
+  const result = (status: CvStatus, target: string) => respond(status, target,
+    request.headers.get("accept")?.includes("application/json") ?? false);
   const session = await readAccountSession();
   if (!session || session.account.status !== "active" || !["candidate", "admin"].includes(session.account.role)) {
     return result("denied", "/login");

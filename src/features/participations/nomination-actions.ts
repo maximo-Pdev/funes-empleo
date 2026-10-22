@@ -14,6 +14,8 @@ export async function createAdminNominationAction(input: unknown): Promise<
       ? input.candidateId : null;
     revalidatePath("/admin/participations");
     if (typeof candidateId === "string") revalidatePath(`/admin/candidates/${candidateId}`);
+    const openingId = typeof input === "object" && input !== null && "openingId" in input ? input.openingId : null;
+    if (typeof openingId === "string") revalidatePath(`/admin/openings/${openingId}`);
     return { code: "OK", participationId };
   } catch (error) { return adminActionFailure(error); }
 }

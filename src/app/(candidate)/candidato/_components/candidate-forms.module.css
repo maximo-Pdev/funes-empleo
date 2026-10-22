@@ -36,7 +36,8 @@
   .profile > div > p, .profile > div > form:first-of-type, .profile > div > form:last-child { grid-column: 1 / -1; }
   .profile > div > form:first-of-type { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .profile > div > form:first-of-type > h2, .profile > div > form:first-of-type > p, .profile > div > form:first-of-type > fieldset,
-  .profile > div > form:first-of-type > button, .profile > div > form:first-of-type > label:has(textarea) { grid-column: 1 / -1; }
+  .profile > div > form:first-of-type > button, .profile > div > form:first-of-type > label:has(textarea),
+  .profile > div > form:first-of-type > [data-form-field]:has(textarea) { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .forms button, .forms input, .forms select, .forms textarea { transition: none; }

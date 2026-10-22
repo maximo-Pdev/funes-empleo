@@ -13,6 +13,14 @@ también deniega acceso interactivo.
 
 ## Fuentes de autorización por superficie
 
+EXTRA035: toda nueva contratación administrativa normal/tardía retira el
+consentimiento global y revoca todos los permisos empresariales dependientes,
+sin cambiar estados de otras participaciones. El admin confirmante es actor;
+`system` no es el actor del retiro ni se simula acción del candidato. Las
+referencias720h siguientes solo aplican a permisos históricos sin revocar.
+Nueva aceptación afirmativa no restaura un permiso revocado. No cambia el
+flujo manual de retiro, que sigue cerrando los casos abiertos.
+
 A02/A03 (2026-10-17): la navegación pública obtiene href/label en servidor desde
 Auth y la cuenta de aplicación activa. Candidato: `/candidato/perfil`; empresa:
 `/empresa/perfil`; administrador: `/account`. Cuenta ausente, bloqueada o identidad
@@ -48,7 +56,7 @@ existencia expondría información.
 | Oferta publicada vigente: consultar | Sí, campos públicos | Sí | Sí | Sí | No |
 | Oferta no publicada: consultar | No | No | Solo propia | Sí | No |
 | Perfil candidato: crear/editar | No | Solo propio | No | Sí, asistido/autorizado | No |
-| Perfil candidato: solicitar eliminación | No | Archiva el propio de inmediato | No | Puede restaurar con motivo | No |
+| Cuenta/perfil candidato: archivar/restaurar | No | No | No | Restaura registros históricos con motivo y confirmación; no se añade archivo | No |
 | DNI/domicilio candidato | No | Solo propio | Nunca | Sí | No |
 | Contacto y perfil laboral | No | Solo propio | Solo con permiso de derivación `active` sobre oferta propia | Sí | No |
 | CV: cargar/reemplazar | No | Solo propio | No | Sí, sobre perfil atendido | No |
@@ -56,7 +64,7 @@ existencia expondría información.
 | Padrón/búsqueda de candidatos | No | No | Nunca | Sí | No |
 | Consentimiento | No | Consultar/aceptar/retirar propio | No | Registrar asistido y consultar | No |
 | Perfil empresa | No | No | Solo propio | Sí | No |
-| Cuenta/perfil empresa: archivar/restaurar | No | No | Archiva los propios; no restaura | Archiva con motivo; restaura con motivo | No |
+| Cuenta/perfil empresa: archivar/restaurar | No | No | No | Archiva con motivo; restaura con motivo | No |
 | Oferta: crear/editar borrador | No | No | Solo propia | Puede mantener/moderar | No |
 | Oferta: publicar/moderar | No | No | Nunca | Sí | No |
 | Postulación propia | No | Crear/retirar propia | No | Consultar; registrar retiro solicitado por candidato; cancelar caso con motivo | No |
@@ -117,7 +125,8 @@ La empresa nunca recibe:
 Una empresa activa cuyo permiso fue revocado conserva únicamente el identificador de la derivación,
 el identificador y título de su propia oferta y la fecha de derivación para comunicar feedback
 tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de otras participaciones.
-`hired` conserva un permiso todavía activo solo hasta 720 horas desde la confirmación administrativa;
+Las nuevas confirmaciones `hired` retiran el consentimiento global y revocan todos sus permisos;
+solo las contrataciones históricas anteriores a EXTRA035 conservaban acceso hasta 720 horas.
 `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo revocan. Una corrección tardía a
 `hired`, un consentimiento posterior, una reactivación o una restauración no revierten la revocación.
 
@@ -130,7 +139,7 @@ tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de o
 - Empresa no registra resultado final.
 - Suspender o archivar candidato/empresa revoca inmediatamente el acceso empresarial a perfil y CV;
   reactivar no lo restablece automáticamente.
-- El archivo empresarial propio y el administrativo bloquean la cuenta/perfil y las ofertas no
+- El archivo empresarial exclusivamente administrativo bloquea la cuenta/perfil y las ofertas no
   finales, preservan historial y resultados y no permiten restauración por la empresa; solo un
   administrador restaura con motivo a cuenta `active`, perfil `incomplete` y ofertas `draft`.
 - Reactivar una cuenta candidata vuelve la cuenta a `active` sin cambiar el estado anterior del
@@ -138,8 +147,9 @@ tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de o
   y no repone ofertas, participaciones, derivaciones ni permisos relacionados.
 - Retirar postulación o consentimiento revoca inmediatamente todos los permisos afectados; aceptar
   nuevamente o restaurar no los repone.
-- `hired` conserva acceso si seguía activo, por un máximo de 720 horas desde la confirmación;
-  incluso antes de que la tarea materialice `revoked`, toda lectura posterior al plazo se deniega.
+- `hired` nuevo retira el consentimiento global y revoca todos los permisos activos sin cambiar
+  otras participaciones. Para permisos históricos previos a EXTRA035 se conserva la prueba del
+  límite720h: aun antes de que la tarea materialice `revoked`, se deniega toda lectura vencida.
   `not_selected`, `withdrawn`, `cancelled` y
   `no_company_response` lo revocan atómicamente. El feedback tardío sigue permitido sin datos y no
   reactiva el acceso, incluso si luego el resultado real se corrige a `hired`.

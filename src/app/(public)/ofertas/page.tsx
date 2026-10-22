@@ -2,15 +2,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CalendarDays, ChevronLeft, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "@/components/ui";
-import { listPublicOffers } from "@/features/openings/public-service";
+import { listPublicOffers, listPublicOfferFilters } from "@/features/openings/public-service";
+import { PublicOfferSearchForm } from "@/features/openings/components/public-offer-search-form";
+import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
+import { publicOfferSearchSchema } from "@/validation/public-offer-search";
 import { getAccountAccess } from "@/features/accounts/navigation";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 
 export const dynamic = "force-dynamic";
 
-export default async function PublicOffersPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const { page } = await searchParams;
-  const [result, accountAccess] = await Promise.all([listPublicOffers({ page: page ?? 1 }), getAccountAccess()]);
+export default async function PublicOffersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const input = publicOfferSearchSchema.safeParse({ ...await searchParams, pageSize: 10 });
+  const filters = input.success ? input.data : publicOfferSearchSchema.parse({});
+  const [result, accountAccess, options] = await Promise.all([
+    input.success ? listPublicOffers(filters) : Promise.resolve({ total: 0, page: 1, pageSize: 10, items: [] }),
+    getAccountAccess(), listPublicOfferFilters(),
+  ]);
+  const filtered = hasPublicOfferFilters(filters);
   const hasPrevious = result.page > 1;
   const hasNext = result.page * result.pageSize < result.total;
 
@@ -43,16 +51,18 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
         <section className="min-w-0" aria-labelledby="listado-title">
+          <PublicOfferSearchForm filters={filters} options={options} />
+          {!input.success && <p role="alert" className="mb-5 rounded-lg border border-border p-4">Revisá los filtros de búsqueda: usá un solo valor por campo y una página válida.</p>}
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <h2 id="listado-title" className="text-lg font-bold text-primary-900">{result.total} oferta{result.total === 1 ? "" : "s"} disponible{result.total === 1 ? "" : "s"}</h2>
+            <h2 id="listado-title" className="text-lg font-bold text-primary-900">{input.success ? `${result.total} oferta${result.total === 1 ? "" : "s"} disponible${result.total === 1 ? "" : "s"}` : "Revisá los filtros para buscar"}</h2>
             {result.items.length > 0 && <p className="text-sm text-muted-foreground">Mostrando {(result.page - 1) * result.pageSize + 1}–{Math.min(result.page * result.pageSize, result.total)} de {result.total}</p>}
           </div>
           {result.items.length === 0 ? (
             <Card className="border-dashed px-6 py-12 text-center">
               <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-secondary text-primary" aria-hidden="true"><BriefcaseBusiness className="h-7 w-7" /></span>
-              <h3 className="mt-5 text-xl font-bold text-primary-900">No hay ofertas vigentes en esta página.</h3>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">{result.total === 0 ? "Las nuevas búsquedas aparecerán acá una vez aprobadas por la Oficina de Empleo. Podés volver a consultar más adelante." : "Podés volver a la primera página para consultar las búsquedas disponibles."}</p>
-              {result.total > 0 && <Link href="/ofertas" className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:bg-primary-700">Ver ofertas disponibles<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
+              <h3 className="mt-5 text-xl font-bold text-primary-900">{!input.success ? "No se pudo realizar la búsqueda." : filtered && result.total === 0 ? "No encontramos ofertas con esos filtros." : "No hay ofertas vigentes en esta página."}</h3>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">{!input.success || filtered && result.total === 0 ? "Podés corregir o limpiar los filtros para volver a buscar." : result.total === 0 ? "Las nuevas búsquedas aparecerán acá una vez aprobadas por la Oficina de Empleo. Podés volver a consultar más adelante." : "Podés volver a la primera página para consultar las búsquedas disponibles."}</p>
+              {result.total > 0 && <Link href={filtered ? publicOffersPageHref(filters, 1) : "/ofertas"} className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:bg-primary-700">Ver ofertas disponibles<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
             </Card>
           ) : (
             <ul className="grid gap-4 md:grid-cols-2">
@@ -65,7 +75,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                         <span className="text-xs font-semibold text-primary-700">Búsqueda vigente</span>
                       </div>
                       <h3 className="text-xl font-bold leading-snug text-primary-900">
-                        <Link href={`/ofertas/${offer.id}`} className="group flex min-h-11 items-start justify-between gap-3 rounded-sm break-words hover:underline hover:underline-offset-4">
+                        <Link href={`/ofertas/${offer.slug}`} className="group flex min-h-11 items-start justify-between gap-3 rounded-sm break-words hover:underline hover:underline-offset-4">
                           <span className="min-w-0">{offer.title}</span>
                           <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-primary transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
                         </Link>
@@ -89,9 +99,9 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
           )}
           {(hasPrevious || hasNext) && (
             <nav aria-label="Páginas de ofertas" className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
-              {hasPrevious ? <Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary" href={`/ofertas?page=${result.page - 1}`} rel="prev"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Anterior</Link> : <span className="inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm text-muted-foreground" aria-disabled="true"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Anterior</span>}
+              {hasPrevious ? <Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary" href={publicOffersPageHref(filters, result.page - 1)} rel="prev"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Anterior</Link> : <span className="inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm text-muted-foreground" aria-disabled="true"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Anterior</span>}
               <p className="text-sm font-medium text-muted-foreground">Página {result.page}</p>
-              {hasNext ? <Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary" href={`/ofertas?page=${result.page + 1}`} rel="next">Siguiente<ChevronRight className="h-4 w-4" aria-hidden="true" /></Link> : <span className="inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm text-muted-foreground" aria-disabled="true">Siguiente<ChevronRight className="h-4 w-4" aria-hidden="true" /></span>}
+              {hasNext ? <Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary" href={publicOffersPageHref(filters, result.page + 1)} rel="next">Siguiente<ChevronRight className="h-4 w-4" aria-hidden="true" /></Link> : <span className="inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm text-muted-foreground" aria-disabled="true">Siguiente<ChevronRight className="h-4 w-4" aria-hidden="true" /></span>}
             </nav>
           )}
         </section>

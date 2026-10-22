@@ -3,7 +3,15 @@ import { createHash } from "node:crypto";
 import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
 const fixture = { ...fixtures, ...fixtures.acceptance };
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { expectUnavailablePublicOffer } from "./fixtures/public-offer";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
+
+function openingSlug(id: string) {
+  expect(id).toMatch(/^[0-9a-f-]{36}$/);
+  const slug = runLocalMaintenanceSql(`select slug from public.job_openings where id='${id}';`).trim();
+  expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{12}$/);
+  return slug;
+}
 
 function fixtureId(kind: string, number: number) {
   const hash = createHash("md5").update(`funes-demo-v1:${kind}:${number}`).digest("hex");
@@ -324,7 +332,12 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.getByLabel("Acción").selectOption("withdraw_on_request");
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Pedido de retiro ficticio.");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
-    await expect(admin.getByText("Seleccioná el contacto entrante donde el candidato pidió el retiro.")).toBeVisible();
+    const requestContact = admin.getByLabel("Solicitud del candidato", { exact: true });
+    await expect(requestContact).toHaveAttribute("aria-invalid", "true");
+    await expect(requestContact).toBeFocused();
+    await expect(admin.locator("[data-form-field]").filter({ has: requestContact }).locator("[data-field-error]")).toHaveText("Elegí una opción.");
+    await expect(admin.getByRole("textbox", { name: "Motivo interno" })).toHaveValue("Pedido de retiro ficticio.");
+    await expect(currentStatus).toContainText("Derivada");
     await admin.getByLabel("Canal", { exact: true }).selectOption("phone");
     await admin.getByLabel("Dirección").selectOption("inbound");
     await admin.getByLabel("Fecha y hora (Funes)").fill("2026-09-24T14:00");
@@ -339,8 +352,10 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Retirada");
 
-    await candidate.goto(`/ofertas/${fixtureId("opening", 4)}`);
+    const publicSlug = openingSlug(fixtureId("opening", 4));
+    await candidate.goto(`/ofertas/${publicSlug}`);
     await candidate.getByRole("link", { name: "Postularme con mi cuenta" }).click();
+    await expect(candidate).toHaveURL(new RegExp(`/candidato/ofertas\\?oferta=${publicSlug}$`));
     const chosenOffer = candidate.getByRole("region", { name: "Oferta elegida" });
     await expect(chosenOffer).toContainText("Oferta ficticia 004");
     await chosenOffer.getByRole("button", { name: "Postularme" }).click();
@@ -381,7 +396,8 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     await candidate.reload();
     await candidate.getByLabel("Elegir PDF").setInputFiles("tests/fixtures/cv-fictitious.pdf");
     await candidate.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-    await expect(candidate).toHaveURL(/\/candidato\/perfil\?cv=ok$/);
+    await expect(candidate).toHaveURL(/\/candidato\/perfil$/);
+    await expect(candidate.getByText("CV guardado.", { exact: true })).toBeVisible();
     await expect(candidate.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", snapshotCv!);
     await company.reload();
     await expect(company.getByText("3415550015")).toBeVisible();
@@ -430,11 +446,14 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     const contactParticipation = fixtureId("e2e-overdue-participation", 2);
     const contactReferral = fixtureId("e2e-overdue-referral", 2);
     const hiredReferral = fixtureId("referral", 21);
+    // Keep global maintenance before unrelated fixture deadlines; only this
+    // scenario's records should expire, regardless of the actual execution date.
+    const maintenanceNow = "2026-10-17T12:00:00Z";
     runLocalMaintenanceSql(`insert into public.participations
       (id,candidate_id,opening_id,origin,created_by,status,feedback_due_at)
       values ('${overdueParticipation}','${fixtureId("profile", 210)}','${fixtureId("opening", 1)}',
-        'admin_nomination','${fixtureId("admin", 1)}','referred',clock_timestamp()-interval '1 day');
-      with moment as (select clock_timestamp()-interval '31 days' as referred_at)
+        'admin_nomination','${fixtureId("admin", 1)}','referred','${maintenanceNow}'::timestamptz-interval '1 day');
+      with moment as (select '${maintenanceNow}'::timestamptz-interval '31 days' as referred_at)
       insert into public.referrals
       (id,participation_id,candidate_id,referred_by,referred_at,access_status,
        consent_event_id,cv_document_id,feedback_due_at,access_changed_actor_type,
@@ -447,8 +466,8 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
       insert into public.participations
       (id,candidate_id,opening_id,origin,created_by,status,feedback_due_at)
       values ('${contactParticipation}','${fixtureId("profile", 211)}','${fixtureId("opening", 1)}',
-        'admin_nomination','${fixtureId("admin", 1)}','referred',clock_timestamp()-interval '1 day');
-      with moment as (select clock_timestamp()-interval '31 days' as referred_at)
+        'admin_nomination','${fixtureId("admin", 1)}','referred','${maintenanceNow}'::timestamptz-interval '1 day');
+      with moment as (select '${maintenanceNow}'::timestamptz-interval '31 days' as referred_at)
       insert into public.referrals
       (id,participation_id,candidate_id,referred_by,referred_at,access_status,
        consent_event_id,cv_document_id,feedback_due_at,access_changed_actor_type,
@@ -457,16 +476,19 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
         '${fixtureId("admin", 1)}',moment.referred_at,'active',
         '${fixtureId("consent", 211)}','${fixtureId("cv", 211)}',
         moment.referred_at+interval '720 hours','account','${fixtureId("admin", 1)}','referral_created'
-      from moment;`);
+      from moment;
+      -- Company authorization uses real time, unlike the injected job clock.
+      update public.referrals set post_hire_access_until=clock_timestamp()+interval '1 day'
+      where id='${hiredReferral}';`);
     await company.goto(`/company/openings/${fixtureId("opening", 1)}/referrals?referral=${overdueReferral}`);
     await expect(company.getByText("Persona ficticia 210")).toBeVisible();
     await hiredCompany.goto(`/company/openings/${fixtureId("opening", 3)}/referrals?referral=${hiredReferral}`);
     await expect(hiredCompany.getByText("Persona ficticia 021")).toBeVisible();
 
-    const sql = `update public.job_openings set closing_date = (clock_timestamp() at time zone 'America/Buenos_Aires')::date - 1 where id = '${opening}';
-      update public.referrals set post_hire_access_until = clock_timestamp() - interval '1 minute' where id = '${hiredReferral}';
-      select private.run_daily_employment_maintenance(clock_timestamp());
-      select private.run_daily_employment_maintenance(clock_timestamp());`;
+    const sql = `update public.job_openings set closing_date = ('${maintenanceNow}'::timestamptz at time zone 'America/Buenos_Aires')::date - 1 where id = '${opening}';
+      update public.referrals set post_hire_access_until = '${maintenanceNow}'::timestamptz - interval '1 minute' where id = '${hiredReferral}';
+      select private.run_daily_employment_maintenance('${maintenanceNow}'::timestamptz);
+      select private.run_daily_employment_maintenance('${maintenanceNow}'::timestamptz);`;
     const runs = runLocalMaintenanceSql(sql).split(/\r?\n/).filter((line) => line.startsWith("{"));
     expect(runs).toHaveLength(2);
     expect(JSON.parse(runs[0]!)).toMatchObject({ closedOpenings: 1, noCompanyResponse: 2, expiredPostHireAccess: 1 });
@@ -477,7 +499,8 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(admin.getByText("Sistema").first()).toBeVisible();
     await offerCompany.goto(`/empresa/ofertas/${opening}`);
     await expect(offerCompany.getByText("Estado:")).toContainText("closed");
-    await offerCompany.goto(`/ofertas/${opening}`);
+    await offerCompany.goto(`/ofertas/${openingSlug(opening)}`);
+    await expectUnavailablePublicOffer(offerCompany, "Oferta ficticia 080");
     await expect(offerCompany.getByText("Oferta ficticia 080")).toHaveCount(0);
 
     await company.reload();
@@ -488,7 +511,7 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(currentStatus).toContainText("Sin respuesta empresarial");
     await admin.getByLabel("Canal", { exact: true }).selectOption("phone");
     await admin.getByLabel("Dirección").selectOption("inbound");
-    await admin.getByLabel("Fecha y hora (Funes)").fill("2026-09-24T14:00");
+    await admin.getByLabel("Fecha y hora (Funes)").fill("2026-10-17T14:00");
     await admin.locator("#contact-summary").fill("La empresa informó tarde por teléfono.");
     await admin.getByRole("button", { name: "Guardar contacto" }).click();
     await expect(admin.getByText("La empresa informó tarde por teléfono.")).toBeVisible();

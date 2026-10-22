@@ -1,4 +1,6 @@
 "use client";
+import { Form } from "@/components/forms/form";
+import { Field } from "@/components/forms/field";
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -60,7 +62,7 @@ export function ModerationForm({ openingId, version, status, onSubmit }: {
         const result = await onSubmit({ openingId, version, decision, publicMessage: publicMessage.trim(),
           internalReason: internalReason.trim(), confirmed });
         const message = adminMutationError(result);
-        if (message) { setError(message); if (result?.code === "CONFLICT_STALE_DATA") router.refresh(); return; }
+        if (message) { setError(message); return; }
         router.refresh();
       } catch { setError("No se pudo guardar. Recargá la página e intentá nuevamente."); }
     });
@@ -68,10 +70,10 @@ export function ModerationForm({ openingId, version, status, onSubmit }: {
 
   if (options.length === 0) return <p>No hay decisiones de moderación disponibles para este estado.</p>;
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
+    <Form onSubmit={submit} className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
       <h2 className="text-lg font-semibold">Decisión municipal sobre la oferta</h2>
       {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
-      <SelectField id="moderation-decision" label="Decisión" value={decision} onChange={(event) => {
+      <SelectField id="moderation-decision" label="Decisión" required value={decision} onChange={(event) => {
         setDecision(event.target.value as AdminOpeningDecision | ""); setError(""); setConfirmed(false);
       }} options={options} />
       {publicMessageDecisions.has(decision as AdminOpeningDecision) &&
@@ -81,11 +83,11 @@ export function ModerationForm({ openingId, version, status, onSubmit }: {
         <TextField id="moderation-internal-reason" label="Motivo interno" value={internalReason}
           onChange={(event) => setInternalReason(event.target.value)} maxLength={1000} required
           hint="Este motivo solo lo ve la Oficina de Empleo." />}
-      {decision === "suspended" && <label className="flex items-start gap-2 rounded-md border border-red-400 bg-red-50 p-3 font-medium text-red-950">
-        <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
+      {decision === "suspended" && <Field className="flex items-start gap-2 rounded-md border border-red-400 bg-red-50 p-3 font-medium text-red-950">
+        <input type="checkbox" required checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
         Confirmo la suspensión de esta oferta
-      </label>}
+      </Field>}
       <Button type="submit" busy={pending}>Guardar decisión</Button>
-    </form>
+    </Form>
   );
 }

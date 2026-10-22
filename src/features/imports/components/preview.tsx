@@ -1,4 +1,6 @@
 "use client";
+import { Form } from "@/components/forms/form";
+import { Field } from "@/components/forms/field";
 import { useState } from "react";
 import Link from "next/link";
 import type { ImportPreview } from "../preview-service";
@@ -12,6 +14,7 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
+  const [decisions, setDecisions] = useState<Record<string, string>>({});
   const editable = ["blocked", "preview_ready"].includes(preview.status);
   return <div className="grid gap-6 [&_input:not([type=checkbox])]:block [&_input:not([type=checkbox])]:w-full [&_input]:rounded [&_input]:border [&_input]:border-slate-500 [&_input]:p-2 [&_select]:block [&_select]:max-w-full [&_select]:rounded [&_select]:border [&_select]:p-2 [&_textarea]:block [&_textarea]:w-full [&_textarea]:rounded [&_textarea]:border [&_textarea]:p-2">
     <p role="status">{preview.status === "completed" ? "Importación completada" : preview.status === "preview_ready" ? "Listo para confirmar" : preview.status === "failed" ? "Importación fallida: no se incorporaron cambios" : "Importación bloqueada"}</p>
@@ -34,7 +37,8 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
         {row.decision === "use_or_update_existing" && ` Campos a actualizar: ${row.fields.map(f => labels[f as keyof typeof labels]).join(", ") || "ninguno"}.`}</p>}
       {row.errors.map(code => <p key={code}>{IMPORT_MESSAGES[code] ?? "Revisá los datos de la fila."}</p>)}
       {editable && <details><summary>Corregir o resolver fila {row.number}</summary>
-        <form className="grid gap-3" onSubmit={async event => {
+        <Form className="grid gap-3" requirements={(decisions[row.id] ?? "correct_and_create") === "correct_and_create"
+          ? [{ names: ["email", "phone"], message: "Ingresá un correo o un teléfono de contacto." }] : []} onSubmit={async event => {
           event.preventDefault(); setBusy(true); setError("");
           const form = new FormData(event.currentTarget);
           const decision = String(form.get("decision"));
@@ -48,13 +52,15 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
             if (!result.ok) setError(result.error); else setPreview(result.preview);
           } catch { setError("No se pudo guardar la decisión."); } finally { setBusy(false); }
         }}>
-          <label>Decisión<select name="decision" defaultValue="correct_and_create"><option value="correct_and_create">Corregir y crear separado</option><option value="use_or_update_existing">Usar o actualizar existente</option><option value="reject">Rechazar fila</option></select></label>
-          <label>Motivo interno<textarea name="reason" required maxLength={1000} /></label>
-          <label>Perfil coincidente<select name="candidate"><option value="">Seleccioná si usás existente</option>{row.matches.map(m => <option key={m.id} value={m.id}>{m.name} · {m.id}</option>)}</select></label>
-          <fieldset><legend>Actualizar existente: marcar solo los campos autorizados del CSV</legend>{IMPORT_FIELDS.map(field => <label className="block" key={field}><input type="checkbox" name="fields" value={field} /> {labels[field]}</label>)}</fieldset>
-          <fieldset><legend>Corregir y crear: volver a ingresar la fila completa con datos ficticios</legend>{Object.entries(labels).map(([key, label]) => <label className="block" key={key}>{label}<input name={key} defaultValue={key === "availability" ? "available" : ""} /></label>)}</fieldset>
+          <Field>Decisión<select name="decision" required defaultValue="correct_and_create" onChange={event => setDecisions(previous => ({ ...previous, [row.id]: event.target.value }))}><option value="correct_and_create">Corregir y crear separado</option><option value="use_or_update_existing">Usar o actualizar existente</option><option value="reject">Rechazar fila</option></select></Field>
+          <Field>Motivo interno<textarea name="reason" required maxLength={1000} /></Field>
+          <Field>Perfil coincidente<select name="candidate" required={decisions[row.id] === "use_or_update_existing"}><option value="">Seleccioná si usás existente</option>{row.matches.map(m => <option key={m.id} value={m.id}>{m.name} · {m.id}</option>)}</select></Field>
+          <fieldset><legend>Actualizar existente: marcar solo los campos autorizados del CSV</legend>{IMPORT_FIELDS.map(field => <Field className="block" key={field}><input type="checkbox" name="fields" value={field} /> {labels[field]}</Field>)}</fieldset>
+          <fieldset disabled={Boolean(decisions[row.id] && decisions[row.id] !== "correct_and_create")}><legend>Corregir y crear: volver a ingresar la fila completa con datos ficticios</legend>{Object.entries(labels).map(([key, label]) => <Field className="block" key={key}>{label}<input name={key}
+            required={["name", "dni", "availability"].includes(key)} type={key === "email" ? "email" : key === "phone" ? "tel" : "text"}
+            defaultValue={key === "availability" ? "available" : ""} /></Field>)}</fieldset>
           <Button type="submit" disabled={busy}>Guardar decisión y revalidar</Button>
-        </form>
+        </Form>
       </details>}
     </section>)}
     {editable && <Button disabled={busy || preview.status !== "preview_ready" || !preview.valid} onClick={async () => {

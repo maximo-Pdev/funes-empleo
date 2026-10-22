@@ -1,0 +1,23 @@
+.form [aria-invalid="true"] {
+  border-color: #b91c1c !important;
+  outline-color: #b91c1c;
+}
+
+.form [data-field-error],
+.form [data-required-marker] {
+  color: #b91c1c !important;
+}
+
+.form input[type="checkbox"][aria-invalid="true"],
+.form input[type="radio"][aria-invalid="true"] {
+  box-shadow: 0 0 0 1px #b91c1c;
+}
+
+.summary {
+  grid-column: 1 / -1;
+  border: 1px solid #b91c1c;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: #991b1b !important;
+  background: #fef2f2;
+}

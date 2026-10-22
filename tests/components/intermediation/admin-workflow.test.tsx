@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
+const router = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
 import { ModerationForm } from "@/features/openings/components/moderation-form";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
 import { ParticipationActionForm } from "@/features/participations/components/participation-action-form";
@@ -15,7 +16,8 @@ describe("intermediación administrativa", () => {
     fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "changes_requested" } });
     fireEvent.click(screen.getByRole("button", { name: "Guardar decisión" }));
     expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert").textContent).toMatch(/explicación.*empresa/i);
+    expect(screen.getByRole("textbox", { name: /^Explicación para la empresa/ }).getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByText("Completá este campo.")).toBeTruthy();
     fireEvent.change(screen.getByRole("textbox", { name: /^Explicación para la empresa/ }), { target: { value: "Completá el horario." } });
     fireEvent.click(screen.getByRole("button", { name: "Guardar decisión" }));
     expect(submit).toHaveBeenCalledWith(expect.objectContaining({
@@ -43,7 +45,7 @@ describe("intermediación administrativa", () => {
     fireEvent.change(screen.getByLabelText("Acción"), { target: { value: "skip_to_preselected" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert").textContent).toMatch(/motivo/i);
+    expect(screen.getByRole("textbox", { name: /^Motivo interno/ }).getAttribute("aria-invalid")).toBe("true");
     fireEvent.change(screen.getByRole("textbox", { name: /^Motivo interno/ }), { target: { value: "Evaluación documentada." } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(submit).toHaveBeenCalledWith(expect.objectContaining({
@@ -58,10 +60,41 @@ describe("intermediación administrativa", () => {
     fireEvent.change(screen.getByLabelText("Acción"), { target: { value: "refer" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert").textContent).toMatch(/motivo/i);
+    expect(screen.getByRole("textbox", { name: /^Motivo interno/ }).getAttribute("aria-invalid")).toBe("true");
     fireEvent.change(screen.getByRole("textbox", { name: /^Motivo interno/ }), { target: { value: "Evaluación municipal suficiente" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(submit).toHaveBeenCalledWith(expect.objectContaining({ command: "refer", reason: "Evaluación municipal suficiente" }));
+  });
+
+  it("bloquea retiro sin solicitud, señala el selector y conserva el motivo hasta elegir contacto entrante", async () => {
+    const submit = vi.fn().mockResolvedValue({ code: "OK" });
+    render(<ParticipationActionForm participationId="case-withdrawal" version={4} status="referred"
+      contacts={[
+        { id: "contact-inbound", label: "Pedido ficticio de retiro", direction: "inbound" },
+        { id: "contact-outbound", label: "Llamada saliente ficticia", direction: "outbound" },
+      ]} onSubmit={submit} />);
+    fireEvent.change(screen.getByLabelText("Acción"), { target: { value: "withdraw_on_request" } });
+    const reason = screen.getByRole("textbox", { name: /^Motivo interno/ });
+    fireEvent.change(reason, { target: { value: "Pedido de retiro ficticio." } });
+    const request = screen.getByLabelText("Solicitud del candidato");
+    expect(request).toHaveProperty("required", true);
+    expect(screen.queryByRole("option", { name: "Llamada saliente ficticia" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
+    expect(submit).not.toHaveBeenCalled();
+    expect(request.getAttribute("aria-invalid")).toBe("true");
+    expect(document.activeElement).toBe(request);
+    const errorId = request.getAttribute("aria-describedby")!;
+    expect(document.getElementById(errorId)?.textContent).toBe("Elegí una opción.");
+    expect(reason).toHaveProperty("value", "Pedido de retiro ficticio.");
+    fireEvent.change(request, { target: { value: "contact-inbound" } });
+    expect(request.getAttribute("aria-invalid")).not.toBe("true");
+    expect(screen.queryByText("Elegí una opción.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
+    expect(submit).toHaveBeenCalledWith(expect.objectContaining({
+      participationId: "case-withdrawal", version: 4, command: "withdraw_on_request",
+      reason: "Pedido de retiro ficticio.", contactId: "contact-inbound", candidateRequestId: "contact-inbound",
+    }));
   });
 
   it("destaca la suspensión y exige confirmación expresa; restaurar no promete reactivar casos", () => {
@@ -107,10 +140,12 @@ describe("intermediación administrativa", () => {
     fireEvent.change(screen.getByLabelText("Acción"), { target: { value: "record_preinterview" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByRole("alert").textContent).toMatch(/motivo/i);
+    expect(screen.getByRole("textbox", { name: /^Motivo interno/ }).getAttribute("aria-invalid")).toBe("true");
     fireEvent.change(screen.getByRole("textbox", { name: /^Motivo interno/ }), { target: { value: "Se inició con entrevista" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
-    expect(screen.getByRole("alert").textContent).toMatch(/canal/i);
+    expect(screen.getByLabelText("Canal de preentrevista").getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByRole("textbox", { name: "Resumen interno" }).getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByLabelText("Fecha realizada").getAttribute("aria-invalid")).toBe("true");
     fireEvent.change(screen.getByLabelText("Canal de preentrevista"), { target: { value: "phone" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Resumen interno" }), { target: { value: "Llamada ficticia" } });
     fireEvent.change(screen.getByLabelText("Fecha realizada"), { target: { value: "2026-09-23T15:00" } });
@@ -119,12 +154,16 @@ describe("intermediación administrativa", () => {
   });
 
   it("muestra un conflicto de versión sin filtrar detalles del servidor", async () => {
+    router.refresh.mockClear();
     const submit = vi.fn().mockResolvedValue({ code: "CONFLICT_STALE_DATA" });
     render(<ModerationForm openingId="offer-2" version={1} status="pending_review" onSubmit={submit} />);
-    fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "approved" } });
+    fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "changes_requested" } });
+    fireEvent.change(screen.getByRole("textbox", { name: /^Explicación para la empresa/ }), { target: { value: "Texto ficticio a conservar" } });
     fireEvent.click(screen.getByRole("button", { name: "Guardar decisión" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toMatch(/registro cambió/i));
     expect(screen.getByRole("alert").textContent).not.toMatch(/CONFLICT_STALE_DATA/);
+    expect(screen.getByRole("textbox", { name: /^Explicación para la empresa/ })).toHaveProperty("value", "Texto ficticio a conservar");
+    expect(router.refresh).not.toHaveBeenCalled();
   });
 
   it("sanitiza un error inesperado al confirmar feedback", async () => {

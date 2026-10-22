@@ -23,9 +23,7 @@ contrato.
 | Reactivar empresa | Admin | `suspended` | `active` | Obligatorio | Perfil empresarial a `incomplete`; ofertas y permisos no se reactivan. |
 | Suspender administrador | Otro admin activo | `active` | `suspended` | Obligatorio | Confirmación; prohíbe autosuspensión y dejar cero administradores activos. |
 | Reactivar administrador | Otro admin activo | `suspended` | `active` | Obligatorio | Conserva identidad y atribución histórica. |
-| Archivar candidato | Candidato titular | `active` | `archived` | No | Solicitud confirmada; archiva cuenta/perfil, bloquea actividad y revoca accesos sin borrar historia. |
-| Archivar empresa propia | Empresa titular | `active` | `archived` | No | Archiva cuenta/perfil y ofertas no finales; revoca permisos y conserva casos/resultados. |
-| Archivar empresa administrativamente | Admin | `active`, `suspended` | `archived` | Obligatorio | Mismos efectos del archivo propio, con actor y motivo administrativos. |
+| Archivar empresa administrativamente | Admin | `active`, `suspended` | `archived` | Obligatorio | Archiva cuenta/perfil y ofertas no finales; revoca permisos y conserva casos/resultados. Sin autoarchivo del titular. |
 | Restaurar candidato | Admin | `archived` | `active` | Obligatorio | Sin conflictos/duplicados; perfil a `draft`, sin reabrir relaciones ni permisos. |
 | Restaurar empresa | Admin | `archived` | `active` | Obligatorio | Sin conflictos; perfil a `incomplete` y ofertas a `draft`, sin reabrir relaciones ni permisos. |
 
@@ -41,7 +39,7 @@ rol y no constituye una transición de negocio.
 | Completar/habilitar | Empresa titular | `incomplete` | `active` | No | Nombre, CUIT único, responsable, contacto, actividad y localidad completos; no exige verificación documental. |
 | Suspender por cuenta | Admin | `active`, `incomplete` | `suspended` | Obligatorio | Ocurre con suspensión de cuenta; bloquea ofertas nuevas y revoca permisos sin fabricar resultados. |
 | Reactivar cuenta | Admin | `suspended` | `incomplete` | Obligatorio | Requiere volver a completar/verificar datos; no reactiva ofertas ni permisos. |
-| Archivar | Empresa titular o admin | `active`, `incomplete`, `suspended` | `archived` | Solo si actúa admin | Ocurre atómicamente con la cuenta y ofertas no finales; preserva historia. |
+| Archivar | Admin | `active`, `incomplete`, `suspended` | `archived` | Obligatorio | Ocurre atómicamente con la cuenta y ofertas no finales; preserva historia. |
 | Restaurar | Admin | `archived` | `incomplete` | Obligatorio | Cuenta a `active`, ofertas a `draft`; no reactiva participaciones, derivaciones ni permisos. |
 
 ## Oferta laboral
@@ -79,7 +77,6 @@ o cancelar.
 | Reactivar disponibilidad | Titular/admin | `unavailable` | `active` | No | Revalida datos, frescura y consentimiento; actualiza confirmación cuando corresponde. |
 | Retirar consentimiento | Titular/admin autorizado | Cualquier estado salvo `archived`, `consent_withdrawn` | `consent_withdrawn` | No | Cierra abiertas como `withdrawn`, revoca permisos y preserva finales/historia. |
 | Aceptar nuevo consentimiento | Titular/admin autorizado | `consent_withdrawn` | `active` | No | Política vigente y demás condiciones de activación válidas; no reabre participaciones ni permisos previos. |
-| Solicitar eliminación | Titular | Cualquier estado propio salvo `archived` | `archived` | No | Archiva cuenta/perfil inmediatamente; revoca actividad/accesos sin borrar historia. |
 | Restaurar | Admin | `archived` | `draft` | Obligatorio | Ausencia de conflicto; cuenta utilizable, sin reactivar participaciones, CV ni derivaciones. |
 | Vincular cuenta | Admin + candidato | igual | igual | No | Correo verificado y DNI exhibido/comprobado presencialmente sin copia; resuelve conflictos, conserva ID/origen/consentimiento/estado/historia y asigna `account_id`. |
 
@@ -101,7 +98,7 @@ Estados internos: `received`, `under_review`, `preinterview`, `preselected`, `re
 | Registrar entrevista | Empresa propia o admin | Derivación activa | Agrega entrevista; estado puede pasar a `company_interview`. |
 | Comunicar feedback | Empresa propia | Derivación propia existente, aunque su permiso de datos esté revocado, y sin resultado real confirmado | Agrega feedback `pending_admin`; no fija resultado final ni habilita perfil/contactos/CV. |
 | Marcar espera | Admin | Participación derivada sin resultado final | `awaiting_feedback`; no altera fecha límite original. |
-| Confirmar resultado empresarial | Admin | Feedback/evidencia registrada o motivo administrativo, participación no final | `hired` conserva un permiso todavía activo y fija `post_hire_access_until` a confirmación +720 horas; `not_selected` lo revoca; actor admin obligatorio. |
+| Confirmar resultado empresarial | Admin | Feedback/evidencia registrada o motivo administrativo, participación no final | `hired` retira consentimiento global y revoca todos sus permisos atómicamente, sin alterar otros casos; `not_selected` revoca el permiso propio; actor admin obligatorio. |
 | Cerrar sin respuesta | Sistema | Derivada, sin final y `feedback_due_at = referred_at + 720 horas` con `feedback_due_at <= now()` | `no_company_response`, revocación y eventos una sola vez, con actor sistema. |
 | Corregir respuesta tardía | Admin | `no_company_response` y feedback del portal o contacto municipal `phone`, `email`, `whatsapp` o `in_person`, con fecha, actor y nota breve | `hired`, `not_selected` o `cancelled`; conserva el cierre automático como evento anterior reemplazado, muestra el resultado nuevo como vigente y mantiene revocado el permiso, incluso si pasa a `hired`. |
 | Retirar participación | Candidato titular o admin que registra su solicitud | Participación no final de cualquier origen; si actúa admin, solicitud del candidato registrada | `withdrawn`; revoca inmediatamente el permiso empresarial sin borrar historia. |
@@ -129,9 +126,9 @@ La revocación funciona como un enclavamiento: `revoked` no vuelve a `active` po
 reactivación, restauración o corrección tardía. `expired_by_policy` no tiene transición ejecutable
 hasta que se resuelva OQ-001. Cada cambio de participación, acceso y auditoría es transaccional.
 Reconsentir tampoco reabre participaciones cerradas por retiro del consentimiento.
-Las 720 horas son solo una ventana de acceso posterior a contratación, no retención o purga de
-perfil, CV e historial. Una corrección tardía a `hired` no fija una nueva ventana si el permiso ya
-había sido revocado.
+Las 720 horas corresponden solo a permisos históricos anteriores a EXTRA035, no a retención o
+purga de perfil, CV e historial. Las nuevas confirmaciones normales o tardías a `hired` retiran el
+consentimiento global y no fijan una nueva ventana de acceso.
 
 ## Permiso de derivación
 
@@ -142,7 +139,7 @@ había sido revocado.
 | Revocar por consentimiento | Candidato o admin autorizado | `active` | `revoked` | `consent_withdrawn` | Revoca todos los permisos afectados y cierra participaciones abiertas. |
 | Revocar por resultado/cancelación | Admin o sistema según resultado | `active` | `revoked` | `not_selected`, `process_cancelled` o `no_company_response` | Ocurre con el resultado final y conserva historial. |
 | Revocar por suspensión/archivo | Admin o titular autorizado | `active` | `revoked` | `candidate_suspended`, `company_suspended`, `candidate_archived` o `company_archived` | Deniega nuevas consultas/descargas sin borrar evidencia. |
-| Conservar tras contratación | Admin | `active` | `active` | Confirmación `hired` | Solo si seguía activo; fija `post_hire_access_until` a confirmación +720 horas. |
+| Conservar tras contratación (histórico, no ejecutable desde EXTRA035) | Admin | `active` | `active` | Confirmación `hired` | Antes del cambio, si seguía activo, fijaba `post_hire_access_until` a confirmación +720 horas. |
 | Vencer acceso poscontratación | Sistema | `active` | `revoked` | `post_hire_window_ended` | Al alcanzar el límite; autorización ya deniega desde ese instante y la materialización es idempotente. |
 
 `revoked` es terminal y nunca vuelve a `active`. `expired_by_policy` está reservado e inalcanzable
@@ -154,8 +151,13 @@ mientras OQ-001 continúe abierta; no existe un comando que lo produzca en el MV
 | --- | --- | --- | --- | --- | --- |
 | Aceptar | Candidato o admin en atención asistida | inexistente, `withdrawn` | `accepted` | No | Registra versión/hash de política, actor y fecha; una nueva aceptación no reabre casos ni permisos. |
 | Retirar | Candidato o admin autorizado | `accepted` | `withdrawn` | No | Cierra participaciones abiertas como `withdrawn` con código `consent_withdrawn`, revoca permisos y conserva resultados finales. |
+| Retirar por contratación | Admin al confirmar hire/late_hire | `accepted` | `withdrawn` | hired | Fuente hiring_workflow, política/hash previos y actor/fecha; revoca todos los permisos activos y NO cierra otros casos. Si ya estaba retirado no duplica el retiro. Todo en la transacción del resultado. |
 
 Los eventos son append-only: una nueva aceptación crea otro evento y nunca modifica el anterior.
+EXTRA035 sustituye la conservación tras nuevas contrataciones; late_hire ejecuta
+el mismo retiro global aunque su propio permiso ya estuviera revocado. Las filas
+de ventana720h/vencimiento anteriores solo aplican a permisos históricos. No hay
+backfill ni restauración de consentimiento/permisos al corregir resultados.
 
 ## CV
 
@@ -164,7 +166,7 @@ Los eventos son append-only: una nueva aceptación crea otro evento y nunca modi
 | Validar carga aceptada | Candidato o admin autorizado + validador | inexistente | `valid` | No | PDF de `1..5 MiB` en demo, firma/estructura legibles y controles aprobados; solo uno vigente por candidato. |
 | Rechazar carga | Validador | inexistente | `rejected` | Código sanitizado | Tipo, tamaño, firma o estructura inválidos; no sustituye el CV válido anterior. |
 | Reemplazar | Candidato o admin autorizado + validador | `valid` anterior | anterior `superseded`; nuevo `valid` | No | Transición atómica; derivaciones previas conservan su `cv_document_id`. |
-| Archivar con perfil | Candidato titular | `valid`, `superseded`, `rejected` | `archived` | Archivo de perfil | Conserva metadatos/objeto bajo OQ-001 y bloquea uso nuevo. |
+| Archivo con perfil (histórico, no ejecutable desde EXTRA039) | Titular en flujo anterior | `valid`, `superseded`, `rejected` | `archived` | Archivo histórico de perfil | Conserva metadatos/objeto bajo OQ-001 y bloquea uso nuevo. |
 
 Restaurar el perfil no vuelve un CV `archived` a `valid`; se requiere una nueva carga válida. Los CV
 `superseded`, `rejected` y `archived` no admiten transición de regreso.
@@ -206,10 +208,10 @@ mientras OQ-001 siga abierta. Las filas usan `valid`, `warning`, `invalid`, `pot
   mismas su estado. Cada operación posterior revalida estado, frescura, disponibilidad,
   consentimiento y CV cuando corresponda; no reactiva ofertas, participaciones, derivaciones ni
   permisos.
-- Archivar por solicitud del candidato: efecto inmediato y recuperable; no requiere aprobación ni
-  borra relaciones, CV o auditoría.
-- Archivar cuenta/perfil empresarial: puede ejecutarlo la propia empresa autenticada sobre sus
-  registros o un administrador, que debe indicar motivo. La operación es atómica y recuperable:
+- Candidato: sin autoarchivo desde EXTRA039 ni nuevo permiso administrativo de archivo.
+  La restauración de registros históricos no borra relaciones, CV o auditoría.
+- Archivar cuenta/perfil empresarial: solo un administrador activo con motivo y confirmación.
+  La operación es atómica y recuperable:
   archiva cuenta/perfil, establece `archived_at` en las ofertas no finales sin crear otro estado de
   workflow, bloquea acciones empresariales y revoca permisos de derivación sin borrar casos,
   resultados ni auditoría.
