@@ -897,3 +897,9 @@ Servidor de desarrollo cerrado con permiso explícito para probar, servidores de
 prueba finalizados y next-env.d.ts preexistente restaurado. No acredita CI, suite
 E2E/SQL completa, aceptación o cierre de OQ-001/002. No cambia el carácter demo de
 la política ni habilita datos reales por quitar su cartel inicial.
+
+Entrega solicitada por Mateo: commitc228d2c publicado sin firma ni atribución
+automática en PR65, abierto hacia main desde feat/candidate-consent-activation-ui:
+https://github.com/maximo-Pdev/funes-empleo/pull/65.
+next-env.d.ts ajeno excluido. Sin nuevas migraciones/cambios alojados, CI y
+revisión pendientes; sin merge o aceptación acreditados.

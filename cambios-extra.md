@@ -2014,6 +2014,17 @@ documentales, diff-check PASS. CI/revisión independiente y aceptación pendient
   OQ-001/002 y revisión humana permanecen abiertos. Policy/hash no modificados y
   retirar el cartel no acredita aprobación municipal o uso con datos reales.
 
+## Entrega de EXTRA040–041 — 2026-10-22
+
+Mateo solicita el PR. Commit funcionalc228d2c desde main5b15b24 actualizado,
+rama feat/candidate-consent-activation-ui, sin firma GPG/sign-off/atribución
+automática. PR65 abierto hacia main, sin merge:
+https://github.com/maximo-Pdev/funes-empleo/pull/65.
+Incluye interfaz, pruebas y artefactos del incremento; next-env.d.ts ajeno queda
+fuera y sin añadir logs/capturas/secretos. Verificaciones locales consignadas en
+EXTRA040–041; publicación no acredita CI, revisión o aceptación. Sin nuevas
+migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
