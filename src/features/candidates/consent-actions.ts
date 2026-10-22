@@ -11,6 +11,7 @@ export async function changeConsentAction(_previous: CandidateActionState, form:
       confirmed: form.get("confirmed") === "on" });
     revalidatePath("/candidato/perfil");
     revalidatePath("/candidato/postulaciones");
+    revalidatePath("/account");
     return { message: status === "withdrawn" ?
       "Consentimiento retirado. Las participaciones abiertas se cerraron y los accesos empresariales quedaron revocados." :
       "Consentimiento registrado. Las participaciones cerradas no se reabren.", success: true };

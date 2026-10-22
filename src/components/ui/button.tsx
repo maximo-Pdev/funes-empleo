@@ -7,8 +7,8 @@ export type ButtonProps = ComponentProps<"button"> & {
 };
 
 const variants = {
-  primary: "bg-blue-800 text-white hover:bg-blue-900",
-  secondary: "border border-slate-500 bg-white text-slate-950 hover:bg-slate-100",
+  primary: "bg-primary text-white hover:bg-brand-text",
+  secondary: "border border-brand-text bg-white text-brand-text hover:bg-surface-muted",
   danger: "bg-red-800 text-white hover:bg-red-900",
 } as const;
 
@@ -22,7 +22,7 @@ export function Button({
       type={type}
       disabled={disabled || busy}
       aria-busy={busy || undefined}
-      className={`inline-flex min-h-11 items-center justify-center rounded-md px-5 py-2 font-semibold transition-colors focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center rounded-sm px-5 py-2 font-heading font-semibold transition-colors focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${className}`}
     >
       {busy ? busyLabel : children}
     </button>

@@ -12,8 +12,10 @@ test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ pa
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(page).toHaveURL(/\/account$/);
-  await expect(page.getByRole("heading", { name: "Mi cuenta", exact: true })).toBeVisible();
-  await expect(page.getByText("Rol: Candidato")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mi perfil", exact: true })).toBeVisible();
+  const sections = page.getByRole("navigation", { name: "Secciones de mi cuenta" });
+  await expect(sections.getByRole("link", { name: "Perfil", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(sections.getByRole("link", { name: "Postulaciones", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Cerrar sesión" }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto("/account");

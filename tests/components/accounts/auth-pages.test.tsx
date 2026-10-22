@@ -1,6 +1,7 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
-const mocks = vi.hoisted(() => ({ guard: vi.fn(), neq: vi.fn(), order: vi.fn(), logout: vi.fn() }));
+const mocks = vi.hoisted(() => ({ guard: vi.fn(), neq: vi.fn(), order: vi.fn(), logout: vi.fn(), candidate: vi.fn() }));
+vi.mock("@/app/(auth)/account/candidate-account", () => ({ renderCandidateAccount: mocks.candidate }));
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: mocks.logout, accountStatusAction: vi.fn() }));
 import Recovery from "@/app/(auth)/recover/page";
@@ -19,6 +20,11 @@ function session(role = "candidate") {
  return { account: { id: "cuenta-ficticia", role, version: 1 }, client: { from: vi.fn(() => ({ select: vi.fn(() => ({ eq: vi.fn(() => ({ neq: mocks.neq })) })) })) } };
 }
 beforeEach(() => { vi.clearAllMocks(); mocks.guard.mockResolvedValue(session()); });
+it("guards the candidate dashboard before forwarding its selected section", async () => {
+ await Account({ searchParams: Promise.resolve({ section: "ofertas" }) });
+ expect(mocks.guard).toHaveBeenCalledOnce();
+ expect(mocks.candidate).toHaveBeenCalledWith({ params: { section: "ofertas" }, email: undefined });
+});
 it.each([
  [Recovery, "Solicitar enlace de recuperación"], [Pending, "Reenviar verificación"],
  [Expired, "Reenviar verificación"], [Invalid, "Solicitar enlace de recuperación"],
@@ -37,7 +43,7 @@ it("conserva la guardia y los campos de contraseña nueva y confirmación", asyn
  expect(screen.getByLabelText("Nueva contraseña")).toHaveProperty("autocomplete", "new-password");
  expect(screen.getByLabelText("Repetir nueva contraseña")).toHaveProperty("required", true);
 });
-it.each(["candidate", "company"])("no ofrece autoarchivo a %s y conserva contraseña/logout", async role => {
+it.each(["company"])("no ofrece autoarchivo a %s y conserva contraseña/logout", async role => {
  mocks.guard.mockResolvedValue(session(role)); render(await Account());
  expect(screen.queryByRole("navigation", { name: "Navegación de Oficina de Empleo" })).toBeNull();
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);

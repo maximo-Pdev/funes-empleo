@@ -20,6 +20,7 @@ Before planning or changing the product, read these files in order:
 8. The active feature artifacts under `specs/`, when they exist
 9. `.specify/memory/constitution.md`, once ratified
 10. `cambios-extra.md`, for necessary additions, their rationale, status, and review history
+11. `docs/UI_GUIDELINES.md`, before changing any page, form, typography, or color
 
 Do not rely on prior chat history. The repository is the shared source of context for both developers and their Codex sessions.
 
@@ -78,6 +79,12 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - Before editing, check the current branch and working tree. Do not overwrite unrelated or uncommitted work.
 - Avoid having both developers edit the same files concurrently.
 - Do not block explicitly requested implementation on an additional coordination or second-developer approval step. Pull request, security, verification, and product-approval requirements still apply; preserve unrelated working-tree changes.
+- Changes to shared contracts, database schema, authentication, authorization, application states, or global UI foundations require coordination before implementation.
+- Collaboration clarification from Maxi, 2026-10-22: changes he explicitly
+  requests have already been discussed with his teammate. Treat those requests
+  as coordination confirmation for their stated scope; do not ask for the same
+  confirmation again. This does not authorize overwriting conflicting concurrent
+  edits, expanding scope, skipping artifact review gates, or publishing changes.
 - Keep commits focused and explain behavior changes in the pull request.
 - A pull request approval is not a merge. Confirm that the pull request was merged before both developers update their local `main` branches.
 
@@ -113,6 +120,29 @@ Do not rely on prior chat history. The repository is the shared source of contex
 - Google Antigravity is an optional course alternative and is not required when the team uses Codex.
 
 ## Engineering expectations
+
+### Shared visual reference
+
+- Follow `docs/UI_GUIDELINES.md` and the current tokens in `src/app/globals.css`
+  for every page-level visual task. The official Funes website is a reference,
+  not a Crafto dependency or a license to copy its template.
+- Reuse the bundled Be Vietnam/Sora families, semantic institutional colors and
+  shared form treatment. Prefer existing UI primitives; do not introduce local
+  replacement palettes, fonts or competing field styles.
+- Preserve validation, accessible focus, error feedback and destructive-action
+  meaning. Coordinate shared changes and keep unrelated page composition intact.
+- Use official shadcn/ui Base components, following the configured `base-nova`
+  style, adapted to the municipal tokens and current appearance. Before adding
+  or replacing a button, field, form composition or other supported UI control,
+  consult its official documentation and registry source. Reuse the adapted
+  shared component; do not create another local shadcn-style imitation.
+- Preserve existing component contracts, form actions, native validation,
+  accessibility and visual layout during migration. Configuration alone is not
+  evidence of an official component integration. Do not bulk-overwrite local
+  components with registry defaults. See `docs/UI_GUIDELINES.md` for migration
+  status and the required shared-foundation coordination.
+
+### Implementation quality
 
 - Prefer the simplest design that satisfies the approved MVP and leaves clear extension points.
 - Centralize business catalogs and workflow states; do not duplicate them as unrelated hardcoded values across the UI and backend.

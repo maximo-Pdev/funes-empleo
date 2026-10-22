@@ -1,19 +1,41 @@
 @import "tailwindcss";
 
+/* Original municipal-theme families, self-hosted under SIL OFL 1.1. */
+@font-face { font-family: "Be Vietnam"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/funes/be-vietnam-400.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/funes/be-vietnam-500.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/funes/be-vietnam-600.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam"; font-style: normal; font-weight: 700; font-display: swap; src: url("/fonts/funes/be-vietnam-700.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam"; font-style: normal; font-weight: 800; font-display: swap; src: url("/fonts/funes/be-vietnam-800.ttf") format("truetype"); }
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/funes/sora-400.ttf") format("truetype"); }
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/funes/sora-600.ttf") format("truetype"); }
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 700; font-display: swap; src: url("/fonts/funes/sora-700.ttf") format("truetype"); }
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 800; font-display: swap; src: url("/fonts/funes/sora-800.ttf") format("truetype"); }
+
+@theme static {
+  --color-brand-primary: #074A1F;
+  --color-brand-secondary: #FFFFFF;
+  --color-brand-text: #262B35;
+  --color-brand-base: #262B35;
+  --color-brand-muted: #868D98;
+  --color-brand-primary-light: #074A1F;
+  --font-sans: "Be Vietnam", Arial, sans-serif;
+  --font-heading: "Sora", "Be Vietnam", sans-serif;
+}
+
 @theme {
   --color-primary-50: #f0f7f3;
   --color-primary-100: #e3f2e9;
   --color-primary-400: #69bc88;
   --color-primary-500: #337f50;
-  --color-primary-600: #006833;
+  --color-primary-600: #074A1F;
   --color-primary-700: #004e24;
   --color-primary-900: #06452b;
 
   --color-page: #f5f8f6;
   --color-surface: #ffffff;
   --color-surface-muted: #f1f6f3;
-  --color-foreground: #202b26;
-  --color-foreground-secondary: #66756b;
+  --color-foreground: #262b35;
+  --color-foreground-secondary: #495057;
   --color-border: #dce8e0;
   --color-accent-violet: #21126f;
 
@@ -26,7 +48,7 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: var(--color-primary-100);
   --color-secondary-foreground: var(--color-primary-700);
-  --color-ring: var(--color-accent-violet);
+  --color-ring: var(--color-brand-primary);
 
   --radius-sm: 0.5rem;
   --radius-md: 0.625rem;
@@ -35,10 +57,70 @@
 
   --shadow-card: 0 1px 3px rgb(32 43 38 / 0.06);
   --shadow-elevated: 0 12px 30px rgb(32 43 38 / 0.10);
+  --shadow-inner-panel: inset 28px 0 36px -12px rgb(0 12 4 / 75%);
+  --shadow-bevel: inset 2px 2px 4px rgb(255 255 255 / 95%), inset -2px -2px 4px rgb(104 128 92 / 24%), 0 1px 1px rgb(255 255 255 / 80%), 0 4px 8px rgb(0 25 10 / 20%), 0 24px 64px rgb(0 25 10 / 30%);
+}
+
+/* Default glossy bevel: reuse this utility instead of recreating the finish. */
+@utility surface-bevel {
+  border: 7px solid transparent;
+  border-radius: 18px;
+
+  background:
+    linear-gradient(#f8faf6, #f8faf6) padding-box,
+    var(--surface-bevel-gradient) border-box;
+  box-shadow: var(--shadow-bevel);
 }
 
 :root {
   color-scheme: light;
+  --surface-bevel-gradient: linear-gradient(135deg, var(--color-brand-secondary) 0%, #f5ffed 16%, #aabb9f 34%, var(--color-brand-secondary) 48%, #e5efdc 60%, #879c7a 83%, #f4ffe9 100%);
+  --form-control-height: 44px;
+  --form-control-padding: 6px 12px 6px 0;
+  --form-label-gap: 6px;
+  --form-field-gap: 16px;
+  --form-panel-padding: 12px;
+}
+
+/* Compact layout remains opt-in; control appearance is shared below. */
+@utility form-compact {
+  & form {
+    margin-top: 12px;
+    gap: var(--form-field-gap);
+  }
+
+  & label {
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  & form > label {
+    row-gap: var(--form-label-gap);
+  }
+
+  & form label + :is(input, select, textarea, div) {
+    margin-top: var(--form-label-gap);
+  }
+
+  & input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),
+  & select {
+    min-height: var(--form-control-height);
+    height: var(--form-control-height);
+    padding: var(--form-control-padding);
+  }
+
+  & button[type="button"] {
+    padding: 6px;
+  }
+
+  & button[type="submit"] {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+
+  & p {
+    line-height: 1.4;
+  }
 }
 
 html {
@@ -49,7 +131,81 @@ body {
   margin: 0;
   background: var(--color-page);
   color: var(--color-foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Keep one control treatment across primitives and legacy raw form controls.
+   Specificity intentionally beats old local borders without !important.
+   Validation, native special inputs and destructive actions retain their roles. */
+:root :is(form input:where(:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"])), form select, form textarea, .municipal-control) {
+  min-width: 0;
+  width: 100%;
+  min-height: var(--form-control-height);
+  height: auto;
+  border: 0;
+  border-bottom: 1px solid var(--color-brand-text);
+  border-radius: 0;
+  background: transparent;
+  padding: var(--form-control-padding);
+  color: var(--color-foreground-secondary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-transform: none;
+  caret-color: var(--color-brand-primary);
+}
+
+:root :is(form textarea, textarea.municipal-control) {
+  min-height: 85px;
+  resize: vertical;
+}
+
+:root :is(form label, .municipal-label):not(:has(input[type="checkbox"], input[type="radio"])) {
+  color: var(--color-brand-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 19.5px;
+  text-transform: uppercase;
+}
+
+:root :is(form input, form textarea, .municipal-control)::placeholder {
+  color: var(--color-foreground-secondary);
+  opacity: 1;
+}
+
+:root :is(form input, form select, form textarea, .municipal-control)[aria-invalid="true"] {
+  border-bottom-color: #991b1b;
+}
+
+:root form :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--color-brand-primary);
+}
+
+:root form button[type="submit"]:not([class*="red-"]):not(.danger *) {
+  min-height: 44px;
+  border-radius: 4px;
+  background: var(--form-submit-background, var(--color-brand-text));
+  padding: 16px 30px;
+  color: var(--color-brand-secondary);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 19.5px;
+}
+
+:root form button[type="submit"]:not([class*="red-"]):not(.danger *):hover:not(:disabled) {
+  background: var(--form-submit-hover, var(--color-brand-primary));
+}
+
+:root :is(form input, form select, form textarea, form button, .municipal-control):focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--color-surface);
 }
 
 :focus-visible {
