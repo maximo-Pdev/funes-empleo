@@ -68,6 +68,37 @@ personas u ofertas. No inferir equivalencias; importación sintética v1 sin cam
 OQ-010 solo se resuelve para el catálogo amplio aprobado, no para equivalencias
 históricas o un catálogo exhaustivo de ocupaciones; OQ-018 permanece abierta.
 
+## Perfil candidato — presentación autorizada 2026-10-22 (EXTRA040)
+
+La primera tarjeta del perfil presenta estado y vigencia. Si el estado guardado
+es active muestra Perfil activo y nunca el botón de activación. En draft,
+needs_update, unavailable o consent_withdrawn, Activar perfil solo aparece si los
+datos guardados satisfacen las reglas actuales de activación: localidad/resumen,
+una categoría, disponibilidad available, consentimiento accepted y CV válido.
+En caso contrario explica qué completar/guardar; archived u otro estado no
+ofrecen activación. Servidor y DB siguen revalidando sin cambios. No confundir
+estado active con elegibilidad para una derivación concreta.
+
+Consentimiento explica el uso laboral por la Oficina y la entrega de perfil,
+contactos y CV únicamente tras derivación municipal a una empresa, sin DNI,
+domicilio o notas internas. Explicita que una contratación normal o tardía
+confirmada retira el consentimiento global vigente y revoca todos los accesos
+empresariales dependientes, conservando otras participaciones, resultados e
+historial. Nueva aceptación siempre afirmativa, sin revivir accesos anteriores.
+El retiro manual conserva sus efectos actuales. Es explicación de reglas
+vigentes, no reemplazo de policy_text/version/hash ni aprobación municipal de
+la política demo; OQ-001/002 permanecen abiertas. Sin cambios de lógica o schema.
+
+### Reorganización solicitada 2026-10-22 (EXTRA041)
+
+Teléfono opcional pasa a la misma tarjeta de Datos laborales y personales,
+sin tarjeta Contacto adicional. Mantiene guardado explícito independiente y las
+reglas actuales, sin prometer una transacción conjunta con los demás campos.
+La carga de CV se coloca antes del consentimiento en el orden real de lectura.
+Se retira el cartel amarillo de política demo de la vista inicial; texto y
+versión siguen consultables en un desplegable accesible cerrado inicialmente.
+No implica política municipal aprobada ni cambia versión/hash/aceptación.
+
 ## Formularios — ajuste autorizado 2026-10-20
 
 Todos los formularios indican requisitos vigentes con asterisco rojo y semántica

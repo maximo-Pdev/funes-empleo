@@ -27,17 +27,13 @@
 .profile a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-primary); }
 .profile input[type="file"] { padding: 8px; }
 .profile input[type="file"]::file-selector-button { border: 0; border-radius: var(--radius-sm); background: var(--color-secondary); padding: 8px 12px; color: var(--color-primary-700); margin-right: 12px; }
-.profile > div > form:last-child { border-color: #fca5a5; background: #fff1f2; }
-.profile > div > form:last-child h2 { color: #7f1d1d; }
-.profile > div > form:last-child button { background: #991b1b; }
 @media (min-width: 768px) {
   .profile > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .profile > div > section { grid-column: 1 / -1; }
-  .profile > div > p, .profile > div > form:first-of-type, .profile > div > form:last-child { grid-column: 1 / -1; }
-  .profile > div > form:first-of-type { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .profile > div > form:first-of-type > h2, .profile > div > form:first-of-type > p, .profile > div > form:first-of-type > fieldset,
-  .profile > div > form:first-of-type > button, .profile > div > form:first-of-type > label:has(textarea),
-  .profile > div > form:first-of-type > [data-form-field]:has(textarea) { grid-column: 1 / -1; }
+  .profile > div > section, .profile > div > form { grid-column: 1 / -1; }
+  .profile [data-profile-details] { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile [data-profile-details] > h2, .profile [data-profile-details] > p, .profile [data-profile-details] > fieldset,
+  .profile [data-profile-details] > button, .profile [data-profile-details] > label:has(textarea),
+  .profile [data-profile-details] > [data-form-field]:has(textarea) { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .forms button, .forms input, .forms select, .forms textarea { transition: none; }
