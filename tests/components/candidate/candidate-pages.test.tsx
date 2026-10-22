@@ -6,7 +6,7 @@ vi.mock("@/features/candidates/profile-service", () => ({ getCandidateWorkspace:
 vi.mock("@/features/candidates/consent-service", () => ({ getDemoConsentPolicy: mocks.policy }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: mocks.offers, getPublicOffer: mocks.selected }));
 vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: mocks.participations }));
-vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn(), archiveProfileAction: vi.fn() }));
+vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn() }));
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: vi.fn(), withdrawParticipationAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));

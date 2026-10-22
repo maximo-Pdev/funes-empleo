@@ -3,8 +3,7 @@ import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
 import { workflowRpcError } from "@/lib/errors/workflow-rpc";
 import { bootstrapCandidate } from "./registration-service";
-import { candidateProfileSchema, phoneSchema, candidateVersionSchema, candidateArchiveSchema } from "@/validation/candidate-profile";
-import { changeAccountStatus } from "@/features/accounts/service";
+import { candidateProfileSchema, phoneSchema, candidateVersionSchema } from "@/validation/candidate-profile";
 
 async function candidateSession() {
   const session = await readAccountSession();
@@ -59,7 +58,6 @@ export async function saveCandidateProfile(input: unknown) {
   if (result.error) throw workflowRpcError(result.error.message);
   return result.data;
 }
-
 export async function setCandidatePhone(input: unknown) {
   const parsed = phoneSchema.safeParse(input);
   if (!parsed.success) throw new AppError("VALIDATION_ERROR");
@@ -78,13 +76,4 @@ export async function activateCandidate(input: unknown) {
   const result = await session.client.rpc("activate_candidate", { p_expected_version: parsed.data.version });
   if (result.error) throw workflowRpcError(result.error.message);
   return result.data;
-}
-
-export async function archiveCandidate(input: unknown) {
-  const parsed = candidateArchiveSchema.safeParse(input);
-  if (!parsed.success) throw new AppError("VALIDATION_ERROR");
-  const session = await candidateSession();
-  const result = await changeAccountStatus({ accountId: session.account.id,
-    version: parsed.data.version, command: "archive", reason: "", confirmed: true });
-  if (result.code !== "OK") throw new AppError(result.code === "CONFLICT_STALE_DATA" ? "CONFLICT_STALE_DATA" : "INVALID_TRANSITION");
 }

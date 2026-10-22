@@ -155,8 +155,15 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await signIn(page, email, password);
     await page.goto("/empresa/perfil");
     await expect(page.getByText("Estado:")).toContainText("Incompleto");
-    await page.getByLabel("Confirmo el archivo de mi empresa y sus ofertas.").check();
-    await page.getByRole("button", { name: "Archivar empresa" }).click();
+    await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
+    await page.goto("/account");
+    await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
+    await admin.reload();
+    await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
+    await admin.getByLabel("Confirmo esta decisión.").last().check();
+    await admin.getByRole("button", { name: "Archivar empresa" }).click();
+    await expect(admin.getByText("Cuenta: archived", { exact: false })).toBeVisible();
+    await page.goto("/empresa/perfil");
     await expect(page).toHaveURL(/\/session-expired$/);
     await admin.reload();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").first().fill("Restauración ficticia");

@@ -1795,6 +1795,83 @@ documentales, diff-check PASS. CI/revisión independiente y aceptación pendient
   propio. next-env.d.ts mantiene el cambio local y se excluye del commit.
   Corrección en el mismo PR63, pendiente nueva ejecución CI completa/revisión.
 
+## EXTRA-039 — Retirar autoarchivo de candidatos y empresas
+
+- **Fecha/origen/autorización:** 2026-10-22, Mateo solicita eliminar archivar/
+  eliminar cuenta en perfiles candidatos y empresas, tras merge de PR63. Alcance
+  comunicado: autoservicio, manteniendo archivo/restauración administrativos y
+  todo el historial; no elimina derechos legales ni decide OQ-001/002.
+- **Evidencia/conflicto:** paneles CandidateProfilePanel/CompanyProfileForm y
+  /account ofrecen archivo propio. FR-016/054 y contratos antiguos lo permiten;
+  service changeAccountStatus y RPC público delegan incluso para titulares.
+  Ocultar solo tarjetas dejaría la operación disponible por requests antiguos.
+  La petición expresa sustituye ese permiso de autoservicio; no afecta archivo
+  de ofertas propias, disponibilidad, retiro de postulaciones o consentimiento.
+- **Cambio técnico mínimo necesario:** quitar formularios/estado/props/Actions/
+  servicio exclusivo de autoarchivo; conservar comandos administrativos. Exigir
+  admin activo en servicio común y wrapper público change_account_status, con
+  nueva migración forward-only, misma firma/grants, sesión bloqueada y delegación
+  privada/auditoría existentes. Sin nuevos estados, tablas, triggers o paquetes.
+- **Archivos/contratos:** perfiles y /account, features/accounts/candidates/
+  companies, validadores solo del flujo removido; spec/plan/modelo/contratos,
+  tareas/checklist; pruebas UI, servidor/HTTP, SQL/RLS/rollback y E2E actuales.
+- **Riesgos/recuperación:** no borrar cuentas/eventos, preservar recursos ya
+  archivados y restauración administrativa. No reutilizar sesiones de titulares
+  como si fueran admin en pruebas. No editar migraciones aplicadas. Recuperación
+  forward-only sin reactivar permisos ni autoarchivo por rollback implícito.
+  Aplicar SQL antes de app en el rollout; alojado no se modifica en esta tarea.
+- **Gates/verificación prevista:** alinear artefactos y checklist/tareas/análisis
+  acotados antes de implementar; RED UI/servicio/SQL, roles negativos y cero
+  cambios ante denegación, archivo/restauración admin positivos con motivo e
+  historial, consentimiento/edición/logout intactos; tipos/lint/pruebas/build y
+  E2E ficticios sin reset local. Misma arquitectura/constitución, sin nueva
+  decisión municipal ni aprobación/revisión independiente inferidas.
+- **Rama/estado inicial:** main actualizado a a75bfc8 (PR63 mergeado), rama
+  codex/feat-remove-profile-self-archival; anterior borrada local/remoto. Cambio
+  local next-env.d.ts preservado. Quality122 del PR63 pasó application/database,
+  98 E2E y carreras SQL, Vercel success. Esta entrada precede a la implementación.
+- **Precisión detectada en pruebas:** el privado anterior rechaza archivar
+  candidatos por admin, aunque sí permite archivo empresarial administrativo y
+  restauración de candidatos. No se añade un permiso administrativo nuevo para
+  sustituir el autoarchivo; se preserva exactamente ese alcance previo. Los tests
+  de restauración preparan archivos candidatos históricos como propietario de la
+  DB ficticia, nunca como permiso público nuevo. Artefactos ajustados a este límite.
+- **Prerrequisitos de pruebas:** inventario Form pasa de41 usos a38 por retirar
+  tres formularios; se actualiza su mínimo manteniendo el escaneo estricto de
+  campos. En navegador local11/12 pasan inicialmente; el recorrido candidato
+  encuentra cuatro ofertas ficticias anteriores con título idéntico. Seleccionar
+  dos títulos únicos disponibles y ubicar sus textos exactos, sin reset/borrar
+  fixtures ni cambiar lógica de postulaciones, para comprobar ambos casos nuevos.
+  La ejecución siguiente conserva11/12 y encuentra concatenación del textarea al
+  rellenarlo inmediatamente tras navegar; probar la sustitución con foco y
+  selección total por teclado, manteniendo la aserción exacta y sin sleeps,
+  reintentos de escritura, cambios de producto o resets.
+- **Implementado:** sin tarjetas de archivo en ambos perfiles o /account; Actions
+  exclusivas/servicio/validador/props retirados, guardia admin en servicio común y
+  migración20261022202940 del wrapper público, misma firma/grants/locks. Archivo
+  empresarial y restauraciones históricas siguen igual; ninguna habilitación de
+  archivo administrativo candidato. Migración aplicada solo localmente, sin tocar
+  la anterior historia local divergente ni editar archivos SQL ya aplicados.
+- **Verificado:** UI/servidor RED7/33, SQL RED10/12; final unitarias/componentes/
+  integración/cobertura730 tests/53 archivos, tooling57, SQL1072/18 archivos,
+  navegador12/12 (incluye HTTP real8/8), tipos/lint/build, diff-check y advisor
+  local sin warn/error PASS. Cobertura configurada mide env/schema, no toda la app.
+  SQL073 final14 casos, snapshot sin cambios por denegación y sin nuevo permiso
+  candidato; se conserva rollback administrativo y restauración de datos legados.
+  React: hooks no condicionales, estado/props sin uso retirados, Form/Field y
+  efectos/validación restantes conservados; edición, logout, teclado/axe y
+  permisos comprobados en recorridos pertinentes. No son revisión externa/NVDA.
+- **Gates/estado final:** spec→plan/modelo/contratos→checklist9/9→tareas→análisis
+  acotado→implementación→verificación/convergencia del incremento. La precisión de
+  permisos candidata descubierta en tests se alinea sin ampliar arquitectura o
+  permisos; sin gaps construibles nuevos dentro de T140–143. No converge ni acepta
+  globalmente el MVP. Guía docs/validation/profile-self-archival.md.
+  Instancia SQL efímera detenida/descartada y servidor propio cerrado; base local
+  original sin reset y next-env.d.ts preservado. Datos de prueba nuevos ficticios;
+  sin cambios alojados, commit/PR nuevo, CI, revisión o aceptación acreditados.
+  Pendiente aplicar únicamente20261022202940 en Supabase compartido antes del
+  despliegue de app y revisión mediante PR; gates históricos/OQ-001/002 intactos.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

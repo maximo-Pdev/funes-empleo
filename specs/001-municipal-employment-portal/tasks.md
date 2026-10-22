@@ -571,3 +571,10 @@ originales, sin alterar historia previa ni ejecutar pruebas/datos de negocio.
 El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 
 - [x] T139 EXTRA038: aislar ofertas ficticias de contratación fuera del listado público y exigir categorías en la selección de fixture de matching. RED0 esperado/2 recibidas y GREEN; E2E6/6, cobertura741/52, tooling57, tipos/lint/build/diff-check PASS. Conserva12 tarjetas/paginación/nominación y contratación normal/tardía; sin reset local ni cambios alojados. Publicación en PR63 con CI completo y revisión como gates pendientes, no aceptación global.
+
+## Retirar autoarchivo — EXTRA039, 2026-10-22
+
+- [x] T140 Registrar petición/alcance y alinear spec/plan/modelo/contratos/checklist; análisis acotado, sin arquitectura nueva o decisiones legales inferidas.
+- [x] T141 RED UI/servidor7/33 y SQL10/12 de autoarchivo candidato/empresa. Conservar archivo empresarial/restauración históricos; no agregar archivo administrativo candidato. Operaciones de perfil/consentimiento intactas.
+- [x] T142 Formularios/Actions/props exclusivas retirados, admin exigido en servicio/RPC mediante20261022202940, misma firma/grants; no cambia datos ni SQL anterior. Migración verificada solo localmente.
+- [x] T143 SQL/HTTP/E2E ajustados a denegación de autoarchivo y restauración legada, sin omitir pruebas: SQL1072/18,730 tests/53 archivos, tooling57, navegador12/12 (HTTP8), tipos/lint/build/diff-check y advisor PASS. Guía docs/validation/profile-self-archival.md; sin reset local ni cambios alojados. CI/revisión/rollout y aceptación pendientes.

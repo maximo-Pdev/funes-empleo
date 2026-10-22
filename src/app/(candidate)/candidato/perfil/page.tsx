@@ -25,7 +25,7 @@ export default async function CandidateProfilePage({ searchParams }: { searchPar
     <div className={`${styles.forms} ${styles.profile}`}><CandidateProfilePanel profile={workspace.profile} dni={workspace.privateData.dni_display}
       address={workspace.privateData.address} phone={workspace.contacts.find((item) => item.kind === "phone")?.value ?? null}
       categories={workspace.allCategories} selectedCategories={workspace.categories.map((item) => item.category_id)}
-      consent={workspace.consent} cv={workspace.cv} policy={policy} accountVersion={workspace.account.version}
+      consent={workspace.consent} cv={workspace.cv} policy={policy}
       cvMessage={cv} /></div>
   </CandidateShell>;
 }

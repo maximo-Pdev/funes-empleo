@@ -70,8 +70,11 @@ select is((select count(*) from public.my_candidate_participations() where displ
 select is((select count(*) from public.candidate_consents),3::bigint,'Consentimientos son append-only');
 select throws_ok($$select public.change_account_status(private.fixture_id('candidate',5),1,'restore','motivo',true)$$,
   'P0001','FORBIDDEN','Candidato no se restaura a sí mismo');
-select lives_ok($$select public.change_account_status(private.fixture_id('candidate',5),1,'archive',null,true)$$,
-  'Solicitud de eliminación archiva cuenta y perfil inmediatamente');
+select throws_ok($$select public.change_account_status(private.fixture_id('candidate',5),1,'archive',null,true)$$,
+  'P0001','FORBIDDEN','Candidato no puede archivar su cuenta');
+reset role;
+select private.change_account_status(private.fixture_id('candidate',5),1,'archive',null,true);
+set local role authenticated;
 select is((select count(*) from public.candidate_profiles),0::bigint,'Archivado pierde lectura privada aun con sesión previa');
 select throws_ok($$select public.apply_to_opening(private.fixture_id('opening',1),4)$$,
   'P0001','AUTH_REQUIRED','Archivado no crea operaciones nuevas');

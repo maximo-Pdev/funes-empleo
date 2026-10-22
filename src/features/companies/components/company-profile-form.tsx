@@ -3,14 +3,13 @@ import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { archiveCompanyAction, saveCompanyProfileAction } from "../company-actions";
+import { saveCompanyProfileAction } from "../company-actions";
 import type { CompanyProfile } from "../service";
 import { companyPhoneField, cuitField } from "@/components/forms/identifier-fields";
 
-export function CompanyProfileForm({ profile, accountVersion }: { profile: CompanyProfile; accountVersion: number }) {
+export function CompanyProfileForm({ profile }: { profile: CompanyProfile }) {
   const router = useRouter();
   const [saved, saveAction, saving] = useActionState(saveCompanyProfileAction, { message: "", success: false });
-  const [archived, archiveAction, archiving] = useActionState(archiveCompanyAction, { message: "", success: false });
   const feedback = useRef<HTMLParagraphElement>(null);
   useEffect(() => { if (saved.message) feedback.current?.focus(); if (saved.success) router.refresh(); }, [saved, router]);
   const field = "rounded border border-slate-500 p-2";
@@ -28,15 +27,5 @@ export function CompanyProfileForm({ profile, accountVersion }: { profile: Compa
       <p ref={feedback} tabIndex={-1} role={saved.success ? "status" : "alert"} aria-live="polite">{saved.message}</p>
       <button disabled={saving} className="rounded bg-blue-800 p-3 text-white">Guardar perfil</button>
     </Form>
-    <section className="rounded border-2 border-red-800 bg-red-50 p-5" aria-label="Archivo recuperable">
-      <h2 className="text-xl font-semibold text-red-900">Archivar empresa</h2>
-      <p>Se bloquea de inmediato el acceso privado, se archivan las ofertas abiertas y se revocan los permisos de derivación. Solo administración puede restaurar.</p>
-      <Form action={archiveAction} result={archived} className="mt-3 grid gap-3" aria-busy={archiving}>
-        <input type="hidden" name="accountVersion" value={accountVersion} />
-        <Field className="flex gap-2"><input type="checkbox" name="confirmed" required />Confirmo el archivo de mi empresa y sus ofertas.</Field>
-        <p role={archived.success ? "status" : "alert"} aria-live="polite">{archived.message}</p>
-        <button disabled={archiving} className="rounded bg-red-800 p-3 text-white">Archivar empresa</button>
-      </Form>
-    </section>
   </div>;
 }

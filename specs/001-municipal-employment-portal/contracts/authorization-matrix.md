@@ -56,7 +56,7 @@ existencia expondría información.
 | Oferta publicada vigente: consultar | Sí, campos públicos | Sí | Sí | Sí | No |
 | Oferta no publicada: consultar | No | No | Solo propia | Sí | No |
 | Perfil candidato: crear/editar | No | Solo propio | No | Sí, asistido/autorizado | No |
-| Perfil candidato: solicitar eliminación | No | Archiva el propio de inmediato | No | Puede restaurar con motivo | No |
+| Cuenta/perfil candidato: archivar/restaurar | No | No | No | Restaura registros históricos con motivo y confirmación; no se añade archivo | No |
 | DNI/domicilio candidato | No | Solo propio | Nunca | Sí | No |
 | Contacto y perfil laboral | No | Solo propio | Solo con permiso de derivación `active` sobre oferta propia | Sí | No |
 | CV: cargar/reemplazar | No | Solo propio | No | Sí, sobre perfil atendido | No |
@@ -64,7 +64,7 @@ existencia expondría información.
 | Padrón/búsqueda de candidatos | No | No | Nunca | Sí | No |
 | Consentimiento | No | Consultar/aceptar/retirar propio | No | Registrar asistido y consultar | No |
 | Perfil empresa | No | No | Solo propio | Sí | No |
-| Cuenta/perfil empresa: archivar/restaurar | No | No | Archiva los propios; no restaura | Archiva con motivo; restaura con motivo | No |
+| Cuenta/perfil empresa: archivar/restaurar | No | No | No | Archiva con motivo; restaura con motivo | No |
 | Oferta: crear/editar borrador | No | No | Solo propia | Puede mantener/moderar | No |
 | Oferta: publicar/moderar | No | No | Nunca | Sí | No |
 | Postulación propia | No | Crear/retirar propia | No | Consultar; registrar retiro solicitado por candidato; cancelar caso con motivo | No |
@@ -139,7 +139,7 @@ solo las contrataciones históricas anteriores a EXTRA035 conservaban acceso has
 - Empresa no registra resultado final.
 - Suspender o archivar candidato/empresa revoca inmediatamente el acceso empresarial a perfil y CV;
   reactivar no lo restablece automáticamente.
-- El archivo empresarial propio y el administrativo bloquean la cuenta/perfil y las ofertas no
+- El archivo empresarial exclusivamente administrativo bloquea la cuenta/perfil y las ofertas no
   finales, preservan historial y resultados y no permiten restauración por la empresa; solo un
   administrador restaura con motivo a cuenta `active`, perfil `incomplete` y ofertas `draft`.
 - Reactivar una cuenta candidata vuelve la cuenta a `active` sin cambiar el estado anterior del

@@ -23,9 +23,7 @@ contrato.
 | Reactivar empresa | Admin | `suspended` | `active` | Obligatorio | Perfil empresarial a `incomplete`; ofertas y permisos no se reactivan. |
 | Suspender administrador | Otro admin activo | `active` | `suspended` | Obligatorio | Confirmación; prohíbe autosuspensión y dejar cero administradores activos. |
 | Reactivar administrador | Otro admin activo | `suspended` | `active` | Obligatorio | Conserva identidad y atribución histórica. |
-| Archivar candidato | Candidato titular | `active` | `archived` | No | Solicitud confirmada; archiva cuenta/perfil, bloquea actividad y revoca accesos sin borrar historia. |
-| Archivar empresa propia | Empresa titular | `active` | `archived` | No | Archiva cuenta/perfil y ofertas no finales; revoca permisos y conserva casos/resultados. |
-| Archivar empresa administrativamente | Admin | `active`, `suspended` | `archived` | Obligatorio | Mismos efectos del archivo propio, con actor y motivo administrativos. |
+| Archivar empresa administrativamente | Admin | `active`, `suspended` | `archived` | Obligatorio | Archiva cuenta/perfil y ofertas no finales; revoca permisos y conserva casos/resultados. Sin autoarchivo del titular. |
 | Restaurar candidato | Admin | `archived` | `active` | Obligatorio | Sin conflictos/duplicados; perfil a `draft`, sin reabrir relaciones ni permisos. |
 | Restaurar empresa | Admin | `archived` | `active` | Obligatorio | Sin conflictos; perfil a `incomplete` y ofertas a `draft`, sin reabrir relaciones ni permisos. |
 
@@ -41,7 +39,7 @@ rol y no constituye una transición de negocio.
 | Completar/habilitar | Empresa titular | `incomplete` | `active` | No | Nombre, CUIT único, responsable, contacto, actividad y localidad completos; no exige verificación documental. |
 | Suspender por cuenta | Admin | `active`, `incomplete` | `suspended` | Obligatorio | Ocurre con suspensión de cuenta; bloquea ofertas nuevas y revoca permisos sin fabricar resultados. |
 | Reactivar cuenta | Admin | `suspended` | `incomplete` | Obligatorio | Requiere volver a completar/verificar datos; no reactiva ofertas ni permisos. |
-| Archivar | Empresa titular o admin | `active`, `incomplete`, `suspended` | `archived` | Solo si actúa admin | Ocurre atómicamente con la cuenta y ofertas no finales; preserva historia. |
+| Archivar | Admin | `active`, `incomplete`, `suspended` | `archived` | Obligatorio | Ocurre atómicamente con la cuenta y ofertas no finales; preserva historia. |
 | Restaurar | Admin | `archived` | `incomplete` | Obligatorio | Cuenta a `active`, ofertas a `draft`; no reactiva participaciones, derivaciones ni permisos. |
 
 ## Oferta laboral
@@ -79,7 +77,6 @@ o cancelar.
 | Reactivar disponibilidad | Titular/admin | `unavailable` | `active` | No | Revalida datos, frescura y consentimiento; actualiza confirmación cuando corresponde. |
 | Retirar consentimiento | Titular/admin autorizado | Cualquier estado salvo `archived`, `consent_withdrawn` | `consent_withdrawn` | No | Cierra abiertas como `withdrawn`, revoca permisos y preserva finales/historia. |
 | Aceptar nuevo consentimiento | Titular/admin autorizado | `consent_withdrawn` | `active` | No | Política vigente y demás condiciones de activación válidas; no reabre participaciones ni permisos previos. |
-| Solicitar eliminación | Titular | Cualquier estado propio salvo `archived` | `archived` | No | Archiva cuenta/perfil inmediatamente; revoca actividad/accesos sin borrar historia. |
 | Restaurar | Admin | `archived` | `draft` | Obligatorio | Ausencia de conflicto; cuenta utilizable, sin reactivar participaciones, CV ni derivaciones. |
 | Vincular cuenta | Admin + candidato | igual | igual | No | Correo verificado y DNI exhibido/comprobado presencialmente sin copia; resuelve conflictos, conserva ID/origen/consentimiento/estado/historia y asigna `account_id`. |
 
@@ -169,7 +166,7 @@ backfill ni restauración de consentimiento/permisos al corregir resultados.
 | Validar carga aceptada | Candidato o admin autorizado + validador | inexistente | `valid` | No | PDF de `1..5 MiB` en demo, firma/estructura legibles y controles aprobados; solo uno vigente por candidato. |
 | Rechazar carga | Validador | inexistente | `rejected` | Código sanitizado | Tipo, tamaño, firma o estructura inválidos; no sustituye el CV válido anterior. |
 | Reemplazar | Candidato o admin autorizado + validador | `valid` anterior | anterior `superseded`; nuevo `valid` | No | Transición atómica; derivaciones previas conservan su `cv_document_id`. |
-| Archivar con perfil | Candidato titular | `valid`, `superseded`, `rejected` | `archived` | Archivo de perfil | Conserva metadatos/objeto bajo OQ-001 y bloquea uso nuevo. |
+| Archivo con perfil (histórico, no ejecutable desde EXTRA039) | Titular en flujo anterior | `valid`, `superseded`, `rejected` | `archived` | Archivo histórico de perfil | Conserva metadatos/objeto bajo OQ-001 y bloquea uso nuevo. |
 
 Restaurar el perfil no vuelve un CV `archived` a `valid`; se requiere una nueva carga válida. Los CV
 `superseded`, `rejected` y `archived` no admiten transición de regreso.
@@ -211,10 +208,10 @@ mientras OQ-001 siga abierta. Las filas usan `valid`, `warning`, `invalid`, `pot
   mismas su estado. Cada operación posterior revalida estado, frescura, disponibilidad,
   consentimiento y CV cuando corresponda; no reactiva ofertas, participaciones, derivaciones ni
   permisos.
-- Archivar por solicitud del candidato: efecto inmediato y recuperable; no requiere aprobación ni
-  borra relaciones, CV o auditoría.
-- Archivar cuenta/perfil empresarial: puede ejecutarlo la propia empresa autenticada sobre sus
-  registros o un administrador, que debe indicar motivo. La operación es atómica y recuperable:
+- Candidato: sin autoarchivo desde EXTRA039 ni nuevo permiso administrativo de archivo.
+  La restauración de registros históricos no borra relaciones, CV o auditoría.
+- Archivar cuenta/perfil empresarial: solo un administrador activo con motivo y confirmación.
+  La operación es atómica y recuperable:
   archiva cuenta/perfil, establece `archived_at` en las ofertas no finales sin crear otro estado de
   workflow, bloquea acciones empresariales y revoca permisos de derivación sin borrar casos,
   resultados ni auditoría.

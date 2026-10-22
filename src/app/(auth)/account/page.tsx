@@ -1,6 +1,6 @@
 import { Form } from "@/components/forms/form";
 import Link from "next/link";
-import { ArrowRight, KeyRound, LogOut, ShieldCheck, UserRound, ShieldAlert } from "lucide-react";
+import { ArrowRight, KeyRound, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { Card } from "@/components/ui";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { AuthShell } from "../_components/auth-surface";
@@ -25,7 +25,6 @@ export default async function AccountPage() {
       <Card className="p-6 sm:p-8"><KeyRound className="h-6 w-6 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-bold text-primary-900">Contraseña</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">Actualizá tu contraseña desde tu cuenta. No la compartas con otras personas.</p><Link href="/update-password" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Cambiar contraseña<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card>
       <Card className="p-6 sm:p-8"><LogOut className="h-6 w-6 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-bold text-primary-900">Cerrar sesión</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">Cerrá tu sesión cuando termines de usar el portal.</p><div className={`${styles.forms} mt-5`}><Form action={logoutAction}><button className="text-white">Cerrar sesión</button></Form></div></Card>
     </div>
-    {account.role !== "admin" && <section aria-label="Archivo recuperable" className="mt-7 rounded-xl border border-red-300 bg-red-50 p-6 sm:p-8"><ShieldAlert className="h-6 w-6 text-red-800" aria-hidden="true" /><h2 className="mt-4 text-xl font-bold text-red-900">Archivar mi cuenta</h2><p className="mt-3 max-w-3xl text-sm leading-7 text-red-950">Se bloqueará el acceso. La Oficina conservará el historial y solo administración podrá restaurarla.</p><div className={`${styles.forms} ${styles.danger} mt-5`}><AccountChangeForm id={account.id} version={account.version} command="archive" /></div></section>}
     {account.role === "admin" && <section aria-label="Cuentas administrativas" className="mt-7"><h2 className="text-xl font-bold text-primary-900">Administradores individuales</h2>
       {peers?.error && <p role="alert" className="mt-4 rounded-xl border border-red-300 bg-red-50 p-5 leading-7 text-red-900">No se pudo cargar la lista. Recargá la página.</p>}
       <div className="mt-5 grid gap-5 md:grid-cols-2">{peers?.data?.map(peer => <Card key={peer.id} className="min-w-0 p-6"><h3 className="break-all text-base font-semibold text-primary-900">Cuenta {peer.id}</h3><p className="mt-3 text-sm leading-6">Estado: {peer.status}</p>{(peer.status === "active" || peer.status === "suspended") && <div className={`${styles.forms} ${styles.danger} mt-5`}><AccountChangeForm id={peer.id} version={peer.version} command={peer.status === "active" ? "suspend" : "reactivate"} /></div>}</Card>)}</div>

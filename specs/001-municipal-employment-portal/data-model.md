@@ -69,7 +69,7 @@ Representa la identidad de aplicación vinculada a Supabase Auth.
 | `status` | `pending_verification`, `active`, `suspended` o `archived`. |
 | `suspended_reason` | Solo administración; obligatorio cuando `status = suspended`. |
 | `suspended_at`, `suspended_by` | Completos juntos. |
-| `archived_at`, `archived_by` | Archivo recuperable; en autogestión puede iniciarlo el titular. |
+| `archived_at`, `archived_by` | Marcas recuperables históricas. Desde EXTRA039, nuevos archivos empresariales solo por admin; sin autoarchivo ni archivo administrativo candidato nuevo. |
 | `last_sign_in_at` | Referencia operativa; no reemplaza datos de Auth. |
 | `created_at`, `updated_at`, `version` | Auditoría técnica y concurrencia. |
 
@@ -88,9 +88,10 @@ Reglas:
   reactivación modifican por sí mismas `candidate_profiles.status`, que conserva el estado anterior.
   Cada operación posterior revalida estado, frescura, disponibilidad, consentimiento y CV cuando
   corresponda; no se reactivan ofertas, participaciones, derivaciones ni permisos relacionados.
-- La solicitud de eliminación del candidato archiva inmediatamente cuenta y perfil; no elimina el
-  usuario de Auth. Solo administración restaura con motivo y sin reactivar relaciones.
-- Una empresa puede archivar su propia cuenta/perfil y un administrador puede archivarlos con motivo.
+- Administración restaura cuentas/perfiles candidatos históricos con motivo y confirmación;
+  no elimina el usuario de Auth ni reactiva relaciones. Sin autoarchivo desde EXTRA039
+  ni nuevo permiso administrativo de archivo candidato.
+- Solo un administrador puede archivar cuenta/perfil empresarial con motivo y confirmación.
   La operación registra actor y fecha, bloquea acceso, marca con archivo recuperable las ofertas no
   finales y revoca permisos empresariales sin borrar historial ni resultados. Solo administración
   restaura con motivo: cuenta a `active`, perfil empresarial a `incomplete` y ofertas a `draft`, sin
@@ -131,8 +132,8 @@ Reglas de activación y uso:
   búsqueda de candidatos activos.
 - La métrica `active_candidate` usa la misma vigencia de seis meses, pero no exige CV: estado activo,
   disponibilidad activa, consentimiento vigente y `last_confirmed_at` dentro del período.
-- El titular corrige sus datos directamente. Solicitar eliminación archiva cuenta/perfil en la misma
-  operación; restaurar exige administración, motivo y devuelve el perfil a `draft`.
+- El titular corrige sus datos directamente, sin autoarchivo/eliminación de cuenta.
+  Restaurar registros históricos exige administración y motivo; devuelve el perfil a `draft`.
 - Suspender o reactivar la cuenta vinculada no modifica por sí mismo `candidate_profiles.status`: al
   reactivar, el perfil conserva el estado anterior y sus condiciones vigentes se vuelven a validar
   antes de cada operación. La reactivación no repone participaciones, derivaciones ni permisos.

@@ -139,6 +139,24 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 
 ## Contexto técnico
 
+### EXTRA039 — retirar autoarchivo, 2026-10-22
+
+Eliminar tarjetas y Actions exclusivas de autoarchivo en perfiles y /account,
+incluyendo props/versiones sin uso. changeAccountStatus exige admin activo antes
+de RPC. Migración forward-only reemplaza solo wrapper público
+change_account_status: conserva bloqueo de sesión, añade private.is_admin() y
+delega al comando privado existente. Firma/grants, locks internos, efectos de
+archivo/restauración administrativos y auditoría permanecen. No se añade archivo
+administrativo candidato: el privado previo lo rechaza; solo se conserva su
+restauración histórica y el archivo empresarial administrativo. No nuevos triggers,
+tablas, estados, dependencias o alternativas de eliminación. Preservar retiro
+de consentimiento, edición, disponibilidad, logout y archivo de ofertas propias.
+Actualizar pruebas a archivo por admin y rechazos explícitos de ambos titulares,
+incluidos HTTP/RPC directo y cero efectos laterales. SQL antes de app; no tocar
+alojado sin solicitud posterior. Recuperar con migración correctiva, no reactivar
+autoarchivo o permisos automáticamente. Gates acotados conservan arquitectura y
+constitución; OQ-001/002 y revisión humana siguen pendientes.
+
 ### EXTRA035 — retiro global por contratación, autorización2026-10-21
 
 Mantener RPC `transition_participation` y su firma/grants: `hire` y `late_hire`

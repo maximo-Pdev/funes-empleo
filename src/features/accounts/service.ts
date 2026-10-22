@@ -61,6 +61,7 @@ export async function changeAccountStatus(input: unknown) {
   if (!parsed.success) return { code: "INVALID_INPUT" as const };
   const session = await readAccountSession();
   if (!session || session.account.status !== "active") return { code: "AUTH_REQUIRED" as const };
+  if (session.account.role !== "admin") return { code: "DENIED" as const };
   const { accountId, version, command, reason, confirmed } = parsed.data;
   const result = await session.client.rpc("change_account_status", {
     p_account: accountId, p_version: version, p_command: command, p_reason: reason ?? "", p_confirmed: confirmed,

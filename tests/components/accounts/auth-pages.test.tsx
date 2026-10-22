@@ -37,14 +37,16 @@ it("conserva la guardia y los campos de contraseña nueva y confirmación", asyn
  expect(screen.getByLabelText("Nueva contraseña")).toHaveProperty("autocomplete", "new-password");
  expect(screen.getByLabelText("Repetir nueva contraseña")).toHaveProperty("required", true);
 });
-it.each(["candidate", "company"])("conserva archivo confirmado para %s", async role => {
+it.each(["candidate", "company"])("no ofrece autoarchivo a %s y conserva contraseña/logout", async role => {
  mocks.guard.mockResolvedValue(session(role)); render(await Account());
  expect(screen.queryByRole("navigation", { name: "Navegación de Oficina de Empleo" })).toBeNull();
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
- expect(screen.getByRole("checkbox")).toHaveProperty("required", true);
- expect(screen.getByRole("button", { name: "Archivar mi cuenta" })).toBeTruthy();
+ expect(screen.queryByRole("checkbox")).toBeNull();
+ expect(screen.queryByRole("button", { name: /archivar|eliminar/i })).toBeNull();
+ expect(screen.getByRole("link", { name: /Cambiar contraseña/ })).toBeTruthy();
+ expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(screen.queryByRole("region", { name: "Cuentas administrativas" })).toBeNull();
- expect(document.querySelector('[name="command"]')).toHaveProperty("value", "archive");
+ expect(document.querySelector('[name="command"]')).toBeNull();
 });
 it("no ofrece archivo a administración y mantiene la exclusión del propio administrador", async () => {
  mocks.guard.mockResolvedValue(session("admin")); render(await Account());

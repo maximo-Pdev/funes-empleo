@@ -5,7 +5,7 @@ vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/companies/service", () => ({ getCompanyWorkspace: mocks.workspace }));
 vi.mock("@/features/openings/company-service", () => ({ listCompanyOffers: mocks.offers, listCompanyCategories: mocks.categories }));
 vi.mock("@/features/referrals/service", () => ({ listCompanyReferralReferences: mocks.references, getCompanyReferral: mocks.referral }));
-vi.mock("@/features/companies/company-actions", () => ({ saveCompanyProfileAction: vi.fn(), archiveCompanyAction: vi.fn() }));
+vi.mock("@/features/companies/company-actions", () => ({ saveCompanyProfileAction: vi.fn() }));
 vi.mock("@/features/openings/company-actions", () => ({ saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn() }));
 vi.mock("@/features/referrals/feedback-actions", () => ({ submitFeedbackAction: vi.fn(), submitInterviewAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), notFound: () => { throw new Error("NOT_FOUND"); } }));
@@ -28,9 +28,10 @@ it("mantiene el bloqueo del panel sin consultar ofertas cuando falta el perfil",
  mocks.workspace.mockResolvedValue({ profile: null }); render(await Dashboard());
  expect(mocks.guard).toHaveBeenCalledWith(["company"]); expect(mocks.offers).not.toHaveBeenCalled(); expect(screen.getByRole("alert")).toBeTruthy();
 });
-it("conserva el CUIT oculto y la confirmación obligatoria para archivar", async () => {
+it("conserva el CUIT oculto sin opciones de autoarchivo", async () => {
  render(await Profile()); expect(screen.getByLabelText("CUIT")).toHaveProperty("type", "password");
- expect(screen.getByRole("checkbox")).toHaveProperty("required", true);
+ expect(screen.queryByRole("button", { name: /archivar|eliminar/i })).toBeNull();
+ expect(screen.queryByRole("checkbox")).toBeNull();
 });
 it("no permite enviar una oferta nueva antes de guardarla", async () => {
  render(await NewOpening()); expect(screen.getByRole("button", { name: "Guardar borrador" })).toBeTruthy();
