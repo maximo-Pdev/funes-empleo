@@ -1,149 +1,119 @@
-import { render, screen, within } from "@testing-library/react";
-import { beforeEach, expect, it, vi } from "vitest";
-import type { PublicOffer } from "@/features/openings/public-service";
+import React from "react";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, expect, it, vi } from "vitest";
 
-const { listPublicOffers, readAccountSession } = vi.hoisted(() => ({
-  listPublicOffers: vi.fn<typeof import("@/features/openings/public-service").listPublicOffers>(),
-  readAccountSession: vi.fn(),
-}));
-
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn() }));
+vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
+vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
+const { listPublicOffers } = vi.hoisted(() => ({ listPublicOffers: vi.fn() }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers }));
-vi.mock("server-only", () => ({}));
-vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 
 import HomePage from "@/app/(public)/page";
+import { HomeNavbar } from "@/app/(public)/home-navbar";
 
-const offers: PublicOffer[] = [
-  "Auxiliar de depósito ficticio",
-  "Asistente administrativo ficticio",
-  "Operario de mantenimiento ficticio",
-].map((title, index) => ({
-  id: `00000000-0000-4000-8000-00000000000${index + 1}`,
-  company_name: `Empresa ficticia ${index + 1}`,
-  title,
-  tasks: "Organizar las tareas del sector de demostración.",
-  requirements: "Experiencia en tareas similares.",
-  vacancies: index + 1,
-  location: "Funes",
-  modality: "onsite",
-  schedule: "Lunes a viernes de 8 a 16",
-  contract_type: "fixed_term",
-  closing_date: "2099-12-31",
-  salary: null,
-  benefits: null,
-  categories: [{ id: "00000000-0000-4000-8000-000000000010", name: "Categoría ficticia" }],
-}));
+afterEach(() => vi.unstubAllGlobals());
 
-beforeEach(() => {
-  listPublicOffers.mockReset();
-  readAccountSession.mockReset().mockResolvedValue(null);
+it("keeps the mobile navbar visible and interactive without scrolling", () => {
+  vi.stubGlobal("scrollY", 0);
+  vi.stubGlobal("matchMedia", () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  render(<HomePage />);
+  const navbar = screen.getByRole("banner");
+  expect(navbar.getAttribute("aria-hidden")).toBe("false");
+  expect(navbar.hasAttribute("inert")).toBe(false);
+  act(() => window.dispatchEvent(new Event("scroll")));
+  expect(navbar.getAttribute("aria-hidden")).toBe("false");
 });
 
-it.each([
-  ["candidate", "/candidato/perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
-])("muestra el acceso de %s en lugar de iniciar sesión", async (role, href, label) => {
-  readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
-  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
-  render(await HomePage());
-  const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
-  expect(within(navigation).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
-  expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+it("hides the navbar at the top and reveals it after page scrolling", () => {
+  vi.stubGlobal("scrollY", 0);
+  render(<HomePage />);
+  const navbar = screen.getByRole("banner", { hidden: true });
+  expect(navbar.getAttribute("aria-hidden")).toBe("true");
+  act(() => {
+    vi.stubGlobal("scrollY", 1);
+    window.dispatchEvent(new Event("scroll"));
+  });
+  expect(navbar.getAttribute("aria-hidden")).toBe("false");
+  act(() => {
+    vi.stubGlobal("scrollY", 0);
+    window.dispatchEvent(new Event("scroll"));
+  });
+  expect(navbar.getAttribute("aria-hidden")).toBe("true");
 });
 
-function expectPreviewRequest() {
-  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith({ page: 1, pageSize: 3 });
-}
+it("keeps an empty information section after the opening viewport", () => {
+  render(<HomePage />);
+  const information = screen.getByRole("region", { name: "Información del portal" });
+  expect(information.textContent).toBe("");
+  expect(information.childElementCount).toBe(0);
+  expect(screen.getByRole("main").lastElementChild).toBe(information);
+});
 
-it("permite saltar la navegación hacia un main enfocable con el registro como primer enlace", async () => {
-  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
-  const { container } = render(await HomePage());
+it("links the floating offers action to the lower information viewport", () => {
+  render(<HomePage />);
+  const action = screen.getByRole("link", { name: "Ver ofertas disponibles" });
+  const target = screen.getByRole("region", { name: "Información del portal" });
+  expect(action.getAttribute("href")).toBe(`#${target.id}`);
+  expect(target.id).toBe("ofertas-disponibles");
+  expect(target.getAttribute("tabindex")).toBe("-1");
+});
 
+it("replaces the photo slideshow with a decorative ribbons canvas", () => {
+  const { container } = render(<HomePage />);
+  expect(container.querySelectorAll("[data-hero-slide]")).toHaveLength(0);
+  const canvas = container.querySelector("canvas[data-ribbons]");
+  expect(canvas).toBeTruthy();
+  expect(canvas?.getAttribute("aria-hidden")).toBe("true");
+  expect(screen.queryByRole("button", { name: /Pausar imágenes|Reanudar imágenes/ })).toBeNull();
+});
+
+it("restores the municipal introduction and complete intermediary information", () => {
+  render(<HomePage />);
+  expect(screen.queryByText("Tu próximo trabajo empieza acá.")).toBeNull();
+  expect(screen.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
+  for (const text of [
+    "Oficina de Empleo", "Municipalidad de Funes",
+    "Ingresá para continuar con tu perfil y gestionar tus oportunidades desde un mismo lugar.",
+    "Postulantes", "Completá tu perfil y postulate a ofertas vigentes.",
+    "Empresas", "Gestioná tus ofertas y los perfiles derivados por la Oficina.",
+    "La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.",
+  ]) expect(screen.getByText(text)).toBeTruthy();
+});
+
+it("uses the supplied vector logo and marks the homepage navbar variant", () => {
+  render(<HomePage />);
+  const navbar = screen.getByRole("banner", { hidden: true });
+  expect(navbar.getAttribute("data-home")).toBe("true");
+  expect(navbar.querySelector("img")?.getAttribute("src")).toBe("/brand/funes-navbar-emblem.svg");
+  const navigation = screen.getByRole("navigation", { hidden: true });
+  const links = Array.from(navigation.querySelectorAll("a"));
+  expect(links.find(link => link.textContent === "Inicio")?.getAttribute("href")).toBe("#contenido");
+  expect(links.find(link => link.textContent === "Ofertas")?.getAttribute("href")).toBe("/ofertas");
+});
+
+it("preserves account navbar navigation back to the homepage", () => {
+  render(<HomeNavbar alwaysVisible />);
+  expect(screen.getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
+  expect(screen.getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/ofertas");
+});
+
+it("preserves a unique focusable skip-link target on the redesigned home", () => {
+  const { container } = render(<HomePage />);
   const main = screen.getByRole("main");
-  const header = screen.getByRole("banner");
   expect(main.id).toBe("contenido");
-  expect(main.contains(header)).toBe(false);
   expect(main.getAttribute("tabindex")).toBe("-1");
-  expect(header.parentElement).toBe(main.parentElement);
-  expect(screen.getByRole("contentinfo").parentElement).toBe(main.parentElement);
-  expect(within(main).getAllByRole("link")[0]?.getAttribute("href")).toBe("/registro/candidato");
   expect(container.querySelectorAll("#contenido")).toHaveLength(1);
 });
 
-it("mantiene objetivos táctiles locales de 44px en los accesos del header", async () => {
-  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
-  render(await HomePage());
-
-  const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
-  for (const name of ["Ofertas", "Iniciar sesión"]) {
-    const link = within(navigation).getByRole("link", { name });
-    expect(link.classList.contains("min-h-11")).toBe(true);
-    expect(link.classList.contains("inline-flex")).toBe(true);
-    expect(link.classList.contains("items-center")).toBe(true);
-  }
-});
-
-it("muestra tres ofertas públicas con títulos y enlaces sin campos privados", async () => {
-  listPublicOffers.mockResolvedValue({ total: 10, page: 1, pageSize: 3, items: offers });
-
-  const { container } = render(await HomePage());
-
-  expectPreviewRequest();
-  expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
-    "Un puente claro entre personas que buscan trabajo y empresas de Funes.",
-  );
-  expect(screen.getByRole("heading", { name: "Intermediación municipal protegida", level: 2 })).toBeTruthy();
-  expect(screen.getAllByText(/datos ficticios/).length).toBeGreaterThan(0);
-  expect(screen.getByText(/Las empresas no ven el padrón completo/)).toBeTruthy();
-  const preview = screen.getByRole("region", { name: "Búsquedas aprobadas por la Oficina de Empleo" });
-  expect(within(preview).getAllByRole("listitem")).toHaveLength(3);
-  for (const offer of offers) {
-    expect(within(preview).getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.id}`);
-    expect(within(preview).getByText(offer.company_name)).toBeTruthy();
-  }
-  expect(within(preview).getAllByText("Funes · Presencial")).toHaveLength(3);
-  const dates = preview.querySelectorAll("time");
-  expect(dates).toHaveLength(3);
-  for (const date of dates) {
-    expect(date.textContent).toBe("31/12/2099");
-    expect(date.getAttribute("datetime")).toBe("2099-12-31");
-  }
-  expect(within(preview).getByRole("link", { name: "Ver todas" }).getAttribute("href")).toBe("/ofertas");
-  expect(container.textContent).not.toMatch(/CUIT|DNI|responsable|contactos privados|notas internas|resultados individuales/i);
-  expect(container.querySelector('a[href^="mailto:"], a[href^="tel:"]')).toBeNull();
-  expect(screen.queryByText("No hay ofertas vigentes para mostrar.")).toBeNull();
-  expect(screen.queryByText("No pudimos cargar las ofertas en este momento.")).toBeNull();
-});
-
-it("muestra un estado vacío sin simular ofertas", async () => {
-  listPublicOffers.mockResolvedValue({ total: 0, page: 1, pageSize: 3, items: [] });
-
-  render(await HomePage());
-
-  expectPreviewRequest();
-  const preview = screen.getByRole("region", { name: "Búsquedas aprobadas por la Oficina de Empleo" });
-  expect(within(preview).getByText("No hay ofertas vigentes para mostrar.")).toBeTruthy();
-  expect(within(preview).queryByRole("list")).toBeNull();
-  expect(screen.queryByText("No pudimos cargar las ofertas en este momento.")).toBeNull();
-});
-
-it("ante un rechazo muestra un mensaje seguro y mantiene registro e ingreso", async () => {
-  const rawError = "Detalle interno ficticio: published_offers falló en la conexión de prueba";
-  listPublicOffers.mockRejectedValue(new Error(rawError));
-
-  const { container } = render(await HomePage());
-
-  expectPreviewRequest();
-  expect(screen.getByText("No pudimos cargar las ofertas en este momento.")).toBeTruthy();
-  expect(screen.getByText("Podés entrar al listado completo o volver a intentarlo más tarde.")).toBeTruthy();
-  expect(screen.queryByText("No hay ofertas vigentes para mostrar.")).toBeNull();
-  expect(container.textContent).not.toContain(rawError);
-  expect(container.textContent).not.toMatch(/published_offers|Error:|stack/i);
-  expect(screen.getByRole("link", { name: "Registrarme como postulante" }).getAttribute("href")).toBe("/registro/candidato");
-  for (const link of screen.getAllByRole("link", { name: "Registrar empresa" })) {
-    expect(link.getAttribute("href")).toBe("/registro/empresa");
-  }
-  expect(screen.getByRole("link", { name: "Iniciar sesión" }).getAttribute("href")).toBe("/login");
-  const preview = screen.getByRole("region", { name: "Búsquedas aprobadas por la Oficina de Empleo" });
-  expect(within(preview).queryByRole("list")).toBeNull();
-  expect(within(preview).getByRole("link", { name: "Ver todas" }).getAttribute("href")).toBe("/ofertas");
+it("replaces the previous offer preview and navigation with the access panel", () => {
+  render(<HomePage />);
+  expect(screen.getByRole("region", { name: "Acceso al portal" })).toBeTruthy();
+  const navbar = screen.getByRole("navigation", { hidden: true });
+  expect(navbar.querySelector("a")?.getAttribute("href")).toBe("https://funes.gob.ar/");
+  expect(navbar.querySelector("img")?.getAttribute("alt")).toBe("Municipalidad de Funes");
+  expect(screen.getByRole("banner", { hidden: true }).contains(navbar)).toBe(true);
+  expect(screen.getByRole("main").contains(navbar)).toBe(false);
+  expect(screen.queryByRole("contentinfo")).toBeNull();
+  expect(screen.queryByRole("region", { name: "Búsquedas aprobadas por la Oficina de Empleo" })).toBeNull();
+  expect(listPublicOffers).not.toHaveBeenCalled();
 });

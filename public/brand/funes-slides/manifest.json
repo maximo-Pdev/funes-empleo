@@ -1,0 +1,110 @@
+{
+  "source": "https://funes.gob.ar/",
+  "rights": "Public availability does not establish reuse permission.",
+  "images": [
+    {
+      "file": "01-tgi-ordenamiento-de-pagos.webp",
+      "source_file": "01-tgi-ordenamiento-de-pagos.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202211081306450.whatsapp_image_2022-11-08_at_12.46.42_pm.jpeg",
+      "article_url": "https://funes.gob.ar/noticia/_programa_de_ordenamiento_de_cobro_de_tasa_general_de_inmuebles__tgi_",
+      "source_sha256": "5769a95aa028c6792a278df271a2444e72cffc2118c9beeb79905ef18298c9d1",
+      "sha256": "d4cb352dfdadffd3e98f2a37ae4aeead709e7ae41c73ed3791d6854638258968",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 36134
+    },
+    {
+      "file": "02-tgi-opciones-de-pago-online.webp",
+      "source_file": "02-tgi-opciones-de-pago-online.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202312061217030.whatsapp_image_2023-12-06_at_11.52.16.jpeg",
+      "article_url": "https://funes.gob.ar/noticia/tgi__opciones_de_pago_online",
+      "source_sha256": "73450e61c56aeebf984c24d15f518e096973b67679963c39ccd2792c1d8a7ddf",
+      "sha256": "de7f3263af6eed55fdd370d4246177d7c6dec31979cb2c2dd4c01845268d34c3",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 47376
+    },
+    {
+      "file": "03-operativo-contra-el-dengue.webp",
+      "source_file": "03-operativo-contra-el-dengue.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202005130940550.006medioambiente.jpg",
+      "article_url": "https://funes.gob.ar/noticia/contundente_operativo_contra_el_dengue",
+      "source_sha256": "957687ce95bee5f43574568d519c44ebce672c27a1f4bd6bbe384379034eec06",
+      "sha256": "12f467eaceb67e14ff388b49d8651d6819db1f1f36d759bf2752366f79c7f42a",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 69674
+    },
+    {
+      "file": "04-pavimentacion-calle-galindo.webp",
+      "source_file": "04-pavimentacion-calle-galindo.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202109201212140.whatsapp_image_2021-09-10_at_12.00.46_-1-.jpeg",
+      "article_url": "https://funes.gob.ar/noticia/pavimentacion_calle_galindo",
+      "source_sha256": "a5cbe37706330847db9aee193630d8b5d793ffa770b21029ef41d32764117b9a",
+      "sha256": "96d7b4e08f02387c431261b02397bbda24d9d3384c7c55b34a011b66bc57105f",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 62018
+    },
+    {
+      "file": "05-mural-paseo-de-la-estacion.webp",
+      "source_file": "05-mural-paseo-de-la-estacion.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202008311048120.118707047_1830173517121701_4790965212262721077_n.jpg",
+      "article_url": "https://funes.gob.ar/noticia/arte_y_colores_en_el_paseo_de_la_estacion",
+      "source_sha256": "aa583e46ae2df5bbf25c6a5a9445b56ec392b7dbbc1aacc2881d1fd07a35e75f",
+      "sha256": "a6012cb699db945ef94a7b8833ce58abdde34dedb1a15a1f16d567b8c1f5b7b6",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 26532
+    },
+    {
+      "file": "06-refacciones-polideportivo.webp",
+      "source_file": "06-refacciones-polideportivo.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202204261533160.278862145_310832207837133_7065893214439909319_n.jpg",
+      "article_url": "https://funes.gob.ar/noticia/refacciones_en_el_polideportivo_municipal",
+      "source_sha256": "bcc39970ae8ce1ad58c5c6f24d50d97a7b7f503099ae11bc95e4909ec0474b8b",
+      "sha256": "2e00d267c104ad89db22e140e858f56c9259b397deb6663a1caafd148a42730c",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 120752
+    },
+    {
+      "file": "07-visita-municipal-ciclo-lectivo.webp",
+      "source_file": "07-visita-municipal-ciclo-lectivo.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202301171119370.whatsapp_image_2023-01-17_at_10.42.58.jpeg",
+      "article_url": "https://funes.gob.ar/noticia/_personal_municipal_visita_las_viviendas_de_aquellos_que_no_estan_inscriptos_para_comenzar_el_ciclo_lectivo_2023",
+      "source_sha256": "da71ad4345472827e74b632738bcc6a0ea30d41a5d80d9d27859c53939fbaed9",
+      "sha256": "82229d2dea7057d66065bbd9a2b373d6af7c0790130a8523fabdaf25e90fe39f",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 36222
+    },
+    {
+      "file": "08-forestacion-plaza-unanue.webp",
+      "source_file": "08-forestacion-plaza-unanue.jpg",
+      "source_url": "https://funes.gob.ar/views/assets/images/noticias/202209260941390.whatsapp_image_2022-09-26_at_9.36.15_am.jpeg",
+      "article_url": "https://funes.gob.ar/noticia/_plaza_unanue__semana_de_la_conciencia_ambiental",
+      "source_sha256": "ee09b4cab2d339c8fab2431b06be6b203da60c4addd2370c52a25c84aaff2fca",
+      "sha256": "3ed905648ef938b248167a10a827cbac540e2088eeca4dc21ea27243ea70b503",
+      "dimensions": [
+        1200,
+        675
+      ],
+      "bytes": 116856
+    }
+  ]
+}
