@@ -778,3 +778,49 @@ diff-check PASS; base local preservada sin reset, sin repetir SQL alojado ni
 migraciones. next-env.d.ts conserva su cambio local fuera del commit. Nueva
 ejecución completa CI en el mismo PR y revisión humana pendientes; no se relajan
 gates ni se declara resuelto el backlog del producto.
+
+## Retiro de autoarchivo en perfiles — EXTRA039, 2026-10-22
+
+Mateo solicita quitar archivar/eliminar cuenta en candidatos y empresas. Se
+confirma PR63 mergeado (a75bfc8) y Quality122 PASS con98 E2E; main actualizado,
+anterior rama borrada local/remoto y nueva codex/feat-remove-profile-self-archival.
+Se conserva el cambio local next-env.d.ts sin incluirlo en el cambio funcional.
+
+Desaparecen tarjetas de ambos perfiles y Mi cuenta y se retiran Actions, estado,
+props y validador exclusivos. Servicio común exige admin antes de RPC. Migración
+20261022202940 reemplaza solo wrapper público con sesión/cuenta activa/admin,
+manteniendo firma/grants y comando privado serializado/auditado. Aplicada solo
+localmente, sin modificar SQL anterior o datos alojados. El archivo empresarial
+administrativo y restauración siguen; no se agrega archivo administrativo
+candidato, antes rechazado por el privado. Se preparan archivos candidatos
+legados solo como fixtures de DB propietaria para probar restauración histórica.
+
+No cambia edición, activación, disponibilidad, consentimiento, participaciones,
+contraseña/logout ni archivo/cancelación de ofertas propias. No borra eventos,
+perfiles, cuentas o registros archivados, ni inventa otra política/canal legal.
+
+| Verificación local | Resultado |
+| --- | --- |
+| Regresiones RED | UI/servidor7/33 fallan contra flujo previo; SQL10/12 fallan al permitir autoarchivo. |
+| Unitarias/componentes/integración y cobertura | 730/53 PASS; elimina solo casos de Actions retiradas y agrega guardias por rol. Cobertura configurada limitada a env/schema. |
+| SQL completo aislado | 18 archivos/1072 PASS; incluye14 nuevos de rechazo/snapshot y no ampliación del archivo candidato. |
+| Navegador/HTTP | 12/12 PASS: HTTP real8, registro/perfil/postulaciones/archivo legado/restauración candidata y gestión empresarial3. |
+| Tipos/lint/tooling/build | PASS, tooling57/57. |
+| Seguridad e integridad | Advisor local aislado sin warn/error y diff-check PASS; grants/rol/versión/auditoría/rollback conservados. |
+
+Prerrequisitos locales encontrados y documentados: títulos duplicados de ofertas
+ficticias previas, selección exacta sin reset; entrada del textarea con foco y
+selección por teclado para sustituir el valor tras navegar. Inventario Form38
+tras retirar tres usos, manteniendo escaneo estricto de campos/componentes.
+React sin hooks condicionales ni estado/props nuevos; mantiene validación/foco y
+las comprobaciones axe de los recorridos existentes.
+
+Análisis/convergencia acotados T140–143: alcance/contratos y comportamiento
+coherentes, sin nueva arquitectura/permiso candidato o gaps construibles en el
+incremento. No acredita revisión independiente, suite E2E completa, CI nuevo,
+NVDA, aceptación ni cierre de gates históricos. Instancia SQL efímera y servidor
+propio cerrados; base original preservada sin reset, fixtures nuevos ficticios.
+Commit70ae1ea publicado en PR64 (abierto, sin merge):
+https://github.com/maximo-Pdev/funes-empleo/pull/64.
+CI y revisión pendientes. Pendiente aplicar20261022202940 en Supabase compartido antes
+de desplegar app; guía docs/validation/profile-self-archival.md. OQ-001/002 abiertos.

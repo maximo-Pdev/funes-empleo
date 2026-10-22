@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { join } from "node:path";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
+import { runLocalMaintenanceSql } from "./local-maintenance";
 
 // One-time local verification links must stay out of traces and screenshots.
 test.use({ trace: "off", screenshot: "off" });
@@ -105,10 +106,11 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", originalCv!);
 
   await page.goto("/candidato/ofertas");
-  const titles = await page.locator("li a[href^='/ofertas/']").allTextContents();
+  const availableTitles = (await page.locator("li a[href^='/ofertas/']").allTextContents()).map(title => title.trim());
+  const titles = availableTitles.filter(title => availableTitles.filter(other => other === title).length === 1);
   expect(titles.length).toBeGreaterThanOrEqual(2);
   for (const title of titles.slice(0, 2)) {
-    const card = page.locator("li").filter({ hasText: title });
+    const card = page.locator("li").filter({ has: page.getByText(title, { exact: true }) });
     await card.getByRole("button", { name: "Postularme" }).click();
     await expect(card.getByRole("button", { name: "Participación registrada" })).toBeDisabled();
   }
@@ -124,7 +126,9 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.locator("li").filter({ hasText: titles[1] })).toContainText("Recibida por la Oficina");
 
   await page.goto("/candidato/perfil");
-  await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia corregida directamente");
+  await page.getByLabel("Habilidades y experiencia").click();
+  await page.getByLabel("Habilidades y experiencia").press("ControlOrMeta+A");
+  await page.keyboard.insertText("Experiencia ficticia corregida directamente");
   await expect(page.getByLabel("Habilidades y experiencia")).toHaveValue("Experiencia ficticia corregida directamente");
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
   await expect(page.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
@@ -158,8 +162,20 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await signIn(page, email, password);
     await page.goto("/candidato/perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("No disponible");
-    await page.getByLabel("Confirmo que quiero archivar mi cuenta y perfil.").check();
-    await page.getByRole("button", { name: "Archivar ahora" }).click();
+    await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
+    await page.goto("/account");
+    await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
+    const profileId = new URL(admin.url()).pathname.split("/").at(-1)!;
+    expect(profileId).toMatch(/^[0-9a-f-]{36}$/);
+    runLocalMaintenanceSql(`begin;
+      select set_config('request.jwt.claim.sub',account.auth_user_id::text,true),
+        set_config('request.jwt.claims',jsonb_build_object('sub',account.auth_user_id,'session_id',
+          (select id from auth.sessions where user_id=account.auth_user_id order by created_at desc limit 1))::text,true)
+      from public.candidate_profiles profile join public.accounts account on account.id=profile.account_id where profile.id='${profileId}';
+      select private.change_account_status(profile.account_id,account.version,'archive',null,true)
+      from public.candidate_profiles profile join public.accounts account on account.id=profile.account_id where profile.id='${profileId}';
+      commit;`);
+    await page.goto("/candidato/perfil");
     await expect(page).toHaveURL(/\/session-expired$/);
     await admin.reload();
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Restauración ficticia E2E");

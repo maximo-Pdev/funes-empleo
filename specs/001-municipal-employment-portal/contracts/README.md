@@ -54,6 +54,13 @@ y misma autorización. El aviso de éxito espera la versión actualizada del per
 
 ## Convenciones compartidas
 
+EXTRA039 (2026-10-22): change_account_status conserva firma/grants pero exige
+administrador activo también para archive. Sin autoarchivo de candidatos/empresas,
+ni en perfiles ni en /account. Las Actions exclusivas de ese flujo se eliminan.
+Los comandos administrativos existentes, su motivo/confirmación, historia y
+restauración segura permanecen: archivo empresarial y restauración candidata
+histórica, sin añadir archivo administrativo candidato. Ningún dato se borra o reactiva.
+
 EXTRA035 (2026-10-21): nuevas confirmaciones `hire`/`late_hire` en
 `transition_participation` retiran el consentimiento global y revocan todos los
 permisos del candidato en la misma transacción. Otros casos conservan estados,

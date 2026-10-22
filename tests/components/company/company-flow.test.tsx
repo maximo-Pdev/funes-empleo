@@ -4,7 +4,7 @@ import { companyRegistrationSchema, companyProfileSchema } from "@/validation/co
 import { openingDraftSchema } from "@/validation/opening";
 
 vi.mock("@/features/companies/company-actions", () => ({
-  registerCompanyAction: vi.fn(), saveCompanyProfileAction: vi.fn(), archiveCompanyAction: vi.fn(),
+  registerCompanyAction: vi.fn(), saveCompanyProfileAction: vi.fn(),
 }));
 vi.mock("@/features/companies/admin-actions", () => ({ adminCompanyAction: vi.fn() }));
 vi.mock("@/features/openings/company-actions", () => ({
@@ -45,13 +45,14 @@ describe("autogestión de empresa", () => {
     expect(screen.queryByRole("button", { name: /Publicar directamente/i })).toBeNull();
   });
 
-  it("muestra estado, archivo explícito y restauración segura", () => {
+  it("muestra estado y guardado sin autoarchivo", () => {
     render(<CompanyProfileForm profile={{ id: categoryA, legalName: "Empresa ficticia", cuit: "30999999997",
       responsibleName: "Responsable ficticio", email: "empresa@example.invalid", phone: null,
-      activity: "Servicios", locality: "Funes", status: "incomplete", version: 2 }} accountVersion={3} />);
+      activity: "Servicios", locality: "Funes", status: "incomplete", version: 2 }} />);
     expect(screen.getByText(/incompleto/i)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Archivar empresa" })).toBeTruthy();
-    expect(screen.getByLabelText(/Confirmo el archivo/i)).toHaveProperty("required", true);
+    expect(screen.getByRole("button", { name: "Guardar perfil" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /archivar|eliminar/i })).toBeNull();
+    expect(screen.queryByLabelText(/Confirmo el archivo/i)).toBeNull();
   });
 
   it("expone solo mensajes públicos de moderación y explica el cierre por fecha", () => {

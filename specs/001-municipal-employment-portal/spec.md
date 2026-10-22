@@ -112,6 +112,18 @@ autenticación, sesiones ni recuperación.
 
 ## Clarifications
 
+### Session 2026-10-22 — sin autoarchivo de perfiles (EXTRA039)
+
+Mateo solicita quitar archivar/eliminar cuenta en candidatos y empresas. Se
+retira del autoservicio (perfiles y Mi cuenta) y se rechaza también en servidor/
+DB. Administración conserva archivo empresarial y restauración de registros
+históricos con motivo/confirmación; no se añade archivo administrativo candidato.
+No afecta archivo de ofertas propias, edición, disponibilidad, consentimiento,
+postulaciones ni cierre de sesión. No borra datos ni modifica registros archivados.
+Esta decisión sustituye las aclaraciones históricas de autoarchivo y las partes
+correspondientes de FR-016/054; no resuelve políticas legales OQ-001/002 ni añade
+un flujo alternativo de solicitudes de eliminación.
+
 ### Session 2026-10-21 — contratación y consentimiento (EXTRA035)
 
 - Q: ¿El retiro automático por contratación afecta solo una derivación o el consentimiento global? → A: Mateo confirma el global y todos sus accesos empresariales, descartando la alternativa de solo matching. La transacción administrativa normal o tardía registra el retiro append-only con actor/fecha/causa, revoca todos los permisos activos y conserva los estados y resultados de las demás participaciones. El retiro manual sigue cerrando casos abiertos. No hay aceptación automática por corregir resultados; cualquier aceptación posterior exige el flujo afirmativo vigente y no revive permisos. Aplica a nuevas confirmaciones tras migración, sin backfill de contrataciones previas.
@@ -386,9 +398,9 @@ seleccionando varias categorías, cargando un CV válido y postulándose a dos o
 5. **Given** una participación en curso, **When** el candidato consulta su estado, **Then** ve la
    recepción y, cuando exista, el resultado final, pero no las etapas de evaluación ni las notas
    internas.
-6. **Given** un candidato autenticado, **When** corrige sus datos propios o solicita la eliminación
-   de su perfil, **Then** la corrección se aplica directamente o el perfil se archiva de inmediato,
-   respectivamente, sin borrar su historial de manera permanente.
+6. **Given** un candidato autenticado, **When** corrige sus datos propios, **Then** la corrección
+   se aplica directamente; no se ofrece ni permite archivar/eliminar su cuenta por autoservicio.
+   La restauración administrativa de registros históricos conserva el historial.
 7. **Given** una participación todavía abierta creada por postulación o nominación administrativa,
    **When** el candidato la retira directamente o pide al personal registrar su retiro, **Then**
    queda `withdrawn`, se revoca el acceso empresarial de esa derivación y se conserva su historia.
@@ -406,7 +418,7 @@ preservar la confianza, la privacidad y el rol municipal.
 
 **Independent Test**: Puede probarse registrando una empresa ficticia, creando un borrador,
 enviándolo a revisión, respondiendo a una solicitud de cambios, consultando solo una derivación
-autorizada y recorriendo el archivo propio o administrativo más la restauración administrativa sin
+autorizada y recorriendo el archivo exclusivamente administrativo más la restauración administrativa sin
 reactivar ofertas, participaciones ni accesos relacionados.
 
 **Acceptance Scenarios**:
@@ -562,10 +574,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   perfil, contactos y CV. Sus participaciones todavía abiertas se cierran como `withdrawn` en la
   misma operación, con motivo `consent_withdrawn`; las ya finalizadas conservan su resultado e
   historial. Ni participaciones ni accesos se reabren automáticamente al aceptar de nuevo.
-- Un candidato solicita eliminar sus datos; el perfil se archiva o desactiva inmediatamente sin
-  revisión administrativa, deja de participar en nuevas búsquedas, postulaciones y derivaciones, y
-  conserva de forma recuperable el historial sujeto a la política de retención pendiente.
-- Una empresa archiva su propia cuenta/perfil, o un administrador los archiva con motivo; la
+- Un candidato o empresa intenta archivar/eliminar su cuenta por un formulario antiguo o un RPC
+  directo; se rechaza sin cambiar datos, sesiones, accesos o historial. Solo un administrador
+  activo puede archivar una empresa de forma recuperable con motivo y confirmación;
+  no se agrega un comando administrativo nuevo para archivar candidatos.
+- Un administrador archiva cuenta/perfil empresarial con motivo; la
   operación bloquea inmediatamente el acceso empresarial, marca sus ofertas no finales como
   archivadas de forma recuperable y revoca sus permisos de derivación, sin borrar ni convertir casos
   existentes en resultados finales. Solo un administrador puede restaurar esos registros.
@@ -680,10 +693,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   perfiles sin confirmar o actualizar durante seis meses DEBEN marcarse para actualización y quedar
   fuera de los resultados activos predeterminados sin ser eliminados.
 - **FR-016**: El sistema DEBE permitir que un candidato retire una postulación activa, desactive su
-  disponibilidad y corrija directamente sus propios datos. Cuando solicite la eliminación, el
-  sistema DEBE archivar o desactivar su perfil de inmediato y sin revisión administrativa, impedir
-  nuevas búsquedas, postulaciones y derivaciones, y conservar el historial de forma recuperable
-  mientras no exista una política de retención aprobada. Si la postulación retirada ya tenía una
+  disponibilidad y corrija directamente sus propios datos. No DEBE ofrecer ni permitir el
+  autoarchivo/eliminación de cuenta o perfil. Los registros ya archivados conservan el historial
+  de forma recuperable mientras no exista una política de retención aprobada. Si la postulación retirada ya tenía una
   derivación, el sistema DEBE revocar inmediatamente el acceso empresarial al perfil, los contactos
   y el CV, conservar el historial administrativo y NO DEBE restaurar ese acceso automáticamente.
 - **FR-017 (Should)**: El sistema DEBERÍA permitir vincular un perfil asistido con la cuenta personal
@@ -856,10 +868,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   corrección o rechazo, pero no las notas ni razones internas de moderación o suspensión.
 - **FR-054**: Los registros de negocio DEBEN archivarse o desactivarse de forma recuperable y NO
   DEBEN eliminarse permanentemente de manera automática mientras la Municipalidad no apruebe una
-  política de retención. La solicitud de eliminación de un candidato DEBE archivar o desactivar su
-  perfil inmediatamente, sin revisión administrativa, y conservar el historial relacionado. Una
-  empresa autenticada DEBE poder archivar su propia cuenta y perfil; un administrador también DEBE
-  poder archivarlos, registrando el motivo. En ambos casos se DEBEN marcar sus ofertas no finales
+  política de retención. Candidatos y empresas NO DEBEN archivar/eliminar sus propias cuentas
+  o perfiles por autoservicio. Se conserva el archivo empresarial exclusivo de
+  administrador activo, con motivo y confirmación, sin añadir archivo administrativo candidato.
+  El archivo empresarial DEBE marcar sus ofertas no finales
   como archivadas de forma recuperable, sin crear un estado alternativo de desactivación, bloquear el
   acceso empresarial y revocar los permisos de derivación, sin borrar historial ni alterar
   resultados finales. Solo un administrador DEBE poder restaurar un registro

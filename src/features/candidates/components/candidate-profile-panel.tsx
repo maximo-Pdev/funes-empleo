@@ -3,7 +3,7 @@ import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { activateProfileAction, archiveProfileAction, savePhoneAction, saveProfileAction } from "../profile-actions";
+import { activateProfileAction, savePhoneAction, saveProfileAction } from "../profile-actions";
 import { changeConsentAction } from "../consent-actions";
 import { candidateProfileStatusLabels } from "../candidate-profile-status";
 import { CvUploadForm } from "./cv-upload-form";
@@ -21,19 +21,18 @@ function ActionMessage({ state }: { state: State }) {
 }
 
 export function CandidateProfilePanel({ profile, dni, address, phone, categories, selectedCategories,
-  consent, cv, policy, accountVersion, cvMessage }: {
+  consent, cv, policy, cvMessage }: {
   profile: Profile; dni: string; address: string | null; phone: string | null;
   categories: Category[]; selectedCategories: string[];
   consent: { status: string; policy_version: string; recorded_at: string } | null;
   cv: { id: string; original_name_safe: string; byte_size: number } | null;
-  policy: Policy; accountVersion: number; cvMessage?: string;
+  policy: Policy; cvMessage?: string;
 }) {
   const router = useRouter();
   const [saved, saveAction, saving] = useActionState(saveProfileAction, { message: "", success: false });
   const [contact, phoneAction, savingPhone] = useActionState(savePhoneAction, { message: "", success: false });
   const [activation, activateAction, activating] = useActionState(activateProfileAction, { message: "", success: false });
   const [consentState, consentAction, changingConsent] = useActionState(changeConsentAction, { message: "", success: false });
-  const [archive, archiveAction, archiving] = useActionState(archiveProfileAction, { message: "", success: false });
   useEffect(() => { if (saved.success || contact.success || activation.success || consentState.success) router.refresh(); },
     [saved.success, contact.success, activation.success, consentState.success, router]);
   const field = "w-full rounded border border-slate-500 bg-white p-2";
@@ -77,12 +76,5 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />
       <button disabled={activating} className="rounded bg-green-800 p-3 text-white">Activar perfil</button>
     </Form>}
-    <Form action={archiveAction} result={archive} className="grid gap-3 rounded border border-red-500 bg-red-50 p-5" aria-busy={archiving}>
-      <h2 className="text-xl font-semibold text-red-900">Solicitar eliminación y archivar</h2>
-      <p>El archivo es inmediato y bloquea tu acceso. La Oficina conserva el historial mientras se define la política de retención. Solo administración puede restaurar el perfil a borrador.</p>
-      <input type="hidden" name="version" value={accountVersion} />
-      <Field className="flex gap-2"><input type="checkbox" name="confirmed" required />Confirmo que quiero archivar mi cuenta y perfil.</Field>
-      <ActionMessage state={archive} /><button disabled={archiving} className="rounded bg-red-800 p-3 text-white">Archivar ahora</button>
-    </Form>
   </div>;
 }

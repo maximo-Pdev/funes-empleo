@@ -1,9 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { publicErrorFrom } from "@/lib/errors/public-error";
-import { changeAccountStatus } from "@/features/accounts/service";
-import { companySession, registerCompany, saveCompanyProfile } from "./service";
+import { registerCompany, saveCompanyProfile } from "./service";
 import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/validation/password";
 
 export type CompanyActionState = { message: string; success: boolean };
@@ -30,15 +28,4 @@ export async function saveCompanyProfileAction(_previous: CompanyActionState, fo
     revalidatePath("/empresa"); revalidatePath("/empresa/perfil");
     return { message: "Perfil actualizado. Ya podés preparar ofertas para revisión municipal.", success: true };
   } catch (error) { return failed(error); }
-}
-
-export async function archiveCompanyAction(_previous: CompanyActionState, form: FormData): Promise<CompanyActionState> {
-  try {
-    const session = await companySession();
-    const result = await changeAccountStatus({ accountId: session.account.id, version: form.get("accountVersion"),
-      command: "archive", reason: "", confirmed: form.get("confirmed") === "on" });
-    if (result.code !== "OK") return { message: result.code === "CONFLICT_STALE_DATA" ?
-      "Los datos cambiaron. Recargá antes de intentar de nuevo." : "No se pudo archivar. Revisá la confirmación.", success: false };
-  } catch (error) { return failed(error); }
-  redirect("/session-expired");
 }
