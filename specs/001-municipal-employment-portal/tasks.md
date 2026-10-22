@@ -556,3 +556,18 @@ CI, revisión o aceptación. Guía: docs/product/auth-frontend.md.
 - [x] T132 EXTRA033: adaptar login al esquema de Mateo: información a la izquierda y registro sobre ingreso a la derecha; último refinamiento: centrar el conjunto y usar altura de contenido, sin expandir tarjetas al viewport. Sustituye disposición T130/T131, no Auth.735 tests/51 archivos, tipos/lint/build y navegador11/11 PASS: alineación/centrado/altura estable/encaje1080/960, móvil/reflow/escritorio bajo, errores/retención/teclado/axe/enlaces y registros. Límites en EXTRA033; sin acreditar revisión/CI/aceptación.
 
 - [ ] T133 EXTRA034: corregir E2E de retiro del PR62 para exigir error por campo, foco, motivo retenido y estado sin retirar; agregar regresión de bloqueo sin evidencia y envío con contacto entrante. Sin cambios funcionales. Verificar tests/tipos/lint y CI completo en el mismo PR, sin reset local.
+
+## Contratación y consentimiento — solicitud 2026-10-21
+
+- [x] T134 EXTRA035/OQ-020: Mateo confirma primera opción original (global), descarta alternativa de solo matching. Spec/plan/modelo/contratos y checklist acotados alineados; análisis previo sin bloqueos de alcance, resultados en EXTRA035. Regla nueva sustituye ventana720h solo en nuevas contrataciones; excepción al retiro manual que cierra casos.
+- [x] T135 RED SQL: contratación normal/tardía, revocación multiderivación, historia/actor/causa, otros casos/finales intactos, rechazo por rol/versión/evidencia y rollback de auditoría. RED22/37; final55/55 PASS en024.
+- [x] T136 Migración forward-only: source hiring_workflow restringido, bloqueo candidato primero y retiro/revocación dentro del RPC existente; grants y firmas intactos, sin backfill ni cambios de retiro manual.20261021220623 y EXTRA036/20261021221414 aplicadas/verificadas solo localmente.
+- [x] T137 Servidor y regresiones: cubrir ambos comandos en servicios/acciones, invalidación de vistas afectadas tras éxito; actualizar expectativas E2E/SQL solo donde cambia la regla, conservando cobertura de permisos históricos. Cinco tests nuevos de servicio y dos E2E propios; suite SQL histórica intacta.
+- [x] T138 Verificar SQL/rollback/concurrencia, unitarios/servidor/E2E pertinentes, tipos/lint/build; sin reset local ni servicios alojados. Documentar despliegue y recuperación sin reaceptación de consentimiento ni restauración de permisos. SQL1062/17, cobertura741/52, tooling57, E2E13, tipos/lint/build y advisor seguridad PASS; guía docs/validation/hiring-consent.md. CI/revisión humana/rollout y gates históricos pendientes.
+
+Actualización de despliegue2026-10-21, EXTRA037: Mateo solicita aplicar ambas
+migraciones alojadas; aplicadas y verificadas en Funes-empleo con versiones
+originales, sin alterar historia previa ni ejecutar pruebas/datos de negocio.
+El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
+
+- [x] T139 EXTRA038: aislar ofertas ficticias de contratación fuera del listado público y exigir categorías en la selección de fixture de matching. RED0 esperado/2 recibidas y GREEN; E2E6/6, cobertura741/52, tooling57, tipos/lint/build/diff-check PASS. Conserva12 tarjetas/paginación/nominación y contratación normal/tardía; sin reset local ni cambios alojados. Publicación en PR63 con CI completo y revisión como gates pendientes, no aceptación global.

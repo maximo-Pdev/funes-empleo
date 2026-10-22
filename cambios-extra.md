@@ -1595,6 +1595,206 @@ ninguna revisión humana ni aprobación municipal está acreditada por esos chec
 - **Estado:** corrección implementada/verificada localmente; pendiente CI completo
   en el mismo PR62. No reset local, cambios alojados, merge ni aceptación global.
 
+## EXTRA-035 — Contratación y retiro de consentimiento: clarificación previa
+
+- **Fecha/responsable/origen:** 2026-10-21, Mateo solicita retiro automático al
+  confirmar contratación normal/tardía, atomicidad, auditoría y conservación de
+  otras participaciones e historial; exige resolver alcance antes de implementar.
+- **Evidencia:** `spec.md` Clarifications 2026-09-19/20/21, FR-036/037,
+  `data-model.md/candidate_consents`, contratos de estados/autorización: un único
+  consentimiento general; retiro manual cierra casos abiertos; contratación normal
+  conserva acceso hasta720 horas y la tardía no revive permisos revocados.
+  Servidor `adminParticipationAction` -> `confirmReportedOutcome` -> RPC
+  `transition_participation` (`hire`/`late_hire`) confirma ambos resultados en DB.
+  El RPC no retira consentimiento; `change_candidate_consent` sí lo retira pero
+  también cierra otras participaciones, por lo que no se puede reutilizar sin más.
+- **Decisión/autorización:** OQ-020 resuelta por Mateo el2026-10-21: confirma la
+  primera opción original, retiro global y revocación a todas las empresas; descarta
+  su comentario posterior sobre solo matching. Conserva estados de otros casos,
+  como excepción al retiro manual. No se inventa consentimiento por oferta, aprobación
+  municipal, cierre de otros casos ni reversión automática de consentimientos.
+- **Propuesta técnica condicionada:** luego de responder, actualizar spec,
+  plan/modelo/contratos, checklist/tareas y análisis antes del código. Migración
+  forward-only que centralice en la transacción de contratación normal/tardía el
+  evento append-only de retiro, actor/fecha/motivo y revocación aprobada; sin cambios
+  parciales, cierre de otros casos ni reactivación por corrección/reconsentimiento.
+  El alcance individual requiere distinguir revocación de acceso y consentimiento
+  global; no implementar una segunda clase de consentimiento por inferencia.
+- **Archivos/contratos previstos:** funciones SQL de transición/consentimiento y
+  autorización, Server Actions/servicios de resultados si corresponde; tests SQL
+  de flujo/RLS/auditoría/rollback, unitarios/servidor y E2E; Spec Kit y guía de
+  despliegue/recuperación. No editar migraciones ya aplicadas ni usar service-role
+  para operaciones ordinarias. Al registrar esta propuesta aún no se había
+  creado/aplicado una migración; resultados de implementación al final de la entrada.
+- **Riesgos/verificación prevista:** ventana720h y retiro manual global son reglas
+  anteriores a reconciliar expresamente; bloqueo/orden de locks e idempotencia;
+  actor y causa fieles (no fingir acción afirmativa del candidato); historial de
+  consentimiento intacto y permisos jamás resucitados. Contratación normal/tardía,
+  permisos de varias empresas, otros casos/finales inalterados, fallo forzado de
+  auditoría con rollback integral, concurrencia, nueva aceptación explícita,
+  roles negativos, tipos/lint/tests/build y recuperación sin restaurar permisos.
+- **Diseño técnico mínimo autorizado:** reemplazar la función RPC de transición
+  manteniendo firma y grants. Bloquear candidato antes de participación y sus
+  permisos para serializar contratación con aceptación/retiro/derivación; no
+  llamar al retiro manual que cierra otros casos. En `hire`/`late_hire`, agregar
+  evento de retiro solo si el último consentimiento es accepted, copiar política/
+  hash y atribuir al admin confirmante. Fuente nueva `hiring_workflow`, restringida
+  a withdrawn (requisito técnico necesario para no fingir autoservicio/atención
+  presencial); motivo `hired` en auditoría y decisión privada ligada a la
+  participación. Revocar todos sus permisos activos, sin tocar otros casos.
+  Perfil pasa a consent_withdrawn salvo si está archivado; versión se incrementa
+  para impedir envíos obsoletos. No crear ventana720h nueva; conservar soporte
+  para contrataciones históricas sin backfill ni restauración de permisos.
+- **Recuperación:** migración correctiva posterior, nunca reaceptar ni reabrir
+  permisos como rollback; copias previas e integridad revisadas en entorno alojado
+  antes de despliegue. No reset de la base local existente para validar.
+- **Evidencia local previa:** regresión nueva RED22/37 contra el RPC anterior.
+  `migration up --local` se detiene por la versión local histórica20261017204435,
+  ajena a este cambio y ausente del checkout. No se reparará/eliminará esa historia:
+  aplicar exclusivamente el SQL nuevo por psql al contenedor local confirmado,
+  registrando solo la nueva versión en la misma transacción y conservando las
+  versiones previas. Documentar el bloqueo del CLI para quien despliegue.
+- **Aislamiento de verificación:** local024 GREEN49/49 y unitarios741/52 PASS.
+  Las suites010/072 requieren versiones iniciales de ofertas; en la base ya usada
+  encuentran versiones9/estados draft y fallan por CONFLICT_STALE_DATA. No corregir
+  esos datos ni resetearlos. Preparar una instancia Supabase efímera separada
+  `funes-empleo-hiring-check` en puertos553xx dentro de test-results (ignorado),
+  con copias de migraciones/tests y fixture ficticio de aceptación, sin .env.local.
+  Solo para pruebas SQL; detener esa instancia al terminar, preservando la original.
+- **Implementado:** migración20261021220623, constraint de fuente restringida,
+  RPC atómico con bloqueo candidato primero, retiro/auditoría/revocación global
+  y ninguna modificación de otros casos. feedback-service conserva un RPC e
+  invalida vistas tras éxito. Tests SQL024, unitario hiring-consent y E2E propio;
+  guía `docs/validation/hiring-consent.md`, especificación/modelo/contratos,
+  plan/checklist/tasks y estado actualizados. EXTRA036 cubre fecha efectiva.
+- **Verificado:** SQL55/55 y suite aislada1062/17 archivos, cobertura741 tests/52
+  archivos, tooling57, tipos/lint/build, E2E13/13 (dos contrataciones con lock
+  real más once regresiones Auth), advisor seguridad sin warn/error y diff-check
+  PASS. Cobertura configurada solo para env/schema, no de toda la aplicación.
+  Se repitió cobertura fuera del sandbox tras un ENOENT de archivos temporales
+  del runner; no exigió cambios de código. Sin reset de la base original.
+- **Gates/estado:** clarify aprobado por Mateo; spec/plan/modelo/contratos,
+  checklist10/10, tareas y análisis acotados antes de implementar. Reanálisis
+  final armoniza referencias antiguas720h como históricas; sin bloqueos de alcance
+  o arquitectónicos nuevos, sin ampliar la arquitectura. Convergencia acotada
+  T134–138 cubierta; no acredita revisión humana, CI, despliegue ni aceptación.
+  PR62 mergeado; rama desde main15ec4e7 `codex/feat-withdraw-consent-on-hire`.
+  Cambio local `next-env.d.ts` preservado, sin commit/PR nuevos ni cambios alojados.
+  Ambas migraciones aplicadas solo localmente; rollout compartido pendiente.
+
+## EXTRA-036 — Fecha efectiva de eventos de consentimiento
+
+- **Fecha/origen/autorización:** 2026-10-21; requisito técnico derivado de
+  EXTRA035/T138: nueva aceptación afirmativa válida después del retiro. Autorizado
+  por la delegación de requisitos técnicos necesarios de AGENTS.md y el pedido.
+- **Evidencia:** pgTAP024 pasa48/49; la aceptación asistida devuelve éxito pero
+  current_consent sigue false dentro de la misma transacción. recorded_at usa
+  now() (inicio de transacción), mientras el retiro automático usa reloj efectivo.
+- **Cambio mínimo:** nueva migración forward-only cambia únicamente el default
+  de candidate_consents.recorded_at a clock_timestamp(). No reescribe filas ni
+  modifica la migración ya aplicada localmente20261021220623. Mantiene fecha
+  efectiva coherente en eventos sucesivos; no simula una aceptación automática.
+- **Archivos/contratos:** nueva migración, modelo/plan, pgTAP024 y guía de despliegue.
+  Ninguna firma RPC ni permiso se amplía; fuentes, actores y afirmación explícita
+  siguen iguales. Riesgo: orden temporal al insertar múltiples eventos; verificar
+  retiro y reaceptación asistida con permisos revocados y perfil draft.
+- **Verificación prevista:**49 pruebas SQL iniciales, suite de consentimiento, servidor,
+  tipos/lint/build. Recuperación solo de default mediante otra migración, sin
+  reordenar historia ni reactivar accesos. Propuesta registrada antes del SQL.
+- **Implementación/verificación:** migración20261021221414 y default comprobado
+  en ambas instancias locales. SQL final55/55 y suite completa1062 PASS, incluida
+  aceptación asistida posterior en la misma transacción, perfil draft y permisos
+  revocados; tipos/lint/build, cobertura741 y E2E13 PASS. Modelo/plan/guía alineados.
+  Implementado/verificado localmente, no revisión humana ni despliegue alojado.
+
+## EXTRA-037 — Aplicación alojada de las dos migraciones de contratación
+
+- **Fecha/origen/autorización:** 2026-10-21, Mateo solicita expresamente
+  “aplicalas” después de explicar EXTRA035/036. Alcance exclusivo: las versiones
+  20261021220623 y20261021221414, sin backfill ni cambios de datos de negocio.
+- **Evidencia previa:** CLI autenticado identifica el proyecto enlazado
+  Funes-empleo/kyjycjojzhwggjuqjnki como ACTIVE_HEALTHY. El conector MCP no tiene
+  acceso a ese proyecto; se usa la sesión CLI autorizada ya existente, sin pedir
+  claves. Consulta de catálogo confirma función idéntica al cuerpo de la versión
+  base, grants esperados, source self_service/assisted y default now(). Ambas
+  versiones nuevas están ausentes. Snapshot de función/constraints/default/grants
+  guardado en test-results/hiring-remote-before.json (ignorado, sin datos personales).
+- **Obstáculo técnico:** migration list y db push --dry-run --skip-vault confirman
+  versiones remotas históricas con timestamps distintos de los archivos locales.
+  No reparar, revertir, renombrar ni volver a ejecutar esa historia para aplicar
+  dos cambios nuevos; no se modifica Vault ni se ejecutan seeds o tests alojados.
+- **Cambio mínimo propuesto:** ejecutar por CLI db query --linked únicamente el
+  contenido revisado de ambas migraciones, en una transacción común con límites
+  de espera/ejecución, guardia contra cambios concurrentes del cuerpo de función
+  y registro de sus propias versiones/nombres/statements en la misma transacción.
+  Los archivos de migración quedan intactos; no se registra éxito antes del DDL.
+  El registro guarda ambos SQL originales para trazabilidad. No modifica versiones
+  previas, configuración, datos de candidatos, permisos existentes ni resultados.
+- **Riesgo/recuperación/verificación:** breves locks DDL; ante conflicto/timeout
+  rollback total y revisar, sin bucles de reintento. Copia previa de definiciones,
+  recuperación forward-only según guía, nunca restaurar consentimiento/permisos.
+  Verificar cuerpos SQL/default/constraints/grants/versiones y advisors antes/
+  después mediante consultas de catálogo sin PII; no crear contrataciones reales.
+  Actualizar guía/estado con resultado real. Estado: procedimiento registrado
+  antes de ejecutar el DDL alojado; no implica CI, PR, revisión ni aceptación.
+- **Resultado alojado:** ambas migraciones aplicadas en una única transacción,
+  incluidas sus versiones originales y SQL registrado. Verificación posterior:
+  cuerpo remoto igual al archivo, ambos constraints correctos, default
+  clock_timestamp(), SECURITY DEFINER/search_path y grants conservados (anon y
+  service_role sin ejecución; authenticated sí). Hash de toda la historia previa
+  idéntico antes/después y hashes del SQL registrado iguales a los archivos.
+  Advisor remoto:52 WARN previos y52 posteriores, cero nuevos; no se declara
+  resuelto ese backlog ni se relajan permisos. No se ejecutaron pruebas/fixtures,
+  contrataciones ni backfill alojados. Evidencia técnica ignorada en test-results/
+  hiring-remote-{before,apply,after}.json y logs de advisors. Guía y estado
+  actualizados; reemplaza el pendiente de rollout alojado de EXTRA035/036.
+  Sin commit/PR nuevo, despliegue de aplicación, CI ni revisión independiente.
+
+## Entrega de EXTRA035–037 — 2026-10-21
+
+Mateo solicita crear el PR. Commit funcional28c6a25, rama
+codex/feat-withdraw-consent-on-hire desde main15ec4e7 actualizado:
+[PR63](https://github.com/maximo-Pdev/funes-empleo/pull/63), abierto hacia main,
+sin merge. Incluye las dos migraciones ya aplicadas/verificadas en Supabase
+compartido, pruebas y trazabilidad de la decisión global. next-env.d.ts conserva
+su modificación local y queda excluido; sin logs/fixtures privados/secretos.
+Verificaciones previas consignadas en EXTRA035–037; cambios de esta entrega solo
+documentales, diff-check PASS. CI/revisión independiente y aceptación pendientes.
+
+## EXTRA-038 — PR63: aislar fixtures de contratación y matching
+
+- **Fecha/origen/autorización:** 2026-10-21, Mateo solicita corregir el error de
+  GitHub del PR63; derivado de T138 y de la obligación de regresión sin saltos.
+- **Evidencia:** Quality121/run39688659768: database PASS; application falla
+  exclusivamente en dos E2E de job-category-matching,95 pasan y1 no corre. Las
+  dos contrataciones nuevas pasan, pero copian ofertas publicadas sin sus rubros.
+  El selector de matching elige cualquier primera oferta pública por UUID: puede
+  elegir una de esas ofertas aleatorias sin categorías y encontrar cero candidatos.
+  No es fallo de migración ni razón para relajar consentimiento o matching.
+- **Cambio mínimo propuesto:** ofertas de contratación ficticias en paused (los
+  permisos de derivación admiten ese estado), aserción de que no aparecen en
+  public_offer_rows, y selector del fixture de matching con categorías explícitas
+  como precondición. Conservar expectativas de12 tarjetas/paginación/nominación,
+  rechazo/ausencia de acceso, auditoría, locks y demás casos intactos.
+- **Archivos/contratos/riesgos:** tests/e2e/hiring-consent.spec.ts,
+  tests/e2e/job-category-matching.spec.ts, tareas/estado y este registro. Solo
+  fixtures/selección de prueba; sin cambios de producto, arquitectura, migraciones,
+  dependencias, configuración, permisos o datos alojados. No borrar/restablecer
+  datos locales para forzar verde ni omitir pruebas.
+- **Verificación prevista:** RED de aislamiento antes del fix, E2E de ambas
+  contrataciones y matching, tipos/lint/tooling/cobertura/build, diff-check;
+  publicar en el mismo PR y comprobar CI completo aislado. Autoriza el pedido y
+  AGENTS.md para prerrequisito técnico; no implica nueva aceptación del producto.
+- **Implementación/verificación local:** aserción de aislamiento RED (esperaba0
+  ofertas públicas, recibía2) y GREEN tras usar paused. Helper de matching exige
+  categorías, sin elegir por cantidad de coincidencias ni bajar expectativas.
+  Navegador6/6 PASS ejecutando contratación antes de matching; ambas contrataciones
+  y las cuatro regresiones de modal/paginación/nominación/roles se conservan.
+  Cobertura741 tests/52 archivos, tooling57, tipos/lint/build y diff-check PASS.
+  Docker/base existentes iniciados sin reset; solo se cerró el servidor de pruebas
+  propio. next-env.d.ts mantiene el cambio local y se excluye del commit.
+  Corrección en el mismo PR63, pendiente nueva ejecución CI completa/revisión.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

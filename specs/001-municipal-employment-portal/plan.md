@@ -116,8 +116,9 @@ mantiene la intermediación: modera ofertas, evalúa y preselecciona personas, d
 confirma los resultados finales. Las empresas nunca acceden al padrón general y solo ven datos
 laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
 Ese acceso se calcula en cada lectura: se revoca ante retiro de postulación o consentimiento, no
-selección, cancelación o falta de respuesta; una contratación confirmada conserva un permiso todavía
-vigente solo hasta 720 horas desde la confirmación administrativa, salvo bloqueo anterior. Esta
+selección, cancelación o falta de respuesta; una nueva contratación normal/tardía
+retira el consentimiento global y revoca todos los permisos atómicamente, sin
+alterar otros casos. Solo permisos históricos anteriores conservan el límite de720 horas. Esta
 ventana de consulta no decide la retención de registros pendiente en OQ-001.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
@@ -137,6 +138,32 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 [public-offer-slugs](../../odd/tasks/public-offer-slugs.md). EXTRA-020 registra la autorización.
 
 ## Contexto técnico
+
+### EXTRA035 — retiro global por contratación, autorización2026-10-21
+
+Mantener RPC `transition_participation` y su firma/grants: `hire` y `late_hire`
+comparten la rama de resultado. Bloqueo candidato FOR UPDATE antes de participación/
+derivaciones, serializando con aceptación/retiro y creación de participaciones.
+No llamar `change_candidate_consent`: su retiro manual cierra otros casos.
+Ampliar solo source de candidate_consents con `hiring_workflow`, válido únicamente
+para withdrawn. Añadir retiro append-only si el último evento sigue accepted,
+copiando política/hash, admin confirmante y fecha posterior al evento anterior;
+actualizar perfil a consent_withdrawn salvo archivado, incrementando versión.
+Motivo de auditoría hired y decisión privada ligada a la participación. Revocar
+permisos activos en orden de ID con el helper existente. No modificar otras
+participaciones, cerrar ofertas ni crear nuevas ventanas720h. Sin trigger ni
+acción UI/postproceso: todos los flujos autorizados usan esta RPC transaccional.
+Helpers privados/grants, sesión, evidencia y versiones siguen siendo obligatorios.
+
+Conservar soporte de lectura/Cron para permisos históricos, sin backfill. Una
+nueva aceptación solo usa el flujo afirmativo vigente, no reabre permisos/casos.
+EXTRA036: recorded_at usa clock_timestamp() como default, no inicio de transacción,
+para que una nueva aceptación explícita suceda al retiro también en una transacción.
+Recuperación por migración forward-only, nunca reaceptar datos o permisos. Tests
+SQL normal/tardío, revocación multiderivación, auditoría/rollback/concurrencia,
+preservación de otros casos, aceptación explícita, servidor y E2E; tipos/lint/build.
+Constitución: mismo stack, autorización en servidor/DB, privacidad reducida,
+historial append-only, sin purgas/secretos ni aprobación municipal inferida.
 
 ### A07 / FR-024B (2026-10-19)
 

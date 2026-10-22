@@ -15,7 +15,9 @@ async function signIn(page: Page, email: string) {
 }
 
 function openingId() {
-  const id = runLocalMaintenanceSql("select id from private.public_offer_rows order by id limit 1");
+  const id = runLocalMaintenanceSql(`select opening.id from private.public_offer_rows opening
+    where exists(select 1 from public.opening_categories category where category.opening_id=opening.id)
+    order by opening.id limit 1`);
   expect(id).toMatch(/^[0-9a-f-]{36}$/);
   return id;
 }

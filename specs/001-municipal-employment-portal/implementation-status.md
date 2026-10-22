@@ -670,3 +670,111 @@ filtrado de contacto saliente y payload correcto al elegir contacto entrante.
 Componentes11/11, suite/cobertura736 tests/51 archivos, tipos/lint/diff-check
 PASS local. Sin cambios de aplicación, DB o entorno ni reset local; ejecución
 completa del CI corregido pendiente. No relaja la evidencia de retiro requerida.
+
+## Contratación y retiro global — 2026-10-21
+
+Mateo confirma el alcance global (OQ-020/EXTRA035), descartando la alternativa de
+solo matching. Trabajo desde main15ec4e7, PR62 ya mergeado, en
+`codex/feat-withdraw-consent-on-hire`; rama anterior eliminada y cambio local de
+`next-env.d.ts` preservado. No hay commit/PR nuevo ni despliegue alojado.
+
+Confirmar `hire` o `late_hire` agrega el retiro si corresponde, con admin, fecha,
+fuente restringida, política/hash y auditoría/causa enlazada al caso. Revoca todos
+los permisos activos sin cambiar otros casos/versiones/resultados. Una única
+transacción y bloqueo candidato primero; no se usa el retiro manual que cierra
+otros casos. Confirmación tardía no restaura accesos y la empresa no confirma por
+sí sola una contratación. Reaceptar requiere acción afirmativa y tampoco restaura
+permisos. Sin backfill: soporte720h/Cron permanece solo para permisos históricos.
+
+T134–T138 implementadas/verificadas localmente. Migraciones nuevas
+20261021220623/20261021221414 (EXTRA036: default de fecha efectiva) aplicadas solo
+localmente. Servidor conserva firma/RPC/grants, invalida vistas tras éxito; no hay
+dependencias, nuevas variables ni cambios de UI. Rollout/recuperación y comandos
+seguros en `docs/validation/hiring-consent.md`.
+
+| Verificación | Evidencia local |
+| --- | --- |
+| SQL específico | RED22/37 contra implementación anterior; final55/55 PASS. |
+| SQL completo | 17 archivos/1062 pruebas PASS, Supabase efímero con fixture ficticio limpio, sin reset de la base original. |
+| Unitarias/componentes/integración y cobertura | 52 archivos/741 tests PASS; incluye5 nuevos de servicio. Cobertura configurada limitada a env/schema. |
+| Tooling | 57/57 PASS. |
+| Tipos/lint/build | PASS con Node24.22.0 y destinos locales, sin editar .env.local. |
+| Navegador | 13/13 PASS: normal/tardía, bloqueo entre conexiones, retiro/permisos/CV y otros casos intactos; once regresiones login/registro. |
+| Seguridad | Advisor local aislado sin warn/error; grants, roles negativos, acceso a CV/perfil, append-only y rollback auditados en SQL. |
+| Integridad de cambios | diff-check PASS; sin datos reales/secretos. next-env local excluido del cambio funcional. |
+
+Se preservó la discrepancia histórica local20261017204435 sin reparar ni eliminar
+versiones. Las suites010/072 inicialmente fallaron sobre ofertas ya modificadas
+del fixture usado; la suite limpia aislada completa pasa. La cobertura inicialmente
+en sandbox falló por ENOENT de archivos temporales del runner; repetición fuera de
+ese sandbox pasa sin cambios funcionales. Fixtures E2E nuevos son ficticios y no
+borran datos existentes.
+
+### Análisis y convergencia acotados
+
+Secuencia aplicada: clarificar alcance → alinear spec → diseño/plan/modelo/
+contratos → checklist de requisitos10/10 → tareas → análisis previo → implementar
+→ verificar → convergencia acotada. La autorización expresa de Mateo cubre este
+cambio; no equivale a revisión independiente ni aprobación municipal/legal.
+
+FR-036/038 y conservación de otros casos se trazan a T135/136 y SQL024; servidor/
+invalidation a T137 y5 unitarias; atomicidad/roles/CV/lock/aceptación a T138 y SQL/
+E2E. EXTRA036 queda cubierto por aceptación posterior en la misma transacción.
+Reanálisis armoniza referencias operativas antiguas a720h como históricas y
+mantiene los antecedentes de decisión. Sin nuevos conflictos de arquitectura o
+constitución ni tareas construibles faltantes dentro de T134–138; no se genera
+una fase de convergencia vacía ni se marca completa la convergencia global.
+
+Límites: no se ejecutó la suite E2E completa ni NVDA/aceptación con personas;
+sin CI, revisión humana o validación alojada de este cambio. Despliegue compartido
+de ambas migraciones y revisión mediante PR siguen pendientes. Los seis gates
+históricos del producto permanecen abiertos; OQ-001 no se resuelve con este cambio.
+
+### Aplicación alojada posterior — EXTRA037, 2026-10-21
+
+Mateo solicita expresamente aplicar las migraciones. CLI autenticado confirma
+proyecto Funes-empleo/kyjycjojzhwggjuqjnki, función base sin cambios concurrentes
+y versiones nuevas ausentes. Se guardan definiciones previas de función/grants/
+constraints/default sin datos personales en test-results ignorado. El dry-run
+confirma el desfase histórico de timestamps; no se repara ni repite esa historia.
+
+Se aplican exclusivamente20261021220623/20261021221414 por db query --linked,
+en una transacción común con guardia de cuerpo previo y límites de espera,
+registrando las versiones/SQL originales en la misma transacción. Verificación
+posterior PASS: cuerpo de función igual al archivo, hashes del SQL registrado,
+ambos constraints/default clock_timestamp(), firma/grants/search_path y hash
+de toda la historia anterior sin cambios. Advisor remoto52 WARN antes/después,
+cero nuevos; no confundirlo con la instancia local aislada sin hallazgos.
+
+Esto reemplaza el pendiente de rollout SQL anterior. Aplica a futuras
+confirmaciones normales/tardías; no se ejecutaron contrataciones, backfill,
+fixtures, E2E ni pgTAP alojados. No cambia código/variables/secretos ni acredita
+despliegue de aplicación, nuevo CI, PR, revisión o aceptación. Las verificaciones
+funcionales locales previas siguen siendo la evidencia de los recorridos.
+
+### Entrega mediante PR — 2026-10-21
+
+Solicitud de Mateo: commit funcional28c6a25 en
+codex/feat-withdraw-consent-on-hire, publicado en
+[PR63](https://github.com/maximo-Pdev/funes-empleo/pull/63) hacia main15ec4e7.
+Abierto sin merge; incluye migraciones ya aplicadas, pruebas y EXTRA035–037.
+next-env.d.ts permanece como cambio local fuera del commit. Evidencia de calidad
+anterior conservada; entrega documental adicional con diff-check PASS. CI,
+revisión independiente y aceptación siguen pendientes, sin cerrar otros gates.
+
+### Corrección de application en PR63 — EXTRA038, 2026-10-21
+
+Quality121/run39688659768: database PASS, application falla solo por dos E2E de
+matching,95 pasan y1 no corre. Las ofertas aleatorias creadas por contratación
+copiaban published sin categorías y el selector de matching podía elegirlas.
+No se modifica el matching real ni el retiro global: solo fixtures en paused,
+aserción explícita de que no son públicos y selector de prueba con categorías.
+Mantiene12 tarjetas, paginación/modal/nominación y todas las comprobaciones de
+contratación, evidencia, revocación, atomicidad y otras participaciones intactas.
+
+Regresión de aislamiento RED0 esperado/2 recibidas; GREEN y navegador6/6 PASS
+en orden contratación→matching. Cobertura741/52, tooling57, tipos/lint/build y
+diff-check PASS; base local preservada sin reset, sin repetir SQL alojado ni
+migraciones. next-env.d.ts conserva su cambio local fuera del commit. Nueva
+ejecución completa CI en el mismo PR y revisión humana pendientes; no se relajan
+gates ni se declara resuelto el backlog del producto.

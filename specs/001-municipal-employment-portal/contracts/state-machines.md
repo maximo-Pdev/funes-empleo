@@ -101,7 +101,7 @@ Estados internos: `received`, `under_review`, `preinterview`, `preselected`, `re
 | Registrar entrevista | Empresa propia o admin | Derivación activa | Agrega entrevista; estado puede pasar a `company_interview`. |
 | Comunicar feedback | Empresa propia | Derivación propia existente, aunque su permiso de datos esté revocado, y sin resultado real confirmado | Agrega feedback `pending_admin`; no fija resultado final ni habilita perfil/contactos/CV. |
 | Marcar espera | Admin | Participación derivada sin resultado final | `awaiting_feedback`; no altera fecha límite original. |
-| Confirmar resultado empresarial | Admin | Feedback/evidencia registrada o motivo administrativo, participación no final | `hired` conserva un permiso todavía activo y fija `post_hire_access_until` a confirmación +720 horas; `not_selected` lo revoca; actor admin obligatorio. |
+| Confirmar resultado empresarial | Admin | Feedback/evidencia registrada o motivo administrativo, participación no final | `hired` retira consentimiento global y revoca todos sus permisos atómicamente, sin alterar otros casos; `not_selected` revoca el permiso propio; actor admin obligatorio. |
 | Cerrar sin respuesta | Sistema | Derivada, sin final y `feedback_due_at = referred_at + 720 horas` con `feedback_due_at <= now()` | `no_company_response`, revocación y eventos una sola vez, con actor sistema. |
 | Corregir respuesta tardía | Admin | `no_company_response` y feedback del portal o contacto municipal `phone`, `email`, `whatsapp` o `in_person`, con fecha, actor y nota breve | `hired`, `not_selected` o `cancelled`; conserva el cierre automático como evento anterior reemplazado, muestra el resultado nuevo como vigente y mantiene revocado el permiso, incluso si pasa a `hired`. |
 | Retirar participación | Candidato titular o admin que registra su solicitud | Participación no final de cualquier origen; si actúa admin, solicitud del candidato registrada | `withdrawn`; revoca inmediatamente el permiso empresarial sin borrar historia. |
@@ -129,9 +129,9 @@ La revocación funciona como un enclavamiento: `revoked` no vuelve a `active` po
 reactivación, restauración o corrección tardía. `expired_by_policy` no tiene transición ejecutable
 hasta que se resuelva OQ-001. Cada cambio de participación, acceso y auditoría es transaccional.
 Reconsentir tampoco reabre participaciones cerradas por retiro del consentimiento.
-Las 720 horas son solo una ventana de acceso posterior a contratación, no retención o purga de
-perfil, CV e historial. Una corrección tardía a `hired` no fija una nueva ventana si el permiso ya
-había sido revocado.
+Las 720 horas corresponden solo a permisos históricos anteriores a EXTRA035, no a retención o
+purga de perfil, CV e historial. Las nuevas confirmaciones normales o tardías a `hired` retiran el
+consentimiento global y no fijan una nueva ventana de acceso.
 
 ## Permiso de derivación
 
@@ -142,7 +142,7 @@ había sido revocado.
 | Revocar por consentimiento | Candidato o admin autorizado | `active` | `revoked` | `consent_withdrawn` | Revoca todos los permisos afectados y cierra participaciones abiertas. |
 | Revocar por resultado/cancelación | Admin o sistema según resultado | `active` | `revoked` | `not_selected`, `process_cancelled` o `no_company_response` | Ocurre con el resultado final y conserva historial. |
 | Revocar por suspensión/archivo | Admin o titular autorizado | `active` | `revoked` | `candidate_suspended`, `company_suspended`, `candidate_archived` o `company_archived` | Deniega nuevas consultas/descargas sin borrar evidencia. |
-| Conservar tras contratación | Admin | `active` | `active` | Confirmación `hired` | Solo si seguía activo; fija `post_hire_access_until` a confirmación +720 horas. |
+| Conservar tras contratación (histórico, no ejecutable desde EXTRA035) | Admin | `active` | `active` | Confirmación `hired` | Antes del cambio, si seguía activo, fijaba `post_hire_access_until` a confirmación +720 horas. |
 | Vencer acceso poscontratación | Sistema | `active` | `revoked` | `post_hire_window_ended` | Al alcanzar el límite; autorización ya deniega desde ese instante y la materialización es idempotente. |
 
 `revoked` es terminal y nunca vuelve a `active`. `expired_by_policy` está reservado e inalcanzable
@@ -154,8 +154,13 @@ mientras OQ-001 continúe abierta; no existe un comando que lo produzca en el MV
 | --- | --- | --- | --- | --- | --- |
 | Aceptar | Candidato o admin en atención asistida | inexistente, `withdrawn` | `accepted` | No | Registra versión/hash de política, actor y fecha; una nueva aceptación no reabre casos ni permisos. |
 | Retirar | Candidato o admin autorizado | `accepted` | `withdrawn` | No | Cierra participaciones abiertas como `withdrawn` con código `consent_withdrawn`, revoca permisos y conserva resultados finales. |
+| Retirar por contratación | Admin al confirmar hire/late_hire | `accepted` | `withdrawn` | hired | Fuente hiring_workflow, política/hash previos y actor/fecha; revoca todos los permisos activos y NO cierra otros casos. Si ya estaba retirado no duplica el retiro. Todo en la transacción del resultado. |
 
 Los eventos son append-only: una nueva aceptación crea otro evento y nunca modifica el anterior.
+EXTRA035 sustituye la conservación tras nuevas contrataciones; late_hire ejecuta
+el mismo retiro global aunque su propio permiso ya estuviera revocado. Las filas
+de ventana720h/vencimiento anteriores solo aplican a permisos históricos. No hay
+backfill ni restauración de consentimiento/permisos al corregir resultados.
 
 ## CV
 
