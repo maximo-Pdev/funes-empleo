@@ -9,15 +9,82 @@ vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipat
 vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn(), archiveProfileAction: vi.fn() }));
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: vi.fn(), withdrawParticipationAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn(), accountStatusAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 import OffersPage from "@/app/(candidate)/candidato/ofertas/page";
 import ProfilePage from "@/app/(candidate)/candidato/perfil/page";
 import ParticipationsPage from "@/app/(candidate)/candidato/postulaciones/page";
 import { AppError } from "@/lib/errors/public-error";
+import AccountPage from "@/app/(auth)/account/page";
 
 const offer = { id: "0a000000-0000-4000-8000-000000000001", title: "Auxiliar administrativo", company_name: "Empresa Ficticia", location: "Funes", closing_date: "2026-11-30", tasks: "Tareas ficticias", requirements: "Experiencia", vacancies: 1, modality: "Presencial", schedule: "Completo", contract_type: "Permanente", salary: null, benefits: null, categories: [] };
 function workspace(status = "active") { return { bootstrap: "ready", profile: { id: offer.id, display_name: "Persona Ficticia", locality: "Funes", skills_experience_summary: "Experiencia ficticia de atención y administración", availability: "available", availability_detail: "", status, version: 1, refresh_due_at: "2027-04-07" }, privateData: { dni_display: "90000001", address: null }, contacts: [], categories: [{ category_id: offer.id }], allCategories: [{ id: offer.id, name: "Administración", code: "ADMIN" }], consent: { status: "accepted", policy_version: "demo", recorded_at: "2026-10-07" }, cv: { id: offer.id, original_name_safe: "cv-ficticio.pdf", byte_size: 500 }, account: { version: 1 } }; }
 beforeEach(() => { vi.clearAllMocks(); mocks.guard.mockResolvedValue(undefined); mocks.workspace.mockResolvedValue(workspace()); mocks.offers.mockResolvedValue({ items: [offer], page: 1, pageSize: 10, total: 11 }); mocks.selected.mockResolvedValue(offer); mocks.participations.mockResolvedValue([]); mocks.policy.mockResolvedValue({ version: "demo-not-approved", policy_hash: "demo", policy_text: "Consentimiento ficticio de prueba." }); });
+function accountSession() {
+ mocks.guard.mockResolvedValue({ account: { id: "candidate-fixture", role: "candidate", status: "active", version: 1 }, user: { email: "persona@example.test" } });
+}
+it("embeds the complete profile in account with sidebar identity and no archive action", async () => {
+ accountSession();
+ render(await AccountPage({ searchParams: Promise.resolve({}) }));
+ const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
+ const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Perfil", "Postulaciones", "Ofertas"]);
+ expect(within(navigation).getByRole("link", { name: "Perfil" }).getAttribute("aria-current")).toBe("page");
+ expect(within(sidebar).getByText("Persona Ficticia")).toBeTruthy();
+ expect(within(sidebar).getByText("persona@example.test")).toBeTruthy();
+ expect(within(sidebar).getByRole("img", { name: "Foto de perfil de ejemplo" })).toBeTruthy();
+ expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
+ expect(screen.getByLabelText("Nombre y apellido")).toHaveProperty("value", "Persona Ficticia");
+ expect(screen.getByRole("heading", { name: "CV PDF" })).toBeTruthy();
+ expect(screen.queryByRole("button", { name: /Archivar/ })).toBeNull();
+ expect(screen.getAllByRole("main")).toHaveLength(1);
+ expect(screen.getByRole("main").id).toBe("contenido");
+ expect(screen.getByRole("link", { name: "Cambiar contraseña" }).getAttribute("href")).toBe("/update-password");
+ expect(document.querySelector('[name="returnTo"]')).toHaveProperty("value", "/account?section=perfil");
+ expect(mocks.workspace).toHaveBeenCalledOnce();
+});
+it("only enables the email loop when the full address exceeds its visible width", async () => {
+ const email = "persona.con.una.direccion.muy.larga@example.test";
+ mocks.guard.mockResolvedValue({ account: { role: "candidate" }, user: { email } });
+ const width = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(100);
+ const textWidth = vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400);
+ try {
+  const view = render(await AccountPage({ searchParams: Promise.resolve({}) }));
+  const address = screen.getByTitle(email);
+  expect(address.getAttribute("data-overflow")).toBe("true");
+  expect(address.querySelector('[aria-hidden="true"]')).toBeTruthy();
+  expect(address.textContent).toBe(email + email);
+  expect(address.tabIndex).toBe(0);
+  textWidth.mockReturnValue(80);
+  fireEvent(window, new Event("resize"));
+  expect(address.getAttribute("data-overflow")).toBe("false");
+  expect(address.textContent).toBe(email);
+  expect(address.tabIndex).toBe(-1);
+  view.unmount();
+ } finally { width.mockRestore(); textWidth.mockRestore(); }
+});
+it("embeds offers with account-local profile and pagination destinations", async () => {
+ accountSession(); mocks.workspace.mockResolvedValue(workspace("draft"));
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "ofertas", oferta: offer.id }) }));
+ expect(screen.getByRole("heading", { level: 1, name: "Ofertas para postularme" })).toBeTruthy();
+ expect(screen.getByRole("button", { name: "Postularme" })).toHaveProperty("disabled", true);
+ expect(screen.getByRole("link", { name: "Revisar perfil" }).getAttribute("href")).toBe("/account?section=perfil");
+ const next = new URL(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")!, "https://example.test");
+ expect(next.pathname).toBe("/account");
+ expect(next.searchParams.get("section")).toBe("ofertas");
+ expect(next.searchParams.get("page")).toBe("2");
+ expect(next.searchParams.get("oferta")).toBe(offer.id);
+ expect(mocks.workspace).toHaveBeenCalledOnce();
+});
+it("embeds participations and preserves withdrawal confirmation", async () => {
+ accountSession();
+ mocks.participations.mockResolvedValue([{ id: "received", opening_title: "Oferta recibida", display_status: "received", version: 2, created_at: "2026-10-07" }]);
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "postulaciones" }) }));
+ expect(screen.getByRole("heading", { level: 1, name: "Mis postulaciones" })).toBeTruthy();
+ expect(screen.getByRole("button", { name: "Retirar participación" })).toBeTruthy();
+ expect(screen.getByRole("checkbox")).toHaveProperty("required", true);
+ expect(screen.getByRole("link", { name: "Explorar ofertas" }).getAttribute("href")).toBe("/account?section=ofertas");
+});
 it("mantiene el bloqueo del perfil y evita duplicar una oferta seleccionada", async () => {
  mocks.workspace.mockResolvedValue(workspace("draft"));
  render(await OffersPage({ searchParams: Promise.resolve({ oferta: offer.id }) }));
