@@ -17,12 +17,12 @@ function ActionMessage({ state }: { state: State }) {
 }
 
 export function CandidateProfilePanel({ profile, dni, address, phone, categories, selectedCategories,
-  consent, cv, policy, accountVersion, cvMessage }: {
+  consent, cv, policy, accountVersion, cvMessage, showArchive = true, cvReturnTo }: {
   profile: Profile; dni: string; address: string | null; phone: string | null;
   categories: Category[]; selectedCategories: string[];
   consent: { status: string; policy_version: string; recorded_at: string } | null;
   cv: { id: string; original_name_safe: string; byte_size: number } | null;
-  policy: Policy; accountVersion: number; cvMessage?: string;
+  policy: Policy; accountVersion: number; cvMessage?: string; showArchive?: boolean; cvReturnTo?: string;
 }) {
   const router = useRouter();
   const [saved, saveAction, saving] = useActionState(saveProfileAction, { message: "", success: false });
@@ -67,6 +67,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       {cv && <a className="text-blue-800 underline" href={`/api/cv/${cv.id}`}>Descargar mi CV</a>}
       {cvMessage && <p role={cvMessage === "ok" ? "status" : "alert"}>{cvMessage === "ok" ? "CV guardado." : cvMessage === "conflict" ? "El perfil cambió. Recargá antes de reemplazar el CV." : "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente."}</p>}
       <form method="post" action="/api/candidate/cv" encType="multipart/form-data" className="grid gap-3">
+        {cvReturnTo && <input type="hidden" name="returnTo" value={cvReturnTo} />}
         <input type="hidden" name="candidateId" value={profile.id} /><input type="hidden" name="version" value={profile.version} />
         <label className="grid gap-1">Elegir PDF<input className={field} type="file" name="cv" accept=".pdf,application/pdf" required /></label>
         <button className="rounded bg-blue-800 p-3 text-white">Cargar o reemplazar CV</button>
@@ -77,12 +78,12 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />
       <button disabled={activating} className="rounded bg-green-800 p-3 text-white">Activar perfil</button>
     </form>}
-    <form action={archiveAction} className="grid gap-3 rounded border border-red-500 bg-red-50 p-5" aria-busy={archiving}>
+    {showArchive && <form action={archiveAction} className="grid gap-3 rounded border border-red-500 bg-red-50 p-5" aria-busy={archiving}>
       <h2 className="text-xl font-semibold text-red-900">Solicitar eliminación y archivar</h2>
       <p>El archivo es inmediato y bloquea tu acceso. La Oficina conserva el historial mientras se define la política de retención. Solo administración puede restaurar el perfil a borrador.</p>
       <input type="hidden" name="version" value={accountVersion} />
       <label className="flex gap-2"><input type="checkbox" name="confirmed" required />Confirmo que quiero archivar mi cuenta y perfil.</label>
       <ActionMessage state={archive} /><button disabled={archiving} className="rounded bg-red-800 p-3 text-white">Archivar ahora</button>
-    </form>
+    </form>}
   </div>;
 }
