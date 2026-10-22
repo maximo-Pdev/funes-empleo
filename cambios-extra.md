@@ -1868,7 +1868,9 @@ documentales, diff-check PASS. CI/revisión independiente y aceptación pendient
   globalmente el MVP. Guía docs/validation/profile-self-archival.md.
   Instancia SQL efímera detenida/descartada y servidor propio cerrado; base local
   original sin reset y next-env.d.ts preservado. Datos de prueba nuevos ficticios;
-  sin cambios alojados, commit/PR nuevo, CI, revisión o aceptación acreditados.
+  sin cambios alojados, CI, revisión o aceptación acreditados.
+  Commit funcional70ae1ea publicado en PR64:
+  https://github.com/maximo-Pdev/funes-empleo/pull/64 (abierto, sin merge).
   Pendiente aplicar únicamente20261022202940 en Supabase compartido antes del
   despliegue de app y revisión mediante PR; gates históricos/OQ-001/002 intactos.
 

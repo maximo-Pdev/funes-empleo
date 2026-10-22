@@ -820,5 +820,7 @@ coherentes, sin nueva arquitectura/permiso candidato o gaps construibles en el
 incremento. No acredita revisión independiente, suite E2E completa, CI nuevo,
 NVDA, aceptación ni cierre de gates históricos. Instancia SQL efímera y servidor
 propio cerrados; base original preservada sin reset, fixtures nuevos ficticios.
-Sin commit/PR nuevo. Pendiente aplicar20261022202940 en Supabase compartido antes
+Commit70ae1ea publicado en PR64 (abierto, sin merge):
+https://github.com/maximo-Pdev/funes-empleo/pull/64.
+CI y revisión pendientes. Pendiente aplicar20261022202940 en Supabase compartido antes
 de desplegar app; guía docs/validation/profile-self-archival.md. OQ-001/002 abiertos.
