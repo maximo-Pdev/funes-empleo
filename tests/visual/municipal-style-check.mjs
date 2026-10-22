@@ -76,7 +76,7 @@ try {
     assert.ok(growth.some(height => height > growth[0] + 1 && height < growth.at(-1) - 1), "Expansion has intermediate animation frames");
     const roles = page.getByRole("group", { name: "Tipo de cuenta", exact: true });
     assert.match(await roles.evaluate(el => getComputedStyle(el).backgroundImage), /linear-gradient/);
-    assert.equal(await roles.locator("div").evaluate(el => getComputedStyle(el).justifyContent), "center");
+    assert.equal(await roles.locator("div").first().evaluate(el => getComputedStyle(el).justifyContent), "center");
     const shrinkage = await capturePanelResize(page, "Iniciar sesión");
     assert.ok(shrinkage.at(-1) < shrinkage[0] - 20, "Login shrinks the card");
     assert.ok(shrinkage.some(height => height < shrinkage[0] - 1 && height > shrinkage.at(-1) + 1), "Shrinkage has intermediate animation frames");
@@ -121,16 +121,16 @@ try {
         });
         assert.equal(spacing.labelGap, 6);
         assert.equal(spacing.fieldGap, 16);
-        assert.equal(await page.getByText("No compartas tu contraseña.", { exact: true }).count(), 1);
-        assert.equal(await page.getByText(/Entre 6 y 128 caracteres/).count(), 0);
+        assert.equal(await page.getByText("Entre 6 y 128 caracteres. No compartas tu contraseña.", { exact: true }).count(), 1);
+        assert.equal(await page.getByText("No compartas tu contraseña.", { exact: true }).count(), 0);
       } else {
-        assert.equal(await page.locator("form > label").first().evaluate(el => getComputedStyle(el).rowGap), "6px");
+        assert.equal(await page.locator("form [data-form-field]").first().evaluate(el => getComputedStyle(el.querySelector("label")).textTransform), "uppercase");
       }
       const style = await input.evaluate(el => {
         const s = getComputedStyle(el);
         return { height: s.height, radius: s.borderRadius, top: s.borderTopWidth, bottom: s.borderBottomWidth, color: s.color, font: s.fontFamily, padding: s.padding, border: s.borderBottomColor };
       });
-      assert.equal(style.height, "38px");
+      assert.equal(style.height, "44px");
       assert.equal(style.radius, "0px");
       assert.equal(style.top, "0px");
       assert.equal(style.bottom, "1px");
@@ -178,8 +178,8 @@ try {
     const fixture = page.locator("#visual-control-fixture");
     assert.equal(await fixture.locator("textarea").evaluate(el => getComputedStyle(el).resize), "vertical");
     assert.equal(await fixture.locator("select").evaluate(el => getComputedStyle(el).borderTopWidth), "0px");
-    assert.notEqual(await fixture.locator('[type="checkbox"]').evaluate(el => getComputedStyle(el).height), "38px");
-    assert.notEqual(await fixture.locator('[type="file"]').evaluate(el => getComputedStyle(el).height), "38px");
+    assert.notEqual(await fixture.locator('[type="checkbox"]').evaluate(el => getComputedStyle(el).height), "44px");
+    assert.notEqual(await fixture.locator('[type="file"]').evaluate(el => getComputedStyle(el).height), "44px");
     assert.equal(await fixture.locator('[aria-invalid="true"]').evaluate(el => getComputedStyle(el).borderBottomColor), "rgb(153, 27, 27)");
     assert.notEqual(await fixture.locator("button").evaluate(el => getComputedStyle(el).backgroundColor), "rgb(38, 43, 53)", "Danger actions keep red");
     assert.equal(await page.evaluate(async () => {

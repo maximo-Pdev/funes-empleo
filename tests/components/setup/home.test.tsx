@@ -8,15 +8,18 @@ vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: 
 const { listPublicOffers } = vi.hoisted(() => ({ listPublicOffers: vi.fn() }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers }));
 
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
+
 import HomePage from "@/app/(public)/page";
 import { HomeNavbar } from "@/app/(public)/home-navbar";
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("keeps the mobile navbar visible and interactive without scrolling", () => {
+it("keeps the mobile navbar visible and interactive without scrolling", async () => {
   vi.stubGlobal("scrollY", 0);
   vi.stubGlobal("matchMedia", () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
-  render(<HomePage />);
+  render(await HomePage());
   const navbar = screen.getByRole("banner");
   expect(navbar.getAttribute("aria-hidden")).toBe("false");
   expect(navbar.hasAttribute("inert")).toBe(false);
@@ -24,9 +27,9 @@ it("keeps the mobile navbar visible and interactive without scrolling", () => {
   expect(navbar.getAttribute("aria-hidden")).toBe("false");
 });
 
-it("hides the navbar at the top and reveals it after page scrolling", () => {
+it("hides the navbar at the top and reveals it after page scrolling", async () => {
   vi.stubGlobal("scrollY", 0);
-  render(<HomePage />);
+  render(await HomePage());
   const navbar = screen.getByRole("banner", { hidden: true });
   expect(navbar.getAttribute("aria-hidden")).toBe("true");
   act(() => {
@@ -41,16 +44,16 @@ it("hides the navbar at the top and reveals it after page scrolling", () => {
   expect(navbar.getAttribute("aria-hidden")).toBe("true");
 });
 
-it("keeps an empty information section after the opening viewport", () => {
-  render(<HomePage />);
+it("keeps an empty information section after the opening viewport", async () => {
+  render(await HomePage());
   const information = screen.getByRole("region", { name: "Información del portal" });
   expect(information.textContent).toBe("");
   expect(information.childElementCount).toBe(0);
   expect(screen.getByRole("main").lastElementChild).toBe(information);
 });
 
-it("links the floating offers action to the lower information viewport", () => {
-  render(<HomePage />);
+it("links the floating offers action to the lower information viewport", async () => {
+  render(await HomePage());
   const action = screen.getByRole("link", { name: "Ver ofertas disponibles" });
   const target = screen.getByRole("region", { name: "Información del portal" });
   expect(action.getAttribute("href")).toBe(`#${target.id}`);
@@ -58,8 +61,8 @@ it("links the floating offers action to the lower information viewport", () => {
   expect(target.getAttribute("tabindex")).toBe("-1");
 });
 
-it("replaces the photo slideshow with a decorative ribbons canvas", () => {
-  const { container } = render(<HomePage />);
+it("replaces the photo slideshow with a decorative ribbons canvas", async () => {
+  const { container } = render(await HomePage());
   expect(container.querySelectorAll("[data-hero-slide]")).toHaveLength(0);
   const canvas = container.querySelector("canvas[data-ribbons]");
   expect(canvas).toBeTruthy();
@@ -67,8 +70,8 @@ it("replaces the photo slideshow with a decorative ribbons canvas", () => {
   expect(screen.queryByRole("button", { name: /Pausar imágenes|Reanudar imágenes/ })).toBeNull();
 });
 
-it("restores the municipal introduction and complete intermediary information", () => {
-  render(<HomePage />);
+it("restores the municipal introduction and complete intermediary information", async () => {
+  render(await HomePage());
   expect(screen.queryByText("Tu próximo trabajo empieza acá.")).toBeNull();
   expect(screen.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
   for (const text of [
@@ -80,35 +83,35 @@ it("restores the municipal introduction and complete intermediary information", 
   ]) expect(screen.getByText(text)).toBeTruthy();
 });
 
-it("uses the supplied vector logo and marks the homepage navbar variant", () => {
-  render(<HomePage />);
+it("uses the supplied vector logo and marks the homepage navbar variant", async () => {
+  render(await HomePage());
   const navbar = screen.getByRole("banner", { hidden: true });
   expect(navbar.getAttribute("data-home")).toBe("true");
   expect(navbar.querySelector("img")?.getAttribute("src")).toBe("/brand/funes-navbar-emblem.svg");
-  const navigation = screen.getByRole("navigation", { hidden: true });
+  const navigation = screen.getByRole("navigation", { name: "Navegación principal", hidden: true });
   const links = Array.from(navigation.querySelectorAll("a"));
   expect(links.find(link => link.textContent === "Inicio")?.getAttribute("href")).toBe("#contenido");
   expect(links.find(link => link.textContent === "Ofertas")?.getAttribute("href")).toBe("/ofertas");
 });
 
-it("preserves account navbar navigation back to the homepage", () => {
+it("preserves account navbar navigation back to the homepage", async () => {
   render(<HomeNavbar alwaysVisible />);
   expect(screen.getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
   expect(screen.getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/ofertas");
 });
 
-it("preserves a unique focusable skip-link target on the redesigned home", () => {
-  const { container } = render(<HomePage />);
+it("preserves a unique focusable skip-link target on the redesigned home", async () => {
+  const { container } = render(await HomePage());
   const main = screen.getByRole("main");
   expect(main.id).toBe("contenido");
   expect(main.getAttribute("tabindex")).toBe("-1");
   expect(container.querySelectorAll("#contenido")).toHaveLength(1);
 });
 
-it("replaces the previous offer preview and navigation with the access panel", () => {
-  render(<HomePage />);
+it("replaces the previous offer preview and navigation with the access panel", async () => {
+  render(await HomePage());
   expect(screen.getByRole("region", { name: "Acceso al portal" })).toBeTruthy();
-  const navbar = screen.getByRole("navigation", { hidden: true });
+  const navbar = screen.getByRole("navigation", { name: "Navegación principal", hidden: true });
   expect(navbar.querySelector("a")?.getAttribute("href")).toBe("https://funes.gob.ar/");
   expect(navbar.querySelector("img")?.getAttribute("alt")).toBe("Municipalidad de Funes");
   expect(screen.getByRole("banner", { hidden: true }).contains(navbar)).toBe(true);

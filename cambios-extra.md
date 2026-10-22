@@ -2165,3 +2165,44 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
 - **Entorno:** Node observado 26.7.0, distinto del 24 LTS requerido; no se modifica
   el entorno local. Revisión visual en navegador de la portada tras el cambio de
   marcado de `Field` y aprobación del PR pendientes.
+
+## EXTRA-048 — Cierre de brechas E2E detectadas por CI en el PR #66
+
+- **Fecha/estado:** 2026-10-22; implementado y verificado localmente; CI y revisión
+  del compañero pendientes. Registrado antes de implementar los ajustes.
+- **Origen:** pedido explícito de Maxi de corregir los 12 E2E rojos del PR #66 con
+  la opción elegida: arreglar los 44px, agregar el acceso a la cuenta en el navbar
+  municipal y actualizar los specs que codificaban la UI anterior.
+- **Problema/evidencia:** el job `application` de CI (run 39863097071) dio 85 E2E
+  verdes y 12 rojos. Causas: (1) tokens de control a 38px contra el mínimo de 44px
+  de `login-layout` y `registration-layout`; (2) la portada ocultaba el skip link
+  global con una regla propia y no ofrecía acceso a la cuenta para sesiones
+  activas, lo que rompía `session-navigation` en las seis combinaciones de rol y
+  entrada; (3) `accounts`, `registration-verification` y `setup` esperaban el h1
+  «Un puente claro…», el h1 «Mi cuenta» y la línea «Acceso individual activo», que
+  el panel con sidebar reemplazó.
+- **Cambio mínimo/justificación:** subir `--form-control-height` a 44px y recuperar
+  el ritmo vertical solo en las páginas de registro mediante `@media (min-width:
+  1024px) and (max-height: 1000px)` sobre la clase local `registrationPage`, sin
+  tocar el gap de campos documentado; eliminar la ocultación del skip link;
+  incorporar `HomeAccountNav` con `aria-label="Accesos principales"` y el enlace de
+  cuenta resuelto en el servidor con `getAccountAccess`, manteniendo la portada
+  como componente async igual que en `main`; alinear `setup`, `accounts` y
+  `registration-verification` con el rediseño aprobado.
+- **Superficies/contratos:** `src/app/globals.css`, `(public)/page.tsx`,
+  `(public)/home-account-nav.tsx`, `(public)/home.module.css`,
+  `(auth)/_components/registration-layout.tsx` y `registration.module.css`, los tres
+  E2E y los tres chequeos visuales, más los tests de componentes de portada.
+- **Riesgos/recuperación:** los encabezados y textos de los E2E son contrato de la
+  suite; se actualizan solo los que el rediseño reemplazó, conservando las
+  aserciones de accesibilidad, simetría y ausencia de scroll. Revertir este diff
+  devuelve el estado rojo de CI.
+- **Verificación local:** `typecheck`, `lint` sin warnings, 773 pruebas unitarias,
+  57 de tooling y build PASS. Playwright local contra producción en 127.0.0.1:3001
+  (puerto 3000 ocupado por otro servidor del usuario, no se tocó):
+  `setup`, `login-layout` y `registration-layout` 12/12 PASS; además
+  `home-responsive-layout-check`, `municipal-style-check` y
+  `home-keyboard-navigation-check` PASS.
+- **Pendiente:** CI completa (incluye `accounts`, `registration-verification` y
+  `session-navigation`, que requieren Supabase local y solo corren en el runner),
+  revisión del compañero y merge del PR. Node local 26.7.0, distinto del 24 LTS.

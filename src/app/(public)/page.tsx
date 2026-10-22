@@ -1,13 +1,16 @@
 import { HomeAccessPanel } from "./home-access-panel";
+import { HomeAccountNav } from "./home-account-nav";
 import { HomeNavbar } from "./home-navbar";
 import { HomeRibbons } from "./home-ribbons";
 import Image from "next/image";
 import { ArrowDown, Building2, ShieldCheck, Users } from "lucide-react";
+import { getAccountAccess } from "@/features/accounts/navigation";
 import styles from "./home.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const accountAccess = await getAccountAccess();
   return (
     <>
       <HomeNavbar />
@@ -20,6 +23,7 @@ export default function HomePage() {
                 <Image src="/brand/logo-funes-verde.svg" alt="" width={48} height={48} />
                 <p><strong>Oficina de Empleo</strong><span>Municipalidad de Funes</span></p>
               </div>
+              <HomeAccountNav href={accountAccess.href} label={accountAccess.label} />
               <h1 className={styles.headline}>El empleo en Funes, con acompañamiento municipal.</h1>
               <p className={styles.introSummary}>Ingresá para continuar con tu perfil y gestionar tus oportunidades desde un mismo lugar.</p>
               <ul className={styles.introRoles}>

@@ -2,11 +2,6 @@
   background: var(--color-brand-secondary);
 }
 
-/* Use homepage navbar navigation without changing skip links on other routes. */
-:global(body):has(.page) > :global(a[href="#contenido"]) {
-  display: none;
-}
-
 .hero {
   position: relative;
   isolation: isolate;
@@ -164,6 +159,39 @@
   color: var(--color-brand-secondary);
   font-size: 14px;
   line-height: 1.75;
+}
+
+.accountNav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 20px;
+  margin-top: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-brand-secondary) 30%, transparent);
+}
+
+.accountNav a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--color-brand-secondary);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.accountNav a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.accountNav a:focus-visible {
+  outline: 3px solid var(--color-brand-secondary);
+  outline-offset: 3px;
 }
 
 .introIdentity {

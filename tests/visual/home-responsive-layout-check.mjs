@@ -130,13 +130,14 @@ try {
       if (width === 1440 && mode === "company") assert.equal(geometry.fitsInitialViewport, true, "Company title and complete card fit the desktop viewport");
       const indicators = await page.locator('form input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"])').evaluateAll(inputs => inputs.map(input => {
         const label = input.labels[0];
-        const marker = label.querySelector(":scope > span") ?? label;
-        return { name: input.name, required: input.required, marker: getComputedStyle(marker, "::after").content.includes("*") };
+        const requiredMarker = label.querySelector("[data-required-marker]");
+        const marker = Boolean(requiredMarker?.textContent?.includes("*")) || getComputedStyle(label, "::after").content.includes("*");
+        return { name: input.name, required: input.required, marker };
       }));
       assert.ok(indicators.every(input => input.required === input.marker), "Asterisks match required attributes, not optional fields");
       assert.doesNotMatch(await card.innerText(), /\(opcional\)/i);
       if (mode === "login") {
-        assert.equal(await card.getByText("No compartas tu contraseña.", { exact: true }).count(), 1);
+        assert.equal(await card.getByText("Entre 6 y 128 caracteres. No compartas tu contraseña.", { exact: true }).count(), 1);
         assert.equal(await card.getByText("Los campos marcados con * son obligatorios.", { exact: true }).count(), 0);
         const recovery = card.getByRole("link", { name: "Recuperar acceso" });
         assert.equal(await recovery.getAttribute("href"), "/recover");
@@ -152,8 +153,7 @@ try {
       } else {
         assert.equal(await card.getByRole("link", { name: "Recuperar acceso" }).count(), 0);
         assert.equal(await card.getByRole("separator").count(), 0);
-        assert.doesNotMatch(await card.innerText(), /No compartas tu contraseña/);
-        assert.equal(await card.getByText("Entre 6 y 128 caracteres.", { exact: true }).count(), 1);
+        assert.equal(await card.getByText("Entre 6 y 128 caracteres. No compartas tu contraseña.", { exact: true }).count(), 1);
         const note = await card.getByText("Los campos marcados con * son obligatorios.", { exact: true }).boundingBox();
         const submit = await card.locator('button[type="submit"]').boundingBox();
         const box = await card.boundingBox();
@@ -165,7 +165,7 @@ try {
         assert.equal(await roles.evaluate(el => getComputedStyle(el).borderTopColor), "rgb(134, 141, 152)");
         assert.equal(await roles.evaluate(el => getComputedStyle(el).borderTopWidth), "1px");
         if (width < 1024) {
-          const caption = await roles.locator("span").boundingBox();
+          const caption = await roles.locator('span[aria-hidden="true"]').first().boundingBox();
           const choices = await Promise.all((await roles.locator("label").all()).map(label => label.boundingBox()));
           assert.ok(choices.every(choice => choice.y >= caption.y + caption.height - 1));
           assert.ok(Math.abs(choices[0].y - choices[1].y) < 1);

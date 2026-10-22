@@ -12,16 +12,15 @@ try {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(baseURL, { waitUntil: "networkidle" });
+    const skip = page.locator('body > a[href="#contenido"]');
+    await page.keyboard.press("Tab");
+    assert.equal(await skip.evaluate(el => el === document.activeElement), true, "Homepage exposes the global skip link first");
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(() => document.activeElement?.id === "contenido");
     for (const mode of ["login", "candidate", "company"]) {
       if (mode !== "login") await page.getByRole("button", { name: "Registrarse", exact: true }).first().click();
       if (mode === "company") await page.getByRole("radio", { name: "Empresa", exact: true }).check();
       await page.waitForTimeout(600);
-      const skip = page.locator('body > a[href="#contenido"]');
-      assert.equal(await skip.evaluate(el => getComputedStyle(el).display), "none", "Homepage does not expose the global skip-link bar");
-      for (let tab = 0; tab < 28; tab++) {
-        await page.keyboard.press("Tab");
-        assert.equal(await skip.evaluate(el => el === document.activeElement), false, "Repeated tabbing never focuses the removed homepage bar");
-      }
       await page.evaluate(() => scrollTo({ top: innerHeight, behavior: "instant" }));
       await page.waitForFunction(() => document.querySelector("header").getAttribute("aria-hidden") === "false");
       const navigation = page.getByRole("navigation", { name: "Navegación principal" });

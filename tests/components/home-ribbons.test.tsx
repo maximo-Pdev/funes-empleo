@@ -1,10 +1,12 @@
-import React from "react";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn() }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
+
 import HomePage from "@/app/(public)/page";
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
@@ -24,17 +26,17 @@ function setup(reduced: boolean) {
   return { stroke, disconnect, motion, request, cancel };
 }
 
-it("preloads a visible static ribbons frame without scheduling motion when reduced motion is requested", () => {
+it("preloads a visible static ribbons frame without scheduling motion when reduced motion is requested", async () => {
   const { stroke, request } = setup(true);
-  const { container } = render(<HomePage />);
+  const { container } = render(await HomePage());
   expect(stroke).toHaveBeenCalled();
   expect(request).not.toHaveBeenCalled();
   expect(container.querySelector("canvas")?.getAttribute("data-motion")).toBe("static");
 });
 
-it("autoplays the ribbons and releases the frame, observer and motion listener on unmount", () => {
+it("autoplays the ribbons and releases the frame, observer and motion listener on unmount", async () => {
   const { stroke, request, cancel, disconnect, motion } = setup(false);
-  const view = render(<HomePage />);
+  const view = render(await HomePage());
   expect(stroke).toHaveBeenCalled();
   expect(request).toHaveBeenCalledTimes(1);
   expect(view.container.querySelector("canvas")?.getAttribute("data-motion")).toBe("animated");

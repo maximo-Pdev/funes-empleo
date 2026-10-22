@@ -8,6 +8,9 @@ vi.mock("@/features/accounts/actions", () => ({
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
+
 import HomePage from "@/app/(public)/page";
 import { AuthForm } from "@/features/accounts/components/auth-form";
 import { CandidateRegistrationForm } from "@/features/candidates/components/candidate-registration-form";
@@ -16,8 +19,8 @@ import { CompanyRegistrationForm } from "@/features/companies/components/company
 afterEach(cleanup);
 
 describe("Home access panel", () => {
-  it("offers recovery below a separator after sign-in, outside the form and only in login mode", () => {
-    render(<HomePage />);
+  it("offers recovery below a separator after sign-in, outside the form and only in login mode", async () => {
+    render(await HomePage());
     const submit = screen.getByRole("button", { name: "Ingresar" });
     const separator = screen.getByRole("separator");
     const recovery = screen.getByRole("link", { name: "Recuperar acceso" });
@@ -34,8 +37,8 @@ describe("Home access panel", () => {
     expect(screen.getByRole("link", { name: "Recuperar acceso" })).toBeTruthy();
   });
 
-  it("explains required asterisks below both registration forms but not login", () => {
-    render(<HomePage />);
+  it("explains required asterisks below both registration forms but not login", async () => {
+    render(await HomePage());
     const note = "Los campos marcados con * son obligatorios.";
     expect(screen.queryByText(note)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
@@ -47,8 +50,8 @@ describe("Home access panel", () => {
     expect(screen.queryByText(note)).toBeNull();
   });
 
-  it("orders company fields into the requested rows without requiring the optional phone", () => {
-    render(<HomePage />);
+  it("orders company fields into the requested rows without requiring the optional phone", async () => {
+    render(await HomePage());
     fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
     fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
     const phone = screen.getByLabelText("Teléfono de contacto") as HTMLInputElement;
@@ -75,8 +78,8 @@ describe("Home access panel", () => {
     expect(screen.getByRole("region", { name: "Acceso al portal" }).parentElement?.getAttribute("data-layout")).toBe("company");
   });
 
-  it("removes the portal title while preserving the animated access card", () => {
-    render(<HomePage />);
+  it("removes the portal title while preserving the animated access card", async () => {
+    render(await HomePage());
     const panel = screen.getByRole("region", { name: "Acceso al portal" });
     expect(screen.queryByText("Portal Municipal de Empleo de Funes")).toBeNull();
     expect(screen.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
@@ -90,7 +93,7 @@ describe("Home access panel", () => {
     expect(panel.getAttribute("data-mode")).toBe("login");
   });
 
-  it("preserves the shared password guidance across login, password change and registration", () => {
+  it("preserves the shared password guidance across login, password change and registration", async () => {
     const help = "Entre 6 y 128 caracteres. No compartas tu contraseña.";
     const view = render(<AuthForm mode="login" />);
     expect(screen.getByText(help)).toBeTruthy();
@@ -102,8 +105,8 @@ describe("Home access panel", () => {
     expect(screen.getByText(help)).toBeTruthy();
   });
 
-  it("shows the sign-in form by default", () => {
-    render(<HomePage />);
+  it("shows the sign-in form by default", async () => {
+    render(await HomePage());
     expect(screen.getByRole("button", { name: "Iniciar sesión" }).getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByLabelText("Correo electrónico")).toBeTruthy();
     expect(screen.getByLabelText("Contraseña", { exact: true })).toBeTruthy();
@@ -111,8 +114,8 @@ describe("Home access panel", () => {
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
   });
 
-  it("switches between candidate and company registration and back to sign-in", () => {
-    render(<HomePage />);
+  it("switches between candidate and company registration and back to sign-in", async () => {
+    render(await HomePage());
     fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
     expect(screen.getByRole("group", { name: "Tipo de cuenta" })).toBeTruthy();
     expect((screen.getByRole("radio", { name: "Postulante" }) as HTMLInputElement).checked).toBe(true);
@@ -128,7 +131,7 @@ describe("Home access panel", () => {
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
   });
 
-  it("preserves the original labels on existing authentication pages", () => {
+  it("preserves the original labels on existing authentication pages", async () => {
     const view = render(<AuthForm mode="login" />);
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeTruthy();
     view.rerender(<CandidateRegistrationForm />);

@@ -75,7 +75,7 @@
 :root {
   color-scheme: light;
   --surface-bevel-gradient: linear-gradient(135deg, var(--color-brand-secondary) 0%, #f5ffed 16%, #aabb9f 34%, var(--color-brand-secondary) 48%, #e5efdc 60%, #879c7a 83%, #f4ffe9 100%);
-  --form-control-height: 38px;
+  --form-control-height: 44px;
   --form-control-padding: 6px 12px 6px 0;
   --form-label-gap: 6px;
   --form-field-gap: 16px;
