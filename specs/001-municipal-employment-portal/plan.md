@@ -139,6 +139,41 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 
 ## Contexto técnico
 
+### EXTRA040 — presentación del perfil candidato, 2026-10-22
+
+Solo CandidateProfilePanel y CSS local: tarjeta inicial de estado/vigencia y
+activación. Derivar visibilidad de props guardadas que ya entrega workspace,
+según el predicado del RPC activate_candidate existente: estados recuperables,
+localidad/resumen, categorías, disponibilidad available, consentimiento accepted
+y CV válido. Enumerar faltantes y pedir guardar antes de activar; mantener versión,
+Action, errores/foco y refresh actuales. El cliente no autoriza ni sustituye la
+revalidación transaccional. active muestra indicador, no acción; archived no activa.
+Selectores semánticos de datos laborales evitan dependencia del orden de forms;
+retirar reglas rojas obsoletas del último form. No ocultar campos ni crear tabs.
+Contacto y consentimiento usan ancho completo para que la explicación no estire
+una tarjeta vecina vacía; datos laborales conserva sus dos columnas internas.
+
+Texto auxiliar de consentimiento alineado con FR-036/038/055 y EXTRA035, distinto
+de la política devuelta por el servidor, que se conserva literalmente con aviso
+demo y su versión/hash actuales. Aclarar alcance global al contratar sin cerrar
+otros casos, revocación y nueva aceptación explícita. Sin persistencia, RPC,
+Actions nuevas, migración, dependencia, entorno o modificación de reglas.
+RED de componente para visibilidad/orden/faltantes y texto, más navegador con
+flujo real de activación/consentimiento, móvil, teclado y axe. Tipos/lint/pruebas/
+build. Modelo/contratos de estados y autorización permanecen intactos.
+
+### EXTRA041 — composición de tarjetas del perfil, 2026-10-22
+
+Una section de Datos laborales y personales contiene los formularios hermanos
+de datos y teléfono opcional, cada uno con su Action/version/resultado; sin
+anidamiento ni encadenar mutaciones no atómicas. Botón Guardar teléfono explícito.
+El Form conserva valores ante error y el éxito telefónico no reinicia el form
+de datos. Reubicar CV antes del Form de consentimiento en DOM. Reemplazar banner
+por details/summary cerrado con la política literal y versión consultables;
+conservar advertencia demo dentro del detalle, no inventar aprobación municipal.
+Sin backend/migraciones/contratos/dependencias. Tests de ubicación, opcionalidad,
+guardado, retención, teclado, política expandible y contacto empresarial derivado.
+
 ### EXTRA039 — retirar autoarchivo, 2026-10-22
 
 Eliminar tarjetas y Actions exclusivas de autoarchivo en perfiles y /account,

@@ -1874,6 +1874,157 @@ documentales, diff-check PASS. CI/revisión independiente y aceptación pendient
   Pendiente aplicar únicamente20261022202940 en Supabase compartido antes del
   despliegue de app y revisión mediante PR; gates históricos/OQ-001/002 intactos.
 
+## EXTRA-040 — Claridad de consentimiento y activación del perfil candidato
+
+- **Fecha/origen/autorización:** 2026-10-22, petición expresa de Mateo de aclarar
+  consentimiento y colocar activación/indicador al principio. PR64 confirmado
+  mergeado (5b15b24); rama codex/feat-candidate-consent-activation-ui desde main
+  actualizado, anterior eliminada local/remoto. next-env.d.ts ajeno preservado.
+- **Evidencia:** CandidateProfilePanel muestra el formulario de activación al
+  final para cualquier estado distinto de active, incluso incompleto/archivado.
+  El RPC activate_candidate de202609190019 exige draft/needs_update/unavailable/
+  consent_withdrawn, disponibilidad available, localidad/resumen no vacíos,
+  categoría, consentimiento accepted y CV válido. Workspace ya provee esos datos
+  guardados y la ruta exige cuenta candidata activa. No hace falta otra consulta.
+  CSS usa first-of-type/last-child y pinta de rojo la activación como si fuera
+  destructiva; moverla sin revisar esos selectores puede deformar otras tarjetas.
+- **Reglas/origen aprobado:** FR-010/015/036/038/055, OQ-020 resuelta y EXTRA035:
+  consentimiento global, no por oferta; contratación normal/tardía confirmada
+  retira el vigente y revoca todos sus accesos empresariales, sin alterar otros
+  casos ni resultados. Nuevo consentimiento exige acción afirmativa y no revive
+  permisos. Retiro manual conserva sus efectos propios. OQ-001/002 siguen abiertas.
+- **Cambio mínimo propuesto antes de implementar:** primera tarjeta con estado,
+  vigencia e indicador Perfil activo, o formulario Activar perfil solo si la
+  proyección guardada satisface las condiciones actuales del RPC. Mostrar faltantes
+  accionables para estados recuperables sin habilitar envíos imposibles; servidor
+  mantiene la revalidación final ante concurrencia. Selectores CSS semánticos para
+  datos laborales, eliminando estilos destructivos posicionales obsoletos.
+  Explicación auxiliar de autorización municipal, derivación, datos visibles/no
+  visibles, retiro global al contratar, historial y nueva aceptación explícita.
+  Conservar íntegros policy_text/version/hash y aviso de política demo no aprobada.
+- **Archivos/contratos afectados:** panel candidato, candidate-forms.module.css,
+  pruebas de componente y navegador; spec/plan/tasks/estado y guía de interfaz.
+  Sin nuevas Actions, RPC, migración, campos persistidos, entorno, dependencias
+  ni cambios de autorización, activación, contratación, disponibilidad o política.
+- **Riesgos/verificación prevista:** no confundir activo con aptitud para derivar,
+  no afirmar cierre de otros casos por contratación ni eliminación de historia;
+  no reemplazar política/hash con explicación auxiliar. RED de orden/estados,
+  faltantes independientes y consentimiento; GREEN, regresiones de candidato,
+  teclado/axe/móvil/escritorio, tipos/lint/tooling/cobertura/build. Usar solo
+  fixtures locales ficticios sin reset ni cambios alojados. Análisis de coherencia
+  acotado a este incremento; revisión humana/aceptación no inferidas.
+- **Estado inicial:** propuesta registrada antes de cambios de producto; autorización
+  expresa del solicitante, sin nueva arquitectura o decisión municipal/legal.
+- **Ajuste visual necesario detectado:** captura local1920×1080 con el texto nuevo
+  muestra consentimiento en media anchura y Contacto adicional estirado con un
+  gran vacío por la fila compartida. Antes de corregir: usar ancho completo para
+  ambos formularios directos del panel; conservar dos columnas internas en datos
+  laborales y una en móvil. Solo CSS local, sin reordenar DOM o agregar componentes.
+  Evidencia sintética ignorada test-results/profile-presentation-desktop.png;
+  verificar nueva captura, axe, ausencia de overflow y regresión de formulario.
+- **Implementación:** tarjeta inicial con estado/vigencia y formulario condicional,
+  faltantes calculados sin efectos/estado duplicados, explicación global y retiro
+  manual diferenciados. policy_text/version/hash y formulario afirmativo intactos.
+  CSS semántico/ancho completo verificados visualmente con capturas sintéticas.
+  Archivos reales: panel, CSS candidato, candidate-flow/profile-presentation y
+  candidate-self-service, guía docs/product/candidate-profile-presentation.md,
+  spec/plan/tasks/implementation-status y este registro. Ningún archivo de
+  backend, autorización, contrato persistido o migración modificado.
+- **Evidencia inicial de pruebas:** RED15/15 de presentación; la suite candidata
+  adicional tuvo fallo de importación temporal en el sandbox de Vitest, no de
+  producto. Reejecución fuera del sandbox GREEN28/28, sin modificar configuración
+  o relajar aserciones. Tooling57/57, cobertura745/54, tipos/lint/build PASS.
+  Cobertura configurada sigue limitada a env/schema, no toda la aplicación.
+  Servidor next dev de Mateo detenido únicamente tras autorización expresa;
+  puerto3000 reservado por Playwright y configuración de proceso solo local.
+- **Verificación final:**745 pruebas/54 archivos y tooling57 PASS, tipos/lint/build
+  y diff-check PASS. Navegador12/12 en una ejecución sin reintentos: autogestión,
+  formularios9 y contratación normal/tardía2. Activación superior por teclado,
+  indicador activo sin botón, faltantes, anchura de tarjetas, móvil360×800,
+  escritorio1920×1080, sin overflow y axe PASS. Revisión visual de las dos capturas
+  ficticias, sin NVDA o validación humana acreditada. Avisos previos de stream
+  cerrado por navegación en logs Next no impidieron los recorridos; sin cambio
+  ajeno para ocultarlos. No se volvió a ejecutar pgTAP completo: no cambia DB.
+- **Análisis/convergencia acotados:** reglas UI trazadas a FR-010/015/036/038/055,
+  consentimiento global a OQ-020/EXTRA035 y tareasT144–147. Sin hallazgos bloqueantes
+  de duplicación/ambigüedad/contratos/constitución o gaps construibles dentro del
+  incremento. Checklists previos4/4 sin ítems pendientes, sin modificarlos ni
+  atribuir revisión independiente. Guía y estado actualizados; hooks de extensión
+  no configurados. Revisión React: derivaciones simples en render, sin nuevo
+  efecto/fetch/estado persistido, hooks incondicionales y claves estables.
+  Servidor de pruebas cerrado automáticamente, base local sin reset, next-env.d.ts
+  ajeno restaurado tras typegen/build. Sin migración, entorno alojado, commit/PR
+  nuevo, CI, suite E2E completa o aceptación global. OQ-001/002 siguen pendientes.
+
+## EXTRA-041 — Reorganizar teléfono, CV y aviso de consentimiento
+
+- **Fecha/origen/autorización:** 2026-10-22, Mateo solicita retirar el cartel de
+  política demo, integrar teléfono opcional en Datos laborales y personales y
+  colocar CV antes del consentimiento. Misma rama, renombrada por pedido de Mateo
+  a feat/candidate-consent-activation-ui; sin prefijo codex ni firmas/atribuciones
+  automáticas en futuros commits. Cambios EXTRA040 y next-env.d.ts preservados.
+- **Evidencia/necesidad:** teléfono y datos usan comandos/versiones separados.
+  Encadenarlos desde la UI como si fueran un guardado atómico podría guardar solo
+  una parte o enviar una versión vencida. El pedido es visual: no justifica un
+  RPC/migración o modificar validación/autorización. El consentimiento registra
+  versión/hash de policy_text demo; quitar toda posibilidad de consultar ese texto
+  rompería la trazabilidad de lo mostrado respecto de lo aceptado.
+- **Cambio mínimo propuesto antes de implementar:** una sola tarjeta de Datos
+  laborales y personales con teléfono opcional y botón explícito Guardar teléfono,
+  conservando dos formularios hermanos y sus comandos existentes, nunca anidados
+  ni guardado parcial disfrazado de éxito conjunto. Eliminar tarjeta/título
+  Contacto adicional. Mover el bloque CV completo antes del consentimiento.
+  Quitar cartel amarillo de la vista inicial; política literal y versión siguen
+  consultables en details/summary accesible, cerrado inicialmente. No cambiar
+  política/hash, aceptación afirmativa, permisos ni su carácter demo. La petición
+  no constituye aprobación legal ni habilitación de datos reales (OQ-001/002).
+- **Archivos/contratos:** panel, CSS si fuera necesario, pruebas componentes/E2E
+  de perfil y contacto derivado, spec/plan/tasks/guía/estado y este registro.
+  Sin cambios backend, DB, migraciones, entorno, dependencias o contratos RPC.
+- **Riesgos/verificación prevista:** evitar forms anidados y pérdida de otros
+  campos al guardar teléfono; validar opcionalidad/errores/versión y persistencia.
+  Orden CV→consentimiento real en DOM; política expandible por teclado y sin
+  banner inicial; activación/consentimiento de EXTRA040 intactos. RED/GREEN de UI,
+  pruebas/tipos/lint/tooling/build y navegador local ficticio, sin reset/alojado.
+  Autoriza el solicitante; revisión/aceptación humana pendientes.
+- **Implementación:** sección única de datos con formularios hermanos, sin
+  anidamiento ni comandos nuevos; teléfono opcional y Guardar teléfono explícito.
+  CV antes del consentimiento. Cartel amarillo retirado; política literal y
+  advertencia solo en details/summary cerrado, con acceso por teclado. Actions,
+  versiones, validación, hash y reglas permanecen. Regresión de contacto derivado
+  actualiza solo el nombre del botón candidato, no las acciones municipales.
+  RED2/16 y GREEN29/29 focales; cobertura746/54, tooling57, tipos/lint/build PASS.
+- **Verificado/cierre acotado:** navegador11/11 PASS sin reintentos: candidato1,
+  formularios9 y snapshot/contactos/consentimiento1. Teléfono inválido señalado,
+  guardado/relectura y vaciado opcional correctos; guardar teléfono no borra ni
+  guarda otras correcciones locales. Política inicialmente cerrada y expandible
+  por teclado; CV antes del consentimiento, sin tarjeta Contacto adicional ni
+  forms anidados. Capturas sintéticas y móvil/escritorio/axe revisados. Contacto
+  actualizado visible a empresa ya derivada, CV instantáneo conservado y retiro/
+  reaceptación sin devolver acceso. Fixture15 se consultó primero para comprobar
+  precondiciones y luego se ejecutó el recorrido existente, sin reset local.
+  Logs Next mantienen avisos previos de stream cerrado al navegar; recorridos
+  completados sin ocultar errores de pruebas o cambiar producto ajeno.
+- **Trazabilidad/límites:** T148–150 y guía/estado alineados, análisis de alcance
+  sin arquitectura/contrato/permiso nuevo ni decisión legal inventada. React con
+  hooks/Actions existentes y sin nuevos efectos/fetch. Diff-check PASS, sin hooks
+  de extensión configurados. Servidor next dev cerrado tras nueva autorización
+  de Mateo y servidores de prueba finalizados; next-env.d.ts ajeno restaurado.
+  Sin migración, cambios alojados, commit/PR, CI, suite completa E2E/SQL o NVDA;
+  OQ-001/002 y revisión humana permanecen abiertos. Policy/hash no modificados y
+  retirar el cartel no acredita aprobación municipal o uso con datos reales.
+
+## Entrega de EXTRA040–041 — 2026-10-22
+
+Mateo solicita el PR. Commit funcionalc228d2c desde main5b15b24 actualizado,
+rama feat/candidate-consent-activation-ui, sin firma GPG/sign-off/atribución
+automática. PR65 abierto hacia main, sin merge:
+https://github.com/maximo-Pdev/funes-empleo/pull/65.
+Incluye interfaz, pruebas y artefactos del incremento; next-env.d.ts ajeno queda
+fuera y sin añadir logs/capturas/secretos. Verificaciones locales consignadas en
+EXTRA040–041; publicación no acredita CI, revisión o aceptación. Sin nuevas
+migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

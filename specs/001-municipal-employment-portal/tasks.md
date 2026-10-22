@@ -578,3 +578,16 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T141 RED UI/servidor7/33 y SQL10/12 de autoarchivo candidato/empresa. Conservar archivo empresarial/restauración históricos; no agregar archivo administrativo candidato. Operaciones de perfil/consentimiento intactas.
 - [x] T142 Formularios/Actions/props exclusivas retirados, admin exigido en servicio/RPC mediante20261022202940, misma firma/grants; no cambia datos ni SQL anterior. Migración verificada solo localmente.
 - [x] T143 SQL/HTTP/E2E ajustados a denegación de autoarchivo y restauración legada, sin omitir pruebas: SQL1072/18,730 tests/53 archivos, tooling57, navegador12/12 (HTTP8), tipos/lint/build/diff-check y advisor PASS. Guía docs/validation/profile-self-archival.md; sin reset local ni cambios alojados. CI/revisión/rollout y aceptación pendientes.
+
+## Claridad de perfil candidato — EXTRA040, 2026-10-22
+
+- [x] T144 Registrar pedido/evidencia, revisar FR-010/015/036/038/055 y OQ-020, alinear spec/plan y analizar el alcance UI sin alterar política, contratos o reglas.
+- [x] T145 RED de CandidateProfilePanel: activación primero y solo elegible en estados permitidos, indicador activo sin botón, faltantes y consentimiento global/historial; conservar política demo. RED15/15 de presentación; GREEN28/28 de los tres archivos candidatos.
+- [x] T146 Reordenar panel y explicar consentimiento; ajustar CSS semántico sin backend, migraciones ni cambios de reglas. Conservar Action, versión, foco, validación y refresh.
+- [x] T147 Verificar regresiones, tipos/lint/tooling/cobertura/build, navegador de candidato con móvil/escritorio/teclado/axe y documentar resultados/límites en guía y estado.745/54, tooling57, navegador12/12, tipos/lint/build/diff-check PASS; sin migración/reset/cambios alojados. Sin acreditar CI, revisión externa o aceptación.
+
+## Reorganizar tarjeta y aviso — EXTRA041, 2026-10-22
+
+- [x] T148 Registrar petición y resolver presentación sin mutaciones nuevas: teléfono con guardado explícito dentro de la tarjeta y política demo consultable sin banner inicial; spec/plan alineados, sin cambios de reglas.
+- [x] T149 RED/GREEN de teléfono opcional en misma tarjeta sin forms anidados, CV antes de consentimiento y política expandible; implementar composición conservando Actions/versiones. RED2/16, GREEN29/29 de los tres archivos candidatos.
+- [x] T150 Verificar UI/guardado telefónico/contacto derivado, datos retenidos, teclado/axe/móvil, regresiones/tipos/lint/tooling/build y documentar límites sin atribuir cambios alojados.746/54, tooling57, tipos/lint/build/diff-check y navegador11/11 PASS; sin reset, migración, cambios alojados o aceptación global.
