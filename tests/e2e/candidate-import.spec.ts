@@ -18,7 +18,7 @@ test("importación ficticia: preview sin alta y confirmación explícita", async
   await page.getByRole("button", { name: "Previsualizar" }).click();
   await expect(page.getByText("Listo para confirmar", { exact: true })).toBeVisible();
   const id = page.url().split("/").pop()!;
-  expect(id).toMatch(/^[a-f0-9-]{36}$/);
+  expect(id).toMatch(/^imp-[a-f0-9]{24}$/);
   expect(runLocalMaintenanceSql(`select count(*) from public.candidate_private_data where dni_normalized='${dni}'`)).toBe("0");
   await expect(page.getByText(dni, { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Confirmar importación" }).click();
@@ -45,7 +45,7 @@ test("duplicados dentro del archivo: bloqueo, rechazo explícito y confirmación
   await second.getByRole("button", { name: "Guardar decisión y revalidar" }).click();
   await expect(page.getByText("Listo para confirmar", { exact: true })).toBeVisible();
   const id = page.url().split("/").pop()!;
-  expect(id).toMatch(/^[a-f0-9-]{36}$/);
+  expect(id).toMatch(/^imp-[a-f0-9]{24}$/);
   const hash = createHash("sha256").update(csv).digest("hex");
   const statuses = await page.evaluate(async ({ id, hash }) => Promise.all([1,2].map(async () => {
     const response = await fetch(`/api/admin/imports/${id}/confirm`, { method: "POST", headers: { "Content-Type": "application/json" },
@@ -69,7 +69,7 @@ test("fallo transaccional visible y nueva carga vinculada recuperable", async ({
   await page.getByRole("button", { name: "Previsualizar" }).click();
   await expect(page.getByText("Listo para confirmar", { exact: true })).toBeVisible();
   const failedId = page.url().split("/").pop()!;
-  expect(failedId).toMatch(/^[a-f0-9-]{36}$/);
+  expect(failedId).toMatch(/^imp-[a-f0-9]{24}$/);
   runLocalMaintenanceSql(`create function private.e2e_import_failure() returns trigger language plpgsql as $$ begin
     if new.display_name='FAIL_E2E_IMPORT' then raise exception 'FICTITIOUS_PRIVATE_ERROR'; end if; return new; end $$;
     create trigger e2e_import_failure before insert on public.candidate_profiles for each row execute function private.e2e_import_failure();`);

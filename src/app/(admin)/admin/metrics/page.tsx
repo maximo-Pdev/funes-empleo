@@ -1,3 +1,6 @@
+import { referenceFilters } from "@/lib/records/page-references";
+import { recordReferences } from "@/lib/records/references";
+import { RecordAnchor } from "@/components/ui/record-link";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
@@ -10,7 +13,7 @@ import { localToday, metricsFilterSchema, metricsQuery } from "@/validation/metr
 export const dynamic = "force-dynamic";
 export default async function MetricsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireActiveAccount(["admin"]);
-  const raw = await searchParams;
+  const raw = await referenceFilters("/admin/metrics", await searchParams, { category: "category" });
   const today = localToday();
   const parsed = metricsFilterSchema.safeParse({ from: `${today.slice(0, 7)}-01`, to: today, ...raw });
   let result: Awaited<ReturnType<typeof getMetrics>> | null = null;
@@ -22,13 +25,14 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
   } catch (e) {
     error = e instanceof MetricsHistoryUnavailable ? `No hay evidencia histórica suficiente para ese período. ${e.message ? `El historial fiable comienza el ${new Date(e.message).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}; elegí fechas desde el día siguiente.` : "Elegí un período posterior al inicio del historial."} No se sustituyen datos históricos por valores actuales.` : publicErrorFrom(e).message;
   }
+  const categoryReferences = await recordReferences("category", categories.map(category => category.id));
   return <AdminShell active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Seguimiento" }, { href: "/account", label: "Mi cuenta" }]}>
     <Form method="get" requirements={[{ names: ["from", "to"], rule: "date-order", message: "La fecha Hasta debe ser igual o posterior a Desde." }]} className="mb-6 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
       <Field>Desde<input className="mt-1 block rounded border p-2" name="from" type="date" required max={today} defaultValue={typeof raw.from === "string" ? raw.from : `${today.slice(0, 7)}-01`} /></Field>
       <Field>Hasta<input className="mt-1 block rounded border p-2" name="to" type="date" required max={today} defaultValue={typeof raw.to === "string" ? raw.to : today} /></Field>
-      <Field>Categoría<select className="mt-1 block max-w-full rounded border p-2" name="category" defaultValue={parsed.success ? parsed.data.category ?? "" : ""}>
-        <option value="">Todas las categorías</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.code}, v{c.version})</option>)}
+      <Field>Categoría<select className="mt-1 block max-w-full rounded border p-2" name="category" defaultValue={parsed.success ? (parsed.data.category ? categoryReferences[parsed.data.category] : "") ?? "" : ""}>
+        <option value="">Todas las categorías</option>{categories.map((c) => <option key={c.id} value={categoryReferences[c.id]}>{c.name} ({c.code}, v{c.version})</option>)}
       </select></Field><button className="rounded bg-blue-800 px-4 py-2 text-white" type="submit">Aplicar filtros</button>
     </Form>
     <section aria-labelledby="definitions" className="mb-6 space-y-2 rounded border border-blue-300 bg-blue-50 p-4">
@@ -41,7 +45,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
     {result && <>
       <p className="mb-4">Foto al {new Date(result.as_of).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}.</p>
-      <a href={`/api/admin/exports/operations.csv?${metricsQuery(result.filters)}`} className="mb-6 inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar CSV filtrado</a>
+      <RecordAnchor href={`/api/admin/exports/operations.csv?${metricsQuery(result.filters)}`} className="mb-6 inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar CSV filtrado</RecordAnchor>
       <Dashboard rows={result.rows} />
     </>}
   </AdminShell>;

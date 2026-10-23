@@ -1,3 +1,4 @@
+import { referenceUrl } from "@/lib/records/reference-url";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { readAccountSession } from "@/lib/auth/session";
@@ -22,7 +23,7 @@ function respond(status: CvStatus, target: string, json: boolean) {
 }
 
 export async function POST(request: Request) {
-  const result = (status: CvStatus, target: string) => respond(status, target,
+  const result = async (status: CvStatus, target: string) => respond(status, await referenceUrl(target).catch(() => "/admin/candidates"),
     request.headers.get("accept")?.includes("application/json") ?? false);
   const session = await readAccountSession();
   if (!session || session.account.status !== "active" || !["candidate", "admin"].includes(session.account.role)) {

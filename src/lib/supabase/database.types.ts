@@ -1584,6 +1584,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_record_references: { Args: { p_kind: string; p_ids: string[] }; Returns: Json }
+      resolve_record_reference: { Args: { p_kind: string; p_reference: string }; Returns: string | null }
       metrics_history_start: { Args: Record<PropertyKey, never>; Returns: string | null }
       admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }
       export_admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }

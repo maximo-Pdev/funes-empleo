@@ -1,5 +1,5 @@
 import { availabilityLabel, interviewStatusLabels, displayLabel } from "@/domain/presentation/labels";
-import Link from "next/link";
+import { RecordLink as Link, RecordLabel } from "@/components/ui/record-link";
 import type { CompanyReferral } from "@/features/referrals/service";
 import { FeedbackForm, InterviewForm } from "./referral-forms";
 
@@ -7,8 +7,8 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
   const candidate = referral.candidate;
   return (
     <section aria-labelledby="detalle-derivacion" className="rounded-lg border border-slate-300 bg-white p-5">
-      <h2 id="detalle-derivacion" className="text-xl font-semibold">Derivación {referral.referralId}</h2>
-      <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? referral.openingId}</p>
+      <h2 id="detalle-derivacion" className="text-xl font-semibold">Derivación <RecordLabel kind="referral" id={referral.referralId} /></h2>
+      <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? "Oferta sin título"}</p>
       <p className="text-sm text-slate-700">Fecha de derivación: {new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Buenos_Aires" }).format(new Date(referral.referredAt))}</p>
       {candidate ? (
         <div className="mt-6 space-y-5">

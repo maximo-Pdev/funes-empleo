@@ -1,3 +1,4 @@
+import { referenceIdentifier } from "./fixtures/record-reference";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
@@ -85,8 +86,9 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Categoría ficticia A").check();
   await page.getByLabel("Categoría ficticia B").check();
   await page.getByRole("button", { name: "Guardar borrador" }).click();
-  await expect(page).toHaveURL(/\/empresa\/ofertas\/[0-9a-f-]{36}$/);
-  const openingId = new URL(page.url()).pathname.split("/").at(-1)!;
+  await expect(page).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
+  const openingReference = new URL(page.url()).pathname.split("/").at(-1)!;
+  const openingId = referenceIdentifier("opening", openingReference);
   await expect(page.getByText("Estado:")).toContainText("Borrador");
   await page.getByRole("button", { name: "Enviar a revisión municipal" }).click();
   await expect(page.getByText("Estado:")).toContainText("Pendiente de revisión");

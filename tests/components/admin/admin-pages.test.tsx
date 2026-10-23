@@ -1,3 +1,4 @@
+import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), search: vi.fn(), categories: vi.fn(), candidate: vi.fn(), nominations: vi.fn(), assisted: vi.fn(), openings: vi.fn(), opening: vi.fn(), participations: vi.fn(), participation: vi.fn(), contacts: vi.fn(), imports: vi.fn(), preview: vi.fn(), metrics: vi.fn(), metricCategories: vi.fn(), from: vi.fn(), range: vi.fn(), company: vi.fn(), account: vi.fn(), companyOffers: vi.fn(), moderate: vi.fn() }));
@@ -100,7 +101,7 @@ it("no consulta ofertas con estado inválido", async () => {
 });
 it("conserva los IDs de filtro al paginar participaciones", async () => {
  render(await Participations({ searchParams: Promise.resolve({ openingId: id, candidateId: id }) }));
- const params = new URL(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")!, "http://local").searchParams; expect(params.get("openingId")).toBe(id); expect(params.get("candidateId")).toBe(id);
+ const params = new URL(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")!, "http://local").searchParams; expect(params.get("openingId")).toBe(fixtureReference("opening", id)); expect(params.get("candidateId")).toBe(fixtureReference("candidate", id));
 });
 it("conserva la confirmación obligatoria en las decisiones de empresa", async () => {
  render(await Company({ params: Promise.resolve({ companyId: id }) })); expect(screen.getAllByRole("checkbox")).toHaveLength(2); for (const checkbox of screen.getAllByRole("checkbox")) expect(checkbox).toHaveProperty("required", true);
@@ -128,3 +129,7 @@ it.each([
  mocks.guard.mockRejectedValue(new Error("FORBIDDEN")); await expect(page()).rejects.toThrow("FORBIDDEN");
  expect(mocks.assisted).not.toHaveBeenCalled(); expect(mocks.imports).not.toHaveBeenCalled(); expect(mocks.participation).not.toHaveBeenCalled();
 });
+
+vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
+vi.mock("@/lib/records/page-references", async () => (await import("../../fixtures/record-references")).pageReferenceMocks);
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

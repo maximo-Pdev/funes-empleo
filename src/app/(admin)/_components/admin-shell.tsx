@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { ArrowLeft, BarChart3, BriefcaseBusiness, Building2, FileSpreadsheet, Home, LockKeyhole, Settings, ShieldCheck, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import styles from "./admin-workspace.module.css";

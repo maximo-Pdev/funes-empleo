@@ -11,14 +11,14 @@ import type { OpeningCandidatePreview, OpeningMatches } from "@/validation/openi
 
 type Selection = { id: string; name: string };
 
-export function OpeningCandidateMatchesList({ openingId, matches }: { openingId: string; matches: OpeningMatches }) {
+export function OpeningCandidateMatchesList({ openingId, openingReference, matches }: { openingId: string; openingReference: string; matches: OpeningMatches }) {
   const router = useRouter();
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const request = useRef(0);
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [profile, setProfile] = useState<OpeningCandidatePreview | null>(null);
+  const [profile, setProfile] = useState<(OpeningCandidatePreview & { cvReference: string }) | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -101,11 +101,11 @@ export function OpeningCandidateMatchesList({ openingId, matches }: { openingId:
           <button type="button" className="mt-2 rounded border border-blue-800 px-3 py-1.5 text-sm font-medium text-blue-800"
             aria-label={`Ver perfil de ${candidate.displayName}`} onClick={event => openProfile({ id: candidate.id, name: candidate.displayName }, event.currentTarget)}>Ver perfil y nominar</button>
         </li>)}</ul>}
-      {matches.page > 1 && !visible.length && <Link className="text-blue-800 underline" href={`/admin/openings/${openingId}#opening-matches`}>Volver a la primera página</Link>}
+      {matches.page > 1 && !visible.length && <Link className="text-blue-800 underline" href={`/admin/openings/${openingReference}#opening-matches`}>Volver a la primera página</Link>}
       {pageCount > 1 && <nav aria-label="Páginas de coincidencias" className="flex flex-wrap gap-4">
-        {matches.page > 1 && <Link className="text-blue-800 underline" href={`/admin/openings/${openingId}?matchPage=${matches.page - 1}#opening-matches`}>Anterior</Link>}
+        {matches.page > 1 && <Link className="text-blue-800 underline" href={`/admin/openings/${openingReference}?matchPage=${matches.page - 1}#opening-matches`}>Anterior</Link>}
         <span>Página {matches.page} de {pageCount}</span>
-        {matches.page < pageCount && <Link className="text-blue-800 underline" href={`/admin/openings/${openingId}?matchPage=${matches.page + 1}#opening-matches`}>Siguiente</Link>}
+        {matches.page < pageCount && <Link className="text-blue-800 underline" href={`/admin/openings/${openingReference}?matchPage=${matches.page + 1}#opening-matches`}>Siguiente</Link>}
       </nav>}
     </>}
     <dialog ref={dialog} aria-labelledby="candidate-preview-title" className="m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-2xl overflow-y-auto rounded-xl border border-slate-300 bg-white p-5 text-slate-950 shadow-xl backdrop:bg-slate-950/50"
@@ -126,7 +126,7 @@ export function OpeningCandidateMatchesList({ openingId, matches }: { openingId:
         </dl>
         <div><h3 className="font-semibold">Rubros del perfil</h3><p>{profile.categories.map(category => `${category.name} (${category.kind === "interest" ? "interés" : "ocupación"})`).join(", ")}</p></div>
         <div><h3 className="font-semibold">Habilidades y experiencia</h3><p className="whitespace-pre-wrap break-words">{profile.skills ?? "Sin información adicional"}</p></div>
-        <a className="inline-block text-blue-800 underline" href={`/api/cv/${profile.cvId}`} target="_blank" rel="noopener noreferrer">Abrir CV PDF en otra pestaña</a>
+        <a className="inline-block text-blue-800 underline" href={`/api/cv/${profile.cvReference}`} target="_blank" rel="noopener noreferrer">Abrir CV PDF en otra pestaña</a>
         <p className="text-sm">Nominar no comparte el perfil con la empresa. La derivación requiere otra decisión municipal.</p>
         <Button type="button" busy={pending} onClick={nominate}>Nominar a esta oferta</Button>
       </div>}

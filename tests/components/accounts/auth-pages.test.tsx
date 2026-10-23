@@ -25,6 +25,8 @@ it("guards the candidate dashboard before forwarding its selected section", asyn
  expect(mocks.guard).toHaveBeenCalledOnce();
  expect(mocks.candidate).toHaveBeenCalledWith({ params: { section: "ofertas" }, email: undefined });
 });
+
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);
 it.each([
  [Recovery, "Solicitar enlace de recuperación"], [Pending, "Reenviar verificación"],
  [Expired, "Reenviar verificación"], [Invalid, "Solicitar enlace de recuperación"],

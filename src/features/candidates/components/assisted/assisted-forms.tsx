@@ -41,7 +41,7 @@ export function AssistedProfileForm({ categories, candidateId, version, initial 
         resolution: matches.length ? { reviewId, decision, reason: form.get("reason"), confirmedFields: form.getAll("confirmedFields") } : null });
       setMessage(result.message);
       if (result.status === "duplicates") { setMatches(result.matches ?? []); setDecision(""); setReviewId(""); }
-      if (result.status === "saved" && result.candidateId) { router.push(`/admin/candidates/assisted/${result.candidateId}`); router.refresh(); }
+      if (result.status === "saved" && result.candidateReference) { router.push(`/admin/candidates/assisted/${result.candidateReference}`); router.refresh(); }
       if (result.status === "rejected") { setMatches([]); setDecision(""); setReviewId(""); }
     });
   }

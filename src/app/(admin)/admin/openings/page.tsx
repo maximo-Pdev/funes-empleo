@@ -1,6 +1,6 @@
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";

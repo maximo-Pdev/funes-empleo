@@ -1,5 +1,5 @@
 import { companyProfileStatusLabels, openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { ArrowRight, BriefcaseBusiness, Building2, ShieldCheck } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
 import { CompanyShell } from "../_components/company-shell";

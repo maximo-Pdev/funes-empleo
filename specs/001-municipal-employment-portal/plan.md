@@ -4,6 +4,17 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## A04 — referencias privadas,2026-10-23
+
+Addendum contracts/private-record-references.md: tabla privada de referencias y
+backfill INSERT para no disparar bump_version/append_only. Códigos aleatorios
+independientes y triggers AFTER INSERT, sin PK/FK nuevas en negocio. Dos RPC de
+lectura con sesión/autoridad por tipo; servidor conserva comandos UUID y genera
+URLs por referencias. SQL antes de app, sin despliegue alojado automático.
+Revisión de constitución: stack, permisos/RLS, historial, accesibilidad española y
+minimización intactos. No nueva infraestructura, claves, rankings o reglas legales.
+Análisis y pruebas de seguridad/compatibilidad antes del gate de implementación.
+
 ## A08 — diseño focalizado, 2026-10-19
 
 Fuente única: `public.job_categories`, sin catálogo paralelo en componentes.

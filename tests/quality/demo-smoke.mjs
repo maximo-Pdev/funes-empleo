@@ -42,7 +42,11 @@ try {
       await expect(page.getByRole("heading", { level:1 })).toBeVisible();
       assert.equal(new URL(page.url()).pathname,path);
       assert.doesNotMatch(await page.locator("body").innerText(), /Application error|Ocurrió un problema inesperado/);
-      const cv = await context.request.get(`/api/cv/${id("cv",1)}`);
+      const legacy = await context.request.get(`/api/cv/${id("cv",1)}`, { maxRedirects: 0 });
+      assert.equal(legacy.status(),307);
+      const target = legacy.headers().location;
+      assert.match(target,new RegExp("^/api/cv/cv-[a-f0-9]{24}$"));
+      const cv = await context.request.get(target);
       assert.equal(cv.status(),200,`CV autorizado de ${role}`);
       const manifest = JSON.parse(await readFile("tests/fixtures/acceptance-manifest.json","utf8"));
       assert.equal(createHash("sha256").update(await cv.body()).digest("hex"),manifest.cvSha256);

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { pageRecordIdentifier } from "@/lib/records/page-references";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { getAssistedWorkspace } from "@/features/candidates/assisted-service";
@@ -10,7 +11,8 @@ import { displayLabel } from "@/domain/presentation/labels";
 export const dynamic = "force-dynamic";
 export default async function AssistedDetailPage({ params }: { params: Promise<{ candidateId: string }> }) {
   await requireActiveAccount(["admin"]);
-  const { candidateId } = await params;
+  const { candidateId: reference } = await params;
+  const candidateId = await pageRecordIdentifier("candidate", reference, `/admin/candidates/assisted/${reference}`);
   const { categories, workspace } = await getAssistedWorkspace(candidateId);
   if (!workspace) return null;
   const { profile, data, requests, consent, policy } = workspace;

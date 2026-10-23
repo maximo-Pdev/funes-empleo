@@ -1,6 +1,8 @@
+import { pageRecordIdentifier } from "@/lib/records/page-references";
+import { routeIdentifier } from "@/lib/records/references";
 import { CompanyShell } from "../../../../_components/company-shell";
 import styles from "../../../../_components/company-forms.module.css";
-import Link from "next/link";
+import { RecordLink as Link, RecordLabel } from "@/components/ui/record-link";
 import { notFound } from "next/navigation";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { AppError } from "@/lib/errors/public-error";
@@ -18,8 +20,13 @@ type Props = {
 
 export default async function CompanyReferralsPage({ params, searchParams }: Props) {
   await requireActiveAccount(["company"]);
-  const { openingId } = await params;
-  const requested = (await searchParams).referral;
+  const { openingId: reference } = await params;
+  const query = await searchParams;
+  if (query.referral !== undefined && typeof query.referral !== "string") notFound();
+  const openingId = await pageRecordIdentifier("opening", reference, `/company/openings/${reference}/referrals`, query);
+  let requested: string | undefined;
+  try { requested = query.referral ? await routeIdentifier("referral", query.referral) : undefined; }
+  catch (error) { if (error instanceof AppError && error.code === "NOT_FOUND") notFound(); throw error; }
   let references;
   try { references = await listCompanyReferralReferences(openingId); }
   catch (error) { if (error instanceof AppError && error.code === "NOT_FOUND") notFound(); throw error; }
@@ -42,7 +49,7 @@ export default async function CompanyReferralsPage({ params, searchParams }: Pro
                 className="block min-h-11 break-words rounded-lg border border-border p-3 text-primary-700 hover:bg-secondary aria-[current=page]:border-primary aria-[current=page]:bg-secondary">
                 <span className="block font-medium">{item.opening_title ?? "Oferta"}</span>
                 <span className="block text-sm">{new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeZone: "America/Buenos_Aires" }).format(new Date(item.referred_at))}</span>
-                <span className="block break-all text-xs">{item.referral_id}</span>
+                <span className="block break-all text-xs"><RecordLabel kind="referral" id={item.referral_id} /></span>
               </Link>
             </li>)}</ul>
           </nav>

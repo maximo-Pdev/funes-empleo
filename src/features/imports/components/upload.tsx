@@ -22,7 +22,7 @@ export function ImportUpload({ retry }: { retry?: string }) {
         method: "POST", headers: { "Content-Type": "text/csv", "X-Fictional-Data": "true" }, body: file });
       const result = await response.json();
       if (!response.ok) { setError(typeof result.error === "string" ? result.error : "No se pudo previsualizar el archivo."); return; }
-      router.push(`/admin/imports/${result.id}`);
+      router.push(`/admin/imports/${result.reference}`);
     } catch { setError("No se pudo previsualizar el archivo. Revisá la conexión e intentá nuevamente."); }
     finally { setBusy(false); }
   }}>

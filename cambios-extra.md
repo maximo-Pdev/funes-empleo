@@ -2400,6 +2400,86 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   conservados. No se ejecutó el reset en la base local preexistente. Se actualiza
   el mismo PR67; nueva CI aislada pendiente al publicar, sin afirmar aprobación.
 
+## EXTRA-052 — Referencias privadas en lugar de UUID visibles
+
+- **Fecha/origen:**2026-10-23, Mateo solicita quitar UUID de todas las páginas y
+  URLs por los cuatro tipos de acceso. A04 ya aprueba slugs públicos/códigos
+  aleatorios privados. PR67 mergeado8d00f95; árbol limpio y main actualizado,
+  rama feat/private-record-references; anterior eliminada local/remota.
+- **Evidencia:** UUID en detalle/enlaces/actores admin, ofertas/derivaciones de
+  empresa, CV, import/retry, filtros de categorías/participaciones y métricas/CSV.
+  Slugs públicos funcionan y permanecen. Triggers bump_version y append_only
+  impiden backfill inocuo por UPDATE en tablas de negocio.
+- **Propuesta previa:** private.record_references con códigos aleatorios96bits
+  estables, backfill INSERT y AFTER INSERT, sin cambiar UUID/versión/historia.
+  RPCs por lote e inversa con sesión viva, autorización por entidad y grants
+  mínimos; no son credenciales. UI resuelve/genera referencias en fronteras sin
+  alterar comandos. Conservar stub empresarial revocado, CV reautorizado y slugs;
+  no codificar UUID ni usar nombres/DNI/email como localizador privado.
+- **Archivos/contratos:** migración nueva, lib de referencias, páginas/actions/API/
+  componentes y pruebas afectadas; spec/plan/modelo/tasks y contrato
+  private-record-references.md. Recuperación aditiva; SQL antes de app.
+- **Riesgos/verificación:** IDOR, revocación, versiones, colisiones, URLs antiguas,
+  filtros, revalidación, duplicados, scripts quality y exportaciones. SQL positivo/
+  negativo, RED/GREEN, tipos/lint/unit/tooling/build y navegador cuatro accesos.
+  Sin reset de la base local o cambios alojados no solicitados. Tokens Auth y
+  datos internos/contenido libre no se convierten por estética.
+- **Revisión:** análisis acotado de arquitectura/constitución y autorización por
+  petición expresa; no nuevas decisiones legales ni aprobación municipal.
+  Investigación delegada de solo lectura según speckit-plan; implementación,
+  verificación local completadas; revisión humana pendiente.
+- **Resultado2026-10-23:** T157–T161 implementadas/verificadas. SQL1125/19,
+  unit/componentes844/65, tooling57, tipos/lint/build/diff-check, advisor security
+  warn/error sin incidencias y navegador108/108 sin reintentos/omisiones; SC-008A
+  conserva cuatro actores, barrera y cinco segundos. Dos carreras SQL adicionales
+  de suspensión/revocación correctas. Lectura manual de cuenta, padrón, perfil,
+  actores y participaciones con códigos, sin mutaciones de negocio.
+  Base desechable funes-reference-check54331/54332, fixture/hashes intactos;
+  no se reseteó ni migró la habitual54321/54322 ni el alojado. Guide/contrato,
+  matriz y estado sincronizados. Migración antes de app; nuevos commit/PR,
+  revisión independiente y rollout alojado no realizados.
+
+### EXTRA-052 — Precisión técnica de la prueba de colisiones
+
+El rol postgres local no es propietario de pgcrypto: la prueba no puede sustituir
+extensions.gen_random_bytes (evidencia SQL,2026-10-23). Para comprobar reintentos y
+rollback sin elevar privilegios ni modificar extensiones, se encapsulan solamente
+los12 bytes en private.record_reference_entropy, sin EXECUTE para clientes.
+Producción sigue usando pgcrypto; la prueba sustituye esa función propia dentro
+de una transacción revertida. Afecta migración, contrato y prueba025. Riesgo:
+exposición accidental, verificada mediante grants y pgTAP. Detalle necesario bajo
+la autorización de EXTRA-052; revisión humana pendiente.
+
+### EXTRA-052 — Aplicación alojada autorizada, 2026-10-23
+
+Mateo solicita «hace la migracion» después de la validación aislada. Se comprobó
+mediante CLI autenticado que el proyecto vinculado es Funes-empleo
+(`kyjycjojzhwggjuqjnki`), activo, y que existen pgcrypto, el guard de sesión,
+can_read_cv y deny_history_change. Tabla/RPCs/triggers/revisión20261023180306
+todavía ausentes. El conector MCP no tiene permisos; el CLI sí accede al proyecto.
+Se aplicará únicamente el SQL completo20261023180306 mediante Management API,
+sin db push/reset ni reparación del historial anterior divergente. Luego se
+verificarán backfill, permisos, metadatos y advisors y se registrará únicamente
+esta versión como aplicada. Se compararán huellas agregadas de negocio antes y
+después, sin extraer datos personales. La publicación de app y revisión por PR
+siguen fuera de esta autorización.
+
+Resultado: SQL completo aplicado, exit0, y solo20261023180306 registrado después
+de verificar.3751 referencias; cero faltantes/huérfanas, nueve triggers, RLS,
+grants restringidos y guard AUTH_REQUIRED comprobados. Huellas y conteos de las
+nueve tablas de origen, consentimientos y auditoría intactos. Advisor alojado:
+52 WARN previos y54 posteriores, cero ERROR; los dos nuevos0029 corresponden a
+los RPC SECURITY DEFINER intencionales con autorización por recurso. No se
+silencian ni se declaran inexistentes; detalle y enlaces en la guía de validación.
+No se hizo db push/reset ni despliegue; historial anterior y base local habitual
+intactos. Se preserva next-env.d.ts regenerado por el servidor existente.
+
+Publicación posterior autorizada por Mateo: commit a22745d sin firma/coautorías,
+[PR68](https://github.com/maximo-Pdev/funes-empleo/pull/68), rama
+feat/private-record-references hacia main8d00f95. Tipos/lint,844 unitarias y57
+tooling repetidos PASS; diff-check y escaneo de patrones de credenciales PASS.
+CI/revisión humana, merge, despliegue y recorridos alojados siguen pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

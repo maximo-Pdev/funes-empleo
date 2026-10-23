@@ -1,16 +1,16 @@
-import Link from "next/link";
+import { pageRecordIdentifier } from "@/lib/records/page-references";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { accountStatusLabels, companyProfileStatusLabels, openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
-import { databaseUuidSchema } from "@/validation/common";
 import { AdminCompanyDecision } from "@/features/companies/components/admin-company-decision";
 
 export const dynamic = "force-dynamic";
 export default async function AdminCompanyPage({ params }: { params: Promise<{ companyId: string }> }) {
-  const { companyId } = await params;
-  if (!databaseUuidSchema.safeParse(companyId).success) notFound();
   const { client } = await requireActiveAccount(["admin"]);
+  const { companyId: reference } = await params;
+  const companyId = await pageRecordIdentifier("company", reference, `/admin/empresas/${reference}`);
   const profile = await client.from("company_profiles").select("id,account_id,legal_name,status,archived_at,version")
     .eq("id", companyId).maybeSingle();
   if (profile.error || !profile.data) notFound();

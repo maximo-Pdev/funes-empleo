@@ -1,9 +1,10 @@
 "use server";
+import { recordReference } from "@/lib/records/references";
 import { revalidatePath } from "next/cache";
 import { publicErrorFrom } from "@/lib/errors/public-error";
 import { saveCompanyOpening, submitCompanyOpening } from "./company-service";
 
-export type CompanyOpeningState = { message: string; success: boolean; id?: string };
+export type CompanyOpeningState = { message: string; success: boolean; id?: string; reference?: string };
 const failed = (error: unknown): CompanyOpeningState => ({ message: publicErrorFrom(error).message, success: false });
 
 export async function saveCompanyOpeningAction(_previous: CompanyOpeningState, form: FormData): Promise<CompanyOpeningState> {
@@ -13,8 +14,8 @@ export async function saveCompanyOpeningAction(_previous: CompanyOpeningState, f
       vacancies: form.get("vacancies") || "", location: form.get("location"), modality: form.get("modality"),
       schedule: form.get("schedule"), contractType: form.get("contractType"), closingDate: form.get("closingDate"),
       salary: form.get("salary"), benefits: form.get("benefits"), categories: form.getAll("categories") });
-    revalidatePath("/empresa"); revalidatePath("/empresa/ofertas"); revalidatePath(`/empresa/ofertas/${result.id}`);
-    return { message: "Borrador guardado. Enviá la oferta para revisión cuando esté completa.", success: true, id: result.id };
+    revalidatePath("/empresa"); revalidatePath("/empresa/ofertas"); revalidatePath("/empresa/ofertas/[openingId]", "page");
+    return { message: "Borrador guardado. Enviá la oferta para revisión cuando esté completa.", success: true, id: result.id, reference: await recordReference("opening", result.id) };
   } catch (error) { return failed(error); }
 }
 
@@ -22,8 +23,8 @@ export async function submitCompanyOpeningAction(_previous: CompanyOpeningState,
   try {
     await submitCompanyOpening({ id: form.get("id"), version: form.get("version") });
     const id = String(form.get("id"));
-    revalidatePath("/empresa"); revalidatePath("/empresa/ofertas"); revalidatePath(`/empresa/ofertas/${id}`);
+    revalidatePath("/empresa"); revalidatePath("/empresa/ofertas"); revalidatePath("/empresa/ofertas/[openingId]", "page");
     revalidatePath("/admin/openings");
-    return { message: "Oferta enviada a revisión. La Oficina decidirá su publicación.", success: true, id };
+    return { message: "Oferta enviada a revisión. La Oficina decidirá su publicación.", success: true, id, reference: await recordReference("opening", id) };
   } catch (error) { return failed(error); }
 }

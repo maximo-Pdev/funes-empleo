@@ -1,3 +1,4 @@
+import { routeIdentifier } from "@/lib/records/references";
 import { NextResponse } from "next/server";
 import { publicErrorFrom } from "@/lib/errors/public-error";
 import { confirmImport, importSession, readBoundedCsv } from "@/features/imports/preview-service";
@@ -7,7 +8,7 @@ export async function POST(request: Request, context: { params: Promise<{ batchI
     await importSession();
     requireImportOrigin(request);
     const text = (await readBoundedCsv(request.body, 1024)).toString("utf8");
-    const { batchId } = await context.params;
+    const batchId = await routeIdentifier("import", (await context.params).batchId);
     return NextResponse.json({ preview: await confirmImport(batchId, JSON.parse(text)) }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     return NextResponse.json({ error: publicErrorFrom(error).message }, { status: 400, headers: { "Cache-Control": "private, no-store" } });
