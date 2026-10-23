@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Dashboard } from "@/features/metrics/components/dashboard";
 import { ContactTimeline } from "@/features/participations/components/contact-timeline";
 describe("métricas accesibles", () => {
@@ -18,3 +18,5 @@ describe("métricas accesibles", () => {
     expect(screen.getByText("No hay contactos registrados para este caso.")).toBeDefined();
   });
 });
+
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

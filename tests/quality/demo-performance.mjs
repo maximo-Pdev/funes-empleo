@@ -116,8 +116,12 @@ try {
     await expect(page.locator("main li a")).toHaveCount(entry.expectedRows);
     milliseconds=performance.now()-start; limit=3000;
   } else if (scenario === "cv") {
+    const legacy=await context.request.get(`/api/cv/${id("cv",1)}`, { maxRedirects: 0 });
+    assert.equal(legacy.status(),307);
+    const target=legacy.headers().location;
+    assert.match(target,new RegExp("^/api/cv/cv-[a-f0-9]{24}$"));
     const start=performance.now();
-    const response=await context.request.get(`/api/cv/${id("cv",1)}`);
+    const response=await context.request.get(target);
     const bytes=await response.body();
     milliseconds=performance.now()-start; limit=10000;
     assert.equal(response.status(),200); assert.equal(bytes.length,manifest.cvDownload.bytes);
@@ -133,7 +137,7 @@ try {
     await expect(page.getByText("Listo para confirmar",{exact:true})).toBeVisible({timeout:90000});
     await expect(page.getByText("Total: 1000. Aceptables: 1000. Inválidas o categorías sin mapear: 0. Duplicadas: 0.",{exact:true})).toBeVisible();
     milliseconds=performance.now()-previewStart; limit=30000;
-    batchId=page.url().split("/").pop(); assert.match(batchId,/^[a-f0-9-]{36}$/);
+    batchId=page.url().split("/").pop(); assert.match(batchId,/^imp-[a-f0-9]{24}$/);
     // Confirmation has its own separately reset run; its prerequisite preview is outside its clock.
     if (scenario === "import-confirm") {
       const start=performance.now();

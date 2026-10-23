@@ -1,3 +1,4 @@
+import { recordReference } from "@/lib/records/references";
 import styles from "../_components/candidate-forms.module.css";
 import { UserRound } from "lucide-react";
 import { Card } from "@/components/ui";
@@ -22,7 +23,7 @@ export async function renderCandidateProfileContent({ workspace, cvMessage, cvRe
     <div className={`${styles.forms} ${styles.profile}`}><CandidateProfilePanel profile={workspace.profile} dni={workspace.privateData.dni_display}
       address={workspace.privateData.address} phone={workspace.contacts.find((item) => item.kind === "phone")?.value ?? null}
       categories={workspace.allCategories} selectedCategories={workspace.categories.map((item) => item.category_id)}
-      consent={workspace.consent} cv={workspace.cv} policy={policy}
+      consent={workspace.consent} cv={workspace.cv} cvReference={workspace.cv ? await recordReference("cv", workspace.cv.id) : undefined} policy={policy}
       cvMessage={cvMessage} cvReturnTo={cvReturnTo} /></div>
   </>;
 }

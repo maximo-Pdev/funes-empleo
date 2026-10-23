@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { listImports } from "@/features/imports/preview-service";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";

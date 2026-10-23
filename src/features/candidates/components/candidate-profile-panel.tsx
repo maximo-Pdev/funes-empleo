@@ -22,12 +22,12 @@ function ActionMessage({ state }: { state: State }) {
 }
 
 export function CandidateProfilePanel({ profile, dni, address, phone, categories, selectedCategories,
-  consent, cv, policy, cvMessage, cvReturnTo }: {
+  consent, cv, cvReference, policy, cvMessage, cvReturnTo }: {
   profile: Profile; dni: string; address: string | null; phone: string | null;
   categories: Category[]; selectedCategories: string[];
   consent: { status: string; policy_version: string; recorded_at: string } | null;
   cv: { id: string; original_name_safe: string; byte_size: number } | null;
-  policy: Policy; cvMessage?: string; cvReturnTo?: string;
+  cvReference?: string; policy: Policy; cvMessage?: string; cvReturnTo?: string;
 }) {
   const router = useRouter();
   const [saved, saveAction, saving] = useActionState(saveProfileAction, { message: "", success: false });
@@ -83,7 +83,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     </section>
     <section className="grid gap-3 rounded border bg-white p-5" aria-label="CV PDF">
       <h2 className="text-xl font-semibold">CV PDF</h2><p>{cv ? `CV vigente: ${cv.original_name_safe}` : "Todavía no hay un CV vigente."}</p>
-      {cv && <a className="text-blue-800 underline" href={`/api/cv/${cv.id}`}>Descargar mi CV</a>}
+      {cv && cvReference && <a className="text-blue-800 underline" href={`/api/cv/${cvReference}`}>Descargar mi CV</a>}
       {cvMessage && <p role={cvMessage === "ok" ? "status" : "alert"}>{cvMessage === "ok" ? "CV guardado." : cvMessage === "conflict" ? "El perfil cambió. Recargá antes de reemplazar el CV." : "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente."}</p>}
       <CvUploadForm candidateId={profile.id} version={profile.version} returnTo={cvReturnTo} />
     </section>

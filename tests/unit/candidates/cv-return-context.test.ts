@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ session: vi.fn(), upload: vi.fn(), rpc: vi.fn(), profile: vi.fn() }));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: mocks.session }));
@@ -39,7 +40,7 @@ it.each([undefined, "https://evil.example.test", "//evil.example.test", "/accoun
 it("preserves the administrative destination regardless of candidate return context", async () => {
  mocks.session.mockResolvedValue(session("admin"));
  const response = await submit("/account?section=perfil");
- expect(new URL(response.headers.get("location")!).pathname).toBe(`/admin/candidates/${id}`);
+ expect(new URL(response.headers.get("location")!).pathname).toBe(`/admin/candidates/${fixtureReference("candidate", id)}`);
 });
 it.each(["/account?section=perfil&x=1", "/account?section=perfil#x", "/account?section=%70erfil", "/account/?section=perfil", "/account?section=perfil "])("rejects nonexact account return %s", async value => {
  const response = await submit(value);
@@ -66,3 +67,5 @@ it("preserves authentication denial before parsing return context", async () => 
  expect(response.headers.get("location")).toBe("https://portal.example.test/login?cv=denied");
  expect(mocks.profile).not.toHaveBeenCalled();
 });
+
+vi.mock("@/lib/records/reference-url", async () => ({ referenceUrl: async (href: string) => (await import("../../fixtures/record-references")).fixtureHref(href) }));

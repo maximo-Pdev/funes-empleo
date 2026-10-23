@@ -1,3 +1,4 @@
+import { referenceIdentifier } from "./fixtures/record-reference";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { join } from "node:path";
@@ -225,7 +226,9 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
     await page.goto("/account");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
-    const profileId = new URL(admin.url()).pathname.split("/").at(-1)!;
+    const profileReference = new URL(admin.url()).pathname.split("/").at(-1)!;
+    expect(profileReference).toMatch(/^can-[0-9a-f]{24}$/);
+    const profileId = referenceIdentifier("candidate", profileReference);
     expect(profileId).toMatch(/^[0-9a-f-]{36}$/);
     runLocalMaintenanceSql(`begin;
       select set_config('request.jwt.claim.sub',account.auth_user_id::text,true),

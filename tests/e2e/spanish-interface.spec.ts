@@ -1,3 +1,4 @@
+import { canonicalFixturePath } from "./fixtures/record-reference";
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
@@ -16,7 +17,7 @@ const rawCodes = /\b(?:pending_verification|pending_review|changes_requested|con
 async function check(page: Page, path: string) {
   const response = await page.goto(path);
   expect(response?.status()).toBeLessThan(400);
-  await expect(page).toHaveURL(new RegExp(`${path.split("?")[0]!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\?|$)`));
+  await expect(page).toHaveURL(new RegExp(`${canonicalFixturePath(path).split("?")[0]!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\?|$)`));
   await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   await expect(page.locator("body")).not.toContainText(rawCodes);
   await expect(page.getByText("No pudimos cargar esta pantalla", { exact: true })).toHaveCount(0);

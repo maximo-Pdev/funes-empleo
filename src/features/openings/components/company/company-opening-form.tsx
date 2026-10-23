@@ -27,7 +27,7 @@ export function CompanyOpeningForm({ opening, categories }: { opening: CompanyOf
   useEffect(() => {
     if (saved.message) feedback.current?.focus();
     if (saved.success && saved.id) {
-      if (!opening) router.push(`/empresa/ofertas/${saved.id}`);
+      if (!opening && saved.reference) router.push(`/empresa/ofertas/${saved.reference}`);
       else router.refresh();
     }
   }, [saved, opening, router]);

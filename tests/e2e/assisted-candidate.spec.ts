@@ -1,3 +1,4 @@
+import { referenceIdentifier } from "./fixtures/record-reference";
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
@@ -32,8 +33,8 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await fillProfile(page, name, dni);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
-  await expect(page).toHaveURL(/\/assisted\/[0-9a-f-]{36}$/);
-  const id = page.url().split("/").pop()!;
+  await expect(page).toHaveURL(/\/assisted\/can-[0-9a-f]{24}$/);
+  const id = referenceIdentifier("candidate", page.url().split("/").pop()!);
   expect(id).toMatch(/^[0-9a-f-]{36}$/);
   const maintenance = `/admin/candidates/assisted/${id}`;
   const detail = `/admin/candidates/${id}`;
@@ -61,7 +62,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   const opening = `${hash.slice(0,8)}-${hash.slice(8,12)}-${hash.slice(12,16)}-${hash.slice(16,20)}-${hash.slice(20)}`;
   await page.getByLabel("Oferta", { exact: true }).selectOption(opening);
   await page.getByRole("button", { name: "Crear nominación" }).click();
-  await expect(page).toHaveURL(/\/admin\/participations\/[0-9a-f-]{36}$/);
+  await expect(page).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
   const participation = page.url();
   await page.getByLabel("Acción", { exact: true }).selectOption("skip_to_preselected");
   await page.getByRole("textbox", { name: "Motivo interno" }).fill("Evaluación presencial ficticia realizada");
@@ -139,7 +140,7 @@ test("duplicados exige las tres decisiones, campos confirmados y corrección ant
   await signIn(page);
   await fillProfile(page, name, dni);
   await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
-  await expect(page).toHaveURL(/\/assisted\/[0-9a-f-]{36}$/);
+  await expect(page).toHaveURL(/\/assisted\/can-[0-9a-f]{24}$/);
   const original = page.url();
   await fillProfile(page, "Nombre que no debe sobrescribir", dni);
   await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
@@ -157,7 +158,7 @@ test("duplicados exige las tres decisiones, campos confirmados y corrección ant
   await page.getByLabel("Motivo de la decisión").fill("Error de identificación ficticio corregido");
   await page.getByLabel("DNI", { exact: true }).fill(`97${suffix}2`);
   await page.getByRole("button", { name: "Confirmar decisión" }).click();
-  await expect(page).toHaveURL(/\/assisted\/[0-9a-f-]{36}$/);
+  await expect(page).toHaveURL(/\/assisted\/can-[0-9a-f]{24}$/);
   expect(page.url()).not.toBe(original);
   await fillProfile(page, name, dni);
   await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();

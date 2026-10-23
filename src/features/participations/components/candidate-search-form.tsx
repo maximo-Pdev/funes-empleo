@@ -9,7 +9,7 @@ import type { CandidateSearchFilters } from "@/validation/candidate-search";
 type SearchValues = Omit<CandidateSearchFilters, "page" | "pageSize">;
 
 export function CandidateSearchForm({ categories, initial, onSearch }: {
-  categories: readonly { id: string; name: string }[];
+  categories: readonly { id: string; name: string; reference?: string }[];
   initial?: Partial<SearchValues>;
   onSearch?: (filters: SearchValues) => void;
 }) {
@@ -29,6 +29,11 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
     if (onSearch) { onSearch(filters); return; }
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
+    if (categoryId) {
+      const reference = categories.find(category => category.id === categoryId)?.reference;
+      if (!reference) return;
+      params.set("categoryId", reference);
+    }
     router.push(`/admin/candidates?${params.toString()}`);
   }
 

@@ -19,6 +19,12 @@ rubros, ID del CV vigente y versiones de candidato/oferta; no incorpora DNI,
 contactos ni notas. Nominación sigue creando una participación bajo el comando
 transaccional y auditoría existentes, sin tablas nuevas ni derivación implícita.
 
+## Referencias de presentación A04 — EXTRA052
+
+private.record_references agrega kind,entity_id,reference única y created_at.
+No sustituye identidades UUID; ver contrato private-record-references.md. Backfill
+INSERT aislado y triggers de creación, sin incrementar versiones de negocio.
+
 ## Convenciones
 
 - Identificadores: UUID generados por servidor.

@@ -1,5 +1,7 @@
+import { recordReferences } from "@/lib/records/references";
+import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { contactChannelLabels, feedbackOutcomeLabels, displayLabel } from "@/domain/presentation/labels";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState, FeedbackMessage } from "@/components/ui";
 import { getAdminParticipation } from "@/features/participations/admin-query";
@@ -23,10 +25,13 @@ export default async function AdminParticipationDetailPage({ params }: {
   params: Promise<{ participationId: string }>;
 }) {
   await requireActiveAccount(["admin"]);
-  const { participationId } = await params;
+  const { participationId: reference } = await params;
+  const participationId = await pageRecordIdentifier("participation", reference, `/admin/participations/${reference}`);
   const { participation, audit, preinterviews, contacts, notes, referral, feedback } =
     await getAdminParticipation(participationId);
   const contactHistory = await getContactTimeline(participationId);
+
+  const actors = await recordReferences("account", audit.map(event => event.actor_account_id));
 
   return <AdminShell active="/admin/participations" title="Seguimiento de participación"
     description="Estado vigente, decisiones y registros internos de este caso."
@@ -65,7 +70,7 @@ export default async function AdminParticipationDetailPage({ params }: {
         </section>
         <ParticipationTimeline currentStatus={participation.status} events={audit.map((event) => ({
           id: event.event_id, occurredAt: event.occurred_at, action: event.action,
-          actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${event.actor_account_id ?? "sin identificar"}`,
+          actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`,
           previousStatus: event.previous_state, newStatus: event.new_state,
           reason: event.reason, reasonCode: event.reason_code,
         }))} />

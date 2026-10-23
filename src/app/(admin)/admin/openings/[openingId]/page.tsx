@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { recordReferences } from "@/lib/records/references";
+import { pageRecordIdentifier } from "@/lib/records/page-references";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { openingStatusLabels, moderationDecisionLabels, displayLabel } from "@/domain/presentation/labels";
 import { publicModalityLabel, publicContractTypeLabel } from "@/features/openings/public-offer-display";
 import { Suspense } from "react";
@@ -17,9 +19,12 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
   searchParams: Promise<{ matchPage?: string | string[] }>;
 }) {
   await requireActiveAccount(["admin"]);
-  const { openingId } = await params;
+  const { openingId: reference } = await params;
+  const openingId = await pageRecordIdentifier("opening", reference, `/admin/openings/${reference}`, await searchParams);
   const { matchPage } = await searchParams;
   const { opening, events } = await getAdminOpening(openingId);
+
+  const actors = await recordReferences("account", events.map(event => event.actor_account_id));
 
   return <AdminShell active="/admin/openings" title={opening.title ?? "Oferta sin título"}
     description="Detalle e historial de decisiones visible solo para la Oficina de Empleo."
@@ -48,7 +53,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         {events.length === 0 ? <EmptyState title="Sin decisiones registradas" description="Todavía no hay eventos de moderación para esta oferta." /> :
           <ol className="space-y-3">{events.map((event) => <li key={event.id} className="rounded-lg border border-slate-300 bg-white p-4">
             <p className="font-semibold">{displayLabel(moderationDecisionLabels, event.decision, "Decisión registrada")}: {event.previous_status ? displayLabel(openingStatusLabels, event.previous_status) : "Inicio"} → {displayLabel(openingStatusLabels, event.new_status)}</p>
-            <p className="text-sm text-slate-700">{new Date(event.created_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${event.actor_account_id ?? "sin identificar"}`}</p>
+            <p className="text-sm text-slate-700">{new Date(event.created_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`}</p>
             {event.company_message && <p className="mt-2">Mensaje a empresa: {event.company_message}</p>}
             {event.internal_reason && <p className="mt-2">Motivo interno: {event.internal_reason}</p>}
           </li>)}</ol>}

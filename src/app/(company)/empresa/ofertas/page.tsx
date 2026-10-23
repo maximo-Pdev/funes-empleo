@@ -1,5 +1,5 @@
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, CalendarDays, MessageSquare, Plus } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
 import { CompanyShell } from "../../_components/company-shell";

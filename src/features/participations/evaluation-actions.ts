@@ -25,8 +25,8 @@ export async function recordEvaluationAction(input: unknown): Promise<AdminMutat
     const candidateId = typeof input === "object" && input !== null && "candidateId" in input &&
       typeof input.candidateId === "string" ? input.candidateId : "";
     revalidatePath("/admin/participations");
-    if (participationId) revalidatePath(`/admin/participations/${participationId}`);
-    if (candidateId) revalidatePath(`/admin/candidates/${candidateId}`);
+    if (participationId) revalidatePath("/admin/participations/[participationId]", "page");
+    if (candidateId) revalidatePath("/admin/candidates/[candidateId]", "page");
     return { code: "OK" };
   } catch (error) { return adminActionFailure(error); }
 }
@@ -73,7 +73,7 @@ export async function adminParticipationAction(input: unknown): Promise<AdminMut
       if (result.error) throw workflowRpcError(result.error.message);
     }
     revalidatePath("/admin/participations");
-    revalidatePath(`/admin/participations/${value.participationId}`);
+    revalidatePath("/admin/participations/[participationId]", "page");
     return { code: "OK" };
   } catch (error) { return adminActionFailure(error); }
 }
@@ -94,7 +94,7 @@ export async function confirmFeedbackAction(input: unknown): Promise<AdminMutati
       feedbackId: value.feedbackId, reason: value.reason || undefined,
       lateCorrection: value.lateCorrection });
     revalidatePath("/admin/participations");
-    revalidatePath(`/admin/participations/${value.participationId}`);
+    revalidatePath("/admin/participations/[participationId]", "page");
     return { code: "OK" };
   } catch (error) { return adminActionFailure(error); }
 }

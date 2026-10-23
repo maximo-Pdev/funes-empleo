@@ -1,3 +1,4 @@
+import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), workspace: vi.fn(), offers: vi.fn(), categories: vi.fn(), references: vi.fn(), referral: vi.fn() }));
@@ -43,7 +44,7 @@ it.each(["draft", "changes_requested", "published", "closed"])("respeta la edici
  expect(Boolean(screen.queryByRole("button", { name: "Guardar borrador" }))).toBe(editable);
  expect(Boolean(screen.queryByRole("button", { name: "Enviar a revisión municipal" }))).toBe(editable);
  expect(screen.getByRole("heading", { name: "Historial de moderación" })).toBeTruthy();
- expect(screen.getByRole("link", { name: "Ver derivaciones de esta oferta" }).getAttribute("href")).toBe(`/company/openings/${id}/referrals`);
+ expect(screen.getByRole("link", { name: "Ver derivaciones de esta oferta" }).getAttribute("href")).toBe(`/company/openings/${fixtureReference("opening", id)}/referrals`);
 });
 it("valida la página solicitada y conserva el mensaje municipal y la paginación", async () => {
  render(await Offers({ searchParams: Promise.resolve({ page: "invalida" }) })); expect(mocks.offers).toHaveBeenCalledWith(1);
@@ -58,3 +59,7 @@ it("permite informar un resultado tras revocar el acceso sin mostrar datos ni CV
 it("conserva el límite de oferta inexistente", async () => {
  mocks.offers.mockResolvedValue({ items: [] }); await expect(Opening({ params: Promise.resolve({ openingId: id }) })).rejects.toThrow("NOT_FOUND");
 });
+
+vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
+vi.mock("@/lib/records/page-references", async () => (await import("../../fixtures/record-references")).pageReferenceMocks);
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

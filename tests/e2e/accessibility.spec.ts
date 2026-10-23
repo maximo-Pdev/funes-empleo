@@ -1,3 +1,4 @@
+import { canonicalFixturePath } from "./fixtures/record-reference";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { loginFixture } from "./fixtures/quality";
@@ -17,7 +18,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
       await loginFixture(page, role);
       for (const path of journeys[role]) {
         await page.goto(path);
-        await expect(page).toHaveURL(new RegExp(path.split("?")[0] + "(?:\\?|$)"));
+        await expect(page).toHaveURL(new RegExp(canonicalFixturePath(path).split("?")[0] + "(?:\\?|$)"));
         await expect(page.locator("h1").first()).toBeVisible();
         await expect(page.getByRole("heading", { name: "Ocurrió un problema", exact: true })).toHaveCount(0);
         expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

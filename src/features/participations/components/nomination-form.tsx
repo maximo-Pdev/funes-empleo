@@ -10,7 +10,7 @@ type Opening = { id: string; title: string | null; version: number; status: stri
 
 export function NominationForm({ candidateId, candidateVersion, openings, onSubmit }: {
   candidateId: string; candidateVersion: number; openings: Opening[];
-  onSubmit: (input: unknown) => Promise<Exclude<AdminMutationResult, void> & { participationId?: string }>;
+  onSubmit: (input: unknown) => Promise<Exclude<AdminMutationResult, void> & { participationId?: string; participationReference?: string }>;
 }) {
   const router = useRouter();
   const [openingId, setOpeningId] = useState("");
@@ -27,7 +27,7 @@ export function NominationForm({ candidateId, candidateVersion, openings, onSubm
         const result = await onSubmit({ candidateId, candidateVersion, openingId, openingVersion: opening.version });
         const message = adminMutationError(result);
         if (message) { setError(message); return; }
-        if (result.participationId) router.push(`/admin/participations/${result.participationId}`);
+        if (result.participationReference) router.push(`/admin/participations/${result.participationReference}`);
       } catch { setError("No se pudo crear la nominación. Recargá e intentá nuevamente."); }
     });
   }

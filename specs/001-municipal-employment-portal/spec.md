@@ -99,6 +99,15 @@ Se retira el cartel amarillo de política demo de la vista inicial; texto y
 versión siguen consultables en un desplegable accesible cerrado inicialmente.
 No implica política municipal aprobada ni cambia versión/hash/aceptación.
 
+## A04 — UUID fuera de la interfaz, solicitud2026-10-23 (EXTRA052)
+
+Textos, enlaces y URLs generados por el portal para cualquier rol no muestran UUID
+de negocio. Conservar slugs públicos; usar nombres o códigos aleatorios estables
+en registros privados, incluidos CV, filtros e importaciones. Identidades internas,
+permisos, historia y comandos siguen intactos. La referencia no habilita acceso:
+resolver y revalidar titularidad, rol y permiso vigentes también en descargas.
+Compatibilidad y verificación en contracts/private-record-references.md.
+
 ## Español transversal — solicitud 2026-10-22 (EXTRA051)
 
 Todas las vistas públicas y de candidatos, empresas y administradores presentan

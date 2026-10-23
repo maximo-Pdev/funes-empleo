@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-22 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-23 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -975,3 +975,37 @@ de búsqueda candidato. Conserva cinco segundos, cuatro actores, barrera y SQL
 de integridad. RED de contrato1/2;808 pruebas/63 archivos, tooling57, tipos/lint/build
 y diff-check PASS. Sin cambios de producto/pipeline ni reset local; benchmark frío
 se verifica en el runner aislado de la nueva CI, pendiente al publicar.
+
+## 2026-10-23 — A04 referencias privadas, EXTRA052
+
+Mateo solicita eliminar UUID visibles y de URLs para todos los accesos. PR67
+mergeado8d00f95; rama anterior eliminada local/remotamente y árbol limpio antes
+de crear feat/private-record-references. T157–T161 implementadas y verificadas;
+sin nuevos commits, push o PR. Los slugs de Máximo y los contratos UUID internos
+permanecen intactos.
+
+Migración20261023180306: tabla privada con códigos aleatorios estables, backfill
+INSERT y triggers, RPCs autorizados con sesión vigente, permisos mínimos y RLS.
+No cambia estados, versiones o historial. UI/API/GET/CSV/clientes/revalidación
+usan referencias; enlaces UUID privados previos se canonicalizan solo tras
+autorizar. CV mantiene RPC+Storage, streaming y no-store; una referencia revocada
+no recupera acceso. Guía/recuperación: docs/validation/private-record-references.md.
+
+SQL1125/19, unit/componentes844/65, tooling57, tipos/lint/build/diff-check y
+advisor security warn/error PASS. Navegador108/108 sin reintentos ni omisiones,
+incluido SC-008A frío con cuatro actores y cinco segundos; dos carreras SQL de
+suspensión/revocación adicionales PASS. Lectura manual de cuenta/padrón/perfil/
+actores y enlaces verificada con identidad ficticia, sin cambios de negocio.
+Solo Supabase desechable funes-reference-check54331/54332; fixture/hashes
+preservados. Base habitual54321/54322 y entorno alojado sin migrar/resetear.
+
+Posteriormente Mateo solicitó aplicar la migración:20261023180306 ejecutada y
+registrada en Funes-empleo (`kyjycjojzhwggjuqjnki`),3751 referencias completas,
+cero faltantes/huérfanas y permisos/guard verificados. Huellas y conteos de las
+nueve tablas de origen, consentimientos y auditoría intactos. Sin reset ni push
+de otras migraciones. Advisor alojado:52 WARN previos,54 posteriores, cero ERROR;
+dos avisos0029 esperados por los RPC autorizados, documentados en la guía.
+
+Pendientes: revisión humana por PR, despliegue de app y recorridos alojados con
+sesiones. No se cierran gates históricos ni se acredita aceptación municipal/global.
+No se reintroducen cambios del PR54; base habitual sigue sin migrar/resetear.

@@ -592,6 +592,14 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T149 RED/GREEN de teléfono opcional en misma tarjeta sin forms anidados, CV antes de consentimiento y política expandible; implementar composición conservando Actions/versiones. RED2/16, GREEN29/29 de los tres archivos candidatos.
 - [x] T150 Verificar UI/guardado telefónico/contacto derivado, datos retenidos, teclado/axe/móvil, regresiones/tipos/lint/tooling/build y documentar límites sin atribuir cambios alojados.746/54, tooling57, tipos/lint/build/diff-check y navegador11/11 PASS; sin reset, migración, cambios alojados o aceptación global.
 
+## Referencias privadas — EXTRA052,2026-10-23
+
+- [x] T157 Revisar contexto/A04, inventariar superficies por cuatro roles y alinear especificación/plan/contrato antes de implementar; PR67 mergeado, árbol limpio, rama feat/private-record-references desde main actualizado.
+- [x] T158 SQL de referencias aleatorias estables, backfill sin versiones/historial y resolución autorizada;53 aserciones nuevas dentro de1125/19 SQL, incluidas colisiones/rollback, RLS, sesión, IDOR y revocación. Recuperación aditiva documentada. Tras solicitud posterior de Mateo,20261023180306 aplicada/registrada en Funes-empleo:3751 referencias completas y permisos/huellas verificados, sin reset ni otras migraciones.
+- [x] T159 Resolver rutas/API/GET y generar enlaces/textos por referencias, conservando slugs, CV protegido, filtros y compatibilidad autorizada. Unitarias/componentes y seis recorridos focales añadidos; acciones UUID internas intactas.
+- [x] T160 Adaptar revalidación, clientes de navegación y scripts quality; no alterar UUID de comandos ni umbrales. Scripts smoke/performance verifican el código CV y el lote imp; tooling57 PASS.
+- [x] T161 SQL1125/19, unit/componentes844/65, tooling57, tipos/lint/build/diff-check, advisor local security warn/error sin incidencias, navegador108/108 sin reintentos/omisiones y dos carreras SQL PASS. Incluye SC-008A de cuatro admins y lectura manual de códigos/actores; guía docs/validation/private-record-references.md y matriz/estado sincronizados. Migración alojada autorizada/aplicada posteriormente, negocio intacto; advisor alojado52 WARN previos/54 posteriores, cero ERROR, dos avisos0029 de los RPC autorizados documentados. Base habitual intacta; PR/revisión/despliegue/recorridos alojados pendientes.
+
 ## Español transversal — EXTRA051, 2026-10-22
 
 - [x] T151 Registrar evidencia y alinear alcance/spec/plan: presentación española en todos los roles, valores técnicos/contratos/contenido libre intactos; análisis sin nueva arquitectura o regla municipal.

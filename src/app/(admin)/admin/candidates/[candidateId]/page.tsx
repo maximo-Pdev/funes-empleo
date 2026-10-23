@@ -1,5 +1,7 @@
+import { recordReferences } from "@/lib/records/references";
+import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { CvUploadForm } from "@/features/candidates/components/cv-upload-form";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel, auditActionLabel, auditStateLabel, reasonLabel } from "@/domain/presentation/labels";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
@@ -20,10 +22,13 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   params: Promise<{ candidateId: string }>; searchParams: Promise<{ cv?: string }>;
 }) {
   await requireActiveAccount(["admin"]);
-  const { candidateId } = await params;
+  const { candidateId: reference } = await params;
+  const candidateId = await pageRecordIdentifier("candidate", reference, `/admin/candidates/${reference}`, await searchParams);
   const { cv } = await searchParams;
   const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
   const nominationOpenings = candidate.status === "active" ? await listNominationOpenings() : [];
+
+  const actors = await recordReferences("account", audit.map(event => event.actor_account_id));
 
   return <AdminShell active="/admin/candidates" title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
@@ -64,7 +69,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
           <ol className="space-y-3">{audit.map((event) => <li key={event.id} className="border-t border-slate-200 pt-3">
             <p className="font-semibold">{auditActionLabel(event.action)}</p>
             <p className="text-sm">{event.previous_state ? auditStateLabel(event.previous_state) : "Inicio"} → {auditStateLabel(event.new_state)}</p>
-            <p className="text-sm text-slate-700">{new Date(event.occurred_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${event.actor_account_id ?? "sin identificar"}`}</p>
+            <p className="text-sm text-slate-700">{new Date(event.occurred_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`}</p>
             {event.reason_code && <p className="text-sm">Motivo: {reasonLabel(event.reason_code)}</p>}
           </li>)}</ol>}
       </section>

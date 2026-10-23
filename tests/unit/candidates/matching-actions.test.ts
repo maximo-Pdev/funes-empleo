@@ -1,3 +1,4 @@
+import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
 const { preview, nominate, revalidate } = vi.hoisted(() => ({ preview: vi.fn(), nominate: vi.fn(), revalidate: vi.fn() }));
 vi.mock("@/features/candidates/matching-service", () => ({ getOpeningCandidatePreview: preview }));
@@ -13,7 +14,7 @@ beforeEach(() => vi.resetAllMocks());
 it("preview transporta el contrato mínimo sin invalidar rutas", async () => {
   preview.mockResolvedValue(openingPreview);
   const input = { openingId: openingPreview.openingId, candidateId: openingPreview.id };
-  expect(await openingCandidatePreviewAction(input)).toEqual({ code: "OK", profile: openingPreview });
+  expect(await openingCandidatePreviewAction(input)).toEqual({ code: "OK", profile: { ...openingPreview, cvReference: fixtureReference("cv", openingPreview.cvId) } });
   expect(preview).toHaveBeenCalledWith(input);
   expect(revalidate).not.toHaveBeenCalled();
 });
@@ -26,9 +27,9 @@ it.each([new Error("SQL ficticio privado"), new AppError("ACCESS_DENIED")])("pre
 it("nominación invalida oferta, candidato y participaciones solo tras éxito", async () => {
   nominate.mockResolvedValue(openingPreview.id);
   const input = { openingId: openingPreview.openingId, openingVersion: 3, candidateId: openingPreview.id, candidateVersion: 7 };
-  expect(await createAdminNominationAction(input)).toEqual({ code: "OK", participationId: openingPreview.id });
+  expect(await createAdminNominationAction(input)).toEqual({ code: "OK", participationId: openingPreview.id, participationReference: fixtureReference("participation", openingPreview.id) });
   expect(nominate).toHaveBeenCalledWith(input);
-  expect(revalidate.mock.calls).toEqual([["/admin/participations"], [`/admin/candidates/${openingPreview.id}`], [`/admin/openings/${openingPreview.openingId}`]]);
+  expect(revalidate.mock.calls).toEqual([["/admin/participations"], ["/admin/candidates/[candidateId]", "page"], ["/admin/openings/[openingId]", "page"]]);
 });
 
 it("conflicto no se convierte en éxito ni invalida rutas", async () => {
@@ -36,3 +37,5 @@ it("conflicto no se convierte en éxito ni invalida rutas", async () => {
   expect(await createAdminNominationAction({})).toEqual({ code: "CONFLICT_STALE_DATA" });
   expect(revalidate).not.toHaveBeenCalled();
 });
+
+vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);

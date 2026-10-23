@@ -1,3 +1,4 @@
+import { referenceIdentifier, persistedReference } from "./fixtures/record-reference";
 import { expect, test } from "@playwright/test";
 import { createHash } from "node:crypto";
 import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
@@ -97,7 +98,7 @@ test("CV privado: solo permisos vigentes permiten descargar y la última revocac
     await signIn(otherCompany, "company2@example.invalid");
     await signIn(admin, "admin1@example.invalid");
 
-    const cvUrl = `/api/cv/${fixtureId("cv", 5)}`;
+    const cvUrl = `/api/cv/${persistedReference("cv", fixtureId("cv", 5))}`;
     for (const authorized of [candidate, company]) {
       const response = await authorized.context().request.get(cvUrl);
       expect(response.status()).toBe(200);
@@ -251,7 +252,7 @@ test("suspender y reactivar una cuenta candidata no restaura el acceso empresari
     const company = await companyContext.newPage();
     await signIn(admin, "admin1@example.invalid");
     await signIn(company, "company1@example.invalid");
-    const cvUrl = `/api/cv/${fixtureId("cv", 8)}`;
+    const cvUrl = `/api/cv/${persistedReference("cv", fixtureId("cv", 8))}`;
     expect((await company.context().request.get(cvUrl)).status()).toBe(200);
 
     await admin.goto(`/admin/candidates/${fixtureId("profile", 8)}`);
@@ -287,7 +288,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.goto(`/admin/candidates/${fixtureId("profile", 1)}`);
     await admin.getByLabel("Oferta", { exact: true }).selectOption(fixtureId("opening", 2));
     await admin.getByRole("button", { name: "Crear nominación" }).click();
-    await expect(admin).toHaveURL(/\/admin\/participations\/[0-9a-f-]{36}$/);
+    await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
     await expect(admin.getByText("Origen: Nominación administrativa")).toBeVisible();
     const currentStatus = admin.getByRole("status").filter({ hasText: "Resultado o estado vigente" });
     await expect(currentStatus).toContainText("En revisión");
@@ -387,7 +388,7 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     await company.goto(referralPage);
     await expect(company.getByText("Persona ficticia 015")).toBeVisible();
     const snapshotCv = await company.getByRole("link", { name: "Descargar CV asociado a esta derivación" }).getAttribute("href");
-    expect(snapshotCv).toBe(`/api/cv/${fixtureId("cv", 15)}`);
+    expect(snapshotCv).toBe(`/api/cv/${persistedReference("cv", fixtureId("cv", 15))}`);
 
     await candidate.goto("/candidato/perfil");
     await candidate.getByLabel("Teléfono (opcional)").fill("3415550015");
@@ -565,8 +566,8 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
       await company.getByLabel("Fecha de cierre").fill("2026-12-31");
       await company.getByLabel("Categoría ficticia A").check();
       await company.getByRole("button", { name: "Guardar borrador" }).click();
-      await expect(company).toHaveURL(/\/empresa\/ofertas\/[0-9a-f-]{36}$/);
-      const id = new URL(company.url()).pathname.split("/").at(-1)!;
+      await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
+      const id = referenceIdentifier("opening", new URL(company.url()).pathname.split("/").at(-1)!);
       await company.getByRole("button", { name: "Enviar a revisión municipal" }).click();
       await expect(company.getByText("Estado:")).toContainText("Pendiente de revisión");
       return id;
@@ -595,7 +596,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
     await admin.goto(`/admin/candidates/${fixtureId("profile", 26)}`);
     await admin.getByLabel("Oferta", { exact: true }).selectOption(closed);
     await admin.getByRole("button", { name: "Crear nominación" }).click();
-    await expect(admin).toHaveURL(/\/admin\/participations\/[0-9a-f-]{36}$/);
+    await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
     const preservedCase = admin.url();
     await decide(closed, "closed", "Cierre interno ficticio");
     await admin.goto(preservedCase);
@@ -609,7 +610,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
     await admin.goto(`/admin/candidates/${fixtureId("profile", 27)}`);
     await admin.getByLabel("Oferta", { exact: true }).selectOption(cancelled);
     await admin.getByRole("button", { name: "Crear nominación" }).click();
-    await expect(admin).toHaveURL(/\/admin\/participations\/[0-9a-f-]{36}$/);
+    await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
     const cancelledCase = admin.url();
     await decide(cancelled, "cancelled", "Cancelación interna ficticia");
     await admin.goto(cancelledCase);
