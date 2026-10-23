@@ -1,4 +1,5 @@
 "use client";
+import { reasonLabel } from "@/domain/presentation/labels";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useState } from "react";
@@ -8,7 +9,7 @@ import { IMPORT_FIELDS, IMPORT_MESSAGES } from "../mapping";
 import { resolveImportAction } from "../actions";
 import { Button } from "@/components/ui/button";
 const labels = { name: "Nombre", dni: "DNI", email: "Correo", phone: "Teléfono", locality: "Localidad",
-  categories: "Categorías (DEMO-A|DEMO-B)", summary: "Experiencia", availability: "Disponibilidad (available/unavailable)", reference: "Referencia ficticia" };
+  categories: "Categorías (DEMO-A|DEMO-B)", summary: "Experiencia", availability: "Disponibilidad", reference: "Referencia ficticia" };
 export function ImportBatch({ initial }: { initial: ImportPreview }) {
   const [preview, setPreview] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -24,7 +25,7 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
       {" "}{preview.rows.filter(r => r.decision === "use_or_update_existing").length} usos o actualizaciones expresas,
       {" "}{preview.rows.filter(r => r.decision === "reject").length} rechazos.</p>
     {error && <p role="alert">{error} Recargá la página antes de reintentar.</p>}
-    {preview.status === "failed" && <><p>Código seguro: {preview.failure}</p><Link href={`/admin/imports/new?retry=${preview.id}`}>Cargar archivo corregido como nuevo intento</Link></>}
+    {preview.status === "failed" && <><p>Motivo: {reasonLabel(preview.failure ?? "")}</p><Link href={`/admin/imports/new?retry=${preview.id}`}>Cargar archivo corregido como nuevo intento</Link></>}
     {preview.retryOf && <Link href={`/admin/imports/${preview.retryOf}`}>Ver intento anterior</Link>}
     <nav aria-label="Páginas de filas"><Button variant="secondary" disabled={!page || busy} onClick={() => setPage(page - 1)}>Anterior</Button>{" "}
       <span>Página {page + 1} de {Math.max(1, Math.ceil(preview.rows.length / 50))}</span>{" "}
@@ -56,9 +57,9 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
           <Field>Motivo interno<textarea name="reason" required maxLength={1000} /></Field>
           <Field>Perfil coincidente<select name="candidate" required={decisions[row.id] === "use_or_update_existing"}><option value="">Seleccioná si usás existente</option>{row.matches.map(m => <option key={m.id} value={m.id}>{m.name} · {m.id}</option>)}</select></Field>
           <fieldset><legend>Actualizar existente: marcar solo los campos autorizados del CSV</legend>{IMPORT_FIELDS.map(field => <Field className="block" key={field}><input type="checkbox" name="fields" value={field} /> {labels[field]}</Field>)}</fieldset>
-          <fieldset disabled={Boolean(decisions[row.id] && decisions[row.id] !== "correct_and_create")}><legend>Corregir y crear: volver a ingresar la fila completa con datos ficticios</legend>{Object.entries(labels).map(([key, label]) => <Field className="block" key={key}>{label}<input name={key}
-            required={["name", "dni", "availability"].includes(key)} type={key === "email" ? "email" : key === "phone" ? "tel" : "text"}
-            defaultValue={key === "availability" ? "available" : ""} /></Field>)}</fieldset>
+          <fieldset disabled={Boolean(decisions[row.id] && decisions[row.id] !== "correct_and_create")}><legend>Corregir y crear: volver a ingresar la fila completa con datos ficticios</legend>{Object.entries(labels).map(([key, label]) => <Field className="block" key={key}>{label}{key === "availability"
+            ? <select name={key} required defaultValue="available"><option value="available">Disponible</option><option value="unavailable">No disponible</option></select>
+            : <input name={key} required={["name", "dni"].includes(key)} type={key === "email" ? "email" : key === "phone" ? "tel" : "text"} defaultValue="" />}</Field>)}</fieldset>
           <Button type="submit" disabled={busy}>Guardar decisión y revalidar</Button>
         </Form>
       </details>}

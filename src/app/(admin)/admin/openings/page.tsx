@@ -1,6 +1,7 @@
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import Link from "next/link";
+import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { OPENING_STATUSES, openingStatusSchema } from "@/domain/states";
@@ -27,7 +28,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
     <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       <div className="space-y-1"><Field className="block font-semibold" label={<>Estado de la oferta</>}><select id="opening-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">
           <option value="">Todos</option>
-          {OPENING_STATUSES.map((value) => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}
+          {OPENING_STATUSES.map((value) => <option key={value} value={value}>{displayLabel(openingStatusLabels, value)}</option>)}
         </select></Field></div>
       <Button type="submit">Filtrar ofertas</Button>
     </Form>
@@ -37,7 +38,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
       {result.items.length === 0 ? <EmptyState title="Sin ofertas" description="No hay ofertas con estos filtros." /> :
         <ul className="space-y-3">{result.items.map((opening) => <li key={opening.id} className="rounded-lg border border-slate-300 bg-white p-4">
           <Link href={`/admin/openings/${opening.id}`} className="font-semibold text-blue-800 underline">{opening.title ?? "Oferta sin título"}</Link>
-          <p className="text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} · Estado: {opening.status.replaceAll("_", " ")}</p>
+          <p className="text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} · Estado: {displayLabel(openingStatusLabels, opening.status)}</p>
         </li>)}</ul>}
       {result.pageCount > 1 && <nav aria-label="Páginas de ofertas" className="flex gap-4">
         {result.page > 1 && <Link href={urlForPage(result.page - 1)} className="text-blue-800 underline">Anterior</Link>}

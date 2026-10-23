@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-20 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-22 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -903,3 +903,39 @@ automática en PR65, abierto hacia main desde feat/candidate-consent-activation-
 https://github.com/maximo-Pdev/funes-empleo/pull/65.
 next-env.d.ts ajeno excluido. Sin nuevas migraciones/cambios alojados, CI y
 revisión pendientes; sin merge o aceptación acreditados.
+
+### Español transversal — EXTRA042, 2026-10-22
+
+PR65 confirmado mergeado en23ba5fa; main actualizado, rama anterior retirada
+local/remota y rama feat/spanish-interface-labels creada sin prefijo codex.
+next-env.d.ts ajeno conservado; no se crea commit/PR en esta solicitud.
+
+Etiquetas españolas compartidas para cuentas/perfiles/ofertas/participaciones,
+consentimiento/accesos/CV/importaciones, acciones/motivos/canales/entrevistas y
+respuestas empresariales. Filtros y formularios muestran español pero conservan
+valores técnicos. Editor empresarial muestra modalidades/contratos legados sin
+reescribir el original al guardar otro campo. FileInput español con input real,
+Field, validación/foco y retención de archivos; importación da error de transporte
+español sin mostrar excepciones del navegador. Mensajes de corrección y registro
+traducidos sin modificar reglas. Texto libre/archivos/CSV técnico no se traducen.
+
+| Verificación final | Evidencia local |
+| --- | --- |
+| Tipos/lint/build | PASS con Node24 y Supabase local. |
+| Pruebas/componentes/inventario | 764/764,58 archivos; enums, auditoría, fallbacks, FormData legado, selector y error de red. |
+| Tooling | 57/57 PASS. |
+| Navegador | 18/18 PASS sin reintentos: español4,candidato1,ofertas3,validación9,filtro municipal1. |
+| Presentación | Público/tres roles en-US; listas/historiales, opciones españolas con value técnico; móvil360×800 sin overflow y axe PASS; capturas ficticias revisadas. |
+| Integridad | Diff-check PASS, sin migración/reset/servicios o cambios alojados; next-env.d.ts ajeno restaurado. |
+
+T151–154 completos para este incremento. Guía docs/product/spanish-interface.md
+y análisis acotado sin gaps nuevos construibles: presentación consistente con
+spec/plan y constitución; modelo/contratos/transiciones/política sin cambios.
+Checklists existentes intactas; no acredita revisión independiente o aprobación.
+Cobertura instrumentada solo de entorno, no cobertura total del negocio.
+Fallos iniciales de expectativas inglesas y sincronización antes de axe corregidos
+sin omitir recorridos/reglas; Next conserva su aviso preexistente de stream cerrado
+durante navegaciones abortadas. Servidor next dev cerrado con autorización y
+servidores de pruebas finalizados. Sin suite SQL/E2E completa, NVDA, CI remoto,
+commit/PR o aceptación nueva. Gates históricos y OQ-001/002 siguen pendientes;
+no hay decisión municipal nueva necesaria para esta traducción.

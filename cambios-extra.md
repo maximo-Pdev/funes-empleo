@@ -2025,6 +2025,77 @@ fuera y sin añadir logs/capturas/secretos. Verificaciones locales consignadas e
 EXTRA040–041; publicación no acredita CI, revisión o aceptación. Sin nuevas
 migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
 
+## EXTRA-042 — Interfaz en español en todos los roles
+
+- **Fecha/origen/autorización:** 2026-10-22, Mateo solicita revisar toda la web
+  y todos los perfiles y traducir palabras/estados del sistema al español.
+  PR65 confirmado mergeado (23ba5fa), main actualizado y rama
+  feat/spanish-interface-labels; anterior eliminada local/remoto. next-env.d.ts
+  ajeno preservado; sin prefijo codex ni firmas/atribuciones automáticas.
+- **Evidencia:** ofertas/cuentas/perfiles muestran status crudo (active, draft,
+  pending_review); historiales usan replaceAll sobre códigos ingleses. Canales,
+  disponibilidad, entrevistas, motivos y feedback también filtran códigos a la
+  vista. Hay etiquetas parciales duplicadas y fallbacks que devuelven el código.
+  Capturas locales previas muestran Choose File/No file chosen del input nativo.
+  Importación muestra available/unavailable en la edición y códigos de error;
+  el CSV tiene encabezados exactos de un contrato técnico que debe conservarse.
+- **Origen aprobado:** accesibilidad en español de spec, FR-056, constituciónIV
+  y petición expresa. No es cambio de negocio, catálogo municipal o permisos.
+- **Cambio mínimo propuesto antes de implementar:** catálogos de presentación
+  tipados para estados existentes, acciones/motivos y canales; reutilizarlos en
+  páginas/filtros/historiales por rol y usar fallback español sin filtrar códigos
+  desconocidos. Reemplazar feedback por respuesta/informe empresarial en textos,
+  conservando nombres internos/RPC/IDs/values/selectores técnicos. Traducir
+  códigos legados conocidos de modalidad/contrato solo en presentación. Evitar
+  alterar automáticamente contenido libre escrito por personas, nombres, emails,
+  archivos, datos ya guardados, URLs, identificadores o formato de CSV.
+  Selector de archivos compartido con textos españoles sin depender del idioma
+  del navegador; conservar input real, Field, teclado, validación y retención.
+- **Archivos/contratos afectados:** domain/presentation, adaptadores de etiquetas
+  existentes, páginas/componentes públicos/candidatos/empresas/admin, selección
+  CV/CSV, pruebas de etiquetas/componentes/E2E, spec/plan/tasks/guía/estado.
+  Sin migración, backend de negocio, schema, auth, dependencias o contratos
+  persistidos nuevos. Contenido libre y contratos técnicos no se traducen.
+- **Riesgos/verificación prevista:** distinguir estados de cada entidad, cubrir
+  todos los valores normativos, no traducir valores enviados ni inventar estados,
+  conservar privacidad de proyecciones y auditoría. RED/GREEN de etiquetas y vistas,
+  escaneo de JSX/códigos visibles y pruebas por rol/historial/selectores; teclado,
+  móvil/axe, tipos/lint/tooling/cobertura/build y navegador ficticio local sin reset
+  ni cambios alojados. Diálogos del SO/navegador ajenos al DOM quedan fuera.
+  Autoriza la petición; revisión humana/aceptación/gates históricos pendientes.
+- **Detalle técnico previo al ajuste del editor:** la oferta puede contener
+  códigos legados onsite/fixed_term en campos de texto libre. Mostrar su etiqueta
+  española no debe reescribirlos al guardar otro campo. Usar un input visible
+  etiquetado y un hidden con el valor original; solo editar explícitamente ese
+  input cambia su valor enviado. Sin normalización de datos, catálogo nuevo o
+  cambios de servicio. Cubrir FormData original y valores visibles en pruebas.
+- **Error cliente detectado antes de corregir:** ImportUpload muestra directamente
+  Error.message del navegador, por ejemplo Failed to fetch en una caída de red.
+  Mantener mensajes españoles devueltos por su API protegida y mostrar un mensaje
+  español genérico para excepciones de transporte/parsing, conservando archivo y
+  confirmación. Regresión de fetch rechazado sin tocar el handler o sus permisos.
+
+- **Implementación/verificación real EXTRA042:** catálogos compartidos en
+  src/domain/presentation/labels.ts y adaptadores; páginas/componentes de cuentas,
+  candidatos, empresas, ofertas, participaciones, derivaciones, importación y
+  métricas. FileInput/CSS compartido para CV/CSV; etiquetas legadas del editor con
+  FormData original preservado. Mensajes de admin-participation-action y
+  referral-feedback y textos de registro traducidos, sin cambiar validaciones.
+  Guía docs/product/spanish-interface.md; spec/plan/tasks y estado alineados.
+  RED inicial de módulo ausente, GREEN focal49/49 y editor/inventario7/7;
+  regresión de transporte1/1. Inventario AST ampliado a frases de mensajes TS/TSX.
+  Resultado final: tipos/lint/build/diff-check PASS;764 pruebas/58 archivos,
+  tooling57/57 y navegador18/18 sin reintentos. Navegador público/tres roles con
+  locale en-US, historial/filtros, guardado/moderación/permisos, PDF/CSV retenidos,
+  móvil360×800, axe y capturas ficticias revisadas. Expectativas inglesas antiguas
+  corregidas y sincronización de h1 antes de axe; no se omiten pruebas/reglas.
+  Supabase local conservado sin reset ni cambios alojados; sin nuevas migraciones,
+  dependencias o variables. Servidor de desarrollo cerrado con autorización,
+  servidores de pruebas finalizados, next-env.d.ts ajeno restaurado.
+  Cobertura instrumentada limitada al módulo de entorno, no al producto entero.
+  Sin suite SQL/E2E completa, NVDA, CI remoto, commit/PR o revisión humana nueva;
+  aceptación municipal, OQ-001/002 y gates históricos no se declaran resueltos.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

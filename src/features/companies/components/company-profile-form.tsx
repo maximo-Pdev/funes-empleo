@@ -1,4 +1,5 @@
 "use client";
+import { companyProfileStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useActionState, useEffect, useRef } from "react";
@@ -14,7 +15,7 @@ export function CompanyProfileForm({ profile }: { profile: CompanyProfile }) {
   useEffect(() => { if (saved.message) feedback.current?.focus(); if (saved.success) router.refresh(); }, [saved, router]);
   const field = "rounded border border-slate-500 p-2";
   return <div className="space-y-8">
-    <p role="status" className="rounded bg-blue-50 p-3">Estado: <strong>{profile.status === "active" ? "Activo" : "Incompleto"}</strong>. Las ofertas se publican solo después de aprobación municipal.</p>
+    <p role="status" className="rounded bg-blue-50 p-3">Estado: <strong>{displayLabel(companyProfileStatusLabels, profile.status)}</strong>. Las ofertas se publican solo después de aprobación municipal.</p>
     <Form action={saveAction} result={saved} requirements={[{ names: ["email", "phone"], message: "Ingresá un correo o un teléfono de contacto." }]} className="grid gap-4 rounded border bg-white p-5" aria-busy={saving}>
       <input type="hidden" name="version" value={profile.version} />
       <Field className="grid gap-1">Nombre de la empresa<input className={field} name="legalName" defaultValue={profile.legalName ?? ""} required minLength={2} maxLength={200} /></Field>

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { openingStatusLabels, moderationDecisionLabels, displayLabel } from "@/domain/presentation/labels";
+import { publicModalityLabel, publicContractTypeLabel } from "@/features/openings/public-offer-display";
 import { Suspense } from "react";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
@@ -27,13 +29,13 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
       <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="opening-details" className="text-xl font-semibold">Oferta y empresa</h2>
         <p>Empresa: <strong>{opening.company_profiles?.legal_name ?? "Sin nombre"}</strong></p>
-        <p>Estado: <strong>{opening.status.replaceAll("_", " ")}</strong></p>
+        <p>Estado: <strong>{displayLabel(openingStatusLabels, opening.status)}</strong></p>
         <p>Fecha de cierre: {opening.closing_date ?? "Sin definir"}</p>
         <p>Vacantes: {opening.vacancies ?? "Sin definir"}</p>
         <p>Localidad: {opening.location ?? "Sin definir"}</p>
-        <p>Modalidad: {opening.modality ?? "Sin definir"}</p>
+        <p>Modalidad: {publicModalityLabel(opening.modality ?? "Sin definir")}</p>
         <p>Jornada: {opening.schedule ?? "Sin definir"}</p>
-        <p>Contrato: {opening.contract_type ?? "Sin definir"}</p>
+        <p>Contrato: {publicContractTypeLabel(opening.contract_type ?? "Sin definir")}</p>
         <div><h3 className="font-semibold">Tareas</h3><p className="whitespace-pre-wrap">{opening.tasks ?? "Sin definir"}</p></div>
         <div><h3 className="font-semibold">Requisitos</h3><p className="whitespace-pre-wrap">{opening.requirements ?? "Sin definir"}</p></div>
         <Link href={`/admin/participations?openingId=${opening.id}`} className="inline-block text-blue-800 underline">Ver participaciones de esta oferta</Link>
@@ -45,7 +47,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         <h2 id="opening-history" className="text-xl font-semibold">Historial de moderación</h2>
         {events.length === 0 ? <EmptyState title="Sin decisiones registradas" description="Todavía no hay eventos de moderación para esta oferta." /> :
           <ol className="space-y-3">{events.map((event) => <li key={event.id} className="rounded-lg border border-slate-300 bg-white p-4">
-            <p className="font-semibold">{event.decision.replaceAll("_", " ")}: {event.previous_status ?? "inicio"} → {event.new_status}</p>
+            <p className="font-semibold">{displayLabel(moderationDecisionLabels, event.decision, "Decisión registrada")}: {event.previous_status ? displayLabel(openingStatusLabels, event.previous_status) : "Inicio"} → {displayLabel(openingStatusLabels, event.new_status)}</p>
             <p className="text-sm text-slate-700">{new Date(event.created_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${event.actor_account_id ?? "sin identificar"}`}</p>
             {event.company_message && <p className="mt-2">Mensaje a empresa: {event.company_message}</p>}
             {event.internal_reason && <p className="mt-2">Motivo interno: {event.internal_reason}</p>}

@@ -87,11 +87,11 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByRole("button", { name: "Guardar borrador" }).click();
   await expect(page).toHaveURL(/\/empresa\/ofertas\/[0-9a-f-]{36}$/);
   const openingId = new URL(page.url()).pathname.split("/").at(-1)!;
-  await expect(page.getByText("Estado:")).toContainText("draft");
+  await expect(page.getByText("Estado:")).toContainText("Borrador");
   await page.getByRole("button", { name: "Enviar a revisión municipal" }).click();
-  await expect(page.getByText("Estado:")).toContainText("pending_review");
+  await expect(page.getByText("Estado:")).toContainText("Pendiente de revisión");
   await page.reload();
-  await expect(page.getByText("Estado:")).toContainText("pending_review");
+  await expect(page.getByText("Estado:")).toContainText("Pendiente de revisión");
   await page.goto(`/ofertas/${openingId}`);
   await expect(page.getByText(title)).toHaveCount(0);
 
@@ -103,7 +103,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByLabel("Decisión").selectOption("changes_requested");
     await admin.getByLabel("Explicación para la empresa").fill("Aclarar el horario de atención.");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
-    await expect(admin.getByText("Estado:")).toContainText("changes requested");
+    await expect(admin.getByText("Estado:")).toContainText("Correcciones solicitadas");
     await page.goto(`/empresa/ofertas/${openingId}`);
     await expect(page.getByText("Aclarar el horario de atención.")).toBeVisible();
     await page.getByLabel("Horario").fill("Lunes a viernes, jornada completa");
@@ -111,11 +111,11 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await expect(page.getByText("Borrador guardado.", { exact: false })).toBeVisible();
     await page.reload();
     await page.getByRole("button", { name: "Enviar a revisión municipal" }).click();
-    await expect(page.getByText("Estado:")).toContainText("pending_review");
+    await expect(page.getByText("Estado:")).toContainText("Pendiente de revisión");
     await admin.reload();
     await admin.getByLabel("Decisión").selectOption("approved");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
-    await expect(admin.getByText("Estado:")).toContainText("published");
+    await expect(admin.getByText("Estado:")).toContainText("Publicada");
     const publicSlug = openingSlug(openingId);
     await page.goto(`/ofertas/${publicSlug}`);
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
@@ -125,14 +125,14 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByLabel("Motivo interno").fill("Pausa operativa ficticia");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
     await page.goto(`/empresa/ofertas/${openingId}`);
-    await expect(page.getByText("Estado:")).toContainText("paused");
+    await expect(page.getByText("Estado:")).toContainText("Pausada");
     await expect(page.locator("body")).not.toContainText("Pausa operativa ficticia");
     await page.goto(`/ofertas/${publicSlug}`);
     await expectUnavailablePublicOffer(page, title);
     await expect(page.locator("body")).not.toContainText("Pausa operativa ficticia");
     await admin.getByLabel("Decisión").selectOption("resumed");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
-    await expect(admin.getByText("Estado:")).toContainText("published");
+    await expect(admin.getByText("Estado:")).toContainText("Publicada");
     expect(openingSlug(openingId)).toBe(publicSlug);
     await page.goto(`/ofertas/${publicSlug}`);
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
@@ -140,7 +140,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.goto("/admin/empresas");
     await admin.getByRole("link", { name }).click();
     await admin.getByRole("button", { name: "Suspender empresa" }).click();
-    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").first().fill("Suspensión ficticia");
     await admin.getByLabel("Confirmo esta decisión.").first().check();
     await admin.getByRole("button", { name: "Suspender empresa" }).click();
@@ -162,7 +162,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
     await admin.getByLabel("Confirmo esta decisión.").last().check();
     await admin.getByRole("button", { name: "Archivar empresa" }).click();
-    await expect(admin.getByText("Cuenta: archived", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await page.goto("/empresa/perfil");
     await expect(page).toHaveURL(/\/session-expired$/);
     await admin.reload();
@@ -186,24 +186,24 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
     await company.goto(`/company/openings/${fixtureId("opening", 2)}/referrals`);
     await expect(company.locator("body")).not.toContainText("Persona ficticia 002");
     await admin.goto(`/admin/empresas/${fixtureId("business", 3)}`);
-    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
     await admin.getByLabel("Confirmo esta decisión.").last().check();
     await admin.getByRole("button", { name: "Archivar empresa" }).click();
-    await expect(admin.getByText("Cuenta: archived", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await company.goto("/empresa/ofertas");
     await expect(company).toHaveURL(/\/session-expired$/);
     await admin.reload();
-    await expect(admin.getByText("Cuenta: archived", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").fill("Restauración administrativa ficticia");
     await admin.getByLabel("Confirmo esta decisión.").check();
     await admin.getByRole("button", { name: "Restaurar empresa" }).click();
-    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await loginFixture(company, "company", 3);
     await company.goto("/empresa/perfil");
     await expect(company.getByText("Estado:")).toContainText("Incompleto");
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 3)}`);
-    await expect(company.getByText("Estado:")).toContainText("draft");
+    await expect(company.getByText("Estado:")).toContainText("Borrador");
     await expect(company.locator("body")).not.toContainText("Archivo administrativo ficticio");
   } finally { await Promise.all([adminContext.close(), companyContext.close()]); }
 });
@@ -211,7 +211,7 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
 test("una oferta vencida no aparece públicamente y la empresa ve su cierre", async ({ page }) => {
   await loginFixture(page, "company", 31);
   await page.goto(`/empresa/ofertas/${fixtureId("opening", 81)}`);
-  await expect(page.getByText("Estado:")).toContainText("closed");
+  await expect(page.getByText("Estado:")).toContainText("Cerrada");
   await expect(page.getByText(/ya no recibe postulaciones/i)).toBeVisible();
   await page.goto(`/ofertas/${openingSlug(fixtureId("opening", 81))}`);
   await expectUnavailablePublicOffer(page, "Oferta ficticia 081");

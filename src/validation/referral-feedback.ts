@@ -35,6 +35,6 @@ export const adminOutcomeInput = z.object({
     ctx.addIssue({ code: "custom", message: "Indicá un motivo para esta decisión.", path: ["reason"] });
   }
   if (value.lateCorrection && !value.feedbackId && !value.contactId) {
-    ctx.addIssue({ code: "custom", message: "La corrección tardía requiere feedback o un contacto municipal registrado.", path: ["feedbackId"] });
+    ctx.addIssue({ code: "custom", message: "La corrección tardía requiere una respuesta empresarial o un contacto municipal registrado.", path: ["feedbackId"] });
   }
 });

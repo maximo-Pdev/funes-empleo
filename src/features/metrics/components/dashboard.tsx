@@ -10,9 +10,9 @@ const states: Record<string, string> = { active: "activas", incomplete: "incompl
   draft: "en borrador", pending_review: "pendientes de revisión", changes_requested: "con correcciones solicitadas", published: "publicadas",
   paused: "pausadas", closed: "cerradas", rejected: "rechazadas", cancelled: "canceladas" };
 export function metricLabel(indicator: string) {
-  if (indicator.startsWith("companies_")) return `Empresas ${states[indicator.slice(10)] ?? indicator}`;
-  if (indicator.startsWith("openings_")) return `Ofertas ${states[indicator.slice(9)] ?? indicator}`;
-  return labels[indicator] ?? indicator;
+  if (indicator.startsWith("companies_")) return `Empresas ${states[indicator.slice(10)] ?? "con estado no reconocido"}`;
+  if (indicator.startsWith("openings_")) return `Ofertas ${states[indicator.slice(9)] ?? "con estado no reconocido"}`;
+  return labels[indicator] ?? "Indicador no reconocido";
 }
 export function Dashboard({ rows }: { rows: readonly MetricRow[] }) {
   const durations = rows.filter((r) => r.unit === "days");

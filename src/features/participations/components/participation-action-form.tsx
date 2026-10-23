@@ -96,7 +96,7 @@ export function ParticipationActionForm({ participationId, version, status, cont
       setError("Seleccioná el contacto entrante donde el candidato pidió el retiro."); return;
     }
     if (command.startsWith("correct_") && !feedbackId && !contactId) {
-      setError("Seleccioná feedback o un contacto municipal como evidencia."); return;
+      setError("Seleccioná una respuesta empresarial o un contacto municipal como evidencia."); return;
     }
     if ((command === "confirm_hired" || command === "confirm_not_selected") &&
       !feedbackId && !contactId && !reason.trim()) {
@@ -120,7 +120,7 @@ export function ParticipationActionForm({ participationId, version, status, cont
   if (choices.length === 0) return <p>Este caso tiene un resultado final y no admite nuevas acciones.</p>;
   return <Form onSubmit={submit} requirements={command === "record_preinterview"
     ? [{ names: ["scheduledAtLocal", "heldAtLocal"], message: "Indicá la fecha programada o realizada de la preentrevista." }]
-    : command.startsWith("correct_") ? [{ names: ["feedbackId", "contactId"], message: "Seleccioná feedback o un contacto municipal como evidencia." }]
+    : command.startsWith("correct_") ? [{ names: ["feedbackId", "contactId"], message: "Seleccioná una respuesta empresarial o un contacto municipal como evidencia." }]
       : command === "confirm_hired" || command === "confirm_not_selected"
         ? [{ names: ["feedbackId", "contactId", "reason"], message: "Registrá un motivo o seleccioná la evidencia del resultado." }] : []}
     className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
@@ -151,7 +151,7 @@ export function ParticipationActionForm({ participationId, version, status, cont
     {(command === "withdraw_on_request" || command?.startsWith("correct_") ||
       command === "confirm_hired" || command === "confirm_not_selected") && <>
       {feedback.length > 0 && command !== "withdraw_on_request" &&
-        <SelectField id="action-feedback" name="feedbackId" label="Feedback empresarial (opcional)" value={feedbackId}
+        <SelectField id="action-feedback" name="feedbackId" label="Respuesta empresarial (opcional)" value={feedbackId}
           onChange={(event) => setFeedbackId(event.target.value)}
           options={[{ value: "", label: "Sin seleccionar" }, ...feedback.map((item) => ({ value: item.id, label: item.label }))]} />}
       <SelectField id="action-contact" name="contactId" required={command === "withdraw_on_request"} label={command === "withdraw_on_request" ? "Solicitud del candidato" : "Contacto municipal (opcional)"}

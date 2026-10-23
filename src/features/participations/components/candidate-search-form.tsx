@@ -37,7 +37,9 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
     <SelectField id="candidate-category" label="Categoría" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}
       options={categories.map((category) => ({ value: category.id, label: category.name }))} placeholder="Todas las categorías" />
     <TextField id="candidate-skills" label="Habilidades" value={skills} onChange={(event) => setSkills(event.target.value)} maxLength={100} />
-    <TextField id="candidate-availability" label="Disponibilidad" value={availability} onChange={(event) => setAvailability(event.target.value)} maxLength={100} />
+    <SelectField id="candidate-availability" label="Disponibilidad" value={availability} onChange={(event) => setAvailability(event.target.value)}
+      placeholder="Todas las disponibilidades" options={[{ value: "available", label: "Disponible" }, { value: "unavailable", label: "No disponible" },
+        ...(!["", "available", "unavailable"].includes(availability) ? [{ value: availability, label: "Filtro anterior" }] : [])]} />
     <TextField id="candidate-locality" label="Localidad" value={locality} onChange={(event) => setLocality(event.target.value)} maxLength={100} />
     <SelectField id="candidate-vigency" label="Vigencia" value={vigency} onChange={(event) => setVigency(event.target.value as SearchValues["vigency"])}
       options={[{ value: "current", label: "Vigente" }, { value: "needs_update", label: "Necesita actualización" }, { value: "all", label: "Todas" }]} />

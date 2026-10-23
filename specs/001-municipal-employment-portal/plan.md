@@ -139,6 +139,23 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 
 ## Contexto técnico
 
+### EXTRA042 — etiquetas españolas, 2026-10-22
+
+Módulo domain/presentation/labels.ts sin dependencias servidor ni autorización:
+Record tipado por catálogos de estados ya existentes, etiquetas de acciones/
+motivos/canales/entrevistas y helper de fallback seguro. Reusar adaptadores
+existentes para no cambiar consumidores ni estados. Páginas y componentes
+renderizan etiquetas; select value/hidden/URLs/RPC y contenido libre se conservan.
+Historiales preservan eventos/detalle/orden y muestran etiquetas, no códigos.
+Traducciones de modalidad/contrato son compatibilidad de presentación, nunca
+nuevo catálogo validado. Importación conserva contrato CSV, edición con opciones
+españolas y mismos valores. FileInput cliente compartido con control real
+accesible, nombre de archivo/ausencia españoles y retención/error/reset iguales.
+Sin i18n framework, dependencia, backend/schema o migración nuevos. Pruebas de
+cobertura de catálogos, fallbacks, JSX/vistas por rol y accesibilidad/selectores,
+tipos/lint/cobertura/tooling/build y navegador local. Constitución y contratos de
+autorización/estados intactos; no traducir contenido personal o formatos técnicos.
+
 ### EXTRA040 — presentación del perfil candidato, 2026-10-22
 
 Solo CandidateProfilePanel y CSS local: tarjeta inicial de estado/vigencia y

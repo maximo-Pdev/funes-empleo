@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { activateProfileAction, savePhoneAction, saveProfileAction } from "../profile-actions";
 import { changeConsentAction } from "../consent-actions";
 import { candidateProfileStatusLabels } from "../candidate-profile-status";
+import { displayLabel } from "@/domain/presentation/labels";
 import { CvUploadForm } from "./cv-upload-form";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
 
@@ -48,7 +49,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
   const field = "w-full rounded border border-slate-500 bg-white p-2";
   return <div className="space-y-8">
     <section className="grid gap-3 rounded border bg-white p-5" aria-label="Activación del perfil">
-      <p role="status" className="rounded bg-blue-50 p-3">{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{candidateProfileStatusLabels[profile.status] ?? "En revisión"}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
+      <p role="status" className="rounded bg-blue-50 p-3">{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{displayLabel(candidateProfileStatusLabels, profile.status)}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
       {canActivate && <Form action={activateAction} result={activation} className="grid gap-3" aria-busy={activating}>
         <h2 className="text-xl font-semibold">Activar perfil</h2><p>Tu perfil cumple los requisitos guardados. Activá tu perfil para postularte y ser considerado por la Oficina de Empleo.</p>
         <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />

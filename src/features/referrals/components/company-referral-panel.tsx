@@ -1,3 +1,4 @@
+import { availabilityLabel, interviewStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import Link from "next/link";
 import type { CompanyReferral } from "@/features/referrals/service";
 import { FeedbackForm, InterviewForm } from "./referral-forms";
@@ -16,7 +17,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
             <dl className="mt-2 grid gap-2 sm:grid-cols-2">
               <div><dt className="font-semibold">Nombre</dt><dd>{candidate.displayName}</dd></div>
               <div><dt className="font-semibold">Localidad</dt><dd>{candidate.locality ?? "No informada"}</dd></div>
-              <div><dt className="font-semibold">Disponibilidad</dt><dd>{candidate.availability ?? "No informada"}</dd></div>
+              <div><dt className="font-semibold">Disponibilidad</dt><dd>{availabilityLabel(candidate.availability)}</dd></div>
               <div><dt className="font-semibold">Experiencia y habilidades</dt><dd className="whitespace-pre-wrap">{candidate.skillsExperienceSummary ?? "No informadas"}</dd></div>
             </dl>
             <h4 className="mt-4 font-semibold">Categorías e intereses</h4>
@@ -30,7 +31,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
           <p className="text-sm text-slate-700">El acceso puede revocarse en cualquier momento. Una copia ya descargada no puede retirarse técnicamente.</p>
           <div>
             <h3 className="text-lg font-semibold">Entrevistas registradas</h3>
-            {referral.interviews?.length ? <ul className="mt-2 list-disc pl-6">{referral.interviews.map((interview) => <li key={interview.id}>{interview.status}: {interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" }) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
+            {referral.interviews?.length ? <ul className="mt-2 list-disc pl-6">{referral.interviews.map((interview) => <li key={interview.id}>{displayLabel(interviewStatusLabels, interview.status)}: {interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" }) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
           </div>
           {referral.participationVersion && <InterviewForm openingId={openingId} referralId={referral.referralId} version={referral.participationVersion} />}
         </div>

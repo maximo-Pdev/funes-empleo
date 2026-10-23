@@ -1,5 +1,6 @@
 import { CvUploadForm } from "@/features/candidates/components/cv-upload-form";
 import Link from "next/link";
+import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel, auditActionLabel, auditStateLabel, reasonLabel } from "@/domain/presentation/labels";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
 import { getAdminCandidate } from "@/features/candidates/search-service";
@@ -42,11 +43,11 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       </section>
       <section aria-labelledby="candidate-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-details" className="text-xl font-semibold">Perfil candidato</h2>
-        <p>Estado: <strong>{candidate.status.replaceAll("_", " ")}</strong></p>
-        <p>Cuenta: {candidate.accounts?.status ?? "Perfil asistido sin cuenta vinculada"}</p>
+        <p>Estado: <strong>{displayLabel(candidateProfileStatusLabels, candidate.status)}</strong></p>
+        <p>Cuenta: {candidate.accounts ? displayLabel(accountStatusLabels, candidate.accounts.status) : "Perfil asistido sin cuenta vinculada"}</p>
         <p>Derivación: <strong>{referralEligible ? "Puede evaluarse" : "No disponible actualmente"}</strong></p>
         <p>Localidad: {candidate.locality ?? "Sin informar"}</p>
-        <p>Disponibilidad: {candidate.availability ?? "Sin informar"}</p>
+        <p>Disponibilidad: {availabilityLabel(candidate.availability)}</p>
         <p>Vigencia hasta: {candidate.refresh_due_at ?? "Sin definir"}</p>
         <p>Habilidades: {candidate.skills_experience_summary ?? "Sin informar"}</p>
         <p>Categorías: {candidate.candidate_categories.map((item) => item.job_categories?.name).filter(Boolean).join(", ") || "Sin categorías"}</p>
@@ -61,10 +62,10 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         <h2 id="candidate-history" className="text-xl font-semibold">Historial de cuenta y perfil</h2>
         {audit.length === 0 ? <EmptyState title="Sin eventos" description="Todavía no hay movimientos registrados." /> :
           <ol className="space-y-3">{audit.map((event) => <li key={event.id} className="border-t border-slate-200 pt-3">
-            <p className="font-semibold">{event.action.replaceAll("_", " ")}</p>
-            <p className="text-sm">{event.previous_state ?? "inicio"} → {event.new_state ?? "sin cambio de estado"}</p>
+            <p className="font-semibold">{auditActionLabel(event.action)}</p>
+            <p className="text-sm">{event.previous_state ? auditStateLabel(event.previous_state) : "Inicio"} → {auditStateLabel(event.new_state)}</p>
             <p className="text-sm text-slate-700">{new Date(event.occurred_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${event.actor_account_id ?? "sin identificar"}`}</p>
-            {event.reason_code && <p className="text-sm">Código de motivo: {event.reason_code}</p>}
+            {event.reason_code && <p className="text-sm">Motivo: {reasonLabel(event.reason_code)}</p>}
           </li>)}</ol>}
       </section>
       </div>
