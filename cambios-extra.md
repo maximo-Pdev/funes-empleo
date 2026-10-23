@@ -2358,6 +2358,31 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   hacia main: https://github.com/maximo-Pdev/funes-empleo/pull/67.
   Next-env.d.ts ajeno excluido. No acredita CI, revisión, merge o aceptación.
 
+- **Corrección CI de PR67, registrada antes de implementar (2026-10-22):**
+  Mateo pide corregir el check fallido. Quality39887066823: database PASS,
+  application falla únicamente en intermediation.spec.ts:581,100 recorridos PASS
+  y1 no ejecutado por dependencia. El helper decide todavía espera rejected/
+  published/closed/cancelled; la vista correctamente muestra Rechazada. RED local
+  reproduce exactamente el mismo fallo. Además queda una expectativa literal
+  cancelled al final del mismo recorrido, que quedaba oculta por el primer error.
+  Origen: petición de español, constituciónIV y T152/T154 de esta entrada.
+  Cambio mínimo: expectativas españolas explícitas por las cuatro decisiones,
+  con unión de tipos que impida claves inesperadas; mantener selectOption en
+  inglés y todas las aserciones de publicación, privacidad y casos independientes.
+  Archivos: tests/e2e/intermediation.spec.ts y este registro/tasks/estado/guía.
+  Sin cambiar producto, backend, contratos, schema, CI o dependencias; sin saltos
+  de tests ni relajación de comprobaciones. Riesgo: que un primer fallo esconda
+  otro estado; verificar el recorrido entero rechazo/publicación/cierre/cancelación,
+  tipos/lint/unit/tooling/build y nueva ejecución remota. No reset local ni cambios
+  alojados. Autorización: solicitud expresa; CI/revisión aún no aprobadas.
+- **Resultado local de la corrección:** RED confirma rejected frente a Rechazada;
+  GREEN del recorrido completo1/1 sin reintentos, incluidas publicación, privacidad,
+  conservación del caso al cerrar y cancelación de su caso relacionado.807 pruebas
+  en63 archivos, tooling57/57, tipos/lint/build y diff-check PASS. Sin modificar
+  aplicación, fixtures, configuración CI o contratos; base local conservada sin
+  reset. Se publica en el mismo PR67 sin firma/atribución; next-env.d.ts ajeno
+  excluido. Nueva ejecución remota y revisión humana pendientes al publicar.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

@@ -97,3 +97,10 @@ y diff contra main PASS. Navegador18/18 sin reintentos, incluyendo las secciones
 perfil/ofertas/postulaciones del nuevo /account. Los tres scripts visuales de main
 municipal-style-check, home-responsive-layout-check y home-keyboard-navigation-check
 PASS. Sin reset local ni cambios alojados; mismos límites de revisión/aceptación.
+
+Corrección de CI de PR67: el helper de moderación del recorrido de intermediación
+también espera Publicada/Rechazada/Cerrada/Cancelada; conserva los selectOption
+ingleses y verifica privacidad y participaciones independientes sin saltar etapas.
+RED local idéntico al check y GREEN del recorrido completo1/1 sin reintentos.
+Tipos/lint/build,807 pruebas y tooling57 PASS; sin modificar producto o pipeline.
+La nueva ejecución remota se distingue de esta verificación local.

@@ -957,3 +957,13 @@ acreditados. Next-env.d.ts ajeno queda fuera de la entrega.
 PR67 abierto hacia main con93fbca6 y4b83104, ambos sin firma/atribución:
 https://github.com/maximo-Pdev/funes-empleo/pull/67.
 Publicación no equivale a CI aprobada, revisión humana, merge o aceptación.
+
+Corrección del check application de PR67 (Quality39887066823,2026-10-22):
+database PASS y100 recorridos PASS; el helper decide aún esperaba códigos ingleses,
+con otro cancelled literal oculto al final. RED local reproduced rejected/Rechazada.
+Expectativas independientes Publicada/Rechazada/Cerrada/Cancelada con unión de
+decisiones tipada; los values ingleses y las aserciones de privacidad/casos siguen.
+GREEN local1/1 del recorrido entero sin reintentos;807 pruebas/63 archivos,
+tooling57/57, tipos/lint/build/diff-check PASS. Sin tocar aplicación, SQL, fixtures,
+pipeline o datos compartidos; sin reset local. T155 implementado/verificado local,
+actualización del mismo PR67; nueva CI y revisión pendientes al publicar.

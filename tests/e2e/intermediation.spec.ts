@@ -571,13 +571,13 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
       await expect(company.getByText("Estado:")).toContainText("Pendiente de revisión");
       return id;
     }
-    async function decide(id: string, decision: string, reason = "", message = "") {
+    async function decide(id: string, decision: "approved" | "rejected" | "closed" | "cancelled", reason = "", message = "") {
       await admin.goto(`/admin/openings/${id}`);
       await admin.getByLabel("Decisión").selectOption(decision);
       if (reason) await admin.getByLabel("Motivo interno").fill(reason);
       if (message) await admin.getByLabel("Explicación para la empresa").fill(message);
       await admin.getByRole("button", { name: "Guardar decisión" }).click();
-      const expected = decision === "approved" ? "published" : decision;
+      const expected = { approved: "Publicada", rejected: "Rechazada", closed: "Cerrada", cancelled: "Cancelada" }[decision];
       await expect(admin.getByText("Estado:")).toContainText(expected);
     }
 
@@ -615,7 +615,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
     await admin.goto(cancelledCase);
     await expect(admin.getByRole("status").filter({ hasText: "Resultado o estado vigente" })).toContainText("Cancelada");
     await company.goto(`/empresa/ofertas/${cancelled}`);
-    await expect(company.getByText("Estado:")).toContainText("cancelled");
+    await expect(company.getByText("Estado:")).toContainText("Cancelada");
     await expect(company.locator("body")).not.toContainText("Cancelación interna ficticia");
   } finally { await Promise.all([companyContext.close(), adminContext.close()]); }
 });
