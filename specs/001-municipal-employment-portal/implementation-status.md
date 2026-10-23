@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-20 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-22 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -903,3 +903,75 @@ automática en PR65, abierto hacia main desde feat/candidate-consent-activation-
 https://github.com/maximo-Pdev/funes-empleo/pull/65.
 next-env.d.ts ajeno excluido. Sin nuevas migraciones/cambios alojados, CI y
 revisión pendientes; sin merge o aceptación acreditados.
+
+### Español transversal — EXTRA051, 2026-10-22
+
+PR65 confirmado mergeado en23ba5fa; main actualizado, rama anterior retirada
+local/remota y rama feat/spanish-interface-labels creada sin prefijo codex.
+next-env.d.ts ajeno conservado; no se crea commit/PR en esta solicitud.
+
+Etiquetas españolas compartidas para cuentas/perfiles/ofertas/participaciones,
+consentimiento/accesos/CV/importaciones, acciones/motivos/canales/entrevistas y
+respuestas empresariales. Filtros y formularios muestran español pero conservan
+valores técnicos. Editor empresarial muestra modalidades/contratos legados sin
+reescribir el original al guardar otro campo. FileInput español con input real,
+Field, validación/foco y retención de archivos; importación da error de transporte
+español sin mostrar excepciones del navegador. Mensajes de corrección y registro
+traducidos sin modificar reglas. Texto libre/archivos/CSV técnico no se traducen.
+
+| Verificación final | Evidencia local |
+| --- | --- |
+| Tipos/lint/build | PASS con Node24 y Supabase local. |
+| Pruebas/componentes/inventario | 764/764,58 archivos; enums, auditoría, fallbacks, FormData legado, selector y error de red. |
+| Tooling | 57/57 PASS. |
+| Navegador | 18/18 PASS sin reintentos: español4,candidato1,ofertas3,validación9,filtro municipal1. |
+| Presentación | Público/tres roles en-US; listas/historiales, opciones españolas con value técnico; móvil360×800 sin overflow y axe PASS; capturas ficticias revisadas. |
+| Integridad | Diff-check PASS, sin migración/reset/servicios o cambios alojados; next-env.d.ts ajeno restaurado. |
+
+T151–154 completos para este incremento. Guía docs/product/spanish-interface.md
+y análisis acotado sin gaps nuevos construibles: presentación consistente con
+spec/plan y constitución; modelo/contratos/transiciones/política sin cambios.
+Checklists existentes intactas; no acredita revisión independiente o aprobación.
+Cobertura instrumentada solo de entorno, no cobertura total del negocio.
+Fallos iniciales de expectativas inglesas y sincronización antes de axe corregidos
+sin omitir recorridos/reglas; Next conserva su aviso preexistente de stream cerrado
+durante navegaciones abortadas. Servidor next dev cerrado con autorización y
+servidores de pruebas finalizados. Sin suite SQL/E2E completa, NVDA, CI remoto,
+commit/PR o aceptación nueva. Gates históricos y OQ-001/002 siguen pendientes;
+no hay decisión municipal nueva necesaria para esta traducción.
+
+Entrega solicitada: commit93fbca6 sin firma ni atribución conserva la implementación
+antes de sincronizar. PR66 avanzó main a8c1612b; se integra sin perder portada,
+sidebar, cvReturnTo/returnTo ni traducciones. El ID local EXTRA042 de esta rama
+colisionó con el visual de main: esta mejora pasa a EXTRA051 y preserva su origen.
+La migración oficial de controles de main continúa independiente. FileInput usa
+los tokens compartidos; no cambia controles/reglas del compañero.
+
+Revalidación tras integración:807 pruebas/63 archivos, tooling57/57, tipos/lint/build,
+18/18 recorridos de navegador sin reintentos y3 scripts visuales de main PASS.
+El smoke español incluye las tres secciones del /account candidato con sidebar.
+Diff del PR contra main PASS; no se modifica el whitespace heredado en la licencia
+Sora al resolver el merge. Sin reset/migración/cambios alojados ni revisión/CI
+acreditados. Next-env.d.ts ajeno queda fuera de la entrega.
+
+PR67 abierto hacia main con93fbca6 y4b83104, ambos sin firma/atribución:
+https://github.com/maximo-Pdev/funes-empleo/pull/67.
+Publicación no equivale a CI aprobada, revisión humana, merge o aceptación.
+
+Corrección del check application de PR67 (Quality39887066823,2026-10-22):
+database PASS y100 recorridos PASS; el helper decide aún esperaba códigos ingleses,
+con otro cancelled literal oculto al final. RED local reproduced rejected/Rechazada.
+Expectativas independientes Publicada/Rechazada/Cerrada/Cancelada con unión de
+decisiones tipada; los values ingleses y las aserciones de privacidad/casos siguen.
+GREEN local1/1 del recorrido entero sin reintentos;807 pruebas/63 archivos,
+tooling57/57, tipos/lint/build/diff-check PASS. Sin tocar aplicación, SQL, fixtures,
+pipeline o datos compartidos; sin reset local. T155 implementado/verificado local,
+actualización del mismo PR67; nueva CI y revisión pendientes al publicar.
+
+Segundo fallo expuesto por CI39889638752:101 recorridos PASS, incluido T155;
+solo SC-008A falla porque demo-performance aún busca Estado: published. T156
+actualiza esa etiqueta a Publicada y usa selectOption(available) para el escenario
+de búsqueda candidato. Conserva cinco segundos, cuatro actores, barrera y SQL
+de integridad. RED de contrato1/2;808 pruebas/63 archivos, tooling57, tipos/lint/build
+y diff-check PASS. Sin cambios de producto/pipeline ni reset local; benchmark frío
+se verifica en el runner aislado de la nueva CI, pendiente al publicar.

@@ -218,7 +218,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Reactivación ficticia E2E");
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
-    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await signIn(page, email, password);
     await page.goto("/candidato/perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("No disponible");
@@ -241,7 +241,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Restauración ficticia E2E");
     await admin.getByLabel("Confirmo la restauración").check();
     await admin.getByRole("button", { name: "Restaurar a borrador" }).click();
-    await expect(admin.getByText("Estado: draft", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Estado: Borrador", { exact: false })).toBeVisible();
     await signIn(page, email, password);
     await page.goto("/candidato/perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("Borrador");

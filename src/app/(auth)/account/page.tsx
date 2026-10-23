@@ -1,5 +1,6 @@
 import { Form } from "@/components/forms/form";
 import Link from "next/link";
+import { accountStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { ArrowRight, KeyRound, LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { Card } from "@/components/ui";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
@@ -29,7 +30,7 @@ export default async function AccountPage({ searchParams = Promise.resolve({}) }
     </div>
     {account.role === "admin" && <section aria-label="Cuentas administrativas" className="mt-7"><h2 className="text-xl font-bold text-primary-900">Administradores individuales</h2>
       {peers?.error && <p role="alert" className="mt-4 rounded-xl border border-red-300 bg-red-50 p-5 leading-7 text-red-900">No se pudo cargar la lista. Recargá la página.</p>}
-      <div className="mt-5 grid gap-5 md:grid-cols-2">{peers?.data?.map(peer => <Card key={peer.id} className="min-w-0 p-6"><h3 className="break-all text-base font-semibold text-primary-900">Cuenta {peer.id}</h3><p className="mt-3 text-sm leading-6">Estado: {peer.status}</p>{(peer.status === "active" || peer.status === "suspended") && <div className={`${styles.forms} ${styles.danger} mt-5`}><AccountChangeForm id={peer.id} version={peer.version} command={peer.status === "active" ? "suspend" : "reactivate"} /></div>}</Card>)}</div>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">{peers?.data?.map(peer => <Card key={peer.id} className="min-w-0 p-6"><h3 className="break-all text-base font-semibold text-primary-900">Cuenta {peer.id}</h3><p className="mt-3 text-sm leading-6">Estado: {displayLabel(accountStatusLabels, peer.status)}</p>{(peer.status === "active" || peer.status === "suspended") && <div className={`${styles.forms} ${styles.danger} mt-5`}><AccountChangeForm id={peer.id} version={peer.version} command={peer.status === "active" ? "suspend" : "reactivate"} /></div>}</Card>)}</div>
     </section>}
   </>;
   return account.role === "admin"

@@ -1,10 +1,13 @@
+import { displayLabel } from "@/domain/presentation/labels";
+
 // Presentation compatibility only, not an input or approved municipal catalog.
 export function publicModalityLabel(value: string): string {
-  return value === "onsite" ? "Presencial" : value;
+  return displayLabel({ onsite: "Presencial", remote: "Remoto", hybrid: "Híbrido" }, value, value);
 }
 
 export function publicContractTypeLabel(value: string): string {
-  return value === "fixed_term" ? "Plazo fijo" : value;
+  return displayLabel({ fixed_term: "Plazo fijo", permanent: "Permanente", temporary: "Temporal", internship: "Pasantía",
+    indefinite: "Tiempo indeterminado", freelance: "Independiente" }, value, value);
 }
 
 // Calendar arithmetic avoids parsing a date-only value as a timezone-dependent instant.

@@ -30,7 +30,7 @@ export const adminParticipationActionInput = z.object({
     fail("candidateRequestId", "Seleccioná el contacto que registra la solicitud del candidato.");
   }
   if (value.command.startsWith("correct_") && !value.feedbackId && !value.contactId) {
-    fail("feedbackId", "La corrección requiere feedback o un contacto municipal registrado.");
+    fail("feedbackId", "La corrección requiere una respuesta empresarial o un contacto municipal registrado.");
   }
   if (["confirm_hired", "confirm_not_selected"].includes(value.command) &&
     !value.reason && !value.feedbackId && !value.contactId) {

@@ -1,3 +1,4 @@
+import { contactChannelLabels, feedbackOutcomeLabels, displayLabel } from "@/domain/presentation/labels";
 import Link from "next/link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState, FeedbackMessage } from "@/components/ui";
@@ -35,10 +36,10 @@ export default async function AdminParticipationDetailPage({ params }: {
         <ParticipationActionForm key={`${participation.id}:${participation.version}`} participationId={participation.id}
           version={participation.version} status={participation.status}
           contacts={contacts.map((item) => ({ id: item.id, direction: item.direction,
-            label: `${localDate(item.occurred_at)} · ${item.channel} · ${item.summary_internal.slice(0, 60)}` }))}
+            label: `${localDate(item.occurred_at)} · ${displayLabel(contactChannelLabels, item.channel, "Canal no informado")} · ${item.summary_internal.slice(0, 60)}` }))}
           feedback={feedback.filter((item) => item.review_status === "pending_admin")
             .map((item) => ({ id: item.id,
-              label: `${localDate(item.reported_at)} · ${item.reported_outcome.replaceAll("_", " ")}` }))}
+              label: `${localDate(item.reported_at)} · ${displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}` }))}
           onSubmit={adminParticipationAction} />
         <FeedbackReviewPanel key={`feedback:${participation.id}:${participation.version}`}
           participationId={participation.id} version={participation.version}
@@ -76,15 +77,15 @@ export default async function AdminParticipationDetailPage({ params }: {
           <h2 id="preinterviews-title" className="text-xl font-semibold">Preentrevistas</h2>
           {preinterviews.length === 0 ? <EmptyState title="Sin preentrevistas" description="Todavía no se registró una preentrevista." /> :
             <ul className="space-y-3">{preinterviews.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
-              <p><strong>{item.channel}</strong> · {localDate(item.created_at)}</p>
+              <p><strong>{displayLabel(contactChannelLabels, item.channel, "Canal no informado")}</strong> · {localDate(item.created_at)}</p>
               {item.summary_internal && <p className="whitespace-pre-wrap">{item.summary_internal}</p>}
             </li>)}</ul>}
         </section>
         <section aria-labelledby="feedback-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
-          <h2 id="feedback-title" className="text-xl font-semibold">Feedback empresarial</h2>
-          {feedback.length === 0 ? <EmptyState title="Sin feedback" description="La empresa todavía no comunicó un resultado." /> :
+          <h2 id="feedback-title" className="text-xl font-semibold">Respuesta empresarial</h2>
+          {feedback.length === 0 ? <EmptyState title="Sin respuesta" description="La empresa todavía no comunicó un resultado." /> :
             <ul className="space-y-3">{feedback.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
-              <p><strong>{item.reported_outcome.replaceAll("_", " ")}</strong> · {localDate(item.reported_at)}</p>
+              <p><strong>{displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}</strong> · {localDate(item.reported_at)}</p>
               <p>{item.review_status === "pending_admin" ? "Pendiente de confirmación administrativa" : "Revisado"}</p>
               {item.message && <p className="whitespace-pre-wrap">{item.message}</p>}
             </li>)}</ul>}

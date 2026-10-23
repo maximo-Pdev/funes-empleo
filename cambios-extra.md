@@ -2257,6 +2257,148 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   revocación según contrato aprobado; pruebas, lint, tipos, build y navegador.
   Aún no implementado ni probado; sin migraciones aplicadas, commit o PR.
 
+## EXTRA-051 — Interfaz en español en todos los roles
+
+- **Fecha/origen/autorización:** 2026-10-22, Mateo solicita revisar toda la web
+  y todos los perfiles y traducir palabras/estados del sistema al español.
+  PR65 confirmado mergeado (23ba5fa), main actualizado y rama
+  feat/spanish-interface-labels; anterior eliminada local/remoto. next-env.d.ts
+  ajeno preservado; sin prefijo codex ni firmas/atribuciones automáticas.
+- **Evidencia:** ofertas/cuentas/perfiles muestran status crudo (active, draft,
+  pending_review); historiales usan replaceAll sobre códigos ingleses. Canales,
+  disponibilidad, entrevistas, motivos y feedback también filtran códigos a la
+  vista. Hay etiquetas parciales duplicadas y fallbacks que devuelven el código.
+  Capturas locales previas muestran Choose File/No file chosen del input nativo.
+  Importación muestra available/unavailable en la edición y códigos de error;
+  el CSV tiene encabezados exactos de un contrato técnico que debe conservarse.
+- **Origen aprobado:** accesibilidad en español de spec, FR-056, constituciónIV
+  y petición expresa. No es cambio de negocio, catálogo municipal o permisos.
+- **Cambio mínimo propuesto antes de implementar:** catálogos de presentación
+  tipados para estados existentes, acciones/motivos y canales; reutilizarlos en
+  páginas/filtros/historiales por rol y usar fallback español sin filtrar códigos
+  desconocidos. Reemplazar feedback por respuesta/informe empresarial en textos,
+  conservando nombres internos/RPC/IDs/values/selectores técnicos. Traducir
+  códigos legados conocidos de modalidad/contrato solo en presentación. Evitar
+  alterar automáticamente contenido libre escrito por personas, nombres, emails,
+  archivos, datos ya guardados, URLs, identificadores o formato de CSV.
+  Selector de archivos compartido con textos españoles sin depender del idioma
+  del navegador; conservar input real, Field, teclado, validación y retención.
+- **Archivos/contratos afectados:** domain/presentation, adaptadores de etiquetas
+  existentes, páginas/componentes públicos/candidatos/empresas/admin, selección
+  CV/CSV, pruebas de etiquetas/componentes/E2E, spec/plan/tasks/guía/estado.
+  Sin migración, backend de negocio, schema, auth, dependencias o contratos
+  persistidos nuevos. Contenido libre y contratos técnicos no se traducen.
+- **Riesgos/verificación prevista:** distinguir estados de cada entidad, cubrir
+  todos los valores normativos, no traducir valores enviados ni inventar estados,
+  conservar privacidad de proyecciones y auditoría. RED/GREEN de etiquetas y vistas,
+  escaneo de JSX/códigos visibles y pruebas por rol/historial/selectores; teclado,
+  móvil/axe, tipos/lint/tooling/cobertura/build y navegador ficticio local sin reset
+  ni cambios alojados. Diálogos del SO/navegador ajenos al DOM quedan fuera.
+  Autoriza la petición; revisión humana/aceptación/gates históricos pendientes.
+- **Detalle técnico previo al ajuste del editor:** la oferta puede contener
+  códigos legados onsite/fixed_term en campos de texto libre. Mostrar su etiqueta
+  española no debe reescribirlos al guardar otro campo. Usar un input visible
+  etiquetado y un hidden con el valor original; solo editar explícitamente ese
+  input cambia su valor enviado. Sin normalización de datos, catálogo nuevo o
+  cambios de servicio. Cubrir FormData original y valores visibles en pruebas.
+- **Error cliente detectado antes de corregir:** ImportUpload muestra directamente
+  Error.message del navegador, por ejemplo Failed to fetch en una caída de red.
+  Mantener mensajes españoles devueltos por su API protegida y mostrar un mensaje
+  español genérico para excepciones de transporte/parsing, conservando archivo y
+  confirmación. Regresión de fetch rechazado sin tocar el handler o sus permisos.
+
+- **Implementación/verificación real EXTRA051:** catálogos compartidos en
+  src/domain/presentation/labels.ts y adaptadores; páginas/componentes de cuentas,
+  candidatos, empresas, ofertas, participaciones, derivaciones, importación y
+  métricas. FileInput/CSS compartido para CV/CSV; etiquetas legadas del editor con
+  FormData original preservado. Mensajes de admin-participation-action y
+  referral-feedback y textos de registro traducidos, sin cambiar validaciones.
+  Guía docs/product/spanish-interface.md; spec/plan/tasks y estado alineados.
+  RED inicial de módulo ausente, GREEN focal49/49 y editor/inventario7/7;
+  regresión de transporte1/1. Inventario AST ampliado a frases de mensajes TS/TSX.
+  Resultado final: tipos/lint/build/diff-check PASS;764 pruebas/58 archivos,
+  tooling57/57 y navegador18/18 sin reintentos. Navegador público/tres roles con
+  locale en-US, historial/filtros, guardado/moderación/permisos, PDF/CSV retenidos,
+  móvil360×800, axe y capturas ficticias revisadas. Expectativas inglesas antiguas
+  corregidas y sincronización de h1 antes de axe; no se omiten pruebas/reglas.
+  Supabase local conservado sin reset ni cambios alojados; sin nuevas migraciones,
+  dependencias o variables. Servidor de desarrollo cerrado con autorización,
+  servidores de pruebas finalizados, next-env.d.ts ajeno restaurado.
+  Cobertura instrumentada limitada al módulo de entorno, no al producto entero.
+  Sin suite SQL/E2E completa, NVDA, CI remoto, commit/PR o revisión humana nueva;
+  aceptación municipal, OQ-001/002 y gates históricos no se declaran resueltos.
+
+- **Integración antes de publicar:** origin/main avanzó a8c1612b (PR66).
+  Colisión del ID local EXTRA042 con el registro visual ya mergeado: esta entrada
+  pasa a EXTRA051, conservando su origen y evidencia; no renumera entradas ajenas.
+  Resolver CV conservando returnTo de main y FileInput español. Conservar sidebar,
+  portada, tipografías y reglas visuales de main. Ajustar solo tokens de FileInput
+  al tema compartido, sin nueva paleta ni migración de controles oficiales.
+  Leídas AGENTS/UI_GUIDELINES actualizadas y documentación/registro oficial Input
+  base-nova; esa migración (EXTRA047 de main) sigue independiente y no se declara
+  implementada aquí. Verificación posterior: tipos/lint/pruebas/build, navegador
+  por rol y formularios, cuenta candidata con sidebar, y chequeos visuales locales.
+  Next-env.d.ts permanece excluido; commit93fbca6 sin firma/atribución guardó el
+  trabajo antes de integrar main. Este párrafo registra el estado previo al merge.
+- **Resultado posterior a integrar PR66:** ambos conflictos resueltos sin perder
+  el retorno de CV ni el diseño. Conserva la cuenta candidata con sidebar y sus
+  tres secciones; el recorrido español ahora las visita también. Guía visual y
+  registros de main intactos. Tipos/lint/build PASS;807 pruebas/63 archivos y
+  tooling57/57 PASS. Navegador18/18 sin reintentos:17 recorridos de español,
+  candidato/empresa/validación y1 filtro municipal. Los tres scripts visuales
+  municipal-style-check, home-responsive-layout-check y home-keyboard-navigation-check
+  PASS. Solo servicios/datos ficticios locales, sin reset o cambios alojados.
+  Un intento de Vitest en sandbox falló por caché temporal ENOENT; la ejecución
+  final fuera de esa restricción aprobó completa, sin cambios de código ni omisiones.
+  Diff del PR contra origin/main sin errores; el merge trae un espacio final ya
+  existente en la licencia Sora de main, que se conserva sin modificar la licencia.
+  Creación/push del commit de integración y PR solicitados; CI y revisión pendientes.
+- **Entrega:** commit93fbca6 de implementación y4b83104 de integración publicados
+  sin firma ni atribución automática en feat/spanish-interface-labels. PR67 abierto
+  hacia main: https://github.com/maximo-Pdev/funes-empleo/pull/67.
+  Next-env.d.ts ajeno excluido. No acredita CI, revisión, merge o aceptación.
+
+- **Corrección CI de PR67, registrada antes de implementar (2026-10-22):**
+  Mateo pide corregir el check fallido. Quality39887066823: database PASS,
+  application falla únicamente en intermediation.spec.ts:581,100 recorridos PASS
+  y1 no ejecutado por dependencia. El helper decide todavía espera rejected/
+  published/closed/cancelled; la vista correctamente muestra Rechazada. RED local
+  reproduce exactamente el mismo fallo. Además queda una expectativa literal
+  cancelled al final del mismo recorrido, que quedaba oculta por el primer error.
+  Origen: petición de español, constituciónIV y T152/T154 de esta entrada.
+  Cambio mínimo: expectativas españolas explícitas por las cuatro decisiones,
+  con unión de tipos que impida claves inesperadas; mantener selectOption en
+  inglés y todas las aserciones de publicación, privacidad y casos independientes.
+  Archivos: tests/e2e/intermediation.spec.ts y este registro/tasks/estado/guía.
+  Sin cambiar producto, backend, contratos, schema, CI o dependencias; sin saltos
+  de tests ni relajación de comprobaciones. Riesgo: que un primer fallo esconda
+  otro estado; verificar el recorrido entero rechazo/publicación/cierre/cancelación,
+  tipos/lint/unit/tooling/build y nueva ejecución remota. No reset local ni cambios
+  alojados. Autorización: solicitud expresa; CI/revisión aún no aprobadas.
+- **Resultado local de la corrección:** RED confirma rejected frente a Rechazada;
+  GREEN del recorrido completo1/1 sin reintentos, incluidas publicación, privacidad,
+  conservación del caso al cerrar y cancelación de su caso relacionado.807 pruebas
+  en63 archivos, tooling57/57, tipos/lint/build y diff-check PASS. Sin modificar
+  aplicación, fixtures, configuración CI o contratos; base local conservada sin
+  reset. Se publica en el mismo PR67 sin firma/atribución; next-env.d.ts ajeno
+  excluido. Nueva ejecución remota y revisión humana pendientes al publicar.
+- **Segundo fallo oculto de CI, antes de implementar:** Quality39889638752
+  confirma101 recorridos PASS, incluido el corregido, y falla solamente SC-008A.
+  demo-performance.mjs:85 aún busca Estado: published; el estado visible aprobado
+  es Estado: Publicada. Ese helper no se ejecutó antes por la dependencia fallida.
+  Su escenario candidato también usa fill(available) sobre el nuevo select.
+  Cambiar solo texto esperado y fill por selectOption(available); agregar prueba
+  de contrato del helper en tests/unit/tooling/spanish-interface.test.ts. Mantener
+  barrera común, cuatro administradores,5 segundos por acción y auditorías SQL,
+  sin ampliar plazos, reintentos ni suprimir comprobaciones. T156 deriva de T154.
+  No ejecutar acceptance-concurrency local porque resetea la base preexistente;
+  verificar RED/GREEN de contrato, tipos/lint/unit/tooling/build y CI aislada que
+  realiza el reset autorizado en su runner. Sin cambios de producto o SQL.
+- **Verificación local del helper:** RED1/2 y GREEN incluido en808/808 pruebas
+  de63 archivos; tooling57/57, tipos/lint/build/diff-check PASS. Diff de medición
+  limitado a etiqueta y selectOption; plazos, barrera, auditorías y reset frío
+  conservados. No se ejecutó el reset en la base local preexistente. Se actualiza
+  el mismo PR67; nueva CI aislada pendiente al publicar, sin afirmar aprobación.
 
 ## Formato para próximas entradas
 

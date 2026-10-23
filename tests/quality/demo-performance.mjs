@@ -82,7 +82,7 @@ try {
       const start=performance.now();
       try {
         await p.getByRole("button",{name:n===0?"Guardar decisión":n===2?"Guardar contacto":"Registrar acción",exact:true}).click();
-        if(n===0) await expect(p.getByText("Estado: published",{exact:true})).toBeVisible();
+        if(n===0) await expect(p.getByText("Estado: Publicada",{exact:true})).toBeVisible();
         else if(n===2) await expect(p.getByText(`Contacto ficticio concurrente ${resetId}`,{exact:true})).toBeVisible();
         else await expect(p.getByRole("status").filter({hasText:`Resultado o estado vigente: ${n===1?"Preseleccionada":"Persona contratada"}`})).toBeVisible();
         const duration=performance.now()-start;
@@ -95,7 +95,7 @@ try {
     await page.goto("/admin/candidates");
     await page.getByLabel("Término",{exact:true}).fill(manifest.sc008a.candidateSearch.term);
     await page.getByLabel("Categoría",{exact:true}).selectOption({label:"Categoría ficticia B"});
-    await page.getByLabel("Disponibilidad",{exact:true}).fill("available");
+    await page.getByLabel("Disponibilidad",{exact:true}).selectOption("available");
     const start=performance.now();
     await page.getByRole("button",{name:"Buscar candidatos",exact:true}).click();
     await expect(page.getByRole("heading",{name:"Resultados: 1",exact:true})).toBeVisible();
