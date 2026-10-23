@@ -2353,6 +2353,10 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   Diff del PR contra origin/main sin errores; el merge trae un espacio final ya
   existente en la licencia Sora de main, que se conserva sin modificar la licencia.
   Creación/push del commit de integración y PR solicitados; CI y revisión pendientes.
+- **Entrega:** commit93fbca6 de implementación y4b83104 de integración publicados
+  sin firma ni atribución automática en feat/spanish-interface-labels. PR67 abierto
+  hacia main: https://github.com/maximo-Pdev/funes-empleo/pull/67.
+  Next-env.d.ts ajeno excluido. No acredita CI, revisión, merge o aceptación.
 
 ## Formato para próximas entradas
 

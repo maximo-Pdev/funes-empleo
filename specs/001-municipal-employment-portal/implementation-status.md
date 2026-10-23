@@ -953,3 +953,7 @@ El smoke español incluye las tres secciones del /account candidato con sidebar.
 Diff del PR contra main PASS; no se modifica el whitespace heredado en la licencia
 Sora al resolver el merge. Sin reset/migración/cambios alojados ni revisión/CI
 acreditados. Next-env.d.ts ajeno queda fuera de la entrega.
+
+PR67 abierto hacia main con93fbca6 y4b83104, ambos sin firma/atribución:
+https://github.com/maximo-Pdev/funes-empleo/pull/67.
+Publicación no equivale a CI aprobada, revisión humana, merge o aceptación.
