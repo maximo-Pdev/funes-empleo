@@ -163,6 +163,16 @@ su resolución no forma parte de esta migración. Referencias:
 [seguridad de contraseñas](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
 Evidencia agregada sin secretos en test-results/reference-hosted-* (ignorado).
 
-Pendientes: publicar la app, PR/revisión independiente y recorridos alojados con
-sesiones reales. No se hicieron nuevos commits/PR ni despliegue. Los gates
-históricos siguen abiertos. El entorno temporal de validación ya quedó cerrado.
+## Publicación para revisión — 2026-10-23
+
+A pedido de Mateo se publicó el commit a22745d, sin firma ni coautorías, en
+feat/private-record-references y se abrió
+[PR68](https://github.com/maximo-Pdev/funes-empleo/pull/68) hacia main8d00f95.
+Antes del commit se repitieron tipos, lint,844 unitarias/componentes y57 tooling:
+todos PASS. Se conservaron las evidencias previas de build/SQL/E2E, sin repetir
+resets ni detener el servidor del usuario. Diff-check y escaneo de patrones de
+credenciales PASS; next-env.d.ts quedó fuera del commit y se preservó en el árbol.
+
+Pendientes: CI del PR, revisión independiente, publicación de la app y recorridos
+alojados con sesiones reales. No se hizo merge ni despliegue. Los gates históricos
+siguen abiertos. El entorno temporal de validación ya quedó cerrado.

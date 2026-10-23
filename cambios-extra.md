@@ -2471,8 +2471,14 @@ nueve tablas de origen, consentimientos y auditoría intactos. Advisor alojado:
 52 WARN previos y54 posteriores, cero ERROR; los dos nuevos0029 corresponden a
 los RPC SECURITY DEFINER intencionales con autorización por recurso. No se
 silencian ni se declaran inexistentes; detalle y enlaces en la guía de validación.
-No se hizo db push/reset, despliegue, commit o PR; historial anterior y base local
-habitual intactos. Se preserva next-env.d.ts regenerado por el servidor existente.
+No se hizo db push/reset ni despliegue; historial anterior y base local habitual
+intactos. Se preserva next-env.d.ts regenerado por el servidor existente.
+
+Publicación posterior autorizada por Mateo: commit a22745d sin firma/coautorías,
+[PR68](https://github.com/maximo-Pdev/funes-empleo/pull/68), rama
+feat/private-record-references hacia main8d00f95. Tipos/lint,844 unitarias y57
+tooling repetidos PASS; diff-check y escaneo de patrones de credenciales PASS.
+CI/revisión humana, merge, despliegue y recorridos alojados siguen pendientes.
 
 ## Formato para próximas entradas
 

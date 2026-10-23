@@ -1006,6 +1006,10 @@ nueve tablas de origen, consentimientos y auditoría intactos. Sin reset ni push
 de otras migraciones. Advisor alojado:52 WARN previos,54 posteriores, cero ERROR;
 dos avisos0029 esperados por los RPC autorizados, documentados en la guía.
 
-Pendientes: revisión humana por PR, despliegue de app y recorridos alojados con
-sesiones. No se cierran gates históricos ni se acredita aceptación municipal/global.
-No se reintroducen cambios del PR54; base habitual sigue sin migrar/resetear.
+Publicación posterior solicitada por Mateo: commit a22745d sin firma/coautorías,
+[PR68](https://github.com/maximo-Pdev/funes-empleo/pull/68) abierto hacia main.
+Tipos/lint,844 unitarias/componentes y57 tooling repetidos PASS antes de publicar;
+next-env.d.ts ajeno excluido y preservado. Pendientes: CI, revisión humana, merge,
+despliegue y recorridos alojados con sesiones. No se cierran gates históricos ni
+se acredita aceptación municipal/global. No se reintroducen cambios del PR54;
+base habitual sigue sin migrar/resetear.
