@@ -43,7 +43,7 @@ export function RegistrationLayout({ role, children }: { role: keyof typeof cont
         <Link href="/ofertas" className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-primary hover:bg-secondary">Ver ofertas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
       </div>
     </header>
-    <div className={`${styles.container} ${styles.content}`}>
+    <div className={`${styles.container} ${styles.content} ${styles.registrationPage}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-semibold text-primary-700 hover:underline hover:underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Volver al inicio</Link>
         <nav aria-label="Tipo de registro" className="flex flex-wrap gap-1 rounded-lg border border-border bg-surface p-1">

@@ -904,7 +904,7 @@ https://github.com/maximo-Pdev/funes-empleo/pull/65.
 next-env.d.ts ajeno excluido. Sin nuevas migraciones/cambios alojados, CI y
 revisión pendientes; sin merge o aceptación acreditados.
 
-### Español transversal — EXTRA042, 2026-10-22
+### Español transversal — EXTRA051, 2026-10-22
 
 PR65 confirmado mergeado en23ba5fa; main actualizado, rama anterior retirada
 local/remota y rama feat/spanish-interface-labels creada sin prefijo codex.
@@ -939,3 +939,17 @@ durante navegaciones abortadas. Servidor next dev cerrado con autorización y
 servidores de pruebas finalizados. Sin suite SQL/E2E completa, NVDA, CI remoto,
 commit/PR o aceptación nueva. Gates históricos y OQ-001/002 siguen pendientes;
 no hay decisión municipal nueva necesaria para esta traducción.
+
+Entrega solicitada: commit93fbca6 sin firma ni atribución conserva la implementación
+antes de sincronizar. PR66 avanzó main a8c1612b; se integra sin perder portada,
+sidebar, cvReturnTo/returnTo ni traducciones. El ID local EXTRA042 de esta rama
+colisionó con el visual de main: esta mejora pasa a EXTRA051 y preserva su origen.
+La migración oficial de controles de main continúa independiente. FileInput usa
+los tokens compartidos; no cambia controles/reglas del compañero.
+
+Revalidación tras integración:807 pruebas/63 archivos, tooling57/57, tipos/lint/build,
+18/18 recorridos de navegador sin reintentos y3 scripts visuales de main PASS.
+El smoke español incluye las tres secciones del /account candidato con sidebar.
+Diff del PR contra main PASS; no se modifica el whitespace heredado en la licencia
+Sora al resolver el merge. Sin reset/migración/cambios alojados ni revisión/CI
+acreditados. Next-env.d.ts ajeno queda fuera de la entrega.

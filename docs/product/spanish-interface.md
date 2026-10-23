@@ -1,6 +1,6 @@
 # Interfaz en español
 
-Petición de Mateo, 2026-10-22, EXTRA042; rama feat/spanish-interface-labels.
+Petición de Mateo, 2026-10-22, EXTRA051; rama feat/spanish-interface-labels.
 Alcance: presentación pública, candidato, empresa y Oficina de Empleo. No cambia
 negocio, transiciones, permisos, datos persistidos ni contratos técnicos.
 
@@ -81,3 +81,19 @@ ignorados por Git. Next mantiene avisos preexistentes de stream cerrado durante
 navegaciones abortadas; no provocaron fallos finales ni se modificaron para esto.
 No ejecuta suite SQL/E2E completa, NVDA o aceptación con personas. CI/revisión
 humana, aprobación municipal y tareas históricas siguen sin acreditarse.
+
+## Integración para publicar el PR
+
+main avanzó a8c1612b (PR66) después de la primera verificación. Se preservaron la
+portada y el sidebar del compañero, las tres secciones de /account, cvReturnTo y
+su hidden returnTo. El selector usa ahora los tokens compartidos de superficie,
+texto y foco. La migración oficial de componentes registrada en main sigue
+independiente; este incremento no la declara implementada ni agrega dependencias.
+EXTRA042 era un ID local no publicado que colisionó con la entrada visual de main;
+la traducción se identifica ahora como EXTRA051, sin renumerar registros ajenos.
+
+Revalidación integrada:807/807 pruebas en63 archivos, tooling57/57, tipos/lint/build
+y diff contra main PASS. Navegador18/18 sin reintentos, incluyendo las secciones
+perfil/ofertas/postulaciones del nuevo /account. Los tres scripts visuales de main
+municipal-style-check, home-responsive-layout-check y home-keyboard-navigation-check
+PASS. Sin reset local ni cambios alojados; mismos límites de revisión/aceptación.

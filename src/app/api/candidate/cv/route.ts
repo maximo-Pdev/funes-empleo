@@ -32,7 +32,11 @@ export async function POST(request: Request) {
   const requestedId = form?.get("candidateId");
   const candidateId = typeof requestedId === "string" && databaseUuidSchema.safeParse(requestedId).success ? requestedId : null;
   const version = versionSchema.safeParse(form?.get("version"));
-  const destination = session.account.role === "admin" && candidateId ? `/admin/candidates/${candidateId}` : "/candidato/perfil";
+  const candidateDestination = form?.get("returnTo") === "/account?section=perfil"
+    ? "/account?section=perfil" : "/candidato/perfil";
+  const destination = session.account.role === "admin"
+    ? (candidateId ? `/admin/candidates/${candidateId}` : "/candidato/perfil")
+    : candidateDestination;
   const file = form?.get("cv");
   if (!candidateId || !version.success || !(file instanceof File)) return result("invalid", destination);
   const profile = await session.client.from("candidate_profiles").select("id,account_id,version,archived_at")

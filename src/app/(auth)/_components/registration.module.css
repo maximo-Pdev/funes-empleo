@@ -46,6 +46,16 @@
   .guide { order: 1; }
   .formSection { order: 2; }
 }
+/* 44px controls keep the documented field gap; short desktop viewports on the
+   registration pages recover the vertical rhythm from page chrome and card
+   padding so nothing scrolls. The login layout keeps a constant height. */
+@media (min-width: 1024px) and (max-height: 1000px) {
+  .registrationPage { padding-block: 4px 8px; }
+  .registrationPage .cards { margin-top: 6px; }
+  .registrationPage .guide,
+  .registrationPage .formCard { padding: 20px; }
+  .registrationPage .form { margin-top: 8px; }
+}
 .loginForm form { grid-template-columns: minmax(0, 1fr); }
 .loginCard { display: flex; flex-direction: column; }
 .loginCard .access { margin-top: 12px; }

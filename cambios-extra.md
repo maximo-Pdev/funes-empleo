@@ -2025,7 +2025,239 @@ fuera y sin añadir logs/capturas/secretos. Verificaciones locales consignadas e
 EXTRA040–041; publicación no acredita CI, revisión o aceptación. Sin nuevas
 migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
 
-## EXTRA-042 — Interfaz en español en todos los roles
+## EXTRA-042 — Referencia visual municipal compartida
+
+- **Fecha/estado:** 2026-10-20; autorizado por Maxi en la rama visual, registrado
+  antes de implementar. No acredita aceptación municipal ni revisión del compañero.
+- **Origen:** solicitud explícita de guardar una guía en el repositorio y aplicar
+  los colores, formularios y fuentes extraídos de `https://funes.gob.ar/`.
+- **Problema/evidencia:** el portal combina Arial, primarios verdes distintos y
+  controles azules. El tema municipal declara Be Vietnam/Sora, `#074A1F`,
+  `#262b35` y `#868d98`; sus formularios usan borde inferior y etiquetas uppercase.
+  AdminLTE pisa parte de la tipografía y elimina el foco: no se replica ese defecto.
+- **Cambio mínimo/justificación:** guía permanente referenciada desde AGENTS,
+  fuentes locales con licencias y procedencia, tokens y presentación compartida de
+  formularios. Necesario para que otras sesiones mantengan la misma referencia.
+- **Superficies:** `docs/UI_GUIDELINES.md`, `AGENTS.md`, `src/app/globals.css`,
+  estilos de formularios de portada/autenticación, primitivas Button/TextField/
+  SelectField, `public/fonts/funes/` y pruebas visuales/de componentes.
+- **Límites/coordinación:** esta rama mantiene lo visual; no cambia acciones,
+  permisos, datos, contratos de props, campos, textos funcionales ni navegación.
+  Se preserva el trabajo previo sin confirmar y la composición de portada.
+- **Riesgos/recuperación:** tokens y reglas de formulario compartidos afectan varias
+  rutas. Revertir únicamente este diff; conservar errores, acciones peligrosas,
+  checkboxes, radios, archivos y foco accesible. No hay migración ni cambios de env.
+- **Verificación prevista:** RED/GREEN visual y de primitivas, pruebas unitarias,
+  lint/typecheck/build, revisión independiente y navegador desktop/mobile sin
+  enviar formularios ni resetear datos. Revisión humana y PR pendientes.
+- **Implementación:** guía `docs/UI_GUIDELINES.md` enlazada desde AGENTS, nueve
+  fuentes originales locales con licencias OFL, tokens municipales y controles
+  compartidos implementados. Be Vietnam para texto/campos y Sora para títulos/
+  botones. Se preservan la composición previa, bisel, sombras y cambios ajenos.
+- **Resultados:** RED observado (dos pruebas de primitivas y fuente Arial en
+  navegador); GREEN focalizado 32/32; regresión 559 pruebas/37 archivos PASS;
+  lint, typecheck y build exit 0; detector visual sin hallazgos; diff-check PASS.
+  Chromium de producción: login y ambos registros a 1440/390px PASS, sin envíos
+  ni reset de datos. Inspección de capturas desktop/mobile realizada.
+- **Revisión independiente:** 16 pruebas focalizadas y seis casos de navegador
+  PASS; nueve hashes de fuentes coinciden con el inventario. Sin bloqueos.
+  Advertencia no bloqueante: TextField sigue siendo un control textual, no debe
+  usarse para checkbox/archivo; la guía delimita esa excepción. No se cambian sus
+  contratos para corregir un uso que no existe entre sus consumidores actuales.
+- **Entorno/límites:** el servidor previo 3000 presentó fallos de hidratación/HMR;
+  la prueba usa producción separada en 3001, no acredita corregir aquel entorno.
+  La primera comprobación de una fuente no usada se corrigió para cargar el peso
+  explícitamente antes de verificarlo. Node observado 26.7.0, distinto del 24.21.0
+  requerido; no se modifica el entorno. No se recorren exhaustivamente páginas
+  privadas ni se ejecuta el E2E que resetea datos. Revisión humana/municipal y PR
+  pendientes. Sin commit ni publicación en esta tarea.
+
+## EXTRA-043 — Acceso a ofertas sin superposición al centrar Empresa
+
+- **Fecha/estado:** 2026-10-21; implementado y verificado técnicamente; registrado
+  antes de implementar como detalle necesario
+  de la corrección visual solicitada por Maxi: «el recuadro de login y registro
+  cuando selecciono Registrarse -> Empresa no está centrado verticalmente».
+- **Evidencia:** la regla de registro usa `align-items: flex-start` y márgenes
+  verticales asimétricos. Centrar Empresa con su altura natural hace coincidir la
+  tarjeta ancha con el enlace inferior centrado en toda la pantalla.
+- **Cambio mínimo/justificación:** centrar Empresa con 40px de espacio superior e
+  inferior; solo en Empresa desktop, centrar el enlace inferior dentro del
+  cuadrante izquierdo para preservar su acceso sin cubrir campos ni la tarjeta.
+- **Superficies/contratos:** `src/app/(public)/home.module.css`,
+  `tests/visual/home-responsive-layout-check.mjs`, `docs/UI_GUIDELINES.md`.
+  Sin cambios de contratos, acciones, validación, datos ni estilos globales.
+- **Riesgos/recuperación:** cambio local de composición; conservar los demás
+  modos y celular. Formularios más altos que la pantalla mantienen scroll del
+  documento. Revertir únicamente estas reglas locales si se rechaza el ajuste.
+- **Autorización/revisión:** derivado de la corrección explícita y la autorización
+  de detalles necesarios; informado al usuario. Revisión humana y PR pendientes.
+- **Verificación:** RED observado por `flex-start` en Chromium; GREEN en 15 estados
+  responsive y seis estados municipales, sin superposición ni scroll interno.
+  Desviación de centrado de Empresa: 0px a 1440×900 y 1920×1080; tarjeta completa
+  dentro del viewport y composición móvil preservada. Tres clics reales del
+  enlace llegan al destino con el offset de navbar, usando la tolerancia de 2px
+  existente para scroll suave y coordenadas fraccionarias, no igualdad exacta.
+  Pasan 568 pruebas unitarias, lint, tipos, build y diff-check; capturas revisadas.
+  Advertencia externa de lockfile conocida/no bloqueante. Sin cambios de datos,
+  envíos de formularios, commit ni publicación. Revisión humana/PR pendientes.
+
+## EXTRA-044 — Espacio de navbar para el SVG ampliado de portada
+
+- **Fecha/estado:** 2026-10-21; registrado antes de implementar, revisión pendiente.
+- **Origen:** pedido de Maxi de quitar el título de la portada y reemplazar el
+  logo por el SVG adjunto, ampliándolo porque casi no se ve.
+- **Problema/cambio mínimo:** el logo de 60px está limitado por una navbar de
+  72px. En portada se mostrará a 96px dentro de una navbar de 104px, ajustando
+  el espacio móvil y el offset del destino inferior para no ocultar contenido.
+- **Superficies/contratos:** `home-navbar.tsx`, `home.module.css`, `page.tsx`,
+  recurso en `public/brand/`, pruebas de portada y guía visual. La variante
+  `alwaysVisible` reutilizada en cuenta conserva sus dimensiones de 72px/60px.
+  No cambian enlaces, acciones, validaciones, datos ni contratos de props.
+- **Riesgos/justificación:** evitar recortar el SVG o superponer la navbar con
+  formularios. Cambio local de composición derivado del tamaño solicitado,
+  informado mediante esta entrada; sin estilos globales ni cambios de permisos.
+- **Verificación/estado:** RED observado para título y logo; previstos copia
+  idéntica del SVG, geometría de imagen/navbar, enlace y offset de 104px,
+  responsive desktop/mobile, variantes de cuenta y puertas de calidad.
+  Implementado: SVG copiado sin modificar (hashes iguales), título y reglas de
+  título retirados, imagen 96×96/navbar 104px en portada y espacio móvil 24px.
+  Pasan 15 pruebas focalizadas, 569 unitarias, lint, tipos, build y diff-check;
+  15 estados responsive y seis municipales en Chromium. SVG decodifica como
+  353×353; geometría CSS compacta sigue en 72px/60px. Capturas desktop/mobile
+  revisadas; enlace municipal y destino inferior de 104px verificados.
+  Next/Image no emite `sizes` para este SVG no optimizado: la prueba incorrecta
+  del atributo se sustituyó por geometría real, sin cambiar la aplicación para
+  satisfacer esa suposición. Sin envíos de formularios ni cambios de datos.
+  Advertencia de lockfile externa preexistente/no bloqueante. Sin commit/PR ni
+  aceptación humana; revisión pendiente.
+
+## EXTRA-045 — Integración local de Canvas Ribbons y restauración informativa
+
+- **Fecha/estado:** 2026-10-21; registrado antes de implementar, revisión pendiente.
+- **Origen:** pedido explícito de reemplazar el slideshow por `bsehovac/LQVzxJ`
+  y restaurar la información de la captura; ZIP original adjuntado por Maxi.
+- **Evidencia/prerrequisito:** el efecto utiliza Canvas 2D/JavaScript, no CSS solo.
+  El ZIP incluye código completo, sin dependencias externas, y licencia MIT de
+  Boris Šehovac. Conservar aviso/licencia es condición de reutilización.
+- **Cambio mínimo:** adaptar las mismas curvas Bézier e historial de cintas a
+  TypeScript/React, paleta municipal y fondo neutro oscuro; retirar estadísticas,
+  globals y bucle sin limpieza del demo. Añadir resize, cancelación al desmontar,
+  pausa fuera de vista/documento oculto y fotograma estático con movimiento reducido.
+- **Superficies:** portada, módulo CSS local, componente de fondo, licencia en
+  `public/brand/canvas-ribbons/`, guía y pruebas de portada. Texto restaurado desde
+  `src/app/(auth)/login/page.tsx`, contrastado con la captura. Sin cambios en esa
+  ruta, formularios, navbar, permisos, datos, paquetes ni servicios externos.
+- **Límites/riesgos:** no ejecutar el HTML global del ZIP, no ocultar el scroll del
+  documento y preservar móvil con tarjeta primero e información desktop oculta.
+  Limitar densidad, FPS y resolución; verificar contraste, ciclo de vida y ausencia
+  de superposición. No afirmar equivalencia sin usar la geometría del original.
+- **Autorización:** solicitud explícita y detalles necesarios de integración local;
+  revisión humana/PR pendientes. Sin commit ni publicación autorizados.
+- **Verificación:** RED observado para contenido, reemplazo y ciclo de vida;
+  previstos GREEN unitario, navegador (píxeles en movimiento/estáticos, resize,
+  contenido y formularios), lint, tipos y build.
+- **Implementado/verificado:** fondo local `home-ribbons.tsx`, información completa
+  restaurada, slideshow retirado y licencia original MIT copiada sin alterar.
+  Pasan 18 pruebas focalizadas, 572 unitarias/38 archivos, lint, tipos, build y
+  diff-check. Chromium: 15 estados responsive y seis municipales PASS, píxeles
+  que cambian en reproducción y se congelan con movimiento reducido, carga
+  inicial reducida con fotograma visible y resize estático correctos; cero
+  solicitudes a fotos y cero errores JS en 1440/768/390px. Capturas inspeccionadas.
+- **Correcciones acotadas:** prueba real reprodujo que `isIntersecting` puede ser
+  verdadero con área visible cero; se usa umbral/ratio explícito para pausar en
+  el borde. La prueba móvil esperaba pausa antes de terminar de crecer la tarjeta:
+  espera ahora sus transiciones antes de ir al final del documento. Pausa fuera
+  de pantalla y reanudación verificadas. Sin cambios ajenos para satisfacer pruebas.
+- **Límites finales:** assets fotográficos/procedencia originales preservados sin
+  uso; navbar de 64px y márgenes existentes intactos. Sin cambios de datos,
+  sesiones, paquetes, envíos reales, commit ni publicación. Advertencia de
+  lockfile externa preexistente/no bloqueante; revisión humana/PR pendientes.
+
+## EXTRA-046 — Retorno de CV y actualización del panel de cuenta
+
+- **Fecha/estado:** 2026-10-21; implementado y verificado técnicamente;
+  revisión humana pendiente. Prerrequisito registrado antes del cambio de retorno.
+- **Origen:** solicitud explícita de integrar perfil, ofertas y postulaciones en
+  `/account` mediante sidebar y retirar el archivo de cuenta de esta pantalla.
+- **Problema/evidencia:** `src/app/api/candidate/cv/route.ts` devuelve todo resultado
+  de candidato a `/candidato/perfil`; las acciones invalidan solo las rutas antiguas.
+  Esto saca al usuario del panel después de cargar el CV o deja sus datos sin invalidar.
+- **Cambio mínimo:** aceptar únicamente el valor exacto `/account?section=perfil`
+  como contexto opcional de retorno de candidato y conservar destinos anteriores
+  por defecto, administrativos y de sesión inválida. Añadir invalidación de `/account`
+  a las acciones existentes; sin modificar validaciones, permisos ni persistencia.
+- **Archivos/contratos:** ruta POST de CV, prop opcional/hidden del panel de perfil,
+  acciones de perfil/consentimiento/postulación y pruebas de retorno/compatibilidad.
+- **Riesgos/límites:** impedir redirecciones externas y preservar propiedad, versión,
+  mensajes, status 303 y cabeceras privadas. No migraciones, nuevos proveedores,
+  cambios de autenticación ni eliminación de rutas.
+- **Autorización/coordinación:** detalle necesario de la integración solicitada;
+  revisión humana del contrato compartido pendiente, sin publicación ni commit.
+- **Verificación:** RED reproducido en retorno válido/inválido; previstos tests de
+  allowlist, compatibilidad legacy/admin, acciones, UI integrada, lint, tipos y build.
+- **Resultados:** 600 pruebas/40 archivos, lint, tipos, build y diff-check pasan.
+  Verificación independiente en copia scratch: 49 pruebas focalizadas, incluidas
+  variantes de redirección, cuenta ajena/archivada/desactualizada y sesiones
+  inhabilitadas; sin defectos bloqueantes. Probes adversariales incorporados al repo.
+  Navegador: seis vistas desktop/móvil de componentes reales con servicios ficticios,
+  clics de las tres secciones, geometría sin superposición/desborde y logout encima
+  de identidad verificados. No equivale a una sesión autenticada con base real.
+- **Compatibilidad/límites:** los cargadores existentes ejecutan bootstrap/frescura;
+  no se afirma que todos los GET de cuenta carezcan de efectos persistentes. Sin
+  nuevas reglas de mutación, paquetes, datos personales, commits ni publicación.
+  La sidebar local adapta la composición no colapsable de shadcn, no instala el
+  registro completo ni cambia primitivas ajenas. Revisión humana/PR pendientes.
+
+## EXTRA-047 — Componentes oficiales de shadcn con identidad municipal
+
+- **Fecha/estado:** 2026-10-22; criterio solicitado por el usuario y documentado;
+  migración de código, coordinación y revisión pendientes.
+- **Origen:** solicitud explícita de usar componentes oficiales de shadcn y
+  adaptarlos al estilo actual, incluidos los controles existentes de la landing.
+- **Problema/evidencia:** `components.json` configura `base-nova`, pero las
+  primitivas actuales son locales; la configuración no acredita integración
+  oficial. La guía anterior solo pedía reutilizar dichas primitivas.
+- **Cambio mínimo/justificación:** registrar la fuente oficial obligatoria para
+  futuras implementaciones y migrar los controles de la landing sin rediseño,
+  conservando contratos, acciones, validación, accesibilidad y estilos actuales.
+- **Archivos/contratos:** política en `AGENTS.md` y `docs/UI_GUIDELINES.md`;
+  implementación prevista en `src/components/ui`, utilidades, manifiesto/lockfile
+  y consumidores de la landing. Revisar consumidores compartidos antes de editar.
+- **Riesgos/límites:** dependencias y contratos compartidos; no ejecutar una
+  instalación que sobrescriba componentes ni alterar pantallas ajenas.
+- **Autorización/coordinación:** dirección autorizada por el usuario; no acredita
+  coordinación del segundo desarrollador ni aprobación global de la spec Draft.
+- **Verificación prevista:** regresiones de controles y formularios, suite, lint,
+  tipos, build y comparación visual desktop/móvil. Por ahora solo documentación;
+  no se afirma instalación, migración o verificación funcional. Sin commit/PR.
+
+## EXTRA-048 — Foto de candidato y logo de empresa
+
+- **Fecha/estado:** 2026-10-22; solicitud y privacidad del candidato registradas;
+  diseño técnico, coordinación, implementación y revisión pendientes.
+- **Origen:** solicitud de foto de perfil y logo empresarial con Avatar oficial.
+  Confirmación textual del usuario: “Si, la foto del candidato debe seguir la misma restricción que su perfil completo, visible para la Oficina de Empleo y para una empresa únicamente cuando la Oficina le derive ese candidato.”
+- **Problema/evidencia:** el avatar de cuenta es un placeholder; la persistencia
+  existente admite CV PDF, no imágenes. Avatar solo presenta imagen/fallback.
+- **Cambio propuesto/justificación:** flujo real de carga y lectura autorizadas,
+  persistencia y presentación con Avatar, sin reutilizar implícitamente el bucket
+  PDF ni hacer públicas las fotos. Preservar el acceso del propio candidato.
+- **Archivos/contratos:** futuras migraciones Storage/metadatos/RLS, validación,
+  handlers, servicios y formularios de candidatos/empresas; derivar rutas exactas
+  al aprobar el diseño. Esta entrada no modifica dichos contratos.
+- **Riesgos/límites:** datos personales, acceso entre empresas, caché y revocación
+  de acceso. No URLs públicas de candidatos. La privacidad confirmada no resuelve
+  visibilidad del logo, límites de archivo ni reglas de reemplazo/retención.
+- **Autorización/coordinación:** solicitud funcional y privacidad del candidato
+  confirmadas; coordinar esquema, permisos y contratos con el otro desarrollador
+  y respetar las revisiones Spec Kit antes de implementarlos.
+- **Verificación prevista:** carga/persistencia, archivos inválidos, acceso propio
+  y administrativo, empresa derivada/no derivada, reemplazo fallido, caché y
+  revocación según contrato aprobado; pruebas, lint, tipos, build y navegador.
+  Aún no implementado ni probado; sin migraciones aplicadas, commit o PR.
+
+## EXTRA-051 — Interfaz en español en todos los roles
 
 - **Fecha/origen/autorización:** 2026-10-22, Mateo solicita revisar toda la web
   y todos los perfiles y traducir palabras/estados del sistema al español.
@@ -2075,7 +2307,7 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   español genérico para excepciones de transporte/parsing, conservando archivo y
   confirmación. Regresión de fetch rechazado sin tocar el handler o sus permisos.
 
-- **Implementación/verificación real EXTRA042:** catálogos compartidos en
+- **Implementación/verificación real EXTRA051:** catálogos compartidos en
   src/domain/presentation/labels.ts y adaptadores; páginas/componentes de cuentas,
   candidatos, empresas, ofertas, participaciones, derivaciones, importación y
   métricas. FileInput/CSS compartido para CV/CSV; etiquetas legadas del editor con
@@ -2096,6 +2328,32 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   Sin suite SQL/E2E completa, NVDA, CI remoto, commit/PR o revisión humana nueva;
   aceptación municipal, OQ-001/002 y gates históricos no se declaran resueltos.
 
+- **Integración antes de publicar:** origin/main avanzó a8c1612b (PR66).
+  Colisión del ID local EXTRA042 con el registro visual ya mergeado: esta entrada
+  pasa a EXTRA051, conservando su origen y evidencia; no renumera entradas ajenas.
+  Resolver CV conservando returnTo de main y FileInput español. Conservar sidebar,
+  portada, tipografías y reglas visuales de main. Ajustar solo tokens de FileInput
+  al tema compartido, sin nueva paleta ni migración de controles oficiales.
+  Leídas AGENTS/UI_GUIDELINES actualizadas y documentación/registro oficial Input
+  base-nova; esa migración (EXTRA047 de main) sigue independiente y no se declara
+  implementada aquí. Verificación posterior: tipos/lint/pruebas/build, navegador
+  por rol y formularios, cuenta candidata con sidebar, y chequeos visuales locales.
+  Next-env.d.ts permanece excluido; commit93fbca6 sin firma/atribución guardó el
+  trabajo antes de integrar main. Este párrafo registra el estado previo al merge.
+- **Resultado posterior a integrar PR66:** ambos conflictos resueltos sin perder
+  el retorno de CV ni el diseño. Conserva la cuenta candidata con sidebar y sus
+  tres secciones; el recorrido español ahora las visita también. Guía visual y
+  registros de main intactos. Tipos/lint/build PASS;807 pruebas/63 archivos y
+  tooling57/57 PASS. Navegador18/18 sin reintentos:17 recorridos de español,
+  candidato/empresa/validación y1 filtro municipal. Los tres scripts visuales
+  municipal-style-check, home-responsive-layout-check y home-keyboard-navigation-check
+  PASS. Solo servicios/datos ficticios locales, sin reset o cambios alojados.
+  Un intento de Vitest en sandbox falló por caché temporal ENOENT; la ejecución
+  final fuera de esa restricción aprobó completa, sin cambios de código ni omisiones.
+  Diff del PR contra origin/main sin errores; el merge trae un espacio final ya
+  existente en la licencia Sora de main, que se conserva sin modificar la licencia.
+  Creación/push del commit de integración y PR solicitados; CI y revisión pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
@@ -2107,3 +2365,91 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
 5. Autorización y coordinación, distinguiendo decisiones pendientes de aprobadas.
 6. Verificación prevista y resultados reales.
 7. Limitaciones, revisión y referencias de commit/PR cuando existan.
+
+## EXTRA-049 — Integración de la rama visual con `main` (40 commits)
+
+- **Fecha/estado:** 2026-10-22; implementado y verificado técnicamente; revisión
+  del compañero y PR pendientes. Registrado al resolver el merge.
+- **Origen:** pedido explícito de Maxi de poner al día el proyecto con las ramas
+  del compañero antes de publicar el trabajo visual.
+- **Problema/evidencia:** la rama `feature/landing-page-visuals` partía de un
+  `main` anterior y sus 7 commits no tenían equivalente remoto. Al sincronizar,
+  14 archivos quedaron en conflicto, incluidos `src/app/(public)/page.tsx`,
+  los formularios de registro, `CandidateProfilePanel` y la portada de pruebas.
+  Ambos lados habían evolucionado en paralelo: el compañero creó los componentes
+  compartidos `Form`/`Field` con validación inline, retiró el autoarchivo y unificó
+  la ayuda de contraseña; esta rama extrajo los cuerpos de página a
+  `candidato/_components/*-content.tsx`, agregó la variante de portada y el retorno
+  de CV hacia `Mi cuenta`.
+- **Cambio mínimo/justificación:** conservar ambos aportes donde son compatibles y
+  preferir `main` en el comportamiento funcional ya publicado. Resoluciones:
+  `TextField`/`SelectField` adoptan `Field` manteniendo las clases municipales y
+  los ids de descripción que `Field` ya calcula; los formularios de registro
+  conservan la validación inline del compañero y la variante `homepageLayout` de
+  portada; `CandidateProfilePanel` mantiene el retiro del autoarchivo y recibe
+  `cvReturnTo`, que se propaga a `CvUploadForm` como campo oculto para el envío sin
+  JavaScript; las ofertas enlazan por `slug`; los radios de tipo de cuenta y el
+  formulario de cierre de sesión usan los componentes compartidos que exige
+  `form-inventory`; los botones llevan `type="submit"` explícito.
+- **Decisiones que requieren revisión:** (1) la portada de esta rama no muestra la
+  vista previa de ofertas que `main` mantiene; se conserva el rediseño aprobado y
+  su enlace a `#ofertas-disponibles`, por lo que el PR debe confirmarlo; (2) se
+  adoptó el texto unificado «Entre 6 y 128 caracteres. No compartas tu contraseña.»
+  en los registros, revirtiendo su ausencia previa; (3) el autoarchivo sigue
+  retirado, sin reintroducir `archiveAction`.
+- **Superficies/contratos:** los 14 archivos en conflicto, `candidate-account.tsx`,
+  `home-access-panel.tsx`, `cv-upload-form.tsx`, `home.module.css`,
+  `docs/UI_GUIDELINES.md` y `tests/components/home-access-panel.test.tsx`.
+  Las entradas de esta rama se renumeraron a EXTRA-040..EXTRA-046 porque `main`
+  ya usaba EXTRA-020..EXTRA-039; las referencias en la guía visual se actualizaron.
+- **Riesgos/recuperación:** los conflictos mezclan capa visual y comportamiento; la
+  recuperación es revertir el merge y volver a resolverlo con este registro. No hay
+  migraciones nuevas ni cambios de variables de entorno en esta resolución.
+- **Verificación:** `npm run typecheck` exit 0, `npm run lint` exit 0 (sin warnings),
+  `npm run test:unit` 773 pruebas en 58 archivos PASS, `npm run test:tooling`
+  57 pruebas PASS, `npm run build` exit 0. Los 602 tests previos de la rama pasaron
+  a 773 por la suite del compañero. No se ejecutó E2E ni el reset de datos.
+- **Entorno:** Node observado 26.7.0, distinto del 24 LTS requerido; no se modifica
+  el entorno local. Revisión visual en navegador de la portada tras el cambio de
+  marcado de `Field` y aprobación del PR pendientes.
+
+## EXTRA-050 — Cierre de brechas E2E detectadas por CI en el PR #66
+
+- **Fecha/estado:** 2026-10-22; implementado y verificado localmente; CI y revisión
+  del compañero pendientes. Registrado antes de implementar los ajustes.
+- **Origen:** pedido explícito de Maxi de corregir los 12 E2E rojos del PR #66 con
+  la opción elegida: arreglar los 44px, agregar el acceso a la cuenta en el navbar
+  municipal y actualizar los specs que codificaban la UI anterior.
+- **Problema/evidencia:** el job `application` de CI (run 39863097071) dio 85 E2E
+  verdes y 12 rojos. Causas: (1) tokens de control a 38px contra el mínimo de 44px
+  de `login-layout` y `registration-layout`; (2) la portada ocultaba el skip link
+  global con una regla propia y no ofrecía acceso a la cuenta para sesiones
+  activas, lo que rompía `session-navigation` en las seis combinaciones de rol y
+  entrada; (3) `accounts`, `registration-verification` y `setup` esperaban el h1
+  «Un puente claro…», el h1 «Mi cuenta» y la línea «Acceso individual activo», que
+  el panel con sidebar reemplazó.
+- **Cambio mínimo/justificación:** subir `--form-control-height` a 44px y recuperar
+  el ritmo vertical solo en las páginas de registro mediante `@media (min-width:
+  1024px) and (max-height: 1000px)` sobre la clase local `registrationPage`, sin
+  tocar el gap de campos documentado; eliminar la ocultación del skip link;
+  incorporar `HomeAccountNav` con `aria-label="Accesos principales"` y el enlace de
+  cuenta resuelto en el servidor con `getAccountAccess`, manteniendo la portada
+  como componente async igual que en `main`; alinear `setup`, `accounts` y
+  `registration-verification` con el rediseño aprobado.
+- **Superficies/contratos:** `src/app/globals.css`, `(public)/page.tsx`,
+  `(public)/home-account-nav.tsx`, `(public)/home.module.css`,
+  `(auth)/_components/registration-layout.tsx` y `registration.module.css`, los tres
+  E2E y los tres chequeos visuales, más los tests de componentes de portada.
+- **Riesgos/recuperación:** los encabezados y textos de los E2E son contrato de la
+  suite; se actualizan solo los que el rediseño reemplazó, conservando las
+  aserciones de accesibilidad, simetría y ausencia de scroll. Revertir este diff
+  devuelve el estado rojo de CI.
+- **Verificación local:** `typecheck`, `lint` sin warnings, 773 pruebas unitarias,
+  57 de tooling y build PASS. Playwright local contra producción en 127.0.0.1:3001
+  (puerto 3000 ocupado por otro servidor del usuario, no se tocó):
+  `setup`, `login-layout` y `registration-layout` 12/12 PASS; además
+  `home-responsive-layout-check`, `municipal-style-check` y
+  `home-keyboard-navigation-check` PASS.
+- **Pendiente:** CI completa (incluye `accounts`, `registration-verification` y
+  `session-navigation`, que requieren Supabase local y solo corren en el runner),
+  revisión del compañero y merge del PR. Node local 26.7.0, distinto del 24 LTS.

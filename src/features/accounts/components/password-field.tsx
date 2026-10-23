@@ -33,7 +33,7 @@ export function PasswordField({ name, label, autoComplete, help }: PasswordField
       <button type="button" aria-controls={inputId} aria-pressed={visible}
         aria-label={`${visible ? "Ocultar" : "Mostrar"} ${description}`}
         onClick={() => setVisible(previous => !previous)}
-        className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded border border-slate-500 bg-blue-800 p-3 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded border border-brand-text bg-brand-text p-3 text-white hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
         {visible ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
       </button>
     </div>

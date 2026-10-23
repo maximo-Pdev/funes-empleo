@@ -99,7 +99,7 @@ Se retira el cartel amarillo de política demo de la vista inicial; texto y
 versión siguen consultables en un desplegable accesible cerrado inicialmente.
 No implica política municipal aprobada ni cambia versión/hash/aceptación.
 
-## Español transversal — solicitud 2026-10-22 (EXTRA042)
+## Español transversal — solicitud 2026-10-22 (EXTRA051)
 
 Todas las vistas públicas y de candidatos, empresas y administradores presentan
 en español los estados, canales, acciones, motivos y mensajes generados por el

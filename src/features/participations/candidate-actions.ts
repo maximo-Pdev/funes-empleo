@@ -8,6 +8,7 @@ export async function applyToOfferAction(_previous: CandidateParticipationState,
   try {
     await applyToOffer({ openingId: form.get("openingId"), candidateVersion: form.get("candidateVersion") });
     revalidatePath("/candidato/postulaciones");
+    revalidatePath("/account");
     return { message: "Postulación recibida por la Oficina de Empleo.", success: true };
   } catch (error) { return { message: publicErrorFrom(error).message, success: false }; }
 }
@@ -16,6 +17,7 @@ export async function withdrawParticipationAction(_previous: CandidateParticipat
     await withdrawParticipation({ participationId: form.get("participationId"),
       version: form.get("version"), confirmed: form.get("confirmed") === "on" });
     revalidatePath("/candidato/postulaciones");
+    revalidatePath("/account");
     return { message: "Participación retirada. La empresa ya no puede consultar esta derivación.", success: true };
   } catch (error) { return { message: publicErrorFrom(error).message, success: false }; }
 }

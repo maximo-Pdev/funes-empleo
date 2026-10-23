@@ -1,0 +1,221 @@
+.page {
+  min-height: 100svh;
+  background: var(--color-brand-secondary);
+  color: var(--color-foreground);
+}
+
+.workspace {
+  padding-top: 64px;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 64px auto 0 0;
+  width: 264px;
+  padding: 32px 20px 20px;
+  overflow-y: auto;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.main {
+  min-width: 0;
+  margin-left: 264px;
+  padding: 40px clamp(24px, 4vw, 64px);
+  overflow-wrap: anywhere;
+}
+
+.heading {
+  margin-bottom: 32px;
+}
+
+.heading h1 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-primary-900);
+}
+
+.heading p {
+  max-width: 70ch;
+  margin-top: 12px;
+  line-height: 1.75;
+  color: var(--color-muted-foreground);
+}
+
+.menu {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  gap: 12px;
+}
+
+.menuLink {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.menuLink svg {
+  width: 22px;
+  height: 22px;
+}
+
+.menuLink:hover,
+.menuLink[aria-current="page"] {
+  background: var(--color-secondary);
+}
+
+.footer {
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.secondaryLink,
+.logoutForm .logout {
+  display: flex;
+  min-height: 44px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-foreground);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.secondaryLink:hover,
+.logoutForm .logout:hover {
+  background: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;
+}
+
+.avatar {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.identityText {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.email {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--color-muted-foreground);
+}
+
+.emailTrack {
+  display: flex;
+  width: max-content;
+}
+
+.emailCopy {
+  flex: none;
+}
+
+.emailValue {
+  display: inline-block;
+}
+
+.email[data-overflow="true"] .emailCopy {
+  padding-inline-end: 24px;
+}
+
+@keyframes email-scroll {
+  to { transform: translateX(-50%); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .email[data-overflow="true"]:hover .emailTrack,
+  .email[data-overflow="true"]:focus-visible .emailTrack {
+    animation: email-scroll var(--email-duration) linear infinite;
+  }
+}
+
+@media (max-width: 767px), (hover: none) {
+  .email[data-overflow="true"] .emailTrack {
+    animation: email-scroll var(--email-duration) linear infinite;
+  }
+
+  .email[data-overflow="true"]:focus .emailTrack {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .email[data-overflow="true"] .emailTrack,
+  .email[data-overflow="true"]:is(:hover, :focus-visible) .emailTrack {
+    animation: none;
+  }
+}
+
+.notice {
+  margin-top: 32px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--color-muted-foreground);
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    position: static;
+    width: auto;
+    padding: 20px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 28px 16px;
+  }
+
+  .menu {
+    gap: 4px;
+  }
+
+  .footer {
+    margin-top: 16px;
+  }
+}

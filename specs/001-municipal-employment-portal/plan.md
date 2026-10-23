@@ -139,7 +139,7 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 
 ## Contexto técnico
 
-### EXTRA042 — etiquetas españolas, 2026-10-22
+### EXTRA051 — etiquetas españolas, 2026-10-22
 
 Módulo domain/presentation/labels.ts sin dependencias servidor ni autorización:
 Record tipado por catálogos de estados ya existentes, etiquetas de acciones/

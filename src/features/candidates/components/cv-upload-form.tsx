@@ -10,8 +10,8 @@ const messages = {
   denied: "No tenés permiso o la sesión venció. Iniciá sesión nuevamente antes de reintentar.",
 };
 
-export function CvUploadForm({ candidateId, version, label = "Elegir PDF", buttonLabel = "Cargar o reemplazar CV" }: {
-  candidateId: string; version: number; label?: string; buttonLabel?: string;
+export function CvUploadForm({ candidateId, version, returnTo, label = "Elegir PDF", buttonLabel = "Cargar o reemplazar CV" }: {
+  candidateId: string; version: number; returnTo?: string; label?: string; buttonLabel?: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -38,7 +38,7 @@ export function CvUploadForm({ candidateId, version, label = "Elegir PDF", butto
         setError("No se pudo confirmar la carga. El archivo se conserva. Revisá el CV vigente antes de reintentar.");
       } finally { setBusy(false); }
     }}>
-    <input type="hidden" name="candidateId" value={candidateId} /><input type="hidden" name="version" value={version} />
+    <input type="hidden" name="candidateId" value={candidateId} /><input type="hidden" name="version" value={version} />{returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
     <FileInput label={label} hint="PDF válido de hasta 5 MiB." error={error} name="cv" accept=".pdf,application/pdf" required
       data-max-bytes={5 * 1024 * 1024} data-file-error="Elegí un PDF no vacío de hasta 5 MiB." />
     {saved && <p role="status">CV guardado.</p>}
