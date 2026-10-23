@@ -967,3 +967,11 @@ GREEN local1/1 del recorrido entero sin reintentos;807 pruebas/63 archivos,
 tooling57/57, tipos/lint/build/diff-check PASS. Sin tocar aplicación, SQL, fixtures,
 pipeline o datos compartidos; sin reset local. T155 implementado/verificado local,
 actualización del mismo PR67; nueva CI y revisión pendientes al publicar.
+
+Segundo fallo expuesto por CI39889638752:101 recorridos PASS, incluido T155;
+solo SC-008A falla porque demo-performance aún busca Estado: published. T156
+actualiza esa etiqueta a Publicada y usa selectOption(available) para el escenario
+de búsqueda candidato. Conserva cinco segundos, cuatro actores, barrera y SQL
+de integridad. RED de contrato1/2;808 pruebas/63 archivos, tooling57, tipos/lint/build
+y diff-check PASS. Sin cambios de producto/pipeline ni reset local; benchmark frío
+se verifica en el runner aislado de la nueva CI, pendiente al publicar.

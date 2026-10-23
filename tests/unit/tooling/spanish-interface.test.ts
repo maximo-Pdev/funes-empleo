@@ -34,3 +34,10 @@ it("no renderiza códigos crudos ni vocabulario inglés en vistas o mensajes", (
   }
   expect(violations).toEqual([]);
 });
+
+it("la medición reutiliza etiquetas españolas y el select de disponibilidad sin cambiar sus valores", () => {
+  const benchmark = readFileSync("tests/quality/demo-performance.mjs", "utf8");
+  expect(benchmark).toMatch(/getByText\("Estado: Publicada",\s*\{exact:true\}\)/);
+  expect(benchmark).toMatch(/getByLabel\("Disponibilidad",\s*\{exact:true\}\)\.selectOption\("available"\)/);
+  expect(benchmark).not.toMatch(/Estado: (?:published|pending_review|draft)/);
+});

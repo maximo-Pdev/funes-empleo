@@ -2382,6 +2382,23 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   aplicación, fixtures, configuración CI o contratos; base local conservada sin
   reset. Se publica en el mismo PR67 sin firma/atribución; next-env.d.ts ajeno
   excluido. Nueva ejecución remota y revisión humana pendientes al publicar.
+- **Segundo fallo oculto de CI, antes de implementar:** Quality39889638752
+  confirma101 recorridos PASS, incluido el corregido, y falla solamente SC-008A.
+  demo-performance.mjs:85 aún busca Estado: published; el estado visible aprobado
+  es Estado: Publicada. Ese helper no se ejecutó antes por la dependencia fallida.
+  Su escenario candidato también usa fill(available) sobre el nuevo select.
+  Cambiar solo texto esperado y fill por selectOption(available); agregar prueba
+  de contrato del helper en tests/unit/tooling/spanish-interface.test.ts. Mantener
+  barrera común, cuatro administradores,5 segundos por acción y auditorías SQL,
+  sin ampliar plazos, reintentos ni suprimir comprobaciones. T156 deriva de T154.
+  No ejecutar acceptance-concurrency local porque resetea la base preexistente;
+  verificar RED/GREEN de contrato, tipos/lint/unit/tooling/build y CI aislada que
+  realiza el reset autorizado en su runner. Sin cambios de producto o SQL.
+- **Verificación local del helper:** RED1/2 y GREEN incluido en808/808 pruebas
+  de63 archivos; tooling57/57, tipos/lint/build/diff-check PASS. Diff de medición
+  limitado a etiqueta y selectOption; plazos, barrera, auditorías y reset frío
+  conservados. No se ejecutó el reset en la base local preexistente. Se actualiza
+  el mismo PR67; nueva CI aislada pendiente al publicar, sin afirmar aprobación.
 
 ## Formato para próximas entradas
 

@@ -104,3 +104,9 @@ ingleses y verifica privacidad y participaciones independientes sin saltar etapa
 RED local idéntico al check y GREEN del recorrido completo1/1 sin reintentos.
 Tipos/lint/build,807 pruebas y tooling57 PASS; sin modificar producto o pipeline.
 La nueva ejecución remota se distingue de esta verificación local.
+
+El helper de medición SC-008A también espera Estado: Publicada; el filtro de
+disponibilidad usa selectOption con el value available. Prueba de contrato RED/GREEN
+añadida:808 pruebas, tooling57, tipos/lint/build PASS. No cambia los límites de
+rendimiento, actores, barrera, datos o auditorías. El reset frío solo se ejecuta
+en CI aislada, nunca sobre la base local existente para este arreglo.
