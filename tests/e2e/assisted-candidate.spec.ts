@@ -115,9 +115,10 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await signIn(company, "company1@example.invalid");
     await company.goto(`/company/openings/${opening}/referrals`);
     await expect(company.getByText(name, { exact: true })).toBeVisible();
-    await expect(company.getByRole("heading", { name: "Categorías laborales", exact: true })).toBeVisible();
-    await expect(company.getByText("Categoría ficticia A", { exact: true })).toBeVisible();
-    await expect(company.getByText("Categoría ficticia B", { exact: true })).toBeVisible();
+    const referredProfile = company.locator("#derivaciones");
+    await expect(referredProfile.getByRole("heading", { name: "Categorías laborales", exact: true })).toBeVisible();
+    await expect(referredProfile.getByText("Categoría ficticia A", { exact: true })).toBeVisible();
+    await expect(referredProfile.getByText("Categoría ficticia B", { exact: true })).toBeVisible();
     await expect(company.locator("body")).not.toContainText("Categorías e intereses");
     await expect(company.locator("body")).not.toContainText("Orientación ficticia de entrevista presencial");
     const candidate = await candidateContext.newPage();

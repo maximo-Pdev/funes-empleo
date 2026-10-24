@@ -618,6 +618,8 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 
 ### Ofertas empresariales y moderación — EXTRA062
 
+- [x] T194 Adaptar regresiones E2E a composición integrada, nombre mínimo tras revocación y ruta canónica; evitar nombre duplicado en contrataciones legadas con permiso completo.983/77 coverage, tipos/lint/build/diff-check y tres focos E2E PASS sin omisiones/reintentos; conservar pruebas de privacidad. Nueva CI completa en seguimiento por PR72, evidencia EXTRA062.
+
 - [x] T193 Corregir sincronización asíncrona de prueba de historial detectada por CI PR72: esperar anuncio final sin omitir datos/foco/cursor/botón.982/77 coverage, diez repeticiones, tipos/lint/build limpio/diff-check PASS; commit f852233 publicado en misma rama, sin cambios productivos. Seguimiento de nueva CI en checks del PR; evidencia EXTRA062.
 
 - [x] T192 Ajuste R5: abrir oferta existente en consulta, edición por botón con cancelación/foco, retorno al detalle actualizado tras guardar y preservación ante error. Mantener estados/alta/reglas.982/77 pruebas,23 focales finales, tipos/lint/build/diff-check, cuatro E2E y revisión1440/390px/axe PASS. Sin SQL nuevo; evidencia EXTRA062, revisión humana/CI pendientes.

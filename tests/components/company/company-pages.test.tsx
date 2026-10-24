@@ -121,6 +121,13 @@ it("la contratación propia conserva solo nombre y no ofrece CV/contactos/entrev
 it("ruta antigua de derivaciones dirige al detalle empresarial canónico", async () => {
  await expect(Referrals({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) })).rejects.toThrow(`REDIRECT:/empresa/ofertas/${fixtureReference("opening", id)}#derivaciones`);
 });
+it("contratación legada con permiso completo no duplica el nombre ni oculta su resultado", async () => {
+ mocks.referral.mockResolvedValue({ ...referral, hiredCandidate: { displayName: referral.candidate.displayName, outcome: "hired" } });
+ render(await CompanyOpeningReferrals({ openingId: id }));
+ expect(screen.getAllByText("Persona Ficticia", { exact: true })).toHaveLength(1);
+ expect(screen.getByText("Contratado", { exact: true })).toBeTruthy();
+ expect(screen.getByRole("heading", { name: "Perfil laboral derivado" })).toBeTruthy();
+});
 vi.mock("@/lib/records/reference-url", async () => ({ referenceUrl: async (href: string) => (await import("../../fixtures/record-references")).fixtureHref(href) }));
 it("conserva el límite de oferta inexistente", async () => {
  mocks.offers.mockResolvedValue({ items: [] }); await expect(Opening({ params: Promise.resolve({ openingId: id }) })).rejects.toThrow("NOT_FOUND");

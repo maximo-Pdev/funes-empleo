@@ -1313,3 +1313,19 @@ y adjunto a la conversación; incluye T186–192 y editor por botón. next-env.d
 ajeno queda fuera del commit. Migración20261024184354 continúa pendiente en el
 proyecto alojado antes del despliegue. CI/revisión humana/merge/despliegue y
 aceptación siguen pendientes; PR abierto no acredita esas etapas.
+
+### Correcciones de CI del PR72 —2026-10-24
+
+El primer fallo application fue una espera insuficiente del anuncio final de la
+transición de historial: commit f852233, diez repeticiones y982/77 coverage PASS;
+tipos/lint/build limpio PASS. La siguiente tanda completa superó esa etapa y
+database, con115 E2E aprobadas, tres fallidas y concurrencia dependiente sin ejecutar.
+
+T194 ajusta categorías al apartado de derivados, ruta esperada al detalle nuevo y
+nombre contratado mínimo tras revocación. Panel no repite nombre legado cuando
+ya aparece en el perfil completo. No cambia DTO/SQL/permisos. Otro permiso válido
+puede autorizar el mismo CV tras caducar uno aislado; tras retiro global se exige
+API403/404.983/77 coverage y tipos/lint/build/diff-check PASS; los tres E2E afectados
+PASS juntos sin omisiones/reintentos. Solo fixture local aislado, manteniendo
+next-env.d.ts ajeno. Publicación en misma rama/PR sin firma; resultado completo de
+nueva CI en checks del PR, revisión humana/merge/despliegue aún pendientes.

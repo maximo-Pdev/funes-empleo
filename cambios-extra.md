@@ -3292,6 +3292,41 @@ de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
   diez repeticiones y982/77 coverage/tipos/lint/build/diff-check PASS. La nueva CI
   completa se sigue en los checks del PR; no se atribuye su éxito antes del resultado.
 
+- **Segundo diagnóstico CI72 previo a cambios,2026-10-24:** la nueva ejecución
+  superó982 pruebas/coverage y database, pero su tanda completa terminó115 E2E
+  aprobadas y tres fallidas (concurrencia dependiente no ejecutada): categorías de
+  oferta y candidato ahora conviven en página, nombre contratado legado repetido
+  con permiso completo aún vigente y helper español espera ruta antigua. Origen
+  R1/R3/R5/T190. Acotar categorías al apartado de derivados; mostrar nombre una sola
+  vez cuando ya aparece en perfil completo, conservando indicador Contratado y
+  nombre mínimo al perder acceso; adaptar expectativa de mantenimiento/contratación
+  tardía para conservar nombre y seguir denegando CV/perfil; canonicalizar helper
+  E2E a detalle empresarial. Archivos panel, tests componentes/assisted/intermediation/
+  helper referencias y artefactos. Sin cambiar autorización ni SQL. Riesgo de
+  ocultar exposición: afirmar explícitamente ausencia de perfil/contactos/CV tras
+  revocar. Verificar focos E2E, unitarias/tipos/lint/build y nueva CI sin skips/retries.
+  Autorizado por corrección solicitada del PR y alcance técnico EXTRA062.
+- **Precisión del fixture durante comprobación:** al vencer una derivación legada,
+  la misma empresa aún puede tener otra derivación vigente del mismo CV (fixture21/
+  521). La API de documento autoriza por cualquiera de sus permisos válidos, según
+  can_read_cv existente. No exigir denegación global por caducar un permiso aislado:
+  comprobar que ese detalle no devuelve perfil/contactos/enlace; tras contratación
+  tardía con retiro global sí comprobar API403/404. No cambiar permisos ajenos ni
+  reglas para satisfacer el test. Primera ejecución local coincidió con arranque
+  del servidor; repetir después de Ready y restablecer solo el fixture aislado.
+- **Resultado T194:** panel evita duplicar nombre legado sin cambiar su DTO ni
+  permisos; categorías E2E se verifican en derivados; helper y recorrido de español
+  esperan detalle empresarial canónico; mantenimiento conserva nombre mínimo y
+  niega perfil/contactos/enlace CV, con API403/404 tras retiro global tardío.
+  Nueva prueba de componente cubre nombre único y resultado con permiso completo.
+ 983 pruebas/77 archivos con coverage PASS; tipos/lint/build/diff-check PASS.
+  Los tres E2E afectados PASS juntos en44.1s, sin skips/retries, tras Ready y reset
+  exclusivo de funes-admin-cv-check54341/54342. No cambios de BD, hosted o base local
+  habitual. next-env.d.ts ajeno conserva su huella; registro de interrupción de
+  revisión automática por cuota resuelto al continuar por pedido de Mateo, sin
+  eludir aprobación. Publicar en mismo PR72 con commit sin firma; nueva CI completa
+  se confirma en los checks del PR, sin declarar aprobación antes de su resultado.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
