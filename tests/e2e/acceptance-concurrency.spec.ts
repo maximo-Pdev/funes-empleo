@@ -9,17 +9,22 @@ import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" 
 
 test.use({ trace: "off", screenshot: "off" });
 test("SC-008A: cuatro admins locales, barrera común, cuatro mutaciones y auditorías íntegras", async () => {
-  test.setTimeout(300_000);
+  // El reset incluye toda la suite SQL y 500 PDF; queda fuera de la medición SC-008A.
+  const preparationTimeout = 300_000;
+  const measurementTimeout = 90_000;
+  test.setTimeout(preparationTimeout + measurementTimeout + 30_000);
   assertLocalTargets();
   const resetId = randomUUID();
   const reset = spawnSync(process.execPath, ["tests/fixtures/reset-local.mjs", "--confirm-local-reset", "--acceptance"], {
-    encoding: "utf8", timeout: 180_000, maxBuffer: 16 * 1024 * 1024,
+    encoding: "utf8", timeout: preparationTimeout, maxBuffer: 16 * 1024 * 1024,
   });
   // Capture subprocess output: never include CLI status/auth/browser logs in errors.
+  expect((reset.error as NodeJS.ErrnoException | undefined)?.code ?? null,
+    "La preparación fría local no debe agotar su presupuesto ni fallar al iniciar").toBeNull();
   expect(reset.status, "Reset frío de aceptación local debe terminar correctamente").toBe(0);
   runLocalMaintenanceSql("set funes.fixture_context='isolated-local-acceptance';\n" + readFileSync(fixtures.acceptance.concurrentAdmins.preparation, "utf8"));
   const measured = spawnSync(process.execPath, ["tests/quality/demo-performance.mjs", "concurrent-admins", resetId, "dpl_localAcceptance"], {
-    env: { ...process.env, APP_ENV: "local" }, encoding: "utf8", timeout: 90_000, maxBuffer: 1024 * 1024,
+    env: { ...process.env, APP_ENV: "local" }, encoding: "utf8", timeout: measurementTimeout, maxBuffer: 1024 * 1024,
   });
   expect(measured.status, "Las cuatro acciones deben confirmar éxito visible en hasta cinco segundos cada una").toBe(0);
   const receipt = JSON.parse(measured.stdout) as { dataset: string; acceptanceBenchmark: boolean; pass: boolean;

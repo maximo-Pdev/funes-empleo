@@ -1329,3 +1329,12 @@ API403/404.983/77 coverage y tipos/lint/build/diff-check PASS; los tres E2E afec
 PASS juntos sin omisiones/reintentos. Solo fixture local aislado, manteniendo
 next-env.d.ts ajeno. Publicación en misma rama/PR sin firma; resultado completo de
 nueva CI en checks del PR, revisión humana/merge/despliegue aún pendientes.
+
+La revisión2daccf3 pasó983 pruebas, database, build y118 E2E; el último caso frío
+SC-008A agotó180s de preparación antes de medir. Reset completo inicial en el mismo
+job:189s, con1205 pgTAP en133s. T195 ajusta solo preparación a300s y total a420s,
+con diagnóstico por código sin exponer logs sensibles. Conserva90s del proceso de
+medición y≤5000ms por cada una de cuatro operaciones, barrera y auditorías completas.
+Prueba fría local íntegra con SQL/500PDF PASS en2.7m; tipos/lint/diff-check y57 tooling
+PASS. Sin cambios de aplicación/SQL ni omisiones/reintentos. Protocolo en performance.md;
+nueva CI completa del PR72 se confirma en sus checks, sin éxito anticipado.

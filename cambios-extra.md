@@ -3327,6 +3327,29 @@ de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
   eludir aprobación. Publicar en mismo PR72 con commit sin firma; nueva CI completa
   se confirma en los checks del PR, sin declarar aprobación antes de su resultado.
 
+- **Preparación SC-008A/CI72, diagnóstico previo2026-10-24:** ejecución40141094918
+  pasó983 pruebas/coverage, database y118 E2E; solo falló la preparación fría de
+  concurrencia al agotarse180s (spawnSync status=null tras3m). En el mismo job,
+  el reset inicial completo duró189s (23:06:04→23:09:13 UTC), incluidos1205 pgTAP
+  en133s, migraciones/seed y500PDF. El límite auxiliar es menor que el costo medido
+  del propio fixture, no se llegó a la barrera/medición. Origen T089/SC-008A y gate
+  final de EXTRA062. Ampliar solo preparación acotada a300s y total del test a420s;
+  mantener subprocess de medición90s, cuatro actores, umbral5000ms, dataset/hash,
+  reset separado sin calentamiento y auditorías. Diagnóstico seguro por código de
+  error, sin stdout/credenciales. Archivos test/protocolo/tasks/log, sin cambios de
+  aplicación, permisos o BD. Riesgo de esconder lentitud: presupuesto solo prepara
+  fixture, cada acción sigue fallando si excede5s y ningún gate se omite. Verificar
+  preparación completa con SQL habilitado y prueba fría local aislada, tipos/lint/
+  tooling y CI completa; autorización derivada del arreglo solicitado, AGENTS.
+- **Resultado local T195:** aceptación fría completa PASS en2.7m en instancia
+  funes-admin-cv-check54341/54342 con SQL habilitado (sin el atajo de UI del snapshot),
+  fixture500/50/100/1000/500PDF, cuatro actores/barrera y cuatro mutaciones/auditorías.
+  Mantiene cada operación≤5000ms y medición de proceso90s. Tipos/lint/diff-check y
+  tooling57 PASS; aplicación no cambió respecto de la revisión que pasó118 E2E y
+  build en CI. Protocolo actualizado en docs/validation/performance.md. Publicar en
+  PR72 sin firma; nueva CI completa se verifica en checks, sin atribuir resultado
+  anticipado. Base habitual/alojada y next-env.d.ts ajeno intactos.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

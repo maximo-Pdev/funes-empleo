@@ -618,6 +618,8 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 
 ### Ofertas empresariales y moderación — EXTRA062
 
+- [x] T195 Ajustar presupuesto de preparación fría SC-008A a costo medido del fixture completo (300s/reset,420s/test), manteniendo90s de proceso,5000ms/acción, cuatro actores y auditorías. Diagnóstico seguro; frío local con SQL completo PASS en2.7m, tipos/lint/diff-check y57 tooling PASS. Nueva CI en seguimiento por PR72, sin omisiones/reintentos.
+
 - [x] T194 Adaptar regresiones E2E a composición integrada, nombre mínimo tras revocación y ruta canónica; evitar nombre duplicado en contrataciones legadas con permiso completo.983/77 coverage, tipos/lint/build/diff-check y tres focos E2E PASS sin omisiones/reintentos; conservar pruebas de privacidad. Nueva CI completa en seguimiento por PR72, evidencia EXTRA062.
 
 - [x] T193 Corregir sincronización asíncrona de prueba de historial detectada por CI PR72: esperar anuncio final sin omitir datos/foco/cursor/botón.982/77 coverage, diez repeticiones, tipos/lint/build limpio/diff-check PASS; commit f852233 publicado en misma rama, sin cambios productivos. Seguimiento de nueva CI en checks del PR; evidencia EXTRA062.
