@@ -3106,6 +3106,19 @@ test-results/admin-current-cv-* ignorados; servicios de prueba se cierran al ter
   globales; no acredita NVDA/zoom real o aceptación municipal. Sin commit/PR
   solicitados; revisión humana/CI/merge/despliegue y gates históricos pendientes.
 
+### Publicación de EXTRA055–061 — 2026-10-24
+
+A pedido de Mateo, commit sin firma ni trailers `0ad6e85` publicado en
+`feat/candidate-profile-categories`. PR abierto para revisión, sin borrador:
+[PR #71](https://github.com/maximo-Pdev/funes-empleo/pull/71).
+Base `main` verificada en `84a2ce6`,80 archivos del trabajo autorizado; cambio
+local previo de `next-env.d.ts` excluido y preservado. Se retiró una línea vacía
+final de la migración de categorías al pasar diff-check, sin cambio semántico.
+Descripción reúne alcance, pruebas y las dos migraciones que deben instalarse
+antes del despliegue; no se aplicaron a Supabase alojado. CI/revisión humana/merge/
+despliegue siguen pendientes. Esta publicación actualiza los estados históricos
+de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

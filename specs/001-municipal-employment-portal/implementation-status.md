@@ -1241,3 +1241,12 @@ Supabase/build/servidor ficticios aislados, sin reset ni cambios alojados; next-
 ajeno preservado. T184/T185 verificados técnicamente. EXTRA061 contiene evidencia
 y límites; sin acreditar SQL/E2E global/NVDA/aceptación. Commit/PR/CI/revisión/merge/
 despliegue y gates históricos siguen pendientes.
+
+## Publicación de mejoras de candidatos — 2026-10-24
+
+Mateo solicitó publicar la rama acumulada EXTRA055–061. Commit `0ad6e85` sin firma
+ni signoff/coautor publicado en `feat/candidate-profile-categories`, desde `main`
+actualizado (`84a2ce6`). [PR #71](https://github.com/maximo-Pdev/funes-empleo/pull/71)
+abierto sin borrador,80 archivos, con evidencias y dos migraciones requeridas antes
+del despliegue. `next-env.d.ts` ajeno queda local y fuera del commit. CI y revisión
+humana siguen pendientes; PR abierto no acredita merge, despliegue o aceptación.
