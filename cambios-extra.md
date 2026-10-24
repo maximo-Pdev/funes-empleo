@@ -2523,7 +2523,11 @@ CI/revisión humana, merge, despliegue y recorridos alojados siguen pendientes.
   reset/SQL/login/envíos de formularios, ni tocar servidor3000 o su .next. Advertencia
   de múltiples lockfiles propia de la copia anidada; no se cambió next.config.
   Evidencias test-results/remove-skip-* ignoradas. No se repitió la batería privada
-  ni se certificó lector de pantalla/zoom real. No hay migración, commit o PR nuevo.
+  ni se certificó lector de pantalla/zoom real. No hay migración.
+- **Publicación autorizada posteriormente:** Mateo solicita el PR; commit9a899d3
+  sin firma/coautorías, rama fix/remove-skip-link, [PR69](https://github.com/maximo-Pdev/funes-empleo/pull/69)
+  abierto hacia main86b7de8. next-env.d.ts ajeno permanece sin incluirse. CI,
+  revisión humana, merge y despliegue pendientes; no acredita aceptación global.
 - **Fuente técnica:** [W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11).
 
 ## Formato para próximas entradas

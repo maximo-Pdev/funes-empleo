@@ -1030,5 +1030,8 @@ axe y primer foco, más seis combinaciones de Inicio a1440/390px (ingreso y ambo
 registros) PASS, sin omisiones/reintentos. Node24.22.0; copia aislada y servidor
 3001 con configuración pública ficticia, sin .env.local. No se tocó servidor3000,
 su .next, base local o alojada; no se enviaron formularios ni hubo login/reset.
-No se repitió E2E privado ni se certificó NVDA/zoom real. Sin commit/PR nuevo;
-revisión humana y gates históricos pendientes.
+No se repitió E2E privado ni se certificó NVDA/zoom real. Por solicitud posterior
+de Mateo se publicó commit9a899d3 sin firma/coautorías y se abrió
+[PR69](https://github.com/maximo-Pdev/funes-empleo/pull/69) hacia main86b7de8.
+next-env.d.ts ajeno queda fuera del commit. CI/revisión humana, merge, despliegue
+y gates históricos pendientes.
