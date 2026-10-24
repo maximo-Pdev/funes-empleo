@@ -2,6 +2,12 @@
 
 ## Actores
 
+EXTRA061: lectura incremental de historial candidato exige admin activo en cada
+llamada. Entrada candidateId/cursor fecha/id validada; scope perfil/cuenta actual
+resuelto por servidor. No acepta entidades, cuenta, filtros o sort del cliente.
+Solo devuelve eventos visibles id técnico/acción/fecha y cursor. Anónimo/candidato/
+empresa/admin inactivo se rechazan antes de leer datos. Auditoría íntegra sin cambios.
+
 - **Público**: sin sesión.
 - **Candidato**: cuenta activa asociada a un perfil propio.
 - **Empresa**: cuenta activa asociada a una empresa propia.
@@ -80,6 +86,12 @@ existencia expondría información.
 | Suspender/reactivar cuentas | No | No | No | Sí; una cuenta admin solo por otro admin activo y nunca si deja cero admins activos | No |
 | Cerrar oferta vencida | No | No | No | Puede consultar historial | Solo oferta publicada vencida |
 
+EXTRA056: create_active_assisted_candidate exige administrador activo y una
+confirmación expresa de aceptación presencial sobre política vigente para cada
+alta nueva. Solo authenticated puede invocarlo y la función revalida el rol real;
+empresa/candidato/anónimo no crean perfiles mediante este comando. No cambia
+la matriz de lectura ni acepta/reactiva perfiles existentes al resolver duplicados.
+
 ## Proyección pública de oferta
 
 La proyección pública de una oferta `published` y vigente contiene solo nombre de la empresa,
@@ -96,7 +108,7 @@ derivación esté `active`, el consentimiento continúe vigente y las cuentas/re
 
 - nombre de presentación;
 - localidad laboral;
-- categorías/intereses;
+- categorías laborales (selección única multivalor desde EXTRA057);
 - resumen de habilidades y experiencia;
 - disponibilidad;
 - todos los contactos vigentes y no archivados;

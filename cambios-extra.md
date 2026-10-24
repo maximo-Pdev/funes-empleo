@@ -2611,6 +2611,501 @@ completa en un único dataset. Guardas/puertos/contenedor/buzón se adaptaron so
 en la copia ignorada, con destinos loopback exactos. Evidencias agregadas y logs
 test-results/admin-current-cv-* ignorados; servicios de prueba se cierran al terminar.
 
+## EXTRA-055 — Apartado administrativo de atención presencial
+
+- **Ajuste solicitado antes de publicar,2026-10-24:** Mateo aclara que el apartado
+  debe permitir crear perfiles y consultar los creados en la misma pantalla, no
+  limitar el alta a un enlace a otra ruta. Propuesta previa a este ajuste:
+  montar el AssistedProfileForm existente encima de filtros/listado, usando el
+  catálogo activo ya consultado. Retirar el enlace de alta de esta pantalla;
+  conservar la ruta anterior y el destino de mantenimiento al guardar por
+  compatibilidad. Sin nuevo formulario, acción, consulta, contrato o permiso.
+  Archivos afectados: página del apartado, pruebas de página/E2E y spec/plan/UI.
+  Riesgos: confundir controles de ambos formularios, perder listado vacío o
+  protección previa a consultas. Verificar alta desde la misma URL, validación,
+  duplicados, listado/detalle, roles, tipos/lint/pruebas/build. Autorizado por el
+  pedido explícito; implementado y verificado técnicamente, revisión pendiente.
+  Resultado: formulario visible arriba y «Perfiles creados» con filtros/listado
+  debajo, en /admin/atencion-presencial. Se conservan categorías ya consultadas,
+  detección de duplicados, acción y destino de mantenimiento al guardar.
+  RED2/26 por ausencia de alta integrada; GREEN35/35 focalizadas. Tipos (typegen y
+  tsc), lint,873/873 unitarias/componentes,57/57 tooling, build y diff-check PASS.
+  Cinco recorridos de navegador pasaron inicialmente, incluido el alta desde la
+  misma URL. La regresión de claim falló por usar el buzón54324 habitual desde la
+  copia aislada; se corrigió solo esa copia a54344 y el recorrido pasó1/1. Sin
+  omisiones o aumento de timeouts. Copia aislada no apta para tests de rutas/guards
+  de tooling: unitarias/tooling finales ejecutados sobre la raíz original, PASS.
+  Una ejecución focalizada previa sufrió ENOENT de caché temporal del sandbox;
+  ejecución con runtime autorizado PASS sin modificar pruebas para eludirlo.
+  Axe sin violaciones en pantalla con ambos formularios; capturas1440/390px
+  revisadas sin overflow ni pageerror. Mismos límites de aceptación que abajo.
+- **Fecha/origen:**2026-10-23, Mateo solicita un apartado propio en el menú lateral
+  con perfiles creados presencialmente y acceso a sus detalles, reutilizando
+  registros/funciones sin modificar permisos o negocio. PR70 mergeado84a2ce6
+  confirmado; main actualizado y rama feat/admin-assisted-candidates-section.
+  Anterior eliminada local/remotamente; next-env.d.ts ajeno preservado.
+- **Evidencia:** AdminShell solo ofrece Candidatos; /admin/candidates/assisted
+  contiene el alta actual y /assisted/[referencia] su mantenimiento. El modelo
+  ya conserva origin=assisted incluso después del claim; account_id nulo o un
+  administrador gestor no identifican por sí solos ese origen. La búsqueda
+  general predeterminada exige vigencia/aptitud, por lo que oculta borradores.
+- **Propuesta previa:** menú «Atención presencial» a /admin/atencion-presencial,
+  listado de los mismos candidate_profiles con origin=assisted fijo en servidor.
+  Reutilizar búsqueda, filtros, paginación, estados españoles, enlaces opacos y
+  controles existentes. Por defecto vigencia/aptitud «Todos» para mostrar también
+  borradores, no disponibles, vinculados y archivados; aplicar filtros explícitos
+  sin cambiar reglas de aptitud. Detalle general ya maneja archivo/historial y
+  permite mantenimiento cuando corresponde. Conservar URL/formulario de alta.
+- **Adiciones necesarias:** factorizar internamente el motor de búsqueda para
+  fijar origen desde un wrapper servidor, no desde URL/cliente; añadir destino
+  opcional al formulario compartido y reconocer categoryId por referencia en la
+  nueva URL. Leer origin en detalle para conservar menú activo y regreso correcto.
+  Sin nuevo registro, tabla, RPC, permisos, migración o componente global paralelo.
+- **Archivos/contratos:** AdminShell, nueva página, páginas asistidas/detalle,
+  search-service, CandidateSearchForm, reference-url, tests/Spec Kit/guía UI.
+  La firma de búsqueda general conserva sus valores predeterminados. Origin es
+  clasificación persistida, no una decisión nueva ni un filtro de autorización.
+- **Riesgos/verificación prevista:** mezclar autoservicio/importados, esconder
+  borradores/vinculados, duplicar perfiles al navegar, cambiar defaults generales,
+  perder filtros o emitir UUID, saltarse guard/RLS y seleccionar dos menús activos.
+  RED/GREEN de scope/menú/lista/empty/error/filtros/referencias y defaults, tipos,
+  lint, unit/tooling/build y navegador ficticio de navegación/roles/claim/teclado.
+- **Gate/análisis acotado:** petición coordinada según AGENTS, US4/FR-004/011/016/
+  032/070 y constituciónI–V; mismo modelo/contratos de negocio y arquitectura.
+  Documentar spec/plan/tasks antes de implementar. Sin decisiones municipales
+  inferidas; implementación/verificación técnica completadas, revisión pendiente. Revertir UI/lectura
+  conserva IDs, origen, datos e historial.
+- **Resultado:** apartado implementado en los archivos previstos, con pruebas de
+  origen fijo antes de conteo/paginación, defaults generales intactos, guard de
+  administrador y navegación existente. El detalle conserva el menú presencial
+  activo incluso con cuenta vinculada. Se actualizó la expectativa de navegación
+  de Mi cuenta de siete a ocho opciones y se afirmó el destino de la nueva opción.
+- **Verificación real:** RED7 fallos/8 pruebas iniciales; GREEN64/64 focalizadas;
+  tipos y lint sin errores;873/873 unitarias/componentes en70 archivos,57/57 tooling,
+  build de producción y diff-check PASS. Seis recorridos Chromium PASS sin omisiones
+  ni reintentos: alta/mantenimiento/claim/historial presencial existentes, decisiones
+  de duplicados, denegación anónimo/candidato/empresa y listado/filtros/paginación/
+  detalle con origen invariable y sin duplicados por navegación. Axe sin violaciones
+  en el listado; capturas ficticias revisadas a1440/390px, foco de menú y apertura
+  de perfil con Enter, sin desborde horizontal ni errores de navegador. Advisor de
+  seguridad local sin hallazgos. Revisión React: página de servidor, guard previo a
+  lecturas, estado por solicitud, controles compartidos y referencias opacas.
+- **Entorno/límites:** Node24.22.0, build y navegador en copia ignorada con .next
+  propio, sin leer .env.local. Base ficticia aislada funes-admin-cv-check54341/54342;
+  no se reseteó o modificó base habitual/alojada. Se cerró temporalmente next dev3000
+  con autorización explícita de Mateo y se usó un servidor de prueba propio. No se
+  repitió la suite E2E/SQL completa ni se certificó NVDA/zoom real. Sin migración,
+  dependencias o configuración de producto nuevas. Pendientes: commit/PR si se
+  solicitan, CI, revisión humana, merge/despliegue y gates históricos de aceptación.
+  Servidor propio detenido y proyecto ficticio apagado con respaldo al terminar;
+  puerto3000 libre. Next registró cierres anticipados de stream durante navegación
+  automatizada; seis recorridos completados y revisión visual sin pageerror.
+
+## EXTRA-056 — Alta presencial activa y aceptación expresa en una transacción
+
+- **Fecha/origen/estado:**2026-10-24, Mateo solicita alta asistida activa inmediata
+  y baja por contratación igual a otros perfiles. Aclara expresamente exigir los
+  datos de activación y registrar aceptación presencial al crear. Coordinación
+  cubierta por AGENTS; propuesta previa a implementación, revisión pendiente.
+- **Evidencia:** save_assisted_candidate permite borradores (usado también por
+  importación); assisted_candidate_command ya exige datos/contacto/disponibilidad
+  y consentimiento para activar. La contratación normal/tardía ya retira el
+  consentimiento global de cualquier origen, pasa a consent_withdrawn y revoca
+  permisos preservando otros casos (20261021220623 y test024_hiring_consent).
+- **Cambio propuesto/justificación:** comando create_active_assisted_candidate
+  reutiliza guardar/aceptar/activar existentes en una transacción administrativa.
+  UI de alta exige localidad, experiencia, al menos un rubro/interés, disponible
+  y checkbox sin marcar que atestigua aceptación de la persona sobre política
+  mostrada/versionada. Servidor y DB validan esos datos/confirmación/política.
+  Duplicados/rechazo no crean consentimiento; usar/actualizar existente no acepta
+  ni activa automáticamente. Mantenimiento/importación conservan contratos
+  anteriores; sin backfill, aceptación implícita ni cambios al flujo de contratar.
+- **Archivos/contratos afectados:** migración y recuperación, assisted-service/
+  actions/forms, páginas de alta y apartado, validación; spec/plan/data-model/
+  state-machines/tasks/UI; pruebas unit/componentes, SQL y E2E. Nuevo RPC con
+  actor activo y permiso solo authenticated/admin real; search_path vacío.
+  Incluir la firma nueva en src/lib/supabase/database.types.ts (contrato RPC
+  tipado existente); contrastar con generación local sin sobrescribir ajustes
+  de nulabilidad de los demás comandos ni regenerar contratos ajenos.
+  Añadir invalidación de la nueva ruta presencial al confirmar contratación,
+  para que una visita anterior no mantenga el indicador activo en la caché cliente.
+  Afecta feedback-service y su prueba normal/tardía; no cambia la transición SQL.
+- **Riesgos:** aceptar por defecto, activar duplicado previamente contratado,
+  crear parcialmente ante fallo, permitir alta incompleta desde API, alterar
+  importación o perder auditabilidad; CV sigue obligatorio para derivar, no para
+  evaluación municipal. No es aprobación municipal para datos reales.
+- **Verificación prevista:** RED/GREEN, roles, incompletos/política obsoleta/sin
+  confirmación, duplicados/no reaceptación, auditoría/rollback; contratación normal
+  y tardía asistida, tipos/lint/unit/tooling/build y navegador ficticio. Advisor
+  y pruebas SQL en instancia aislada; no migrar base habitual/alojada en este paso.
+- **Gates/recuperación:** alinear artefactos y analizar antes del código. Cambio
+  aditivo dentro de arquitectura RPC/Next/Supabase aprobada; constituciónI–VI y
+  FR011/014/015/017/037/070. Revertir aplicación y retirar solo nuevo RPC conserva
+  datos/historial; nunca borrar altas o consentimientos ya registrados.
+- **Resultado técnico:** implementado en los archivos previstos y contrato de
+  tipos DB, sin reemplazar el RPC legado ni modificar contratación SQL. Alta y
+  política protegidas por administrador; contacto/categorías/datos/checkbox
+  exigidos; auditoría append-only y activación atómicas. Invalidación del nuevo
+  apartado al guardar, consentir y contratar. Política y checkbox sin marcar
+  visibles; edición de existentes conserva las condiciones anteriores.
+- **Análisis:** check-prerequisites resolvió la feature vigente; no extensions.yml
+  ni hooks. Seis criterios del delta cubiertos por T171–T173, cero críticos/altos
+  abiertos en este alcance. Decisión de datos completos/aceptación afirmativa
+  resuelta por Mateo antes de implementar; constitución/roles/privacidad intactos.
+  Consultadas docs de funciones Supabase y changelog, fuente base-nova checkbox;
+  se reutiliza el Field/control nativo actual sin otra imitación o dependencia.
+- **Verificación real:** RED8 fallos/10 iniciales; GREEN44/44 focalizadas. Tipos
+  next typegen/tsc, lint,884/884 unitarias/componentes en71 archivos,57/57 tooling,
+  build producción y diff-check PASS. SQL04124/24,04065/65 y02455/55 (144
+  aserciones) PASS; incluyen actor, datos, consentimiento/política, duplicados,
+  historial, dos fallos de auditoría con rollback y contratación normal/tardía
+  con permisos y otros casos intactos. Ocho E2E Chromium PASS sin omisiones/
+  reintentos, incluidos alta activa desde el apartado y ruta anterior, duplicados,
+  vinculación, roles y contratación con bloqueo concurrente por candidato.
+  Axe sin violaciones; capturas de política/checkbox y ancho/foco a1440/390px
+  revisadas, sin overflow ni pageerror. Advisor local sin hallazgos.
+- **Diagnóstico/entorno:** copia ignorada con .next propio, Node24.22.0 y
+  funes-admin-cv-check54341/54342. db query rechazó script multisentencia antes de
+  ejecutar; aplicado por psql solo al contenedor aislado. Se habilitó pgTAP allí.
+  Test024 requiere fixture candidato200 de aceptación completa; en copia se usó
+  candidato4 disponible (mismo rol) para sesión/sub, sin cambiar aserciones.
+  Tests originales no alterados por esa adaptación. Puertos/buzón/contenedor de
+  navegador adaptados solo en copia. El build detectó contrato RPC faltante:
+  tipo agregado, contrastado con gen types local, build repetido PASS. La suite
+  detectó guard posterior a precondiciones nuevas: restaurado guard previo y
+  242 pruebas de autorización incluidas en suite final PASS.
+- **Límites/estado:** implementado/verificado técnicamente; revisión humana,
+  commit/PR si se solicitan y CI/merge/despliegue pendientes. Migración
+  20261024033056 probada solo en base ficticia, NO aplicada a Supabase alojado
+  ni base habitual. No se leyó .env.local; next-env.d.ts ajeno preservado. Guía
+  docs/operations/active-assisted-registration.md describe instalación/recuperación.
+  Sin backfill, suite aceptación E2E/SQL completa o certificación NVDA/zoom real;
+  no se cierran gates históricos ni se acredita aprobación municipal de la política.
+
+## EXTRA-057 — Categorías laborales como única selección del candidato
+
+- **Fecha/origen/estado:**2026-10-24, solicitud explícita de Mateo: eliminar
+  Intereses laborales de todos los flujos, preservar datos y criterios restantes.
+  Coordinación cubierta por AGENTS. Base84a2ce6 coincide con origin/main;
+  rama feat/candidate-profile-categories conserva trabajo local EXTRA055/056 y
+  next-env.d.ts ajeno. Copia de39 archivos previos en test-results/categories-before
+  ignorada; sin reset, stash, commit o publicación. Propuesta antes de código.
+- **Evidencia:** frontend asistido y fichas empresariales/preview distinguen tipos;
+  autoservicio ya escribe solo occupation. Matching/búsqueda/activación consideran
+  ambos tipos, sobre los mismos job_categories y regla OR. candidate_categories
+  permite occupation/interest; seed demo/aceptación usa interest. Save asistido
+  exige dos arrays y es reutilizado por CSV. El alta activa056 depende de ello.
+- **Cambio propuesto:** única selección categories. Consolidar la unión exacta de
+  IDs existentes como occupation sin duplicados (incluye categorías inactivas,
+  perfiles archivados y cuentas vinculadas, sin reactivar catálogo o personas).
+  Guardar cada relación interest original, created_at/updated_at,
+  versión del perfil y versión de migración en historial privado append-only con
+  RLS y sin grants de aplicación. La PK(candidate_id,category_id) ya garantiza
+  unicidad: reclasificar kind in situ y verificar conservación de timestamps,
+  sin insertar/borrar asociaciones; restringir kind a occupation. No borrar el historial
+  original ni auditar la migración como acción de una persona ficticia.
+- **Adiciones necesarias:** unificar límite de selección en40 (antes20 categorías
+  más20 intereses) en comandos propios/asistidos para poder mantener toda unión
+  histórica válida. CSV conserva su mapping/columnas; accepts interests:[] legado
+  solo como compatibilidad vacía, rechaza valores no vacíos y confirmedFields
+  obsoletos. Actualizar guardar asistido, alta activa y autoservicio en nueva
+  migración; no editar migraciones históricas. Lecturas/matching mantienen OR,
+  rubros activos, elegibilidad, exclusión por participación, orden y paginación.
+- **Archivos/contratos afectados:** formularios/asistido/registro informativo,
+  validación/proyecciones TS, tipos RPC si corresponde, seed y pruebas; migración
+  nueva y recuperación. Spec/plan/data-model/contratos/tareas/checklist/UI y guías
+  de importación/matching/validación/discovery. Historial documental previo se
+  conserva como evidencia; interés por una oferta no es el campo que se elimina.
+- **Riesgos:** pérdida de selecciones, duplicar coincidencias, ocultar únicos
+  intereses, reactivar perfiles o renovar consentimiento por backfill, aceptar
+  payload antiguo con pérdida silenciosa, romper CSV/duplicados y perder origen.
+  Historial nuevo privado, sin exposición empresarial o nueva autorización.
+- **Verificación prevista:** etapas de specify/clarificación (solicitud expresa,
+  sin incertidumbre municipal nueva)/plan/checklist/tasks/análisis antes de código;
+  RED/GREEN de UI/validación, SQL migración/igualdad de uniones/duplicados/datos
+  históricos/rollback/privacidad y comandos propios/asistidos/CSV/matching;
+  tipos/lint/unit/tooling/build y navegador candidato/admin/empresa, incluyendo
+  consentimiento/contratación previa056. Solo base ficticia aislada, sin alojado.
+- **Recuperación/gobernanza:** compatible hacia adelante; conservar originales en
+  ledger y captura de definiciones previas de comandos. Reversión automática solo
+  antes de cambios posteriores en perfiles; después revisión/recuperación selectiva
+  sin borrar selecciones nuevas. No modifica principios constitucionalesI–VI ni
+  privacidad/consentimiento/estados, solo FR012 y selección efectiva equivalente.
+  Revisión humana/CI y aplicación alojada pendientes, no aceptación municipal.
+- **Resultado:** campo y etiquetas retirados de alta/mantenimiento asistido,
+  texto de registro, preview de oferta y ficha empresarial. Autoservicio conserva
+  su selector único y ahora puede guardar la unión histórica40. Proyecciones
+  aceptan solo occupation. Payload vacío anterior se descarta en la frontera
+  técnica, nunca se convierte en un campo de producto; no vacío se rechaza.
+  Importación permanece con una sola columna categorias y mapping v1. Migración
+  nueva reclasifica filas in situ, sin borrar asociaciones, y guarda origen y
+  timestamps en ledger privado inmutable. Guía operacional y semillas/hashes
+  regenerados. Ningún criterio adicional de matching o regla de estados cambiado.
+- **Gates/verificación real:** spec/clarificación expresa/plan/checklist/tasks y
+  análisis del delta revisados antes de código; diez criterios de aceptación
+  cubiertos por T174–T178, sin críticos/altos abiertos del delta. RED3/3 iniciales,
+  GREEN21/21 focalizadas;887/887 unitarias/componentes en72 archivos,57 tooling,
+  typegen/tsc, lint, build de producción y diff-check PASS. Prueba de migración
+  sobre relaciones previas no vacías14/14 PASS: unión exacta, ambos timestamps,
+  personas archivadas, categoría inactiva, perfiles/versiones/consentimientos/
+  participaciones/auditoría/catálogo intactos y mismo matching real en3 páginas.
+  Nuevo fixture042 y suite SQL completa21 archivos/1163 aserciones PASS, incluida
+  importación, rollback, privacidad, perfiles, matching, derivación y contratación.
+  Fixture500 candidatos/50 empresas/100 ofertas/1000 participaciones y500 CV
+  ficticios cargados y permisos de Storage comprobados por runner existente.
+  Dieciséis E2E PASS sin omisiones/reintentos: autoservicio/registro, asistido/claim,
+  duplicados, roles, CSV y concurrencia/rollback, matching/modal/nominación y
+  contratación normal/tardía. Categorías visibles y persistidas en candidato,
+  admin y empresa; sin campo/etiquetas retiradas. Axe sin violaciones; capturas
+  ficticias revisadas1440/390px, foco y ancho sin overflow/pageerror. Advisor local
+  sin hallazgos. Revisión React: mismos controles compartidos, sin nuevo estado
+  duplicado/efectos ni cambios de permisos o dependencies.
+- **Entorno/diagnóstico:** Node24.22.0, build en copia ignorada/.next independiente,
+  funes-admin-cv-check54341/54342. Docker estaba detenido y se inició oculto.
+  Después de la prueba de migración se reconstruyó exclusivamente ese proyecto
+  ficticio con runner de aceptación; guards de puerto/proyecto/contenedor/buzón
+  adaptados solo en la copia, sin relajar guards de la raíz o usar destino alojado.
+  SQL completo usa fixtures reales de aceptación sin sustituciones de identidad.
+  La PK real es (candidate_id,category_id): se corrigió la propuesta preliminar
+  de copiar/borrar por reclasificación in situ antes de aplicar; ninguna fila de
+  asociación se borró por el backfill. Se mantiene evidencia de la migración
+  y de la aceptación en test-results ignorado, sin secretos ni datos reales.
+- **Convergencia/límites:** implementación del delta cubierta y verificada;
+  T174–T178 no cierran gates históricos del MVP. Revisión humana/CI, commit/PR si
+  se solicitan y despliegue pendientes. Migración20261024124316 probada únicamente
+  local; no aplicada a Supabase alojado o base habitual. Recuperación selectiva
+  documentada; no se ejecutó una reversión sobre datos compartidos. E2E relevante
+  completo, sin certificar suite E2E global o NVDA/zoom real. Cambios previos y
+  next-env.d.ts ajeno conservados (hash verificado); no .env.local ni publicación.
+
+## EXTRA-058 — Retirar nominación desde el perfil candidato
+
+- **Fecha/origen/estado:**2026-10-24, Mateo solicita eliminar la opción de nominar
+  desde el perfil. Misma rama feat/candidate-profile-categories y cambios pendientes
+  previos preservados; propuesta previa a implementar, revisión humana pendiente.
+- **Evidencia:** detalle admin importa NominationForm y consulta
+  listNominationOpenings para perfiles active; mantenimiento presencial enlaza al
+  detalle anunciando nominación. La oferta ya permite nominar explícitamente desde
+  su popup mediante el comando servidor existente.
+- **Cambio mínimo:** retirar formulario/imports/consulta del detalle y referencia
+  textual en enlace asistido; eliminar componente y consulta huérfanos. Mantener
+  Ofertas, CV, notas, historial, participaciones y decisiones de cuenta. No
+  modificar createAdminNominationAction/servicio de comando ni SQL/permisos.
+- **Archivos/contratos:** página candidate detail, assisted detail, componente
+  nomination-form y función listNominationOpenings; spec/plan/UI/tasks y tests.
+  Derivado necesario: E2E existentes deben iniciar nominaciones desde una oferta;
+  helper de prueba usa matching/popup actual y lectura ficticia para localizar la
+  página y el caso creado. Datos de prueba deben coincidir en rubro y tener CV;
+  el bloqueo de derivación sin CV sigue verificado por SQL, sin cambiar su regla.
+- **Riesgos/verificación:** retirar solo esa entrada, no la nominación general;
+  conservar datos/autorización y no consultar catálogo de ofertas al ver perfil.
+  RED/GREEN de detalle activo/asistido/inactivo/archivado, regresión popup de oferta,
+  flujo asistido y escenarios de intermediar/cancelar; tipos/lint/unit/tooling/build
+  y navegador local ficticio. Sin nueva migración o configuración.
+- **Gate/recuperación:** UI acotada autorizada; mismo contrato de comando y
+  arquitectura, constituciónI–VI/FR031/034/070. Artefactos alineados antes de código.
+  Revertir UI recupera entrada anterior sin tocar registros; no decisiones
+  municipales nuevas ni revisión humana/aceptación declaradas.
+- **Resultado:** se retiró NominationForm del detalle y su componente sin usos;
+  listNominationOpenings eliminado junto con imports y consulta por perfil activo.
+  Enlace asistido ahora «Consultar CV vigente, notas e historial». Comando de
+  nominación y popup de oferta intactos; no nuevos permisos, tablas, estados,
+  dependencias o migraciones. Misma rama y trabajo previo preservados.
+- **Verificación real:** RED1 fallo/26 pruebas; GREEN30/30 de páginas,891/891
+  unitarias/componentes en72 archivos,57 tooling, typegen/tsc, lint, build y
+  diff-check PASS. Cuatro regresiones cubren activo propio/asistido, borrador y
+  archivado sin selector/botón, con historial/Ofertas disponibles y sin catálogo
+  de nominación. Ocho E2E PASS sin omisiones/reintentos: asistido/claim/duplicados,
+  cuatro matching/popup y dos escenarios de intermediar/retiro/cierre/cancelación.
+  Helper nuevo usa realmente la UI de oferta, solo lee DB ficticia para localizar
+  página/caso. Candidato1 selecciona rubro A para sus ofertas2/3; caso de cancelación
+  usa28 (rubro A), manteniendo los resultados independientes del escenario.
+  CV de asistido se carga antes de acceder al matching, sin alterar reglas de DB;
+  pruebas SQL anteriores conservan cobertura de derivación sin CV. Axe de los
+  recorridos sin violaciones; capturas1440/390px de perfil revisadas, Ofertas con
+  foco de teclado, sin overflow ni pageerror.
+- **Diagnóstico/entorno:** servidor de usuario3000 se conservó; copia ignorada con
+  .next propio y servidor de producción3001. Auth ficticio/guards/contextos/buzón
+  adaptados estrictamente a3001/54341 solo en copia; raíz conserva configuración
+  original. Fixture de aceptación reconstruido solo en funes-admin-cv-check para
+  escenarios independientes (500/50/100/1000 y500 CV comprobados). Sin repetir
+  SQL de negocio porque este cambio no lo modifica. Primer build detectó uso de
+  opción exact de Playwright en Testing Library: corregido en dos selectores.
+  Lint detectó variable de prueba huérfana: eliminada. Una captura de status
+  coincidió con reinicio del fixture y el guard abortó antes de compilar; espera
+  a completar fixture y build final PASS. No se relajaron aserciones ni timeouts.
+- **Estado/límites:** implementado y verificado técnicamente; docs/spec/plan/UI/
+  tareas alineados. No se tocó base habitual o alojada, .env.local, caché del
+  usuario o migraciones anteriores pendientes. Commit/PR no solicitados; CI,
+  revisión humana/merge/despliegue y gates globales pendientes. No certifica toda
+  la suite E2E/SQL, NVDA/zoom real o aceptación municipal. No hay migración nueva.
+
+## EXTRA-059 — Atención presencial dentro del perfil administrativo
+
+- **Fecha/estado:** 2026-10-24; registrado antes de implementar, implementado y
+  verificado técnicamente. Autorizado por solicitud explícita de Mateo; revisión
+  humana y PR pendientes.
+- **Problema/evidencia/origen:** el detalle ofrece otro enlace a «Mantener perfil
+  y atención presencial», donde se duplican notas y navegación. Mateo pide las
+  opciones al entrar al perfil, únicamente si fue creado presencialmente y aún
+  no tiene cuenta vinculada. Deriva de FR-011/013/018 y EXTRA055/056/058.
+  Aclaración posterior del mismo pedido: al vincular deben quedar las mismas
+  opciones de gestión que en un perfil normal, según el estado de la cuenta.
+- **Cambio mínimo:** reutilizar AssistedProfileForm, AssistedCommands, ClaimForm
+  y CvUploadForm dentro del detalle administrativo, solo para origin=assisted,
+  account_id nulo y perfil no archivado. Consultar workspace únicamente en ese
+  caso y comprobar de nuevo su origen/vinculación. Conservar notas, CV e historial
+  una sola vez. Alta/guardado navegan al detalle principal; ruta antigua redirige
+  con autorización y referencia opaca, sin romper enlaces existentes.
+- **Archivos/contratos:** páginas de detalle principal/antiguo, assisted-forms,
+  search-service (leer archived_at), pruebas de páginas/flujo presencial,
+  spec/plan/tasks/UI y guía presencial. No cambia RPC, DB, permisos, reglas de
+  activación/consentimiento, comandos ni contratos de escritura.
+- **Riesgos/recuperación:** controles obsoletos durante vinculación concurrente;
+  conservar guard/versiones del servidor y volver a verificar workspace. Al
+  refrescar tras vincular desaparecen edición/consentimiento/carga/vinculación;
+  consulta, notas e historial permanecen. Revertir solo este delta de UI.
+- **Análisis acotado:** constitución I–VI respetada; composición de componentes
+  existentes sin nueva arquitectura ni decisiones municipales. El alcance
+  solicitado confirma coordinación; no hay gates arquitectónicos nuevos.
+- **Verificación prevista:** matriz asistido/vinculado/otros orígenes/archivo,
+  lectura después de guard, redirección opaca; alta, edición, CV, consentimiento,
+  claim y conservación de historial en navegador ficticio. Tipos, lint, unitarias,
+  tooling y build. Sin mutaciones alojadas o migración adicional.
+- **Archivos reales:** los dos detalles de candidates, search-service.ts,
+  assisted-forms.tsx, admin-pages.test.tsx, E2E assisted-candidate/assisted-section/
+  private-references, guía phase-6-assisted-service y artefactos/UI/este registro.
+  Guard, versiones, RPC y reglas existentes se conservan; sin permisos nuevos.
+- **Resultados:** RED3/38 inicial y RED específico de actualización tras claim;
+  GREEN46/46 focales, incluidos cuatro estados de cuenta con controles idénticos
+  para autogestionado/asistido vinculado, matriz de origen/archivo y ocultación
+  concurrente. Suite completa903/72 PASS seguida de46/46 focales con cuatro casos
+  nuevos por la aclaración posterior. Tooling57, lint sin warnings, tipos,
+  build de producción y diff-check PASS en Node24.22.0. Dieciséis E2E PASS sin
+  omisiones/reintentos: alta/edición/CV/reemplazo/consentimiento/retiro/aceptación/
+  activación/claim/conflicto/historial, duplicados, listado, roles, matching y
+  referencias privadas. Comparación del perfil vinculado verifica controles
+  normales, CV e historial presentes y formularios asistidos ausentes.
+- **Hallazgos corregidos:** E2E detectó una clave React duplicada entre edición
+  y notas que dejaba el formulario al vincular. Prueba de rerender reprodujo el
+  defecto y pasó con clave específica. La ruta antigua resuelve directamente
+  el destino principal; prueba espera su URL final para no abortar un redirect
+  en curso. No se relajaron aserciones ni timeouts. Vitest forks encontró archivos
+  temporales ausentes; ejecución threads sin caché pasó, sin cambiar dependencias
+  o configuración versionada. Script visual requirió contexto explícito de axe.
+- **Entorno/límites:** build/.next y Supabase ficticio funes-admin-cv-check aislados,
+  servidor3001, fixture500/50/100/1000 y500 CV comprobado. Revisión1440/390px con
+  capturas, foco, secciones únicas, sin overflow/pageerror y axe sin violaciones.
+  Se conserva aviso previo de streams RSC abortados en pruebas de navegación;
+  no produjo fallas finales. Sin repetir SQL de negocio, migración nueva, datos
+  alojados o base habitual; .env.local/caché/next-env del usuario preservados.
+  No acredita suite E2E completa, NVDA/zoom real o aceptación municipal. Sin
+  commit/PR por no estar solicitados en este cambio; revisión/CI/despliegue pendientes.
+
+## EXTRA-060 — Orden de tarjetas en perfiles presenciales
+
+- **Fecha/estado:** 2026-10-24; registrado antes de implementar, implementado y
+  verificado técnicamente. Solicitud explícita
+  de Mateo: CV inmediatamente debajo de Mantener perfil y resumen Perfil candidato
+  encima de Participaciones recientes, en atención presencial.
+- **Origen/evidencia:** composición de EXTRA059/T181–182 en detalle administrativo;
+  CV estaba debajo de notas/resumen y el resumen en la columna opuesta a casos.
+- **Cambio mínimo/justificación:** conservar un único bloque JSX para cada tarjeta,
+  ubicarlos según origen assisted. CV después del formulario cuando exista y
+  resumen justo antes de participaciones. Perfiles normales conservan su orden;
+  asistidos vinculados conservan controles normales y origen histórico.
+- **Archivos/contratos:** detalle candidates/[candidateId], aserciones existentes
+  de admin-pages, spec/plan/tasks/UI y estado. Sin cambios de datos, RPC, acciones,
+  autorización, validación o migraciones. No requiere gate arquitectónico nuevo.
+- **Riesgos/recuperación:** duplicar tarjetas/ids o alterar visibilidad por mover
+  JSX; reutilizar elementos únicos, conservar condiciones y comprobar orden en
+  escritorio/móvil. Revertir solo este reordenamiento.
+- **Verificación prevista:** pruebas existentes de estados, vinculación y opciones
+  normales (comparar opciones, sin exigir idéntico orden visual de encabezados),
+  tipos/lint/tooling/build y revisión ficticia1440/390px con foco/axe/orden.
+- **Autorización/revisión:** petición directa confirma alcance/coordinación;
+  revisión humana/PR/CI y aceptación global pendientes. Preservar trabajo local.
+- **Resultados:**907 pruebas/72 archivos,46 focales de detalle,57 tooling, lint
+  sin warnings, tipos, build y diff-check PASS en Node24.22.0. Se ajustaron
+  aserciones existentes para comprobar vecindad de tarjetas y equivalencia de
+  opciones sin imponer igual orden de encabezados entre orígenes. Revisión real
+  de perfiles ficticios1440/390px: DOM y posición de CV/resumen correctos, secciones
+  únicas, foco conservado, sin overflow/pageerror ni violaciones axe; capturas
+  revisadas. Sin repetir flujos de escritura o SQL porque solo se movió JSX.
+- **Entorno/límites:** copia/.next/servidor3001 y respaldo Supabase ficticio
+  funes-admin-cv-check54341/54342; sin reset, migración o cambios alojados. Fuente
+  previa, next-env.d.ts ajeno y entorno habitual preservados. Sin commit/PR
+  solicitados; no acredita aceptación municipal, NVDA o E2E global.
+
+## EXTRA-061 — Historial resumido de cuenta y perfil del candidato
+
+- **Fecha/estado:** 2026-10-24; registrado antes de implementar, implementado y
+  verificado técnicamente. Mateo identifica
+  esta tarjeta con captura y decide evento por evento. Solo detalle administrativo
+  de candidatos; otros historiales quedan fuera del alcance confirmado.
+- **Decisiones autorizadas:** mostrar profile_activated, consent_accepted,
+  consent_withdrawn (incluido retiro por contratación), availability_changed,
+  account_suspended, account_reactivated, profile_linked y freshness_due. Ocultar
+  creación/edición de perfil, creación/verificación de cuenta y archivo/restauración.
+  Todas las clases siguen registrándose internamente. Evento y fecha/hora solamente,
+  sin actor/código/estados/motivo. Reciente primero, cinco iniciales y Ver más.
+- **Evidencia/origen:** FR-050/constituciónIII exige auditoría append-only; las
+  respuestas confirman conservar registro interno completo. Consulta actual limita50
+  antes del filtro: ocultar después perdería eventos visibles antiguos.
+- **Adición técnica necesaria/propuesta:** catálogo único, filtro antes de limit,
+  lotes5+1 y cursor fecha/id con desempate. Server Action de lectura incremental
+  valida candidato/cursor, exige admin activo y reconstruye scope perfil/cuenta en
+  servidor; RLS intacto. Seleccionar/enviar solo id técnico/acción/fecha. Cliente
+  conserva eventos ante error, ofrece reintento, anuncia progreso y enfoca nuevos.
+- **Archivos/contratos:** candidate-history/validación, search-service,
+  history-actions, componente, detalle candidato y pruebas; spec/plan/contrato/UI/
+  tasks/estado. Nuevo contrato de lectura paginada admin, sin RPC/schema/privilegios
+  nuevos ni cambios de escritura/retención. Componentes municipales reutilizados.
+- **Riesgos/recuperación:** cursor manipulado, empate de fecha, scope ajeno, sesiones
+  suspendidas, eventos nuevos durante paginado, más de50 y vacíos. Validación,
+  guard+RLS, orden estable y payload mínimo; revertir lectura/UI sin tocar datos.
+- **Análisis/gates:** lectura Next/Supabase ya prevista en plan; no arquitectura
+  nueva o cambio a FR-050. Artefactos alineados antes del código; constitución I–VI
+  preservada. Sin decisiones legales. Petición directa confirma coordinación.
+- **Verificación prevista:** ocho eventos/negativos, filtro antes de limit,
+  cursor/empates/scope/errores/roles/sesiones y continuidad más de50; UI cinco/
+  Ver más/foco/reintento/vacío, auditoría intacta, tipos/lint/unit/tooling/build y
+  navegador ficticio1440/390px/axe. Revisión humana/PR/CI y aceptación pendientes.
+- **Adición detectada en revisión visual, antes del ajuste:** Chromium convierte
+  2031-01-01T00:00Z en «31/12/2030,09:00:00» con es-AR por defecto, sin período;
+  hour12:false entrega21:00 correctamente. Fijar24h solo en la tarjeta nueva y
+  agregar regresión de tarde, para cumplir fecha/hora clara. Sin cambiar otras
+  fechas o zonas del producto; verificación en navegador/ts/unit/build prevista.
+- **Archivos reales:** candidate-history.ts, validation/candidate-history.ts,
+  search-service.ts, history-actions.ts, components/candidate-history.tsx y detalle
+  administrativo; pruebas de servicio/componente/E2E nuevas, admin-current-cv y
+  inventario transversal de Server Actions. Spec/plan/contrato/UI/tasks/estado y
+  este registro actualizados. No se modificaron migraciones, RLS o escritores.
+- **Resultados:** suite939/74 PASS y después24 focales postajuste24h PASS (un caso
+  horario adicional). Tooling57, lint sin warnings, tipos y build final PASS en
+  Node24.22.0. Nueve E2E sin omisiones/reintentos PASS antes del ajuste horario;
+  recorrido de historial repetido tras24h PASS. Incluye80 eventos ocultos recientes,
+  61 visibles antiguos con fecha empatada, continuación más allá de50, llegada de
+  nuevo evento entre páginas, foco por teclado y comparación de huella de todas
+  las filas antes/después de las lecturas: auditoría íntegra. Solo se agregaron
+  eventos de prueba explícitamente ficticios en la instancia aislada.
+- **UI/seguridad:**1440/390px revisados con capturas de cinco entradas y botón,
+  fecha argentina24h correcta, sin overflow/pageerror y axe sin violaciones en
+  tarjeta. Guard en cada llamada, casos negativos de rol/sesión/cursor/scope,
+  payload mínimo, vacío, errores/reintento, bloqueo de doble carga y deduplicación
+  cubiertos. Campos internos no se consultan ni envían para esta tarjeta.
+- **Diagnósticos:** primer build detectó tipos opcionales en tests; corregidos sin
+  cambiar aserciones. Verificación visual detectó hora12h ambigua, corregida como
+  adición registrada arriba. Revisión automática de un comando falló por límite
+  de uso antes de ejecutarse; tras «continua» se reintentó por el mismo mecanismo
+  y build/tipos/lint/navegador finales pasaron. Sin bypass o instalación nueva.
+  Aviso previo de streams RSC abortados en navegación no causó fallos finales.
+- **Entorno/límites:** copia/.next/servidor3001, Supabase ficticio
+  funes-admin-cv-check54341/54342, sin reset, migración nueva o cambios alojados.
+  Fuente previa y next-env.d.ts ajeno preservados. No se repitieron SQL ni E2E
+  globales; no acredita NVDA/zoom real o aceptación municipal. Sin commit/PR
+  solicitados; revisión humana/CI/merge/despliegue y gates históricos pendientes.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

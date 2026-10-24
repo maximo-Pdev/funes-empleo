@@ -124,7 +124,7 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
           <div><dt className="font-semibold">Vigencia del perfil</dt><dd>{new Date(profile.refreshDueAt).toLocaleDateString("es-AR", { timeZone: "America/Buenos_Aires" })}</dd></div>
           <div><dt className="font-semibold">Rubros coincidentes</dt><dd>{profile.matchedCategories.map(category => category.name).join(", ")}</dd></div>
         </dl>
-        <div><h3 className="font-semibold">Rubros del perfil</h3><p>{profile.categories.map(category => `${category.name} (${category.kind === "interest" ? "interés" : "ocupación"})`).join(", ")}</p></div>
+        <div><h3 className="font-semibold">Categorías laborales</h3><p>{profile.categories.map(category => category.name).join(", ")}</p></div>
         <div><h3 className="font-semibold">Habilidades y experiencia</h3><p className="whitespace-pre-wrap break-words">{profile.skills ?? "Sin información adicional"}</p></div>
         <a className="inline-block text-blue-800 underline" href={`/api/cv/${profile.cvReference}`} target="_blank" rel="noopener noreferrer">Abrir CV PDF en otra pestaña</a>
         <p className="text-sm">Nominar no comparte el perfil con la empresa. La derivación requiere otra decisión municipal.</p>

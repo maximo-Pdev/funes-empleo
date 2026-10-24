@@ -36,8 +36,9 @@ Aceptación y límites: A02/A03 en la matriz; sin aprobar retrospectivamente el 
 ## Incremento A08 autorizado — 2026-10-19
 
 Mateo solicita implementar el catálogo amplio de quince rubros registrado en la
-matriz, cuya aprobación municipal fue informada por él. Ocupaciones e intereses
-del candidato y categorías de ofertas siguen siendo multiselección. Desde una
+matriz, cuya aprobación municipal fue informada por él. Categorías laborales
+del candidato y categorías de ofertas son multiselección (EXTRA057 unificó las
+dos selecciones anteriores del candidato). Desde una
 oferta publicada o pausada y vigente de una empresa activa, solo administración
 puede consultar candidatos aptos para derivación con al menos un rubro activo
 compartido (OR, no todos). Mostrar rubros coincidentes, ordenar por nombre e ID
@@ -98,6 +99,84 @@ La carga de CV se coloca antes del consentimiento en el orden real de lectura.
 Se retira el cartel amarillo de política demo de la vista inicial; texto y
 versión siguen consultables en un desplegable accesible cerrado inicialmente.
 No implica política municipal aprobada ni cambia versión/hash/aceptación.
+
+## Atención presencial integrada, solicitud2026-10-24 (EXTRA059)
+
+EXTRA061, decisiones explícitas2026-10-24: «Historial de cuenta y perfil» del detalle
+administrativo de candidatos muestra solo activación, aceptación/retiro del
+consentimiento, disponibilidad, suspensión/reactivación de cuenta, vinculación y
+pendiente de actualización. Creación, ediciones comunes, verificación y archivo/
+restauración se conservan internamente sin mostrarse en esta tarjeta. Evento y
+fecha/hora únicamente, reciente primero, cinco iniciales y Ver más por lotes de
+cinco sin tope50. FR-050, auditoría completa y permisos permanecen intactos.
+No aplica estas preferencias a los historiales de otros recursos.
+
+El detalle administrativo muestra directamente edición, consentimiento/activación,
+carga de CV y vinculación presencial solo para perfiles de origen assisted sin
+cuenta vinculada y no archivados. Tras vincular desaparecen estos controles;
+consulta de CV, notas, participaciones e historial se conservan. Al vincular,
+los controles administrativos son los mismos que en un perfil autogestionado
+con igual estado de cuenta, sin borrar el origen o historial. La ruta antigua
+de mantenimiento conduce al mismo detalle autorizado. No modifica reglas ni
+permisos de los comandos existentes ni reintroduce nominación desde el perfil.
+
+EXTRA060,2026-10-24: en perfiles de origen presencial, la tarjeta CV queda
+inmediatamente después de Mantener perfil cuando ese formulario esté disponible;
+Perfil candidato se ubica inmediatamente antes de Participaciones recientes.
+Solo cambia la composición visual, conservando visibilidad y controles aprobados.
+
+## Categorías laborales únicas, decisión2026-10-24 (EXTRA057)
+
+EXTRA058,2026-10-24: el detalle administrativo de candidato y el mantenimiento
+presencial no ofrecen ni anuncian la nominación a una oferta. Esta acción de UI
+se conserva en el popup del matching de la oferta. Detalle mantiene CV, notas,
+historial, participaciones y enlace Ofertas. Sin cambiar comandos/permisos,
+elegibilidad o participaciones existentes y sin deshabilitar la nominación general.
+
+Se elimina el campo independiente Intereses laborales de registro, perfil propio
+y asistido, mantenimiento, fichas empresariales y preview municipal. La selección
+del candidato es únicamente categorías laborales (multiselección). Los intereses
+existentes se consolidan por sus mismos IDs en categorías, sin duplicados y con
+historial privado recuperable de origen/fecha; no se descartan datos o se infieren
+equivalencias de catálogo. Categorías inactivas permanecen almacenadas sin
+reactivarse. No cambian matching OR, criterios de aptitud, consentimiento,
+contratación, autorización, orden, paginación o exclusiones existentes.
+
+La unión histórica permite hasta40 selecciones (20+20 anteriores), sin perder
+capacidad de editar/guardar. CSV conserva columnas/mapping. Nuevos comandos no
+guardan intereses; clientes anteriores solo pueden enviar el array legado vacío,
+y se rechaza expresamente un array no vacío. Resolver duplicados conserva los
+campos no autorizados y nunca reactiva ni acepta consentimientos por este cambio.
+Aceptación: ausencia del campo en todos los roles; conservación de la unión y
+origen históricos; paridad de resultados/paginación antes/después; persistencia
+de categorías por autoservicio, administración e importación; seguridad y rollback.
+Sustituye las menciones funcionales anteriores de ocupaciones/intereses como dos
+selecciones. No elimina el concepto de interés de una persona por una oferta.
+
+## Alta presencial activa, decisión2026-10-24 (EXTRA056)
+
+El alta presencial interactiva exige datos completos de activación (nombre/DNI,
+contacto, localidad, experiencia, disponible y categorías laborales) y aceptación
+presencial expresa registrada por el administrador sobre la política vigente.
+Crear, aceptar y activar ocurren atómicamente; no requiere PDF para evaluación
+interna, pero sí para derivar. No hay alta interactiva incompleta o aceptación
+por defecto. Duplicados/rechazo no aceptan consentimiento; usar/actualizar un
+existente conserva su estado y consentimiento sin reactivarlos. Importación y
+mantenimiento conservan sus reglas. No se activa retroactivamente ningún perfil.
+Contratación normal/tardía mantiene EXTRA035: retiro global y consent_withdrawn,
+revocación empresarial y otros casos intactos; nunca reaceptación implícita.
+
+## Apartado de atención presencial, solicitud2026-10-23 (EXTRA055)
+
+El menú administrativo incluye «Atención presencial», con listado exclusivo de
+perfiles cuyo origen persistido es assisted y acceso al detalle existente. Incluye
+por defecto estados no aptos/borrador y perfiles que vincularon cuenta, sin
+alterar elegibilidad ni origen. El mismo apartado muestra el formulario existente
+para crear perfiles arriba y el listado con sus filtros debajo; no exige salir
+a otra pantalla para comenzar el alta. Filtros/paginación conservan el ámbito;
+las rutas de alta y mantenimiento existentes continúan disponibles. No duplica perfiles ni cambia
+autorización, historial o reglas de claim. Los archivados abren el detalle de
+consulta vigente sin habilitar mantenimiento nuevo.
 
 ## CV vigente administrativo, solicitud2026-10-23 (EXTRA054)
 
@@ -456,8 +535,8 @@ seleccionando varias categorías, cargando un CV válido y postulándose a dos o
 1. **Given** una persona con correo que no tiene cuenta, **When** registra su nombre, DNI, correo y
    contraseña y verifica el correo, **Then** puede iniciar sesión y acceder a su panel aunque su
    perfil laboral todavía no esté activo.
-2. **Given** un candidato autenticado, **When** completa desde su panel la localidad, categorías e
-   intereses, habilidades o experiencia resumida, disponibilidad y CV y acepta el consentimiento
+2. **Given** un candidato autenticado, **When** completa desde su panel la localidad, categorías
+   laborales, habilidades o experiencia resumida, disponibilidad y CV y acepta el consentimiento
    aprobado, **Then** se activa su perfil, queda registrada la aceptación para el tratamiento
    laboral y futuras derivaciones, y solo modifica su propia información.
 3. **Given** un perfil que cumple los requisitos aprobados para postularse, **When** el candidato
@@ -740,14 +819,15 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 
 - **FR-010**: El autorregistro inicial de un candidato DEBE solicitar nombre completo, DNI, correo
   electrónico, contraseña y verificación del correo; una vez autenticado, el candidato DEBE completar
-  desde su panel la localidad, múltiples categorías e intereses, habilidades o experiencia resumida,
+  desde su panel la localidad, múltiples categorías laborales, habilidades o experiencia resumida,
   disponibilidad y CV antes de activar su perfil laboral. Los candidatos sin correo DEBEN poder ser
   atendidos mediante un perfil asistido creado por un administrador.
 - **FR-011**: Un administrador DEBE poder crear y mantener un perfil asistido para una persona
   atendida presencialmente, identificándose como responsable de sus acciones, aunque todavía no
   tenga un CV PDF.
-- **FR-012**: Un candidato DEBE poder seleccionar múltiples categorías ocupacionales e intereses
-  laborales de un catálogo controlado y registrar habilidades según las reglas aprobadas.
+- **FR-012**: Un candidato DEBE poder seleccionar múltiples categorías laborales de un catálogo
+  controlado y registrar habilidades según las reglas aprobadas. No existe un campo separado
+  de intereses laborales; sus selecciones históricas se conservan según EXTRA057.
 - **FR-013**: Un candidato o administrador autorizado DEBE poder incorporar y reemplazar un CV en el
   formato aprobado, sujeto a validación de tipo, tamaño e integridad antes de aceptarlo.
 - **FR-014**: El sistema DEBE detectar coincidencias potenciales por DNI y correo y bloquear el alta

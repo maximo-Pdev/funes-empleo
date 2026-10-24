@@ -8,8 +8,8 @@ const id = "0a000000-0000-4000-8000-000000000001";
 const cv = { id, original_name_safe: "cv-ficticio.pdf", byte_size: 2048 };
 const results = new Map<string, { data: unknown; error: unknown }>();
 function query(table: string) {
-  const builder = { select: vi.fn(), eq: vi.fn(), is: vi.fn(), in: vi.fn(), order: vi.fn(), maybeSingle: vi.fn(), limit: vi.fn() };
-  for (const method of [builder.select, builder.eq, builder.is, builder.in, builder.order]) method.mockReturnValue(builder);
+  const builder = { select: vi.fn(), eq: vi.fn(), is: vi.fn(), in: vi.fn(), or: vi.fn(), order: vi.fn(), maybeSingle: vi.fn(), limit: vi.fn() };
+  for (const method of [builder.select, builder.eq, builder.is, builder.in, builder.or, builder.order]) method.mockReturnValue(builder);
   builder.maybeSingle.mockImplementation(async () => results.get(table));
   builder.limit.mockImplementation(async () => results.get(table));
   return builder;

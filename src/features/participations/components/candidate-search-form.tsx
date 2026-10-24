@@ -8,10 +8,11 @@ import type { CandidateSearchFilters } from "@/validation/candidate-search";
 
 type SearchValues = Omit<CandidateSearchFilters, "page" | "pageSize">;
 
-export function CandidateSearchForm({ categories, initial, onSearch }: {
+export function CandidateSearchForm({ categories, initial, onSearch, destination = "/admin/candidates" }: {
   categories: readonly { id: string; name: string; reference?: string }[];
   initial?: Partial<SearchValues>;
   onSearch?: (filters: SearchValues) => void;
+  destination?: "/admin/candidates" | "/admin/atencion-presencial";
 }) {
   const router = useRouter();
   const [term, setTerm] = useState(initial?.term ?? "");
@@ -34,7 +35,7 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
       if (!reference) return;
       params.set("categoryId", reference);
     }
-    router.push(`/admin/candidates?${params.toString()}`);
+    router.push(`${destination}?${params.toString()}`);
   }
 
   return <Form onSubmit={submit} className="grid gap-4 rounded-lg border border-slate-300 bg-white p-5 sm:grid-cols-2" role="search">

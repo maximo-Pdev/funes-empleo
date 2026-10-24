@@ -56,6 +56,8 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("button", { name: "Nominar a esta oferta", exact: true })).toBeVisible();
   await expect(dialog.getByRole("heading", { name: "Habilidades y experiencia", exact: true })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: "Categorías laborales", exact: true })).toBeVisible();
+  await expect(dialog).not.toContainText("interés");
   expect((await new AxeBuilder({ page }).include("dialog[open]").analyze()).violations).toEqual([]);
   expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
   await page.keyboard.press("Escape");

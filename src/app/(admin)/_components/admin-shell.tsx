@@ -6,6 +6,7 @@ import styles from "./admin-workspace.module.css";
 
 const navigation = [
   { href: "/admin/candidates", label: "Candidatos", icon: Users },
+  { href: "/admin/atencion-presencial", label: "Atención presencial", icon: Users },
   { href: "/admin/empresas", label: "Empresas", icon: Building2 },
   { href: "/admin/openings", label: "Ofertas", icon: BriefcaseBusiness },
   { href: "/admin/participations", label: "Participaciones", icon: ShieldCheck },

@@ -29,6 +29,6 @@ export const openingCandidatePreviewSchema = z.object({
   candidateVersion: z.number().int().positive(), cvId: databaseUuidSchema,
   openingId: databaseUuidSchema, openingTitle: z.string(), openingVersion: z.number().int().positive(),
   matchedCategories: z.array(z.object({ code: z.string(), name: z.string() })).min(1),
-  categories: z.array(z.object({ code: z.string(), name: z.string(), kind: z.enum(["occupation", "interest"]) })),
+  categories: z.array(z.object({ code: z.string(), name: z.string(), kind: z.literal("occupation") })),
 });
 export type OpeningCandidatePreview = z.infer<typeof openingCandidatePreviewSchema>;

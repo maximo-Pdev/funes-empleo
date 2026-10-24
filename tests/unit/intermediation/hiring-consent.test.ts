@@ -25,6 +25,7 @@ it.each([false, true])("contratación tardía=%s usa un solo RPC atómico y actu
   });
   expect(revalidatePath).toHaveBeenCalledWith("/admin/openings/[openingId]", "page");
   expect(revalidatePath).toHaveBeenCalledWith("/candidato/perfil", "page");
+  expect(revalidatePath).toHaveBeenCalledWith("/admin/atencion-presencial", "page");
   expect(revalidatePath).toHaveBeenCalledWith("/company/openings/[openingId]/referrals", "page");
 });
 

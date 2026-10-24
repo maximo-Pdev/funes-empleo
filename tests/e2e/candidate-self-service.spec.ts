@@ -34,6 +34,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
   await page.goto("/registro/candidato");
+  await expect(page.locator("body")).not.toContainText("intereses");
   await page.getByLabel("Nombre y apellido").fill(name);
   await page.getByLabel("DNI").fill(dni);
   await page.getByLabel("Correo electrónico").fill(email);
@@ -68,6 +69,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en tareas administrativas");
   await page.getByLabel("Categoría ficticia A").check();
   await page.getByLabel("Categoría ficticia B").check();
+  await expect(page.getByRole("group", { name: "Intereses laborales" })).toHaveCount(0);
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
   await expect(page.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
   await page.reload();

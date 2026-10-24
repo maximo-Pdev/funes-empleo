@@ -13,7 +13,7 @@ const content = {
     steps: [
       ["Creá tu cuenta", "Completá tus datos de acceso en este formulario."],
       ["Verificá tu correo", "Seguí el enlace que recibirás por correo electrónico."],
-      ["Completá tu perfil laboral", "Después de ingresar, agregá tu experiencia, intereses y CV desde tu panel."],
+      ["Completá tu perfil laboral", "Después de ingresar, agregá tu experiencia, categorías laborales y CV desde tu panel."],
     ],
     privacy: "La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.",
   },

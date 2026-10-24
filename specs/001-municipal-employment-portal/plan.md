@@ -4,6 +4,84 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## Atención presencial integrada,2026-10-24 (EXTRA059)
+
+EXTRA061: lista única de eventos visibles de candidatos; filtro antes de limit,
+selección id/action/occurred_at, orden descendente por fecha/id y lotes5+1. Cursor
+validado por Zod, ámbito perfil/cuenta actual reconstruido por servidor y guard
+admin activo/RLS en lectura inicial y Server Action de continuación. Sin migración
+ni cambios a escritura/retención. Cliente acumula lotes, maneja error/reintento,
+anuncia carga y enfoca entradas nuevas; usa componentes municipales existentes.
+
+Componer los formularios asistidos existentes en AdminCandidateDetailPage con
+guard admin previo y carga condicional de getAssistedWorkspace. Leer archived_at
+en la consulta administrativa y comprobar origen/cuenta otra vez en workspace.
+Conservar una sola sección de notas/historial/CV. Guardar y crear navegan al
+detalle principal; la ruta antigua resuelve referencia y redirige al detalle
+opaco autorizado. Sin SQL, contratos de comandos o autorización nuevos.
+
+EXTRA060: reutilizar los bloques de resumen/CV como elementos únicos; para
+origen assisted, CV después de edición y resumen antes de participaciones en la
+otra columna. Otros orígenes conservan orden. Sin duplicar forms/ids o datos.
+
+## Categorías laborales únicas,2026-10-24 (EXTRA057)
+
+EXTRA058: quitar NominationForm y listNominationOpenings del detalle; eliminar
+sus definiciones sin consumidores. Conservar createAdminNominationAction y
+createAdminNomination usados por el popup. Enlace asistido solo anuncia CV/notas/
+historial. Sin backend/SQL/roles nuevos; pruebas de ausencia y continuidad de oferta.
+
+Migración forward-only: bloquear candidate_categories durante consolidación,
+guardar filas interest originales con ambos timestamps/version en ledger
+privado append-only/RLS y capturar definiciones previas de los tres comandos.
+PK(candidate_id,category_id) ya garantiza unicidad: reclasificar kind a occupation
+sin insertar/borrar relaciones, comprobar unión y timestamps, CHECK kind=occupation. No actualizar perfiles,
+estados, versiones, consentimientos, CV, ofertas o participaciones por el backfill.
+Reemplazar save_assisted_candidate sin selección interests (acepta únicamente
+array vacío legado), create_active_assisted_candidate exige categories y
+save_candidate_profile admite40 selecciones, conservando las demás validaciones.
+Límite40 deriva de20+20 anteriores, CSV sin columna/mapping nuevo. No cambiar RPC
+de matching, búsqueda, preview, derivaciones o métricas: sus conjuntos efectivos
+son idénticos y ahora un solo tipo. Proyecciones TS aceptan kind occupation, UI
+solo muestra nombres de categorías. Semilla nueva usa occupation.
+
+Recuperación antes de escrituras posteriores: originales y definiciones previas
+privados permiten restaurar clasificación sin pérdida. Tras escrituras nuevas,
+no aplicar reversión destructiva: revisión/forward fix. Documento operativo con
+precondiciones, conteos, diagnóstico y pruebas. SQL antes de app; sin despliegue
+o aplicación alojada automática. T174–T178 y checklist categories-only cubren
+constituciónI–VI, FR010/011/012/014/032/035/040/052/070.
+
+## Alta presencial activa,2026-10-24 (EXTRA056)
+
+Nuevo RPC create_active_assisted_candidate, SECURITY DEFINER con search_path
+vacío, actor activo admin y EXECUTE limitado a authenticated. Reutiliza
+save_assisted_candidate y assisted_candidate_command para consentir y activar
+solo un registro nuevo con versión leída/bloqueada, en la misma transacción.
+La resolución use_or_update_existing/reject conserva la semántica anterior y no
+reactiva ni acepta. Validación duplicada TS/DB de datos completos/confirmación/
+política. Alta UI carga política pública autenticada, muestra texto y checkbox
+sin defaultChecked. Actualizaciones y CSV usan el RPC previo, sin cambio de
+contrato. Nueva migración aditiva sin backfill; recuperación por rollback de app
+y DROP del RPC nuevo sin borrar datos. No cambia contratación ni autorización
+de proyección empresarial. Pruebas de rollback/auditoría/duplicados/roles/alta
+y contratación existente; gate acotado de análisis antes de implementar.
+
+## Apartado de atención presencial,2026-10-23
+
+Nueva página servidor /admin/atencion-presencial bajo guard admin y RLS. Wrapper
+searchAssistedCandidates reutiliza el motor existente con origin=assisted fijo en
+SQL antes de conteo/paginación; búsqueda general conserva defaults. Página usa
+vigency/eligibility=all por defecto y controles/validación/paginación existentes.
+CandidateSearchForm recibe destino opcional con default actual; referencias de
+categoryId reconocen la nueva URL. Detalle lee origin y mantiene menú/regreso;
+AssistedProfileForm se monta directamente arriba de filtros/listado y reutiliza
+las categorías activas ya consultadas; guarda mediante la acción y redirección
+existentes. Alta y mantenimiento conservan sus rutas, formularios y funciones. Sin schema,
+RPC, permisos o dependencia nueva. Scope/listado no modifica estados ni identidad.
+Pruebas de defaults, scope, roles, filtros, referencias y continuidad US4; análisis
+constitucional acotado documentado en EXTRA055, sin replanificación arquitectónica.
+
 ## CV vigente administrativo,2026-10-23
 
 getAdminCandidate agrega currentCv mediante consulta mínima a cv_documents con

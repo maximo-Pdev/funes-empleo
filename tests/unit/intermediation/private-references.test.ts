@@ -49,6 +49,12 @@ it("acepta UUID legados con mayúsculas sin exponerlos ni cambiar el código", a
   expect(await routeIdentifier("candidate", id.toUpperCase())).toBe(id);
   expect(await referenceUrl(`/admin/candidates/${id.toUpperCase()}`)).toBe(`/admin/candidates/${reference}`);
 });
+it("conserva categorías opacas en filtros del apartado presencial", async () => {
+  const category = "rub-0123456789abcdef01234567";
+  mocks.rpc.mockResolvedValue({ data: { [id]: category }, error: null });
+  expect(await referenceUrl(`/admin/atencion-presencial?categoryId=${id}&page=2`)).toBe(`/admin/atencion-presencial?categoryId=${category}&page=2`);
+  expect(mocks.rpc).toHaveBeenCalledWith("get_record_references", { p_kind: "category", p_ids: [id] });
+});
 it.each([null, { account: { status: "suspended" } }])("no consulta referencias sin sesión activa: %j", async session => {
   mocks.session.mockResolvedValue(session);
   await expect(recordReferences("candidate", [id])).rejects.toMatchObject({ code: "AUTH_REQUIRED" });

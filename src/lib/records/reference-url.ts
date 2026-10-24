@@ -23,7 +23,7 @@ export async function referenceUrl(href: string): Promise<string> {
     }
   }
   const queries: [string, ReferenceKind][] = [];
-  if (url.pathname === "/admin/candidates") queries.push(["categoryId", "category"]);
+  if (url.pathname === "/admin/candidates" || url.pathname === "/admin/atencion-presencial") queries.push(["categoryId", "category"]);
   if (url.pathname === "/admin/participations") queries.push(["openingId", "opening"], ["candidateId", "candidate"]);
   if (url.pathname === "/admin/metrics" || url.pathname === "/api/admin/exports/operations.csv") queries.push(["category", "category"]);
   if (url.pathname.startsWith("/company/openings/")) queries.push(["referral", "referral"]);

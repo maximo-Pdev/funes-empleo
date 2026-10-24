@@ -128,7 +128,7 @@ en EXTRA-022 y `docs/operations/public-offer-search.md`.
 
 Quince rubros v2 en la base existente, sin hardcodes paralelos ni reasignación de
 categorías anteriores. La multiselección ya existente los consulta automáticamente.
-El detalle de oferta agrega coincidencias OR por ocupación/interés activo, sin
+El detalle de oferta agrega coincidencias OR por categoría laboral activa, sin
 duplicar personas, con total/páginas posteriores a filtros y orden por nombre/ID.
 Solo administración activa; perfil apto, CV/consentimiento/vigencia y empresa
 activos. Permite evaluación de ofertas publicadas o pausadas vigentes; excluye

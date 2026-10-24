@@ -60,7 +60,8 @@ it("no ofrece archivo a administración y mantiene la exclusión del propio admi
  mocks.guard.mockResolvedValue(session("admin")); render(await Account());
  const navigation = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
  expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("aria-current")).toBe("page");
- expect(within(navigation).getAllByRole("link")).toHaveLength(7);
+ expect(within(navigation).getAllByRole("link")).toHaveLength(8);
+ expect(within(navigation).getByRole("link", { name: "Atención presencial" }).getAttribute("href")).toBe("/admin/atencion-presencial");
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
  expect(mocks.neq).toHaveBeenCalledWith("id", "cuenta-ficticia");
  expect(screen.queryByRole("button", { name: "Archivar mi cuenta" })).toBeNull();

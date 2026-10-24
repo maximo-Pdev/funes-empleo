@@ -154,7 +154,39 @@ on desktop and mobile. Landmarks preserve assistive-technology navigation
 ([W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11)); `Inicio` is not
 a universal replacement for a skip link, nor does plain Tab skip every header.
 
+## Administrative assisted-service section
+
+EXTRA057 removes the independent “Intereses laborales” field. Candidate,
+assisted/admin, employer referral and offer-preview screens use only “Categorías
+laborales” with category names, without occupation/interest type labels. Reuse
+the existing category controls, errors and focus; do not introduce a new selector.
+
+EXTRA056: the interactive creation form requires activation data and available
+status, displays the current consent policy and an unchecked explicit attestation
+of the person's in-person acceptance. Saving creates an active profile atomically;
+PDF remains optional for internal evaluation. Existing-profile maintenance and
+duplicate resolution never silently reactivate or renew consent. Hiring retains
+the existing global withdrawal, labelled “Consentimiento retirado”.
+
+The existing administrative sidebar includes “Atención presencial”, linking to
+`/admin/atencion-presencial`. Use the same menu treatment, responsive layout and
+aria-current behavior; do not introduce a second sidebar. The list is restricted
+on the server to origin=assisted, including profiles that later claimed an account.
+Default vigency/eligibility filters to all so unfinished profiles remain visible;
+preserve the existing eligibility calculation and show Spanish states. Cards open
+the existing candidate detail; archived entries retain its read-only restrictions.
+The section itself renders the existing AssistedProfileForm above the filters
+and list, so administrators can create a profile without first leaving this page.
+Keep its validation, duplicate resolution, save action and maintenance destination.
+The current creation route `/admin/candidates/assisted` and maintenance routes stay
+intact, with a return link to the new section. Filter submission and pagination
+stay inside the section and use opaque category/candidate references (EXTRA-055).
+
 ## Administrative candidate CV
+
+EXTRA058: the candidate detail has no nomination form/offer selector. Its existing
+Ofertas navigation remains; nomination stays in the offer's candidate preview.
+Assisted maintenance links to CV/notes/history without promising nomination there.
 
 The administrative candidate detail shows the current valid, non-archived CV's
 safe filename and size, with a native protected download link using its opaque
@@ -299,6 +331,28 @@ The floating “Ver ofertas disponibles” action links to `#ofertas-disponibles
 the currently empty white section below the hero. Native smooth anchor scrolling
 uses the existing 104px target clearance (not the navbar height) and becomes instant for
 reduced-motion preferences. Do not add placeholder job offers to this section.
+
+## Atención presencial integrada — EXTRA059
+
+EXTRA061: «Historial de cuenta y perfil» de candidatos muestra solo los eventos
+elegidos en spec, con evento y fecha/hora. Sin actor/código/estados/motivo en cada
+entrada. Cinco iniciales y Ver más incremental, con progreso accesible/error/
+reintento/foco en entradas nuevas. Reutilizar controles compartidos y conservar
+registro interno íntegro; vacío dice «Sin eventos para mostrar», sin afirmar
+que no existen registros auditados. Otros historiales sin cambios.
+La fecha usa America/Buenos_Aires y hora24h explícita para evitar ambigüedad AM/PM.
+
+En el detalle administrativo del candidato, reutilizar los formularios de edición,
+consentimiento/activación, carga de CV y vinculación solo si el origen es presencial,
+no tiene cuenta vinculada y no está archivado. No duplicar notas/historial/CV ni
+mostrar el enlace intermedio de mantenimiento. Después de vincular, conservar la
+consulta administrativa y retirar esos formularios. Mantener componentes, campos,
+validación, foco y reglas vigentes; diseño en dos columnas que apila en móvil.
+El perfil asistido vinculado ofrece los mismos controles administrativos que
+un perfil normal con igual estado de cuenta. El origen histórico se conserva.
+EXTRA060: en origen presencial, CV PDF va debajo de Mantener perfil y Perfil
+candidato antes de Participaciones recientes, en la columna derecha. En móvil
+se apilan las columnas respetando ese orden de lectura. No duplicar tarjetas.
 
 ## Verification
 

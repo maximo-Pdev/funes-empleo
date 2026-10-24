@@ -2,21 +2,37 @@ import "server-only";
 import { z } from "zod";
 import { AppError } from "@/lib/errors/public-error";
 import { workflowRpcError } from "@/lib/errors/workflow-rpc";
+import { getServerEnvironment } from "@/lib/env/server";
 import { databaseUuidSchema } from "@/validation/common";
 import { assistedProfileSchema, duplicateResolutionSchema } from "@/validation/duplicate-resolution";
 import { assistedAdminSession, duplicateMatchSchema } from "./duplicate-service";
 const saveSchema = z.object({ candidateId: databaseUuidSchema.nullable(), version: z.coerce.number().int().positive().nullable(),
-  data: assistedProfileSchema, resolution: duplicateResolutionSchema.nullable() });
+  data: assistedProfileSchema, resolution: duplicateResolutionSchema.nullable(),
+  consent: z.object({ confirmed: z.literal(true), policyVersion: z.string().min(1), policyHash: z.string().regex(/^[a-f0-9]{64}$/) }).optional() });
+const consentPolicySchema = z.object({ version: z.string(), policy_text: z.string(), policy_hash: z.string() });
+export type AssistedConsentPolicy = z.infer<typeof consentPolicySchema>;
+export async function getAssistedCreationPolicy() {
+  const session = await assistedAdminSession();
+  const result = await session.client.rpc("candidate_consent_policy");
+  const policy = consentPolicySchema.safeParse(result.data?.[0]);
+  if (result.error || !policy.success || policy.data.version !== getServerEnvironment().CONSENT_POLICY_VERSION) throw new AppError("INTERNAL_ERROR");
+  return policy.data;
+}
 export const assistedResultSchema = z.object({ status: z.enum(["saved", "duplicates", "rejected"]),
   candidateId: databaseUuidSchema.optional(), matches: z.array(duplicateMatchSchema).optional() });
 export async function saveAssistedCandidate(input: unknown) {
   const parsed = saveSchema.safeParse(input);
   if (!parsed.success) throw new AppError("VALIDATION_ERROR");
+  const { candidateId, version, data, resolution, consent } = parsed.data;
   const session = await assistedAdminSession();
-  const { candidateId, version, data, resolution } = parsed.data;
-  const result = await session.client.rpc("save_assisted_candidate", { p_candidate: candidateId, p_expected_version: version,
+  if (!candidateId && (!consent || consent.policyVersion !== getServerEnvironment().CONSENT_POLICY_VERSION
+    || !data.locality || !data.summary || !data.categories.length || data.availability !== "available")) throw new AppError("VALIDATION_ERROR");
+  const common = { p_expected_version: version,
     p_data: data, p_review: resolution?.reviewId ?? null, p_decision: resolution?.decision ?? null,
-    p_reason: resolution?.reason ?? null, p_fields: resolution?.confirmedFields ?? [] });
+    p_reason: resolution?.reason ?? null, p_fields: resolution?.confirmedFields ?? [] };
+  const result = candidateId ? await session.client.rpc("save_assisted_candidate", { p_candidate: candidateId, ...common })
+    : await session.client.rpc("create_active_assisted_candidate", { ...common, p_confirmed: consent!.confirmed,
+      p_policy_version: consent!.policyVersion, p_policy_hash: consent!.policyHash });
   if (result.error) throw workflowRpcError(result.error.message);
   return assistedResultSchema.parse(result.data);
 }
@@ -44,7 +60,6 @@ export async function getAssistedWorkspace(candidateId?: string) {
     detail: p.availability_detail ?? "", phone: contacts.data?.find((c) => c.kind === "phone")?.value ?? "",
     email: contacts.data?.find((c) => c.kind === "email")?.value ?? "",
     categories: selected.data?.filter((c) => c.kind === "occupation").map((c) => c.category_id) ?? [],
-    interests: selected.data?.filter((c) => c.kind === "interest").map((c) => c.category_id) ?? [],
   }, policy: policy.data[0], consent: consent.data?.[0]?.status,
   requests: z.array(z.object({ accountId: databaseUuidSchema, email: z.string(), verified: z.boolean() })).parse(requests.data) } };
 }

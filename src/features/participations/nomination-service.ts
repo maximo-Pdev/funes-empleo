@@ -20,18 +20,6 @@ async function adminClient() {
   return session.client;
 }
 
-export async function listNominationOpenings() {
-  const client = await adminClient();
-  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Buenos_Aires",
-    year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-  const result = await client.from("job_openings")
-    .select("id,title,version,status,closing_date")
-    .is("archived_at", null).in("status", ["published", "paused"])
-    .gte("closing_date", today).order("closing_date").limit(200);
-  if (result.error) throw new AppError("INTERNAL_ERROR");
-  return result.data ?? [];
-}
-
 export async function createAdminNomination(input: unknown) {
   const parsed = nominationInput.safeParse(input);
   if (!parsed.success) throw new AppError("VALIDATION_ERROR");

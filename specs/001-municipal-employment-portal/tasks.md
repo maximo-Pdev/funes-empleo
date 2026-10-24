@@ -612,6 +612,41 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T166 RED6/28 y GREEN66/66 focalizadas de consulta mínima/currentCv y detalle sin carga, ausencia/error, permisos, enlaces opacos y formulario asistido conservado; sin cambios de endpoint/schema.
 - [x] T167 Tipos/lint,856 pruebas/67 archivos, tooling57, build y diff-check PASS. Seis recorridos de referencias/roles sobre respaldo y dos asistidos completos sobre instancia nueva PASS, sin omisiones/reintentos; teclado/descarga a1440/390px y advisor local PASS. EXTRA054 documenta incompatibilidad Storage del respaldo y verificación nueva sin parches de índices. Sin cambios alojados/migración; revisión/PR pendientes, no aceptación global.
 
+## Apartado de atención presencial — EXTRA055,2026-10-23
+
+### Atención presencial integrada — EXTRA059,2026-10-24
+
+- [x] T184 EXTRA061: registrar decisiones de tarjeta, alinear artefactos/contrato y aplicar catálogo/filtro/paginación5 con guard y payload mínimo; conservar auditoría y otros historiales. Sin cambios de escritura/SQL/RLS; hora argentina24h explícita.
+- [x] T185 Roles/cursor/scope/empates/>50 y UI cinco/Ver más/foco/errores/vacío verificados;939/74 suite y24 focales postajuste24h,57 tooling, tipos/lint/build/diff-check PASS. Nueve E2E y repetición focal final PASS; huella de auditoría intacta, capturas1440/390px/axe revisadas. Diagnósticos y límites en EXTRA061; revisión/PR/CI pendientes.
+
+- [x] T183 EXTRA060: reordenar tarjetas de perfiles presenciales (CV después de edición; resumen antes de casos), conservar controles/otros orígenes.907/72 unitarias/componentes,46 focales,57 tooling, tipos/lint/build/diff-check y revisión1440/390px con orden/foco/axe PASS; sin migración/reset. Evidencia y límites en EXTRA060.
+
+- [x] T181 Alinear artefactos y registrar EXTRA059; integrar controles reutilizados solo en perfiles presenciales sin cuenta/no archivados y redirigir mantenimiento antiguo sin UUID. Al vincular conserva mismos controles normales por estado de cuenta; sin modificar reglas/RPC.
+- [x] T182 Verificar matriz de visibilidad, guard, alta/edición/CV/consentimiento/claim e historial; tipos/lint/unit/tooling/build y navegador ficticio. RED3/38 y RED de rerender; GREEN46 focales, suite903/72 previa a cuatro casos añadidos, tooling57, tipos/lint/build/diff-check y16 E2E PASS sin omisiones/reintentos;1440/390px/axe/foco sin incidencias. EXTRA059 documenta corrección de clave, redirección, entorno y límites.
+
+### Nominación desde oferta — EXTRA058,2026-10-24
+
+- [x] T179 Documentar alcance UI y quitar formulario/consulta huérfanos del perfil; conservar comando y popup de oferta, sin migración. Eliminados NominationForm/listNominationOpenings y anuncio del enlace asistido.
+- [x] T180 Probar ausencia en estados/orígenes, actualizar enlaces y E2E para nominar desde oferta; ejecutar tipos/lint/unit/tooling/build y navegador ficticio, registrar evidencia y límites. RED1/26, GREEN30/30,891 unit/componentes,57 tooling, tipos/lint/build/diff-check y8 E2E PASS sin omisiones/reintentos;1440/390px revisados. Límites en EXTRA058.
+
+### Categorías únicas — EXTRA057,2026-10-24
+
+- [x] T174 Revisar inventario y alinear spec/clarificación expresa/plan/modelo/contratos/checklist; analizar antes de implementar, preservar trabajo local previo y registrar EXTRA057. Diez criterios cubiertos, sin críticos/altos abiertos del delta.
+- [x] T175 RED/GREEN y quitar campo/etiquetas de formularios y fichas; categorías únicas en validación/proyecciones con límite combinado40 y rechazo de entradas legadas no vacías. RED3/3, GREEN21/21 focalizadas.
+- [x] T176 Migración nueva con ledger privado append-only, unión/deduplicación comprobada y comandos compatibles; documentar recuperación y preservar otros agregados/estados. PK por par permite reclasificar sin insertar/borrar; prueba de paridad14/14 PASS.
+- [x] T177 Ajustar semillas y pruebas actuales; verificar SQL de backfill/paridad/rollback/roles/propio/asistido/CSV/matching/derivación y navegador de todos los roles, sin perder consentimiento/contratación056.1163 SQL/21 archivos y16 E2E PASS sin omisiones/reintentos; fixture completo y Storage verificados.
+- [x] T178 Tipos/lint/unit/tooling/build, análisis de convergencia del delta, evidencia y límites; sin aplicación alojada ni aceptación global automática.887 unit/componentes/72 archivos,57 tooling, tipos/lint/build/diff-check PASS;1440/390px y advisor sin hallazgos. Límites en EXTRA057.
+
+### Alta activa — EXTRA056,2026-10-24
+
+- [x] T171 Alinear spec/plan/modelo/contrato/UI y analizar consentimiento, activación, duplicados, importación y contratación; documentar EXTRA056 antes de código. Seis criterios cubiertos, cero críticos/altos abiertos en el delta.
+- [x] T172 RED/GREEN de nuevo RPC atómico de alta activa y servidor/formulario con aceptación expresa; conservar mantenimiento/CSV y no reactivar existentes. RED8/10, GREEN44/44; contrato DB contrastado con generación local.
+- [x] T173 SQL de roles, incompletos, política, consentimiento/auditoría, duplicados y rollback; regresión de contratación normal/tardía; tipos/lint/unit/tooling/build y navegador aislado. Tipos/lint/build,884 unit/componentes,57 tooling,144 SQL,8 E2E y revisión1440/390px PASS; advisor sin hallazgos. Recuperación/límites en EXTRA056 y guía; migración alojada pendiente.
+
+- [x] T168 Revisar modelo origin/US4 y alinear spec/plan/UI; registrar EXTRA055 y análisis de alcance sin cambios de permisos, datos o negocio.
+- [x] T169 RED/GREEN de listado assisted en servidor, defaults generales intactos, menú activo, ausencia/error, filtros/paginación/referencias y acceso a detalle/alta existentes; implementar reutilizando motor y controles. RED7/8, GREEN64/64 focalizadas. Ajuste2026-10-24: formulario de alta existente en la misma pantalla arriba del listado; RED2/26 y GREEN35/35, alta integrada probada en navegador.
+- [x] T170 Verificar tipos/lint/unit/tooling/build y navegador ficticio con roles, teclado, listado vacío, borrador/claim/paginación y continuidad asistida; registrar evidencia y límites sin tocar alojado o base habitual. Tipos/lint/build,873 unit/componentes,57 tooling,6 E2E,1440/390px y advisor local PASS; límites en EXTRA055.
+
 ## Español transversal — EXTRA051, 2026-10-22
 
 - [x] T151 Registrar evidencia y alinear alcance/spec/plan: presentación española en todos los roles, valores técnicos/contratos/contenido libre intactos; análisis sin nueva arquitectura o regla municipal.

@@ -1629,6 +1629,20 @@ export type Database = {
         }
         Returns: Json
       }
+      create_active_assisted_candidate: {
+        Args: {
+          p_data: Json
+          p_confirmed: boolean
+          p_policy_version: string
+          p_policy_hash: string
+          p_expected_version?: number | null
+          p_review?: string | null
+          p_decision?: string | null
+          p_reason?: string | null
+          p_fields?: string[]
+        }
+        Returns: Json
+      }
       screen_assisted_duplicates: {
         Args: { p_dni: string; p_email: string; p_exclude?: string | null }
         Returns: Json
