@@ -1060,4 +1060,7 @@ ficticias revisadas; advisor local PASS. Detalle de diagnóstico: cambios-extra.
 Sin reset o modificaciones de base habitual/alojada, lectura de .env.local o
 cambios de .next del usuario; build en copia ignorada con Node24.22.0. No se
 repitió aceptación E2E/SQL completa ni se certificó NVDA/zoom real. No hay migración
-nueva, commit o PR; revisión humana y gates históricos pendientes.
+nueva. Por solicitud posterior de Mateo se publicó commit aa139cc sin firma ni
+coautorías y se abrió [PR70](https://github.com/maximo-Pdev/funes-empleo/pull/70)
+hacia main08cd740. next-env.d.ts y evidencias temporales excluidos. CI/revisión
+humana, merge, despliegue y gates históricos pendientes.

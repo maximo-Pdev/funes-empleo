@@ -2583,7 +2583,12 @@ CI/revisión humana, merge, despliegue y recorridos alojados siguen pendientes.
   certifican NVDA, zoom real ni revisión municipal. No se tocó la base habitual
   ni alojada, .env.local o .next del usuario. Copia ignorada, Node24.22.0 y
   configuración local ficticia; diagnóstico del respaldo explicado debajo.
-  Sin migración nueva, commit, push o PR; next-env.d.ts ajeno preservado.
+  Sin migración nueva; next-env.d.ts ajeno preservado.
+- **Publicación posterior autorizada:** Mateo solicita el PR; commit aa139cc
+  sin firma/coautorías y [PR70](https://github.com/maximo-Pdev/funes-empleo/pull/70)
+  abierto desde feat/admin-candidate-current-cv hacia main08cd740. next-env.d.ts,
+  copias, logs y credenciales locales excluidos. CI/revisión, merge y despliegue
+  pendientes; no acredita aceptación municipal/global.
 
 ### EXTRA-054 — Diagnóstico del entorno de verificación
 
