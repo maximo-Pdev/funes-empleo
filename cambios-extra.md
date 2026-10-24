@@ -3286,6 +3286,11 @@ de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
   se conserva diagnóstico y se prueba caché limpia, sin cambiar código productivo
   ni configuración para ocultarlo. Publicar en el mismo PR con commit sin firma,
   preservando next-env.d.ts; nueva ejecución completa de CI pendiente de comprobar.
+- **Cierre local del arreglo CI:** build desde caché limpia PASS con configuración
+  explícitamente ficticia, sin iniciar servicios ni cambiar el proyecto. El fallo
+  PostCSS no se reprodujo en limpio. Commit `f852233` publicado sin firma en PR72;
+  diez repeticiones y982/77 coverage/tipos/lint/build/diff-check PASS. La nueva CI
+  completa se sigue en los checks del PR; no se atribuye su éxito antes del resultado.
 
 ## Formato para próximas entradas
 
