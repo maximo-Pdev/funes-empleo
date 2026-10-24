@@ -18,6 +18,7 @@ const companyReferralSchema = z.object({
   openingTitle: z.string().nullable(),
   referredAt: z.iso.datetime({ offset: true }),
   participationVersion: z.number().int().positive().optional(),
+  hiredCandidate: z.object({ displayName: z.string(), outcome: z.literal("hired") }).optional(),
   candidate: z.object({
     displayName: z.string(), locality: z.string().nullable(),
     skillsExperienceSummary: z.string().nullable(), availability: z.string().nullable(),

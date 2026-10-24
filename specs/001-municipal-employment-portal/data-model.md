@@ -1,5 +1,11 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA062: no agrega tablas/campos. Publicada editada pasa a pending_review dentro
+del guardado/envío; historial audita ambas acciones/versiones, manteniendo slug,
+casos/resultados/permisos. Cancelación empresarial no final reutiliza el cierre
+existente, conserva finales y queda Cancelada. Proyección de propia contratación
+hiredCandidate/displayName/outcome mínima, sin restituir acceso completo o consentimiento.
+
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 

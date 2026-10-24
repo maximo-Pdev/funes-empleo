@@ -616,6 +616,23 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 
 ### Atención presencial integrada — EXTRA059,2026-10-24
 
+### Ofertas empresariales y moderación — EXTRA062
+
+- [x] T195 Ajustar presupuesto de preparación fría SC-008A a costo medido del fixture completo (300s/reset,420s/test), manteniendo90s de proceso,5000ms/acción, cuatro actores y auditorías. Diagnóstico seguro; frío local con SQL completo PASS en2.7m, tipos/lint/diff-check y57 tooling PASS. Nueva CI en seguimiento por PR72, sin omisiones/reintentos.
+
+- [x] T194 Adaptar regresiones E2E a composición integrada, nombre mínimo tras revocación y ruta canónica; evitar nombre duplicado en contrataciones legadas con permiso completo.983/77 coverage, tipos/lint/build/diff-check y tres focos E2E PASS sin omisiones/reintentos; conservar pruebas de privacidad. Nueva CI completa en seguimiento por PR72, evidencia EXTRA062.
+
+- [x] T193 Corregir sincronización asíncrona de prueba de historial detectada por CI PR72: esperar anuncio final sin omitir datos/foco/cursor/botón.982/77 coverage, diez repeticiones, tipos/lint/build limpio/diff-check PASS; commit f852233 publicado en misma rama, sin cambios productivos. Seguimiento de nueva CI en checks del PR; evidencia EXTRA062.
+
+- [x] T192 Ajuste R5: abrir oferta existente en consulta, edición por botón con cancelación/foco, retorno al detalle actualizado tras guardar y preservación ante error. Mantener estados/alta/reglas.982/77 pruebas,23 focales finales, tipos/lint/build/diff-check, cuatro E2E y revisión1440/390px/axe PASS. Sin SQL nuevo; evidencia EXTRA062, revisión humana/CI pendientes.
+
+- [x] T186 Alinear seis requisitos R1–R6/clarificaciones, plan/modelo/contratos/checklist y analizar delta constitucional antes de código; preservar rama/base y cambio local ajeno.
+- [x] T187 Migración de tres RPC: mínimo nombre en hired propio, edición publicada/envío y cancelación empresarial atómicos; permisos, firmas, slug, otros resultados y auditoría intactos, recuperación documentada.
+- [x] T188 Excluir draft de listados/filtro admin; integrar derivaciones/historia empresarial con ruta compatible, historia5/Ver más en ambos roles y formularios claros de edición/cancelación; actualizar información de consentimiento.
+- [x] T189 Probar SQL de roles/propio/ajeno/inactivo, normal/tardío/sin confirmar, CV/PII denegados, datos incompletos/conflictos/rollback y finales/casos/permisos/auditoría conservados; guard y validación de acciones.
+- [x] T190 Verificar navegador ficticio para empresa/admin/candidato, publicar/editar/reaprobar/cancelar, borradores/filtros/URL e historia5; tipos/lint/unit/tooling/build, a11y/desktop/móvil y evidencia.980/77 unit/componentes,283 focales finales,57 tooling, SQL1201 globales y97 focales,12 E2E y1 final1440/390/axe PASS; tipos/lint/build/diff-check PASS.
+- [x] T191 Documentar recuperación, migración pendiente y límites; contraste de R1–R6 con implementación y evidencias, sin atribuir CI/revisión/aceptación o aplicación alojada automática. Resultado de convergencia en EXTRA062/implementation-status.
+
 - [x] T184 EXTRA061: registrar decisiones de tarjeta, alinear artefactos/contrato y aplicar catálogo/filtro/paginación5 con guard y payload mínimo; conservar auditoría y otros historiales. Sin cambios de escritura/SQL/RLS; hora argentina24h explícita.
 - [x] T185 Roles/cursor/scope/empates/>50 y UI cinco/Ver más/foco/errores/vacío verificados;939/74 suite y24 focales postajuste24h,57 tooling, tipos/lint/build/diff-check PASS. Nueve E2E y repetición focal final PASS; huella de auditoría intacta, capturas1440/390px/axe revisadas. Diagnósticos y límites en EXTRA061; revisión/PR/CI pendientes.
 

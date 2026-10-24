@@ -12,6 +12,9 @@
 .forms button { min-height: 48px; border-radius: var(--radius-lg); padding: 12px 16px; background: var(--color-primary); color: white; font-size: .875rem; font-weight: 600; }
 .forms button:hover:not(:disabled) { background: var(--color-primary-700); }
 .forms button:disabled { cursor: not-allowed; }
+.forms.workspace form[aria-label="Cancelación de oferta"] { grid-template-columns: minmax(0, 1fr); border-color: #fca5a5; }
+.forms form[aria-label="Cancelación de oferta"] button { background: #991b1b; }
+.forms form[aria-label="Cancelación de oferta"] button:hover:not(:disabled) { background: #7f1d1d; }
 .forms p, .forms dd, .forms li { line-height: 1.75; overflow-wrap: anywhere; }
 .forms h2, .forms h3, .forms h4 { color: var(--color-primary-900); overflow-wrap: anywhere; }
 .forms [role="alert"]:not(:empty) { border: 1px solid var(--color-accent-violet); border-radius: var(--radius-lg); background: var(--color-surface); padding: 12px; color: var(--color-accent-violet); }

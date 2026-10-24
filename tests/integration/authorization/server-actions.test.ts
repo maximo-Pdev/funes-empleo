@@ -69,6 +69,7 @@ add("candidates/matching-actions", "admin", "openingCandidatePreviewAction", { c
 add("openings/admin-actions", "admin", "moderateOpeningAction", { openingId: id, version: 1, decision: "approved" });
 add("openings/company-actions", "company", "saveCompanyOpeningAction", { title: "", tasks: "", requirements: "", location: "", modality: "", schedule: "", contractType: "", closingDate: "", salary: "", benefits: "" }, true);
 add("openings/company-actions", "company", "submitCompanyOpeningAction", {}, true);
+add("openings/company-actions", "company", "cancelCompanyOpeningAction", { id, version:1, cancelReason:"Cancelación ficticia", cancelConfirmed:"on" }, true);
 add("companies/company-actions", "company", "saveCompanyProfileAction", { legalName: "Empresa ficticia", cuit: "30999999991", responsibleName: "Contacto ficticio", email: "fixture@example.invalid", phone: "", activity: "Prueba", locality: "Funes" }, true);
 add("companies/admin-actions", "admin", "adminCompanyAction", {}, true);
 add("accounts/actions", "admin", "accountStatusAction", {}, true);

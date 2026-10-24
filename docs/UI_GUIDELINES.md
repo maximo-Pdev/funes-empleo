@@ -334,6 +334,17 @@ reduced-motion preferences. Do not add placeholder job offers to this section.
 
 ## Atención presencial integrada — EXTRA059
 
+EXTRA062: oferta empresarial muestra en su misma página derivaciones y moderación;
+conservar sanitización por rol y enlaces canónicos previos. Moderación empresa/admin
+presenta5 recientes con Ver más por5/foco/anuncio. Editar publicada explica que vuelve
+a revisión; controles compartidos/asteriscos/errores y valores conservados. Eliminar
+requiere motivo/confirmación y deja visible Cancelada; no borrar historial. Contratado
+propio puede mostrar solo nombre cuando el permiso completo ya no está disponible.
+Las ofertas empresariales existentes abren en consulta: «Editar oferta» revela
+el formulario solo si su estado permite edición; «Cancelar edición» vuelve al
+detalle. Guardado correcto vuelve al detalle actualizado, error conserva valores.
+Alta nueva directa; conservar foco, validación y reenvío a revisión de publicadas.
+
 EXTRA061: «Historial de cuenta y perfil» de candidatos muestra solo los eventos
 elegidos en spec, con evento y fecha/hora. Sin actor/código/estados/motivo en cada
 entrada. Cinco iniciales y Ver más incremental, con progreso accesible/error/

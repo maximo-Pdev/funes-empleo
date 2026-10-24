@@ -17,7 +17,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
   const params = await searchParams;
   const status = params.status ? openingStatusSchema.safeParse(params.status) : null;
   const page = Number(params.page ?? 1);
-  const invalid = (status && !status.success) || !Number.isInteger(page) || page < 1 || page > 1000;
+  const invalid = (status && (!status.success || status.data === "draft")) || !Number.isInteger(page) || page < 1 || page > 1000;
   const result = !invalid ? await listAdminOpenings({ status: status?.success ? status.data : undefined, page, pageSize: 10 }) : null;
   const urlForPage = (target: number) => `/admin/openings?${new URLSearchParams({
     ...(status?.success ? { status: status.data } : {}), page: String(target),
@@ -28,7 +28,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
     <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       <div className="space-y-1"><Field className="block font-semibold" label={<>Estado de la oferta</>}><select id="opening-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">
           <option value="">Todos</option>
-          {OPENING_STATUSES.map((value) => <option key={value} value={value}>{displayLabel(openingStatusLabels, value)}</option>)}
+          {OPENING_STATUSES.filter(value => value !== "draft").map((value) => <option key={value} value={value}>{displayLabel(openingStatusLabels, value)}</option>)}
         </select></Field></div>
       <Button type="submit">Filtrar ofertas</Button>
     </Form>

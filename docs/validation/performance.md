@@ -57,6 +57,14 @@ admins locales; el test posterior comprueba versiones y cuatro eventos con los
 actores/request IDs correctos. No consultar admin3/admin4 alojados ni declarar este
 requisito no soportado por el pequeño demo.
 
+El presupuesto auxiliar del reset frío es300s (migraciones, suite SQL completa y
+500 PDF), con420s para el test completo. Se ajustó tras observar189s de preparación
+en CI, superior al antiguo límite180s. Esa preparación no integra el cronómetro
+SC-008A: medición sigue acotada a90s de proceso, cinco segundos por operación,
+cuatro actores, barrera común y comprobación posterior de cuatro auditorías.
+Un error de preparación detiene la medición; solo se informa código de error y
+estado de salida, sin publicar stdout de procesos con configuración sensible.
+
 Concurrencia: preparar cuatro sesiones individuales y cuatro registros distintos,
 sin ejecutar antes la acción. Liberarlas con una barrera común; registrar duración
 de cada acción hasta éxito visible y comprobar después las cuatro entidades, versiones

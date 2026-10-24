@@ -19,5 +19,6 @@ export function persistedReference(kind: ReferenceKind, id: string) {
 export function canonicalFixturePath(path: string) {
   const kind: ReferenceKind = path.includes("/candidates/") ? "candidate" : path.includes("/empresas/") ? "company" :
     path.includes("/participations/") ? "participation" : path.includes("/imports/") ? "import" : "opening";
-  return path.replace(/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/gi, id => persistedReference(kind, id));
+  const canonical = path.replace(/^\/company\/openings\/([^/?]+)\/referrals/, "/empresa/ofertas/$1");
+  return canonical.replace(/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/gi, id => persistedReference(kind, id));
 }

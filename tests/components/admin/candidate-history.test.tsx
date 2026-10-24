@@ -22,11 +22,12 @@ it("carga sin navegar ni perder eventos, anuncia resultado y enfoca el primer nu
   render(<CandidateHistory candidateId={id} initialEvents={initial} initialCursor={cursor} />);
   fireEvent.click(screen.getByRole("button",{ name:"Ver más" }));
   await screen.findByText("Consentimiento retirado");
+  // La fila puede aparecer antes de que useTransition termine de anunciar la carga.
+  await waitFor(()=>expect(screen.getByRole("status").textContent).toContain("1 evento anterior cargado"));
   expect(mocks.load).toHaveBeenCalledWith({ candidateId:id,cursor });
   expect(screen.getAllByRole("listitem")).toHaveLength(6);
   expect(screen.getByText("Consentimiento retirado").closest("li")).toBe(document.activeElement);
   expect(screen.queryByRole("button",{ name:"Ver más" })).toBeNull();
-  expect(screen.getByRole("status").textContent).toContain("1 evento anterior cargado");
 });
 it("mantiene datos y cursor tras error, permite reintento y no duplica entradas",async()=>{
   mocks.load.mockResolvedValueOnce({ success:false,message:"No se pudo cargar." })

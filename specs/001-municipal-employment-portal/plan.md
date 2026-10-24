@@ -6,6 +6,30 @@
 
 ## Atención presencial integrada,2026-10-24 (EXTRA059)
 
+### Incremento EXTRA062 —2026-10-24
+
+Migración conserva firmas/grants de tres RPC. company_referral agrega únicamente
+hiredCandidate/displayName/outcome para propia contratación confirmada, validando
+empresa/cuenta activas y pertenencia; permisos completos/CV intactos. save_company_opening
+admite published y llama transition_opening(submit) tras guardar dentro de la misma
+transacción. transition_opening permite submit/cancel a propia empresa activa, sin
+moderar. Edición/envío auditan sus versiones; cancelación reutiliza cierre/revocación
+y preservación de finales. Recuperación reaplica definiciones anteriores sin borrar datos.
+Listados admin excluyen draft antes de count/range; rol y métricas intactos.
+Historia recibida limita render a5 recientes y expansión por5/foco/anuncio, sin
+motivos internos para empresa. Componente servidor de derivaciones se integra en
+detalle empresarial; ruta vieja redirige canónicamente sin UUID, guard/proyección
+validan la oferta/referral. Formularios completos en publicada y parcial en borrador;
+mensajes correctos, cancelación confirmada y valores conservados ante error.
+La composición consulta el workspace: perfil empresarial incomplete conserva
+detalle/borrador y aviso, sin invocar RPC de derivaciones que exige empresa active.
+No captura autorizaciones fallidas para mostrar datos ni amplía permisos.
+Presentación R5: detalle de oferta existente de solo lectura; editor se abre por
+botón compartido y estado local ligado a identificador/versión editada. Cancelar vuelve al
+detalle, nueva versión guardada cierra editor; error conserva controles/valores.
+Foco al encabezado al abrir y al botón al cerrar; alta nueva directa. Sin rutas,
+comandos, contratos de servidor ni migraciones adicionales.
+
 EXTRA061: lista única de eventos visibles de candidatos; filtro antes de limit,
 selección id/action/occurred_at, orden descendente por fecha/id y lotes5+1. Cursor
 validado por Zod, ámbito perfil/cuenta actual reconstruido por servidor y guard

@@ -527,7 +527,10 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(currentStatus).toContainText("No seleccionada");
     await expect(admin.getByText("Sin respuesta empresarial: cierre automático anterior", { exact: false })).toBeVisible();
     await hiredCompany.reload();
-    await expect(hiredCompany.getByText("Persona ficticia 021")).toHaveCount(0);
+    await expect(hiredCompany.getByText("Persona ficticia 021 · Contratado", { exact: true })).toBeVisible();
+    await expect(hiredCompany.getByRole("heading", { name: "Perfil laboral derivado" })).toHaveCount(0);
+    await expect(hiredCompany.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
+    await expect(hiredCompany.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
     await admin.goto(`/admin/participations/${overdueParticipation}`);
     await expect(currentStatus).toContainText("Sin respuesta empresarial");
     await company.getByLabel("Resultado informado").selectOption("hired");
@@ -540,7 +543,11 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(currentStatus).toContainText("Persona contratada");
     await expect(admin.getByText("Sin respuesta empresarial: cierre automático anterior", { exact: false })).toBeVisible();
     await company.reload();
-    await expect(company.getByText("Persona ficticia 210")).toHaveCount(0);
+    await expect(company.getByText("Persona ficticia 210 · Contratado", { exact: true })).toBeVisible();
+    await expect(company.getByRole("heading", { name: "Perfil laboral derivado" })).toHaveCount(0);
+    await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
+    await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
+    expect([403, 404]).toContain((await company.request.get(`/api/cv/${fixtureId("cv", 210)}`)).status());
   } finally {
     await Promise.all([companyContext.close(), hiredCompanyContext.close(), adminContext.close(), offerCompanyContext.close()]);
   }
