@@ -108,9 +108,12 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await expect(admin.getByText("Estado:")).toContainText("Correcciones solicitadas");
     await page.goto(`/empresa/ofertas/${openingId}`);
     await expect(page.getByText("Aclarar el horario de atención.")).toBeVisible();
+    await page.getByRole("button", { name: "Editar oferta", exact: true }).click();
     await page.getByLabel("Horario").fill("Lunes a viernes, jornada completa");
     await page.getByRole("button", { name: "Guardar borrador" }).click();
     await expect(page.getByText("Borrador guardado.", { exact: false })).toBeVisible();
+    await expect(page.getByLabel("Horario", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Información de la oferta" })).toContainText("Lunes a viernes, jornada completa");
     await page.reload();
     await page.getByRole("button", { name: "Enviar a revisión municipal" }).click();
     await expect(page.getByText("Estado:")).toContainText("Pendiente de revisión");

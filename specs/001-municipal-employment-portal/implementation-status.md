@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-23 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-24 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -1250,3 +1250,66 @@ actualizado (`84a2ce6`). [PR #71](https://github.com/maximo-Pdev/funes-empleo/pu
 abierto sin borrador,80 archivos, con evidencias y dos migraciones requeridas antes
 del despliegue. `next-env.d.ts` ajeno queda local y fuera del commit. CI y revisión
 humana siguen pendientes; PR abierto no acredita merge, despliegue o aceptación.
+
+## Gestión empresarial de ofertas y moderación — EXTRA062,2026-10-24
+
+PR71 confirmado mergeado en4da73c7; main actualizado, rama anterior eliminada
+local/remota y nueva feat/company-offer-management. Cambio next-env.d.ts ajeno
+preservado (huella en EXTRA062). Sin commit ni PR de este incremento.
+
+Empresa contratante activa conserva nombre/resultado de su contratación confirmada,
+normal o tardía; no revive consentimiento global, perfil/contactos/CV ni accesos
+de otras empresas. Admin excluye borradores de sus listados/filtros, incluido
+detalle empresarial; rol/RLS/métricas/restauración siguen vigentes. Vista empresarial
+reúne moderación y derivados, ruta previa compatible sin UUID; historia cinco
+recientes y Ver más por cinco para ambos roles, con privacidad correspondiente.
+
+Publicado editable completo vuelve atómicamente a pending_review, con dos versiones
+y eventos de guardado/envío; sale del público y conserva slug/casos/resultados.
+Empresa cancela propia oferta no final con motivo/confirmación: sigue visible
+Cancelada, cierra solo abiertos y revoca sus accesos, conserva finales e historial.
+Empresa restaurada incompleta conserva detalle/borrador con aviso, sin acceso
+anticipado a derivados. Acción destructiva roja; invalidación de informes/entrevistas
+adaptada a la página integrada. Sin dependencias/tablas/campos nuevos.
+
+Migración20261024184354 reemplaza tres RPC manteniendo firmas/grants. Aplicada y
+probada solo en funes-admin-cv-check local aislado54341/54342; base habitual y
+proyecto alojado sin cambios. Recuperación sin borrar datos ni revivir estados
+documentada en docs/operations/company-offer-management.md.
+
+980 pruebas/77 archivos y283 focales finales,57 tooling, tipos/lint/build final y
+diff-check PASS. SQL1201 aserciones/22 archivos y97 focales tras ampliar inactividad
+PASS. Fixture ficticio inicial500 candidatos/50 empresas/100 ofertas/1000 casos/
+500PDF. Doce E2E PASS y un recorrido final adicional PASS (informe pending_admin,
+errores sin borrar valores, edición/reaprobación/slug, cancelación/finales,
+1440/390px/axe/capturas revisadas). Diagnósticos corregidos en EXTRA062.
+
+Análisis previo y convergencia final acotados a R1–R6/T186–191, sin brechas nuevas
+ni hooks. T186–191 verificados técnicamente; tasks sin cambios durante convergencia.
+No acredita cierre global del MVP. Migración alojada, entrega/PR/CI/revisión humana,
+merge/despliegue, aceptación/NVDA/zoom real y gates históricos siguen pendientes.
+
+### Ajuste R5: editor por botón — T192,2026-10-24
+
+Mateo pide consulta inicial en ofertas existentes. CompanyOpeningDetails muestra
+datos y vacíos; «Editar oferta» revela formulario solo en estados editables,
+«Cancelar edición» vuelve sin guardar, versión guardada vuelve al detalle nuevo.
+Estado local ligado a id/versión, foco y errores/valores preservados; alta nueva
+directa. Sin cambios de servidor, contratos de datos ni migración adicional.
+
+982/77 pruebas y23 focales finales PASS, tipos/lint/build/diff-check PASS; cuatro
+E2E empresariales (alta, edición normal/publicada, revisión, cancelación, permisos,
+restauración y cierre) PASS.1440/390px/axe y capturas revisadas. Supabase local
+aislado reanudado sin reset; evidencia/diagnósticos en EXTRA062 y logs editor.
+T192 técnicamente verificado, revisión humana/CI/entrega y migración previa alojada
+pendientes. Cambios acumulados y next-env.d.ts ajeno preservados.
+
+### Publicación de EXTRA062 —2026-10-24
+
+Por solicitud de Mateo, commit `e2fd399` (48 archivos) publicado sin firma,
+signoff ni coautor en feat/company-offer-management, desde main actualizado4da73c7.
+[PR #72](https://github.com/maximo-Pdev/funes-empleo/pull/72) abierto sin borrador
+y adjunto a la conversación; incluye T186–192 y editor por botón. next-env.d.ts
+ajeno queda fuera del commit. Migración20261024184354 continúa pendiente en el
+proyecto alojado antes del despliegue. CI/revisión humana/merge/despliegue y
+aceptación siguen pendientes; PR abierto no acredita esas etapas.

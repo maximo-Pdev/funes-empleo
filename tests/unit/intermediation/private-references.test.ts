@@ -82,6 +82,13 @@ it("no cambia slugs públicos, URL externas, hashes ni tokens de Auth", async ()
   }
   expect(mocks.rpc).not.toHaveBeenCalled();
 });
+it("canonicaliza la oferta y el selector de derivación en la página empresarial integrada", async () => {
+  mocks.rpc.mockImplementation(async (_name, args) => ({ data: {
+    [id]: args.p_kind === "opening" ? "ofe-0123456789abcdef01234567" : "der-0123456789abcdef01234567",
+  }, error: null }));
+  expect(await referenceUrl(`/empresa/ofertas/${id}?referral=${id}#derivaciones`))
+    .toBe("/empresa/ofertas/ofe-0123456789abcdef01234567?referral=der-0123456789abcdef01234567#derivaciones");
+});
 it("rechaza un detalle ajeno con 404, sin canonicalizar ni revelar su código", async () => {
   mocks.rpc.mockResolvedValue({ data: {}, error: null });
   await expect(pageRecordIdentifier("candidate", id, `/admin/candidates/${id}`)).rejects.toThrow("NOT_FOUND_PAGE");

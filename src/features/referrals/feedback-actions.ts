@@ -43,6 +43,7 @@ export async function submitFeedbackAction(_previous: ReferralActionState, form:
       reportedOutcome: form.get("reportedOutcome"), message: form.get("message") ?? "",
     });
     revalidatePath("/company/openings/[openingId]/referrals", "page");
+    revalidatePath("/empresa/ofertas/[openingId]", "page");
     return { status: "success", message: "El resultado informado quedó pendiente de revisión municipal." };
   } catch (error) { return failure(error); }
 }
@@ -57,6 +58,7 @@ export async function submitInterviewAction(_previous: ReferralActionState, form
       heldAt: funesLocalToIso(form.get("heldAt")), message: form.get("message") ?? "",
     });
     revalidatePath("/company/openings/[openingId]/referrals", "page");
+    revalidatePath("/empresa/ofertas/[openingId]", "page");
     return { status: "success", message: "La entrevista quedó registrada." };
   } catch (error) { return failure(error); }
 }

@@ -30,3 +30,8 @@ export const openingSubmitSchema = z.object({
   id: databaseUuidSchema,
   version: z.coerce.number().int().positive(),
 });
+
+export const openingCancelSchema = z.object({
+  id: databaseUuidSchema, version: z.coerce.number().int().positive(),
+  reason: z.string().trim().min(1).max(1000), confirmed: z.literal(true),
+}).strict();

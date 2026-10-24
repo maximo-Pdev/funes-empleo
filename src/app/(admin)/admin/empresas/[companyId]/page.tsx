@@ -16,7 +16,7 @@ export default async function AdminCompanyPage({ params }: { params: Promise<{ c
   if (profile.error || !profile.data) notFound();
   const [account, offers] = await Promise.all([
     client.from("accounts").select("id,status,version").eq("id", profile.data.account_id).single(),
-    client.from("job_openings").select("id,title,status,archived_at").eq("company_id", companyId).order("created_at", { ascending: false }).limit(50),
+    client.from("job_openings").select("id,title,status,archived_at").eq("company_id", companyId).neq("status", "draft").order("created_at", { ascending: false }).limit(50),
   ]);
   if (account.error || !account.data || offers.error) notFound();
   const command = account.data.status === "suspended" ? "reactivate" : account.data.status === "archived" ? "restore" : "suspend";

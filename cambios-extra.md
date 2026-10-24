@@ -3119,6 +3119,179 @@ antes del despliegue; no se aplicaron a Supabase alojado. CI/revisión humana/me
 despliegue siguen pendientes. Esta publicación actualiza los estados históricos
 de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
 
+## EXTRA-062 — Ofertas empresariales, derivaciones y moderación
+
+- **Fecha/estado:**2026-10-24, registrado antes de implementar; implementado y
+  verificado técnicamente en local. Mateo solicita cinco
+  ajustes y confirma: derivaciones en la misma página empresarial; editar publicada
+  vuelve a revisión; eliminar conserva la oferta visible Cancelada. PR71 mergeado,
+  rama anterior borrada local/remota; feat/company-offer-management desde4da73c7,
+  next-env.d.ts ajeno preservado.
+- **Origen/evidencia:** FR-021/022/023/036/050/055, A09 y EXTRA035. Empresa solo edita
+  draft/changes_requested y no cancela; admin lista borradores; derivaciones están
+  separadas y el historial muestra todo. Al contratar desaparece el nombre.
+- **Alcance autorizado:** R1 solo nombre del contratado confirmado normal/tardío
+  en derivación propia, no basta feedback. Empresa/cuenta activas, oferta/caso/
+  derivación no archivados; no padrón ni restitución de consentimiento/perfil/CV/
+  contactos. R2 excluir draft antes de conteo/paginación en listados y filtro admin,
+  incluido detalle empresarial; no cambiar permisos completos, métricas/restauración.
+  R3 reunir derivaciones y moderación en oferta empresarial, conservando URL previa.
+  R4 historial de ambos roles: cinco recientes y Ver más por5, privacidad por rol.
+  R5 editar publicada exige datos completos y envía atómicamente a pending_review;
+  no es pública hasta aprobarse, mantiene slug/casos/resultados/permisos existentes.
+  R6 empresa cancela su oferta no final con motivo/confirmación: cierra casos abiertos
+  y revoca sus accesos, conserva resultados/historial y se mantiene visible Cancelada.
+- **Adiciones técnicas:** migración nueva reemplaza tres funciones con firmas/grants
+  existentes: transition_opening, save_company_opening, company_referral. Guardado
+  publicado llama al envío dentro de la misma transacción y devuelve estado real;
+  dos escrituras/versiones y eventos, con rollback íntegro si falla. Nueva proyección
+  JSON hiredCandidate{displayName,outcome:hired} mínima para propia contratación,
+  independiente del permiso completo. No modificar can_company_read_referral/CV.
+  Explicar excepción de nombre en consentimiento, sin alterar policy_text/hash/
+  versión ni atribuir aprobación municipal/legal para datos reales. UI de historial
+  limita presentación de datos ya entregados; controles compartidos, foco/errores.
+- **Archivos/contratos:** SQL/tests/guía de recuperación; servicios/acciones/formulario
+  oferta, composición empresarial/derivaciones, listados admin/referencias, información
+  de consentimiento, catálogo/validación y tests; spec/plan/modelo/contratos/checklist/
+  tasks/estado/UI. Sin roles, dependencias, servicios o infraestructura nuevos.
+- **Riesgos/recuperación:** nombres ajenos/sin contratación, empresa inactiva, cambios
+  de estado concurrentes, casos finales, datos incompletos, mensajes privados, URLs
+  y versiones; probar guard/RLS/propiedad/rollback/preservación. Recuperar funciones
+  previas sin eliminar datos/decisiones ni regenerar slugs. Solo entorno ficticio
+  aislado; no aplicar alojado ni resetear base habitual.
+- **Gates/verificación prevista:** actualizar especificación/clarificaciones, plan,
+  contratos/checklist/tasks; análisis Spec Kit antes de código. SQL contratación
+  normal/tardía, revocación/cancelación/casos finales/auditoría/atomicidad; formularios,
+  filtros, historia5/Ver más, privacidad de roles; tipos/lint/unit/tooling/build y
+  navegador ficticio1440/390px/axe. CI/PR/revisión humana pendientes; OQ municipales
+  de datos reales/retención/producción continúan abiertas.
+
+- **Adición EXTRA062 derivada antes de corregir integración:** E2E empresarial
+  detectó que restauración deja perfil incomplete: puede consultar su borrador,
+  pero el RPC de derivaciones exige empresa active. La composición conjunta no
+  debe convertir esa restricción en404 de toda la oferta. Consultar workspace y
+  mostrar aviso sin invocar derivaciones hasta completar perfil; conservar scope,
+  permisos y SQL actuales. Archivos: página empresarial/artefactos y regresión UI/E2E.
+  Riesgo: ocultar errores de autorización; se evita condicionando estado conocido,
+  sin capturar genéricamente errores ni ampliar permisos. Verificar restauración,
+  empresa activa y ajena. Autorizado por alcance necesario de R3 y AGENTS.
+- **Adición visual necesaria previa:** CSS empresarial existente aplica verde a
+  todos los botones y dos columnas al primer formulario, incluidos nuevos controles
+  destructivos. Marcar el formulario de cancelación y adaptar solo ese selector para
+  conservar rojo de peligro y una columna. Reutiliza tonos ya usados en el módulo;
+  no modifica base global ni otros formularios. Archivos: formulario/CSS empresarial,
+  prueba navegador de color/viewport/axe. Origen R6 y reglas UI de acción destructiva.
+- **Adición de contrato de navegación previa:** las acciones de informe/entrevista
+  revalidan solo la ruta antigua. Añadir el detalle empresarial actual a ambas
+  invalidaciones conservando la anterior, para refrescar el contenido reunido por R3.
+  Sin cambiar validación, permisos ni comandos; archivos feedback-actions/tests.
+- **Resultado real:** migración20261024184354 de tres funciones, sin nuevas tablas
+  ni alteración de datos históricos; prueba043 y ampliación024. Componentes nuevos:
+  ModerationHistory, CompanyOpeningCancel, CompanyOpeningReferrals y política de
+  estados empresariales; servicios/acciones/validación/formulario, composición y
+  revalidaciones/ruta compatible, filtros admin, información de consentimiento y
+  CSS empresarial acotado. Guía `docs/operations/company-offer-management.md`.
+- **Verificación:** Node24.22.0,980 pruebas en77 archivos,283 focales finales tras
+  revalidaciones,57 tooling; tipos/lint/build de producción/diff-check PASS. Supabase
+  aislado funes-admin-cv-check54341/54342:1201 aserciones SQL/22 archivos PASS;
+  ampliación de inactividad y repetición024/043:97 aserciones PASS. Fixture ficticio
+  inicial500 candidatos/50 empresas/100 ofertas/1000 participaciones/500 PDF.
+  Doce E2E (gestión, registro/restauración, contratación normal/tardía y referencias
+  privadas/públicas/tres roles) PASS; un recorrido final adicional tras CSS/cache
+  PASS con informe real pending_admin, validación sin perder valores, color rojo,
+  edición/reaprobación/slug/cancelación/finales y capturas1440/390px/axe revisadas.
+  Logs/capturas en test-results/extra062-* y snapshot aislado, ignorados por Git.
+- **Diagnósticos corregidos:** mock de query thenable, tipo opcional de fixture,
+  campos obligatorios de suspensión en test, esperas de navegación/canonicalización,
+  estado esperado pending_admin y selector CSS Modules; no se debilitaron permisos
+  ni verificaciones para resolverlos. Regresión de empresa incomplete corregida
+  sin ampliar acceso. next-env.d.ts ajeno conserva SHA-256
+  B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+- **Límites/entrega:** migración probada solo en local aislado; proyecto alojado,
+  aplicación habitual y secretos no modificados. Sin commit/PR para este incremento;
+  CI/revisión humana/merge/despliegue y aceptación/NVDA/zoom real pendientes. No se
+  cierran OQ municipales ni gates históricos; checklist de revisión mantiene las
+  casillas humanas pendientes. Rama feat/company-offer-management, sin prefijo
+  codex; solicitud futura de commit respetará ausencia de firma/signoff/coautor.
+- **Convergencia acotada:** speckit-converge sobre R1–R6/T186–191: seis requisitos,
+  siete decisiones del plan y seis principios constitucionales contrastados con
+  código/contratos/pruebas; cero brechas nuevas missing/partial/contradicts/unrequested,
+  cero incidencias críticas/altas. No se agregaron tareas ni cabecera vacía;
+  tasks.md permaneció byte a byte igual durante la evaluación (SHA-256
+  8999218A2CAFB22EC3DB3BF16BFBDB6F26A99836C0CE3ACE40F12F8BE56490B4).
+  Sin hooks de extensiones. La evaluación se limita a este incremento y no cierra
+  tareas históricas, validación municipal, CI o revisión humana.
+
+- **Ajuste de presentación R5 solicitado,2026-10-24 (antes de código):** Mateo pide
+  que entrar a una oferta existente muestre su información y un botón «Editar
+  oferta», en lugar del formulario abierto. Mostrar formulario tras esa acción,
+  permitir cancelar edición y volver al detalle después de guardar una versión
+  nueva. Oferta nueva conserva alta directa; botón solo en estados editables.
+  Estado local de presentación ligado a versión, foco accesible y detalle completo
+  con vacíos/fechas/códigos traducidos. Sin nuevos comandos, rutas, permisos ni SQL.
+  Archivos: componente empresarial/detalle, tests/componentes/E2E, spec/plan/UI/tasks
+  y guía. Riesgos: perder valores ante error, enviar sin guardar, edición fuera de
+  estado o foco perdido. Verificar abrir/cancelar/guardar/error, estados y creación;
+  tipos/lint/unit/build y navegador ficticio. Autorización explícita de Mateo.
+- **Resultado del ajuste R5/T192:** implementado/verificado técnicamente. Nuevo
+  CompanyOpeningDetails muestra campos, categorías, fechas y vacíos en consulta;
+  CompanyOpeningForm abre editor por botón, permite cancelarlo, conserva estado
+  ante validación fallida y cierra al recibir otra versión/registro. Foco al
+  encabezado/botón, control bloqueado durante guardado/envío. Alta nueva directa,
+  envío de borrador separado tras guardar. Formularios, servicios, comandos y
+  permisos existentes preservados; sin nueva migración ni aplicación alojada.
+  Artefactos/UI/guía/tests actualizados; consulta oficial de Button Base/registro
+  base-nova y revisión React, sin nuevas dependencias/fundaciones.
+  Verificación982 pruebas/77 archivos PASS,23 focales finales tras ligar editor a
+  id/versión, tipos/lint/build final/diff-check PASS. Cuatro E2E empresariales PASS,
+  incluyendo edición/cancelación/foco/validación sin borrar/guardado/reflejo en
+  consulta/revisión/alta/restauración/cierre;1440/390px/axe y capturas revisadas.
+  Supabase ficticio aislado reanudado sin reset, sin repetir SQL porque este ajuste
+  no cambia contratos/BD; warning de stream abortado durante navegación registrado
+  sin fallos finales. Logs extra062-editor-* ignorados. next-env.d.ts ajeno con
+  misma huella; rama y cambios acumulados conservados. Contraste acotado contra R5,
+  plan/T192 sin brechas nuevas; PR/CI/revisión humana y migración alojada previa
+  continúan pendientes.
+
+- **Entrega solicitada,2026-10-24:** Mateo pide publicar EXTRA062/T186–192 como
+  PR. Base main remota comprobada sin commits nuevos; publicar la rama enfocada
+  con commit sin firma/signoff/coautor, excluyendo next-env.d.ts ajeno. Incluir en
+  el PR el alcance completo, evidencia local y migración alojada pendiente antes
+  del despliegue. Solicitud de publicación no acredita CI/revisión/merge/aceptación.
+- **Publicación realizada,2026-10-24:** commit `e2fd399` sin firma/signoff/coautor,
+  48 archivos de EXTRA062/T186–192, publicado en feat/company-offer-management.
+  [PR #72](https://github.com/maximo-Pdev/funes-empleo/pull/72) abierto hacia main,
+  sin borrador, desde4da73c7; adjuntado a esta conversación. next-env.d.ts ajeno
+  permanece solo local. Descripción contiene alcance, verificación y migración
+  20261024184354 pendiente en alojado antes del despliegue. CI/revisión humana,
+  merge/despliegue y aceptación siguen pendientes; no se aplicó SQL alojado.
+
+- **Corrección CI del PR72 previa,2026-10-24:** application del commit de4e23f
+  falla en candidate-history.test.tsx:29: tras aparecer la fila nueva todavía
+  muestra «Cargando eventos anteriores…». React useTransition puede confirmar
+  contenido y finalizar pending en commits distintos. La prueba asume sincronía
+  entre ambos; no evidencia pérdida de datos o falla del comando. Esperar el
+  anuncio final con waitFor antes de verificar el resultado, conservando las
+  aserciones de cantidad, foco, cursor y botón. Origen T185/EXTRA061 y gate CI de
+  EXTRA062; archivos test/log/tasks/estado. Sin cambios funcionales, permisos,
+  datos o migración. Riesgo: ocultar falla real; se evita exigir el mismo texto
+  final, sin sleeps, saltos ni retries. Verificar repeticiones focales, coverage
+  completa, tipos/lint/build y nueva CI. Autorizado por pedido de corregir PR72.
+- **Validación y entrega del arreglo CI:**982 pruebas/77 archivos con coverage
+  PASS (100% del alcance configurado, src/lib/env/schema.ts), diez ejecuciones
+  focales consecutivas con coverage PASS; tipos/lint/diff-check PASS. Un primer
+  intento de coverage local se superpuso con las repeticiones y disputó su carpeta
+  temporal; corregido al repetir la suite completa por separado. Build local
+  encontró salida prematura del proceso PostCSS de Turbopack en el snapshot;
+  se conserva diagnóstico y se prueba caché limpia, sin cambiar código productivo
+  ni configuración para ocultarlo. Publicar en el mismo PR con commit sin firma,
+  preservando next-env.d.ts; nueva ejecución completa de CI pendiente de comprobar.
+- **Cierre local del arreglo CI:** build desde caché limpia PASS con configuración
+  explícitamente ficticia, sin iniciar servicios ni cambiar el proyecto. El fallo
+  PostCSS no se reprodujo en limpio. Commit `f852233` publicado sin firma en PR72;
+  diez repeticiones y982/77 coverage/tipos/lint/build/diff-check PASS. La nueva CI
+  completa se sigue en los checks del PR; no se atribuye su éxito antes del resultado.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

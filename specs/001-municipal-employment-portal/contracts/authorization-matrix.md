@@ -1,5 +1,14 @@
 # Contrato de autorización y visibilidad
 
+EXTRA062: empresa/cuenta activas pueden leer hiredCandidate{displayName,outcome:hired}
+en su propia derivación/caso/oferta no archivados con contratación confirmada. Sin
+permiso completo no se devuelven perfil/contactos/CV/entrevistas; nombres de casos
+ajenos o solo informados no se entregan. No se modifica RLS de datos candidatos.
+Empresa activa edita propia publicada y la envía a revisión atómicamente; cancela
+propia no final con motivo, conservando auditoría/casos finales. Sin facultad de
+moderar; actor/propiedad/versión se revalidan transaccionalmente. Admin no lista
+draft, pero conserva su rol/autorizaciones operativas y métricas actuales.
+
 ## Actores
 
 EXTRA061: lectura incremental de historial candidato exige admin activo en cada

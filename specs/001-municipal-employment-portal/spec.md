@@ -102,6 +102,29 @@ No implica política municipal aprobada ni cambia versión/hash/aceptación.
 
 ## Atención presencial integrada, solicitud2026-10-24 (EXTRA059)
 
+### Ajustes empresariales confirmados2026-10-24 — EXTRA062
+
+R1: propia empresa activa conserva solo el nombre de su contratado confirmado
+normal/tardío en derivación/oferta/caso no archivados, aun revocado el permiso.
+Es una excepción explícita a la ocultación total: no restituye consentimiento,
+perfil, CV o contactos, no muestra contratados ajenos y no basta feedback empresarial.
+R2: excluir draft antes de contar/paginar en bandeja/filtro de ofertas admin y
+listado del detalle empresarial administrativo; no altera rol, métricas/restauración.
+R3/R4: oferta empresarial incluye derivaciones y moderación en la misma página;
+empresa restaurada con perfil incompleto conserva su oferta, con aviso y sin
+consultar derivaciones hasta completar el perfil; no se restablecen accesos.
+enlaces previos funcionan. Historia empresa/admin: cinco recientes y Ver más por5,
+conservando privacidad de mensajes públicos y motivos internos según rol.
+R5: editar propia publicada exige campos completos y la devuelve atómicamente a
+pending_review, sin publicación hasta aprobación. Mantiene slug, casos, resultados
+y permisos existentes; sin nuevas derivaciones en revisión. Draft/correcciones
+conservan guardado parcial y envío separado.
+La oferta existente abre en consulta; «Editar oferta» abre el formulario solo en
+estados editables. Cancelar edición vuelve al detalle; guardar correctamente vuelve
+al detalle actualizado. El alta de oferta nueva abre directamente el formulario.
+R6: cancelar propia oferta no final exige motivo/confirmación, cierra casos abiertos
+y revoca sus accesos, conserva resultados finales/historial y sigue visible Cancelada.
+
 EXTRA061, decisiones explícitas2026-10-24: «Historial de cuenta y perfil» del detalle
 administrativo de candidatos muestra solo activación, aceptación/retiro del
 consentimiento, disponibilidad, suspensión/reactivación de cuenta, vinculación y
