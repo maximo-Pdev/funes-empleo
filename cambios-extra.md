@@ -3258,6 +3258,13 @@ de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
   con commit sin firma/signoff/coautor, excluyendo next-env.d.ts ajeno. Incluir en
   el PR el alcance completo, evidencia local y migración alojada pendiente antes
   del despliegue. Solicitud de publicación no acredita CI/revisión/merge/aceptación.
+- **Publicación realizada,2026-10-24:** commit `e2fd399` sin firma/signoff/coautor,
+  48 archivos de EXTRA062/T186–192, publicado en feat/company-offer-management.
+  [PR #72](https://github.com/maximo-Pdev/funes-empleo/pull/72) abierto hacia main,
+  sin borrador, desde4da73c7; adjuntado a esta conversación. next-env.d.ts ajeno
+  permanece solo local. Descripción contiene alcance, verificación y migración
+  20261024184354 pendiente en alojado antes del despliegue. CI/revisión humana,
+  merge/despliegue y aceptación siguen pendientes; no se aplicó SQL alojado.
 
 ## Formato para próximas entradas
 

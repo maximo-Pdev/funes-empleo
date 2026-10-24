@@ -1303,3 +1303,13 @@ restauración y cierre) PASS.1440/390px/axe y capturas revisadas. Supabase local
 aislado reanudado sin reset; evidencia/diagnósticos en EXTRA062 y logs editor.
 T192 técnicamente verificado, revisión humana/CI/entrega y migración previa alojada
 pendientes. Cambios acumulados y next-env.d.ts ajeno preservados.
+
+### Publicación de EXTRA062 —2026-10-24
+
+Por solicitud de Mateo, commit `e2fd399` (48 archivos) publicado sin firma,
+signoff ni coautor en feat/company-offer-management, desde main actualizado4da73c7.
+[PR #72](https://github.com/maximo-Pdev/funes-empleo/pull/72) abierto sin borrador
+y adjunto a la conversación; incluye T186–192 y editor por botón. next-env.d.ts
+ajeno queda fuera del commit. Migración20261024184354 continúa pendiente en el
+proyecto alojado antes del despliegue. CI/revisión humana/merge/despliegue y
+aceptación siguen pendientes; PR abierto no acredita esas etapas.
