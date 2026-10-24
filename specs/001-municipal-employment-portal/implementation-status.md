@@ -1013,3 +1013,25 @@ next-env.d.ts ajeno excluido y preservado. Pendientes: CI, revisión humana, mer
 despliegue y recorridos alojados con sesiones. No se cierran gates históricos ni
 se acredita aceptación municipal/global. No se reintroducen cambios del PR54;
 base habitual sigue sin migrar/resetear.
+
+## 2026-10-23 — A16 retirar enlace global, EXTRA053
+
+PR68 mergeado86b7de8 confirmado; main actualizado y rama anterior eliminada
+local/remotamente. Rama fix/remove-skip-link. Cambio local previo de next-env.d.ts
+preservado. Se retira únicamente el anchor global «Ir al contenido principal»;
+main#contenido, landmarks, foco visible y enlace Inicio de portada permanecen.
+A16/spec/plan/UI/pauta manual y pruebas actualizados; sin backend o migración.
+Análisis acotado conserva constituciónIV/FR-070/SC-009 mediante operabilidad y
+landmarks, sin declarar Inicio equivalente universal del salto.
+
+RED2/2 y GREEN14/14 focalizadas; tipos/lint,846 pruebas/66 archivos, tooling57,
+build de producción y diff-check PASS. Seis recorridos públicos de lectura con
+axe y primer foco, más seis combinaciones de Inicio a1440/390px (ingreso y ambos
+registros) PASS, sin omisiones/reintentos. Node24.22.0; copia aislada y servidor
+3001 con configuración pública ficticia, sin .env.local. No se tocó servidor3000,
+su .next, base local o alojada; no se enviaron formularios ni hubo login/reset.
+No se repitió E2E privado ni se certificó NVDA/zoom real. Por solicitud posterior
+de Mateo se publicó commit9a899d3 sin firma/coautorías y se abrió
+[PR69](https://github.com/maximo-Pdev/funes-empleo/pull/69) hacia main86b7de8.
+next-env.d.ts ajeno queda fuera del commit. CI/revisión humana, merge, despliegue
+y gates históricos pendientes.

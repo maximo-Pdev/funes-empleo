@@ -600,6 +600,12 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T160 Adaptar revalidación, clientes de navegación y scripts quality; no alterar UUID de comandos ni umbrales. Scripts smoke/performance verifican el código CV y el lote imp; tooling57 PASS.
 - [x] T161 SQL1125/19, unit/componentes844/65, tooling57, tipos/lint/build/diff-check, advisor local security warn/error sin incidencias, navegador108/108 sin reintentos/omisiones y dos carreras SQL PASS. Incluye SC-008A de cuatro admins y lectura manual de códigos/actores; guía docs/validation/private-record-references.md y matriz/estado sincronizados. Migración alojada autorizada/aplicada posteriormente, negocio intacto; advisor alojado52 WARN previos/54 posteriores, cero ERROR, dos avisos0029 de los RPC autorizados documentados. Base habitual intacta; PR/revisión/despliegue/recorridos alojados pendientes.
 
+## Retirar enlace global — EXTRA053,2026-10-23
+
+- [x] T162 Alinear A16/spec/plan/UI y registrar evidencia/análisis acotado en EXTRA053; conservar constituciónIV, landmarks y controles existentes sin cambios de negocio.
+- [x] T163 RED2/2 del layout sin enlace global y GREEN14/14 focalizadas; actualizar setup/chequeo visual para primer foco real y retorno Inicio, conservando destino/foco/axe.
+- [x] T164 Tipos/lint,846 pruebas/66 archivos, tooling57, build y diff-check PASS. Seis recorridos públicos/axe y seis combinaciones de Inicio por teclado escritorio/móvil PASS; copia/servidor aislados3001, sin reset/login/mutaciones alojadas ni tocar servidor3000. EXTRA053 registra límites; PR/revisión pendientes.
+
 ## Español transversal — EXTRA051, 2026-10-22
 
 - [x] T151 Registrar evidencia y alinear alcance/spec/plan: presentación española en todos los roles, valores técnicos/contratos/contenido libre intactos; análisis sin nueva arquitectura o regla municipal.

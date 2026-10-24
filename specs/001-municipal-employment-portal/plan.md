@@ -4,6 +4,16 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## A16 — enlace global,2026-10-23
+
+Retirar el anchor sr-only de RootLayout sin reemplazo ni nuevas dependencias.
+Conservar regiones semánticas, main#contenido, tabIndex y enlaces Inicio existentes.
+Pruebas del layout raíz, primer foco de controles reales, ausencia del enlace,
+teclado escritorio/móvil y axe; actualizar el chequeo visual que exigía ese salto.
+ConstituciónIV/FR-070/SC-009 conservados mediante operabilidad y landmarks; no se
+declara equivalencia universal de Inicio con un skip link ni aceptación NVDA.
+Sin cambios de arquitectura, datos, autenticación, negocio o contratos.
+
 ## A04 — referencias privadas,2026-10-23
 
 Addendum contracts/private-record-references.md: tabla privada de referencias y

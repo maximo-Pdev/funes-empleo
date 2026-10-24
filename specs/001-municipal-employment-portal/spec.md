@@ -99,6 +99,14 @@ Se retira el cartel amarillo de política demo de la vista inicial; texto y
 versión siguen consultables en un desplegable accesible cerrado inicialmente.
 No implica política municipal aprobada ni cambia versión/hash/aceptación.
 
+## A16 — Retirar enlace global de salto, solicitud2026-10-23 (EXTRA053)
+
+Eliminar «Ir al contenido principal» del layout raíz en todas las rutas, sin
+sustituirlo por otro control oculto. Conservar los landmarks main/nav, títulos,
+destino main#contenido y foco visible/operabilidad de los controles existentes.
+El enlace Inicio de portada conserva su retorno y foco en main; no se considera
+equivalente universal de un skip link. FR-070 y SC-009 permanecen vigentes.
+
 ## A04 — UUID fuera de la interfaz, solicitud2026-10-23 (EXTRA052)
 
 Textos, enlaces y URLs generados por el portal para cualquier rol no muestran UUID
