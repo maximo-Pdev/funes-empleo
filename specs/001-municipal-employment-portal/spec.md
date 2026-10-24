@@ -99,6 +99,14 @@ Se retira el cartel amarillo de política demo de la vista inicial; texto y
 versión siguen consultables en un desplegable accesible cerrado inicialmente.
 No implica política municipal aprobada ni cambia versión/hash/aceptación.
 
+## CV vigente administrativo, solicitud2026-10-23 (EXTRA054)
+
+La ficha administrativa del candidato muestra el CV válido no archivado y una
+descarga protegida por referencia opaca, en lugar del formulario de carga. Sin
+CV vigente presenta un mensaje claro y no ofrece descarga. El mantenimiento
+presencial conserva la carga/reemplazo autorizada de FR-013 y sus validaciones;
+no se cambia el autoservicio ni permisos, versiones históricas o retención.
+
 ## A16 — Retirar enlace global de salto, solicitud2026-10-23 (EXTRA053)
 
 Eliminar «Ir al contenido principal» del layout raíz en todas las rutas, sin

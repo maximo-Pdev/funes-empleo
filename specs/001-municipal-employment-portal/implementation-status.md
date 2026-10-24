@@ -1035,3 +1035,29 @@ de Mateo se publicó commit9a899d3 sin firma/coautorías y se abrió
 [PR69](https://github.com/maximo-Pdev/funes-empleo/pull/69) hacia main86b7de8.
 next-env.d.ts ajeno queda fuera del commit. CI/revisión humana, merge, despliegue
 y gates históricos pendientes.
+
+## 2026-10-23 — CV vigente administrativo, EXTRA054
+
+PR69 mergeado08cd740 confirmado; rama anterior eliminada local/remotamente y
+feat/admin-candidate-current-cv desde main actualizado. next-env.d.ts local
+preexistente preservado. El detalle administrativo reemplaza la carga por
+nombre/tamaño del CV válido no archivado y descarga protegida por referencia;
+sin CV muestra un mensaje sin enlace. La carga/reemplazo existente se conserva
+en mantenimiento presencial para no romper FR-013. Consulta mínima administrativa
+con RLS y error diferenciado de ausencia. No se cambia endpoint/SQL/permisos,
+historial, autoservicio candidato, infraestructura o dependencias de producto.
+
+RED6/28, GREEN66/66 focalizadas, tipos/lint,856 pruebas/67 archivos, tooling57,
+build de producción y diff-check PASS. Seis recorridos de referencias/roles/IDOR
+PASS en respaldo aislado; la carga de ese respaldo falló con Storage500/42P10
+por faltar un índice esperado por su imagen. Instancia nueva desechable
+funes-admin-cv-check54341/54342 generó esquema compatible y ambos recorridos
+asistidos completos pasaron2/2, sin omisiones/reintentos ni parches de índices.
+Incluyen ausencia, carga/reemplazo, descarga vigente, derivación, consentimiento,
+claim e historial. Descarga con Enter a1440/390px sin overflow/errores y capturas
+ficticias revisadas; advisor local PASS. Detalle de diagnóstico: cambios-extra.md.
+
+Sin reset o modificaciones de base habitual/alojada, lectura de .env.local o
+cambios de .next del usuario; build en copia ignorada con Node24.22.0. No se
+repitió aceptación E2E/SQL completa ni se certificó NVDA/zoom real. No hay migración
+nueva, commit o PR; revisión humana y gates históricos pendientes.

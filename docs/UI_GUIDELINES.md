@@ -154,6 +154,18 @@ on desktop and mobile. Landmarks preserve assistive-technology navigation
 ([W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11)); `Inicio` is not
 a universal replacement for a skip link, nor does plain Tab skip every header.
 
+## Administrative candidate CV
+
+The administrative candidate detail shows the current valid, non-archived CV's
+safe filename and size, with a native protected download link using its opaque
+reference. Do not embed Storage paths, signed URLs or historical files as current.
+Without a current CV show “El candidato no tiene un CV vigente.” and no download.
+Keep the existing archived-profile restriction. The existing upload/replacement
+form lives in the assisted-maintenance screen, reached through “Mantener perfil
+y atención presencial”; its validation, version checks and permission rules stay
+unchanged. Candidate self-service and company referral access are unaffected.
+See EXTRA-054. No embedded PDF viewer or new file exposure is introduced.
+
 ## Candidate account workspace
 
 Candidate `/account` uses a white main surface and a 264px left sidebar below the

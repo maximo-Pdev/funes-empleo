@@ -4,6 +4,17 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## CV vigente administrativo,2026-10-23
+
+getAdminCandidate agrega currentCv mediante consulta mínima a cv_documents con
+sesión administrativa, RLS, candidate_id exacto, status=valid y archived_at=null.
+Un error no equivale a ausencia. Server Component presenta metadatos y RecordAnchor
+hacia /api/cv/[referencia], conservando attachment/no-store y reautorización actual.
+Mover el CvUploadForm existente al mantenimiento presencial, sin alterar su POST
+ni capacidad FR-013. Sin visor embebido, nueva ruta, schema, grants o dependencias.
+Pruebas de consulta/UI, ausencia/error, regresión de permisos y flujo asistido;
+constituciónII/III/IV y contratos de negocio intactos (EXTRA054).
+
 ## A16 — enlace global,2026-10-23
 
 Retirar el anchor sr-only de RootLayout sin reemplazo ni nuevas dependencias.

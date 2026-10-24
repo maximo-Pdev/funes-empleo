@@ -1,7 +1,6 @@
 import { recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
-import { CvUploadForm } from "@/features/candidates/components/cv-upload-form";
-import { RecordLink as Link } from "@/components/ui/record-link";
+import { RecordLink as Link, RecordAnchor } from "@/components/ui/record-link";
 import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel, auditActionLabel, auditStateLabel, reasonLabel } from "@/domain/presentation/labels";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState } from "@/components/ui";
@@ -25,7 +24,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   const { candidateId: reference } = await params;
   const candidateId = await pageRecordIdentifier("candidate", reference, `/admin/candidates/${reference}`, await searchParams);
   const { cv } = await searchParams;
-  const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
+  const { candidate, currentCv, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
   const nominationOpenings = candidate.status === "active" ? await listNominationOpenings() : [];
 
   const actors = await recordReferences("account", audit.map(event => event.actor_account_id));
@@ -59,9 +58,12 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       </section>
       {candidate.status !== "archived" && <section aria-labelledby="candidate-cv" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-cv" className="text-xl font-semibold">CV PDF del candidato</h2>
-        <p>La carga conserva las versiones anteriores usadas en derivaciones.</p>
+        {currentCv ? <>
+          <p>CV vigente: <strong>{currentCv.original_name_safe}</strong></p>
+          <p className="text-sm text-muted-foreground">PDF · {new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(currentCv.byte_size / 1024)} KB</p>
+          <RecordAnchor href={`/api/cv/${currentCv.id}`} className="inline-flex min-h-11 items-center text-primary underline underline-offset-4">Descargar CV vigente</RecordAnchor>
+        </> : <p>El candidato no tiene un CV vigente.</p>}
         {cv && <p role={cv === "ok" ? "status" : "alert"}>{cv === "ok" ? "CV guardado." : cv === "conflict" ? "El perfil cambió. Recargá antes de cargarlo." : "El PDF fue rechazado; el CV vigente no cambió."}</p>}
-        <CvUploadForm candidateId={candidate.id} version={candidate.version} label="Archivo PDF" buttonLabel="Cargar CV" />
       </section>}
       <section aria-labelledby="candidate-history" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-history" className="text-xl font-semibold">Historial de cuenta y perfil</h2>

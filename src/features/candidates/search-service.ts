@@ -139,7 +139,7 @@ export async function getAdminCandidate(candidateId: string) {
   if (!parsed.success || !parsed.data) throw new AppError("NOT_FOUND");
   const client = await adminClient();
   await refreshDueProfiles(client, parsed.data);
-  const [candidate, participations, notes] = await Promise.all([
+  const [candidate, participations, notes, currentCv] = await Promise.all([
     client.from("candidate_profiles")
       .select("id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,version,accounts!candidate_profiles_account_id_fkey(id,status,version),candidate_categories(job_categories(code,name)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)")
       .eq("id", parsed.data).maybeSingle(),
@@ -150,8 +150,10 @@ export async function getAdminCandidate(candidateId: string) {
       .select("id,note_kind,body,created_at")
       .eq("candidate_id", parsed.data).is("archived_at", null)
       .is("participation_id", null).order("created_at", { ascending: false }).limit(50),
+    client.from("cv_documents").select("id,original_name_safe,byte_size")
+      .eq("candidate_id", parsed.data).eq("status", "valid").is("archived_at", null).maybeSingle(),
   ]);
-  if (candidate.error || participations.error || notes.error) throw new AppError("INTERNAL_ERROR");
+  if (candidate.error || participations.error || notes.error || currentCv.error) throw new AppError("INTERNAL_ERROR");
   if (!candidate.data) throw new AppError("NOT_FOUND");
   const row = candidate.data as unknown as CandidateSearchRow;
   const entityIds = candidate.data.account_id ? [candidate.data.id, candidate.data.account_id] : [candidate.data.id];
@@ -160,6 +162,6 @@ export async function getAdminCandidate(candidateId: string) {
     .in("entity_id", entityIds).in("entity_type", ["candidate_profiles", "accounts"])
     .order("occurred_at", { ascending: false }).limit(50);
   if (audit.error) throw new AppError("INTERNAL_ERROR");
-  return { candidate: candidate.data, referralEligible: candidateIsReferralEligible(row, new Date()),
+  return { candidate: candidate.data, currentCv: currentCv.data ?? null, referralEligible: candidateIsReferralEligible(row, new Date()),
     participations: participations.data ?? [], notes: notes.data ?? [], audit: audit.data ?? [] };
 }

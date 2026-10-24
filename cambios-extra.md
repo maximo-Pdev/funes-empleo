@@ -2530,6 +2530,82 @@ CI/revisión humana, merge, despliegue y recorridos alojados siguen pendientes.
   revisión humana, merge y despliegue pendientes; no acredita aceptación global.
 - **Fuente técnica:** [W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11).
 
+## EXTRA-054 — CV vigente en el perfil administrativo del candidato
+
+- **Fecha/origen:**2026-10-23, Mateo solicita sustituir «Cargar CV» por el CV
+  vigente y acceso protegido, con mensaje si falta y sin cambiar autorización.
+  PR69 mergeado08cd740 confirmado; main actualizado, nueva rama
+  feat/admin-candidate-current-cv y anterior eliminada local/remotamente.
+  next-env.d.ts local ajeno se conserva.
+- **Evidencia:** detalle administrativo solo monta CvUploadForm; getAdminCandidate
+  trae estados del CV, no metadatos/enlace. El handler /api/cv/[referencia] ya
+  transmite attachment privado reautorizado por sesión, RPC y Storage. La carga
+  del detalle es también el único acceso UI administrativo para perfiles asistidos
+  (assisted-candidate.spec.ts). Retirarla sin alternativa rompería FR-013.
+- **Cambio propuesto antes de implementar:** leer únicamente metadatos del CV
+  status=valid y archived_at=null mediante sesión admin y RLS; mostrar nombre,
+  tamaño y descarga por referencia opaca usando el handler existente. Sin CV,
+  mensaje explícito y ningún enlace. No consultar ni mostrar versiones históricas
+  como vigentes, rutas Storage, hashes o signed URLs. Conservar ocultación actual
+  de la tarjeta en perfiles archivados y errores seguros ante fallos de consulta.
+- **Adición necesaria/justificación:** mover el formulario existente a «Mantener
+  perfil y atención presencial», sin cambiar su POST, validación, versión o
+  permisos. Actualizar el texto del enlace asistido y el recorrido E2E para que
+  la asistencia con PDF siga siendo realizable. No retirar la capacidad aprobada
+  de carga/reemplazo administrativa ni modificar el autoservicio candidato.
+- **Archivos/contratos:** search-service, páginas de detalle/mantenimiento admin,
+  tests de consulta/UI/descarga y assisted-candidate; spec/plan/tasks y guía UI.
+  Ampliación interna del resultado del servicio (currentCv); sin schema, nuevos
+  RPC, endpoint, grants, dependencias o migración. Descarga attachment existente,
+  no visor embebido ni nueva exposición inline del PDF.
+- **Riesgos/verificación prevista:** CV reemplazado/archivado, error interpretado
+  como ausencia, pérdida de carga asistida, URL UUID o IDOR. RED/GREEN de consulta
+  y UI, permisos antes de consultar, ausencia/error, enlace vigente y endpoint
+  reautorizado; tipos/lint/unit/tooling/build y navegador local ficticio.
+- **Gate/análisis acotado:** petición expresa coordinada según AGENTS; conserva
+  FR-004/013/070, constituciónII/III/IV, matriz de autorización y modelo CV.
+  No cambia arquitectura o decisión legal. Implementación/verificación local
+  completadas; revisión humana pendiente. Recuperación: revertir UI/consulta
+  conservando archivos e historial.
+- **Resultado:** ficha con nombre/tamaño y descarga vigente por referencia; estado
+  vacío claro, sin selector de archivo. Carga/reemplazo trasladados al mantenimiento
+  existente. RED6/28, GREEN66/66 focalizadas; tipos/lint,856 pruebas/67 archivos,
+  tooling57 y build PASS. Diff-check PASS; endpoint/SQL/RLS/Storage originales
+  intactos. Revisión React: componentes servidor, consulta paralela y mínima,
+  enlace nativo sin prefetch, sin nuevas dependencias o caché compartida.
+- **Navegador:** seis recorridos de referencias/roles/IDOR PASS sobre el respaldo
+  desechable; dos recorridos asistidos completos PASS sobre instancia nueva,
+  sin omisiones/reintentos. Incluyen ausencia de CV, dos cargas, enlace nuevo tras
+  reemplazo, descarga PDF attachment/no-store, derivación, consentimiento, claim,
+  duplicados e historial. Dos anchos1440/390px: descarga con Enter, sin overflow
+  ni errores del navegador; capturas ficticias revisadas. Advisor local sin incidencias.
+- **Límites:** no se ejecutó la batería completa E2E/SQL de aceptación; no se
+  certifican NVDA, zoom real ni revisión municipal. No se tocó la base habitual
+  ni alojada, .env.local o .next del usuario. Copia ignorada, Node24.22.0 y
+  configuración local ficticia; diagnóstico del respaldo explicado debajo.
+  Sin migración nueva, commit, push o PR; next-env.d.ts ajeno preservado.
+
+### EXTRA-054 — Diagnóstico del entorno de verificación
+
+La prueba de lectura/descarga/roles pasó, pero la carga en el respaldo local
+funes-reference-check falló: reserva correcta, Storage POST500/42P10. Se comprobaron
+índices de storage.objects (solo únicos parciales/versionados) y StorageAPI1.72.1;
+no se cambian índices del proveedor para hacer pasar la prueba. Se comprobará una
+instancia desechable nueva funes-admin-cv-check54341/54342, sin resetear/modificar
+la habitual o alojada. Es diagnóstico de infraestructura de pruebas, no una
+migración ni cambio funcional o de seguridad del proyecto.
+
+Resultado: instancia nueva cargó el mismo PDF correctamente. Su esquema generado
+por Storage incluye bucketid_objname único(bucket_id,name), ausente en el respaldo;
+se confirma incompatibilidad del respaldo, no del formulario trasladado. No se
+añadieron índices ni se alteraron migraciones para silenciar42P10. Se recompiló
+la copia contra54341 y se repitieron ambos recorridos asistidos completos2/2 PASS,
+sin modificar límites, aserciones, timeouts o reintentos. Los seis controles de
+referencias/roles del respaldo habían pasado; no se presentan como una batería
+completa en un único dataset. Guardas/puertos/contenedor/buzón se adaptaron solo
+en la copia ignorada, con destinos loopback exactos. Evidencias agregadas y logs
+test-results/admin-current-cv-* ignorados; servicios de prueba se cierran al terminar.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
