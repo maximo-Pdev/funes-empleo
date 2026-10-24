@@ -8,7 +8,7 @@ vi.mock("@/features/companies/company-actions", () => ({
 }));
 vi.mock("@/features/companies/admin-actions", () => ({ adminCompanyAction: vi.fn() }));
 vi.mock("@/features/openings/company-actions", () => ({
-  saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn(),
+  saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn(), cancelCompanyOpeningAction: vi.fn(),
 }));
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
 import { CompanyProfileForm } from "@/features/companies/components/company-profile-form";
@@ -26,7 +26,8 @@ describe("autogestión de empresa", () => {
       tasks: "Tareas", requirements: "Requisitos", vacancies: 1, location: "Funes", modality: "onsite",
       schedule: "Jornada completa", contract_type: "fixed_term", closingDate: "2027-10-01", salary: null,
       benefits: null, status: "draft", version: 1, createdAt: "2026-10-22", categories: [], history: [] }} />);
-    expect(screen.getByRole("status").textContent).toContain("Borrador");
+    expect(screen.getAllByRole("status").some(status => status.textContent?.includes("Borrador"))).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Editar oferta" }));
     expect(screen.getByLabelText("Modalidad")).toHaveProperty("value", "Presencial");
     expect(screen.getByLabelText("Tipo de contratación")).toHaveProperty("value", "Plazo fijo");
     const form = container.querySelector("form")!;

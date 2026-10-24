@@ -1,5 +1,15 @@
 # Contratos de comandos y estados
 
+EXTRA062,2026-10-24: empresa propia activa puede editar published y reenviar a
+pending_review en una transacción, con completitud/versión y auditoría de edición/
+envío. Published deja de ser pública; conserva slug y casos/permisos, sin nuevas
+derivaciones hasta publicación. Submit sigue permitido desde draft/changes_requested.
+Empresa también puede cancel con motivo en estados no finales (draft,pending_review,
+changes_requested,published,paused,suspended), siguiendo los mismos cierres/revocación
+y conservación de finales que admin. No puede aprobar/publicar/moderar/restaurar.
+Hired sigue retirando consentimiento global; proyección empresarial de solo nombre
+para su propia contratación confirmada es excepción explícita, sin reabrir permisos.
+
 Cada comando es atómico: valida actor, versión, estado y precondiciones; modifica el agregado e
 inserta el evento de historial dentro de la misma transacción.
 

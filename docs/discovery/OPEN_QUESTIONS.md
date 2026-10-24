@@ -17,6 +17,12 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ### OQ-020 — Retiro automático del consentimiento al contratar (2026-10-21)
 
+Actualización2026-10-24, EXTRA062: Mateo solicita conservar únicamente el nombre
+para la empresa de una contratación confirmada propia, con cuenta/empresa activas
+y oferta/caso/derivación no archivados. Excepción de proyección mínima, sin reactivar
+consentimiento, perfiles, contactos o CV. La decisión anterior y sus accesos
+dependientes siguen abajo como evidencia; datos reales/política municipal no se aprueban.
+
 **Resuelta para el cambio solicitado:** Mateo, 2026-10-21, confirma expresamente
 la primera opción original: retiro del consentimiento **global** y revocación de
 todos los accesos empresariales. Descarta su comentario posterior sobre limitar

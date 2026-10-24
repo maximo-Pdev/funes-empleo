@@ -1,11 +1,11 @@
 import { recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { RecordLink as Link } from "@/components/ui/record-link";
-import { openingStatusLabels, moderationDecisionLabels, displayLabel } from "@/domain/presentation/labels";
+import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { publicModalityLabel, publicContractTypeLabel } from "@/features/openings/public-offer-display";
 import { Suspense } from "react";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { EmptyState } from "@/components/ui";
+import { ModerationHistory } from "@/features/openings/components/moderation-history";
 import { getAdminOpening } from "@/features/openings/admin-service";
 import { moderateOpeningAction } from "@/features/openings/admin-actions";
 import { ModerationForm } from "@/features/openings/components/moderation-form";
@@ -48,16 +48,11 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
       <ModerationForm key={`${opening.status}-${opening.version}`} openingId={opening.id}
         version={opening.version} status={opening.status} onSubmit={moderateOpeningAction} />
       </div>
-      <section aria-labelledby="opening-history" className="space-y-4">
-        <h2 id="opening-history" className="text-xl font-semibold">Historial de moderación</h2>
-        {events.length === 0 ? <EmptyState title="Sin decisiones registradas" description="Todavía no hay eventos de moderación para esta oferta." /> :
-          <ol className="space-y-3">{events.map((event) => <li key={event.id} className="rounded-lg border border-slate-300 bg-white p-4">
-            <p className="font-semibold">{displayLabel(moderationDecisionLabels, event.decision, "Decisión registrada")}: {event.previous_status ? displayLabel(openingStatusLabels, event.previous_status) : "Inicio"} → {displayLabel(openingStatusLabels, event.new_status)}</p>
-            <p className="text-sm text-slate-700">{new Date(event.created_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`}</p>
-            {event.company_message && <p className="mt-2">Mensaje a empresa: {event.company_message}</p>}
-            {event.internal_reason && <p className="mt-2">Motivo interno: {event.internal_reason}</p>}
-          </li>)}</ol>}
-      </section>
+      <ModerationHistory key={`${opening.id}:${opening.version}`} events={events.map(event => ({
+        id: event.id, decision: event.decision, previousStatus: event.previous_status, newStatus: event.new_status,
+        at: event.created_at, message: event.company_message, internalReason: event.internal_reason,
+        actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`,
+      }))} />
     </div>
     <Suspense key={Array.isArray(matchPage) ? matchPage.join(",") : matchPage ?? "1"}
       fallback={<p role="status">Buscando candidatos con rubros coincidentes…</p>}>

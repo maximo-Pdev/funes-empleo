@@ -10,6 +10,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
       <h2 id="detalle-derivacion" className="text-xl font-semibold">Derivación <RecordLabel kind="referral" id={referral.referralId} /></h2>
       <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? "Oferta sin título"}</p>
       <p className="text-sm text-slate-700">Fecha de derivación: {new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Buenos_Aires" }).format(new Date(referral.referredAt))}</p>
+      {referral.hiredCandidate && <p className="mt-4 font-semibold">{referral.hiredCandidate.displayName} · Contratado</p>}
       {candidate ? (
         <div className="mt-6 space-y-5">
           <div>
@@ -37,12 +38,12 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
         </div>
       ) : (
         <p role="status" className="mt-5 rounded-md border border-amber-300 bg-amber-50 p-4 text-amber-950">
-          El acceso a los datos de esta persona finalizó. Solo se conserva esta referencia no personal para informar una respuesta pendiente.
+          {referral.hiredCandidate ? "La contratación fue confirmada. Se conserva únicamente el nombre; el perfil, los contactos y el CV ya no están disponibles." : "El acceso a los datos de esta persona finalizó. Solo se conserva esta referencia no personal para informar una respuesta pendiente."}
         </p>
       )}
-      <div className="mt-6">
+      {!referral.hiredCandidate && <div className="mt-6">
         <FeedbackForm openingId={openingId} referralId={referral.referralId} />
-      </div>
+      </div>}
     </section>
   );
 }
