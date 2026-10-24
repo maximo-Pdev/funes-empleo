@@ -25,7 +25,7 @@ insert into public.candidate_categories(candidate_id,category_id,kind)
 select m.id,j.id,'occupation' from match_candidates m cross join public.job_categories j
 where j.version=2 and j.code='ADMINISTRACION';
 insert into public.candidate_categories(candidate_id,category_id,kind)
-select m.id,j.id,'interest' from match_candidates m cross join public.job_categories j
+select m.id,j.id,'occupation' from match_candidates m cross join public.job_categories j
 where j.version=2 and j.code='COMERCIO';
 select set_config('test.match_opening',(select id::text from public.job_openings where status='published' and archived_at is null order by id limit 1),true);
 select set_config('test.match_candidate',(select id::text from match_candidates order by id limit 1),true);
@@ -108,7 +108,7 @@ where not exists(select 1 from public.participations where candidate_id=current_
 and opening_id=current_setting('test.match_opening')::uuid and archived_at is null);
 select set_config('test.baseline_participations',(select count(*)::text from public.participations),true);
 insert into public.candidate_categories(candidate_id,category_id,kind)
-select private.fixture_id('profile',499),id,'interest' from public.job_categories where version=2 and code='COMERCIO';
+select private.fixture_id('profile',499),id,'occupation' from public.job_categories where version=2 and code='COMERCIO';
 set local role authenticated;
 select is(public.match_opening_candidates(current_setting('test.match_opening')::uuid)->>'total','10','Participación existente se excluye antes del total');
 select ok(not exists(select 1 from jsonb_array_elements(public.match_opening_candidates(current_setting('test.match_opening')::uuid)->'items') item

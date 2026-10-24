@@ -11,6 +11,25 @@ Toda transición usa la versión esperada, registra actor/fecha/estado anterior/
 solo cuando la fila lo indica. Los errores y conflictos se resuelven por la sección final de este
 contrato.
 
+## Alta presencial activa — EXTRA056,2026-10-24
+
+EXTRA057: única selección categories (máximo40); no se crean relaciones interest.
+El campo legado interests puede omitirse o ser [] en payloads antiguos; cualquier
+otro valor y confirmedFields que incluya interests se rechazan explícitamente.
+Consolidación de datos anteriores no ejecuta transiciones ni renueva consentimiento.
+
+create_active_assisted_candidate(p_data jsonb,p_confirmed boolean,p_policy_version
+text,p_policy_hash text,p_expected_version integer default null,p_review uuid
+default null,p_decision text default null,p_reason text default null,p_fields
+text[] default '{}') devuelve el resultado JSON existente saved/duplicates/rejected.
+Solo admin activo. Nuevo perfil: datos de activación completos/disponible y
+confirmación afirmativa de aceptación de la persona con política válida; guardar,
+evento accepted y activate en una transacción, con auditoría/actor/fecha. Falta
+de confirmación/política rechaza sin escritura. Duplicados/rechazo no consentir;
+use_or_update_existing conserva estados/consentimientos. No altera el RPC legado
+de importación/mantenimiento ni contratación normal/tardía (EXTRA035). Error en
+cualquier escritura o auditoría revierte el agregado completo.
+
 ## Cuenta
 
 | Comando | Actor | Desde | Hacia | Motivo | Precondiciones y efecto |

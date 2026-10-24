@@ -10,7 +10,7 @@ import { workflowRpcError } from "@/lib/errors/workflow-rpc";
 const id = z.guid();
 const referralInput = z.object({ participationId: id, expectedVersion: z.number().int().positive(), reason: z.string().trim().max(1_000).optional() });
 
-const categorySchema = z.object({ name: z.string(), kind: z.enum(["occupation", "interest"]) });
+const categorySchema = z.object({ name: z.string(), kind: z.literal("occupation") });
 const contactSchema = z.object({ kind: z.enum(["email", "phone", "other_approved"]), value: z.string() });
 const companyReferralSchema = z.object({
   referralId: id,

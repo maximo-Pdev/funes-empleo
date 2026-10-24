@@ -9,7 +9,7 @@ insert into auth.sessions(id,user_id) values
  ('ee400000-0000-4000-8000-000000000003',private.fixture_id('company',1));
 select set_config('test.assisted_data',jsonb_build_object('name','Persona asistida ficticia','dni','98000001','phone','3410000000',
  'email','','locality','Funes','summary','Experiencia ficticia','availability','available','detail','','address','',
- 'categories',jsonb_build_array(private.fixture_id('category',1)),'interests',jsonb_build_array(private.fixture_id('category',2)))::text,true);
+ 'categories',jsonb_build_array(private.fixture_id('category',1),private.fixture_id('category',2)))::text,true);
 set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('candidate',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('candidate',1),'session_id','ee400000-0000-4000-8000-000000000002')::text,true);
@@ -27,7 +27,7 @@ select is((select account_id from public.candidate_profiles where id=current_set
 select is((select managed_by_admin_id from public.candidate_profiles where id=current_setting('test.assisted_id')::uuid),private.fixture_id('admin',1),'Responsable real de sesión');
 select is((select origin from public.candidate_profiles where id=current_setting('test.assisted_id')::uuid),'assisted','Origen asistido');
 select is((select count(*) from public.cv_documents where candidate_id=current_setting('test.assisted_id')::uuid),0::bigint,'Alta sin CV');
-select is((select count(*) from public.candidate_categories where candidate_id=current_setting('test.assisted_id')::uuid),2::bigint,'Categoría e interés preservados');
+select is((select count(*) from public.candidate_categories where candidate_id=current_setting('test.assisted_id')::uuid),2::bigint,'Ambas categorías laborales preservadas');
 select throws_ok($$select public.assisted_candidate_command(current_setting('test.assisted_id')::uuid,2,'activate')$$,'P0001','CONSENT_REQUIRED','Activación exige consentimiento');
 select throws_ok($$select public.assisted_candidate_command(current_setting('test.assisted_id')::uuid,1,'activate')$$,'P0001','CONFLICT_STALE_DATA','Conflicto de versión');
 select lives_ok($$select public.assisted_candidate_command(current_setting('test.assisted_id')::uuid,2,'accept_consent',

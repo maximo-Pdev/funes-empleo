@@ -1,4 +1,5 @@
 import { referenceIdentifier, persistedReference } from "./fixtures/record-reference";
+import { nominateFromOpening } from "./fixtures/nomination";
 import { expect, test } from "@playwright/test";
 import { createHash } from "node:crypto";
 import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
@@ -285,9 +286,13 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await signIn(candidate, "candidate1@example.invalid");
     await signIn(company, "company2@example.invalid");
 
+    await candidate.goto("/candidato/perfil");
+    await candidate.getByLabel("Categoría ficticia A", { exact: true }).check();
+    await candidate.getByRole("button", { name: "Guardar correcciones" }).click();
+    await expect(candidate.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
     await admin.goto(`/admin/candidates/${fixtureId("profile", 1)}`);
-    await admin.getByLabel("Oferta", { exact: true }).selectOption(fixtureId("opening", 2));
-    await admin.getByRole("button", { name: "Crear nominación" }).click();
+    await expect(admin.getByRole("button", { name: "Crear nominación" })).toHaveCount(0);
+    await nominateFromOpening(admin, fixtureId("profile", 1), fixtureId("opening", 2));
     await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
     await expect(admin.getByText("Origen: Nominación administrativa")).toBeVisible();
     const currentStatus = admin.getByRole("status").filter({ hasText: "Resultado o estado vigente" });
@@ -318,9 +323,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await company.reload();
     await expect(company.getByText("Persona ficticia 001")).toHaveCount(0);
 
-    await admin.goto(`/admin/candidates/${fixtureId("profile", 1)}`);
-    await admin.getByLabel("Oferta", { exact: true }).selectOption(fixtureId("opening", 3));
-    await admin.getByRole("button", { name: "Crear nominación" }).click();
+    await nominateFromOpening(admin, fixtureId("profile", 1), fixtureId("opening", 3));
     await expect(currentStatus).toContainText("En revisión");
     await admin.getByLabel("Acción").selectOption("skip_to_preselected");
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Omisión justificada de etapas ficticias.");
@@ -593,9 +596,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
 
     const closed = await submittedOffer("Oferta ficticia cerrada E2E");
     await decide(closed, "approved");
-    await admin.goto(`/admin/candidates/${fixtureId("profile", 26)}`);
-    await admin.getByLabel("Oferta", { exact: true }).selectOption(closed);
-    await admin.getByRole("button", { name: "Crear nominación" }).click();
+    await nominateFromOpening(admin, fixtureId("profile", 26), closed);
     await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
     const preservedCase = admin.url();
     await decide(closed, "closed", "Cierre interno ficticio");
@@ -607,9 +608,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
 
     const cancelled = await submittedOffer("Oferta ficticia cancelada E2E");
     await decide(cancelled, "approved");
-    await admin.goto(`/admin/candidates/${fixtureId("profile", 27)}`);
-    await admin.getByLabel("Oferta", { exact: true }).selectOption(cancelled);
-    await admin.getByRole("button", { name: "Crear nominación" }).click();
+    await nominateFromOpening(admin, fixtureId("profile", 28), cancelled);
     await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
     const cancelledCase = admin.url();
     await decide(cancelled, "cancelled", "Cancelación interna ficticia");

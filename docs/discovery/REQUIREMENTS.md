@@ -20,7 +20,9 @@ Priority meanings:
 
 - **FR-010 — Must:** Candidates can create and maintain their own structured profile.
 - **FR-011 — Must:** Administrators can create and maintain an assisted profile for an in-person candidate.
-- **FR-012 — Must:** A candidate can select multiple occupational categories and job interests.
+- **FR-012 — Must:** A candidate can select multiple job categories. EXTRA057,
+  requested2026-10-24, removes the independent interests field and preserves old
+  selections as categories with private recoverable origin history.
 - **FR-013 — Must:** A candidate can upload and replace a PDF CV subject to file validation.
 - **FR-014 — Must:** Candidate duplication is detected using DNI and email, with an administrator-controlled resolution process.
 - **FR-015 — Must:** Candidate availability and profile freshness are visible to staff.

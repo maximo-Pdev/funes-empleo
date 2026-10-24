@@ -14,6 +14,10 @@ fecha y referencia de aprobación. Nunca cargar personas reales para probarlo.
 
 ## Encabezados exactos y orden
 
+EXTRA057: `categorias` es la única selección laboral. No se añade columna de
+intereses ni se altera el mapping v1. Payload legado interno `interests:[]` sigue
+siendo compatible, pero no crea relaciones ni puede contener valores nuevos.
+
 `nombre,dni,email,telefono,localidad,categorias,experiencia,disponibilidad,referencia`
 
 Todos los encabezados son obligatorios, aunque algunos valores puedan estar vacíos.

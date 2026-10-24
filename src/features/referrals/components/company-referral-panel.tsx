@@ -20,8 +20,8 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
               <div><dt className="font-semibold">Disponibilidad</dt><dd>{availabilityLabel(candidate.availability)}</dd></div>
               <div><dt className="font-semibold">Experiencia y habilidades</dt><dd className="whitespace-pre-wrap">{candidate.skillsExperienceSummary ?? "No informadas"}</dd></div>
             </dl>
-            <h4 className="mt-4 font-semibold">Categorías e intereses</h4>
-            {candidate.categories.length ? <ul className="list-disc pl-6">{candidate.categories.map((category, index) => <li key={`${category.name}-${index}`}>{category.name} ({category.kind === "occupation" ? "ocupación" : "interés"})</li>)}</ul> : <p>No se informaron categorías.</p>}
+            <h4 className="mt-4 font-semibold">Categorías laborales</h4>
+            {candidate.categories.length ? <ul className="list-disc pl-6">{candidate.categories.map((category, index) => <li key={`${category.name}-${index}`}>{category.name}</li>)}</ul> : <p>No se informaron categorías.</p>}
           </div>
           <div>
             <h3 className="text-lg font-semibold">Contactos vigentes</h3>

@@ -7,7 +7,7 @@ vi.mock("@/features/candidates/assisted-actions", () => ({ saveAssistedAction: v
 vi.mock("@/features/candidates/claim-actions", () => ({ claimAssistedAction: vi.fn() }));
 import { AssistedProfileForm, ClaimForm } from "@/features/candidates/components/assisted/assisted-forms";
 const id = "04000000-0000-4000-8000-000000000001";
-const base = { name: "Persona ficticia", dni: "98.000.001", phone: "3410000000", email: "", locality: "", summary: "", availability: "available", detail: "", address: "", categories: [], interests: [] };
+const base = { name: "Persona ficticia", dni: "98.000.001", phone: "3410000000", email: "", locality: "", summary: "", availability: "available", detail: "", address: "", categories: [] };
 describe("atención presencial", () => {
   it("permite alta sin cuenta ni CV, normaliza DNI y exige nombre y contacto", () => {
     expect(assistedProfileSchema.parse(base).dni).toBe("98000001");
@@ -38,5 +38,18 @@ describe("atención presencial", () => {
     render(<ClaimForm candidateId={id} version={1} requests={[]} />);
     expect(screen.getByLabelText(/Comprobé presencialmente/)).toHaveProperty("required", true);
     expect(screen.getByText(/correo verificado/i)).toBeTruthy();
+  });
+  it("el alta exige datos laborales y aceptación sin marcar; mantenimiento no los agrega", () => {
+    const { unmount } = render(<AssistedProfileForm categories={[{ id, name: "Rubro ficticio" }]} creationPolicy={{ version: "demo-not-approved", policy_text: "Política ficticia", policy_hash: "a".repeat(64) }} />);
+    expect(screen.getByLabelText("Localidad laboral")).toHaveProperty("required", true);
+    expect(screen.getByLabelText("Habilidades y experiencia")).toHaveProperty("required", true);
+    const confirmation = screen.getByLabelText(/Confirmo que la persona aceptó/);
+    expect(confirmation).toHaveProperty("required", true); expect(confirmation).toHaveProperty("checked", false);
+    expect(screen.queryByRole("option", { name: "No disponible" })).toBeNull();
+    unmount();
+    render(<AssistedProfileForm categories={[]} candidateId={id} version={2} initial={{ ...base, availability: "available" }} />);
+    expect(screen.queryByLabelText(/Confirmo que la persona aceptó/)).toBeNull();
+    expect(screen.getByLabelText("Localidad laboral")).toHaveProperty("required", false);
+    expect(screen.getByRole("option", { name: "No disponible" })).toBeTruthy();
   });
 });

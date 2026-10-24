@@ -1,7 +1,7 @@
 // Valid inputs shared by real HTTP denial tests. No mocked session or client.
 const id = "00000000-0000-4000-8000-000000000001";
 const profile = { name: "Persona ficticia", dni: "99000001", locality: "Funes", summary: "",
-  availability: "available", detail: "", address: "", categories: [], phone: "", email: "fixture@example.invalid", interests: [] };
+  availability: "available", detail: "", address: "", categories: [], phone: "", email: "fixture@example.invalid" };
 const common = { version: "1", candidateVersion: "1", expectedVersion: "1", accountVersion: "1",
   id, accountId: id, candidateId: id, openingId: id, participationId: id, referralId: id,
   confirmed: "on", reason: "Prueba ficticia", command: "archive" };

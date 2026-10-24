@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { saveAssistedAction, assistedCommandAction } from "../../assisted-actions";
 import { claimAssistedAction } from "../../claim-actions";
 import type { DuplicateMatch } from "../../duplicate-service";
+import type { AssistedConsentPolicy } from "../../assisted-service";
 import { assistedFields, type AssistedInput } from "@/validation/duplicate-resolution";
 import { DUPLICATE_DECISIONS } from "@/domain/catalogs";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
@@ -13,14 +14,14 @@ const field = "w-full rounded border border-slate-500 bg-white p-2";
 const button = "rounded bg-blue-800 p-3 text-white disabled:opacity-50";
 const labels = { name: "Nombre y apellido", dni: "DNI", phone: "Teléfono", email: "Correo de contacto (opcional)",
   locality: "Localidad laboral", summary: "Habilidades y experiencia", availability: "Disponibilidad", detail: "Detalle de disponibilidad",
-  address: "Domicilio privado (opcional)", categories: "Categorías laborales", interests: "Intereses laborales" };
+  address: "Domicilio privado (opcional)", categories: "Categorías laborales" };
 function Message({ text }: { text: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
   useEffect(() => { if (text) ref.current?.focus(); }, [text]);
   return <p tabIndex={-1} ref={ref} role="status" aria-live="polite">{text}</p>;
 }
-export function AssistedProfileForm({ categories, candidateId, version, initial }: {
-  categories: { id: string; name: string }[]; candidateId?: string; version?: number; initial?: AssistedInput;
+export function AssistedProfileForm({ categories, candidateId, version, initial, creationPolicy }: {
+  categories: { id: string; name: string }[]; candidateId?: string; version?: number; initial?: AssistedInput; creationPolicy?: AssistedConsentPolicy;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -32,34 +33,41 @@ export function AssistedProfileForm({ categories, candidateId, version, initial 
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const data = Object.fromEntries(assistedFields.map((key) => [key,
-      key === "categories" || key === "interests" ? form.getAll(key) : form.get(key)]));
+      key === "categories" ? form.getAll(key) : form.get(key)]));
     const match = matches.find((m) => m.reviewId === reviewId);
     if (matches.length && (!decision || !match)) { setMessage("Seleccioná una coincidencia y una decisión."); return; }
     start(async () => {
       const result = await saveAssistedAction({ candidateId: candidateId ?? null,
         version: decision === "use_or_update_existing" ? match?.version : version ?? null, data,
+        ...(!candidateId && creationPolicy ? { consent: { confirmed: form.get("consentConfirmed") === "on", policyVersion: creationPolicy.version, policyHash: creationPolicy.policy_hash } } : {}),
         resolution: matches.length ? { reviewId, decision, reason: form.get("reason"), confirmedFields: form.getAll("confirmedFields") } : null });
       setMessage(result.message);
       if (result.status === "duplicates") { setMatches(result.matches ?? []); setDecision(""); setReviewId(""); }
-      if (result.status === "saved" && result.candidateReference) { router.push(`/admin/candidates/assisted/${result.candidateReference}`); router.refresh(); }
+      if (result.status === "saved" && result.candidateReference) { router.push(`/admin/candidates/${result.candidateReference}`); router.refresh(); }
       if (result.status === "rejected") { setMatches([]); setDecision(""); setReviewId(""); }
     });
   }
-  return <Form onSubmit={submit} requirements={[{ names: ["email", "phone"], message: "Ingresá al menos un contacto: correo o teléfono." }]} className="grid gap-4 rounded border bg-white p-5" aria-busy={pending}>
+  return <Form onSubmit={submit} requirements={[{ names: ["email", "phone"], message: "Ingresá al menos un contacto: correo o teléfono." },
+    ...(!candidateId ? [{ names: ["categories"], message: "Seleccioná al menos una categoría laboral." }] : [])]} className="grid gap-4 rounded border bg-white p-5" aria-busy={pending}>
     <h2 className="text-xl font-semibold">{candidateId ? "Mantener perfil" : "Crear perfil asistido"}</h2>
-    <p>La sesión identifica al administrador responsable. Para comenzar se requieren nombre, DNI y al menos un contacto; el CV puede incorporarse después.</p>
+    <p>La sesión identifica al administrador responsable. {candidateId ? "El CV puede incorporarse después." : "El alta exige datos laborales completos, disponibilidad y aceptación presencial. El perfil se guarda activo para evaluación interna; derivarlo requiere un CV válido."}</p>
     {(["name", "dni", "phone", "email", "locality", "summary", "detail", "address"] as const).map((key) =>
       <Field key={key} className="grid gap-1">{labels[key]}{key === "summary"
-        ? <textarea className={field} name={key} defaultValue={initial?.[key] ?? ""} maxLength={5000} />
-        : <input {...(key === "dni" ? dniField : key === "phone" ? candidatePhoneField : {})} className={field} name={key} defaultValue={initial?.[key] ?? ""} required={key === "name" || key === "dni"} minLength={key === "name" ? 2 : undefined}
+        ? <textarea className={field} name={key} defaultValue={initial?.[key] ?? ""} required={!candidateId} maxLength={5000} />
+        : <input {...(key === "dni" ? dniField : key === "phone" ? candidatePhoneField : {})} className={field} name={key} defaultValue={initial?.[key] ?? ""} required={key === "name" || key === "dni" || !candidateId && key === "locality"} minLength={key === "name" ? 2 : undefined}
           type={key === "dni" ? "password" : key === "email" ? "email" : key === "phone" ? "tel" : "text"}
           autoComplete={key === "dni" ? "off" : undefined} maxLength={key === "name" ? 200 : key === "dni" ? 20 : key === "phone" ? 50 : key === "email" ? 320 : key === "locality" ? 150 : 500} />}</Field>)}
     <Field className="grid gap-1">Disponibilidad<select name="availability" required className={field} defaultValue={initial?.availability ?? "available"}>
-      <option value="available">Disponible</option><option value="unavailable">No disponible</option></select></Field>
-    {(["categories", "interests"] as const).map((kind) => <fieldset key={kind} className="rounded border p-3"><legend>{labels[kind]}</legend>
+      <option value="available">Disponible</option>{candidateId && <option value="unavailable">No disponible</option>}</select></Field>
+    <fieldset className="rounded border p-3"><legend>{labels.categories}</legend>
       {categories.length === 0 && <p>No hay categorías vigentes disponibles.</p>}
-      <div className="grid gap-2 sm:grid-cols-2">{categories.map((c) => <Field key={c.id} className="flex gap-2"><input name={kind} type="checkbox" value={c.id}
-        defaultChecked={initial?.[kind].includes(c.id)} />{kind === "interests" ? `Interés: ${c.name}` : c.name}</Field>)}</div></fieldset>)}
+      <div className="grid gap-2 sm:grid-cols-2">{categories.map((c) => <Field key={c.id} className="flex gap-2"><input name="categories" type="checkbox" value={c.id}
+        defaultChecked={initial?.categories.includes(c.id)} />{c.name}</Field>)}</div></fieldset>
+    {!candidateId && <fieldset className="grid gap-3 rounded border p-4"><legend className="font-semibold">Consentimiento presencial</legend>
+      <p>La persona autoriza el uso de sus datos laborales por la Oficina de Empleo y su comunicación a empresas únicamente después de una derivación municipal. Al confirmar una contratación se retira el consentimiento global y se revocan los accesos empresariales.</p>
+      {creationPolicy ? <p>{creationPolicy.policy_text} Versión {creationPolicy.version}.</p> : <p>No se pudo cargar la política. Volvé a abrir esta página antes de crear el perfil.</p>}
+      <Field className="flex gap-2"><input type="checkbox" name="consentConfirmed" required />Confirmo que la persona aceptó el consentimiento presencial informado.</Field>
+    </fieldset>}
     {matches.length > 0 && <fieldset className="grid gap-3 rounded border border-amber-600 p-4"><legend className="font-semibold">Resolver coincidencias</legend>
       <p>No se fusionan perfiles. Corregir y crear exige que el DNI y correo dejen de coincidir; usar el existente solo modifica los campos que marques.</p>
       <Field>Perfil coincidente<select className={field} value={reviewId} onChange={(e) => setReviewId(e.target.value)} required><option value="">Seleccionar</option>
@@ -72,7 +80,7 @@ export function AssistedProfileForm({ categories, candidateId, version, initial 
       {decision === "use_or_update_existing" && <fieldset><legend>Campos que autorizo actualizar</legend><p>Sin marcar campos, solo se utiliza el perfil existente.</p>
         {assistedFields.map((key) => <Field key={key} className="flex gap-2"><input type="checkbox" name="confirmedFields" value={key} />{labels[key]}</Field>)}</fieldset>}
     </fieldset>}
-    <Message text={message} /><button className={button} disabled={pending}>{matches.length ? "Confirmar decisión" : candidateId ? "Guardar perfil asistido" : "Comprobar duplicados y guardar"}</button>
+    <Message text={message} /><button className={button} disabled={pending || !candidateId && !creationPolicy}>{matches.length ? "Confirmar decisión" : candidateId ? "Guardar perfil asistido" : "Comprobar duplicados y guardar"}</button>
   </Form>;
 }
 

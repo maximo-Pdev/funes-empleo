@@ -7,6 +7,18 @@ Rama: `codex/temp-phase-6-assisted-service`, creada desde `main` actualizado, co
 
 ## Comportamiento implementado
 
+Actualización2026-10-24, EXTRA059: las opciones de mantenimiento, consentimiento/
+activación, carga de CV y vinculación aparecen directamente en el detalle del
+candidato presencial sin cuenta vinculada y no archivado. Al vincular dejan de
+mostrarse; las notas, el CV vigente y el historial siguen disponibles. La URL
+antigua de mantenimiento redirige a la ficha principal con referencia opaca.
+Sin nueva migración ni cambios de permisos/reglas de comandos por esta composición.
+
+Actualización2026-10-24, EXTRA056/057: el alta interactiva exige datos completos,
+aceptación presencial y guarda activo; la selección laboral actual es únicamente
+categorías. El texto siguiente conserva evidencia histórica de la fase original,
+no restablece el campo retirado. Validación del cambio en implementation-status.
+
 - `/admin/candidates/assisted` permite crear una ficha sin cuenta pública, correo ni PDF,
   siempre con nombre, DNI y al menos un contacto. La sesión determina el administrador responsable.
 - El mantenimiento permite corregir datos, contactos, categorías e intereses, disponibilidad,

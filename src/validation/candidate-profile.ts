@@ -11,7 +11,7 @@ export const candidateProfileSchema = z.object({
   availability: z.enum(["available", "unavailable"]),
   detail: z.string().trim().max(500),
   address: z.string().trim().max(500),
-  categories: z.array(uuid).max(20).refine((ids) => new Set(ids).size === ids.length),
+  categories: z.array(uuid).max(40).refine((ids) => new Set(ids).size === ids.length),
 });
 export const phoneSchema = z.object({
   version: z.coerce.number().int().positive(),

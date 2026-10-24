@@ -8,5 +8,5 @@ export const openingPreview: OpeningCandidatePreview = {
   candidateVersion: 7, openingVersion: 3, openingTitle: "Oferta ficticia actual",
   cvId: "00000000-0000-4000-8000-000000000009",
   matchedCategories: [{ code: "COMERCIO", name: "Comercio" }],
-  categories: [{ code: "COMERCIO", name: "Comercio", kind: "interest" }],
+  categories: [{ code: "COMERCIO", name: "Comercio", kind: "occupation" }],
 };

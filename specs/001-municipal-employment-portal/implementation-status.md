@@ -1064,3 +1064,189 @@ nueva. Por solicitud posterior de Mateo se publicó commit aa139cc sin firma ni
 coautorías y se abrió [PR70](https://github.com/maximo-Pdev/funes-empleo/pull/70)
 hacia main08cd740. next-env.d.ts y evidencias temporales excluidos. CI/revisión
 humana, merge, despliegue y gates históricos pendientes.
+
+## 2026-10-23 — Apartado de atención presencial, EXTRA055
+
+PR70 mergeado84a2ce6 confirmado; main actualizado, rama anterior eliminada
+local/remotamente y nueva feat/admin-assisted-candidates-section. next-env.d.ts
+ajeno preservado. Menú «Atención presencial» debajo de Candidatos dirige a
+/admin/atencion-presencial: mismos perfiles con origin=assisted fijo en servidor,
+incluso borradores, archivados y cuentas vinculadas; vigencia/aptitud «Todos»
+por defecto solo en este apartado. Reutiliza filtros, paginación, referencias
+opacas, detalle y formulario/mantenimiento actuales. No cambia registros, RLS,
+permisos, reglas de aptitud, estados, dependencias o esquema; sin migración.
+
+RED7/8 y GREEN64/64 focalizadas, tipos/lint,873 pruebas/70 archivos,57 tooling,
+build de producción y diff-check PASS. Seis E2E Chromium sin omisiones/reintentos:
+flujo asistido/claim/historial y duplicados existentes; protección de anónimo,
+candidato y empresa; listado vacío, borradores, filtros, paginación y detalle
+por teclado sin crear duplicados al navegar. Axe sin violaciones y capturas
+ficticias revisadas a1440/390px sin overflow ni errores de navegador. Advisor
+de seguridad local sin hallazgos. Ajustado test de navegación Mi cuenta a8 opciones.
+
+Node24.22.0 en copia ignorada con .next propio y base ficticia aislada
+funes-admin-cv-check54341/54342, sin .env.local o reset/cambios en bases habitual
+o alojada. Servidor next dev3000 detenido con autorización explícita para probar;
+sin cambios en configuración de producto. No se repitió aceptación E2E/SQL completa
+ni se certificó NVDA/zoom real. Commit/PR no solicitados todavía; CI/revisión humana,
+merge/despliegue y gates históricos pendientes. T168–T170 verificados técnicamente.
+
+Corrección solicitada2026-10-24: el apartado muestra el formulario existente
+«Crear perfil asistido» arriba y «Perfiles creados» con búsqueda/listado debajo;
+el alta ya no requiere un enlace a otra pantalla. Conserva las acciones,
+validación, duplicados y redirección al mantenimiento al guardar. Reutiliza el
+catálogo ya cargado, sin nuevas consultas o cambios de backend/DB. RED2/26 y
+GREEN35/35 focalizadas; tipos/typegen, lint,873 unit/componentes,57 tooling, build
+y diff-check repetidos PASS. Alta integrada y otros cuatro E2E PASS; claim pasó
+1/1 tras corregir el buzón ficticio solo en la copia aislada. Axe sin violaciones,
+1440/390px sin desbordes ni pageerror. Diagnóstico/límites en EXTRA055; no se
+declara aceptación global. Misma rama, cambios ajenos preservados; sin commit/PR.
+
+## 2026-10-24 — Alta presencial activa, EXTRA056
+
+Mateo elige exigir datos de activación y registrar aceptación presencial al crear.
+Nuevo RPC create_active_assisted_candidate guarda/consiente/activa atómicamente
+con administrador activo; validación servidor/DB y checkbox sin marcar con
+política visible. Usa comandos/auditoría/duplicados vigentes. Usar existente o
+rechazar no acepta/reactiva; CSV/mantenimiento y contrataciones anteriores sin
+backfill. Contratación normal/tardía ya retira consentimiento global y deja el
+perfil consent_withdrawn revocando todos sus permisos, sin alterar otros casos.
+Se invalida también la nueva ruta presencial tras contratación.
+
+Spec/plan/modelo/contratos/UI/tasks alineados y análisis de seis criterios sin
+críticos/altos abiertos en el delta. RED8/10, GREEN44/44; tipos/typegen, lint,
+884 pruebas/71 archivos,57 tooling, build y diff-check PASS. SQL04124+04065+02455
+=144 aserciones PASS (024 usa identidad ficticia equivalente disponible solo en
+copia reducida);8 E2E sin omisiones/reintentos PASS, incluidas contrataciones
+normal/tardía, bloqueo concurrente, consentimiento/accesos y otros casos intactos.
+Axe sin violaciones, política/aceptación sin marcar revisadas a1440/390px, sin
+overflow/pageerror; advisor local sin hallazgos. Entorno/diagnósticos en EXTRA056.
+
+Migración20261024033056_active_assisted_registration.sql ejecutada solamente
+en instancia ficticia aislada54341/54342 para verificar; pendiente aplicación
+en Supabase alojado antes de desplegar. Guía de operación/recuperación incluida.
+Sin .env.local, reset/modificación de base habitual o cambios a next-env.d.ts
+ajeno. Misma rama feat/admin-assisted-candidates-section, sin commit/PR solicitados.
+T171–T173 verificados técnicamente; revisión humana/CI/merge/despliegue y gates
+históricos pendientes. No se certifica aceptación global/municipal ni NVDA.
+
+## 2026-10-24 — Categorías laborales únicas, EXTRA057
+
+Rama feat/candidate-profile-categories desde84a2ce6 (origin/main coincidente),
+con trabajo local EXTRA055/056 preservado y copia ignorada de39 archivos previos.
+next-env.d.ts ajeno y menú anterior intactos por hash. Se retira Intereses laborales
+de formularios/asistido/registro informativo, preview y ficha empresarial. Propio
+ya usa categorías; persiste hasta40 para conservar la capacidad histórica20+20.
+Proyecciones y nuevas relaciones solo occupation. Payload legado no vacío se
+rechaza sin pérdida silenciosa; vacío solo compatibilidad técnica sin campo UI.
+
+Migración20261024124316 captura origen y ambos timestamps en historial privado
+append-only/RLS/sin grants de aplicación y reclasifica asociaciones in situ:
+no inserta ni borra relaciones ni altera perfiles/versiones, consentimiento, CV,
+participaciones o catálogo. Matching conserva OR, aptitud, exclusiones, orden y
+paginación; CSV conserva columna/mapping. Definiciones previas recuperables,
+guía operacional con reversión restringida a antes de escrituras posteriores.
+Spec/plan/modelo/contratos/checklist/tareas alineados, análisis previo sin
+críticos/altos abiertos y convergencia del delta cubierta por T174–T178.
+
+RED3/3, GREEN21/21 focalizadas;887 unit/componentes/72 archivos,57 tooling,
+typegen/tsc, lint, build y diff-check PASS. Prueba sobre datos previos14/14
+conserva unión/timestamps y agregados y matching exacto en3 páginas. Suite SQL
+completa1163 aserciones/21 archivos PASS; fixture aceptación500/50/100/1000 y500
+CV sintéticos con Storage verificado. Dieciséis E2E por roles/propio/asistido/CSV/
+matching/modal/nominación/contratación normal y tardía PASS, cero omisiones o
+reintentos. Axe sin violaciones;1440/390px, foco y ancho revisados, sin pageerror.
+Advisor local sin hallazgos. Diagnósticos y alcance detallados en EXTRA057.
+
+Solo instancia ficticia funes-admin-cv-check54341/54342, copia ignorada con
+.next propio y Node24.22.0; no .env.local ni reset/cambios de base habitual o
+alojada. Migración alojada pendiente antes de despliegue. Sin commit/PR pedido;
+revisión humana/CI/merge/despliegue y gates históricos pendientes. No aceptación
+municipal/global, suite E2E global o certificación NVDA/zoom real.
+
+## 2026-10-24 — Nominación desde oferta, EXTRA058
+
+Detalle administrativo del candidato sin formulario para nominar ni consulta de
+ofertas para ese formulario. Componente NominationForm y listNominationOpenings
+eliminados por quedar sin consumidores. El mantenimiento asistido enlaza solo a
+CV/notas/historial. Nominación por matching/popup de oferta y comando existente
+intactos; conserva CV, notas, participaciones, decisiones de cuenta y permisos.
+UI acotada según solicitud expresa; spec/plan/UI/tasks alineados, sin migración.
+
+RED1/26, GREEN30/30;891 pruebas/72 archivos,57 tooling, typegen/tsc, lint, build y
+diff-check PASS. Ocho E2E sin omisiones/reintentos PASS: flujo asistido y vinculación,
+duplicados, matching/popup/nominación y escenarios de seguimiento, retiro,
+rechazo/cierre/cancelación. Pruebas ahora nominan por la oferta; perfiles activos,
+asistidos, borradores y archivados no ofrecen selector/botón. Capturas1440/390px,
+foco en Ofertas y ancho revisados sin overflow/pageerror. Axe de recorridos sin
+violaciones. Diagnósticos y detalles en EXTRA058.
+
+Servidor3001 y Auth ficticio/fixture500 en copia ignorada, sin detener servidor
+de usuario3000 ni modificar su .next/.env.local, base habitual/alojada o configuración
+de producto. No se repitió SQL inalterado o suite E2E global; sin certificación
+NVDA/zoom real. Misma rama feat/candidate-profile-categories, trabajo previo y
+next-env.d.ts ajeno preservados. T179/T180 verificados técnicamente; commit/PR,
+CI/revisión humana/merge/despliegue y gates históricos pendientes.
+
+## Atención presencial integrada — EXTRA059,2026-10-24
+
+Edición, consentimiento/activación, carga/reemplazo CV y claim dentro del detalle
+administrativo, únicamente para origen presencial sin cuenta y no archivado.
+No duplica notas/historial. Tras vincular desaparecen esos formularios y quedan
+los mismos controles normales por estado de cuenta, conservando origen/historial.
+Alta/guardado abren detalle principal; mantenimiento antiguo redirige allí por
+referencia opaca con guard previo. Sin migración o cambio de permisos/comandos.
+
+Suite903/72 PASS y luego46 focales (incluidos cuatro casos nuevos de equivalencia
+con perfil normal). Tooling57, tipos/lint/build/diff-check PASS en Node24.22.0.
+Dieciséis E2E PASS sin omisiones/reintentos: alta/edición, consentimiento/retiro/
+aceptación/activación, CV/reemplazo, claim/conflicto/historial, duplicados, sección,
+roles, matching y referencias. Revisión1440/390px/teclado/axe sin incidencias.
+Se corrigió clave React duplicada detectada por E2E y reproducida en test de
+rerender; retirada de controles verificada sin recarga manual tras claim.
+
+Entorno ficticio aislado funes-admin-cv-check54341/54342, build/servidor3001 en
+copia ignorada. Base habitual/alojada, .env.local, .next y next-env del usuario
+preservados. Sin repetir SQL inalterado ni acreditar E2E global/NVDA/aceptación.
+T181/T182 verificados técnicamente; detalles/diagnósticos en EXTRA059. Commit/PR,
+CI/revisión humana/merge/despliegue y gates históricos pendientes.
+
+## Orden de tarjetas presenciales — EXTRA060,2026-10-24
+
+CV inmediatamente debajo de Mantener perfil y Perfil candidato antes de
+Participaciones recientes en la columna derecha, para origen presencial.
+Bloques únicos sin cambiar visibilidad, controles o datos. Otros orígenes
+conservan composición.907/72 pruebas,46 focales,57 tooling, tipos/lint/build/
+diff-check PASS; revisión1440/390px de orden real/DOM, foco y axe sin incidencias.
+Servidor/build y Supabase ficticios aislados, sin reset o migración. T183
+verificado técnicamente; límites en EXTRA060, revisión humana/PR/CI pendientes.
+
+## Historial resumido de cuenta y perfil — EXTRA061,2026-10-24
+
+Decisiones de Mateo aplicadas solo a esa tarjeta: activación, consentimiento,
+disponibilidad, suspensión/reactivación, vinculación y actualización pendiente
+visibles; creación, edición común, verificación y archivo/restauración internos.
+Evento y fecha/hora argentina24h, cinco iniciales y Ver más. Filtro antes de limit,
+cursor fecha/id estable y Server Action admin con scope reconstruido/payload mínimo.
+Auditoría completa, permisos y otros historiales intactos; sin nueva migración.
+
+Suite939/74 PASS seguida de24 focales postajuste horario (un caso adicional),
+tooling57, tipos/lint/build final/diff-check PASS. Nueve E2E PASS y recorrido del
+historial repetido tras24h PASS:80 eventos ocultos/61 visibles con empates, más de50,
+nueva llegada entre páginas, teclado y huella íntegra de auditoría.1440/390px/axe
+sin incidencias y capturas revisadas. Primer error de tipos en tests corregido;
+interrupción de revisión automática por cuota resuelta al reintentar sin bypass.
+
+Supabase/build/servidor ficticios aislados, sin reset ni cambios alojados; next-env
+ajeno preservado. T184/T185 verificados técnicamente. EXTRA061 contiene evidencia
+y límites; sin acreditar SQL/E2E global/NVDA/aceptación. Commit/PR/CI/revisión/merge/
+despliegue y gates históricos siguen pendientes.
+
+## Publicación de mejoras de candidatos — 2026-10-24
+
+Mateo solicitó publicar la rama acumulada EXTRA055–061. Commit `0ad6e85` sin firma
+ni signoff/coautor publicado en `feat/candidate-profile-categories`, desde `main`
+actualizado (`84a2ce6`). [PR #71](https://github.com/maximo-Pdev/funes-empleo/pull/71)
+abierto sin borrador,80 archivos, con evidencias y dos migraciones requeridas antes
+del despliegue. `next-env.d.ts` ajeno queda local y fuera del commit. CI y revisión
+humana siguen pendientes; PR abierto no acredita merge, despliegue o aceptación.

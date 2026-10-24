@@ -20,7 +20,7 @@ Can:
 
 - Register, verify access, sign in, recover access, and sign out.
 - Maintain only their own profile and CV.
-- Select multiple employment categories and job interests.
+- Select multiple employment categories (EXTRA057 replaces the separate interests field).
 - Browse published openings and apply to several openings.
 - View the status information the office chooses to expose.
 - Withdraw an active application or deactivate their availability.
