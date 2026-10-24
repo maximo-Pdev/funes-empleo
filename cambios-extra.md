@@ -2480,6 +2480,52 @@ feat/private-record-references hacia main8d00f95. Tipos/lint,844 unitarias y57
 tooling repetidos PASS; diff-check y escaneo de patrones de credenciales PASS.
 CI/revisión humana, merge, despliegue y recorridos alojados siguen pendientes.
 
+## EXTRA-053 — Retirar enlace global «Ir al contenido principal»
+
+- **Fecha/origen/autoridad:**2026-10-23, Mateo solicita expresamente eliminar el
+  enlace oculto repetido, conservando la navegación existente (A16). PR68 mergeado
+  confirmado86b7de8; main actualizado, rama fix/remove-skip-link; anterior
+  eliminada local/remotamente. next-env.d.ts ajeno se conserva sin incluirlo.
+- **Problema/evidencia:** RootLayout agrega un anchor sr-only a todas las rutas.
+  setup.spec.ts y home-keyboard-navigation-check.mjs exigen ese primer foco; A16
+  estaba pendiente de comprobar alternativa accesible. UI_GUIDELINES conserva
+  una indicación histórica contradictoria de ocultación solo en portada.
+- **Cambio propuesto antes de implementar:** quitar solamente ese anchor del
+  layout compartido; conservar main#contenido, tabIndex, títulos, regiones/nav
+  identificadas, foco visible y enlace Inicio de portada. Actualizar regresiones
+  de ausencia del enlace, primer control real y retorno Inicio mediante teclado.
+  No reemplazarlo por otro enlace oculto, componente o atajo inventado.
+- **Justificación/alcance:** constituciónIV, FR-070 y SC-009 exigen operabilidad
+  por teclado, no ese texto/control concreto. Se conserva navegación semántica
+  por landmarks (técnica W3C ARIA11) y controles operables; Inicio de portada no se
+  presenta como sustituto universal del salto para todas las rutas. No se afirma
+  que Tab sin tecnología de apoyo salte automáticamente las cabeceras.
+- **Archivos/contratos:** layout raíz, tests de layout/portada/setup y chequeo
+  visual de teclado; A16, spec/plan/tasks, guía UI y pauta manual de validación.
+  Sin contratos de negocio, backend, schema, dependencias o migraciones.
+- **Riesgos/verificación prevista:** regresión del primer foco, pérdida de
+  destino/landmarks, navegación Inicio y aparición accidental del enlace.
+  RED/GREEN de layout, teclado escritorio/móvil y páginas públicas, axe sin
+  omisiones, tipos/lint/unitarias/tooling/build. Pruebas de lectura sin reset,
+  login ni cambios de negocio. Revertir el diff recupera el enlace anterior.
+- **Gate acotado:** solicitud explícita y análisis de consistencia A16/FR-070/
+  SC-009/constituciónIV; sin arquitectura nueva o decisión municipal inferida.
+  Modelo y contratos intactos. Implementación/verificación completadas; revisión
+  humana pendiente, sin aprobación municipal o aceptación NVDA inferidas.
+- **Resultado:** eliminado únicamente el anchor global de src/app/layout.tsx;
+  main y enlaces Inicio intactos. RED2/2 en el layout y GREEN14/14 focalizadas.
+  Tipos/lint,846 pruebas/66 archivos, tooling57 y build de producción PASS;
+  diff-check PASS. Seis recorridos públicos de lectura con primer foco/landmarks
+  y axe sin violaciones, más seis combinaciones de Inicio por teclado a1440/390px
+  (ingreso/postulante/empresa) PASS. Sin omisiones ni reintentos.
+- **Entorno/límites:** Node24.22.0; compilación en copia aislada ignorada y servidor
+  propio3001, con configuración pública ficticia, sin copiar .env.local. Sin
+  reset/SQL/login/envíos de formularios, ni tocar servidor3000 o su .next. Advertencia
+  de múltiples lockfiles propia de la copia anidada; no se cambió next.config.
+  Evidencias test-results/remove-skip-* ignoradas. No se repitió la batería privada
+  ni se certificó lector de pantalla/zoom real. No hay migración, commit o PR nuevo.
+- **Fuente técnica:** [W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11).
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:

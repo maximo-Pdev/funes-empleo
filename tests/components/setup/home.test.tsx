@@ -100,7 +100,7 @@ it("preserves account navbar navigation back to the homepage", async () => {
   expect(screen.getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/ofertas");
 });
 
-it("preserves a unique focusable skip-link target on the redesigned home", async () => {
+it("preserves a unique focusable target for the existing Inicio navigation", async () => {
   const { container } = render(await HomePage());
   const main = screen.getByRole("main");
   expect(main.id).toBe("contenido");

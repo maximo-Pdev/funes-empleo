@@ -12,11 +12,13 @@ try {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(baseURL, { waitUntil: "networkidle" });
-    const skip = page.locator('body > a[href="#contenido"]');
+    assert.equal(await page.locator('body > a[href="#contenido"]').count(), 0, "The removed global link is absent from the DOM");
+    assert.equal(await page.getByRole("main").count(), 1, "The main landmark is preserved");
     await page.keyboard.press("Tab");
-    assert.equal(await skip.evaluate(el => el === document.activeElement), true, "Homepage exposes the global skip link first");
-    await page.keyboard.press("Enter");
-    await page.waitForFunction(() => document.activeElement?.id === "contenido");
+    const firstLink = width < 768
+      ? page.getByRole("link", { name: "Ir al sitio de la Municipalidad de Funes" })
+      : page.getByRole("navigation", { name: "Accesos principales" }).getByRole("link", { name: "Ofertas", exact: true });
+    assert.equal(await firstLink.evaluate(el => el === document.activeElement), true, "Tab starts on existing visible navigation");
     for (const mode of ["login", "candidate", "company"]) {
       if (mode !== "login") await page.getByRole("button", { name: "Registrarse", exact: true }).first().click();
       if (mode === "company") await page.getByRole("radio", { name: "Empresa", exact: true }).check();
@@ -35,9 +37,10 @@ try {
     }
   }
   await page.goto(`${baseURL}/login`, { waitUntil: "networkidle" });
+  assert.equal(await page.locator('body > a[href="#contenido"]').count(), 0, "Standalone routes also omit the removed global link");
   await page.keyboard.press("Tab");
-  assert.equal(await page.locator('body > a[href="#contenido"]').evaluate(el => el === document.activeElement), true, "Other routes preserve their existing keyboard skip link");
-  console.log(JSON.stringify({ status: "PASS", checks, standaloneSkipLink: "preserved" }));
+  assert.equal(await page.getByRole("main").locator('a[href="/"]').first().evaluate(el => el === document.activeElement), true, "Standalone navigation remains keyboard accessible");
+  console.log(JSON.stringify({ status: "PASS", checks, globalSkipLink: "removed", mainLandmark: "preserved" }));
 } finally {
   await browser.close();
 }

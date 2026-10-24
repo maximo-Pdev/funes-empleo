@@ -145,11 +145,14 @@ Right-aligned text links provide `Inicio` (`#contenido` on the homepage, `/` in
 the account variant) and `Ofertas` (`/ofertas`). Use a native same-page anchor on
 the homepage so repeated activation returns to the start and focuses `main#contenido`.
 The link has no background, border or color filter; do not reuse the old green badge.
-On the homepage only, hide the root skip-link bar completely, including from the
-tab order. Use the navbar's existing `Inicio` link to return to the page start.
-Preserve the global skip link on other routes and retain the homepage's unique
-focusable `main#contenido` landmark. Verify repeated Tab navigation and Enter on
-`Inicio` on both desktop and mobile; hiding the bar is not equivalent to a skip link.
+At Mateo's explicit request (A16 / EXTRA-053, 2026-10-23), remove the root
+“Ir al contenido principal” link on all routes, not merely its styling or tab stop.
+Keep the unique `main#contenido` landmark, page headings, named navigation,
+existing focus targets and visible keyboard focus. The homepage navbar's `Inicio`
+link still returns to and focuses the main landmark. Verify repeated Tab/Enter
+on desktop and mobile. Landmarks preserve assistive-technology navigation
+([W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11)); `Inicio` is not
+a universal replacement for a skip link, nor does plain Tab skip every header.
 
 ## Candidate account workspace
 
@@ -297,6 +300,8 @@ reduced-motion preferences. Do not add placeholder job offers to this section.
 - Run `node tests/visual/home-responsive-layout-check.mjs` against a local server
   for full-height registration, width animation, required markers and mobile
   overlay/contact-row layouts; it never submits forms or resets data.
+- Run `node tests/visual/home-keyboard-navigation-check.mjs` to verify the removed
+  global link, first visible controls and preserved `Inicio` focus behavior.
 - Do not use `npm run test:e2e` for a visual spot check: its wrapper resets the
   acceptance database. A filename filter does not make that wrapper read-only.
 - Check loading, errors, keyboard navigation and long forms in a real browser.
