@@ -618,6 +618,8 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 
 ### Ofertas empresariales y moderación — EXTRA062
 
+- [x] T193 Corregir sincronización asíncrona de prueba de historial detectada por CI PR72: esperar anuncio final sin omitir datos/foco/cursor/botón.982/77 coverage, diez repeticiones, tipos/lint/diff-check PASS; arreglo para publicar en misma rama. Build local diagnosticado y nueva CI pendientes de comprobación, sin cambios productivos; evidencia EXTRA062.
+
 - [x] T192 Ajuste R5: abrir oferta existente en consulta, edición por botón con cancelación/foco, retorno al detalle actualizado tras guardar y preservación ante error. Mantener estados/alta/reglas.982/77 pruebas,23 focales finales, tipos/lint/build/diff-check, cuatro E2E y revisión1440/390px/axe PASS. Sin SQL nuevo; evidencia EXTRA062, revisión humana/CI pendientes.
 
 - [x] T186 Alinear seis requisitos R1–R6/clarificaciones, plan/modelo/contratos/checklist y analizar delta constitucional antes de código; preservar rama/base y cambio local ajeno.

@@ -3266,6 +3266,27 @@ de commit/PR pendientes de las entradas anteriores, sin acreditar aceptación.
   20261024184354 pendiente en alojado antes del despliegue. CI/revisión humana,
   merge/despliegue y aceptación siguen pendientes; no se aplicó SQL alojado.
 
+- **Corrección CI del PR72 previa,2026-10-24:** application del commit de4e23f
+  falla en candidate-history.test.tsx:29: tras aparecer la fila nueva todavía
+  muestra «Cargando eventos anteriores…». React useTransition puede confirmar
+  contenido y finalizar pending en commits distintos. La prueba asume sincronía
+  entre ambos; no evidencia pérdida de datos o falla del comando. Esperar el
+  anuncio final con waitFor antes de verificar el resultado, conservando las
+  aserciones de cantidad, foco, cursor y botón. Origen T185/EXTRA061 y gate CI de
+  EXTRA062; archivos test/log/tasks/estado. Sin cambios funcionales, permisos,
+  datos o migración. Riesgo: ocultar falla real; se evita exigir el mismo texto
+  final, sin sleeps, saltos ni retries. Verificar repeticiones focales, coverage
+  completa, tipos/lint/build y nueva CI. Autorizado por pedido de corregir PR72.
+- **Validación y entrega del arreglo CI:**982 pruebas/77 archivos con coverage
+  PASS (100% del alcance configurado, src/lib/env/schema.ts), diez ejecuciones
+  focales consecutivas con coverage PASS; tipos/lint/diff-check PASS. Un primer
+  intento de coverage local se superpuso con las repeticiones y disputó su carpeta
+  temporal; corregido al repetir la suite completa por separado. Build local
+  encontró salida prematura del proceso PostCSS de Turbopack en el snapshot;
+  se conserva diagnóstico y se prueba caché limpia, sin cambiar código productivo
+  ni configuración para ocultarlo. Publicar en el mismo PR con commit sin firma,
+  preservando next-env.d.ts; nueva ejecución completa de CI pendiente de comprobar.
+
 ## Formato para próximas entradas
 
 Usar un ID consecutivo `EXTRA-NNN` y registrar:
