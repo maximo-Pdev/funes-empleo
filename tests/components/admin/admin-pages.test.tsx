@@ -56,7 +56,7 @@ beforeEach(() => {
  mocks.from.mockImplementation(() => { const query = { select: () => query, order: () => query, eq: () => query, range: mocks.range, maybeSingle: mocks.company, single: mocks.account, limit: mocks.companyOffers }; return query; });
  mocks.range.mockResolvedValue({ data: [company], count: 11, error: null }); mocks.company.mockResolvedValue({ data: company, error: null }); mocks.account.mockResolvedValue({ data: { id, status: "active", version: 1 }, error: null }); mocks.companyOffers.mockResolvedValue({ data: [opening], error: null });
  mocks.categories.mockResolvedValue(categories); mocks.search.mockResolvedValue({ total: 11, page: 1, pageCount: 2, items: [{ id, displayName: candidate.display_name, locality: "Funes", availability: "Disponible", categories, referralEligible: true }] });
- mocks.candidate.mockResolvedValue({ candidate, referralEligible: true, participations: [participation], notes: [], audit: [] }); mocks.nominations.mockResolvedValue([opening]);
+ mocks.candidate.mockResolvedValue({ candidate, currentCv: null, referralEligible: true, participations: [participation], notes: [], audit: [] }); mocks.nominations.mockResolvedValue([opening]);
  mocks.assisted.mockResolvedValue({ categories, workspace: { profile: { ...candidate, origin: "assisted", account_id: null }, data: profileData, requests: [], consent: "accepted", policy: { version: "demo", policy_text: "Consentimiento ficticio de prueba.", policy_hash: "ficticio" } } });
  mocks.openings.mockResolvedValue({ items: [opening], total: 11, page: 1, pageCount: 2 }); mocks.opening.mockResolvedValue({ opening, events: [] });
  mocks.participations.mockResolvedValue({ items: [participation], total: 11, page: 1, pageCount: 2 }); mocks.participation.mockResolvedValue({ participation, audit: [], preinterviews: [], contacts: [], notes: [], referral: null, feedback: [] }); mocks.contacts.mockResolvedValue([]);
@@ -73,9 +73,25 @@ it("conserva los filtros de candidatos al paginar", async () => {
 it("no consulta candidatos con filtros inválidos", async () => {
  render(await Candidates({ searchParams: Promise.resolve({ page: "0" }) })); expect(mocks.search).not.toHaveBeenCalled(); expect(screen.getByRole("alert").textContent).toContain("Revisá los filtros");
 });
-it("conserva los controles PDF y la nominación de un perfil activo", async () => {
+it("muestra ausencia de CV sin carga ni descarga y conserva la nominación", async () => {
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
- expect(screen.getByLabelText("Archivo PDF").getAttribute("accept")).toBe(".pdf,application/pdf"); expect(mocks.nominations).toHaveBeenCalledOnce();
+ expect(screen.getByText("El candidato no tiene un CV vigente.")).toBeTruthy();
+ expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByRole("button", { name: "Cargar CV" })).toBeNull();
+ expect(screen.queryByRole("link", { name: "Descargar CV vigente" })).toBeNull();
+ expect(mocks.nominations).toHaveBeenCalledOnce();
+});
+it("muestra metadatos y descarga del CV vigente por referencia, sin formulario", async () => {
+ mocks.candidate.mockResolvedValue({ candidate, currentCv: { id, original_name_safe: "cv-ficticio.pdf", byte_size: 2048 }, referralEligible: true, participations: [], notes: [], audit: [] });
+ render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
+ expect(screen.getByText("cv-ficticio.pdf")).toBeTruthy();
+ expect(screen.getByRole("link", { name: "Descargar CV vigente" }).getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", id)}`);
+ expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+});
+it("protege el detalle antes de consultar candidato o CV", async () => {
+ mocks.guard.mockRejectedValue(new Error("FORBIDDEN"));
+ await expect(Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) })).rejects.toThrow("FORBIDDEN");
+ expect(mocks.candidate).not.toHaveBeenCalled();
 });
 it("no ofrece carga de CV ni mantenimiento para un perfil archivado", async () => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, status: "archived", account_id: null }, referralEligible: false, participations: [], notes: [], audit: [] });
@@ -117,6 +133,9 @@ it("exporta los filtros consultados y conserva cobertura pendiente", async () =>
 });
 it("mantiene DNI oculto y vinculación inhabilitada sin solicitud", async () => {
  render(await AssistedDetail({ params: Promise.resolve({ candidateId: id }) })); expect(screen.getByLabelText("DNI exhibido")).toHaveProperty("type", "password"); expect(screen.getByRole("button", { name: "Vincular conservando historial" })).toHaveProperty("disabled", true);
+ expect(screen.getByLabelText("Archivo PDF").getAttribute("accept")).toBe(".pdf,application/pdf");
+ expect(screen.getByRole("button", { name: "Cargar CV" })).toBeTruthy();
+ expect(screen.getByRole("link", { name: "Consultar CV vigente, notas e historial y nominar a una oferta" })).toBeTruthy();
 });
 it("ofrece navegación completa y un único encabezado principal", async () => {
  render(await Companies({ searchParams: Promise.resolve({}) })); const nav = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }); expect(within(nav).getByRole("link", { name: "Empresas" }).getAttribute("aria-current")).toBe("page"); expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);

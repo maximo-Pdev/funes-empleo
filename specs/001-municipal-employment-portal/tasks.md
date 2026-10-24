@@ -606,6 +606,12 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T163 RED2/2 del layout sin enlace global y GREEN14/14 focalizadas; actualizar setup/chequeo visual para primer foco real y retorno Inicio, conservando destino/foco/axe.
 - [x] T164 Tipos/lint,846 pruebas/66 archivos, tooling57, build y diff-check PASS. Seis recorridos públicos/axe y seis combinaciones de Inicio por teclado escritorio/móvil PASS; copia/servidor aislados3001, sin reset/login/mutaciones alojadas ni tocar servidor3000. EXTRA053 registra límites; PR/revisión pendientes.
 
+## CV vigente administrativo — EXTRA054,2026-10-23
+
+- [x] T165 Registrar solicitud/evidencia, alinear spec/plan/UI y analizar FR-004/013/070; conservar modelo, permisos y carga asistida mediante mantenimiento presencial.
+- [x] T166 RED6/28 y GREEN66/66 focalizadas de consulta mínima/currentCv y detalle sin carga, ausencia/error, permisos, enlaces opacos y formulario asistido conservado; sin cambios de endpoint/schema.
+- [x] T167 Tipos/lint,856 pruebas/67 archivos, tooling57, build y diff-check PASS. Seis recorridos de referencias/roles sobre respaldo y dos asistidos completos sobre instancia nueva PASS, sin omisiones/reintentos; teclado/descarga a1440/390px y advisor local PASS. EXTRA054 documenta incompatibilidad Storage del respaldo y verificación nueva sin parches de índices. Sin cambios alojados/migración; revisión/PR pendientes, no aceptación global.
+
 ## Español transversal — EXTRA051, 2026-10-22
 
 - [x] T151 Registrar evidencia y alinear alcance/spec/plan: presentación española en todos los roles, valores técnicos/contratos/contenido libre intactos; análisis sin nueva arquitectura o regla municipal.

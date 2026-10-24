@@ -8,6 +8,7 @@ import { InternalNoteForm } from "@/features/participations/components/internal-
 import { recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { candidateProfileStatusLabels } from "@/features/candidates/candidate-profile-status";
 import { displayLabel } from "@/domain/presentation/labels";
+import { CvUploadForm } from "@/features/candidates/components/cv-upload-form";
 export const dynamic = "force-dynamic";
 export default async function AssistedDetailPage({ params }: { params: Promise<{ candidateId: string }> }) {
   await requireActiveAccount(["admin"]);
@@ -22,7 +23,12 @@ export default async function AssistedDetailPage({ params }: { params: Promise<{
     <div className="grid gap-6 lg:grid-cols-2"><AssistedProfileForm key={`${candidateId}:${profile.version}`} candidateId={candidateId} version={profile.version} categories={categories} initial={data} />
       <div className="space-y-6"><AssistedCommands candidateId={candidateId} version={profile.version} status={profile.status} consent={consent} policy={policy} />
         <InternalNoteForm candidateId={candidateId} version={profile.version} onSubmit={recordEvaluationAction} />
-        <Link className="block rounded border bg-white p-4 text-blue-800 underline" href={`/admin/candidates/${candidateId}`}>Cargar CV, consultar notas e historial y nominar a una oferta</Link>
+        <section aria-labelledby="assisted-cv" className="space-y-3 rounded-lg border border-border bg-surface p-5">
+          <h2 id="assisted-cv" className="text-xl font-semibold">Cargar o reemplazar CV</h2>
+          <p>La carga conserva las versiones anteriores usadas en derivaciones.</p>
+          <CvUploadForm candidateId={candidateId} version={profile.version} label="Archivo PDF" buttonLabel="Cargar CV" />
+        </section>
+        <Link className="block rounded border bg-white p-4 text-blue-800 underline" href={`/admin/candidates/${candidateId}`}>Consultar CV vigente, notas e historial y nominar a una oferta</Link>
         {profile.origin === "assisted" && !profile.account_id && <ClaimForm candidateId={candidateId} version={profile.version} requests={requests} />}
       </div></div>
   </AdminShell>;
