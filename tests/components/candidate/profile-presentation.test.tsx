@@ -76,17 +76,19 @@ describe("presentación de consentimiento y activación", () => {
     expect(within(cvRegion).getByRole("button", { name: "Cargar o reemplazar CV" })).toBeTruthy();
   });
   it.each([
-    ["active", "active", "Perfil activo"],
-    ["draft", "incomplete", "Borrador"],
-    ["needs_update", "incomplete", "Necesita actualización"],
+    ["active", "green", "Activo"],
+    ["draft", "neutral", "Borrador"],
+    ["needs_update", "amber", "Necesita actualización"],
     ["unavailable", "neutral", "No disponible"],
-    ["consent_withdrawn", "neutral", "Consentimiento retirado"],
+    ["consent_withdrawn", "red", "Consentimiento retirado"],
     ["archived", "neutral", "Archivado"],
     ["unknown", "neutral", "En revisión"],
   ])("muestra un indicador veraz para %s", (status, tone, label) => {
     const { container } = render(<CandidateProfilePanel {...props} profile={{ ...props.profile, status }} cv={null} />);
-    expect(container.querySelector("[data-profile-status]")?.getAttribute("data-tone")).toBe(tone);
-    expect(within(screen.getByRole("region", { name: "Activación del perfil" })).getByText(label, { exact: true })).toBeTruthy();
+    const badge = container.querySelector("[data-profile-status]");
+    expect(badge?.getAttribute("data-tone")).toBe(tone);
+    expect(badge?.textContent).toBe(label);
+    expect(badge?.classList.contains(`border-status-${tone}`)).toBe(true);
   });
   it("integra teléfono opcional en la tarjeta de datos sin formularios anidados y coloca CV antes del consentimiento", () => {
     const { container } = render(<CandidateProfilePanel {...props} phone="3415550100" />);
@@ -116,10 +118,11 @@ describe("presentación de consentimiento y activación", () => {
     expect(within(activation).queryByText("Perfil activo", { exact: true })).toBeNull();
   });
 
-  it("muestra Perfil activo arriba sin ofrecer activación, independientemente de aptitud", () => {
-    render(<CandidateProfilePanel {...props} profile={{ ...props.profile, status: "active" }} cv={null} />);
+  it("muestra el estado activo arriba sin ofrecer activación, independientemente de aptitud", () => {
+    const { container } = render(<CandidateProfilePanel {...props} profile={{ ...props.profile, status: "active" }} cv={null} />);
     const activation = screen.getByRole("region", { name: "Activación del perfil" });
-    expect(within(activation).getByText("Perfil activo", { exact: true })).toBeTruthy();
+    expect(within(activation).queryByText("Perfil activo", { exact: true })).toBeNull();
+    expect(container.querySelector("[data-profile-status]")?.textContent).toBe("Activo");
     expect(screen.queryByRole("button", { name: "Activar perfil" })).toBeNull();
     expect(within(activation).queryByRole("form")).toBeNull();
   });
@@ -127,7 +130,7 @@ describe("presentación de consentimiento y activación", () => {
   it.each(["archived", "unknown"])("no ofrece activación para estado %s", status => {
     render(<CandidateProfilePanel {...props} profile={{ ...props.profile, status }} />);
     expect(screen.queryByRole("button", { name: "Activar perfil" })).toBeNull();
-    expect(screen.queryByText("Perfil activo", { exact: true })).toBeNull();
+    expect(screen.queryByText("Activo", { exact: true })).toBeNull();
   });
 
   it.each([

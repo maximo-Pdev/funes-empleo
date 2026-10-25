@@ -5,6 +5,7 @@ import styles from "../_components/candidate-forms.module.css";
 import { listMyParticipations } from "@/features/participations/candidate-service";
 import { CandidateWithdrawForm } from "@/features/participations/components/candidate-status";
 import { candidateStatusLabels } from "@/features/participations/candidate-status-labels";
+import { participationStatusTones, statusTone } from "@/domain/presentation/status-tone";
 
 export async function renderCandidateParticipationsContent({ offersHref = "/dashboard?section=ofertas" }: { offersHref?: string } = {}) {
   const items = await listMyParticipations();
@@ -14,7 +15,7 @@ export async function renderCandidateParticipationsContent({ offersHref = "/dash
       <ul className="grid gap-5 md:grid-cols-2">{items.map((item) => <li key={item.id} className="min-w-0">
         <Card className="h-full p-6"><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-primary"><ClipboardList className="h-5 w-5" aria-hidden="true" /></div>
           <h2 className="break-words text-xl font-bold leading-7 text-primary-900">{item.opening_title ?? "Oferta"}</h2>
-          <p className="mt-4 text-sm"><span className="sr-only">Estado: </span><Badge><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></p>
+          <p className="mt-4 text-sm"><span className="sr-only">Estado: </span><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></p>
           <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {new Date(item.created_at).toLocaleDateString("es-AR")}</p>
           {item.display_status === "received" && <div className={`${styles.forms} mt-5 border-t border-border pt-3`}><CandidateWithdrawForm participationId={item.id} version={item.version} /></div>}
         </Card>

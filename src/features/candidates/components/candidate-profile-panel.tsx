@@ -7,10 +7,12 @@ import { activateProfileAction, savePhoneAction, saveProfileAction } from "../pr
 import { changeConsentAction } from "../consent-actions";
 import { candidateProfileStatusLabels } from "../candidate-profile-status";
 import { displayLabel } from "@/domain/presentation/labels";
+import { candidateProfileStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { CvUploadForm } from "./cv-upload-form";
 import { CandidatePhotoForm } from "./candidate-photo-form";
 import styles from "./profile-panel.module.css";
 import { FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Attachment, AttachmentMedia, AttachmentContent, AttachmentTitle, AttachmentDescription, AttachmentActions } from "@/components/ui/attachment";
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty";
@@ -53,13 +55,13 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     !cv && "Cargá un CV PDF válido.",
   ].filter(Boolean);
   const canActivate = activatableState && activationRequirements.length === 0;
-  const statusTone = profile.status === "active" ? "active" : ["draft", "needs_update"].includes(profile.status) && activationRequirements.length > 0 ? "incomplete" : "neutral";
+  const tone = statusTone(candidateProfileStatusTones, profile.status);
   const field = "municipal-control";
   return <div className={styles.panel}>
     <CandidatePhotoForm candidateId={profile.id} version={profile.version} photo={photo} name={profile.display_name} cleanupPending={photoCleanupPending} unavailable={photoUnavailable} />
     <section className={styles.section} aria-label="Activación del perfil">
       <p role="status" className={styles.status}>
-        <span data-profile-status data-tone={statusTone} className={styles.statusDot} aria-hidden="true" />{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{displayLabel(candidateProfileStatusLabels, profile.status, "En revisión")}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
+        Estado del perfil <Badge variant="status" tone={tone} data-profile-status data-tone={tone}>{displayLabel(candidateProfileStatusLabels, profile.status, "En revisión")}</Badge>. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
       {canActivate && <Form action={activateAction} result={activation} className="grid gap-3" aria-busy={activating}>
         <h2 className="text-xl font-semibold">Activar perfil</h2><p>Tu perfil cumple los requisitos guardados. Activá tu perfil para postularte y ser considerado por la Oficina de Empleo.</p>
         <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />

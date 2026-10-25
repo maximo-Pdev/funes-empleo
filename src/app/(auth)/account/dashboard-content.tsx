@@ -5,6 +5,7 @@ import type { getCandidateWorkspace } from "@/features/candidates/profile-servic
 import { candidateProfileStatusLabels } from "@/features/candidates/candidate-profile-status";
 import { listMyParticipations } from "@/features/participations/candidate-service";
 import { candidateStatusLabels } from "@/features/participations/candidate-status-labels";
+import { candidateProfileStatusTones, participationStatusTones, statusTone, type StatusTone } from "@/domain/presentation/status-tone";
 import styles from "./account.module.css";
 
 const closedStatuses = ["hired", "not_selected", "withdrawn", "cancelled", "no_company_response"];
@@ -23,11 +24,11 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
   const open = items.filter((item) => !closedStatuses.includes(item.display_status));
   const closed = items.filter((item) => closedStatuses.includes(item.display_status));
   const profile = workspace.profile;
-  const checks = [
-    { label: "Perfil", value: profile ? candidateProfileStatusLabels[profile.status] ?? "Registrado" : "Sin perfil", done: profile?.status === "active" },
-    { label: "Disponibilidad", value: profile?.availability === "available" ? "Disponible" : "No disponible", done: profile?.availability === "available" },
-    { label: "CV", value: workspace.cv ? "Cargado" : "Pendiente", done: Boolean(workspace.cv) },
-    { label: "Consentimiento", value: workspace.consent?.status === "accepted" ? "Vigente" : "Pendiente", done: workspace.consent?.status === "accepted" },
+  const checks: Array<{ label: string; value: string; tone: StatusTone; done: boolean }> = [
+    { label: "Perfil", value: profile ? candidateProfileStatusLabels[profile.status] ?? "Registrado" : "Sin perfil", tone: statusTone(candidateProfileStatusTones, profile?.status), done: profile?.status === "active" },
+    { label: "Disponibilidad", value: profile?.availability === "available" ? "Disponible" : "No disponible", tone: profile?.availability === "available" ? "green" : "amber", done: profile?.availability === "available" },
+    { label: "CV", value: workspace.cv ? "Cargado" : "Pendiente", tone: workspace.cv ? "green" : "amber", done: Boolean(workspace.cv) },
+    { label: "Consentimiento", value: workspace.consent?.status === "accepted" ? "Vigente" : "Pendiente", tone: workspace.consent?.status === "accepted" ? "green" : "amber", done: workspace.consent?.status === "accepted" },
   ];
 
   return <>
@@ -50,7 +51,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
           {checks.map((check) => <li key={check.label} className={styles.checkRow} data-done={check.done}>
             {check.done ? <CircleCheck className={styles.checkIcon} aria-hidden="true" /> : <CircleSlash className={styles.checkIcon} aria-hidden="true" />}
             <span className={styles.checkLabel}>{check.label}</span>
-            <span className={styles.checkValue}>{check.value}</span>
+            <span className={styles.checkValue}><Badge variant="status" tone={check.tone}>{check.value}</Badge></span>
           </li>)}
         </ul>
         <p className={styles.summaryNote}><ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />La Oficina de Empleo revisa los perfiles antes de derivarlos a una empresa.</p>
@@ -66,7 +67,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
         ? <Card className={styles.dashboardEmpty}><BriefcaseBusiness className="h-6 w-6 text-primary" aria-hidden="true" /><p className="mt-3 text-sm leading-6 text-muted-foreground">No tenés postulaciones en curso. Cuando te postules a una oferta, vas a verla acá con su estado.</p><Link href={offersHref} className={styles.emptyLink}>Explorar ofertas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card>
         : <ul className={styles.dashboardList}>{open.map((item) => <li key={item.id}>
           <Card className={styles.dashboardItem}>
-            <div className={styles.itemHead}><h3 className={styles.itemTitle}>{item.opening_title ?? "Oferta"}</h3><Badge><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></div>
+            <div className={styles.itemHead}><h3 className={styles.itemTitle}>{item.opening_title ?? "Oferta"}</h3><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></div>
             <p className={styles.itemMeta}><CalendarDays className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {receivedOn(item.created_at)}</p>
           </Card>
         </li>)}</ul>}
@@ -79,7 +80,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
       </div>
       <ul className={styles.dashboardList}>{closed.map((item) => <li key={item.id}>
         <Card className={styles.dashboardItem}>
-          <div className={styles.itemHead}><h3 className={styles.itemTitle}>{item.opening_title ?? "Oferta"}</h3><Badge variant="outline"><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></div>
+          <div className={styles.itemHead}><h3 className={styles.itemTitle}>{item.opening_title ?? "Oferta"}</h3><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></div>
           <p className={styles.itemMeta}><CalendarDays className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {receivedOn(item.created_at)}</p>
         </Card>
       </li>)}</ul>

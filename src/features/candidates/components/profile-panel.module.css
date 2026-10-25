@@ -28,6 +28,3 @@
   .attachment [data-slot="attachment-actions"] { flex-basis: 100%; }
 }
 .status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--color-brand-text); }
-.statusDot { display: inline-block; flex: 0 0 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--color-brand-muted); }
-.statusDot[data-tone="active"] { background: var(--color-brand-primary); }
-.statusDot[data-tone="incomplete"] { background: #b7791f; }

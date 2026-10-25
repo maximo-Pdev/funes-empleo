@@ -344,7 +344,6 @@
 .checkValue {
   margin-left: auto;
   text-align: right;
-  color: var(--color-muted-foreground);
 }
 
 .summaryNote {
