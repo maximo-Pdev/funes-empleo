@@ -90,7 +90,7 @@ select lives_ok($$select public.transition_participation(current_setting('us1.pa
 select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',1)::text,'session_id','ee000000-0000-4000-8000-000000000002')::text,true);
 select is((select count(*) from jsonb_object_keys(public.company_referral(current_setting('us1.referral')::uuid))),
-  4::bigint,'Tras revocación solo quedan cuatro campos no personales');
+  5::bigint,'Tras revocación quedan cuatro referencias y solo el nombre autorizado');
 select ok(not private.can_read_cv(private.fixture_id('cv',200)),'Retiro revoca la descarga inmediatamente');
 
 select set_config('request.jwt.claim.sub',private.fixture_id('candidate',203)::text,true);
@@ -242,7 +242,7 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_
 select lives_ok($$select public.submit_company_feedback(private.fixture_id('us1-referral',1),'hired','Respuesta ficticia tardía')$$,
   'Empresa informa tarde usando solo referencia no personal');
 select is((select count(*) from jsonb_object_keys(public.company_referral(private.fixture_id('us1-referral',1)))),
-  4::bigint,'El feedback no restablece datos privados');
+  5::bigint,'El feedback conserva nombre mínimo sin restablecer perfil/contactos/CV');
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee000000-0000-4000-8000-000000000001')::text,true);
 select throws_ok($$select public.transition_participation(private.fixture_id('us1-part',1),2,'late_hire','Corrección ficticia')$$,
@@ -327,7 +327,7 @@ select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_
 select ok(not private.can_company_read_referral(private.fixture_id('referral',5)),
   'Retiro de consentimiento deniega nueva lectura aun antes de materializar revocación');
 select is((select count(*) from jsonb_object_keys(public.company_referral(private.fixture_id('referral',5)))),
-  4::bigint,'La proyección no revela datos con consentimiento retirado');
+  5::bigint,'Consentimiento retirado conserva solo nombre y referencias');
 
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee000000-0000-4000-8000-000000000001')::text,true);

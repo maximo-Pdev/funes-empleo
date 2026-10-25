@@ -547,6 +547,13 @@ se apilan las columnas respetando ese orden de lectura. No duplicar tarjetas.
 - Check loading, errors, keyboard navigation and long forms in a real browser.
   This guide does not claim all private pages have been manually reviewed.
 
+## Nombres en derivaciones empresariales — EXTRA069
+
+Lista y encabezado identifican al candidato por su nombre actual; el código de
+derivación permanece secundario. Si terminó el permiso, explicar que solo se
+conserva el nombre para identificar el caso, sin perfil/contactos/foto/CV.
+Mantener selección por referencia opaca, formularios y reglas de informe vigentes.
+
 ## Current change review
 
 The 2026-10-20 alignment replaces Arial, maps legacy primary `#006833` to

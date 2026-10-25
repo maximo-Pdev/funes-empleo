@@ -29,7 +29,7 @@ export async function CompanyOpeningReferrals({ openingId, requestedReference }:
           <ul className="mt-3 space-y-2">{references.map(item => <li key={item.referral_id}>
             <Link href={`/empresa/ofertas/${openingId}?referral=${item.referral_id}#derivaciones`} aria-current={selectedId === item.referral_id ? "page" : undefined}
               className="block min-h-11 break-words rounded-lg border border-border p-3 text-primary-700 hover:bg-secondary aria-[current=page]:border-primary aria-[current=page]:bg-secondary">
-              <span className="block font-medium">{item.opening_title ?? "Oferta"}</span>
+              <span className="block font-medium">{item.candidate_name ?? "Candidato de esta derivación"}</span>
               <span className="block text-sm">{new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeZone: "America/Buenos_Aires" }).format(new Date(item.referred_at))}</span>
               <span className="block break-all text-xs"><RecordLabel kind="referral" id={item.referral_id} /></span>
             </Link>

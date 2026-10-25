@@ -1367,3 +1367,41 @@ Publicación solicitada2026-10-25: commit4d3922f sin firma/signoff/coautor y
 no borrador, en fix/admin-candidate-preview. Cambio ajeno next-env.d.ts fuera
 del commit; sin migración nueva ni cambios alojados. CI/revisión/merge y
 despliegue permanecen pendientes; no acredita aceptación municipal.
+
+### Nombre en derivaciones empresariales — EXTRA069,2026-10-25
+
+PR74 confirmado mergeado; main0bd10b1, rama previa local/remota eliminada y
+nueva fix/company-referral-names. next-env.d.ts ajeno preservado. Mateo confirmó
+nombre mínimo en toda derivación propia aunque termine el permiso, resolviendo
+el conflicto con stub039; empresa/cuenta activas y oferta/caso/derivación no
+archivados. No recupera perfil, contactos, foto, CV o consentimiento revocados.
+
+Migración20261025135805 añade company_referral_summaries y candidateName en
+company_referral; no cambia firma del RPC previo de referencias, hiredCandidate,
+helpers de perfil/CV, RLS o comandos de informes. Sin tablas/backfill/copias de
+nombres o cambios de estados/versiones por consulta. UI identifica nombres en
+lista/encabezado, código secundario, aviso claro y explicación candidata alineada.
+Proyección descarta clasificación histórica de categorías no usada por la ficha.
+
+Gates acotados: N1–N6 cubiertos100%, sin críticos/altos; convergencia final sin
+brechas nuevas y revisión React sin hallazgos.1195/90 unit/componentes,57 tooling,
+1275/24 SQL (41 nuevas),17 E2E finales sin omisiones/reintentos, tipos/lint/build/
+diff-check, advisor local y1440/390px/teclado/axe0 PASS. Cubre contratación normal/
+tardía, informe, retiro/reaceptación, suspensión/reactivación y CV denegado.
+
+Primer HTTP detectó25006: guard FOR SHARE requiere summaries VOLATILE; no se
+retiró el bloqueo. Fixture propio rehecho y suite íntegra final PASS. Solo
+funes-admin-cv-check54341/54342/app3001,500PDF ficticios; base habitual/alojada
+sin cambios. Recuperación y despliegue SQL antes que app en guía operativa.
+T198–201 completos técnicamente; migración alojada, commit/PR/CI, revisión
+humana, despliegue y aceptación pendientes. EXTRA069 conserva diagnósticos.
+
+Aplicación alojada posterior, autorizada por Mateo2026-10-25: únicamente
+20261025135805_company_referral_names ejecutada y registrada applied en el
+proyecto vinculado kyjycjojzhwggjuqjnki. Cuerpos por hash contra archivo, grants,
+VOLATILE/search_path del RPC y denegación sin sesión verificados; helpers de
+perfil/CV y contrato previo intactos. Respaldo exacto de definición/ACL anterior
+en test-results ignorado; no reset, backfill o reparación de versiones previas.
+Advisor56→57 WARN, cero ERROR: solo nuevo0029 del RPC autenticado intencional.
+Guía y EXTRA069 actualizados. Interfaz aún requiere commit/PR/CI/despliegue;
+esta ejecución no acredita revisión humana ni aceptación municipal.

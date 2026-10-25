@@ -1730,6 +1730,16 @@ export type Database = {
         Returns: number
       }
       company_referral: { Args: { p_referral: string }; Returns: Json }
+        company_referral_summaries: {
+          Args: { p_opening: string }
+          Returns: {
+            opening_id: string
+            opening_title: string | null
+            referral_id: string
+            referred_at: string
+            candidate_name: string
+          }[]
+        }
       company_referral_references: {
         Args: { p_opening: string }
         Returns: {

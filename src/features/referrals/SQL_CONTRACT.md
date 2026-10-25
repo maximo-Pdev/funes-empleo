@@ -83,8 +83,16 @@ Para resultado/cancelación, el servicio debe volver a leer la versión después
 `company_referral(p_referral uuid) -> jsonb` devuelve esos cuatro campos. Solo si la derivación
 mantiene acceso efectivo añade `candidate` (perfil laboral, todos los contactos vigentes,
 `cvDocumentId` exacto), entrevistas, feedback y versión de participación para registrar
-entrevista. Después de revocación o vencimiento, el JSON conserva **solo** los cuatro campos
-de referencia; no se entrega versión, resultado individual ni dato personal.
+entrevista. EXTRA069: el JSON incluye candidateName actual incluso tras revocación
+o vencimiento, junto a los cuatro campos de referencia; no se entregan versión,
+perfil, contactos, foto o CV revocados. hiredCandidate permanece para contratación
+confirmada propia (EXTRA062). No autoriza tratamiento real ni fija retención.
+
+`company_referral_summaries(p_opening uuid)` agrega candidate_name a las cuatro
+columnas anteriores, reutilizando company_referral_references para ámbito/orden
+y validando sesión/rol. Solo oferta/caso/derivación no archivados de propia empresa
+y cuenta activas, sin importar que el permiso completo ya terminó. No modifica
+la firma del endpoint anterior; se usa para identificar personas en la lista.
 
 `authorized_cv_path(p_cv uuid) -> text` reautoriza titular, administrador o empresa con
 derivación propia vigente y CV exacto. Solo el Route Handler privado consume la ruta; Storage
