@@ -40,6 +40,21 @@
   --color-border: #dce8e0;
   --color-accent-violet: #21126f;
 
+  /* Status tones: solid colour for dot, border and label; soft colour for the
+     surface. Keep in sync with src/domain/presentation/status-tone.ts. */
+  --color-status-green: #0b7a3b;
+  --color-status-green-soft: #e9f6ee;
+  --color-status-red: #b3251a;
+  --color-status-red-soft: #fbeae8;
+  --color-status-amber: #9a6b00;
+  --color-status-amber-soft: #fcf3db;
+  --color-status-blue: #1358a5;
+  --color-status-blue-soft: #e8f0fb;
+  --color-status-violet: #5758d6;
+  --color-status-violet-soft: #ededfc;
+  --color-status-neutral: #5b6472;
+  --color-status-neutral-soft: #eef1f5;
+
   --color-background: var(--color-page);
   --color-card: var(--color-surface);
   --color-card-foreground: var(--color-foreground);
