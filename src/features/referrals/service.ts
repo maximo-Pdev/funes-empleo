@@ -10,13 +10,14 @@ import { workflowRpcError } from "@/lib/errors/workflow-rpc";
 const id = z.guid();
 const referralInput = z.object({ participationId: id, expectedVersion: z.number().int().positive(), reason: z.string().trim().max(1_000).optional() });
 
-const categorySchema = z.object({ name: z.string(), kind: z.literal("occupation") });
+const categorySchema = z.object({ name: z.string() });
 const contactSchema = z.object({ kind: z.enum(["email", "phone", "other_approved"]), value: z.string() });
 const companyReferralSchema = z.object({
   referralId: id,
   openingId: id,
   openingTitle: z.string().nullable(),
   referredAt: z.iso.datetime({ offset: true }),
+  candidateName: z.string().optional(),
   participationVersion: z.number().int().positive().optional(),
   hiredCandidate: z.object({ displayName: z.string(), outcome: z.literal("hired") }).optional(),
   candidate: z.object({
@@ -35,6 +36,11 @@ const companyReferralSchema = z.object({
 });
 
 export type CompanyReferral = z.infer<typeof companyReferralSchema>;
+
+const referralSummariesSchema = z.array(z.object({
+  referral_id: id, opening_id: id, opening_title: z.string().nullable(),
+  referred_at: z.iso.datetime({ offset: true }), candidate_name: z.string(),
+}));
 
 export async function referCandidate(input: unknown) {
   const parsed = referralInput.safeParse(input);
@@ -59,12 +65,14 @@ export async function listCompanyReferralReferences(openingId: string) {
   const session = await readAccountSession();
   if (!session) throw new AppError("AUTH_REQUIRED");
   if (session.account.role !== "company" || session.account.status !== "active") throw new AppError("NOT_FOUND");
-  const { data, error } = await session.client.rpc("company_referral_references", { p_opening: openingId });
+  const { data, error } = await session.client.rpc("company_referral_summaries", { p_opening: openingId });
   if (error) {
     if (error.message === "NOT_FOUND") throw new AppError("NOT_FOUND");
     throw new AppError("INTERNAL_ERROR");
   }
-  return data ?? [];
+  const parsed = referralSummariesSchema.safeParse(data);
+  if (!parsed.success || parsed.data.some(item => item.opening_id !== openingId)) throw new AppError("INTERNAL_ERROR");
+  return parsed.data;
 }
 
 export async function getCompanyReferral(openingId: string, referralId: string): Promise<CompanyReferral> {
@@ -78,6 +86,6 @@ export async function getCompanyReferral(openingId: string, referralId: string):
     throw new AppError("INTERNAL_ERROR");
   }
   const parsed = companyReferralSchema.safeParse(data);
-  if (!parsed.success || parsed.data.openingId !== openingId) throw new AppError("NOT_FOUND");
+  if (!parsed.success || parsed.data.openingId !== openingId || parsed.data.referralId !== referralId) throw new AppError("NOT_FOUND");
   return parsed.data;
 }

@@ -1,5 +1,9 @@
 # Contratos de comandos y estados
 
+EXTRA069: conservar nombre en toda derivación propia es una proyección mínima,
+no transición ni restauración de acceso. Informe tardío, contratación normal/
+tardía, retiros, cierres y auditoría mantienen exactamente sus reglas.
+
 EXTRA062,2026-10-24: empresa propia activa puede editar published y reenviar a
 pending_review en una transacción, con completitud/versión y auditoría de edición/
 envío. Published deja de ser pública; conserva slug y casos/permisos, sin nuevas

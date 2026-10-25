@@ -147,9 +147,21 @@ No implica política municipal aprobada ni cambia versión/hash/aceptación.
 
 ## Atención presencial integrada, solicitud2026-10-24 (EXTRA059)
 
+### Identificación en derivaciones — EXTRA069,2026-10-25
+
+Mateo confirma que la empresa conserve únicamente el nombre de presentación de
+la persona en sus derivaciones propias aunque termine el permiso por retiro del
+consentimiento, falta de respuesta u otro cierre. Nombre visible en listado y
+encabezado del detalle/informe; no habilita perfil laboral, contactos, foto o CV
+revocados. Cuenta y empresa activas; oferta, caso y derivación no archivados.
+No expone nombres a empresas ajenas ni de personas sin derivación. Conserva
+resultados, consentimiento, auditoría y precondiciones del informe tardío.
+El nombre se lee del perfil existente; no crea snapshots o historial de nombres.
+Sustituye la prohibición de nombre del stub de FR039 y amplía R1 de EXTRA062.
+
 ### Ajustes empresariales confirmados2026-10-24 — EXTRA062
 
-R1: propia empresa activa conserva solo el nombre de su contratado confirmado
+R1 (ampliado por EXTRA069 a toda derivación propia): propia empresa activa conserva solo el nombre de su contratado confirmado
 normal/tardío en derivación/oferta/caso no archivados, aun revocado el permiso.
 Es una excepción explícita a la ocultación total: no restituye consentimiento,
 perfil, CV o contactos, no muestra contratados ajenos y no basta feedback empresarial.
@@ -756,7 +768,7 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   gestión administrativa y conservan su historial sin convertirse automáticamente en un resultado
   final. El feedback ya recibido permanece pendiente de revisión administrativa. Una empresa
   suspendida no puede enviar nuevo feedback; si solo el candidato está suspendido, una empresa aún
-  activa puede informar sobre su derivación mediante la referencia no personal de FR-039, sin
+  activa puede informar sobre su derivación mediante la referencia y el nombre mínimo de FR-039, sin
   recuperar datos del candidato. Al reactivar una cuenta candidata, la cuenta vuelve a `active` y el
   perfil conserva el estado anterior porque ni la suspensión ni la reactivación lo cambian por sí
   mismas; cada operación posterior revalida las condiciones vigentes. La reactivación de cualquier
@@ -882,7 +894,7 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   sin habilitarlo hasta que vuelva a completar los datos requeridos. El
   feedback ya recibido DEBE permanecer pendiente de revisión administrativa; la empresa suspendida
   NO DEBE enviar nuevo feedback. Si solo el candidato está suspendido, una empresa activa PUEDE
-  informar sobre una derivación propia usando únicamente la referencia no personal de FR-039.
+  informar sobre una derivación propia usando la referencia y el nombre mínimo de FR-039.
 - **FR-006**: Las personas no autenticadas DEBEN poder consultar únicamente información pública y
   ofertas vigentes publicadas; postularse DEBE requerir una cuenta de candidato.
 
@@ -1044,7 +1056,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   candidato, la Oficina PUEDE cerrar solo esa participación como cancelada, sin cancelar la oferta.
   Después de revocado el acceso a los datos del candidato, una empresa activa solo DEBE conservar
   para ese feedback tardío el identificador de su derivación, el identificador y título de su propia
-  oferta y la fecha de derivación; NO DEBE recuperar nombre, perfil, contactos ni CV del candidato.
+  oferta, la fecha de derivación y únicamente el nombre del candidato (EXTRA069).
+  NO DEBE recuperar perfil, contactos, foto ni CV revocados. La empresa/cuenta
+  deben estar activas y la oferta, participación y derivación no archivadas.
 - **FR-040**: Cuando no exista respuesta empresarial, el caso DEBE permanecer pendiente durante 30
   días exactos (720 horas) contados desde el instante de la derivación y luego cerrarse
   automáticamente como sin respuesta empresarial,

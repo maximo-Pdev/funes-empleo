@@ -1,5 +1,11 @@
 # Contratos del MVP
 
+EXTRA069,2026-10-25: company_referral_summaries(uuid) añade candidate_name a las
+referencias propias autorizadas y company_referral(uuid) conserva candidateName
+aun revocado el permiso completo. Cuenta/empresa activas, oferta/caso/derivación
+no archivados, sin restituir perfil/contactos/foto/CV. Firma del RPC anterior de
+referencias intacta; detalle y recuperación en docs/operations/company-referral-names.md.
+
 Estos contratos describen fronteras verificables del producto. No publican una API de terceros ni
 autorizan integraciones nuevas.
 
@@ -109,7 +115,8 @@ esta validación sin cambiar sus controles de sesión y revocación existentes.
 - Excepción aprobada para feedback empresarial append-only: el envío tardío recibe la referencia de
   derivación, bloquea y revalida propiedad/estado dentro de la transacción, e inserta un evento nuevo
   sin sobrescribir el agregado ni exigir una versión adicional a la empresa. Así la referencia
-  revocada conserva exactamente los cuatro campos no personales de FR-039.
+  revocada conserva los cuatro campos de referencia y el nombre mínimo de FR-039,
+  sin restaurar datos completos ni exigir versión (EXTRA069).
 - Éxito: resultado mínimo necesario, nueva versión y mensaje en español cuando corresponda.
 - Error esperado: código estable y mensaje accionable en español; no contiene stack, SQL, existencia
   de cuentas ajenas, PII, notas internas ni secretos.

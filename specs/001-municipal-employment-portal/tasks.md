@@ -679,6 +679,17 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T196 Registrar evidencia y contrato mínimo de categorías; RED3/45 y reparar proyección code/name sin cambios de matching, SQL o permisos. EXTRA068/spec/plan/contrato alineados; sin reintroducir Intereses ni sustituir consolidación057.
 - [x] T197 Respuestas legadas/mixtas/actuales, roles, campos privados/CV/identidad cruzada PASS;1178 unit/componentes/89 archivos,57 tooling,56 SQL, cinco recorridos de navegador sin omisiones/reintentos, tipos/lint/build/diff-check PASS.1440/390px, axe/foco/CV200/nominación/auditoría/exclusión verificados en fixture aislado. EXTRA068 registra diagnóstico y migraciones previas pendientes; commit/PR/CI/revisión/despliegue pendientes.
 
+## Identificar derivaciones empresariales — EXTRA069,2026-10-25
+
+- [x] T202 Corregir frontera de acceso entre roles del PR75: actor candidato distinto del recurso protegido, identidad propia tras redirección y nombre ajeno ausente; RED determinista/GREEN cuatro actores sin omisiones/reintentos, tipos aislados/lint/diff PASS. Fronteras también PASS en CI40205272342/044f40b; restantes119 PASS, dos expectativas antiguas de contratación requieren T203. Sin cambios de permisos/producto/SQL; evidencia EXTRA069.
+
+- [x] T203 Alinear contratación normal/tardía con excepción mínima de nombre en derivaciones propias revocadas; mantener retiro/atomicidad/participaciones intactas/CV denegado y exigir perfil/contactos ausentes. RED2/GREEN6 junto con fronteras, tipos aislados/lint/diff PASS; nueva CI completa pendiente de publicación. Solo E2E/documentación; EXTRA069.
+
+- [x] T198 Decisión humana/spec/plan/modelo/contratos/checklist alineados antes de código; análisisN1–N6 cobertura100%, sin críticos/altos. Rama desde main0bd10b1, cambios ajenos preservados; EXTRA069.
+- [x] T199 Migración20261025135805 aditiva summaries VOLATILE para guard FOR SHARE y nombre mínimo en company_referral; grants/firmas previas intactos. DTO/identidades validados, categorías legadas compatibles, lista/encabezado/aviso/explicación alineados; sin reactivar accesos o cambiar informes.
+- [x] T200 Roles/sesión/propiedad/archivo/activo/revocado/finales, ausencia de PII/CV y escrituras;1275 SQL/24 archivos (41 nuevas),1195 unit/componentes/90 archivos y17 E2E finales sin omisiones/reintentos PASS; contratación normal/tardía e informe sin reactivación conservados.
+- [x] T201 Tipos/lint/build/diff-check,57 tooling, advisor local y1440/390px/teclado/axe0 PASS. Guía/recuperación y convergencia sin brechas nuevas; EXTRA069 registra diagnósticos. Tras pedido posterior de Mateo,20261025135805 aplicada y registrada alojada2026-10-25: cuerpos/grants/volatilidad/guard/helpers verificados; advisor56→57 WARN (solo RPC autenticado previsto), cero ERROR. Commit/PR/CI/revisión/despliegue de UI pendientes.
+
 ## Español transversal — EXTRA051, 2026-10-22
 
 - [x] T151 Registrar evidencia y alinear alcance/spec/plan: presentación española en todos los roles, valores técnicos/contratos/contenido libre intactos; análisis sin nueva arquitectura o regla municipal.

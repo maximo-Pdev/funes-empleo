@@ -17,6 +17,13 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ### OQ-020 — Retiro automático del consentimiento al contratar (2026-10-21)
 
+Actualización2026-10-25, EXTRA069: ante la imposibilidad de identificar a quién
+informar, Mateo confirma conservar el nombre también en toda derivación propia
+con acceso terminado (retiro/falta de respuesta/otro cierre), con empresa/cuenta
+activas y oferta/caso/derivación no archivados. No restituye perfil/contactos/foto/
+CV, consentimiento o permisos; reemplaza la prohibición de nombre del stub039.
+Decisiones anteriores quedan como evidencia, no aprobación legal de datos reales.
+
 Actualización2026-10-24, EXTRA062: Mateo solicita conservar únicamente el nombre
 para la empresa de una contratación confirmada propia, con cuenta/empresa activas
 y oferta/caso/derivación no archivados. Excepción de proyección mínima, sin reactivar

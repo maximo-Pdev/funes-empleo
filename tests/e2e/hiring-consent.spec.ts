@@ -96,7 +96,10 @@ for (const late of [false, true]) {
       expect(runLocalMaintenanceSql(`select count(*) from public.referrals where candidate_id='${candidateId}' and access_status='active';`)).toBe("0");
       expect(runLocalMaintenanceSql(`select to_jsonb(part)::text from public.participations part where id='${otherParticipationId}';`)).toBe(otherCaseBefore);
       await company.reload();
-      await expect(company.getByText(name, { exact: true })).toHaveCount(0);
+      await expect(company.getByText(name, { exact: true })).toBeVisible();
+      await expect(company.getByRole("heading", { name: `Derivación de ${name}`, exact: true })).toBeVisible();
+      await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
+      await expect(company.getByRole("heading", { name: "Contactos vigentes", exact: true })).toHaveCount(0);
       await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
       expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
       await companyContext.clearCookies();
@@ -104,7 +107,9 @@ for (const late of [false, true]) {
       await company.goto(`/empresa/ofertas/${openingId}#derivaciones`);
       // El detalle canoniza la referencia privada; el fragmento no sobrevive al redirect de servidor.
       await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
-      await expect(company.getByText(`${name} · Contratado`, { exact: true })).toBeVisible();
+      await expect(company.getByRole("heading", { name: `Derivación de ${name}`, exact: true })).toBeVisible();
+      await expect(company.getByText("Contratado", { exact: true })).toBeVisible();
+      await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
       await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
       await expect(company.getByRole("link", { name: /Descargar CV/ })).toHaveCount(0);
       await expect(company.getByRole("button", { name: "Enviar informe" })).toHaveCount(0);

@@ -4,6 +4,24 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## Nombre en derivaciones propias — EXTRA069,2026-10-25
+
+RPC aditivo company_referral_summaries(uuid) devuelve las mismas referencias
+autorizadas por company_referral_references más candidate_name actual por join
+a referrals/participations/candidate_profiles. Revalida sesión/rol y reutiliza
+propiedad/cuenta/empresa/archivo del RPC existente, sin N+1 o snapshots. No cambia
+la firma anterior. company_referral añade candidateName mínimo antes del guard
+de datos completos; hiredCandidate permanece compatible. No cambia helper de
+lectura completa, CV, RLS, comandos o estados. Servidor valida ambas proyecciones,
+vincula oferta/derivación y descarta campos extra; UI muestra nombre en navegación
+y encabezado, código secundario y aviso de datos revocados. Explicación candidata
+se alinea sin sustituir política/version/hash. SQL antes que aplicación;
+recuperación restaura definición previa y retira RPC nuevo tras revertir app.
+Categorías del perfil completo proyectan únicamente name, descartando kind
+histórico no usado; evita que una clasificación antigua bloquee toda la ficha.
+Summaries se declara VOLATILE para que PostgREST permita FOR SHARE del guard
+de sesión; no añade DML ni elimina el bloqueo de autorización existente.
+
 ## Authorized candidate-photo design — EXTRA-059
 
 Use an additive private photo metadata/bucket migration, session-authorized read endpoint, tightly scoped trusted server image ingestion, profile-version locks and durable physical-cleanup retries. JPEG/PNG up to 5 MiB and 16 megapixels normalize to metadata-free WebP <=1024px with explicit sharp dependency. Official shadcn Base-nova Avatar/Attachment/Empty use Base UI/CVA while preserving municipal styles and existing Button contracts. The narrow service-role photo exception and deployment/recovery/verification requirements are in `../../docs/implementation/candidate-profile-photos.md`; review it alongside this plan before rollout. No current database reset or remote migration is permitted.
@@ -652,7 +670,8 @@ del compañero pendiente.
   retención, no esta ventana de acceso.
 - La empresa puede enviar feedback tardío sobre una derivación propia cuyo acceso a datos fue
   revocado. Para ubicarla ve solo su identificador de derivación, el identificador y título de su
-  oferta y la fecha de derivación, sin nombre, perfil, contactos ni CV del candidato. Una
+  oferta, la fecha de derivación y solo el nombre actual del candidato según EXTRA069;
+  no recupera perfil, contactos, foto o CV revocados. Una
   corrección tardía de `no_company_response` a `hired` conserva el acceso revocado: “mantener” una
   autorización de contratación no equivale a restaurar una autorización que ya terminó.
 - Administrador activo: operación municipal completa, siempre con actor identificado.
