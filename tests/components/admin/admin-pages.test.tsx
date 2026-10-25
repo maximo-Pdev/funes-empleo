@@ -326,6 +326,24 @@ function saveFixture(section: string, html: string) {
  mkdirSync(output, { recursive: true });
  writeFileSync(path.join(output, `${section}.json`), JSON.stringify({ section, html, css }));
 }
+it("muestra los estados con el badge compartido en las superficies administrativas", async () => {
+ const openingsView = render(await Openings({ searchParams: Promise.resolve({}) }));
+ const openingBadge = openingsView.container.querySelector<HTMLElement>("[class*='border-status-']");
+ expect(openingBadge?.textContent?.trim()).toBe("Pendiente de revisión");
+ expect(openingBadge?.className).toContain("border-status-amber");
+ openingsView.unmount();
+ const participationsView = render(await Participations({ searchParams: Promise.resolve({}) }));
+ const participationBadge = participationsView.container.querySelector<HTMLElement>("[class*='border-status-']");
+ expect(participationBadge?.textContent?.trim()).toBe("Recibida");
+ expect(participationBadge?.className).toContain("border-status-neutral");
+ participationsView.unmount();
+ const importsView = render(await Imports());
+ const importBadge = importsView.container.querySelector<HTMLElement>("[class*='border-status-']");
+ expect(importBadge?.textContent?.trim()).toBe("Bloqueado");
+ expect(importBadge?.className).toContain("border-status-red");
+ expect(importBadge?.querySelector("[aria-hidden='true']")).toBeTruthy();
+});
+
 it.each([
  ["alta presencial", () => Assisted()],
  ["historial de importaciones", () => Imports()],
