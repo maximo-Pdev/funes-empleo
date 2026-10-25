@@ -39,6 +39,8 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
 }
 
 test("empresa registra, corrige, somete y archiva una oferta bajo decisión municipal", async ({ page, browser, request }) => {
+  // This lifecycle includes email verification, two axe scans and two role sessions.
+  test.slow();
   const suffix = Date.now().toString().slice(-8);
   const email = `company-e2e-${suffix}@example.invalid`;
   const password = "Fictitious-Local-E2E-2026!";

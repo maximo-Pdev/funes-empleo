@@ -430,6 +430,8 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
 });
 
 test("el mantenimiento local cierra una oferta, vence permisos y permite corregir feedback tardío sin reabrir acceso", async ({ browser }) => {
+  // Four role sessions, SQL maintenance and outcome corrections share this journey.
+  test.slow();
   const context = { baseURL: "http://127.0.0.1:3000" };
   const companyContext = await browser.newContext(context);
   const hiredCompanyContext = await browser.newContext(context);
