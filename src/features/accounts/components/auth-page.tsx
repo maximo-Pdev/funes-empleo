@@ -5,7 +5,7 @@ export function AuthPage({ title, children }: { title: string; children: React.R
     <h1 className="text-3xl font-bold">{title}</h1>
     {children}
     <nav aria-label="Acceso" className="mt-8 flex flex-wrap gap-4">
-      <Link className="text-blue-800 underline" href="/login">Iniciar sesión</Link>
+      <Link className="text-blue-800 underline" href="/">Iniciar sesión</Link>
       <Link className="text-blue-800 underline" href="/recover">Recuperar acceso</Link>
       <Link className="text-blue-800 underline" href="/">Volver al inicio</Link>
     </nav>

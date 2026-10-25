@@ -9,9 +9,10 @@ import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/valid
 const genericRenewal = { message: "Si corresponde, recibirás un enlace en tu correo. Revisá también la carpeta de correo no deseado.", success: true };
 
 export async function loginAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
-  let status: "active" | "invalid" | "suspended" = "invalid";
+  let status: "active" | "invalid" | "suspended" | "already-active" = "invalid";
   try { status = (await signIn({ email: form.get("email"), password: form.get("password") })).status; }
   catch { return { message: "No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.", success: false }; }
+  if (status === "already-active") return { message: "Ya tenés la sesión iniciada", success: false };
   if (status === "suspended") redirect("/account-suspended");
   if (status !== "active") return { message: "No pudimos iniciar sesión. Revisá el correo, la contraseña y su verificación.", success: false };
   revalidatePath("/", "layout");
@@ -34,14 +35,14 @@ export async function registerAccountAction(_previous: AccountFormState, form: F
 export async function passwordAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   let success = false;
   try { success = await updatePassword({ password: form.get("password"), confirmation: form.get("confirmation") }); } catch { /* sanitized below */ }
-  if (success) redirect("/login?changed=1");
+  if (success) redirect("/?changed=1");
   return { message: "No se pudo guardar. Las contraseñas deben coincidir y tener al menos 6 caracteres. Si el enlace venció, solicitá uno nuevo.", success: false };
 }
 export async function logoutAction() {
   const client = await createServerSupabaseClient();
   await client.auth.signOut({ scope: "local" });
   revalidatePath("/", "layout");
-  redirect("/login");
+  redirect("/");
 }
 export async function accountStatusAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   try {
