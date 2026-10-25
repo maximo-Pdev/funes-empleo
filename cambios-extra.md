@@ -4126,3 +4126,25 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   sin borrador y adjunto a la conversación. Incluye27 archivos del incremento;
   next-env.d.ts ajeno y respaldos ignorados excluidos. Migración alojada ya
   aplicada/registrada; CI/revisión/merge/despliegue de interfaz pendientes.
+- **CI PR75, preparación de corrección2026-10-25:** ejecución40203520389,
+  head41f7047, application falla en authorization-boundaries.spec.ts:75. El
+  candidato1 vuelve correctamente a /account, cuyo panel muestra su propio
+  nombre; la prueba lo confunde con exposición ajena.29 E2E pasan y92 no corren
+  por dependencia; database/Vercel PASS. Antes de editar: usar candidato2 para
+  conservar prohibición de Persona ficticia001, verificar su propia identidad
+  en la redirección y mantener URLs/roles/ausencia de PII. Sin cambios a producto,
+  permisos, SQL o migración aplicada. Verificar RED/GREEN y los cuatro actores,
+  tipos/lint/diff-check, publicar en mismo PR sin firma y seguir CI completa.
+- **Corrección local PR75 verificada2026-10-25:** authorization-boundaries.spec.ts
+  inicia candidato2 frente a recursos del candidato1 y espera su nombre propio
+  antes de comprobar ausencia del ajeno. RED determinista en copia ficticia:
+  candidato1 con espera de carga reproduce la aserción contradictoria de CI;
+  la prueba original podía pasar antes de que llegara el contenido transmitido.
+  GREEN cuatro actores, cero reintentos/omisiones (21s). Lint y diff-check PASS;
+  tipos PASS en copia aislada de fuentes actuales. Typecheck raíz incluye
+  snapshots históricos ignorados y falla por sus contratos antiguos; no se
+  modifican esos snapshots ni tsconfig para ocultarlo. next typegen regeneró
+  next-env.d.ts: restaurados sus bytes ajenos exactos por SHA256 previo
+  B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+  Producto/build/SQL sin cambios respecto al head anterior, cuyos gates pasaron
+  en CI. Pendiente publicación y nueva ejecución completa del mismo PR.
