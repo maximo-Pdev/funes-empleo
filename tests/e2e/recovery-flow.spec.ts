@@ -32,10 +32,10 @@ test("enlace ficticio de recuperación habilita nueva contraseña una sola vez",
   await page.getByLabel("Nueva contraseña", { exact: true }).fill("Fictitious-Recovered-2026!");
   await page.getByLabel("Repetir nueva contraseña").fill("Fictitious-Recovered-2026!");
   await page.getByRole("button", { name: "Guardar nueva contraseña" }).click();
-  await expect(page).toHaveURL(/\/login\?changed=1$/);
+  await expect(page).toHaveURL(/\/\?changed=1$/);
   await page.getByLabel("Correo electrónico").fill("candidate3@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Recovered-2026!");
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
   await page.goto(verifyUrl!);
   await expect(page).toHaveURL(/\/recovery-invalid#?$/);

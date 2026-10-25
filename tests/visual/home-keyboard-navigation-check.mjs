@@ -36,10 +36,11 @@ try {
       checks.push({ width, mode, keyboardHome: "PASS" });
     }
   }
-  await page.goto(`${baseURL}/login`, { waitUntil: "networkidle" });
+  await page.goto(`${baseURL}/recover`, { waitUntil: "networkidle" });
   assert.equal(await page.locator('body > a[href="#contenido"]').count(), 0, "Standalone routes also omit the removed global link");
+  assert.equal(await page.locator("main#contenido").count(), 1, "Standalone routes keep a single main landmark");
   await page.keyboard.press("Tab");
-  assert.equal(await page.getByRole("main").locator('a[href="/"]').first().evaluate(el => el === document.activeElement), true, "Standalone navigation remains keyboard accessible");
+  assert.equal(await page.locator('header a[href="/"]').first().evaluate(el => el === document.activeElement), true, "Standalone navigation remains keyboard accessible");
   console.log(JSON.stringify({ status: "PASS", checks, globalSkipLink: "removed", mainLandmark: "preserved" }));
 } finally {
   await browser.close();

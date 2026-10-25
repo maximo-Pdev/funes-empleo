@@ -12,7 +12,7 @@ import { Dashboard } from "@/features/metrics/components/dashboard";
 import { localToday, metricsFilterSchema, metricsQuery } from "@/validation/metrics";
 export const dynamic = "force-dynamic";
 export default async function MetricsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const raw = await referenceFilters("/admin/metrics", await searchParams, { category: "category" });
   const today = localToday();
   const parsed = metricsFilterSchema.safeParse({ from: `${today.slice(0, 7)}-01`, to: today, ...raw });
@@ -26,7 +26,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
     error = e instanceof MetricsHistoryUnavailable ? `No hay evidencia histórica suficiente para ese período. ${e.message ? `El historial fiable comienza el ${new Date(e.message).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}; elegí fechas desde el día siguiente.` : "Elegí un período posterior al inicio del historial."} No se sustituyen datos históricos por valores actuales.` : publicErrorFrom(e).message;
   }
   const categoryReferences = await recordReferences("category", categories.map(category => category.id));
-  return <AdminShell active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
+  return <AdminShell email={user?.email} active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Seguimiento" }, { href: "/account", label: "Mi cuenta" }]}>
     <Form method="get" requirements={[{ names: ["from", "to"], rule: "date-order", message: "La fecha Hasta debe ser igual o posterior a Desde." }]} className="mb-6 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
       <Field>Desde<input className="mt-1 block rounded border p-2" name="from" type="date" required max={today} defaultValue={typeof raw.from === "string" ? raw.from : `${today.slice(0, 7)}-01`} /></Field>

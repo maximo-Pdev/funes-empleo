@@ -32,7 +32,7 @@ export function AuthSurface({ title, description, icon: Icon = KeyRound, childre
       {description && <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>}
       <div className={`${styles.forms} mt-5`}>{children}</div>
       <nav aria-label="Acceso" className="mt-6 grid gap-2 border-t border-border pt-4 sm:flex sm:flex-wrap sm:gap-x-5">
-        <Link href="/login" className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Iniciar sesión<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+        <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Iniciar sesión<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
         <Link href="/recover" className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Recuperar acceso</Link>
       </nav>
     </Card></section>

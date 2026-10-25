@@ -67,7 +67,7 @@ y hooks funcionales sin nuevos efectos ni solicitudes desde el cliente.
 - `src/app/(admin)/admin/candidates/page.tsx`
 - `src/app/(admin)/admin/candidates/assisted/loading.tsx`
 - `src/app/(admin)/admin/candidates/assisted/page.tsx`
-- `src/app/(admin)/admin/candidates/assisted/[candidateId]/page.tsx`
+
 - `src/app/(admin)/admin/candidates/[candidateId]/page.tsx`
 - `src/app/(admin)/admin/empresas/page.tsx`
 - `src/app/(admin)/admin/empresas/[companyId]/page.tsx`

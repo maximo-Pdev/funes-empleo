@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Form } from "@/components/forms/form";
 import { FileInput } from "@/components/forms/file-input";
+import { Button } from "@/components/ui/button";
 
 const messages = {
   invalid: "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente.",
@@ -43,6 +44,6 @@ export function CvUploadForm({ candidateId, version, returnTo, label = "Elegir P
       data-max-bytes={5 * 1024 * 1024} data-file-error="Elegí un PDF no vacío de hasta 5 MiB." />
     {saved && <p role="status">CV guardado.</p>}
     {refreshing && <p role="status">CV guardado; actualizando el perfil…</p>}
-    <button disabled={busy || refreshing} className="rounded bg-blue-800 p-3 text-white disabled:opacity-60">{busy || refreshing ? "Cargando CV…" : buttonLabel}</button>
+    <Button type="submit" disabled={busy || refreshing}>{busy || refreshing ? "Cargando CV…" : buttonLabel}</Button>
   </Form>;
 }

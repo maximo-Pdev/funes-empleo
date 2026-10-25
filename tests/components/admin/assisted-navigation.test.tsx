@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
+vi.mock("server-only", () => ({}));
 vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 

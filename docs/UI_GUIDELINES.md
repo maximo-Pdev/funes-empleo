@@ -7,6 +7,11 @@ manual or evidence of stakeholder acceptance.
 
 ## Before changing a page
 
+Home's left introduction follows the access selection: login retains its municipal
+message; candidate and company registration reuse the original registration guide,
+steps and privacy notice. Company registration also retains the documentary
+verification disclaimer. Switching back to login restores its original copy.
+
 1. Read this guide and `src/app/globals.css`.
 2. Reuse `Button`, `TextField` and `SelectField` from `src/components/ui` where
    applicable. Keep existing form actions, fields, validation and accessibility.
@@ -32,7 +37,11 @@ props, form actions, field names, validation, focus, error feedback, pending
 states and destructive-action meaning. Registry defaults must not reset the
 theme or silently change existing behavior.
 
-Migration status: requested, not implemented. `components.json` configures
+Migration status: partial. Candidate profile Avatar, Attachment, Empty and the
+compatible shared Button now use adapted official base-nova sources (EXTRA-059);
+independent verification/deployment status is tracked in
+`odd/tasks/candidate-profile-rebuild.md`. Other primitives and the sidebar are not
+automatically migrated. `components.json` configures
 `base-nova`, but current local primitives and sidebar are not thereby official
 registry installations. Historical native-control/no-dependency decisions below
 describe the current implementation, not an exemption for future components.
@@ -48,7 +57,10 @@ Employment Office, and a company only after an Office referral to that company.
 Never publish candidate photos through a public bucket or unrestricted URL.
 Company-logo visibility is not implicitly the same as candidate-photo visibility
 and must be established before implementing a read contract. See EXTRA-047 and
-EXTRA-048 in `cambios-extra.md`; neither image flow is implemented yet.
+EXTRA-048/059 in `cambios-extra.md`. Candidate-photo implementation now includes
+private persisted upload/change/remove and physical old-object cleanup; rollout
+requires its additive migration and existing server-only secret. Company logos
+remain unimplemented. See `docs/implementation/candidate-profile-photos.md`.
 
 Observed on 2026-10-20:
 
@@ -130,21 +142,50 @@ The homepage's compact layout uses 6px between labels and their controls,
 16px between field groups, and 12px panel padding. Reuse `--form-label-gap`,
 `--form-field-gap`, and `--form-panel-padding` through `form-compact`.
 These are intentional portal layout choices, not extracted municipal measurements.
-The homepage navbar is white with a 1px `--color-brand-muted` bottom border;
-it remains an overlay rather than taking space in the content flow.
+The homepage navbar uses a subtle white frosted-glass surface: 85% white and
+16px backdrop blur where supported, with solid white as the unsupported-browser
+fallback. Keep text, logo and controls fully opaque and sharp: never apply opacity
+or a foreground blur to the header itself. Retain the 1px `--color-brand-muted`
+bottom border and overlay positioning rather than taking space in the content flow.
 On desktop it is hidden at the top and slides into view after scrolling
-(`scrollY > 0`); returning to the top hides it again. The desktop transition lasts
+(`scrollY > 0`). After returning to the top from a positive scroll position, keep
+it open for 2000ms before hiding. Hover or keyboard focus within the navbar keeps
+it open even after that delay; leaving hides it only once the delay has expired.
+Cancel pending timers on renewed scrolling, breakpoint changes and unmount.
+The initial desktop top state remains hidden. The desktop transition lasts
 280ms and is disabled for reduced motion; hidden navigation is inert.
-Below 768px it is visible and interactive without scrolling, with no slide
-transition. A media-query subscription updates visibility on viewport changes.
+Below 768px it is fixed at the bottom, visible and interactive without scrolling,
+with no slide transition. Preserve a 64px control row plus the device bottom safe
+area, move the divider/shadow to its upper edge, and reserve 88px plus the safe
+area at the end of Home and the candidate workspace so content remains reachable.
+Remove the workspace's former top reservation; Home's introduction starts 24px
+from the top and its access anchor uses 24px clearance on mobile (88px desktop).
+A media-query subscription updates visibility on viewport changes.
 The left navbar brand uses the user-supplied `public/brand/funes-navbar-emblem.svg`
 (225×235 viewBox, copied without alteration) and links to `https://funes.gob.ar/`.
-Render the text-free vector emblem at 48px high with automatic proportional width
-inside a 64px navbar, on both the homepage and the `alwaysVisible` account variant.
+Render the vector emblem at 48px high with automatic proportional width inside
+a 64px navbar, on both the homepage and the `alwaysVisible` account variant.
+On desktop, place “Oficina de Empleo” / “Municipalidad de Funes” beside it;
+hide this identity text below 768px. Remove the repeated identity/logo from the
+hero, not its headline, summary, roles or intermediary notice. Preserve the
+official municipal destination even though Inicio links within the portal.
+Keep the white frosted bar, subtle border, visible keyboard focus and restrained
+hover underline. Add only a soft shadow after scrolling, not initial desktop
+visibility. The green action is “Ingresar” for anonymous visitors, a native link
+to the focusable `#contenido` landmark, returning to the very top of Home (including repeated activation), rather than aligning only the login card. The separate `#acceso` target retains its existing clearance for other links. With a verified
+active session, replace it with “Mi cuenta” at the current role-resolved panel
+destination (including `/dashboard` for candidates).
 Right-aligned text links provide `Inicio` (`#contenido` on the homepage, `/` in
 the account variant) and `Ofertas` (`/ofertas`). Use a native same-page anchor on
 the homepage so repeated activation returns to the start and focuses `main#contenido`.
 The link has no background, border or color filter; do not reuse the old green badge.
+The landing page is called Home. In `HomeNavbar`, mark the current destination
+with `aria-current="page"` and persist its existing hover style: green text and
+underline for Inicio on `/`, and Ofertas on `/ofertas` and its detail routes.
+Mi cuenta retains its own button hover treatment when its destination is current.
+Ingresar is an in-page shortcut, not a separate current page. Preserve all anchor
+destinations and navbar visibility rules; do not extend this navbar to other shells.
+
 At Mateo's explicit request (A16 / EXTRA-053, 2026-10-23), remove the root
 “Ir al contenido principal” link on all routes, not merely its styling or tab stop.
 Keep the unique `main#contenido` landmark, page headings, named navigation,
@@ -178,8 +219,9 @@ the existing candidate detail; archived entries retain its read-only restriction
 The section itself renders the existing AssistedProfileForm above the filters
 and list, so administrators can create a profile without first leaving this page.
 Keep its validation, duplicate resolution, save action and maintenance destination.
-The current creation route `/admin/candidates/assisted` and maintenance routes stay
-intact, with a return link to the new section. Filter submission and pagination
+The creation route `/admin/candidates/assisted` stays intact, with a return link to the new
+section. The former per-candidate maintenance route `/admin/candidates/assisted/[candidateId]`
+was retired: maintenance now happens in the candidate detail. Filter submission and pagination
 stay inside the section and use opaque category/candidate references (EXTRA-055).
 
 ## Administrative candidate CV
@@ -198,18 +240,95 @@ y atención presencial”; its validation, version checks and permission rules s
 unchanged. Candidate self-service and company referral access are unaffected.
 See EXTRA-054. No embedded PDF viewer or new file exposure is introduced.
 
-## Candidate account workspace
+## Landing access state and missing-field feedback
 
-Candidate `/account` uses a white main surface and a 264px left sidebar below the
-64px shared navbar. The non-collapsible composition in `src/components/ui/sidebar.tsx`
+Show nonempty informational feedback in the Home login and both registrations
+in the semantic informational color (`--color-feedback-info: #5758D6`, defined in
+`src/app/globals.css`) with a decorative `Info` SVG from the existing `lucide-react`
+library. Never substitute Unicode/ASCII glyphs or generated text for this icon.
+Keep the existing
+message text, live-region semantics and focus target. Preserve red error feedback,
+including login failures that use `role="status"` with `text-red-700`, and leave
+empty feedback collapsed without an icon. Static help and standalone forms retain
+their existing appearance. Registration's conditional verification notice is
+informational, not proof that an account or verification email was created.
+
+Resolve the active-session projection once on the server for both navbar and
+access panel. In login mode show “Ya tenés la sesión iniciada” instead of the
+form/recovery link when active; keep both registration roles enabled. The login
+service must check the authoritative session before provider sign-in, returning
+the same safe feedback without sign-in, sign-out, redirect or revalidation when
+already active. Keep anonymous login and suspension cleanup intact.
+Below the active-session message, show a green role-specific panel link:
+“Ir al panel de usuario” for candidates, “Ir al panel de empresa” for companies,
+and “Ir al panel de administración” for administrators. Resolve its label from
+the same verified session projection as its existing destination, never from the
+registration role selector. Keep its
+`Accesos principales` navigation landmark inside the access card, not in the
+left introduction. Hide this card shortcut in registration modes and for anonymous
+visitors. Public offers/detail pages retain their existing profile entries.
+
+Homepage login and registrations opt into `Form missingFieldMessages="summary"`.
+Suppress only generic required-empty text explanations. Keep the full error map,
+accurate “Revisá los x campos indicados.” count, first-invalid focus, required
+markers and `aria-invalid` red underlines. Do not remove useful format, length,
+confirmation, custom or supplied server errors. Suppressed paragraphs must not
+leave dangling error IDs in `aria-describedby`; preserve hints and labels.
+Other forms retain the default inline explanations.
+
+## Shared account workspace
+
+Candidate, company and administrator panels use the same `DashboardShell` in
+`src/components/ui/dashboard-shell.tsx` and the same `account.module.css` below.
+Change sidebar, navbar placement, workspace/canvas geometry, heading rhythm and
+identity styling there, not in role-specific copies. Shared CSS retains its
+existing candidate-prefixed names for compatibility; company uses those same
+classes. Role callers supply navigation, active links, persisted identity and
+content only. `CompanyShell` supplies company headings/content in that frame for
+dashboard, profile, offers, draft/detail, referrals and company `/account`.
+The company canvas is white, not empty: existing business information/forms remain
+inside it. Company identity shows legal name and verified session email (not the
+editable contact email), falling back to Mi empresa when the profile is missing.
+Cuenta keeps the password shortcut; logout appears once, in the shared sidebar.
+No company/admin data or permissions are exposed through this presentation reuse.
+
+`AdminShell` uses the same frame with Candidatos, Empresas, Ofertas,
+Participaciones, Importaciones, Métricas and Mi cuenta. Existing management
+content, contextual links and the internal-use notice remain inside `admin-canvas`.
+Administración is a truthful role fallback, not an invented personal name;
+each protected page supplies its verified session email. Loading shells show
+Correo no disponible until that identity is available. Page-local role guards
+are unchanged. Keep legacy admin-workspace CSS scoped to business content so
+it cannot restyle the shared sidebar/navbar. Admin account retains password
+and peer-administration controls, with logout only in the sidebar (EXTRA-068).
+
+### Candidate account workspace
+
+Candidate `/dashboard` (also rendered by `/account`) uses one shared centered white,
+natural-height canvas capped at 960px for Perfil, Panel de usuario, Postulaciones
+and Ofertas. The exterior is flat `--color-brand-primary`: no gradient or exterior
+animation. Desktop main and the 264px fixed sidebar start at top 0 behind the
+existing frosted navbar. Main padding-top is 96px (64px navbar + 32px clearance);
+sidebar uses the same internal top padding, preserving unobscured links. The
+canvas itself starts below the navbar, not behind it. Outer gutters are 24px on
+desktop and 16px on mobile. Nonprofile headings/content share one padded inner
+wrapper; the profile panel retains its own padding and `data-slot="profile-canvas"`.
+Other sections expose `data-slot="candidate-canvas"`; all use `candidateCanvas`.
+Below 768px the sidebar remains stacked in document flow, main uses 24px top padding
+rather than desktop clearance, and workspace reserves 88px plus the bottom safe
+area for the unchanged bottom navbar. This supersedes the earlier profile-only
+animated-gradient treatment (EXTRA-063; `odd/tasks/candidate-panel-finalize.md` S2–S4).
+The non-collapsible composition in `src/components/ui/sidebar.tsx`
 adapts the [shadcn Base sidebar anatomy](https://ui.shadcn.com/docs/components/base/sidebar)
 to existing local primitives and municipal tokens; it is not a full registry install
 and does not introduce Base UI dependencies, a theme reset or a second palette.
-The centered upper menu contains Perfil, Postulaciones and Ofertas. Its buttons
+The centered upper menu contains Panel de usuario, Perfil, Postulaciones, Ofertas and Cuenta. Its buttons
 fill the sidebar's inner width, use a 56px minimum height, 16px text and 22px icons,
 and retain a shared left-aligned icon/text column. Active
-links use `aria-current="page"`. The footer keeps password access, then logout,
-then a placeholder avatar with the persisted candidate display name and validated
+links use `aria-current="page"`. Cuenta (`section=cuenta`) contains the existing
+password shortcut to `/update-password`, absent from the sidebar footer and other
+candidate views. The unchanged logout form/action stays in the footer, followed by
+a placeholder avatar with the persisted candidate display name and validated
 session email. No photo upload or storage flow is implied by the placeholder.
 Keep the email on one clipped line. Measure actual text overflow with ResizeObserver
 and recheck after font loading and email changes. Only overflowing addresses loop
@@ -220,16 +339,21 @@ and accessible original text, and disable movement for reduced-motion preference
 including while hovered. Addresses that fit must remain static without a duplicate.
 Below 768px the sidebar moves into normal document flow before the main content.
 
-Views are selected with `/account?section=perfil|postulaciones|ofertas` and rendered
+Views are selected with `/dashboard?section=perfil|postulaciones|ofertas` and rendered
 on the server, without iframes or duplicate main landmarks. Missing/unsupported
-sections show the profile. Shared content preserves existing standalone candidate
-routes, forms, notices, application requirements, withdrawal confirmation and CV
-feedback. Account-local profile/offers links and pagination retain the selected
-view; public offer-detail links still open the existing detailed offer route.
-Archive controls are absent from this candidate account screen, including the
-embedded profile; standalone profile and other account roles remain unchanged.
-CV uploads may return only to the exact account profile destination or the existing
-legacy/admin destinations. See EXTRA-046 for compatibility and review status.
+sections show the dashboard summary. Shared content preserves forms, notices,
+application requirements, withdrawal confirmation and CV feedback without cloning.
+Profile/offers links and pagination retain the section, selected offer and page;
+public offer-detail links still open `/ofertas/[openingId]`. Its application link
+opens `/dashboard?section=ofertas&oferta=<slug>`.
+Archive controls remain absent from this candidate account screen. Administrator
+screens reuse the shared dashboard frame. CV uploads allow only exact `/dashboard?section=perfil` or
+`/account?section=perfil` return contexts; unsupported contexts fall back to the
+dashboard profile. Administrative uploads keep their candidate detail destination
+or the administration list for malformed IDs. See EXTRA-056, which supersedes
+the legacy route compatibility in EXTRA-046.
+`/candidato/perfil`, `/candidato/ofertas` and `/candidato/postulaciones` have no
+page, rewrite or redirect: direct requests, including query variants, return 404.
 
 ## Homepage ribbons and offers shortcut
 
@@ -249,11 +373,17 @@ Pause when off-screen or the document is hidden; reduced motion draws a preloade
 static frame, never an empty canvas. Release frames/observers/listeners on unmount.
 A dark overlay preserves readable white foreground text; CSS provides a fallback.
 
-Restore the complete municipal information from `src/app/(auth)/login/page.tsx`
+Preserve the complete municipal information from the historical `src/app/(auth)/login/page.tsx`
 and the supplied screenshot: office/municipality identity, “El empleo en Funes,
 con acompañamiento municipal.”, the introduction, Postulantes/Empresas descriptions
 and the municipal intermediary notice. This replaces the former employment slogan.
 Use the existing fonts, icons and identity asset; do not change business wording.
+
+The introduction swaps between login, postulante and empresa instead of
+replacing its text instantly. Remount it per view and let each direct block
+enter with a 420ms fade plus an 8px rise, staggered 45ms up to the fifth block.
+Keep the animation decorative: no text, order or destination changes, no
+residual transform once it settles, and `animation: none` under reduced motion.
 
 The right half uses the principal green `#074A1F`. Its form panel is white,
 with dark labels, helper text and underlined fields, plus a neutral gray bevel,
@@ -270,6 +400,9 @@ with extra bottom clearance on narrower desktop layouts to avoid the offers acti
 Company uses symmetric top/bottom clearance. Only in company desktop mode, the
 offers shortcut is centered below the left quadrant so it cannot cover the wide,
 vertically centered card. Other modes retain their existing shortcut position.
+Animate its horizontal position in both directions over 360ms with the card's
+ease-out timing. Keep it in normal flow without horizontal movement on mobile;
+disable the transition for reduced-motion preferences.
 Do not clip or scale fields to claim viewport fit:
 tall forms still use normal document scrolling. A content
 ResizeObserver updates the card's explicit natural height. Both height and wrapper
@@ -289,9 +422,13 @@ Homepage registration forms opt into `homepageLayout`; other routes retain their
 original field layout. The company order is company name, responsible person/email,
 CUIT/activity, locality/contact phone, password and password confirmation.
 Each slash-separated pair shares a desktop row and stacks in that order on mobile.
-Required indicators derive from the existing native `required`
-attributes, not new validation rules. CSS-generated asterisks have an empty
-accessible alternative to avoid duplicating native required announcements.
+Required indicators derive from the existing native `required` attributes.
+Use a single shared Field marker, not an additional CSS pseudo-element.
+Homepage login starts without markers; submitting an empty required field shows
+a red marker. Homepage registration starts with gray markers, turning red only
+for missing required values after submission. Correction hides the login marker
+or restores registration gray; other invalid nonempty values retain their error
+messages and ARIA state. Other forms keep their existing red markers.
 Optional phone has no asterisk or “(opcional)” suffix on the homepage.
 Both homepage registration forms end with “Los campos marcados con * son
 obligatorios.” below the submit. Registration password guidance is only
@@ -299,10 +436,18 @@ obligatorios.” below the submit. Registration password guidance is only
 but preserve it in login and password-change flows. Native limits and confirmation
 validation remain unchanged.
 
+The homepage is the unified login surface. `/login` returns 404, with no redirect
+or duplicate page. Login links and logout go directly to `/`; password changes
+return to `/?changed=1`. This supersedes the temporary compatibility redirect
+recorded in EXTRA-051 (login), per EXTRA-056. The left
+introduction contains no account/profile, Ofertas or Iniciar sesión shortcuts.
+Keep authenticated panel access inside the login card and in the navbar, plus
+the existing lower offers shortcut.
+
 Below 768px, show the complete municipal introduction first, followed by the
 login/registration card, then the offers footer. Reuse the same content and DOM
-order as desktop, without duplicating text. Clear the 64px navbar by 24px
-(88px introduction top padding) and leave 32px between introduction and card.
+order as desktop, without duplicating text. Use 24px introduction top padding
+with the navbar now below, and leave 32px between introduction and card.
 Use 32px before the intermediary notice on mobile; preserve all its wording.
 The card remains horizontally centered and naturally sized in every access mode;
 do not vertically center login independently or add a second top clearance for
@@ -327,10 +472,18 @@ The offers action has its own in-flow footer with 24px padding above and below;
 it is no longer absolutely positioned over mobile content. The desktop offers
 action retains its original floating position.
 
-The floating “Ver ofertas disponibles” action links to `#ofertas-disponibles`,
-the currently empty white section below the hero. Native smooth anchor scrolling
-uses the existing 104px target clearance (not the navbar height) and becomes instant for
-reduced-motion preferences. Do not add placeholder job offers to this section.
+The floating “Ver ofertas disponibles” action uses the navbar's frosted finish,
+with 85% white and the same 16px backdrop blur, plus solid fallback.
+Its existing light-green hover tint also remains 85% opaque where supported;
+the navbar uses the same 85% white.
+Keep the text and arrow fully opaque, and preserve its shape, position and focus.
+It links to `#ofertas-disponibles`, the currently empty white section below the
+hero. Native smooth anchor scrolling
+aligns the section with the viewport top, with zero target scroll margin, so no
+part of the hero remains visible. Preserve the fixed navbar overlay and the
+separate access-panel clearance; do not apply a navbar offset to this full-screen
+section jump. Scrolling becomes instant for reduced-motion preferences. Do not
+add placeholder job offers to this section.
 
 ## Atención presencial integrada — EXTRA059
 
@@ -373,6 +526,16 @@ se apilan las columnas respetando ese orden de lectura. No duplicar tarjetas.
   `node tests/visual/municipal-style-check.mjs` (optionally set `VISUAL_BASE_URL`).
   It checks desktop/mobile login and both registration forms, fonts, underlines,
   labels, focus, toggles and generic controls without submitting forms.
+- Run `node tests/visual/candidate-workspace-check.mjs` for standalone 1440px/390px
+  geometry checks of all four candidate sections, with both motion preferences.
+  The runner exports actual React composition from the focused component test,
+  compiles current global/module CSS without Next, and writes screenshots/results
+  under Hermes scratch (or `CANDIDATE_WORKSPACE_OUTPUT_DIR`). Services use explicitly
+  fictitious mocked fixtures: this proves layout, not live authenticated data.
+  It checks flat primary green, white centered natural-height canvas, navbar/sidebar
+  clearance, bottom-navbar reservation and overflow. Headless safe-area env is zero;
+  the additive `env(safe-area-inset-bottom)` declaration is checked separately.
+  `profile-gradient-check.mjs` is retained only as an entrypoint to this static proof.
 - Run repository-required unit tests, lint, typecheck and production build.
 - Run `node tests/visual/home-responsive-layout-check.mjs` against a local server
   for full-height registration, width animation, required markers and mobile

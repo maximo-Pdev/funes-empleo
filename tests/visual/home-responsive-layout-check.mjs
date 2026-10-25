@@ -72,14 +72,14 @@ try {
           const f = getComputedStyle(footer);
           const a = action.getBoundingClientRect();
           const box = footer.getBoundingClientRect();
-          const navbar = document.querySelector("header").getBoundingClientRect();
+
           const introduction = document.querySelector("h1").parentElement;
           const intro = introduction.getBoundingClientRect();
-          return { padding: [f.paddingTop, f.paddingBottom], above: a.top - box.top, below: box.bottom - a.bottom, introGap: el.getBoundingClientRect().top - intro.bottom, introClearance: introduction.firstElementChild.getBoundingClientRect().top + scrollY - navbar.height };
+          return { padding: [f.paddingTop, f.paddingBottom], above: a.top - box.top, below: box.bottom - a.bottom, introGap: el.getBoundingClientRect().top - intro.bottom, introClearance: introduction.firstElementChild.getBoundingClientRect().top + scrollY };
         });
         assert.deepEqual(mobileSpacing.padding, ["24px", "24px"]);
         assert.ok(Math.abs(mobileSpacing.introGap - 32) < 1, "All mobile access modes follow the complete introduction with consistent spacing");
-        assert.equal(mobileSpacing.introClearance, 24, "Introduction clears the mobile navbar");
+        assert.equal(mobileSpacing.introClearance, 24, "Introduction retains top spacing without the former upper navbar reservation");
         assert.ok(Math.abs(mobileSpacing.above - 24) < 1 && Math.abs(mobileSpacing.below - 24) < 1);
       } else if (mode !== "login") {
         const spacing = await card.evaluate(el => {
@@ -134,7 +134,7 @@ try {
         const marker = Boolean(requiredMarker?.textContent?.includes("*")) || getComputedStyle(label, "::after").content.includes("*");
         return { name: input.name, required: input.required, marker };
       }));
-      assert.ok(indicators.every(input => input.required === input.marker), "Asterisks match required attributes, not optional fields");
+      assert.ok(indicators.every(input => (mode === "login" ? false : input.required) === input.marker), "Only registration required fields show initial asterisks");
       assert.doesNotMatch(await card.innerText(), /\(opcional\)/i);
       if (mode === "login") {
         assert.equal(await card.getByText("Entre 6 y 128 caracteres. No compartas tu contraseña.", { exact: true }).count(), 1);

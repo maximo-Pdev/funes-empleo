@@ -7,13 +7,17 @@ export function formControls(form: HTMLFormElement): FormControl[] {
     && element.willValidate);
 }
 
+export function controlMissing(control: FormControl): boolean {
+  if (!control.willValidate) return false;
+  return control instanceof HTMLInputElement && control.type === "file"
+    ? control.required && !control.files?.length
+    : control.validity.valueMissing || (control.required && control.type !== "checkbox" && !control.value.trim());
+}
+
 export function controlError(control: FormControl): string {
   if (!control.willValidate) return "";
   if (control.validity.customError) return control.validationMessage;
-  const missing = control instanceof HTMLInputElement && control.type === "file"
-    ? control.required && !control.files?.length
-    : control.validity.valueMissing || (control.required && control.type !== "checkbox" && !control.value.trim());
-  if (missing) {
+  if (controlMissing(control)) {
     if (control.type === "checkbox" || control.type === "radio") return "Confirmá esta opción para continuar.";
     if (control.type === "file") return "Seleccioná un archivo para continuar.";
     if (control instanceof HTMLSelectElement) return "Elegí una opción.";

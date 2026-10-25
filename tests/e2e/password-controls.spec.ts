@@ -56,7 +56,7 @@ for (const registration of [
 }
 
 test("muestra y oculta la contraseña de ingreso con teclado", async ({ page }) => {
-  await page.goto("/login");
+  await page.goto("/");
   const password = page.getByLabel("Contraseña", { exact: true });
   await password.fill("Fictitious-Login-Only!");
   await password.press("Tab");

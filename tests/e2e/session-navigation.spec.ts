@@ -29,9 +29,9 @@ async function expireStoredSession(context: BrowserContext) {
 }
 
 for (const account of [
-  { role: "candidate", href: "/candidato/perfil", label: "Mi perfil" },
-  { role: "company", href: "/empresa/perfil", label: "Mi perfil" },
-  { role: "admin", href: "/account", label: "Mi cuenta" },
+  { role: "candidate", href: "/dashboard?section=perfil", label: "Mi perfil", panelHref: "/dashboard", panelLabel: "Ir al panel de usuario" },
+  { role: "company", href: "/empresa/perfil", label: "Mi perfil", panelHref: "/empresa", panelLabel: "Ir al panel de empresa" },
+  { role: "admin", href: "/account", label: "Mi cuenta", panelHref: "/account", panelLabel: "Ir al panel de administración" },
 ] as const) {
   for (const entry of ["public", "private"] as const) {
     test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page, browser }) => {
@@ -49,12 +49,14 @@ for (const account of [
       for (const path of ["/", "/ofertas", detail]) {
         await page.goto(path);
         const navigation = page.getByRole("navigation", { name: "Accesos principales", exact: true });
-        await expect(navigation.getByRole("link", { name: account.label, exact: true })).toHaveAttribute("href", account.href);
+        const destination = path === "/" ? { label: account.panelLabel, href: account.panelHref } : account;
+        if (path === "/") await expect(page.getByRole("region", { name: "Acceso al portal" })).toContainText("Ya tenés la sesión iniciada");
+        await expect(navigation.getByRole("link", { name: destination.label, exact: true })).toHaveAttribute("href", destination.href);
         await expect(navigation.getByRole("link", { name: "Iniciar sesión", exact: true })).toHaveCount(0);
-        await navigation.getByRole("link", { name: account.label, exact: true }).click();
-        await expect(page).toHaveURL(account.href);
+        await navigation.getByRole("link", { name: destination.label, exact: true }).click();
+        await expect(page).toHaveURL(destination.href);
         await page.reload();
-        await expect(page).toHaveURL(account.href);
+        await expect(page).toHaveURL(destination.href);
       }
 
       const resumed = await browser.newContext({ baseURL: "http://127.0.0.1:3000", storageState: await page.context().storageState() });
@@ -65,15 +67,15 @@ for (const account of [
 
         await page.goto("/account");
         await page.getByRole("button", { name: "Cerrar sesión", exact: true }).click();
-        await expect(page).toHaveURL(/\/login$/);
+        await expect(page).toHaveURL(/\/$/);
         await page.goto("/");
-        await expect(page.getByRole("navigation", { name: "Accesos principales", exact: true }).getByRole("link", { name: "Iniciar sesión", exact: true })).toBeVisible();
+        await expect(page.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
         await page.goto(account.href);
         await expect(page).toHaveURL(/\/session-expired$/);
         await tab.goto(account.href);
         await expect(tab).toHaveURL(/\/session-expired$/);
         await tab.goto("/");
-        await expect(tab.getByRole("navigation", { name: "Accesos principales", exact: true }).getByRole("link", { name: "Iniciar sesión", exact: true })).toBeVisible();
+        await expect(tab.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
       } finally { await resumed.close(); }
     });
   }

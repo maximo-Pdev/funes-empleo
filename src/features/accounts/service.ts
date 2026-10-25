@@ -19,6 +19,8 @@ export async function registerAccount(input: unknown) {
 export async function signIn(input: unknown) {
   const parsed = credentialsInput.safeParse(input);
   if (!parsed.success) return { status: "invalid" as const };
+  const existing = await readAccountSession();
+  if (existing?.account.status === "active") return { status: "already-active" as const };
   const client = await createServerSupabaseClient();
   const result = await client.auth.signInWithPassword(parsed.data);
   if (result.error) return { status: "invalid" as const };

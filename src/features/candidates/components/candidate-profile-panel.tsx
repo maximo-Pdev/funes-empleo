@@ -8,6 +8,12 @@ import { changeConsentAction } from "../consent-actions";
 import { candidateProfileStatusLabels } from "../candidate-profile-status";
 import { displayLabel } from "@/domain/presentation/labels";
 import { CvUploadForm } from "./cv-upload-form";
+import { CandidatePhotoForm } from "./candidate-photo-form";
+import styles from "./profile-panel.module.css";
+import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Attachment, AttachmentMedia, AttachmentContent, AttachmentTitle, AttachmentDescription, AttachmentActions } from "@/components/ui/attachment";
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
 
 type State = { message: string; success: boolean };
@@ -22,12 +28,13 @@ function ActionMessage({ state }: { state: State }) {
 }
 
 export function CandidateProfilePanel({ profile, dni, address, phone, categories, selectedCategories,
-  consent, cv, cvReference, policy, cvMessage, cvReturnTo }: {
+  consent, cv, cvReference, photo, photoCleanupPending, photoUnavailable, policy, cvMessage, cvReturnTo }: {
   profile: Profile; dni: string; address: string | null; phone: string | null;
   categories: Category[]; selectedCategories: string[];
   consent: { status: string; policy_version: string; recorded_at: string } | null;
   cv: { id: string; original_name_safe: string; byte_size: number } | null;
   cvReference?: string; policy: Policy; cvMessage?: string; cvReturnTo?: string;
+  photo?: { id: string } | null; photoCleanupPending?: boolean; photoUnavailable?: boolean;
 }) {
   const router = useRouter();
   const [saved, saveAction, saving] = useActionState(saveProfileAction, { message: "", success: false });
@@ -46,23 +53,26 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     !cv && "Cargá un CV PDF válido.",
   ].filter(Boolean);
   const canActivate = activatableState && activationRequirements.length === 0;
-  const field = "w-full rounded border border-slate-500 bg-white p-2";
-  return <div className="space-y-8">
-    <section className="grid gap-3 rounded border bg-white p-5" aria-label="Activación del perfil">
-      <p role="status" className="rounded bg-blue-50 p-3">{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{displayLabel(candidateProfileStatusLabels, profile.status)}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
+  const statusTone = profile.status === "active" ? "active" : ["draft", "needs_update"].includes(profile.status) && activationRequirements.length > 0 ? "incomplete" : "neutral";
+  const field = "municipal-control";
+  return <div className={styles.panel}>
+    <CandidatePhotoForm candidateId={profile.id} version={profile.version} photo={photo} name={profile.display_name} cleanupPending={photoCleanupPending} unavailable={photoUnavailable} />
+    <section className={styles.section} aria-label="Activación del perfil">
+      <p role="status" className={styles.status}>
+        <span data-profile-status data-tone={statusTone} className={styles.statusDot} aria-hidden="true" />{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{displayLabel(candidateProfileStatusLabels, profile.status, "En revisión")}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
       {canActivate && <Form action={activateAction} result={activation} className="grid gap-3" aria-busy={activating}>
         <h2 className="text-xl font-semibold">Activar perfil</h2><p>Tu perfil cumple los requisitos guardados. Activá tu perfil para postularte y ser considerado por la Oficina de Empleo.</p>
         <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />
-        <button disabled={activating} className="rounded bg-green-800 p-3 text-white">Activar perfil</button>
+        <Button type="submit" disabled={activating}>Activar perfil</Button>
       </Form>}
-      {activatableState && activationRequirements.length > 0 && <>
-        <h2 className="text-xl font-semibold">Antes de activar tu perfil</h2>
-        <p>Completá estos pasos en las secciones de abajo. El botón aparecerá cuando los cambios estén guardados.</p>
+      {activatableState && activationRequirements.length > 0 && <Empty className={styles.pending}>
+        <EmptyHeader><h2 className="text-xl font-semibold">Antes de activar tu perfil</h2>
+          <EmptyDescription>Completá estos pasos en las secciones de abajo. El botón aparecerá cuando los cambios estén guardados.</EmptyDescription></EmptyHeader>
         <ul className="list-disc space-y-1 pl-5">{activationRequirements.map(requirement => <li key={String(requirement)}>{requirement}</li>)}</ul>
-      </>}
+      </Empty>}
     </section>
-    <section className="grid gap-6 rounded border bg-white p-5" aria-label="Datos laborales y personales">
-    <Form action={saveAction} result={saved} data-profile-details className="grid gap-4" aria-busy={saving}>
+    <section className={styles.section} aria-label="Datos laborales y personales">
+    <Form action={saveAction} result={saved} data-profile-details className={styles.details} aria-busy={saving}>
       <h2 className="text-xl font-semibold">Datos laborales y personales</h2>
       <input type="hidden" name="version" value={profile.version} />
       <Field className="grid gap-1">Nombre y apellido<input className={field} name="name" defaultValue={profile.display_name} required minLength={2} maxLength={200} /></Field>
@@ -72,22 +82,32 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       <Field className="grid gap-1">Disponibilidad<select className={field} name="availability" required defaultValue={profile.availability ?? "available"}><option value="available">Disponible</option><option value="unavailable">No disponible</option></select></Field>
       <Field className="grid gap-1">Detalle de disponibilidad<input className={field} name="detail" defaultValue={profile.availability_detail ?? ""} maxLength={500} /></Field>
       <Field className="grid gap-1">Domicilio privado (opcional)<input className={field} name="address" defaultValue={address ?? ""} maxLength={500} autoComplete="street-address" /></Field>
-      <fieldset className="rounded border p-3"><legend className="font-semibold">Categorías laborales</legend><p className="mb-2 text-sm">Elegí una o varias.</p><div className="grid gap-2 sm:grid-cols-2">{categories.map((category) => <Field key={category.id} className="flex items-start gap-2"><input type="checkbox" name="categories" value={category.id} defaultChecked={selectedCategories.includes(category.id)} />{category.name}</Field>)}</div></fieldset>
-      <ActionMessage state={saved} /><button disabled={saving} className="rounded bg-blue-800 p-3 text-white">Guardar correcciones</button>
+      <fieldset className={styles.group}><legend className="font-semibold">Categorías laborales</legend><p className="mb-2 text-sm">Elegí una o varias.</p>{categories.length === 0 && <Empty className={styles.empty}><EmptyHeader>
+        <EmptyTitle>No hay categorías laborales disponibles.</EmptyTitle><EmptyDescription>El catálogo no está disponible. Volvé a intentar más tarde o consultá a la Oficina de Empleo.</EmptyDescription>
+      </EmptyHeader></Empty>}<div className="grid gap-2 sm:grid-cols-2">{categories.map((category) => <Field key={category.id} className={styles.choice}><input type="checkbox" name="categories" value={category.id} defaultChecked={selectedCategories.includes(category.id)} />{category.name}</Field>)}</div></fieldset>
+      <ActionMessage state={saved} /><Button type="submit" disabled={saving}>Guardar correcciones</Button>
     </Form>
     <Form action={phoneAction} result={contact} className="grid gap-3" aria-label="Guardar teléfono opcional" aria-busy={savingPhone}>
       <input type="hidden" name="version" value={profile.version} />
       <Field className="grid gap-1">Teléfono (opcional)<input {...candidatePhoneField} className={field} name="phone" type="tel" defaultValue={phone ?? ""} maxLength={50} /></Field>
-      <ActionMessage state={contact} /><button disabled={savingPhone} className="rounded bg-blue-800 p-3 text-white">Guardar teléfono</button>
+      <ActionMessage state={contact} /><Button type="submit" disabled={savingPhone}>Guardar teléfono</Button>
     </Form>
     </section>
-    <section className="grid gap-3 rounded border bg-white p-5" aria-label="CV PDF">
-      <h2 className="text-xl font-semibold">CV PDF</h2><p>{cv ? `CV vigente: ${cv.original_name_safe}` : "Todavía no hay un CV vigente."}</p>
-      {cv && cvReference && <a className="text-blue-800 underline" href={`/api/cv/${cvReference}`}>Descargar mi CV</a>}
+    <section className={styles.section} aria-label="CV PDF">
+      <h2 className="text-xl font-semibold">CV PDF</h2>
+      {cv && cvReference ? <Attachment className={styles.attachment}>
+        <AttachmentMedia><FileText aria-hidden="true" /></AttachmentMedia>
+        <AttachmentContent><AttachmentTitle title={cv.original_name_safe}>{cv.original_name_safe}</AttachmentTitle>
+          <AttachmentDescription>CV vigente · PDF · {new Intl.NumberFormat("es-AR").format(cv.byte_size)} bytes</AttachmentDescription>
+        </AttachmentContent>
+        <AttachmentActions><a className={styles.download} href={`/api/cv/${cvReference}`}>Descargar mi CV</a></AttachmentActions>
+      </Attachment> : <Empty className={styles.empty}><EmptyHeader><EmptyMedia variant="icon"><FileText aria-hidden="true" /></EmptyMedia>
+        <EmptyTitle>Todavía no hay un CV vigente.</EmptyTitle><EmptyDescription>Cargá un PDF válido para completar este requisito del perfil.</EmptyDescription>
+      </EmptyHeader></Empty>}
       {cvMessage && <p role={cvMessage === "ok" ? "status" : "alert"}>{cvMessage === "ok" ? "CV guardado." : cvMessage === "conflict" ? "El perfil cambió. Recargá antes de reemplazar el CV." : "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente."}</p>}
       <CvUploadForm candidateId={profile.id} version={profile.version} returnTo={cvReturnTo} />
     </section>
-    <Form action={consentAction} result={consentState} className="grid gap-3 rounded border bg-white p-5" aria-busy={changingConsent}>
+    <Form action={consentAction} result={consentState} className={styles.section} aria-busy={changingConsent}>
       <h2 className="text-xl font-semibold">Consentimiento de prueba</h2>
       <p>Al aceptar, autorizás a la Oficina de Empleo a registrar y usar tus datos para acompañar tu búsqueda laboral y gestionar futuras derivaciones. Es un consentimiento general, no una aceptación por cada oferta.</p>
       <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
@@ -95,15 +115,15 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       <p>La empresa que te contrató podrá seguir viendo únicamente tu nombre en el registro de esa contratación. Esto no le devuelve acceso a tu perfil, contactos ni CV.</p>
       <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
       <p>También podés retirarlo manualmente: se bloquean nuevas derivaciones, se revocan los accesos empresariales y se cierran como retiradas tus participaciones abiertas. Los resultados finales y el historial se conservan.</p>
-      <details className="rounded border p-3">
-        <summary className="cursor-pointer font-semibold">Ver política de consentimiento</summary>
+      <details className={styles.group}>
+        <summary className={styles.policySummary}>Ver política de consentimiento</summary>
         <p className="mt-3">{policy.policy_text} Esta versión <strong>{policy.version}</strong> no es texto municipal aprobado.</p>
       </details>
       <p>Estado actual: {consent?.status === "accepted" ? "aceptado" : consent?.status === "withdrawn" ? "retirado" : "pendiente"}.</p>
       <input type="hidden" name="version" value={profile.version} />
       <Field className="grid gap-1">Acción<select className={field} name="status" required defaultValue={consent?.status === "accepted" ? "withdrawn" : "accepted"}><option value="accepted">Aceptar</option><option value="withdrawn">Retirar</option></select></Field>
-      <Field className="flex gap-2"><input type="checkbox" name="confirmed" required />Confirmo esta decisión y entiendo sus efectos.</Field>
-      <ActionMessage state={consentState} /><button disabled={changingConsent} className="rounded bg-blue-800 p-3 text-white">Guardar consentimiento</button>
+      <Field className={styles.choice}><input type="checkbox" name="confirmed" required />Confirmo esta decisión y entiendo sus efectos.</Field>
+      <ActionMessage state={consentState} /><Button type="submit" disabled={changingConsent}>Guardar consentimiento</Button>
     </Form>
   </div>;
 }

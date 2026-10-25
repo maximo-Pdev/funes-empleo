@@ -69,7 +69,7 @@ export async function confirmReportedOutcome(input: unknown) {
   if (error) throw databaseError(error.message);
   if (outcome === "hired") {
     for (const path of ["/admin/candidates", "/admin/atencion-presencial", "/admin/candidates/[candidateId]", "/admin/openings/[openingId]",
-      "/candidato/perfil", "/company/openings/[openingId]/referrals"]) revalidatePath(path, "page");
+      "/dashboard", "/account", "/empresa/ofertas/[openingId]"]) revalidatePath(path, "page");
   }
   return { version: data };
 }

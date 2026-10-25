@@ -6,18 +6,23 @@ test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ pa
   assertLocalTargets();
   await page.goto("/account");
   await expect(page).toHaveURL(/\/session-expired$/);
-  await page.goto("/login");
+  await page.goto("/");
+  const headline = page.getByRole("heading", { level: 1 });
+  await expect(headline).toBeVisible();
+  // El hero anima el h1 con un fade de 420 ms desde opacity 0: un barrido de axe durante
+  // la animación reporta page-has-heading-one aunque el h1 ya esté en el DOM.
+  await expect.poll(() => headline.evaluate(element => Number(getComputedStyle(element).opacity))).toBe(1);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByLabel("Correo electrónico").fill("candidate1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
-  await expect(page.getByRole("heading", { name: "Mi perfil", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Panel de usuario", exact: true })).toBeVisible();
   const sections = page.getByRole("navigation", { name: "Secciones de mi cuenta" });
-  await expect(sections.getByRole("link", { name: "Perfil", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(sections.getByRole("link", { name: "Panel de usuario", exact: true })).toHaveAttribute("aria-current", "page");
   await expect(sections.getByRole("link", { name: "Postulaciones", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Cerrar sesión" }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/$/);
   await page.goto("/account");
   await expect(page).toHaveURL(/\/session-expired$/);
 });

@@ -1,7 +1,9 @@
 # Diseño del área de candidatos
 
-Las páginas `/candidato/perfil`, `/candidato/ofertas` y `/candidato/postulaciones`
-usan la identidad municipal de las pantallas públicas y de registro: logos existentes,
+Las secciones `/dashboard?section=perfil`, `/dashboard?section=ofertas` y
+`/dashboard?section=postulaciones` reutilizan el contenido compartido sin clonar.
+Las tres URLs anteriores y `/login` responden 404 sin redirecciones (EXTRA-056).
+El acceso está en `/`. Se conserva la identidad municipal: logos existentes,
 verde institucional, superficies claras, tarjetas, iconos Lucide y foco visible.
 
 La cabecera y navegación son locales a `(candidate)`. Los estilos de formularios están

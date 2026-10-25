@@ -120,7 +120,9 @@ Suggested structure:
 2. Make clear that offers need municipal review before publication.
 3. Preserve existing validation and actions.
 
-### Login: `src/app/(auth)/login/page.tsx`
+### Login: homepage access panel (formerly `src/app/(auth)/login/page.tsx`)
+
+EXTRA-056 supersedes the standalone route: `/login` returns 404; use `/`.
 
 Goal: match the product identity and avoid plain HTML feel.
 

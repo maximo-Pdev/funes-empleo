@@ -12,10 +12,10 @@ test.beforeEach(() => {
 });
 async function signIn(page: Page, email = "admin1@example.invalid") {
   const password = localFixturePassword();
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 async function fillProfile(page: Page, name: string, dni: string) {
@@ -41,7 +41,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
   const id = referenceIdentifier("candidate", page.url().split("/").pop()!);
   expect(id).toMatch(/^[0-9a-f-]{36}$/);
-  const maintenance = `/admin/candidates/assisted/${id}`;
+  // The assisted maintenance workspace (profile, consent, claim and CV) now lives on the candidate detail itself.
   const detail = `/admin/candidates/${id}`;
   await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado: Activo");
   expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("1");
@@ -70,6 +70,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await page.getByRole("button", { name: "Guardar nota" }).click();
   await expect.poll(() => runLocalMaintenanceSql(`select count(*) from public.internal_notes where candidate_id='${id}'`)).toBe("1");
   await page.goto(detail);
+  await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
   await expect(page.getByText("Orientación ficticia de entrevista presencial")).toBeVisible();
   const hash = createHash("md5").update("funes-demo-v1:opening:1").digest("hex");
   const opening = `${hash.slice(0,8)}-${hash.slice(8,12)}-${hash.slice(12,16)}-${hash.slice(16,20)}-${hash.slice(20)}`;
@@ -85,8 +86,6 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   const cvLink = page.getByRole("link", { name: "Descargar CV vigente" });
   await expect(cvLink).toHaveAttribute("href", /^\/api\/cv\/cv-[0-9a-f]{24}$/);
   const previousCv = await cvLink.getAttribute("href");
-  await page.goto(maintenance);
-  await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
   await page.getByLabel("Archivo PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   await page.getByRole("button", { name: "Cargar CV", exact: true }).click();
   await expect(page.getByText("CV guardado.")).toBeVisible();
@@ -113,7 +112,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   try {
     const company = await companyContext.newPage();
     await signIn(company, "company1@example.invalid");
-    await company.goto(`/company/openings/${opening}/referrals`);
+    await company.goto(`/empresa/ofertas/${opening}#derivaciones`);
     await expect(company.getByText(name, { exact: true })).toBeVisible();
     const referredProfile = company.locator("#derivaciones");
     await expect(referredProfile.getByRole("heading", { name: "Categorías laborales", exact: true })).toBeVisible();
@@ -141,10 +140,10 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     const link = (mail.Text ?? mail.HTML ?? "").match(/https?:\/\/[^\s"<>]+/)?.[0]?.replaceAll("&amp;", "&");
     expect(link).toBeTruthy();
     await candidate.goto(link!);
-    await candidate.goto("/candidato/perfil");
+    await candidate.goto("/dashboard?section=perfil");
     await expect(candidate.locator("body")).toContainText(/presencial/);
     const before = runLocalMaintenanceSql(`select jsonb_build_object('origin',origin,'status',status,'consents',(select count(*) from public.candidate_consents where candidate_id='${id}'),'cases',(select count(*) from public.participations where candidate_id='${id}'),'notes',(select count(*) from public.internal_notes where candidate_id='${id}')) from public.candidate_profiles where id='${id}'`);
-    await page.goto(maintenance);
+    await page.goto(detail);
     await page.getByLabel("Cuenta solicitante").selectOption({ label: `${email} · verificado` });
     await page.getByLabel("DNI exhibido", { exact: true }).fill("98000009");
     await page.getByLabel("Motivo de vinculación").fill("Identidad comprobada en atención ficticia");
@@ -161,7 +160,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await expect(page.getByRole("button", { name: "Suspender cuenta", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Descargar CV vigente" })).toBeVisible();
     await expect(page.getByText("Orientación ficticia de entrevista presencial")).toBeVisible();
-    await page.goto(maintenance);
+    await page.goto(detail);
     await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
     await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toHaveCount(0);
     const after = runLocalMaintenanceSql(`select jsonb_build_object('origin',origin,'status',status,'consents',(select count(*) from public.candidate_consents where candidate_id='${id}'),'cases',(select count(*) from public.participations where candidate_id='${id}'),'notes',(select count(*) from public.internal_notes where candidate_id='${id}')) from public.candidate_profiles where id='${id}'`);

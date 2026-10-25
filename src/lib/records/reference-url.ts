@@ -6,7 +6,7 @@ import { databaseIdentifierPattern, type ReferenceKind } from "./reference-forma
 const routeRules: readonly [RegExp, ReferenceKind][] = [
   [/^(\/admin\/candidates\/(?:assisted\/)?)([^/]+)$/, "candidate"],
   [/^(\/admin\/empresas\/)([^/]+)$/, "company"],
-  [/^(\/(?:admin\/openings|empresa\/ofertas|company\/openings)\/)([^/]+)(\/referrals)?$/, "opening"],
+  [/^(\/(?:admin\/openings|empresa\/ofertas)\/)([^/]+)$/, "opening"],
   [/^(\/admin\/participations\/)([^/]+)$/, "participation"],
   [/^(\/(?:admin\/imports|api\/admin\/imports)\/)([^/]+)(\/confirm)?$/, "import"],
   [/^(\/api\/cv\/)([^/]+)$/, "cv"],
@@ -26,7 +26,7 @@ export async function referenceUrl(href: string): Promise<string> {
   if (url.pathname === "/admin/candidates" || url.pathname === "/admin/atencion-presencial") queries.push(["categoryId", "category"]);
   if (url.pathname === "/admin/participations") queries.push(["openingId", "opening"], ["candidateId", "candidate"]);
   if (url.pathname === "/admin/metrics" || url.pathname === "/api/admin/exports/operations.csv") queries.push(["category", "category"]);
-  if (url.pathname.startsWith("/company/openings/") || /^\/empresa\/ofertas\/[^/]+$/.test(url.pathname)) queries.push(["referral", "referral"]);
+  if (/^\/empresa\/ofertas\/[^/]+$/.test(url.pathname)) queries.push(["referral", "referral"]);
   if (url.pathname === "/admin/imports/new" || url.pathname === "/api/admin/imports/preview") queries.push(["retry", "import"]);
   for (const [key, kind] of queries) {
     const value = url.searchParams.get(key);

@@ -6,7 +6,7 @@ import { listMyParticipations } from "@/features/participations/candidate-servic
 import { CandidateWithdrawForm } from "@/features/participations/components/candidate-status";
 import { candidateStatusLabels } from "@/features/participations/candidate-status-labels";
 
-export async function renderCandidateParticipationsContent({ offersHref = "/candidato/ofertas" }: { offersHref?: string } = {}) {
+export async function renderCandidateParticipationsContent({ offersHref = "/dashboard?section=ofertas" }: { offersHref?: string } = {}) {
   const items = await listMyParticipations();
   return <>
     <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{items.length} {items.length === 1 ? "participación registrada" : "participaciones registradas"}</p><Link href={offersHref} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-primary hover:bg-secondary">Explorar ofertas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></div>

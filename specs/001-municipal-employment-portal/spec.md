@@ -1,10 +1,23 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## Authorized profile increment — EXTRA-059
+
+The requesting developer authorized rebuilding Perfil inside its existing 960px canvas and persisted candidate-photo upload/change/removal. Previous photo bytes must be physically deleted on replacement/removal; metadata/audit may remain. Access follows full-profile privacy (owner, active Office staff, company only through a live authorized referral); photos are optional for profile activation. Preserve all existing profile fields, phone/CV transports, consent text and effects, roles and intermediary policy. Company logos, new legal wording, unrelated page redesign and remote deployment are excluded. Full acceptance checks and user strings: `../../odd/tasks/candidate-profile-rebuild.md`; design/recovery: `../../docs/implementation/candidate-profile-photos.md`. Implementation/review status is tracked separately, not automatically accepted.
+
 **Feature Branch**: `spec/municipal-employment-portal-mvp`
 
 **Created**: 2026-09-19
 
 **Status**: Approved
+
+**Routing amendment authorized by Maxi, 2026-10-23 (EXTRA-056):**
+«Está bien, haz eso eliminar las tres rutas de candidato, actualizar todos sus enlaces y destinos al panel, y dejar que las URLs anteriores den 404 y lo mismo con /login».
+Candidate profile, offers and participations use `/dashboard?section=perfil`,
+`/dashboard?section=ofertas` and `/dashboard?section=postulaciones`. Retired
+`/candidato/perfil`, `/candidato/ofertas`, `/candidato/postulaciones` and `/login`
+return HTTP 404 without redirects, including query variants. Login is at `/`.
+Existing content, validation, role guards, CV feedback and selected-offer queries
+are preserved. Public `/ofertas` and other-role `/account` behavior remain intact.
 
 **Approval record**: Máximo approved the current scope and business rules on 2026-10-17.
 This approval does not establish final product acceptance, close open questions or pending
@@ -32,6 +45,30 @@ de inicio y ofertas públicas reemplazan Iniciar sesión por Mi perfil de candid
 o empresa activa, o Mi cuenta de administrador activo, sin exponer datos personales.
 Login/logout actualizan esos accesos sin compartir la respuesta entre usuarios.
 Aceptación y límites: A02/A03 en la matriz; sin aprobar retrospectivamente el Draft.
+
+## Ajuste de acceso y navegación autorizado — 2026-10-22
+
+Máximo solicita trasladar “Oficina de Empleo” / “Municipalidad de Funes” y el
+emblema del hero a la navbar en escritorio, conservando el enlace al sitio oficial
+de Funes y la visibilidad inicial actual. La navbar ofrece Ingresar hacia el
+recuadro existente o Mi cuenta hacia el panel correspondiente si hay sesión activa.
+El hero conserva el contenido restante y el fondo animado.
+
+Con sesión activa verificada, el modo Iniciar sesión muestra “Ya tenés la sesión
+iniciada” sin otro formulario de login. El servidor impide otro inicio de sesión
+antes de autenticar credenciales nuevas; ambos autorregistros siguen disponibles
+con sus reglas de confirmación existentes. Los campos vacíos de estos formularios
+de portada mantienen las líneas rojas y el resumen “Revisá los x campos indicados.”,
+sin repetir “Completá este campo.”. Se conservan errores útiles de formato,
+confirmación y servidor, validaciones y semántica accesible. Trazabilidad EXTRA-052.
+
+**Refinamiento autorizado de portada, 2026-10-23:** Máximo solicita retirar Mi
+perfil del cuadrante izquierdo y colocar “Ir al panel de usuario” debajo de
+“Ya tenés la sesión iniciada”. El destino usa el panel vigente por rol y conserva
+la entrada de navegación accesible dentro del recuadro; ofertas y detalle no
+cambian. Ver ofertas disponibles se desplaza suavemente al cuadrante izquierdo
+al seleccionar Registrarse → Empresa y vuelve al salir de ese modo, sin movimiento
+horizontal móvil ni animación con movimiento reducido. Trazabilidad EXTRA-053.
 
 ## Incremento A08 autorizado — 2026-10-19
 
@@ -241,8 +278,11 @@ automáticamente. No agrega catálogos municipales, reglas o migraciones.
 
 ## Formularios — ajuste autorizado 2026-10-20
 
-Todos los formularios indican requisitos vigentes con asterisco rojo y semántica
-required. Enviar incompletos/incorrectos marca cada campo, explica en español
+Los formularios conservan semántica required. En la portada unificada, el login
+no muestra asteriscos inicialmente: aparecen rojos al enviar campos obligatorios
+vacíos. Los registros muestran un único asterisco gris por obligatorio, rojo
+cuando falta el valor tras enviar y gris de nuevo al completarlo. Otros formularios
+conservan asteriscos rojos. Enviar incompletos/incorrectos marca cada campo, explica en español
 cómo corregirlo, anuncia un resumen y enfoca el primer error. Al corregir se
 actualizan los errores. Incluye inputs, selects, textareas, confirmaciones,
 grupos requeridos y archivos; opcionales y borradores conservan sus reglas.

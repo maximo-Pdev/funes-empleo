@@ -1,6 +1,12 @@
-import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import accountStyles from "@/app/(auth)/account/account.module.css";
+import homeStyles from "@/app/(public)/home.module.css";
+import formStyles from "@/components/forms/form.module.css";
+import companyStyles from "@/app/(company)/_components/company-forms.module.css";
+vi.mock("server-only", () => ({}));
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), workspace: vi.fn(), offers: vi.fn(), categories: vi.fn(), references: vi.fn(), referral: vi.fn() }));
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/companies/service", () => ({ getCompanyWorkspace: mocks.workspace }));
@@ -9,22 +15,59 @@ vi.mock("@/features/referrals/service", () => ({ listCompanyReferralReferences: 
 vi.mock("@/features/companies/company-actions", () => ({ saveCompanyProfileAction: vi.fn() }));
 vi.mock("@/features/openings/company-actions", () => ({ saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn(), cancelCompanyOpeningAction: vi.fn() }));
 vi.mock("@/features/referrals/feedback-actions", () => ({ submitFeedbackAction: vi.fn(), submitInterviewAction: vi.fn() }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), redirect: (url: string) => { throw new Error(`REDIRECT:${url}`); }, notFound: () => { throw new Error("NOT_FOUND"); } }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/empresa", useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), redirect: (url: string) => { throw new Error(`REDIRECT:${url}`); }, notFound: () => { throw new Error("NOT_FOUND"); } }));
+vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn() }));
 import Dashboard from "@/app/(company)/empresa/page";
 import Profile from "@/app/(company)/empresa/perfil/page";
 import Offers from "@/app/(company)/empresa/ofertas/page";
 import NewOpening from "@/app/(company)/empresa/ofertas/nueva/page";
 import Opening from "@/app/(company)/empresa/ofertas/[openingId]/page";
-import Referrals from "@/app/(company)/company/openings/[openingId]/referrals/page";
+
+import Account from "@/app/(auth)/account/page";
 import { CompanyOpeningReferrals } from "@/features/referrals/components/company-opening-referrals";
 const id = "0a000000-0000-4000-8000-000000000001";
 const offer = { id, title: "Auxiliar administrativo", tasks: "Atención y administración ficticias", requirements: "Experiencia administrativa", vacancies: 1, location: "Funes", modality: "Presencial", schedule: "Jornada completa", contract_type: "Permanente", closingDate: "2026-11-30", salary: null, benefits: null, status: "draft", version: 1, createdAt: "2026-10-07", categories: [{ id, name: "Administración" }], history: [{ decision: "request_changes", previousStatus: "submitted", newStatus: "changes_requested", message: "Detallar el horario de la búsqueda.", at: "2026-10-07T12:00:00Z" }] };
 const workspace = { profile: { id, legalName: "Empresa Ficticia", cuit: "30712345678", responsibleName: "Persona Ficticia", email: "empresa@example.invalid", phone: "", activity: "Servicios administrativos ficticios", locality: "Funes", status: "active", version: 1 }, account: { version: 1 }, bootstrap: "ready" };
 const referral = { referralId: id, openingId: id, openingTitle: offer.title, referredAt: "2026-10-07T12:00:00Z", participationVersion: 1, candidate: { displayName: "Persona Ficticia", locality: "Funes", skillsExperienceSummary: "Experiencia ficticia en administración", availability: "Jornada completa", categories: [{ name: "Administración", kind: "occupation" }], contacts: [], cvDocumentId: id } };
 beforeEach(() => {
- vi.clearAllMocks(); mocks.guard.mockResolvedValue(undefined); mocks.workspace.mockResolvedValue(workspace);
+ vi.clearAllMocks(); mocks.guard.mockResolvedValue({ user: { email: "login@example.invalid" }, account: { role: "company" } }); mocks.workspace.mockResolvedValue(workspace);
  mocks.offers.mockResolvedValue({ items: [offer], page: 1, pageSize: 10, total: 11 }); mocks.categories.mockResolvedValue(offer.categories);
  mocks.references.mockResolvedValue([{ referral_id: id, opening_title: offer.title, referred_at: referral.referredAt }]); mocks.referral.mockResolvedValue(referral);
+});
+it.each([
+ ["dashboard", () => Dashboard(), "/empresa"],
+ ["profile", () => Profile(), "/empresa/perfil"],
+ ["offers", () => Offers({ searchParams: Promise.resolve({}) }), "/empresa/ofertas"],
+ ["new", () => NewOpening(), "/empresa/ofertas"],
+ ["opening", () => Opening({ params: Promise.resolve({ openingId: id }) }), "/empresa/ofertas"],
+] as const)("renders %s in the shared account frame with company identity", async (name, page, active) => {
+ const view = render(await page());
+ saveFixture(name, view.container.innerHTML);
+ const sidebar = screen.getByRole("complementary", { name: "Panel de empresa" });
+ const main = screen.getByRole("main");
+ expect(screen.getAllByRole("main")).toHaveLength(1);
+ expect(main.querySelector('[data-slot="company-canvas"]')).toBeTruthy();
+ expect(main.querySelectorAll("h1")).toHaveLength(1);
+ expect(within(sidebar).getByText("Empresa Ficticia")).toBeTruthy();
+ expect(within(sidebar).getByTitle("login@example.invalid")).toBeTruthy();
+ expect(within(sidebar).queryByText("empresa@example.invalid")).toBeNull();
+ const nav = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/empresa", "/empresa/perfil", "/empresa/ofertas", "/account"]);
+ expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
+ expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
+ expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
+ expect(document.querySelector("header[data-home]")).toBeTruthy();
+});
+it("keeps company account settings in the same frame without duplicate logout", async () => {
+ const view = render(await Account());
+ saveFixture("account", view.container.innerHTML);
+ const sidebar = screen.getByRole("complementary", { name: "Panel de empresa" });
+ expect(within(sidebar).getByText("Empresa Ficticia")).toBeTruthy();
+ expect(sidebar.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe("/account");
+ expect(screen.getByRole("main").querySelector('[data-slot="company-canvas"]')).toBeTruthy();
+ expect(screen.getByRole("link", { name: /Cambiar contraseña/ }).getAttribute("href")).toBe("/update-password");
+ expect(screen.getAllByRole("button", { name: "Cerrar sesión" })).toHaveLength(1);
+ expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
 });
 it("mantiene el bloqueo del panel sin consultar ofertas cuando falta el perfil", async () => {
  mocks.workspace.mockResolvedValue({ profile: null }); render(await Dashboard());
@@ -118,9 +161,7 @@ it("la contratación propia conserva solo nombre y no ofrece CV/contactos/entrev
  expect(screen.queryByRole("button", { name: "Enviar informe" })).toBeNull();
  expect(screen.queryByRole("button", { name: "Registrar entrevista" })).toBeNull();
 });
-it("ruta antigua de derivaciones dirige al detalle empresarial canónico", async () => {
- await expect(Referrals({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) })).rejects.toThrow(`REDIRECT:/empresa/ofertas/${fixtureReference("opening", id)}#derivaciones`);
-});
+
 it("contratación legada con permiso completo no duplica el nombre ni oculta su resultado", async () => {
  mocks.referral.mockResolvedValue({ ...referral, hiredCandidate: { displayName: referral.candidate.displayName, outcome: "hired" } });
  render(await CompanyOpeningReferrals({ openingId: id }));
@@ -133,6 +174,19 @@ it("conserva el límite de oferta inexistente", async () => {
  mocks.offers.mockResolvedValue({ items: [] }); await expect(Opening({ params: Promise.resolve({ openingId: id }) })).rejects.toThrow("NOT_FOUND");
 });
 
+function saveFixture(section: string, html: string) {
+ const output = process.env.COMPANY_WORKSPACE_FIXTURE_DIR;
+ if (!output) return;
+ const modules = [
+  ["src/app/(auth)/account/account.module.css", accountStyles],
+  ["src/app/(public)/home.module.css", homeStyles],
+  ["src/components/forms/form.module.css", formStyles],
+  ["src/app/(company)/_components/company-forms.module.css", companyStyles],
+ ] as const;
+ const css = modules.map(([file, names]) => readFileSync(file, "utf8").replace(/\.([a-zA-Z_][\w-]*)/g, (selector, name: string) => names[name] ? `.${names[name]}` : selector)).join("\n");
+ mkdirSync(output, { recursive: true });
+ writeFileSync(path.join(output, `${section}.json`), JSON.stringify({ section, html, css }));
+}
 vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
 vi.mock("@/lib/records/page-references", async () => (await import("../../fixtures/record-references")).pageReferenceMocks);
 vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

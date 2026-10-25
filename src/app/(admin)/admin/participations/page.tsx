@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminParticipationsPage({ searchParams }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const original = await searchParams;
   const raw = await referenceFilters("/admin/participations", original, { openingId: "opening", candidateId: "candidate" });
   const openingId = typeof raw.openingId === "string" ? raw.openingId : undefined;
@@ -38,7 +38,7 @@ export default async function AdminParticipationsPage({ searchParams }: {
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;
 
-  return <AdminShell active="/admin/participations" title="Participaciones" description="La Oficina evalúa cada caso y conserva su historial."
+  return <AdminShell email={user?.email} active="/admin/participations" title="Participaciones" description="La Oficina evalúa cada caso y conserva su historial."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       {openingReference && <input type="hidden" name="openingId" value={openingReference} />}

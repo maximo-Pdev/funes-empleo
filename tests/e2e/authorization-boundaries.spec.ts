@@ -31,7 +31,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
       const upload = await page.request.post("/api/candidate/cv", { multipart: { candidateId: fixtureId("profile", n), version: "1",
         cv: { name: "cv-ficticio.pdf", mimeType: "application/pdf", buffer: readFileSync("tests/fixtures/cv-fictitious.pdf") } }, maxRedirects: 0 });
       expect(upload.status()).toBe(303);
-      expect(upload.headers().location).toContain("/login?cv=denied");
+      expect(upload.headers().location).toContain("/?cv=denied");
       const cv = await page.request.get(`/api/cv/${fixtureId("cv", 1)}`);
       expect([401,403,404]).toContain(cv.status());
       expect(cv.headers()["cache-control"]).toContain("no-store");
@@ -45,8 +45,10 @@ for (const role of ["candidate", "company", "admin"] as const) {
 
 test("empresa: oferta y derivación ajenas e inexistentes muestran el mismo NOT_FOUND", async ({ page }) => {
   await loginFixture(page, "company", 1);
-  for (const path of ["/empresa/ofertas/", "/company/openings/"]) {
-    const suffix = path.includes("/company/") ? "/referrals" : "";
+  // `/company/openings/[openingId]/referrals` ya no existe: el detalle de la oferta
+  // es la única superficie que expone derivaciones, con `?referral=` para una puntual.
+  for (const suffix of ["", `?referral=${fixtureId("referral", 2)}`]) {
+    const path = "/empresa/ofertas/";
     const foreign = await page.goto(`${path}${fixtureId("opening",2)}${suffix}`);
     await expect(page.getByRole("heading", { name: "No encontramos la página", exact: true })).toBeVisible();
     const foreignText = await page.locator("body").innerText();
@@ -123,13 +125,13 @@ test("sesión administrativa existente no sobrevive a suspensión en base", asyn
 });
 test("Server Action en vuelo: suspensión antes de ejecutar impide escritura", async ({ page }) => {
   await loginFixture(page, "candidate", 400);
-  await page.goto("/candidato/perfil");
+  await page.goto("/dashboard?section=perfil");
   await expect(page.getByRole("button", { name: "Guardar correcciones", exact: true })).toBeVisible();
   const profile = fixtureId("profile", 400);
   const actor = fixtureId("candidate", 400);
   const before = runLocalMaintenanceSql(`select version from public.candidate_profiles where id='${profile}'`);
   let intercepted = false;
-  await page.route("**/candidato/perfil", async (route) => {
+  await page.route(url => url.pathname === "/dashboard" && url.searchParams.get("section") === "perfil", async (route) => {
     if (route.request().method() === "POST" && route.request().headers()["next-action"]) {
       intercepted = true;
       runLocalMaintenanceSql(`update public.accounts set status='suspended', suspended_reason='Prueba ficticia en vuelo', suspended_at=clock_timestamp(), suspended_by=(select id from public.accounts where auth_user_id='${fixtureId("admin",1)}') where auth_user_id='${actor}'`);

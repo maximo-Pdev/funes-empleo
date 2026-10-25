@@ -1,8 +1,267 @@
 # Cambios extra necesarios
 
+## Aviso de numeración — ids 056 a 068 duplicados (2026-10-24)
+
+Este archivo registra dos líneas de trabajo que avanzaron en paralelo sobre bases distintas y
+usaron el mismo espacio de ids `EXTRA`. Los ids 056 a 068 aparecen **dos veces con contenido
+distinto**: una entrada de `main` (PRs #67 a #72) y otra de la rama
+`fix/landing-unified-access`. Se conservaron los dos textos sin reescribir el registro; para leer
+o citar una entrada hay que mirar el título, no solo el número.
+
+| Id | Entrada de `main` | Entrada de `fix/landing-unified-access` |
+| --- | --- | --- |
+| EXTRA-056 | Alta presencial activa y aceptación expresa en una transacción | Retirar rutas duplicadas de candidato y login |
+| EXTRA-057 | Categorías laborales como única selección del candidato | Avisos informativos azules en el acceso de Home |
+| EXTRA-058 | Retirar nominación desde el perfil candidato | Navbar inferior en celular |
+| EXTRA-059 | Atención presencial dentro del perfil administrativo | Rebuild candidate profile and persist private photos |
+| EXTRA-060 | Orden de tarjetas en perfiles presenciales | Animated gradient behind the profile canvas |
+| EXTRA-061 | Historial resumido de cuenta y perfil del candidato | Alternate endpoint-color gradient and photo availability repair |
+| EXTRA-062 | Ofertas empresariales, derivaciones y moderación | Etiqueta del acceso al panel según la cuenta activa / Slower pure-CSS profile gradient |
+| EXTRA-063 a 068 | No usados | Complete local photo repair, Ingresar vuelve al inicio, Candidate account sidebar, Shared candidate and company dashboard frame, Cambio suave entre introducciones, Shared administrator dashboard frame |
+
+Las referencias `EXTRA-056` a `EXTRA-068` en `specs/plan.md`, `specs/data-model.md`,
+`specs/.../contracts/authorization-matrix.md`, `docs/UI_GUIDELINES.md` y
+`docs/implementation/candidate-profile-photos.md` se leen igual: el id identifica el registro
+junto con el título de la sección que lo cita.
+
+## EXTRA-068 — Shared administrator dashboard frame
+
+- **Date/status:** 2026-10-24; recorded before implementation, explicitly requested by Maxi.
+- **Request:** “Quiero hacer en el dashboard de administradores lo mismo que hicimos en el dashboard de usuarios y empresas: navbar, sidebar, lienzo en blanco, etc. Copia el formato pero con la información que hay en la cuenta de administradores.”
+- **Evidence/change:** AdminShell still has separate header/sidebar geometry. Reuse DashboardShell and the existing account CSS without changing candidate/company chrome. Preserve administrative information, contextual navigation, forms, internal-use notice, routes and page-local authorization. White canvas means the shared white content surface, not removal of information.
+- **Scope:** AdminShell, admin page verified-email props, administrator account presentation, focused component tests, offline visual runner and UI guide. No schema, service, dependency, persistence or authorization changes. Loading shells keep truthful unavailable-email fallback.
+- **Identity:** Administración fallback and verified session email; do not fabricate a stored personal name. Keep logout once in the sidebar and existing password and peer-administration controls inside the account canvas.
+- **Risk/recovery:** shared administrative presentation affects existing route consumers (item 3); preserve public shell props and contextual links. Revert only this increment, preserving unrelated dirty work.
+- **Verification plan:** observe composition RED, focused regressions, full unit suite, lint, typecheck, production build, desktop/mobile real-markup geometry with mocked fictitious services, independent read-only review. No database resets, live account submissions, remote operations, commits or publication.
+- **Observed verification:** 16 frame expectations observed RED before source edits. Node 24.16.0: 977/977 unit/component tests in 70 files; lint, typecheck, production build and diff-check pass. Offline Chromium proof: 160/160 geometries across 16 compositions, five viewport widths and both motion preferences; actual rendered JSX/CSS with fictitious services. Native disclosures expanded to verify complete forms; closed details initially produced false containment failures. Desktop account and mobile companies screenshots inspected. Existing jsdom Canvas and external-lockfile warnings remain. No live authentication/database proof or deployment claimed.
+- **Review:** independent read-only verification found no functional blockers; 107/107 focused tests in six files and diff-check pass. Parent spot check repeats that command. Corrected this entry's ID to EXTRA-068 because EXTRA-067 already describes Home animation. Implemented and verified locally; human acceptance pending. No commit or publication. Risk: item 3 (existing administrative shell consumers), covered by regressions and independent review.
+
+## EXTRA-066 — Shared candidate and company dashboard frame
+
+- **Date/status:** 2026-10-24; recorded before implementation, explicitly requested by Maxi.
+- **Request:** “Quiero hacer en el dashboard de empresas lo mismo que hicimos en el dashboard de usuarios: navbar, sidebar, lienzo en blanco, etc. Copia el formato pero con la información que hay en la cuenta de empresa.” Follow-up: “Ten en cuenta que si hago un cambio en el estilo de la sidebar de usuario quiero que se replique en la de empresa, lo mismo con los estilos del dashboard en general.”
+- **Evidence/change:** company pages still use a horizontal navigation shell. Extract the existing candidate frame into one shared DashboardShell, retaining the same CSS module, navbar, sidebar primitives, logout and email treatment. Both roles consume it; company routes retain their existing content, forms and destinations, including company account settings.
+- **Scope:** shared dashboard component; candidate/company presentation shells; company route identity props; company branch of account page; focused tests, visual proof and UI guide. No service, authorization, schema, dependency or persistence changes.
+- **Identity:** persisted company legal name and verified login email, with truthful missing-profile fallback. Existing route guards remain unchanged; do not substitute editable contact email for session email.
+- **Risk/recovery:** shared presentation affects both roles; preserve candidate DOM/classes and regressions. Revert only this increment if necessary, preserving the pre-existing dirty tree.
+- **Verification:** failing company composition test first; company/candidate/navbar regression tests, lint, typecheck, production build, read-only desktop/mobile geometry fixtures. No fixture reset, account submissions, remote operation, commit or publishing.
+- **Observed verification:** initial company frame RED: 6 failures (missing sidebar); account frame RED: 1 failure. Final suite: 962/962 tests in 70 files. Lint, typecheck, production build and diff-check pass. Chromium with real component markup/CSS and fictitious mocked services: company 70/70 geometries, candidate 50/50 (1440/1024/768/390/320px, normal/reduced motion). Desktop dashboard/mobile profile screenshots inspected; no live authentication, database submission or deployment proof claimed. Existing jsdom Canvas notices and external-lockfile build warning remain.
+- **Review:** independent read-only shared-presentation review found no change-caused blockers; focused regression 74/74 in 6 files, repeated by parent with the same result; diff-check passes. Implemented and checked locally. No commit, publication or product acceptance implied. Risk: item 3 (shared presentation reused by both account roles), covered by own regressions, browser fixtures and independent review.
+
+## EXTRA-065 — Candidate account sidebar section
+
+- **User correction (current scope):** «Me confundí, quise decir el botón de "Cambiar contraseña", el botón de Cerrar sesión estaba bien en la sidebar». This supersedes the original placement recorded below: keep Cuenta, move the existing `/update-password` shortcut there and restore the unchanged logout form above sidebar identity. Three corrected expectations observed RED before source changes. Corrected placement passes 955 unit tests/70 files, lint, typecheck, build, diff-check and all 50 standalone visual combinations; both base paths and unchanged mocked logout invocation are covered. No live session mutations, commits or publication. Human review pending.
+- **Authorization:** Maxi explicitly requested: «Quiero que crees una nueva opción en la sidebar llamada "Cuenta" y muevas el botón de "Cerrar sesión" ahí.»
+- **Evidence and scope:** The candidate sidebar currently submits logout from its footer. Add `section=cuenta` to its existing section navigation and move the same logout form/action into that view. Preserve password access, identity, existing sections, default dashboard and company/admin behavior. No authentication, schema or session-service changes.
+- **Affected files:** `candidate-account.tsx`, its scoped CSS, candidate component tests and `docs/UI_GUIDELINES.md`.
+- **Risk and checks:** Presentation-only relocation; retain POST/server-action submission. RED observed: five failing assertions for the missing Cuenta section and outdated navigation, with 18 existing tests passing. Verify both `/account` and `/dashboard`, action invocation, existing sections, responsive layout, unit suite, lint, types and build. No live logout or acceptance database reset.
+- **Status:** Implemented and verified. Both base paths render Cuenta and invoke the unchanged mocked logout action on form submission. All 23 focused tests and 955 unit tests/70 files pass; lint, typecheck, build and diff-check pass. Standalone browser proof passes 50 combinations of five sections, five viewport widths and two motion preferences, including logout placement, touch target and keyboard focus. Uses fictitious service fixtures, not a live authenticated session. Human review pending; no commit or publication. Existing non-blocking canvas-jsdom and external-lockfile warnings remain.
+
+## EXTRA-064 — Ingresar vuelve al inicio completo de Home
+
+- **Autorización:** pedido explícito de Maxi: «Revisa que cuando clickeas "Ingresar" en la navbar en Home no sube hasta arriba de todo. Arregla eso.»
+- **Evidencia:** el enlace apunta a `#acceso`, que alinea el recuadro en lugar del comienzo del documento. Dos pruebas RED reproducen ese destino incorrecto.
+- **Cambio mínimo:** utilizar el destino nativo `#contenido`, ya único y enfocable, también en Ingresar. Conservar Mi cuenta, los destinos por rol, Inicio, registros, movimiento reducido y comportamiento responsive de la navbar. El destino propio `#acceso` se conserva para otros enlaces.
+- **Superficies:** `home-navbar.tsx`, pruebas de navbar/portada/navegación visual y guía visual.
+- **Verificación:** implementado. Dos regresiones observadas en RED y luego 31 pruebas focalizadas y 950 pruebas/70 archivos aprobadas; lint, tipos, build y diff-check aprobados con Node 24. Navegador de producción propio: Ingresar vuelve a scrollY0 y enfoca main mediante clic y Enter repetidos a 1440/768/390/320px; 12 comprobaciones de formularios también aprobadas, sin solicitudes de mutación. Se esperó el final del scroll suave antes de la segunda activación para no interrumpirlo desde el runner. Servidor propio cerrado. Sin datos, commits ni publicación; revisión del usuario pendiente.
+
+## EXTRA-062 — Etiqueta del acceso al panel según la cuenta activa
+
+- **Fecha/autorización:** 2026-10-24; pedido explícito: «Cuando tengo la sesión iniciada como empresa y vuelvo a Home el botón que aparece en el recuadro de Login dice "Ir al panel de usuario" cuando debería decir "Ir al panel de empresa". Lo mismo pasará con admin. Arregla eso.»
+- **Problema/evidencia:** `getSiteAccess` asigna a todos los roles `Panel de usuario` y el recuadro repite una etiqueta fija; seis pruebas RED reproducen el defecto para empresa y administración.
+- **Cambio/justificación:** proyectar la etiqueta del panel desde el rol ya verificado y pasarla al recuadro: usuario, empresa o administración. Conservar destinos, estado de sesión, permisos, registros y estilo; no inferir la identidad a partir del selector de registro.
+- **Archivos afectados:** `src/features/accounts/navigation.ts`, `src/app/(public)/page.tsx`, `home-access-panel.tsx`, pruebas de navegación/portada/recuadro, expectativa E2E y guía visual.
+- **Verificación/riesgo:** comprobar los tres roles, etiquetas y destinos antes/después de cambiar de pestaña; mantener anonimato/cuentas no activas sin acceso y defaults de componentes. Es un cambio de presentación, no de autorización. No ejecutar el wrapper E2E que reinicia datos.
+- **Estado/verificación:** implementado; 44 pruebas focalizadas y 929 pruebas/70 archivos de la suite completa aprobadas con Node 24. Lint, tipos, build y `git diff --check` aprobados. Se probaron etiquetas y destinos de los tres roles, retorno desde ambos registros, ausencia del acceso durante el registro y guardas existentes para cuentas no activas. Destinos y verificación de sesión sin cambios. Expectativa E2E actualizada, sin ejecutar el wrapper que reinicia datos ni iniciar sesiones reales. Avisos no bloqueantes existentes de Canvas/jsdom y lockfile externo. Sin commits ni publicación; revisión visual del usuario pendiente.
+
+## EXTRA-058 — Navbar inferior en celular
+
+- **Fecha/estado:** 2026-10-23; registrado antes de implementar, por pedido de Maxi.
+- **Origen:** «Quiero que en vista de celular la navbar aparezca en la parte
+  inferior de la pantalla en lugar de arriba».
+- **Cambio mínimo:** por debajo de 768px, fijar la navbar compartida al borde
+  inferior con espacio para el área segura del dispositivo. Mantener vidrio,
+  enlaces y visibilidad móvil. Reservar espacio inferior en Home y el panel de
+  cuenta; quitar sus reservas superiores obsoletas y adaptar el ancla de acceso.
+  Escritorio y su espera de 2 segundos no cambian.
+- **Superficies:** `home.module.css`, `account/account.module.css`, guía visual,
+  comprobaciones visuales de navbar/acceso/layout y este registro.
+- **Riesgos/recuperación:** CSS responsive acotado, sin datos, permisos o rutas
+  nuevos. No extender la navbar a otros shells. Reversible en las media queries.
+- **Verificación prevista:** RED/GREEN de geometría real a 320/390px y 768px,
+  tres modos, anclas y espacio al final del documento; unitarias/lint/tipos/build.
+  Sin envíos, reset, commit o publicación.
+
+- **Resultado EXTRA-058:** implementado y verificado localmente. RED de navegador
+  confirmó navbar arriba; GREEN a 320px y 390px en login y ambos registros,
+  con clics reales en Ingresar/Inicio/ofertas y 24px libres entre el último
+  contenido y la barra al final del scroll. A 768px vuelve arriba. Capturas
+  móviles inspeccionadas; fixture con CSS real del workspace confirma reserva
+  inferior móvil de 88px y padding superior desktop de 64px intacto. El código
+  contempla safe-area, sin afirmar prueba física de notch/teclado iOS.
+  Suite 864/864 en 64 archivos, lint/tipos/build/diff-check PASS; avisos de
+  Canvas en jsdom y lockfile externo preexistentes. Servidor propio cerrado.
+  Sin datos modificados, commit o publicación; revisión del usuario pendiente.
+
 Registro de requisitos derivados y ajustes técnicos necesarios para cumplir tareas
 aprobadas. No sustituye la constitución ni los artefactos de Spec Kit, y no convierte
 una propuesta en una decisión municipal aprobada.
+
+## EXTRA-057 — Avisos informativos azules en el acceso de Home
+
+- **Ajuste solicitado antes de implementar:** «En lugar de un caracter unicode o ascii pon un ícono sacado de donde sacaste el resto de íconos. Y el color podría ser este #5758D6, anotalo en global.css como variable para mensajes informativos de este tipo». Se sustituye el prefijo generado por `Info` de `lucide-react`, dependencia existente, y se añade `--color-feedback-info: #5758D6` en `src/app/globals.css`. El icono es decorativo, solo con contenido informativo, sin modificar acciones ni defaults standalone. Pruebas nuevas observadas en RED: faltaban iconos SVG y token global.
+- **Resultado del ajuste:** implementado en los tres formularios y el aviso de sesión activa, conservando textos, foco, regiones vivas y errores rojos; eliminado el prefijo Unicode del CSS. Los SVG heredan exactamente `#5758D6` mediante el token global. Nuevas pruebas de componentes: 15 casos; comprobación focalizada: 30 pruebas; suite completa: 864 pruebas/64 archivos. Lint, tipos, build y diff-check aprobados con Node 24. Navegador: seis fixtures de estilo y seis escenarios de validación aprobados, defaults standalone intactos y cero mutaciones; captura móvil inspeccionada. Sin altas reales, cambios de sesión, dependencias nuevas, commits ni publicación. Revisión visual del usuario pendiente. La verificación inicial descrita abajo corresponde a la versión anterior con glifo, reemplazada por este ajuste.
+
+- **Fecha/autorización:** 2026-10-23, solicitud explícita de Maxi: «Quiero que los mensajes informativos al hacer click en "Registrarse" o "Ingresar" aparezcan de color azul con el icono típico "🛈". Por ejemplo el de "Si los datos son válidos, recibirás un enlace para verificar tu correo. Revisá también spam."».
+- **Problema/evidencia:** los resultados informativos usan párrafos `role="status"`, pero el estilo local de Home les asigna el mismo color neutro que a las explicaciones estáticas.
+- **Origen/alcance:** presentación de respuestas en el acceso existente; no cambia acciones, validación, sesiones ni la respuesta antienumeración.
+- **Cambio propuesto/justificación:** aplicar azul e icono decorativo a los avisos no vacíos, conservando en rojo los errores y sin iconos en estados vacíos. Mantener textos, regiones vivas, foco y formularios de otras páginas.
+- **Archivos/contratos afectados:** `src/app/(public)/home.module.css`, comprobación visual local y `docs/UI_GUIDELINES.md`; sin cambios de contratos o dependencias.
+- **Riesgo/verificación:** comprobar estilos calculados de mensajes informativos, errores y estados vacíos en los tres modos, escritorio y móvil. Las muestras visuales son fixtures de DOM explícitos; no envían formularios ni simulan respuestas del proveedor.
+- **Estado/verificación:** implementado exclusivamente en el CSS local de Home. RED de navegador reprodujo texto neutro en lugar de azul; GREEN aprobó seis combinaciones de modo/viewport con avisos azules, icono decorativo, foco/región viva preservados, errores rojos y estados vacíos ocultos. La comprobación independiente de marcadores también aprobó seis combinaciones y sus defaults standalone; ambas sin solicitudes de mutación. Se inspeccionó la captura del fixture móvil para confirmar que el símbolo no fuera un glifo ausente. Vitest: 849 pruebas/63 archivos; lint, tipos, build y `git diff --check` aprobados con Node 24. La suite emite avisos de Canvas en jsdom y el build conserva el aviso de lockfile externo, sin fallos. No se enviaron registros ni se validó correo contra el proveedor. Sin commits ni publicación; revisión visual del usuario pendiente.
+
+## EXTRA-056 — Retirar rutas duplicadas de candidato y login
+
+- **Fecha/autorización:** 2026-10-23, solicitud explícita de Maxi:
+  «Está bien, haz eso eliminar las tres rutas de candidato, actualizar todos sus enlaces y destinos al panel, y dejar que las URLs anteriores den 404 y lo mismo con /login».
+- **Problema/evidencia:** el panel reutiliza los renderizadores existentes, pero
+  navegación, retornos de CV y pruebas todavía consumen rutas independientes.
+  La redirección temporal de login mantiene una URL que ahora se pide retirar.
+- **Cambio/justificación:** eliminar los tres entrypoints de candidato y la
+  redirección de login; migrar enlaces, retornos y revalidaciones al panel o a
+  la portada. Conservar componentes compartidos sin clonar contenido. Preservar
+  selección de oferta y paginación al usar el destino del panel.
+- **Origen/contratos:** FR-001, FR-010, FR-013, FR-030 y pedido anterior;
+  reemplaza la compatibilidad de rutas de EXTRA-046 y EXTRA-051 (login), sin
+  alterar permisos, estados, datos, `/ofertas` público ni otros roles de `/account`.
+- **Archivos afectados:** rutas candidato, next.config.ts, navegación y acciones
+  de cuentas/candidato, retorno de CV, feedback/revalidación, pruebas y contratos
+  de navegación en specs y documentación visual/producto.
+- **Riesgos:** ruptura de URLs explícitamente autorizada; preservar autorización,
+  allowlist exacta de retorno de CV, respuestas JSON/303 y queries de selección.
+- **Verificación prevista:** RED/GREEN, suite unit/component/tooling, lint,
+  typecheck, build, HTTP 404 real sin Location y revisión independiente. No se
+  autorizan resets, credenciales reales ni operaciones remotas.
+- **Estado:** implementado; RED de cuatro rutas y destinos observada antes del
+  cambio, más RED del retorno CV y selección de oferta al paginar. GREEN: 120
+  pruebas focalizadas, suite de 846 pruebas/62 archivos, tooling 57/57, lint,
+  tipos y build con Node 24.16.0 aprobados. Colección E2E: 98 casos/23 archivos.
+  HTTP local: 32 combinaciones GET/HEAD/query responden 404 sin Location;
+  Chromium confirma las cuatro URLs y portada/recuperación/retorno. Marcadores:
+  seis escenarios desktop/móvil aprobados sin POST. El primer probe de navegador
+  requería esperar la navegación; corregido el harness, pasó. Revisión técnica
+  independiente aprobada: 120/120 pruebas en copia aislada y 32/32 probes HTTP,
+  sin bloqueos funcionales. Se renumeró esta entrada de EXTRA-055 a EXTRA-056
+  para evitar colisión con el trabajo concurrente de navbar, sin modificarlo.
+  No se ejecutó el runner E2E completo porque resetea
+  aceptación; no se usaron sesiones reales ni se verificó contra DB autenticada.
+  Sin commits ni publicación.
+
+## EXTRA-054 — Mostrar completa la siguiente pantalla al consultar ofertas
+
+- **Fecha/autorización:** 2026-10-23; solicitud explícita de no dejar visible
+  ninguna parte de Home al activar Ver ofertas disponibles.
+- **Evidencia/cambio:** el destino conserva scroll-margin-top de 104px, dejando
+  esa franja del hero. Retirar ese margen solo de la sección de ofertas; conservar
+  desplazamiento nativo, foco, movimiento reducido y los demás offsets.
+- **Archivos/riesgos:** home.module.css, pruebas visuales y guía visual. Cambio
+  local de presentación, sin cambios de rutas, permisos o contenido.
+- **Verificación prevista:** clic/teclado reales en desktop/móvil, tres modos y
+  ambas preferencias de movimiento; destino alineado arriba y hero fuera de vista.
+- **Estado:** implementado. RED reprodujo destino/hero a 104px; GREEN en 12
+  escenarios desktop/móvil, tres modos, clic/teclado y movimiento reducido:
+  destino arriba, hero fuera de vista y foco conservado. Suite de 828 pruebas,
+  lint, tipos, build y diff-check aprobados; la transición horizontal previa
+  conserva sus tres viewports aprobados. Build reintentado al terminar otro build,
+  sin interrumpir procesos ajenos. La prueba visual general de estilo falla por
+  el fondo translúcido de navbar/ofertas incorporado en paralelo, no por el salto;
+  no se modifica ese cambio ajeno ni su expectativa de color en esta tarea.
+  Sin cuentas reales, envíos, reseteos, commits ni operaciones remotas.
+
+## EXTRA-053 — Acceso al panel dentro del login y desplazamiento de ofertas
+
+- **Fecha:** 2026-10-23.
+- **Origen/autorización:** pedido explícito de retirar Mi perfil del cuadrante
+  izquierdo, añadir acceso al panel bajo el aviso de sesión y animar la posición
+  de Ver ofertas disponibles al seleccionar o abandonar el registro de Empresa.
+- **Evidencia/cambio necesario:** trasladar la entrada autenticada existente al
+  recuadro, conservando su landmark de navegación y usando el destino de panel
+  ya resuelto por rol. Actualizar la expectativa de portada en la prueba de
+  navegación; ofertas y detalle conservan sus accesos al perfil. Añadir transición
+  CSS de posición solo en escritorio, sin movimiento con preferencia reducida.
+- **Archivos/contratos:** page/home-access-panel/home.module.css; pruebas de
+  componentes, navegación por sesión y transición; especificación y guía visual.
+  No se modifican permisos, sesiones, registros ni resolución de destinos.
+- **Riesgos/verificación:** comprobar los tres roles, login anónimo y registros;
+  medir posiciones intermedias en ambos sentidos, móvil y movimiento reducido;
+  conservar teclado, navbar y flujo documental. Suite, lint, tipos y build.
+  No se autorizan cuentas reales, reseteos ni operaciones remotas.
+- **Estado:** implementado y verificado: RED de destinos/ubicación del enlace y
+  ausencia de posiciones intermedias; GREEN de 29 pruebas focalizadas y suite de
+  828 pruebas/62 archivos. Lint, tipos, build y diff-check aprobados con Node 24.
+  Navegador sin POST: transición ida/vuelta y movimiento reducido a 1440/768/390px;
+  15 estados responsive, 6 de estilo y 12 de navbar/validación aprobados.
+  Expectativa E2E actualizada, sin ejecutar su runner que resetea datos. Sin
+  cambios de autenticación, cuentas reales, commits ni operaciones remotas.
+  Aceptación visual del usuario pendiente.
+
+## EXTRA-052 — Navbar institucional, sesión activa y validación discreta
+
+- **Fecha:** 2026-10-22.
+- **Origen/autorización:** solicitud explícita de Maxi: trasladar la identidad a la
+  navbar, conservar el enlace municipal y la visibilidad actual; ofrecer Ingresar
+  o Mi cuenta; impedir otro login con sesión activa sin bloquear los registros;
+  retirar “Completá este campo.” conservando líneas rojas y resumen de errores.
+- **Evidencia:** la portada ya resuelve la sesión para navegación pero no para el
+  recuadro; signIn autentica antes de comprobar la cuenta. Form/Field comparten
+  el mapa de errores para mensajes, conteo, foco y aria-invalid.
+- **Cambio necesario:** compartir la proyección verificada de sesión, comprobarla
+  antes del login y añadir una política opcional que oculte únicamente mensajes
+  de texto obligatorio vacío en los formularios de portada, sin borrar errores.
+  El registro mantiene sus acciones y la verificación de correo existentes.
+- **Archivos/contratos:** portada/navbar/panel/CSS; servicio y Action de login;
+  Form/Field y opt-ins de formularios; pruebas, especificación y guía visual.
+- **Riesgos:** autenticación y componentes compartidos. Conservar registros,
+  destinos por rol, errores de formato/servidor y asociaciones ARIA válidas.
+- **Verificación prevista:** RED/GREEN de sesión activa y login anónimo; navbar,
+  registro disponible, faltantes/conteo/foco/ARIA/defaults; suite, lint, tipos,
+  build, navegador local sin POST y verificación independiente de autenticación.
+  No se autorizan reseteos de datos, cuentas reales ni operaciones remotas.
+- **Estado:** implementado; verificación propia aprobada con Node 24.16:
+  822 pruebas/61 archivos, lint, tipos, build y diff-check. Navegador sin POST:
+  12 estados de navbar/validación, 15 responsive, 6 de estilo/movimiento,
+  6 de teclado y 6 de asteriscos; capturas desktop/móvil revisadas.
+  Sesión activa y login directo comprobados con pruebas aisladas, sin cuentas
+  reales. E2E con reseteo de datos no ejecutado. Revisión técnica independiente
+  de autenticación/contratos sin bloqueos: 90 pruebas en 6 archivos aislados.
+  Contraprueba final: 25 pruebas de sesión/validación y diff-check aprobados.
+  Aceptación visual del usuario pendiente; sin commits.
+
+## EXTRA-051 — Unificar el acceso de portada sin romper `/login`
+
+- **Fecha:** 2026-10-22.
+- **Origen/autorización:** pedido del usuario de retirar enlaces duplicados del
+  cuadrante izquierdo, ajustar asteriscos y eliminar la página de login duplicada.
+- **Evidencia:** dos fuentes de asteriscos (Field y pseudo-elementos de portada);
+  enlaces de ofertas, cierre de sesión y recuperación todavía usan `/login`.
+- **Cambio necesario:** borrar la página duplicada y conservar su URL mediante
+  redirección temporal a `/`, preservando queries. Una política opcional de Form
+  permite indicadores de faltantes en login y grises/rojos en registro de portada;
+  defaults compartidos y reglas de validación no cambian. Se conserva el acceso
+  autenticado a Mi perfil/Mi cuenta y la navegación de ofertas fuera del duplicado.
+- **Archivos/contratos:** next.config.ts; componentes Form/Field/validation;
+  portada y formularios locales; pruebas, spec y guía visual relacionados.
+- **Riesgos:** ruta pública consumida y componentes compartidos; errores de formato
+  no deben confundirse con ausencia de valor ni activar asteriscos opcionales.
+- **Verificación:** pruebas de markers/corrección/semántica/defaults y perfiles;
+  navegador local sin POST, redirects/query strings, responsive, lint, tipos/build.
+  No se autoriza resetear datasets ni realizar envíos reales de credenciales.
+- **Estado:** implementado y verificado: 794 pruebas unitarias, lint, tipos,
+  build y diff correctos; navegador con 6 estados de indicadores, 15 responsive
+  y 6 de teclado, redirecciones 307 y queries preservadas, sin POST.
+  Revisión independiente sin bloqueos: 46 pruebas focalizadas y repetición de
+  controles de navegador correctas. Flujos autenticados y aceptación con reset
+  de datos no ejecutados. Sin commit ni PR.
 
 ## EXTRA-023 — Estabilizar el escenario E2E de mantenimiento
 
@@ -2232,6 +2491,53 @@ migraciones ni cambios alojados. Documentación de entrega: diff-check PASS.
   tipos, build y comparación visual desktop/móvil. Por ahora solo documentación;
   no se afirma instalación, migración o verificación funcional. Sin commit/PR.
 
+## EXTRA-063 — Complete local photo repair and unify candidate canvases
+
+- **Date/status:** 2026-10-24; explicitly authorized; implemented and verified locally; user visual/product review pending.
+- **Origin/evidence:** latest user authorizes local server-key setup and photo repair; requests static primary green, backgrounds beneath navbar, full-height sidebar and consistent960px white canvases for all four candidate sections. Real local photo POST rejects matching127.0.0.1 origin because internal Next URL useslocalhost; server-only key absent.
+- **Change/rationale:** correct actual-host origin comparison without accepting foreign origins; configure existing local service key privately only in ignored.env.local. Share existing profile canvas styling across candidate sections; no animation or unrelated global/navbar behavior changes. See odd/tasks/candidate-panel-finalize.md S1-S4.
+- **Surfaces/risks:** photo route/tests/environment/docs; account renderer/CSS/tests; security/config risk and responsive overlay clearance. No new schema, remote access, resets, dependency changes or commits. Parallel disjoint workers; parent owns integration/docs/git.
+- **Checks:** current implementation preserved; 950 unit/component tests, lint, typecheck, production build and diff-check pass. Forty four-section desktop/mobile/motion geometry cases pass. Independent security inspection and 45 focused tests pass; first live harness failed an intentionally denied service_role metadata SELECT, not product persistence. Corrected scratch-only metadata probe, without new privileges: actual authenticated production upload/refresh/readback/replace/remove, anonymous denial, Storage byte equality and physical old/current deletion all passed. Owned test server stopped. Known fictitious test records are documented in the feature log; no real accounts/reset/remote operations. Product review remains pending.
+
+## EXTRA-062 — Slower pure-CSS profile gradient
+
+- **Status:** implemented and verified; recorded during implementation; user visual acceptance pending.
+- **Origin:** supplied `pure-css-animated-gradient-background.zip` and “Además debe ser más lenta, que el movimiento sea sugerido.”
+- **Design:** adapt actual Manuel Pinto pyBNzX MIT CSS: -45-degree four-stop green/darker-green gradient, 400% size, sixty-second ease cycle instead of the original fifteen seconds. Keep natural content height, white canvas and static reduced-motion fallback; no demo frameworks or global styles.
+- **Files/checks:** account.module.css; updated profile-gradient-check.mjs; preserved source/license/provenance in public/brand/pure-css-animated-gradient-background/. Test assertion observed RED before replacing previous crossfade; four desktop/mobile motion/reduced-motion browser cases, wraparound pixels, 16 focused component tests, lint/types/build and diff-check passed. Previous exports retained unused.
+- **Scope:** this visual request does not cancel the independently running photo upload verification. No further database or permission changes from the gradient.
+
+## EXTRA-061 — Alternate endpoint-color gradient and photo availability repair
+
+- **Status:** authorized implementation in progress; verification pending.
+- **Origin:** user supplied `animated-background-gradient.zip` because the previous motion was too subtle, and requested fixing profile-photo upload.
+- **Visual evidence/design:** Mario Klingemann's MIT CodePen AZedgK blends the two endpoint RGB colors, rather than moving a fixed gradient. With the requested primary-green/darker-green two-color palette, targets alternate. Reproduce this as an opacity blend between opposite horizontal gradients (five seconds each direction), without jQuery, interval loops, global body styles or dependencies. Preserve the white canvas, other sections and static reduced-motion mode.
+- **Necessary addition:** preserve original script/style/license and provenance under `public/brand/animated-background-gradient/`. The former export remains unused, not deleted.
+- **Photo scope:** diagnose actual runtime prerequisites; the prior optional-photo fallback is not a working upload fix. Apply only necessary, authorized local corrections; no unrelated migration batch, reset, remote deployment or credential reuse is implicitly authorized.
+- **Risks/checks:** visual render/cycle/reduced-motion/interaction checks; photo requires actual persistence/readback and existing permission/version rules. Record the verified target and remaining deployment authority before database writes.
+
+## EXTRA-060 — Animated gradient behind the profile canvas
+
+- **Latest user revision:** replace the medium-gray stop with a dark derivative of the same primary green (20% primary / 80% black). The original SCSS subtracts 50 lightness points, which would produce black for this already-dark green. Preserve animation/white canvas/reduced-motion behavior. The updated dark-green browser assertion was observed RED, then all four browser cases, lint/types/build/diff-check passed GREEN.
+- **Status:** implemented and locally verified; no commit or publication.
+- **Origin:** user-provided `gradient-background-animation.zip` and request to cycle between the institutional primary green and medium gray behind the canvas.
+- **Evidence/design:** supplied Andy Tran CodePen MaRqwd export uses a 45-degree CSS gradient, 200% background size and six-second 0/100/0 position loop. Adapt colors to existing municipal tokens; scope to `.profileWorkspace`, retain the white canvas and all other surfaces. Do not import its global body/html styles or external reset stylesheet.
+- **Necessary addition:** preserve the supplied MIT notice and provenance under `public/brand/gradient-background-animation/`; no dependency or external runtime request. Add a static reduced-motion fallback.
+- **Risks/recovery:** visual-only; restore the prior primary-green declaration to revert. No data, authorization, migration or form changes.
+- **Verification:** all four CSS-browser cases passed (1440px/390px, normal/reduced motion): distinct midpoint pixels, identical start/end at six seconds, real elapsed autoplay, static reduced-motion pixels and white canvas preserved. Sixteen focused tests, lint, typecheck, build and diff-check passed. This is CSS-fixture proof, not authenticated application testing. No commit or publication authorized.
+
+## EXTRA-059 — Rebuild candidate profile and persist private photos
+
+- **Status:** implemented and verified in isolated local PostgreSQL/Storage; original application database rollout and developer review remain pending.
+- **Origin:** current profile-canvas rebuild request, photo persistence confirmation, and explicit retention choice “Borrar el archivo anterior”. Extends EXTRA-047/048 for candidate photos only, not company logos.
+- **Evidence:** the profile renderer and existing validated forms are preserved but disconnected; no candidate image bucket, image validation or photo mutation/read path exists.
+- **Change:** restore profile forms inside the 960px canvas with official adapted Avatar/Attachment/Empty. Implement owner photo upload/replace/remove, private metadata and Storage, live owner/Office/current referral authorization, versions and cleanup. JPEG/PNG up to 5 MiB and 16 megapixels, orientation-aware re-encoding/metadata stripping and bounded output dimensions are technical safety defaults, not municipal requirements. A photo is not required to activate a profile.
+- **Retention:** revoke old-photo access atomically on replacement/removal, then physically remove the old Storage object; surface failures as pending cleanup and keep a retryable record. Never erase the current image before a replacement is committed.
+- **Files/contracts:** tracked in `odd/tasks/candidate-profile-rebuild.md`; photo services/handlers, additive SQL migration/RLS, typed database contracts, profile presentation, focused tests and recovery docs. Server-only validated ingestion needs an explicit narrow extension to the privileged-operation allowlist; browser writes remain forbidden. Existing admin-invitation behavior remains unchanged.
+- **Authorization:** requesting developer explicitly approved functionality and physical deletion; their explicit request confirms coordination under AGENTS.md. No remote migration, reset, publish, commit or merge authorized. Existing consent text and legal policy remain unchanged.
+- **Risks:** security, personal data, concurrency, physical object deletion and new dependencies. Tests must include stale/conflicting mutation, denied access/revocation, malformed images, failed replace/cleanup and legacy CV/form regressions. Independent verifier required. Apply SQL before application rollout; rollback application only, preserve data and use forward corrective SQL.
+- **Verification:** corrected four independently reproduced blockers (audit constraint, owner-only mutation, originating session and cleanup-only retry). Current code passes 927 unit/component tests, lint, typecheck, build and diff-check; prior tooling57 tests and eight responsive fixtures pass. Actual isolated proof: shipped SQL27/27, additional live-permission14/14, real Storage upload/readback and physical file deletion, and independent competing-commit race with one winner/no loser audit. Seven migrations remain pending on the original local DB; none applied. No remote operations or commits. Do not run reset wrappers on existing data.
+
 ## EXTRA-048 — Foto de candidato y logo de empresa
 
 - **Fecha/estado:** 2026-10-22; solicitud y privacidad del candidato registradas;
@@ -3449,3 +3755,182 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
 - **Pendiente:** CI completa (incluye `accounts`, `registration-verification` y
   `session-navigation`, que requieren Supabase local y solo corren en el runner),
   revisión del compañero y merge del PR. Node local 26.7.0, distinto del 24 LTS.
+
+## EXTRA-051 — Panel de usuario (dashboard) accesible desde la navbar
+
+- **Fecha/estado:** 2026-10-22; implementado y verificado localmente; revisión del
+  compañero y PR pendientes. Se registra durante la implementación, no antes, por
+  un desvío del orden previsto en `AGENTS.md`.
+- **Origen:** pedido explícito de Maxi: la sesión iniciada debe ser visible en la
+  navbar con un enlace «Panel de usuario», y ese panel —métricas de postulaciones
+  en curso y cerradas— debe existir y figurar arriba de «Perfil» en la sidebar.
+- **Problema/evidencia:** la navbar compartida solo ofrecía «Inicio» y «Ofertas»;
+  una sesión activa no tenía un acceso directo al panel. Las postulaciones se
+  consultaban en una lista plana sin resumen ni separación entre estados.
+- **Cambio mínimo/justificación:** `getSiteAccess` resuelve acceso de cuenta y
+  panel en una sola lectura de sesión; `HomeNavbar` acepta un enlace opcional
+  `panel` que solo se renderiza con sesión activa; `/dashboard` reutiliza el panel
+  candidato con `basePath` propio y redirige a empresa/administración según rol;
+  se agrega la sección «Panel de usuario» como primera y predeterminada, con
+  métricas, estado del perfil y listas de postulaciones en curso y cerradas.
+- **Superficies/contratos:** `src/features/accounts/navigation.ts`,
+  `(public)/home-navbar.tsx`, `(public)/page.tsx`, `(public)/home.module.css`,
+  `(auth)/account/candidate-account.tsx`, `(auth)/account/dashboard-content.tsx`,
+  `(auth)/account/account.module.css`, `(auth)/dashboard/page.tsx`,
+  `api/candidate/cv/route.ts` (allowlist de retorno del CV) y las acciones de
+  perfil, consentimiento y postulaciones (`revalidatePath("/dashboard")`).
+- **Riesgos/recuperación:** el enlace de panel se resuelve en el servidor, por lo
+  que no expone datos de sesión al cliente. El retorno del CV acepta únicamente
+  la cadena exacta `/dashboard?section=perfil`, sin parámetros adicionales.
+  Revertir el diff devuelve la navbar y el panel al estado anterior.
+- **Verificación local:** `npm run typecheck` exit 0, `npm run lint` exit 0,
+  `npm run test:unit` 803 pruebas en 59 archivos PASS, `npm run build` exit 0 con
+  `/dashboard` registrada. No se ejecutó E2E ni el reset de datos.
+- **Pendiente:** verificación visual en navegador, CI, revisión del compañero y
+  merge. Node local 26.7.0, distinto del 24 LTS requerido.
+
+## EXTRA-052 — Estado activo de la navbar
+
+- **Fecha/estado:** 2026-10-23; registrado antes de implementar, autorizado por
+  el pedido explícito de Maxi. Desde este pedido, la landing se denomina Home.
+- **Origen/problema:** conservar en el enlace de la página actual el estilo de
+  hover; en Home, «Inicio» debe permanecer verde y subrayado sin usar el mouse.
+- **Cambio/justificación:** identificar la ruta actual en `HomeNavbar`, exponer
+  `aria-current="page"` y reutilizar sus reglas de hover para el estado activo.
+  Mantener destinos, anclas, visibilidad y estilo particular de «Mi cuenta».
+- **Superficies:** `src/app/(public)/home-navbar.tsx`, `home.module.css`,
+  `tests/components/home-navbar.test.tsx`, `docs/UI_GUIDELINES.md` y este registro.
+- **Riesgos/recuperación:** presentación local, sin cambios de contratos,
+  autenticación o datos. No extender la navbar a rutas que no la utilizan.
+  Revertir únicamente este incremento restaura el estilo previo.
+- **Verificación prevista:** RED/GREEN del enlace activo y navegación existente;
+  suite unitaria, lint, tipos, build y comprobación visual desktop/mobile sin
+  envíos ni reset de datos. Revisión humana y publicación pendientes.
+- **Resultado:** implementado y verificado localmente. RED 5/6 fallos por ausencia
+  de estado activo; GREEN 6/6. Se adaptó únicamente el mock `usePathname` de
+  `tests/components/candidate/candidate-pages.test.tsx` al nuevo hook. Suite final
+  828/828 en 62 archivos, lint, tipos, build y diff-check PASS. Navegador a 1440px
+  y 390px confirma Inicio verde/subrayado sin hover, Ofertas sin estado activo y
+  clic nativo que vuelve al inicio y enfoca `contenido`. Sin reset ni envíos.
+  Capturas en scratch; servidor temporal propio cerrado. Sin commit ni publicación.
+
+## EXTRA-053 — Navbar blanca con vidrio esmerilado sutil
+
+- **Fecha/estado:** 2026-10-23; registrado antes de implementar, pedido explícito
+  de Maxi para probar una navbar blanca semitranslúcida con contenido legible.
+- **Cambio mínimo:** blanco al 90% y desenfoque de fondo de 16px solamente en
+  navegadores con soporte; conservar blanco sólido como fallback. No aplicar
+  opacidad o filtro a textos, logo o controles. Mantener navegación, dimensiones,
+  borde, sombra, estado activo y reglas de visibilidad.
+- **Superficies:** `src/app/(public)/home.module.css`, `docs/UI_GUIDELINES.md`
+  y este registro; prueba visual temporal de solo lectura en scratch.
+- **Riesgos/recuperación:** cambio visual acotado, reversible retirando la regla
+  de soporte. Sin dependencias, datos o cambios de contratos.
+- **Verificación prevista:** comparar fondo/desenfoque calculados antes/después;
+  capturas desktop/mobile, legibilidad y anclas; unitarias, lint, tipos y build.
+  Sin reset de datos, envíos, commit o publicación.
+- **Resultado:** implementado y verificado localmente. Prueba visual RED sobre
+  fondo blanco sólido; GREEN en producción a 1440px y 390px con alpha 0.9,
+  `backdrop-filter: blur(16px)`, opacidad 1 y sin filtro de primer plano.
+  Capturas inspeccionadas: contenido legible y sin recortes en la navbar;
+  Inicio conserva el estado activo y el clic devuelve foco a `contenido`.
+  Unitarias 828/828, lint, tipos, build y diff-check PASS. Build conserva aviso
+  sobre lockfile externo al repositorio. Servidor propio cerrado; sin reset,
+  envíos, commit o publicación. Evaluación visual del usuario pendiente.
+
+## EXTRA-054 — Vidrio esmerilado en el acceso a ofertas de Home
+
+- **Fecha/estado:** 2026-10-23; registrado antes de implementar, por pedido de Maxi.
+- **Origen/cambio:** aplicar al fondo de «Ver ofertas disponibles» el mismo blanco
+  al 90% y desenfoque de 16px de la navbar, reutilizando su regla de soporte y
+  conservando el fallback sólido. Mantener el matiz de hover, también translúcido.
+- **Superficies:** `src/app/(public)/home.module.css`, `docs/UI_GUIDELINES.md`
+  y este registro. Sin cambios de markup, destinos, posición, texto o icono.
+- **Riesgos/recuperación:** presentación local reversible, sin contratos o datos.
+- **Verificación prevista:** RED/GREEN de estilos calculados; escritorio/móvil,
+  hover y clic al destino existente; unitarias, lint, tipos, build y diff-check.
+  Pruebas de solo lectura sin reset, envíos, commit ni publicación.
+- **Resultado:** RED observado por blanco sólido previo; GREEN en navegador de
+  producción a 1440px y 390px: fondo blanco alpha 0.9, blur 16px, texto verde
+  opaco y nítido, hover tintado alpha 0.9. Capturas inspeccionadas y clic al
+  destino existente con foco y alineación superior correctos. Suite 828/828,
+  lint, tipos, build y diff-check PASS; aviso previo de lockfile externo persiste.
+  Servidor temporal propio cerrado. Implementado/verificado localmente,
+  sin commit o publicación; revisión visual del usuario pendiente.
+- **Ajuste solicitado 2026-10-23 (antes de editar):** Maxi pide «quizás un 85%»
+  para notar más transparencia. Bajar solamente el fondo del botón y su hover
+  a 85% de opacidad; navbar permanece al 90%, blur de ambos permanece en 16px.
+  Mismas superficies, riesgos y comprobaciones visuales; no cambia el contenido.
+- **Verificación del ajuste:** RED por alpha previo 0.9; GREEN normal/hover a
+  0.85 en 1440px y 390px, navbar confirmada en 0.9, blur 16px y texto sin filtro.
+  Capturas inspeccionadas, clics/foco correctos. 828/828 tests, lint, tipos,
+  build y diff-check PASS; sin commit, publicación o reset.
+- **Corrección de alcance 2026-10-23:** Maxi aclara «Era lo mismo en la navbar».
+  La interpretación anterior de limitar el 85% al botón fue incorrecta. Aplicar
+  también 85% a la navbar, conservando blur, contenido y navegación. Registrado
+  antes de editar; mismas verificaciones de estilos desktop/mobile.
+- **Resultado de la corrección:** navbar con variable local al 85%; botón intacto
+  al 85%. RED sobre producción previa al 90%; Chromium con CSS real en fixture
+  aislado a 1440px/390px confirma alpha 0.85 y blur 16px en ambas superficies,
+  sin opacidad/filtro de primer plano. Lint y diff-check PASS. Build/typecheck
+  bloqueados por imports de páginas candidatas retiradas en trabajo concurrente;
+  suite registra ese módulo no resuelto y dos expectativas desactualizadas de
+  navegación/logout (815 PASS, 2 FAIL, 1 suite no cargada). No se modifican esas
+  rutas o pruebas ajenas. No se afirma comprobación integral ni build PASS.
+
+## EXTRA-055 — Permanencia temporal de la navbar al volver arriba
+
+- **Fecha/estado:** 2026-10-23; registrado antes de implementar. Maxi solicita
+  «unos 3 segundos desplegada» al volver arriba tras bajar, y mantenerla mientras
+  el mouse esté encima. Implementación autorizada en Home, sin nuevos paquetes.
+- **Cambio:** conservar el estado inicial oculto en escritorio; al pasar de
+  scroll positivo a cero, retener 3000ms. Hover mantiene abierta la barra tras el
+  vencimiento; salir la oculta si ya venció. Conservar foco de teclado mientras
+  se usa la navegación. Cancelar timers al bajar, cambiar breakpoint o desmontar.
+- **Superficies:** `home-navbar.tsx`, pruebas de navbar y Home, guía visual y este
+  registro. Mantener móvil siempre visible, variante de cuenta y acabado de vidrio.
+- **Riesgos/recuperación:** interacción visual local con temporizador cancelable;
+  pruebas deterministas de reloj/eventos, sin datos o contratos cambiados.
+- **Verificación prevista:** RED/GREEN de espera, hover/salida, scroll repetido,
+  limpieza, teclado y móvil; suite, lint, tipos, build y navegador si disponible.
+- **Resultado:** implementado con timer cancelable y retención independiente
+  por hover/foco. RED 5 pruebas fallando por ocultamiento inmediato; GREEN
+  29/29 pruebas de Home/navbar, incluida cancelación por breakpoint y desmontaje.
+  `tests/visual/home-navbar-delay-check.mjs` agregado: navegador de producción
+  confirma inicio oculto, espera al regresar, hover más allá de 3 segundos,
+  salida y móvil visible, con y sin movimiento reducido. Servidor propio cerrado.
+  Suite final 846/846 en 62 archivos, lint, tipos, build y diff-check PASS.
+  Fallos intermedios de rutas concurrentes ya no aparecen en la suite final;
+  no se editaron sus pruebas. Sin cambios de datos, commit o publicación.
+- **Revisión solicitada 2026-10-23 (previa al cambio):** «3 segundos es mucho,
+  reducelo a 2». Cambiar la espera a 2000ms, conservando hover/foco y las demás
+  reglas; ajustar pruebas y guía en las mismas superficies.
+- **Verificación de la revisión:** RED 2 fallos por espera de 3000ms; GREEN
+  846/846 tests, lint, tipos, build y diff-check PASS. Navegador de producción
+  confirma espera reducida, hover y móvil, con/sin movimiento reducido. Sin commit.
+
+## EXTRA-067 — Cambio suave entre las introducciones de Home
+
+- **Fecha/estado:** 2026-10-24; implementado y verificado. Maxi solicita «una
+  animación suave de cambio» entre los textos del cuadrante izquierdo al
+  alternar Iniciar sesión / Registrarse / Empresa.
+- **Problema:** la introducción municipal se reemplazaba de golpe mientras la
+  tarjeta animaba alto y ancho, lo que hacía el cambio de textos abrupto.
+- **Cambio:** la introducción se remonta por vista (`key={view}`) y sus bloques
+  directos entran con un fundido y un desplazamiento vertical de 8px en 420ms,
+  con escalonado de 45ms hasta el quinto bloque. Sin cambios de texto, orden,
+  estructura ni destinos. Movimiento reducido desactiva la animación.
+- **Superficies:** `src/app/(public)/home-hero.tsx`,
+  `src/app/(public)/home.module.css`, `docs/UI_GUIDELINES.md` y este registro.
+- **Riesgos/recuperación:** animación puramente visual sobre nodos sin estado;
+  sin cambios de datos, contratos, permisos ni formularios. Revertir el
+  `key` y las reglas `introTextIn` restituye el comportamiento anterior.
+- **Verificación:** `tests/components/setup/home.test.tsx` y
+  `tests/components/home-access-panel.test.tsx` 33/33; suite completa 962/962
+  en 70 archivos; lint, tipos, build y `git diff --check` PASS. Comprobación de
+  navegador propia sobre producción local: fundido con fotogramas intermedios,
+  textos finales correctos en login/postulante/empresa, asentamiento sin
+  transform residual, movimiento reducido con `animation-name: none`, en
+  1440px y 390px. Corredores existentes: responsive 15 estados y navbar 12
+  estados PASS en dos pasadas (un primer intento falló por el retraso de
+  hidratación de la navbar, ajeno a este cambio). Servidor propio cerrado.

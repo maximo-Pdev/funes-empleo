@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminCandidateDetailPage({ params, searchParams }: {
   params: Promise<{ candidateId: string }>; searchParams: Promise<{ cv?: string }>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const { candidateId: reference } = await params;
   const candidateId = await pageRecordIdentifier("candidate", reference, `/admin/candidates/${reference}`, await searchParams);
   const { cv } = await searchParams;
@@ -59,7 +59,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         </div>}
       </section>;
 
-  return <AdminShell active={assisted ? "/admin/atencion-presencial" : "/admin/candidates"} title={candidate.display_name}
+  return <AdminShell email={user?.email} active={assisted ? "/admin/atencion-presencial" : "/admin/candidates"} title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
     navigation={[{ href: assisted ? "/admin/atencion-presencial" : "/admin/candidates", label: assisted ? "Volver a atención presencial" : "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <div className="grid gap-6 lg:grid-cols-2">

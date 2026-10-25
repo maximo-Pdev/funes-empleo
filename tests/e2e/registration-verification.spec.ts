@@ -51,12 +51,12 @@ for (const role of ["candidate", "company"] as const) {
     await page.goto(link!);
     await expect(page).toHaveURL("http://127.0.0.1:3000/account");
     if (role === "candidate") {
-      await expect(page.getByRole("heading", { name: "Mi perfil", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Panel de usuario", exact: true })).toBeVisible();
       await expect(page.getByRole("navigation", { name: "Secciones de mi cuenta" })).toBeVisible();
     } else {
       await expect(page.getByText("Acceso individual activo. Rol: Empresa.", { exact: true })).toBeVisible();
     }
-    await page.goto(role === "candidate" ? "/candidato/perfil" : "/empresa/perfil");
+    await page.goto(role === "candidate" ? "/dashboard?section=perfil" : "/empresa/perfil");
     await expect(page.getByRole("heading", { name: role === "candidate" ? "Mi perfil" : "Perfil de empresa", exact: true })).toBeVisible();
     await expect(page.getByLabel(role === "candidate" ? "Nombre y apellido" : "Nombre de la empresa", { exact: true })).toHaveValue(`${role === "candidate" ? "Persona" : "Empresa"} ficticia ${suffix}`);
     await page.reload();

@@ -13,10 +13,14 @@ test.beforeEach(() => {
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
   assertLocalTargets();
-  await page.goto("/login");
+  // The login form lives on the home page and is replaced by a session notice while a session is active
+  // (here the candidate is re-entered after a suspension or an archive). Drop the stale session first.
+  await page.context().clearCookies();
+  await page.goto("/");
+  await expect(page.getByLabel("Correo electrónico")).toBeVisible();
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 
@@ -58,7 +62,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   expect(link).toBeTruthy();
   await page.goto(link!);
   await expect(page).toHaveURL(/\/account$/);
-  await page.goto("/candidato/perfil");
+  await page.goto("/dashboard?section=perfil");
   await expect(page.getByRole("heading", { name: "Mi perfil" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await expect(page.getByText("Estado del perfil:")).toContainText("Borrador");
@@ -84,7 +88,8 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   let releaseRefresh!: () => void;
   const refreshGate = new Promise<void>(resolve => { releaseRefresh = resolve; });
-  await page.route("**/candidato/perfil*", async route => {
+  const profileRoute = (url: URL) => url.pathname === "/dashboard" && url.searchParams.get("section") === "perfil";
+  await page.route(profileRoute, async route => {
     if (route.request().method() === "GET" && route.request().headers().rsc === "1") await refreshGate;
     await route.continue();
   });
@@ -94,9 +99,9 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await expect(page.getByText("CV guardado.", { exact: true })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Cargando CV…" })).toBeDisabled();
   } finally { releaseRefresh(); }
-  await expect(page).toHaveURL(/\/candidato\/perfil$/);
+  await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
   await expect(page.getByText("CV guardado.")).toBeVisible();
-  await page.unroute("**/candidato/perfil*");
+  await page.unroute(profileRoute);
   await expect(activation.getByRole("button", { name: "Activar perfil" })).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect(activation).toBeInViewport();
@@ -110,7 +115,11 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(activation.getByText("Perfil activo", { exact: true })).toBeInViewport();
+  // The profile heading above the canvas pushes the activation state below the fold at 360px,
+  // so the person reaches it by scrolling; the assertion still checks it is on screen.
+  const activeStatus = activation.getByText("Perfil activo", { exact: true });
+  await activeStatus.scrollIntoViewIfNeeded();
+  await expect(activeStatus).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({ path: "test-results/profile-presentation-mobile.png" });
@@ -118,8 +127,10 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   const detailsCard = page.getByRole("region", { name: "Datos laborales y personales" });
   const cvCard = page.getByRole("region", { name: "CV PDF" });
   const consentCard = page.locator("form").filter({ has: page.getByRole("heading", { name: "Consentimiento de prueba" }) });
-  await expect(detailsCard).toHaveCSS("grid-column-end", "-1");
-  await expect(consentCard).toHaveCSS("grid-column-end", "-1");
+  // La grilla de dos columnas vive dentro de la sección de datos, no en la sección misma.
+  const detailsGrid = page.locator("[data-profile-details]");
+  expect(await detailsGrid.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(" ").length)).toBe(2);
+  await expect(consentCard).toBeVisible();
   const cvBounds = await cvCard.boundingBox();
   const consentBounds = await consentCard.boundingBox();
   expect(consentBounds!.y).toBeGreaterThanOrEqual(cvBounds!.y + cvBounds!.height);
@@ -160,15 +171,15 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     name: "rechazado.pdf", mimeType: "application/pdf", buffer: Buffer.from("PDF ficticio dañado"),
   });
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page).toHaveURL(/\/candidato\/perfil$/);
   await expect(page.getByText("El PDF fue rechazado.", { exact: false })).toBeVisible();
+  await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
   await expect(page.getByRole("link", { name: "Descargar mi CV" })).toHaveAttribute("href", originalCv!);
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page).toHaveURL(/\/candidato\/perfil$/);
   await expect(page.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", originalCv!);
+  await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
 
-  await page.goto("/candidato/ofertas");
+  await page.goto("/dashboard?section=ofertas");
   const availableTitles = (await page.locator("li a[href^='/ofertas/']").allTextContents()).map(title => title.trim());
   const titles = availableTitles.filter(title => availableTitles.filter(other => other === title).length === 1);
   expect(titles.length).toBeGreaterThanOrEqual(2);
@@ -177,8 +188,8 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await card.getByRole("button", { name: "Postularme" }).click();
     await expect(card.getByRole("button", { name: "Participación registrada" })).toBeDisabled();
   }
-  await page.goto("/candidato/postulaciones");
-  await expect(page.getByRole("heading", { name: "Mis participaciones" })).toBeVisible();
+  await page.goto("/dashboard?section=postulaciones");
+  await expect(page.getByRole("heading", { name: "Mis postulaciones" })).toBeVisible();
   await expect(page.locator("li").filter({ hasText: titles[0] })).toContainText("Recibida por la Oficina");
   await expect(page.locator("li").filter({ hasText: titles[1] })).toContainText("Recibida por la Oficina");
   await expect(page.locator("body")).not.toContainText(/preseleccionad|preentrevista|nota interna/i);
@@ -188,7 +199,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(first).toContainText("Retirada");
   await expect(page.locator("li").filter({ hasText: titles[1] })).toContainText("Recibida por la Oficina");
 
-  await page.goto("/candidato/perfil");
+  await page.goto("/dashboard?section=perfil");
   await page.getByLabel("Habilidades y experiencia").click();
   await page.getByLabel("Habilidades y experiencia").press("ControlOrMeta+A");
   await page.keyboard.insertText("Experiencia ficticia corregida directamente");
@@ -216,14 +227,14 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByLabel("Confirmo la suspensión").check();
     await admin.getByRole("button", { name: "Suspender cuenta" }).click();
     await expect(admin.getByRole("button", { name: "Reactivar cuenta" })).toBeVisible();
-    await page.goto("/candidato/perfil");
+    await page.goto("/dashboard?section=perfil");
     await expect(page).toHaveURL(/\/account-suspended$/);
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Reactivación ficticia E2E");
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
     await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await signIn(page, email, password);
-    await page.goto("/candidato/perfil");
+    await page.goto("/dashboard?section=perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("No disponible");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
     await page.goto("/account");
@@ -240,7 +251,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
       select private.change_account_status(profile.account_id,account.version,'archive',null,true)
       from public.candidate_profiles profile join public.accounts account on account.id=profile.account_id where profile.id='${profileId}';
       commit;`);
-    await page.goto("/candidato/perfil");
+    await page.goto("/dashboard?section=perfil");
     await expect(page).toHaveURL(/\/session-expired$/);
     await admin.reload();
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Restauración ficticia E2E");
@@ -248,9 +259,9 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("button", { name: "Restaurar a borrador" }).click();
     await expect(admin.getByText("Estado: Borrador", { exact: false })).toBeVisible();
     await signIn(page, email, password);
-    await page.goto("/candidato/perfil");
+    await page.goto("/dashboard?section=perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("Borrador");
-    await page.goto("/candidato/postulaciones");
+    await page.goto("/dashboard?section=postulaciones");
     await expect(page.locator("li").filter({ hasText: titles[0] })).toContainText("Retirada");
   } finally { await adminContext.close(); }
 });

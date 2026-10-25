@@ -32,7 +32,7 @@ export async function assistedCommandAction(input: unknown) {
     if (result.error) throw workflowRpcError(result.error.message);
     revalidatePath("/admin/candidates"); revalidatePath("/admin/candidates/[candidateId]", "page");
     revalidatePath("/admin/atencion-presencial");
-    revalidatePath("/admin/candidates/assisted/[candidateId]", "page");
+
     return { success: true, message: data.command === "activate" ? "Perfil activo para evaluación interna." : "Consentimiento registrado." };
   } catch (error) { return { success: false, message: publicErrorFrom(error).message }; }
 }

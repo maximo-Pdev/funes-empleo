@@ -15,7 +15,7 @@
 .information {
   min-height: 100svh;
   background: var(--color-brand-secondary);
-  scroll-margin-top: 104px;
+  scroll-margin-top: 0;
 }
 
 .offersFooter {
@@ -23,6 +23,7 @@
 }
 
 .offersAction {
+  --frosted-opacity: 85%;
   position: absolute;
   z-index: 3;
   left: 50%;
@@ -51,11 +52,12 @@
 }
 
 .navbar {
+  --frosted-opacity: 85%;
   position: fixed;
   inset: 0 0 auto;
   z-index: 20;
   height: 64px;
-  border-bottom: 1px solid var(--color-brand-muted);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-brand-muted) 35%, transparent);
   background: var(--color-brand-secondary);
   transform: translateY(-100%);
   visibility: hidden;
@@ -63,11 +65,28 @@
   transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 280ms;
 }
 
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navbar,
+  .offersAction {
+    background: color-mix(in srgb, var(--color-brand-secondary) var(--frosted-opacity, 90%), transparent);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .offersAction:hover {
+    background: color-mix(in srgb, var(--color-primary-100) var(--frosted-opacity, 90%), transparent);
+  }
+}
+
 .navbar[data-visible="true"] {
   transform: translateY(0);
   visibility: visible;
   pointer-events: auto;
   transition-delay: 0s;
+}
+
+.navbar[data-scrolled="true"] {
+  box-shadow: 0 3px 12px rgb(0 0 0 / 8%);
 }
 
 .navbarContent {
@@ -92,6 +111,20 @@
   height: 48px;
 }
 
+.navbarIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 12px;
+  color: var(--color-brand-text);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.navbarIdentity strong {
+  font-size: 14px;
+}
+
 .navbarLinks {
   display: flex;
   align-items: center;
@@ -107,10 +140,28 @@
   font-weight: 600;
 }
 
-.navbarLinks a:hover {
+.navbarLinks a:hover,
+.navbarLinks a[aria-current="page"] {
   color: var(--color-primary);
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+.navbarLinks .navbarPanel {
+  padding-inline: 16px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--color-brand-primary);
+  color: var(--color-brand-secondary);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.navbarLinks .navbarPanel:hover,
+.navbarLinks .navbarPanel[aria-current="page"] {
+  background: color-mix(in srgb, var(--color-brand-primary) 90%, black);
+  color: var(--color-brand-secondary);
+  text-decoration: none;
 }
 
 .brand {
@@ -143,7 +194,7 @@
 }
 
 .headline {
-  margin: 24px 0 0;
+  margin: 0;
   color: var(--color-brand-secondary);
   font-size: clamp(28px, 2.6vw, 40px);
   font-weight: 700;
@@ -159,6 +210,40 @@
   color: var(--color-brand-secondary);
   font-size: 14px;
   line-height: 1.75;
+}
+
+/* Soft swap between the login and registration introductions. The remounted
+   children fade and rise with a short stagger so the change reads as one motion. */
+.introduction > * {
+  animation: introTextIn 420ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.introduction > :nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.introduction > :nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.introduction > :nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.introduction > :nth-child(5) {
+  animation-delay: 180ms;
+}
+
+@keyframes introTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .accountNav {
@@ -194,23 +279,28 @@
   outline-offset: 3px;
 }
 
-.introIdentity {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.introIdentity img {
-  flex-shrink: 0;
-  border-radius: 12px;
-}
-
-.introIdentity span {
-  display: block;
-}
 
 .introSummary {
   margin-top: 16px;
+}
+
+.introRoles.introSteps {
+  gap: 16px;
+}
+
+.introIcon.introStepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.introDisclaimer {
+  margin-top: 24px;
+  padding: 12px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 5%);
 }
 
 .introRoles {
@@ -286,6 +376,7 @@
 }
 
 .panel {
+  scroll-margin-top: 88px;
   --surface-bevel-gradient: linear-gradient(135deg, #ffffff 0%, #eef0f3 16%, #a5adb7 34%, #ffffff 48%, #e1e5eb 60%, #87909d 83%, #f6f8fa 100%);
   --shadow-bevel: inset 2px 2px 4px rgb(255 255 255 / 95%), inset -2px -2px 4px rgb(71 85 105 / 18%), 0 1px 1px rgb(255 255 255 / 80%), 0 4px 8px rgb(38 43 53 / 12%), 0 24px 64px rgb(38 43 53 / 16%);
   background: linear-gradient(var(--color-brand-secondary), var(--color-brand-secondary)) padding-box, var(--surface-bevel-gradient) border-box;
@@ -407,13 +498,6 @@
 .form label {
   color: var(--color-brand-text);
 }
-
-.form label > span:has(+ input:required)::after,
-.form label:has(+ input:required)::after,
-.form label:has(+ div > input:required)::after {
-  content: " *" / "";
-}
-
 .form [data-company-field-row] {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -456,15 +540,64 @@
   font-size: 12px;
 }
 
+.form .sessionMessage {
+  padding: 28px 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sessionActions .accountNav {
+  justify-content: center;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+.sessionActions .accountNav a {
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 6px;
+  background: var(--color-brand-primary);
+  color: var(--color-brand-secondary);
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.sessionActions .accountNav a:hover {
+  background: color-mix(in srgb, var(--color-brand-primary) 90%, black);
+  text-decoration: none;
+}
+
+.sessionActions .accountNav a:focus-visible {
+  outline-color: var(--color-ring);
+}
+
 .form p[role]:empty {
   display: none;
 }
 
+.form p[role="status"]:not(:empty):not(:global(.text-red-700)) {
+  color: var(--color-feedback-info);
+}
+
+.form p[role="status"] > svg {
+  display: inline-block;
+  margin-inline-end: 6px;
+  vertical-align: -3px;
+}
+
+.form p[role="status"]:global(.text-red-700),
 .form p[role="alert"]:not(:empty) {
   color: #8c2430;
 }
 
 @media (min-width: 768px) {
+  .offersAction {
+    transition: left 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .hero:has(.accessGroup[data-layout="company"]) .offersAction {
     left: 25%;
   }
@@ -484,8 +617,38 @@
 }
 
 @media (max-width: 767px) {
+  .navbarIdentity {
+    display: none;
+  }
+
+  .navbarLinks {
+    gap: 12px;
+  }
+
+  .navbarLinks .navbarPanel {
+    padding-inline: 12px;
+    font-size: 13px;
+  }
+
   .navbar {
+    inset: auto 0 0;
     transition: none;
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid color-mix(in srgb, var(--color-brand-muted) 35%, transparent);
+    border-bottom: 0;
+  }
+
+  .navbar[data-scrolled="true"] {
+    box-shadow: 0 -3px 12px rgb(0 0 0 / 8%);
+  }
+
+  .page {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .panel {
+    scroll-margin-top: 24px;
   }
 
   .hero {
@@ -502,7 +665,7 @@
   .introduction {
     position: relative;
     display: block;
-    padding: 88px 20px 0;
+    padding: 24px 20px 0;
   }
 
   .introNotice {
@@ -545,7 +708,626 @@
   .modes button,
   .accessGroup,
   .panel,
+  .offersAction,
   .navbar {
     transition: none;
+  }
+
+  .introduction > * {
+    animation: none;
+  }
+}
+
+/* --- Offers preview section --- */
+
+.offersSection {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: clamp(48px, 7vw, 88px) clamp(20px, 5vw, 80px);
+}
+
+.offersHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.offersTitle {
+  margin: 0;
+  color: var(--color-brand-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.offersSubtitle {
+  margin: 12px 0 0;
+  max-width: 62ch;
+  color: var(--color-foreground-secondary);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.offersAllLink {
+  display: inline-flex;
+  min-height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-brand-primary);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary-400);
+  text-underline-offset: 4px;
+}
+
+.offersAllLink:hover {
+  color: var(--color-brand-text);
+}
+
+.offersEmpty {
+  padding: 40px 32px;
+  border: 1px dashed var(--color-border);
+  border-radius: 14px;
+  color: var(--color-foreground-secondary);
+  text-align: center;
+}
+
+.offersEmpty p {
+  margin: 0 0 8px;
+}
+
+.offersEmpty p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Offers carousel --- */
+
+.offersCarousel {
+  position: relative;
+}
+
+.carouselHorizontal {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.carouselHorizontal > .coverflow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Coverflow technique adapted from "CSS Variables 3D Carousel (No JS)" by Chris Neale (https://codepen.io/onion2k/pen/xxZYBVj), MIT license (see public/brand/coverflow-3d/LICENSE.txt). */
+.coverflow {
+  position: relative;
+  height: 460px;
+  overflow: hidden;
+  perspective: 900px;
+}
+.coverflowCard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 400px;
+  margin-left: -150px;
+  margin-top: -200px;
+  --r: 0;
+  --abs: max(calc(var(--r) * -1), var(--r));
+  transform: rotateY(calc(-12deg * var(--r))) translateX(calc(-280px * var(--r)));
+  transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease-out;
+  z-index: calc(100 - var(--abs));
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coverflowCard {
+    transition: none;
+  }
+}
+
+.carouselVertical {
+  position: relative;
+}
+
+.carouselContentVertical {
+  height: 460px;
+}
+
+.carouselVertical [data-slot="carousel-item"] {
+  flex-basis: 50%;
+}
+
+.carouselControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.carouselButton {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-brand-secondary);
+  color: var(--color-brand-primary);
+  box-shadow: 0 4px 12px rgb(0 25 10 / 16%);
+  cursor: pointer;
+  transition: background-color 160ms ease-out, color 160ms ease-out, opacity 160ms ease-out;
+}
+
+.carouselVertical .carouselButton {
+  transform: rotate(90deg);
+}
+
+.carouselButton:hover:not(:disabled) {
+  background: var(--color-primary-100);
+}
+
+.carouselButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.carouselButton:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* --- Offer preview card --- */
+
+.offerCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-brand-secondary);
+  box-shadow: var(--shadow-card);
+  color: var(--color-foreground);
+}
+
+.offerTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.offerTagLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.offerCardTitle {
+  display: -webkit-box;
+  margin: 0 0 10px;
+  overflow: hidden;
+  color: var(--color-brand-text);
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.offerCardTitle a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.offerCardTitle a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.offerCompany {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--color-brand-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.offerCompany svg,
+.offerMeta svg {
+  flex-shrink: 0;
+  color: var(--color-foreground-secondary);
+}
+
+.offerCompanyName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.offerCardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.offerMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--color-foreground-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .offerCardTitle {
+    font-size: 18px;
+  }
+
+  .offerCardMeta {
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .offersHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .offersSection {
+    padding: 48px 20px 64px;
+  }
+}
+
+/* --- Lower content sections --- */
+
+.processSection {
+  background: var(--color-brand-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.rolesSection {
+  background: color-mix(in srgb, var(--color-brand-primary) 5%, var(--color-brand-secondary));
+}
+
+.faqSection {
+  background: var(--color-brand-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.closingSection {
+  background: var(--color-brand-primary);
+  color: var(--color-brand-secondary);
+}
+
+.sectionInner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: clamp(48px, 7vw, 88px) clamp(20px, 5vw, 80px);
+}
+
+.sectionEyebrow {
+  margin: 0 0 10px;
+  color: var(--color-brand-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--color-brand-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.sectionLead {
+  margin: 14px 0 0;
+  max-width: 64ch;
+  color: var(--color-foreground-secondary);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.processSteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.processStep {
+  padding: 28px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-brand-secondary);
+  box-shadow: var(--shadow-card);
+}
+
+.processStepNumber {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--color-brand-primary);
+  color: var(--color-brand-secondary);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.processStep p {
+  margin: 16px 0 0;
+  color: var(--color-foreground);
+  line-height: 1.65;
+}
+
+.roleCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.roleCard {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-brand-secondary);
+  box-shadow: var(--shadow-card);
+}
+
+.roleCardIcon {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--color-primary-100);
+  color: var(--color-brand-primary);
+}
+
+.roleCardTitle {
+  margin: 18px 0 0;
+  color: var(--color-brand-text);
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.roleCardDescription {
+  margin: 12px 0 0;
+  color: var(--color-foreground-secondary);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.roleCardLink {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  color: var(--color-brand-primary);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary-400);
+  text-underline-offset: 4px;
+}
+
+.roleCardLink:hover {
+  color: var(--color-brand-text);
+}
+
+.faqList {
+  margin-top: 40px;
+  border-top: 1px solid var(--color-border);
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.faqQuestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 4px;
+  cursor: pointer;
+  color: var(--color-brand-text);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion svg {
+  flex-shrink: 0;
+  color: var(--color-brand-primary);
+  transition: transform 180ms ease-out;
+}
+
+.faqItem[open] .faqQuestion svg {
+  transform: rotate(180deg);
+}
+
+.faqAnswer {
+  margin: 0 0 20px;
+  max-width: 72ch;
+  color: var(--color-foreground-secondary);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.closingGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.closingTitle {
+  margin: 0;
+  color: var(--color-brand-secondary);
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.closingLead {
+  margin: 14px 0 0;
+  max-width: 56ch;
+  color: color-mix(in srgb, var(--color-brand-secondary) 85%, transparent);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.closingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.closingPrimary,
+.closingSecondary {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.closingPrimary {
+  background: var(--color-brand-secondary);
+  color: var(--color-brand-primary);
+}
+
+.closingPrimary:hover {
+  background: var(--color-primary-100);
+}
+
+.closingSecondary {
+  border: 1px solid color-mix(in srgb, var(--color-brand-secondary) 45%, transparent);
+  background: transparent;
+  color: var(--color-brand-secondary);
+}
+
+.closingSecondary:hover {
+  background: color-mix(in srgb, var(--color-brand-secondary) 10%, transparent);
+}
+
+.closingContact {
+  padding: 28px 24px;
+  border: 1px solid color-mix(in srgb, var(--color-brand-secondary) 25%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-brand-secondary) 6%, transparent);
+}
+
+.closingContactTitle {
+  margin: 0;
+  color: var(--color-brand-secondary);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.closingContactSub {
+  margin: 4px 0 0;
+  color: color-mix(in srgb, var(--color-brand-secondary) 75%, transparent);
+  font-size: 14px;
+}
+
+.contactList {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contactList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: color-mix(in srgb, var(--color-brand-secondary) 88%, transparent);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.contactList svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-primary-400);
+}
+
+@media (max-width: 767px) {
+  .processSteps,
+  .roleCards {
+    grid-template-columns: 1fr;
+  }
+
+  .closingGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .closingActions {
+    flex-direction: column;
+  }
+
+  .closingPrimary,
+  .closingSecondary {
+    width: 100%;
   }
 }

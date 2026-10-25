@@ -1,11 +1,11 @@
 import { beforeEach, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ signIn: vi.fn(), signOut: vi.fn(), revalidatePath: vi.fn(), redirect: vi.fn(), createClient: vi.fn() }));
+const mocks = vi.hoisted(() => ({ signIn: vi.fn(), signOut: vi.fn(), revalidatePath: vi.fn(), redirect: vi.fn(), createClient: vi.fn(), updatePassword: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/lib/supabase/server", () => ({ createServerSupabaseClient: mocks.createClient }));
-vi.mock("@/features/accounts/service", () => ({ signIn: mocks.signIn, requestRecovery: vi.fn(), resendVerification: vi.fn(), updatePassword: vi.fn(), changeAccountStatus: vi.fn(), registerAccount: vi.fn() }));
-import { loginAction, logoutAction } from "@/features/accounts/actions";
+vi.mock("@/features/accounts/service", () => ({ signIn: mocks.signIn, requestRecovery: vi.fn(), resendVerification: vi.fn(), updatePassword: mocks.updatePassword, changeAccountStatus: vi.fn(), registerAccount: vi.fn() }));
+import { loginAction, logoutAction, passwordAction } from "@/features/accounts/actions";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -21,7 +21,7 @@ it("invalida la navegación después de iniciar sesión correctamente", async ()
 });
 
 it("invalida la navegación al cerrar explícitamente solo la sesión local", async () => {
-  await expect(logoutAction()).rejects.toThrow("Redirect /login");
+  await expect(logoutAction()).rejects.toThrow(/^Redirect \/$/);
   expect(mocks.signOut).toHaveBeenCalledExactlyOnceWith({ scope: "local" });
   expect(mocks.revalidatePath).toHaveBeenCalledWith("/", "layout");
 });
@@ -30,5 +30,16 @@ it("no invalida el portal ni crea sesión ante credenciales inválidas", async (
   mocks.signIn.mockResolvedValue({ status: "invalid" });
   expect((await loginAction({ message: "", success: false }, new FormData())).success).toBe(false);
   expect(mocks.revalidatePath).not.toHaveBeenCalled();
+  expect(mocks.redirect).not.toHaveBeenCalled();
+});
+
+it("returns password changes to the homepage with the existing feedback query", async () => {
+  mocks.updatePassword.mockResolvedValue(true);
+  await expect(passwordAction({ message: "", success: false }, new FormData())).rejects.toThrow("Redirect /?changed=1");
+});
+
+it("keeps rejected password changes on the form without redirecting", async () => {
+  mocks.updatePassword.mockResolvedValue(false);
+  expect((await passwordAction({ message: "", success: false }, new FormData())).success).toBe(false);
   expect(mocks.redirect).not.toHaveBeenCalled();
 });

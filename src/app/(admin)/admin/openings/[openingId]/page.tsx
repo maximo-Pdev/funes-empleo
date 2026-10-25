@@ -18,7 +18,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
   params: Promise<{ openingId: string }>;
   searchParams: Promise<{ matchPage?: string | string[] }>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const { openingId: reference } = await params;
   const openingId = await pageRecordIdentifier("opening", reference, `/admin/openings/${reference}`, await searchParams);
   const { matchPage } = await searchParams;
@@ -26,7 +26,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
 
   const actors = await recordReferences("account", events.map(event => event.actor_account_id));
 
-  return <AdminShell active="/admin/openings" title={opening.title ?? "Oferta sin título"}
+  return <AdminShell email={user?.email} active="/admin/openings" title={opening.title ?? "Oferta sin título"}
     description="Detalle e historial de decisiones visible solo para la Oficina de Empleo."
     navigation={[{ href: "/admin/openings", label: "Volver a ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <div className="grid gap-6 lg:grid-cols-2">

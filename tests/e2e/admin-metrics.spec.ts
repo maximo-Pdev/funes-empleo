@@ -17,10 +17,10 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
   const auditBefore = Number(runLocalMaintenanceSql("select count(*) from private.metrics_exports"));
   runLocalMaintenanceSql(`update public.job_openings set title='=OFERTA FICTICIA' where id='${fixtureId("opening",2)}'`);
   try {
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
   await page.goto("/admin/metrics?from=invalido");
   await expect(page.getByRole("heading", { name: "Métricas operativas" })).toBeVisible();
@@ -67,10 +67,10 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
 test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ page, request }) => {
   const url = "/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20";
   const anonymous = await request.get(url);
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill("company1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
   const denied = await page.request.get(url);
   for (const response of [anonymous, denied]) {
@@ -90,10 +90,10 @@ test("seguimiento: canales cronológicos y plantillas sin envío", async ({ page
       'Seguimiento ficticio '||n,'2026-09-28 12:00+00','${fixtureId("admin",1)}'
     from (values (1,'phone'),(2,'email'),(3,'whatsapp'),(4,'in_person')) v(n,channel)
     where not exists(select 1 from public.contact_events c where c.participation_id='${fixtureId("participation",1)}' and c.summary_internal='Seguimiento ficticio '||n)`);
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
   await page.goto(`/admin/participations/${fixtureId("participation",1)}`);
   const timeline = page.getByRole("region", { name: "Historial de contactos" });

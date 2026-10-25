@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminOpeningsPage({ searchParams }: {
   searchParams: Promise<{ status?: string; page?: string }>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const params = await searchParams;
   const status = params.status ? openingStatusSchema.safeParse(params.status) : null;
   const page = Number(params.page ?? 1);
@@ -23,7 +23,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;
 
-  return <AdminShell active="/admin/openings" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
+  return <AdminShell email={user?.email} active="/admin/openings" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Mi cuenta" }]}>
     <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       <div className="space-y-1"><Field className="block font-semibold" label={<>Estado de la oferta</>}><select id="opening-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">

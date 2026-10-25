@@ -6,12 +6,12 @@ test.use({ trace: "off", screenshot: "off" });
 const uuid = /[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/i;
 const journeys = {
   admin: ["/account", "/admin/candidates", "/admin/atencion-presencial", `/admin/candidates/${fixtureId("profile", 1)}?cv=ok`,
-    `/admin/candidates/assisted/${fixtureId("profile", 1)}`, "/admin/empresas", `/admin/empresas/${fixtureId("business", 1)}`,
+    "/admin/empresas", `/admin/empresas/${fixtureId("business", 1)}`,
     "/admin/openings", `/admin/openings/${fixtureId("opening", 1)}?matchPage=1`, "/admin/participations",
     `/admin/participations/${fixtureId("participation", 301)}`, "/admin/imports", "/admin/imports/new", "/admin/metrics"],
-  candidate: ["/account?section=perfil", "/candidato/perfil", "/candidato/ofertas", "/candidato/postulaciones"],
+  candidate: ["/account?section=perfil", "/account?section=ofertas", "/account?section=postulaciones"],
   company: ["/account", "/empresa", "/empresa/perfil", "/empresa/ofertas", `/empresa/ofertas/${fixtureId("opening", 1)}`,
-    `/company/openings/${fixtureId("opening", 1)}/referrals`],
+    `/empresa/ofertas/${fixtureId("opening", 1)}#derivaciones`],
 } as const;
 for (const role of ["admin", "candidate", "company"] as const) {
   test(`${role}: textos, enlaces y navegación privada sin UUID`, async ({ page }) => {
@@ -19,7 +19,8 @@ for (const role of ["admin", "candidate", "company"] as const) {
     await loginFixture(page, role);
     for (const path of journeys[role]) {
       await page.goto(path);
-      if (path.includes("/candidates/assisted/")) await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
+      // The candidate detail (assisted maintenance included) answers on the shared reference, never the raw id.
+      if (path.startsWith("/admin/candidates/")) await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}(\?cv=ok)?$/);
       await expect(page.getByRole("main")).toBeVisible();
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       expect(new URL(page.url()).pathname + new URL(page.url()).search).not.toMatch(uuid);
@@ -71,6 +72,6 @@ test("derivación repetida en query se rechaza, sin elegir silenciosamente un va
   await loginFixture(page, "company");
   const opening = persistedReference("opening", fixtureId("opening", 1));
   const referral = persistedReference("referral", fixtureId("referral", 1));
-  await page.goto(`/company/openings/${opening}/referrals?referral=${referral}&referral=${referral}`);
+  await page.goto(`/empresa/ofertas/${opening}?referral=${referral}&referral=${referral}`);
   await expect(page.getByRole("heading", { name: "No encontramos la página", exact: true })).toBeVisible();
 });

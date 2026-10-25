@@ -24,9 +24,10 @@ it.each([false, true])("contratación tardía=%s usa un solo RPC atómico y actu
     p_reason: "Contratación ficticia confirmada", p_feedback: null, p_contact: contactId,
   });
   expect(revalidatePath).toHaveBeenCalledWith("/admin/openings/[openingId]", "page");
-  expect(revalidatePath).toHaveBeenCalledWith("/candidato/perfil", "page");
   expect(revalidatePath).toHaveBeenCalledWith("/admin/atencion-presencial", "page");
-  expect(revalidatePath).toHaveBeenCalledWith("/company/openings/[openingId]/referrals", "page");
+  expect(revalidatePath).toHaveBeenCalledWith("/dashboard", "page");
+  expect(revalidatePath).toHaveBeenCalledWith("/account", "page");
+  expect(revalidatePath).toHaveBeenCalledWith("/empresa/ofertas/[openingId]", "page");
 });
 
 it.each(["candidate", "company"])("%s no puede contratar ni retirar consentimiento mediante el servidor", async role => {

@@ -11,7 +11,7 @@ const base = "https://funes-empleo-demo.vercel.app";
 assert.equal(process.argv[2], "--confirm-fictitious-demo");
 // Vercel's CLI owns the authentication and bypass credential. Only the resulting
 // scoped browser cookie is held in memory; never write headers/storageState/trace.
-const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
+const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
 assert.equal(process.platform, "win32", "Este smoke usa la sesión local de Vercel en Windows.");
 let headers;
 try {
@@ -32,15 +32,15 @@ try {
     await page.goto("/ofertas");
     await expect(page.locator("body")).toContainText(/Oferta ficticia/, { timeout:30000 });
     if (role !== "anonymous") {
-      await page.goto("/login");
+      await page.goto("/");
       await page.getByLabel("Correo electrónico").fill(credentials[`${role}1`].email);
       await page.getByLabel("Contraseña", { exact:true }).fill(credentials[`${role}1`].password);
-      await page.getByRole("button",{ name:"Iniciar sesión",exact:true }).click();
+      await page.getByRole("button",{ name:"Ingresar",exact:true }).click();
       await page.waitForURL("**/account");
-      const path = role === "admin" ? "/admin/candidates" : role === "candidate" ? "/candidato/perfil" : "/empresa/perfil";
+      const path = role === "admin" ? "/admin/candidates" : role === "candidate" ? "/dashboard?section=perfil" : "/empresa/perfil";
       await page.goto(path);
       await expect(page.getByRole("heading", { level:1 })).toBeVisible();
-      assert.equal(new URL(page.url()).pathname,path);
+      assert.equal(new URL(page.url()).pathname + new URL(page.url()).search,path);
       assert.doesNotMatch(await page.locator("body").innerText(), /Application error|Ocurrió un problema inesperado/);
       const legacy = await context.request.get(`/api/cv/${id("cv",1)}`, { maxRedirects: 0 });
       assert.equal(legacy.status(),307);
@@ -55,7 +55,7 @@ try {
     }
     if (role !== "admin") {
       await page.goto("/admin/candidates");
-      await page.waitForURL(/\/(account|session-expired|login)$/);
+      await page.waitForURL(/\/(account|session-expired)$/);
     }
     assert.equal(errors.length,0,`Errores de navegador ${role}`);
     console.log(`PASS demo: ${role}, navegación, aislamiento y CV.`);

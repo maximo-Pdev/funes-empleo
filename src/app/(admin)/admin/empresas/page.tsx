@@ -7,7 +7,7 @@ import { COMPANY_PROFILE_STATUSES, companyProfileStatusSchema } from "@/domain/s
 
 export const dynamic = "force-dynamic";
 export default async function AdminCompaniesPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
-  const { client } = await requireActiveAccount(["admin"]);
+  const { client, user } = await requireActiveAccount(["admin"]);
   const params = await searchParams;
   const page = Number(params.page ?? "1");
   const status = params.status ? companyProfileStatusSchema.safeParse(params.status) : null;
@@ -18,7 +18,7 @@ export default async function AdminCompaniesPage({ searchParams }: { searchParam
   const result = invalid ? null : await query.range((page - 1) * 10, page * 10 - 1);
   const pageUrl = (target: number) => `/admin/empresas?${new URLSearchParams({page:String(target), ...(status?.success ? {status:status.data} : {})})}`;
   const labels = { incomplete: "Incompleta", active: "Activa", suspended: "Suspendida", archived: "Archivada" };
-  return <AdminShell active="/admin/empresas" title="Empresas" navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }, { href: "/account", label: "Mi cuenta" }]}>
+  return <AdminShell email={user?.email} active="/admin/empresas" title="Empresas" navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }, { href: "/account", label: "Mi cuenta" }]}>
     <Form method="get" className="mb-5 flex flex-wrap items-end gap-3 rounded border bg-white p-4">
       <Field>Estado de la empresa<select name="status" defaultValue={status?.success ? status.data : ""} className="block min-h-11 rounded border p-2">
         <option value="">Todos</option>{COMPANY_PROFILE_STATUSES.map(value=><option key={value} value={value}>{labels[value]}</option>)}

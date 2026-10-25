@@ -5,6 +5,10 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## Authorized profile follow-up — EXTRA-059
+
+This increment is tracked in `../../odd/tasks/candidate-profile-rebuild.md` (T1-T3, S1-S7) rather than renumbering the existing MVP ledger. Pending: private persisted image flow and SQL proof; official component profile rebuild; integration/regression/browser gates and independent high-risk verification. Existing checked tasks are not evidence that this increment is accepted. No commits, resets or remote deployment authorized.
+
 **Input**: Design documents from `specs/001-municipal-employment-portal/`
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
@@ -28,6 +32,12 @@ casillas ni acredita el cierre de tareas originales de aceptación del MVP. EXTR
 registra autorización, superficies, riesgos y comprobaciones.
 
 ## Format: `[ID] [P?] [Story] Description`
+
+Routing follow-up authorized on 2026-10-23 is recorded in `cambios-extra.md`,
+EXTRA-056. Candidate page locations below are historical implementation evidence:
+their content is now served through `/dashboard?section=perfil|ofertas|postulaciones`.
+`/login` and the three old candidate URLs return 404; login lives at `/`.
+This does not close or reopen the original MVP acceptance tasks.
 
 - **[P]**: Can run in parallel because it changes different files and has no dependency on another
   incomplete task in the same group.
@@ -107,7 +117,7 @@ the company can see only referred data and every critical transition retains act
 - [X] T033 [P] [US1] Implement append-only company interview/feedback submission and admin-only confirmation of company-reported outcomes in `src/features/referrals/feedback-service.ts`, `src/features/referrals/feedback-actions.ts`, and `src/validation/referral-feedback.ts`; include `process_cancelled` for one participation without cancelling the opening, and allow a late `no_company_response` correction only to `hired|not_selected|cancelled` using portal feedback or a participation-linked municipal contact with phone/email/WhatsApp/in-person channel, date, admin and short note, showing the new result as current while retaining the automatic closure as superseded history and never reactivating access
 - [X] T034 [US1] Add one idempotent daily Supabase Cron function in `supabase/migrations/202609190012_daily_automations.sql` that records actor `system`, evaluates UTC instants with the UI boundary documented for `America/Buenos_Aires`, closes `published` offers only after `closing_date` has ended without altering existing participations, closes unresolved referrals when `feedback_due_at <= now()` exactly 30 days after `referred_at` as `no_company_response` without pause/reset from interviews, contacts, or follow-up, and materializes `revoked` with `post_hire_window_ended` for hired referrals whose 720-hour access window has ended; authorization denies reads immediately at the deadline regardless of cron timing; repeated runs create no duplicate events and later admin outcomes preserve the automatic event
 - [X] T035 [US1] Build the admin offer moderation/suspension/restoration, candidate-account suspension and candidate restore-to-`draft`, candidate search, participation timeline, preinterview, justified stage-skip, preselection, referral, and outcome pages in `src/app/(admin)/admin/openings/`, `src/app/(admin)/admin/candidates/`, and `src/app/(admin)/admin/participations/`
-- [X] T036 [P] [US1] Build the company read-only referred-candidate projection showing all current contacts and only the CV version attached to that referral, plus interview and feedback UI, in `src/app/(company)/company/openings/[openingId]/referrals/` and `src/features/referrals/components/`
+- [X] T036 [P] [US1] Build the company read-only referred-candidate projection showing all current contacts and only the CV version attached to that referral, plus interview and feedback UI, in `src/features/referrals/components/`, rendered inside the company offer detail at `src/app/(company)/empresa/ofertas/[openingId]/page.tsx`
 - [X] T037 [US1] Integrate audit timelines, stale-version conflict recovery, loading/empty/error states, and cache invalidation across the US1 pages in `src/features/participations/components/` and `src/features/openings/components/`
 
 **Checkpoint**: US1 is independently demonstrable with admin/company fixtures and proves that no

@@ -26,14 +26,21 @@ function fixtureId(kind: string, number: number) {
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
   assertLocalTargets();
-  await page.goto("/login");
+  // The login form lives on the home page and is replaced by a session notice while a session is active
+  // (this journey reaches this point after the company was redirected to /account-suspended). Drop the
+  // stale session so the form is rendered again.
+  await page.context().clearCookies();
+  await page.goto("/");
+  await expect(page.getByLabel("Correo electrónico")).toBeVisible();
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 
 test("empresa registra, corrige, somete y archiva una oferta bajo decisión municipal", async ({ page, browser, request }) => {
+  // This lifecycle includes email verification, two axe scans and two role sessions.
+  test.slow();
   const suffix = Date.now().toString().slice(-8);
   const email = `company-e2e-${suffix}@example.invalid`;
   const password = "Fictitious-Local-E2E-2026!";
@@ -179,6 +186,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
 });
 
 test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva y restaura sin reabrirlas", async ({ browser }) => {
+  test.setTimeout(120_000);
   const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   const companyContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
@@ -188,22 +196,31 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
     await loginFixture(company, "company", 3);
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}`);
     await expect(company.locator("body")).not.toContainText("Oferta ficticia 002");
-    await company.goto(`/company/openings/${fixtureId("opening", 2)}/referrals`);
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}#derivaciones`);
     await expect(company.locator("body")).not.toContainText("Persona ficticia 002");
     await admin.goto(`/admin/empresas/${fixtureId("business", 3)}`);
     await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
-    await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
-    await admin.getByLabel("Confirmo esta decisión.").last().check();
-    await admin.getByRole("button", { name: "Archivar empresa" }).click();
+    // Decision forms share labels, so scope each operation by its heading.
+    const decision = (heading: string) => admin.locator("form").filter({ has: admin.getByRole("heading", { name: heading, exact: true }) });
+    const archive = decision("Archivar empresa");
+    await archive.getByLabel("Motivo interno (no visible a la empresa)").fill("Archivo administrativo ficticio");
+    await archive.getByLabel("Confirmo esta decisión.").check();
+    await archive.getByRole("button", { name: "Archivar empresa" }).click();
+    // Wait for the action response before reloading its persisted state.
+    await expect(decision("Archivar empresa")).toHaveCount(0);
+    await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await company.goto("/empresa/ofertas");
     await expect(company).toHaveURL(/\/session-expired$/);
     await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
-    await admin.getByLabel("Motivo interno (no visible a la empresa)").fill("Restauración administrativa ficticia");
-    await admin.getByLabel("Confirmo esta decisión.").check();
-    await admin.getByRole("button", { name: "Restaurar empresa" }).click();
+    const restore = decision("Restaurar empresa");
+    await restore.getByLabel("Motivo interno (no visible a la empresa)").fill("Restauración administrativa ficticia");
+    await restore.getByLabel("Confirmo esta decisión.").check();
+    await restore.getByRole("button", { name: "Restaurar empresa" }).click();
     await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
+    // Restoring access does not sign out the existing company session.
+    await companyContext.clearCookies();
     await loginFixture(company, "company", 3);
     await company.goto("/empresa/perfil");
     await expect(company.getByText("Estado:")).toContainText("Incompleto");

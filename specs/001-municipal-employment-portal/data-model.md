@@ -1,13 +1,17 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+**Fecha**: 2026-09-19  
+**Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
+
 EXTRA062: no agrega tablas/campos. Publicada editada pasa a pending_review dentro
 del guardado/envío; historial audita ambas acciones/versiones, manteniendo slug,
 casos/resultados/permisos. Cancelación empresarial no final reutiliza el cierre
 existente, conserva finales y queda Cancelada. Proyección de propia contratación
 hiredCandidate/displayName/outcome mínima, sin restituir acceso completo o consentimiento.
 
-**Fecha**: 2026-09-19  
-**Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
+## Candidate photos — EXTRA-059
+
+Add private metadata/current-photo and durable cleanup records in the additive `202610240001_candidate_photos.sql` migration; SQL is the exact executable schema. Objects use opaque immutable keys in a separate private candidate-photos bucket. Mutations lock and advance the existing candidate profile version, keep one current photo, attribute the authenticated actor in audit and revoke obsolete reads before physical object cleanup. Only current photos can be read using live full-profile authorization. No original filename, public URL, photo requirement or change to CV retention is added. Current photo bytes are permanently removed on owner replacement/removal, per explicit user decision; committed audit is not erased. Design: `../../docs/implementation/candidate-profile-photos.md`.
 
 ## A08 — catálogo y proyección administrativa (2026-10-19)
 

@@ -149,7 +149,7 @@ test("all direct E2E consumers use centralized guarded credentials", () => {
     assert(!source.includes('startsWith("http://127.0.0.1:54321")'));
   }
   const helper = readFileSync("tests/e2e/fixtures/quality.ts", "utf8");
-  assert(helper.indexOf("const password = localFixturePassword();") < helper.indexOf('await page.goto("/login")'));
+  assert(helper.indexOf("const password = localFixturePassword();") < helper.indexOf('await page.goto("/")'));
 });
 for (const extra of [
   { NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321.evil.invalid" },

@@ -1,5 +1,14 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+// El hero de la home anima el h1 con un fade de 420 ms desde opacity 0. Playwright lo
+// considera visible desde el primer pintado, pero axe todavía no lo cuenta como título
+// visible, así que el barrido tiene que esperar el final de la animación.
+async function waitForHeroEntrance(page: Page) {
+  const heading = page.getByRole("heading", { level: 1 });
+  await expect(heading).toBeVisible();
+  await expect.poll(() => heading.evaluate(element => Number(getComputedStyle(element).opacity))).toBe(1);
+}
 
 test("base pública en español sin barreras automáticas detectadas", async ({ page }) => {
   await page.goto("/");
@@ -8,22 +17,36 @@ test("base pública en español sin barreras automáticas detectadas", async ({ 
   await expect(page.getByRole("link", { name: "Ir al contenido principal", includeHidden: true })).toHaveCount(0);
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByRole("main")).toHaveAttribute("id", "contenido");
+  const navigation = page.getByRole("navigation", { name: "Navegación principal", includeHidden: true });
+  await expect(navigation.getByRole("link", { name: "Ir al sitio de la Municipalidad de Funes", includeHidden: true })).toHaveAttribute("href", "https://funes.gob.ar/");
+  await expect(navigation.getByRole("link", { name: "Ofertas", exact: true, includeHidden: true })).toHaveAttribute("href", "/ofertas");
+  await waitForHeroEntrance(page);
+  // La navbar de la home está inerte mientras no se desplaza (HomeNavbar: inert={!visible}),
+  // así que el primer Tab ya entra al panel de acceso unificado: no hace falta enlace de salto.
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("navigation", { name: "Accesos principales" }).getByRole("link", { name: "Ofertas", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Iniciar sesión", exact: true })).toBeFocused();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
-for (const path of ["/login", "/registro/candidato", "/registro/empresa", "/recover", "/verification-pending"]) {
+for (const path of ["/", "/registro/candidato", "/registro/empresa", "/recover", "/verification-pending"]) {
   test(`navegación existente sin enlace global en ${path}`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole("link", { name: "Ir al contenido principal", includeHidden: true })).toHaveCount(0);
     await expect(page.getByRole("main")).toHaveCount(1);
     await expect(page.getByRole("main")).toHaveAttribute("id", "contenido");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await waitForHeroEntrance(page);
     await page.keyboard.press("Tab");
-    const focused = page.locator(":focus");
-    await expect(focused).toBeVisible();
-    await expect(focused).toHaveAttribute("href", "/");
+    if (path === "/") {
+      // En la home la navbar recién aparece al desplazarse y queda inerte mientras está
+      // oculta, por eso el primer foco cae en el conmutador del panel de acceso.
+      const modeSwitch = page.getByRole("button", { name: "Iniciar sesión", exact: true });
+      await expect(modeSwitch).toBeFocused();
+      await expect(modeSwitch).toHaveAttribute("aria-pressed", "true");
+    } else {
+      const focused = page.locator(":focus");
+      await expect(focused).toBeVisible();
+      await expect(focused).toHaveAttribute("href", "/");
+    }
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 }

@@ -8,6 +8,10 @@
   color: #b91c1c !important;
 }
 
+.form [data-required-marker][data-marker-state="muted"] {
+  color: var(--color-brand-muted, #868d98) !important;
+}
+
 .form input[type="checkbox"][aria-invalid="true"],
 .form input[type="radio"][aria-invalid="true"] {
   box-shadow: 0 0 0 1px #b91c1c;

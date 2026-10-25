@@ -39,7 +39,7 @@ Archivos del cambio:
 - `src/app/(company)/empresa/ofertas/page.tsx`
 - `src/app/(company)/empresa/ofertas/nueva/page.tsx`
 - `src/app/(company)/empresa/ofertas/[openingId]/page.tsx`
-- `src/app/(company)/company/openings/[openingId]/referrals/page.tsx`
+
 - `tests/components/company/company-pages.test.tsx`
 - `docs/product/company-frontend.md`
 

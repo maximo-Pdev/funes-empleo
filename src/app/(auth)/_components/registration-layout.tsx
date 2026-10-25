@@ -3,32 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Building2, KeyRound, MailCheck, ShieldCheck, UserRoundPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { registrationContent as content } from "@/features/accounts/registration-content";
 import styles from "./registration.module.css";
-
-const content = {
-  candidate: {
-    label: "Cuenta de postulante", title: "Registro de candidatos", guide: "Tu próximo paso laboral empieza acá.",
-    introduction: "Creá tu cuenta y prepará tu perfil para postularte a las ofertas del portal.",
-    description: "Completá tus datos de acceso y confirmá la contraseña. Tu perfil laboral se completa después.",
-    steps: [
-      ["Creá tu cuenta", "Completá tus datos de acceso en este formulario."],
-      ["Verificá tu correo", "Seguí el enlace que recibirás por correo electrónico."],
-      ["Completá tu perfil laboral", "Después de ingresar, agregá tu experiencia, categorías laborales y CV desde tu panel."],
-    ],
-    privacy: "La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.",
-  },
-  company: {
-    label: "Cuenta de empresa", title: "Registro de empresas", guide: "Encontrá talento para tu empresa.",
-    introduction: "Gestioná tus búsquedas laborales con el acompañamiento de la Oficina de Empleo de Funes.",
-    description: "Completá los datos de tu empresa y de acceso. Todos los campos son obligatorios, salvo el teléfono.",
-    steps: [
-      ["Creá tu cuenta", "Registrá tu empresa y verificá tu correo para ingresar."],
-      ["Prepará tu oferta", "Guardá un borrador y envialo a revisión municipal antes de su publicación."],
-      ["Recibí perfiles derivados", "La Oficina preselecciona y deriva candidatos para tus ofertas."],
-    ],
-    privacy: "Las empresas acceden únicamente a los candidatos derivados por la Oficina a sus propias ofertas.",
-  },
-} as const;
 
 export function RegistrationLayout({ role, children }: { role: keyof typeof content; children: ReactNode }) {
   const copy = content[role];
@@ -88,7 +64,7 @@ export function RegistrationLayout({ role, children }: { role: keyof typeof cont
             <p className="mt-2 text-sm leading-5 text-muted-foreground">{copy.description}</p>
             <div className={`${styles.form} ${role === "candidate" ? styles.candidate : styles.company}`}>{children}</div>
             <nav aria-label="Acceso" className={styles.access}>
-              <Link href="/login" className={styles.link}>Ya tengo cuenta<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+              <Link href="/" className={styles.link}>Ya tengo cuenta<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
               <Link href="/recover" className={styles.link}><KeyRound className="h-4 w-4" aria-hidden="true" />Recuperar acceso</Link>
             </nav>
             <div className={styles.mailHelp}>

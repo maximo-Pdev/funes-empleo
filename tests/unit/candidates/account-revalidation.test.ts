@@ -10,12 +10,13 @@ import { changeConsentAction } from "@/features/candidates/consent-actions";
 import { applyToOfferAction, withdrawParticipationAction } from "@/features/participations/candidate-actions";
 beforeEach(() => vi.clearAllMocks());
 it.each([
- [saveProfileAction, mocks.save, "/candidato/perfil"], [savePhoneAction, mocks.phone, "/candidato/perfil"], [activateProfileAction, mocks.activate, "/candidato/perfil"],
- [changeConsentAction, mocks.consent, "/candidato/perfil"], [applyToOfferAction, mocks.apply, "/candidato/postulaciones"], [withdrawParticipationAction, mocks.withdraw, "/candidato/postulaciones"],
-] as const)("invalidates the account panel and preserves legacy invalidation after %s", async (action, service, legacy) => {
+ [saveProfileAction, mocks.save], [savePhoneAction, mocks.phone], [activateProfileAction, mocks.activate],
+ [changeConsentAction, mocks.consent], [applyToOfferAction, mocks.apply], [withdrawParticipationAction, mocks.withdraw],
+] as const)("invalidates both existing candidate panels after %s", async (action, service) => {
  const result = await action({ message: "", success: false }, new FormData());
  expect(service).toHaveBeenCalledOnce();
  expect(result.success).toBe(true);
  expect(mocks.revalidate).toHaveBeenCalledWith("/account");
- expect(mocks.revalidate).toHaveBeenCalledWith(legacy);
+ expect(mocks.revalidate).toHaveBeenCalledWith("/dashboard");
+ expect(mocks.revalidate).toHaveBeenCalledTimes(2);
 });
