@@ -681,7 +681,9 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 
 ## Identificar derivaciones empresariales — EXTRA069,2026-10-25
 
-- [ ] T202 Corregir frontera de acceso entre roles del PR75: actor candidato distinto del recurso protegido, identidad propia tras redirección y nombre ajeno ausente; RED determinista/GREEN cuatro actores sin omisiones/reintentos, tipos aislados/lint/diff PASS. CI completa pendiente de publicación. Sin cambios de permisos/producto/SQL; evidencia EXTRA069.
+- [x] T202 Corregir frontera de acceso entre roles del PR75: actor candidato distinto del recurso protegido, identidad propia tras redirección y nombre ajeno ausente; RED determinista/GREEN cuatro actores sin omisiones/reintentos, tipos aislados/lint/diff PASS. Fronteras también PASS en CI40205272342/044f40b; restantes119 PASS, dos expectativas antiguas de contratación requieren T203. Sin cambios de permisos/producto/SQL; evidencia EXTRA069.
+
+- [x] T203 Alinear contratación normal/tardía con excepción mínima de nombre en derivaciones propias revocadas; mantener retiro/atomicidad/participaciones intactas/CV denegado y exigir perfil/contactos ausentes. RED2/GREEN6 junto con fronteras, tipos aislados/lint/diff PASS; nueva CI completa pendiente de publicación. Solo E2E/documentación; EXTRA069.
 
 - [x] T198 Decisión humana/spec/plan/modelo/contratos/checklist alineados antes de código; análisisN1–N6 cobertura100%, sin críticos/altos. Rama desde main0bd10b1, cambios ajenos preservados; EXTRA069.
 - [x] T199 Migración20261025135805 aditiva summaries VOLATILE para guard FOR SHARE y nombre mínimo en company_referral; grants/firmas previas intactos. DTO/identidades validados, categorías legadas compatibles, lista/encabezado/aviso/explicación alineados; sin reactivar accesos o cambiar informes.

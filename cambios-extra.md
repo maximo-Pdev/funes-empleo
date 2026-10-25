@@ -4148,3 +4148,24 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
   Producto/build/SQL sin cambios respecto al head anterior, cuyos gates pasaron
   en CI. Pendiente publicación y nueva ejecución completa del mismo PR.
+- **Segundo diagnóstico CI PR75, antes de editar2026-10-25:** commit044f40b,
+  ejecución40205272342: frontera corregida PASS,119 E2E PASS, dos fallos en
+  hiring-consent.spec.ts:99 y una dependencia sin ejecutar. Ambas variantes de
+  contratación esperaban cero apariciones del nombre para la otra empresa con
+  derivación propia revocada; contradicen la excepción mínima EXTRA069 aprobada.
+  Propuesta: esperar nombre/listado y encabezado identificable también allí,
+  añadir ausencia de perfil/contactos, conservar denegación de CV y todas las
+  aserciones de consentimiento global, bloqueo transaccional y casos intactos.
+  Solo prueba E2E; producto, SQL, permisos y migración sin cambios. Verificación:
+  RED/GREEN normal+tardía, cuatro actores, tipos/lint/diff y nueva CI completa.
+- **Segundo ajuste local verificado2026-10-25:** hiring-consent.spec.ts mantiene
+  bloqueo/atomicidad, retiro global, acceso revocado en todas las derivaciones,
+  caso ajeno byte a byte y CV403/404. Nombre/encabezado y distintivo Contratado
+  se comprueban por separado según la presentación actual; ausencia de perfil
+  laboral/contactos se exige también a la otra empresa con derivación propia.
+  RED2/2 reproduce CI; GREEN6/6 normal/tardía/cuatro actores (34.2s), cero
+  reintentos/omisiones; tipos aislados, lint y diff-check PASS. Se recorrieron
+  expectativas de nombres revocados de E2E: los restantes119 casos pasaron en
+  CI40205272342, pendiente nueva suite completa tras publicar este ajuste.
+  T202 verificada también en CI; T203 implementada/verificada local. PR75
+  permanece abierto sin merge y cambios ajenos excluidos; sin cambios alojados.
