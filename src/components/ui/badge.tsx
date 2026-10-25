@@ -5,9 +5,9 @@ import type { StatusTone } from "@/domain/presentation/status-tone";
 type BadgeVariant = "default" | "secondary" | "outline" | "status";
 
 const variants: Record<Exclude<BadgeVariant, "status">, string> = {
-  default: "bg-primary px-3 text-primary-foreground",
-  secondary: "bg-secondary px-3 text-secondary-foreground",
-  outline: "border border-border bg-card px-3 text-foreground",
+  default: "min-h-6 bg-primary px-3 text-primary-foreground",
+  secondary: "min-h-6 bg-secondary px-3 text-secondary-foreground",
+  outline: "min-h-6 border border-border bg-card px-3 text-foreground",
 };
 
 /** Solid border and label, tinted surface, and a dot that inherits the label colour. */
@@ -27,7 +27,7 @@ export function Badge({ className, variant = "default", tone = "neutral", childr
   return (
     <span
       className={cn(
-        "inline-flex min-h-6 w-fit items-center rounded-full py-1 text-xs font-semibold leading-none",
+        "inline-flex w-fit items-center rounded-full py-1 text-xs font-semibold leading-none",
         !isStatus && "px-3",
         isStatus && "min-h-[26px] gap-[7px] border pe-[11px] ps-[9px]",
         isStatus ? tones[tone] : variants[variant],
