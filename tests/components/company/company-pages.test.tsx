@@ -174,6 +174,21 @@ it("conserva el límite de oferta inexistente", async () => {
  mocks.offers.mockResolvedValue({ items: [] }); await expect(Opening({ params: Promise.resolve({ openingId: id }) })).rejects.toThrow("NOT_FOUND");
 });
 
+it("muestra el estado de cada oferta con el badge de estado compartido", async () => {
+ const draft = render(await Offers({ searchParams: Promise.resolve({}) }));
+ const draftBadge = draft.container.querySelector<HTMLElement>("[class*='border-status-']");
+ expect(draftBadge?.textContent?.trim()).toBe("Borrador");
+ expect(draftBadge?.className).toContain("border-status-neutral");
+ expect(draftBadge?.className).toContain("bg-status-neutral-soft");
+ expect(draftBadge?.querySelector("[aria-hidden='true']")).toBeTruthy();
+ draft.unmount();
+ mocks.offers.mockResolvedValue({ items: [{ ...offer, status: "published" }], page: 1, pageSize: 10, total: 1 });
+ const published = render(await Offers({ searchParams: Promise.resolve({}) }));
+ const publishedBadge = published.container.querySelector<HTMLElement>("[class*='border-status-']");
+ expect(publishedBadge?.textContent?.trim()).toBe("Publicada");
+ expect(publishedBadge?.className).toContain("border-status-green");
+});
+
 function saveFixture(section: string, html: string) {
  const output = process.env.COMPANY_WORKSPACE_FIXTURE_DIR;
  if (!output) return;
