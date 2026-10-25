@@ -1,5 +1,29 @@
 # Cambios extra necesarios
 
+## Aviso de numeración — ids 056 a 068 duplicados (2026-10-24)
+
+Este archivo registra dos líneas de trabajo que avanzaron en paralelo sobre bases distintas y
+usaron el mismo espacio de ids `EXTRA`. Los ids 056 a 068 aparecen **dos veces con contenido
+distinto**: una entrada de `main` (PRs #67 a #72) y otra de la rama
+`fix/landing-unified-access`. Se conservaron los dos textos sin reescribir el registro; para leer
+o citar una entrada hay que mirar el título, no solo el número.
+
+| Id | Entrada de `main` | Entrada de `fix/landing-unified-access` |
+| --- | --- | --- |
+| EXTRA-056 | Alta presencial activa y aceptación expresa en una transacción | Retirar rutas duplicadas de candidato y login |
+| EXTRA-057 | Categorías laborales como única selección del candidato | Avisos informativos azules en el acceso de Home |
+| EXTRA-058 | Retirar nominación desde el perfil candidato | Navbar inferior en celular |
+| EXTRA-059 | Atención presencial dentro del perfil administrativo | Rebuild candidate profile and persist private photos |
+| EXTRA-060 | Orden de tarjetas en perfiles presenciales | Animated gradient behind the profile canvas |
+| EXTRA-061 | Historial resumido de cuenta y perfil del candidato | Alternate endpoint-color gradient and photo availability repair |
+| EXTRA-062 | Ofertas empresariales, derivaciones y moderación | Etiqueta del acceso al panel según la cuenta activa / Slower pure-CSS profile gradient |
+| EXTRA-063 a 068 | No usados | Complete local photo repair, Ingresar vuelve al inicio, Candidate account sidebar, Shared candidate and company dashboard frame, Cambio suave entre introducciones, Shared administrator dashboard frame |
+
+Las referencias `EXTRA-056` a `EXTRA-068` en `specs/plan.md`, `specs/data-model.md`,
+`specs/.../contracts/authorization-matrix.md`, `docs/UI_GUIDELINES.md` y
+`docs/implementation/candidate-profile-photos.md` se leen igual: el id identifica el registro
+junto con el título de la sección que lo cita.
+
 ## EXTRA-068 — Shared administrator dashboard frame
 
 - **Date/status:** 2026-10-24; recorded before implementation, explicitly requested by Maxi.
