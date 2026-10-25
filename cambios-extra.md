@@ -3999,3 +3999,8 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   T196/T197 técnicamente completos; revisión humana, commit, PR, CI y despliegue
   pendientes. next-env.d.ts conserva la huella inicial. Convergencia acotada:
   sin brechas nuevas en lectura, permisos, privacidad y nominación aprobadas.
+- **Publicación2026-10-25:** por pedido de Mateo, commit4d3922f publicado sin
+  firma/signoff/coautor en fix/admin-candidate-preview y
+  [PR74](https://github.com/maximo-Pdev/funes-empleo/pull/74) abierto hacia main,
+  sin borrador y adjunto a esta conversación. next-env.d.ts ajeno excluido;
+  no hay migración nueva. CI/revisión humana/merge/despliegue pendientes.

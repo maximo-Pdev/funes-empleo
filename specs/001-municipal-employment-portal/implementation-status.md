@@ -1361,3 +1361,9 @@ Escape/foco y1440/390px/axe0 verificados. Node24.22.0; solo entorno propio54341/
 Evidencia/diagnósticos y versiones anteriores pendientes en EXTRA068. No precisa
 migración nueva; no sustituye el rollout de cambios anteriores. T196/T197 completos
 técnicamente; commit/PR/CI, revisión humana, despliegue y aceptación pendientes.
+
+Publicación solicitada2026-10-25: commit4d3922f sin firma/signoff/coautor y
+[PR74](https://github.com/maximo-Pdev/funes-empleo/pull/74) abierto hacia main,
+no borrador, en fix/admin-candidate-preview. Cambio ajeno next-env.d.ts fuera
+del commit; sin migración nueva ni cambios alojados. CI/revisión/merge y
+despliegue permanecen pendientes; no acredita aceptación municipal.
