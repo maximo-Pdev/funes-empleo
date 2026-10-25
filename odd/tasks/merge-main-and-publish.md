@@ -19,13 +19,13 @@ Runner: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:unit
 
 ## Tasks
 
-- T1 | S1, S8 | inline | pending | Thematic commits: docs track, ui foundation, home, auth, candidate/photos, workspace chrome, tests, docs.
-- T2 | S1 | inline | pending | Single merge of `origin/main`.
-- T3 | S2, S6, S7 | inline | pending | Resolve the 46 hunks per the decided unions; D1 label, D5 strings, D6 rewrite.
-- T4 | S5 | inline | pending | Renumber local EXTRA ids to 069-075.
-- T5 | S4 | inline | pending | `supabase migration up` + regenerate types in its own commit.
-- T6 | S1, S9 | inline | pending | lint, typecheck, build, unit, e2e.
-- T7 | S3 | inline | pending | Retire the two redirect shims and migrate the five e2e (last commit).
+- T1 | S1, S8 | inline | done | 8 thematic commits (97e9771, 63b2ab1, a81f3a9, f7e5f92, 4c8fb76, c1a4d14, 5727fd8, a716b02); the three unreferenced brand folders stayed out.
+- T2 | S1 | delegated (4 parallel writers) | done | Single merge c536134 of origin/main; 30 files, 46 hunks, zero markers.
+- T3 | S2, S6, S7 | delegated + inline | done | Unions applied; DashboardShell gained navigationLabel; D5 texts ported; keyboard check rewritten against /recover. Five test corrections followed from the merged behaviour.
+- T4 | S5 | inline | done differently | a65f8c0 documents the duplicated ids with a title table instead of renumbering: both id formats (EXTRA-056 and EXTRA056) are interleaved across six files, so a blind rewrite would have corrupted main's references. Full renumber remains possible as a follow-up.
+- T5 | S4 | inline | blocked | Local database is behind main (missing get_record_references, resolve_record_reference, create_active_assisted_candidate and the private reference tables) and its migration history is desynced, so `supabase migration up` refuses. Needs a decision on `supabase db reset`.
+- T6 | S1, S9 | inline | partial | lint, typecheck, production build and 1169 unit/component tests pass at c536134. E2E pending on the database decision.
+- T7 | S3 | inline | pending | Retire the two redirect shims and migrate the five e2e; last commit before the PR.
 - T8 | S1 | inline | pending | Push branch and open PR with the decisions and known limitations.
 
 ## Log
@@ -36,3 +36,5 @@ Runner: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:unit
 - L4 — "explicame los cambios de cada decisión de manera sencilla" D1-D6 explained.
 - L5 — "Con respecto a D2 significa que van a haber páginas ya hechas que quedarán inutilizables? Si ese es el caso entonces lo ideal sería eliminarlas y modificar las reglas del proyecto, porque sino van a quedar cosas innecesarias. Con respecto al D3 cuando correríamos "supabase gen types"? Con el resto de decisiones está todo bien. Respondeme las preguntas y después hacemos el PR"
 - L6 — "Si, van como último commit en este PR" Accepting S3's shim retirement inside this PR.
+- L6b — Resolutions observed at the merge commit: 46 hunks in 30 files, no markers left. Unit suite 1169/1169 in 88 files; lint, typecheck and production build pass. Two candidate-history tests fail only under full-suite load and pass alone or per directory; recorded as environmental flakiness, not logic.
+- L6c — Local database check: it has the five photo RPC and candidate_photos, but not get_record_references, resolve_record_reference, create_active_assisted_candidate, nor the private reference and legacy-interest tables. Migration history holds versions without matching files and files without matching versions, so the CLI refuses to advance; the documented fallback is a local reset.
