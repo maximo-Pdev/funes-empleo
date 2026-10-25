@@ -198,20 +198,27 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
     await expect(company.locator("body")).not.toContainText("Persona ficticia 002");
     await admin.goto(`/admin/empresas/${fixtureId("business", 3)}`);
     await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
-    await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
-    await admin.getByLabel("Confirmo esta decisión.").last().check();
-    await admin.getByRole("button", { name: "Archivar empresa" }).click();
-    // La acción responde "Decisión registrada con historial. Recargá para ver el estado actual."
+    // Decision forms share labels, so scope each operation by its heading.
+    const decision = (heading: string) => admin.locator("form").filter({ has: admin.getByRole("heading", { name: heading, exact: true }) });
+    const archive = decision("Archivar empresa");
+    await archive.getByLabel("Motivo interno (no visible a la empresa)").fill("Archivo administrativo ficticio");
+    await archive.getByLabel("Confirmo esta decisión.").check();
+    await archive.getByRole("button", { name: "Archivar empresa" }).click();
+    // Wait for the action response before reloading its persisted state.
+    await expect(decision("Archivar empresa")).toHaveCount(0);
     await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await company.goto("/empresa/ofertas");
     await expect(company).toHaveURL(/\/session-expired$/);
     await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
-    await admin.getByLabel("Motivo interno (no visible a la empresa)").fill("Restauración administrativa ficticia");
-    await admin.getByLabel("Confirmo esta decisión.").check();
-    await admin.getByRole("button", { name: "Restaurar empresa" }).click();
+    const restore = decision("Restaurar empresa");
+    await restore.getByLabel("Motivo interno (no visible a la empresa)").fill("Restauración administrativa ficticia");
+    await restore.getByLabel("Confirmo esta decisión.").check();
+    await restore.getByRole("button", { name: "Restaurar empresa" }).click();
     await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
+    // Restoring access does not sign out the existing company session.
+    await companyContext.clearCookies();
     await loginFixture(company, "company", 3);
     await company.goto("/empresa/perfil");
     await expect(company.getByText("Estado:")).toContainText("Incompleto");
