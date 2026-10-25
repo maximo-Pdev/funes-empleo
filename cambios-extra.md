@@ -3934,3 +3934,73 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   1440px y 390px. Corredores existentes: responsive 15 estados y navbar 12
   estados PASS en dos pasadas (un primer intento falló por el retraso de
   hidratación de la navbar, ajeno a este cambio). Servidor propio cerrado.
+
+## EXTRA-068 — Compatibilidad del perfil del candidato al nominar
+
+- **Fecha/estado:** 2026-10-25; propuesto antes de implementar. Autorizado por
+  Mateo al solicitar reparar «Ver perfil y nominar» en administración.
+- **Evidencia:** el listado funciona pero el diálogo responde INTERNAL_ERROR.
+  `openingCandidatePreviewSchema` exige kind=occupation en cada categoría,
+  aunque el diálogo solo consume code/name. Lectura agregada de la base local:
+  occupation30/interest500 y migración de consolidación20261024124316 ausente.
+  El historial remoto consultado por CLI también carece de esa versión; esto no
+  prueba los valores remotos. El conector SQL remoto denegó acceso, sin cambios.
+- **Origen aprobado:** A08/FR-031/032/070, EXTRA057 (categorías únicas) y EXTRA058
+  (nominación desde la oferta). No se recupera el campo Intereses ni se interpreta
+  como nueva selección. El pool SQL ya usa las relaciones de ambas clases.
+- **Cambio mínimo:** proyectar categorías de preview como code/name, descartando
+  el metadato interno kind legado igual que otros campos fuera del contrato.
+  Mantener validación de identidad, versiones, CV, disponibilidad y vigencia;
+  conservar autorización, matching OR, exclusiones, comandos y auditoría.
+- **Archivos/contratos:** src/validation/opening-matching.ts, fixture de preview,
+  pruebas de matching/acciones y E2E; spec/plan/contracts/README/tasks y estado.
+  Sin nuevo SQL, dependencias, permisos ni cambios visuales. Las migraciones
+  anteriores pendientes conservan su propósito y no se aplican por este arreglo.
+- **Riesgos/recuperación:** no relajar code/name ni otras precondiciones para
+  ocultar respuestas inválidas. Revertir el cambio de proyección recupera el
+  fallo con categorías legadas. No borrar/reclasificar datos como atajo.
+- **Verificación prevista:** RED/GREEN con payload legado, mixto y actual,
+  guard de roles, IDs cruzados, contrato mínimo sin campos privados; navegador
+  ficticio con apertura/CV/nominación/exclusión, errores/reintento y foco;
+  tipos, lint, suite relevante/global, tooling, build y diff-check.
+- **Git:** PR72 confirmado mergeado; main actualizado a a2001e5, rama anterior
+  local eliminada (remota ya eliminada), nueva fix/admin-candidate-preview.
+  next-env.d.ts ajeno preservado (SHA256 B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000).
+- **Revisión previa acotada:** cubre lectura y nominación ya aprobadas, sin nueva
+  arquitectura o decisión municipal. Constitución I–VI y spec/plan/contrato
+  compatibles; sin críticos/altos abiertos en este delta. Revisión humana,
+  verificación y publicación pendientes; no se marca aceptación global.
+- **Resultado:** implementado y verificado localmente. RED3/45 (INTERNAL_ERROR
+  con interest y mezcla; occupation todavía exponía kind). GREEN1178 pruebas en89
+  archivos, incluida cadena real Action/servicio/validador/referencia con RPC
+  simulado, roles denegados, CV inaccesible e identidad cruzada. Lint, tooling57,
+  tipos, build de producción y diff-check PASS con Node24.22.0.
+- **Navegador/SQL:** cinco recorridos sin reintentos/omisiones PASS: cuatro de
+  matching existentes y uno local adicional reconstruyendo clasificación interest
+  solo en fixture propio. Abre/reintenta, CV200/PDF por referencia opaca, conserva
+  conteos al consultar, nomina exactamente una vez, registra auditoría y excluye
+  tras recarga. Capturas1440/390px revisadas, sin overflow, axe0 y Escape devuelve
+  foco. La clasificación temporal y su constraint se restauraron en finally.
+  pgTAP existentes023/024:35+21=56 aserciones PASS (transacciones con rollback).
+- **Entorno/diagnósticos:** base funes-admin-cv-check54341/54342 reanudada con
+  fixture ficticio500 personas, sin reset. Código actual copiado a test-results
+  con guards locales conservados y sin .env.local. Dependencias aprobadas de main
+  sincronizadas con npm ci --ignore-scripts; primer intento bloqueado por Next
+  del proyecto, cerrado temporalmente según autorización. El intento intermedio
+  npm install se detuvo y la instalación final usa exactamente el lockfile.
+  Selector SQL del CLI falló al traducir rutas Windows; psql ejecutó pgTAP
+  habilitado solo en fixture, comprobando plan, conteos y ausencia de not ok.
+  No se modificaron manifiestos, umbrales, servicios alojados ni la base habitual.
+- **Límites/entrega:** no hay migración nueva ni aplicación remota. El historial
+  alojado también muestra pendientes20261022202940/20261024033056/
+  20261024124316/20261024184354, con nombres históricos diferentes; no reparar
+  masivamente ni aplicar migraciones antiguas por este arreglo. Esta corrección
+  no reemplaza su rollout ni acredita que esos cambios estén desplegados.
+  T196/T197 técnicamente completos; revisión humana, commit, PR, CI y despliegue
+  pendientes. next-env.d.ts conserva la huella inicial. Convergencia acotada:
+  sin brechas nuevas en lectura, permisos, privacidad y nominación aprobadas.
+- **Publicación2026-10-25:** por pedido de Mateo, commit4d3922f publicado sin
+  firma/signoff/coautor en fix/admin-candidate-preview y
+  [PR74](https://github.com/maximo-Pdev/funes-empleo/pull/74) abierto hacia main,
+  sin borrador y adjunto a esta conversación. next-env.d.ts ajeno excluido;
+  no hay migración nueva. CI/revisión humana/merge/despliegue pendientes.

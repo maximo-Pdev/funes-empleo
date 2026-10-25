@@ -40,6 +40,12 @@ existente con ambas versiones; éxito revalida detalle y quita ficha, nunca deri
 No amplía acceso empresarial
 ni sustituye comandos municipales, sus bloqueos optimistas o su auditoría.
 
+EXTRA068,2026-10-25: la frontera TS de preview transmite categorías únicamente
+como `{code,name}`. Descarta kind interno presente en respuestas legadas/actuales,
+sin reintroducir un campo Intereses ni fallar por su clasificación histórica.
+Conserva el resto del contrato, autorización y revalidación de nominación. La
+migración de consolidación EXTRA057 sigue siendo necesaria para ese cambio de datos.
+
 ## Validación de formularios — 2026-10-20
 
 Errores de entrada se asocian a los controles con texto/aria-describedby y
