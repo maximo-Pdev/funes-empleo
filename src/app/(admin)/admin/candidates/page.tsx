@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 type SearchParams = Record<string, string | string[] | undefined>;
 
 export default async function AdminCandidatesPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const raw = await searchParams;
   const parsed = candidateSearchSchema.safeParse(raw);
   const categories = await listCandidateSearchCategories();
@@ -25,7 +25,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
     return `/admin/candidates?${params.toString()}`;
   };
 
-  return <AdminShell active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
+  return <AdminShell email={user?.email} active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/admin/imports", label: "Importaciones" }, { href: "/admin/metrics", label: "Métricas" }, { href: "/account", label: "Mi cuenta" }]}>
     <Link href="/admin/candidates/assisted" className="inline-block rounded bg-blue-800 p-3 text-white">Nueva atención presencial</Link>
     <CandidateSearchForm categories={categories.map((category) => ({ id: category.id, name: category.name }))}

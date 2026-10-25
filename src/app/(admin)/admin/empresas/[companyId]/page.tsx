@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminCompanyPage({ params }: { params: Promise<{ companyId: string }> }) {
   const { companyId } = await params;
   if (!databaseUuidSchema.safeParse(companyId).success) notFound();
-  const { client } = await requireActiveAccount(["admin"]);
+  const { client, user } = await requireActiveAccount(["admin"]);
   const profile = await client.from("company_profiles").select("id,account_id,legal_name,status,archived_at,version")
     .eq("id", companyId).maybeSingle();
   if (profile.error || !profile.data) notFound();
@@ -19,7 +19,7 @@ export default async function AdminCompanyPage({ params }: { params: Promise<{ c
   ]);
   if (account.error || !account.data || offers.error) notFound();
   const command = account.data.status === "suspended" ? "reactivate" : account.data.status === "archived" ? "restore" : "suspend";
-  return <AdminShell active="/admin/empresas" title={profile.data.legal_name || "Empresa incompleta"}
+  return <AdminShell email={user?.email} active="/admin/empresas" title={profile.data.legal_name || "Empresa incompleta"}
     navigation={[{ href: "/admin/empresas", label: "Empresas" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <p>Cuenta: {account.data.status}. Perfil: {profile.data.status}. {profile.data.archived_at ? "Archivada." : ""}</p>
     <p className="mt-2">Una reactivación deja el perfil incompleto. Restaurar deja las ofertas archivadas en borrador; ninguna decisión recupera accesos revocados.</p>

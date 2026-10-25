@@ -14,12 +14,12 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
   params: Promise<{ openingId: string }>;
   searchParams: Promise<{ matchPage?: string | string[] }>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const { openingId } = await params;
   const { matchPage } = await searchParams;
   const { opening, events } = await getAdminOpening(openingId);
 
-  return <AdminShell active="/admin/openings" title={opening.title ?? "Oferta sin título"}
+  return <AdminShell email={user?.email} active="/admin/openings" title={opening.title ?? "Oferta sin título"}
     description="Detalle e historial de decisiones visible solo para la Oficina de Empleo."
     navigation={[{ href: "/admin/openings", label: "Volver a ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <div className="grid gap-6 lg:grid-cols-2">

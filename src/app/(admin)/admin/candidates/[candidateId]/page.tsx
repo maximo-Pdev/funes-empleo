@@ -18,13 +18,13 @@ export const dynamic = "force-dynamic";
 export default async function AdminCandidateDetailPage({ params, searchParams }: {
   params: Promise<{ candidateId: string }>; searchParams: Promise<{ cv?: string }>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const { candidateId } = await params;
   const { cv } = await searchParams;
   const { candidate, referralEligible, participations, notes, audit } = await getAdminCandidate(candidateId);
   const nominationOpenings = candidate.status === "active" ? await listNominationOpenings() : [];
 
-  return <AdminShell active="/admin/candidates" title={candidate.display_name}
+  return <AdminShell email={user?.email} active="/admin/candidates" title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
     navigation={[{ href: "/admin/candidates", label: "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     {candidate.status !== "archived" && <Link className="inline-block rounded bg-blue-800 p-3 text-white" href={`/admin/candidates/assisted/${candidate.id}`}>Mantener perfil y atención presencial</Link>}

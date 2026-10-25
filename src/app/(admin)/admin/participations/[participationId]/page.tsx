@@ -21,13 +21,13 @@ function localDate(value: string) {
 export default async function AdminParticipationDetailPage({ params }: {
   params: Promise<{ participationId: string }>;
 }) {
-  await requireActiveAccount(["admin"]);
+  const { user } = await requireActiveAccount(["admin"]);
   const { participationId } = await params;
   const { participation, audit, preinterviews, contacts, notes, referral, feedback } =
     await getAdminParticipation(participationId);
   const contactHistory = await getContactTimeline(participationId);
 
-  return <AdminShell active="/admin/participations" title="Seguimiento de participación"
+  return <AdminShell email={user?.email} active="/admin/participations" title="Seguimiento de participación"
     description="Estado vigente, decisiones y registros internos de este caso."
     navigation={[{ href: "/admin/participations", label: "Volver a casos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <div className="grid gap-6 lg:grid-cols-2">

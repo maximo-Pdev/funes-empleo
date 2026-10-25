@@ -7,6 +7,7 @@ import { AppError } from "@/lib/errors/public-error";
 import { EmptyState } from "@/components/ui/page-state";
 import { CompanyReferralPanel } from "@/features/referrals/components/company-referral-panel";
 import { getCompanyReferral, listCompanyReferralReferences } from "@/features/referrals/service";
+import { getCompanyWorkspace } from "@/features/companies/service";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -17,7 +18,7 @@ type Props = {
 };
 
 export default async function CompanyReferralsPage({ params, searchParams }: Props) {
-  await requireActiveAccount(["company"]);
+  const { user } = await requireActiveAccount(["company"]);
   const { openingId } = await params;
   const requested = (await searchParams).referral;
   let references;
@@ -29,8 +30,9 @@ export default async function CompanyReferralsPage({ params, searchParams }: Pro
     try { selected = await getCompanyReferral(openingId, selectedId); }
     catch (error) { if (error instanceof AppError && error.code === "NOT_FOUND") notFound(); throw error; }
   }
+  const workspace = await getCompanyWorkspace();
   return (
-    <CompanyShell title="Candidatos derivados" active="/empresa/ofertas" description="Solo aparecen derivaciones de esta oferta. La Oficina de Empleo decide qué perfiles compartir y confirma los resultados finales.">
+    <CompanyShell name={workspace.profile?.legalName} email={user.email} title="Candidatos derivados" active="/empresa/ofertas" description="Solo aparecen derivaciones de esta oferta. La Oficina de Empleo decide qué perfiles compartir y confirma los resultados finales.">
       <nav aria-label="Ruta de navegación"><Link href="/account" className="inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-primary underline underline-offset-4">Mi cuenta</Link></nav>
       {references.length === 0 ? <div className="mt-8"><EmptyState title="Todavía no hay derivaciones" description="La Oficina te avisará cuando derive candidatos para esta oferta." /></div> : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(15rem,20rem)_minmax(0,1fr)]">
