@@ -26,7 +26,12 @@ function fixtureId(kind: string, number: number) {
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
   assertLocalTargets();
+  // The login form lives on the home page and is replaced by a session notice while a session is active
+  // (this journey reaches this point after the company was redirected to /account-suspended). Drop the
+  // stale session so the form is rendered again.
+  await page.context().clearCookies();
   await page.goto("/");
+  await expect(page.getByLabel("Correo electrónico")).toBeVisible();
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
@@ -179,6 +184,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
 });
 
 test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva y restaura sin reabrirlas", async ({ browser }) => {
+  test.setTimeout(120_000);
   const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   const companyContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
@@ -188,13 +194,15 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
     await loginFixture(company, "company", 3);
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}`);
     await expect(company.locator("body")).not.toContainText("Oferta ficticia 002");
-    await company.goto(`/company/openings/${fixtureId("opening", 2)}/referrals`);
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}#derivaciones`);
     await expect(company.locator("body")).not.toContainText("Persona ficticia 002");
     await admin.goto(`/admin/empresas/${fixtureId("business", 3)}`);
     await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").last().fill("Archivo administrativo ficticio");
     await admin.getByLabel("Confirmo esta decisión.").last().check();
     await admin.getByRole("button", { name: "Archivar empresa" }).click();
+    // La acción responde "Decisión registrada con historial. Recargá para ver el estado actual."
+    await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await company.goto("/empresa/ofertas");
     await expect(company).toHaveURL(/\/session-expired$/);

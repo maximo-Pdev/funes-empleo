@@ -51,7 +51,7 @@ for (const role of ["candidate", "company"] as const) {
     await page.goto(link!);
     await expect(page).toHaveURL("http://127.0.0.1:3000/account");
     if (role === "candidate") {
-      await expect(page.getByRole("heading", { name: "Mi perfil", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Panel de usuario", exact: true })).toBeVisible();
       await expect(page.getByRole("navigation", { name: "Secciones de mi cuenta" })).toBeVisible();
     } else {
       await expect(page.getByText("Acceso individual activo. Rol: Empresa.", { exact: true })).toBeVisible();

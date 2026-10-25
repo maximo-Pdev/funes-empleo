@@ -13,7 +13,7 @@ export async function claimAssistedAction(input: unknown) {
     const result = await session.client.rpc("claim_assisted_profile", { p_candidate: d.candidateId, p_expected_version: d.version,
       p_account: d.accountId, p_dni: d.dni, p_in_person: d.verifiedInPerson, p_reason: d.reason });
     if (result.error) throw workflowRpcError(result.error.message);
-    revalidatePath("/admin/candidates/assisted/[candidateId]", "page"); revalidatePath("/admin/candidates/[candidateId]", "page");
+    revalidatePath("/admin/candidates/[candidateId]", "page");
     return { success: result.data === "linked", message: result.data === "linked" ? "Cuenta vinculada. Se conservan el perfil y su historial."
       : "Vinculación bloqueada por conflicto de cuenta, DNI o correo. Se registró una revisión de duplicados; corregí los datos y volvé a comprobar la identidad presencialmente." };
   } catch (error) { return { success: false, message: publicErrorFrom(error).message }; }

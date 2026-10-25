@@ -27,7 +27,7 @@ export async function cancelCompanyOpeningAction(_previous: CompanyOpeningState,
   try {
     const id = String(form.get("id"));
     await cancelCompanyOpening({ id, version: form.get("version"), reason: form.get("cancelReason"), confirmed: form.get("cancelConfirmed") === "on" });
-    for (const path of ["/empresa", "/empresa/ofertas", "/empresa/ofertas/[openingId]", "/admin/openings", "/admin/openings/[openingId]", "/admin/participations", "/ofertas", "/ofertas/[openingId]", "/candidato/postulaciones", "/company/openings/[openingId]/referrals"]) revalidatePath(path, "page");
+    for (const path of ["/empresa", "/empresa/ofertas", "/empresa/ofertas/[openingId]", "/admin/openings", "/admin/openings/[openingId]", "/admin/participations", "/ofertas", "/ofertas/[openingId]", "/candidato/postulaciones"]) revalidatePath(path, "page");
     return { message: "Oferta cancelada. Se conservan los resultados finales y el historial.", success: true, id };
   } catch (error) { return failed(error); }
 }

@@ -48,9 +48,10 @@ ejecución, pero también hay que verificar los flujos siguientes.
   cancela solo casos abiertos y revoca sus accesos. No elimina físicamente datos.
 - Administración: los listados de ofertas y los del detalle de empresa excluyen
   borradores antes de paginar. No se cambian RLS, métricas ni la restauración.
-- La página empresarial de oferta reúne moderación y derivados. El enlace
-  anterior `/company/openings/<referencia>/referrals` redirige al detalle,
-  conservando el selector autorizado. Los identificadores privados siguen opacos.
+- La página empresarial de oferta reúne moderación y derivados. La ruta anterior
+  `/company/openings/<referencia>/referrals` se retiró: su contenido vive en el
+  detalle de la oferta, con el selector autorizado y el ancla `#derivaciones`.
+  Los identificadores privados siguen opacos.
   Una empresa restaurada con perfil incompleto conserva el detalle de su oferta;
   recibe un aviso para completar su perfil sin consultar ni recuperar derivaciones.
 - Historial de moderación: cinco eventos recientes, «Ver más» agrega cinco.

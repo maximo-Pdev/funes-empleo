@@ -45,8 +45,10 @@ for (const role of ["candidate", "company", "admin"] as const) {
 
 test("empresa: oferta y derivación ajenas e inexistentes muestran el mismo NOT_FOUND", async ({ page }) => {
   await loginFixture(page, "company", 1);
-  for (const path of ["/empresa/ofertas/", "/company/openings/"]) {
-    const suffix = path.includes("/company/") ? "/referrals" : "";
+  // `/company/openings/[openingId]/referrals` ya no existe: el detalle de la oferta
+  // es la única superficie que expone derivaciones, con `?referral=` para una puntual.
+  for (const suffix of ["", `?referral=${fixtureId("referral", 2)}`]) {
+    const path = "/empresa/ofertas/";
     const foreign = await page.goto(`${path}${fixtureId("opening",2)}${suffix}`);
     await expect(page.getByRole("heading", { name: "No encontramos la página", exact: true })).toBeVisible();
     const foreignText = await page.locator("body").innerText();

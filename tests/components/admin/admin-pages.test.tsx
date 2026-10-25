@@ -33,7 +33,7 @@ import Candidates from "@/app/(admin)/admin/candidates/page";
 import AssistedCandidates from "@/app/(admin)/admin/atencion-presencial/page";
 import Candidate from "@/app/(admin)/admin/candidates/[candidateId]/page";
 import Assisted from "@/app/(admin)/admin/candidates/assisted/page";
-import AssistedDetail from "@/app/(admin)/admin/candidates/assisted/[candidateId]/page";
+
 import Companies from "@/app/(admin)/admin/empresas/page";
 import Company from "@/app/(admin)/admin/empresas/[companyId]/page";
 import Openings from "@/app/(admin)/admin/openings/page";
@@ -275,16 +275,7 @@ it.each(["active", "suspended", "pending_verification", "archived"])("el asistid
  expect(screen.getByRole("link", { name: "Descargar CV vigente" })).toBeTruthy();
  expect(mocks.assisted).not.toHaveBeenCalled();
 });
-it("redirige mantenimiento antiguo al detalle con referencia opaca sin cargar datos personales", async () => {
- await expect(AssistedDetail({ params: Promise.resolve({ candidateId: id }) })).rejects.toThrow(`REDIRECT:/admin/candidates/${fixtureReference("candidate", id)}`);
- expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
- expect(mocks.assisted).not.toHaveBeenCalled();
-});
-it("protege mantenimiento antiguo antes de redirigir", async () => {
- mocks.guard.mockRejectedValue(new Error("FORBIDDEN"));
- await expect(AssistedDetail({ params: Promise.resolve({ candidateId: id }) })).rejects.toThrow("FORBIDDEN");
- expect(mocks.assisted).not.toHaveBeenCalled();
-});
+
 it("ofrece navegación completa y un único encabezado principal", async () => {
  render(await Companies({ searchParams: Promise.resolve({}) })); const nav = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }); expect(within(nav).getByRole("link", { name: "Empresas" }).getAttribute("aria-current")).toBe("page"); expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
 });

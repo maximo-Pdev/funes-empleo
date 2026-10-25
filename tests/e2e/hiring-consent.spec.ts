@@ -59,7 +59,7 @@ for (const late of [false, true]) {
       const admin = await adminContext.newPage();
       const company = await companyContext.newPage();
       await signIn(admin, "admin1"); await signIn(company, "company2");
-      await company.goto(`/company/openings/${otherOpeningId}/referrals`);
+      await company.goto(`/empresa/ofertas/${otherOpeningId}#derivaciones`);
       await expect(company.getByText(name, { exact: true })).toBeVisible();
       await admin.goto(`/admin/participations/${participationId}`);
       if (late) {
@@ -101,8 +101,9 @@ for (const late of [false, true]) {
       expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
       await companyContext.clearCookies();
       await signIn(company, "company1");
-      await company.goto(`/company/openings/${openingId}/referrals`);
-      await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}(?:#derivaciones)?$/);
+      await company.goto(`/empresa/ofertas/${openingId}#derivaciones`);
+      // El detalle canoniza la referencia privada; el fragmento no sobrevive al redirect de servidor.
+      await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
       await expect(company.getByText(`${name} · Contratado`, { exact: true })).toBeVisible();
       await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
       await expect(company.getByRole("link", { name: /Descargar CV/ })).toHaveCount(0);

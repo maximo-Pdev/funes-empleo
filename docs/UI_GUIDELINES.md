@@ -219,8 +219,9 @@ the existing candidate detail; archived entries retain its read-only restriction
 The section itself renders the existing AssistedProfileForm above the filters
 and list, so administrators can create a profile without first leaving this page.
 Keep its validation, duplicate resolution, save action and maintenance destination.
-The current creation route `/admin/candidates/assisted` and maintenance routes stay
-intact, with a return link to the new section. Filter submission and pagination
+The creation route `/admin/candidates/assisted` stays intact, with a return link to the new
+section. The former per-candidate maintenance route `/admin/candidates/assisted/[candidateId]`
+was retired: maintenance now happens in the candidate detail. Filter submission and pagination
 stay inside the section and use opaque category/candidate references (EXTRA-055).
 
 ## Administrative candidate CV

@@ -1,4 +1,3 @@
-import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -23,7 +22,7 @@ import Profile from "@/app/(company)/empresa/perfil/page";
 import Offers from "@/app/(company)/empresa/ofertas/page";
 import NewOpening from "@/app/(company)/empresa/ofertas/nueva/page";
 import Opening from "@/app/(company)/empresa/ofertas/[openingId]/page";
-import Referrals from "@/app/(company)/company/openings/[openingId]/referrals/page";
+
 import Account from "@/app/(auth)/account/page";
 import { CompanyOpeningReferrals } from "@/features/referrals/components/company-opening-referrals";
 const id = "0a000000-0000-4000-8000-000000000001";
@@ -162,9 +161,7 @@ it("la contratación propia conserva solo nombre y no ofrece CV/contactos/entrev
  expect(screen.queryByRole("button", { name: "Enviar informe" })).toBeNull();
  expect(screen.queryByRole("button", { name: "Registrar entrevista" })).toBeNull();
 });
-it("ruta antigua de derivaciones dirige al detalle empresarial canónico", async () => {
- await expect(Referrals({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) })).rejects.toThrow(`REDIRECT:/empresa/ofertas/${fixtureReference("opening", id)}#derivaciones`);
-});
+
 it("contratación legada con permiso completo no duplica el nombre ni oculta su resultado", async () => {
  mocks.referral.mockResolvedValue({ ...referral, hiredCandidate: { displayName: referral.candidate.displayName, outcome: "hired" } });
  render(await CompanyOpeningReferrals({ openingId: id }));

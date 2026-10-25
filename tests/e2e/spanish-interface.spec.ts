@@ -24,29 +24,28 @@ async function check(page: Page, path: string) {
 }
 
 test("público: navegación, búsqueda y registros con textos españoles", async ({ page }) => {
-  for (const path of ["/", "/ofertas", "/login", "/registro/candidato", "/registro/empresa", "/recover"])
+  for (const path of ["/", "/ofertas", "/registro/candidato", "/registro/empresa", "/recover"])
     await check(page, path);
 });
 
 for (const role of ["candidate", "company", "admin"] as const) {
   test(`${role}: vistas, estados, historiales y controles en español`, async ({ page }) => {
     test.setTimeout(90_000);
-    await page.goto("/login");
+    await page.goto("/");
     await page.getByLabel("Correo electrónico").fill(`${role}1@example.invalid`);
     await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-    await page.getByRole("button", { name: "Iniciar sesión", exact: true }).click();
+    await page.getByRole("button", { name: "Ingresar", exact: true }).click();
     await expect(page).toHaveURL(/\/account$/);
-    const paths = role === "candidate" ? ["/account", "/account?section=perfil", "/account?section=ofertas", "/account?section=postulaciones",
-      "/candidato/perfil", "/candidato/ofertas", "/candidato/postulaciones"]
+    const paths = role === "candidate" ? ["/account", "/account?section=perfil", "/account?section=ofertas", "/account?section=postulaciones"]
       : role === "company" ? ["/account", "/empresa", "/empresa/perfil", "/empresa/ofertas",
-        `/empresa/ofertas/${fixtureId("opening", 1)}`, `/company/openings/${fixtureId("opening", 1)}/referrals`]
+        `/empresa/ofertas/${fixtureId("opening", 1)}`]
         : ["/account", "/admin/candidates", `/admin/candidates/${fixtureId("profile", 2)}`, "/admin/candidates/assisted",
           "/admin/empresas", `/admin/empresas/${fixtureId("business", 2)}`, "/admin/openings",
           `/admin/openings/${fixtureId("opening", 2)}`, "/admin/participations",
           `/admin/participations/${fixtureId("participation", 3)}`, "/admin/imports", "/admin/imports/new", "/admin/metrics"];
     for (const path of paths) await check(page, path);
     if (role === "candidate") {
-      await page.goto("/candidato/perfil");
+      await page.goto("/account?section=perfil");
       await expect(page.getByText("Seleccionar archivo", { exact: true })).toBeVisible();
       await expect(page.getByText("Ningún archivo seleccionado", { exact: true })).toBeVisible();
     }

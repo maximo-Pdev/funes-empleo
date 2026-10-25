@@ -110,7 +110,7 @@ test("CV privado: solo permisos vigentes permiten descargar y la última revocac
     }
     expect((await otherCompany.context().request.get(cvUrl)).status()).toBe(404);
     expect((await company.context().request.get(`/api/cv/${fixtureId("cv", 11)}`)).status()).toBe(404);
-    const referralPage = `/company/openings/${fixtureId("opening", 1)}/referrals?referral=${fixtureId("referral", 5)}`;
+    const referralPage = `/empresa/ofertas/${fixtureId("opening", 1)}?referral=${fixtureId("referral", 5)}#derivaciones`;
     await company.goto(referralPage);
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado" })).toBeVisible();
     await expect(company.getByText("Persona ficticia 005")).toBeVisible();
@@ -157,7 +157,7 @@ test("la empresa informa una contratación y solo la Oficina confirma el resulta
     const admin = await adminContext.newPage();
     await signIn(company, "company1@example.invalid");
     await signIn(admin, "admin1@example.invalid");
-    await company.goto(`/company/openings/${fixtureId("opening", 1)}/referrals?referral=${fixtureId("referral", 6)}`);
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 1)}?referral=${fixtureId("referral", 6)}#derivaciones`);
     await company.getByLabel("Resultado informado").selectOption("hired");
     await company.getByRole("button", { name: "Enviar informe" }).click();
     await expect(company.getByText("El resultado informado quedó pendiente de revisión municipal.")).toBeVisible();
@@ -184,7 +184,7 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
     await signIn(company, "company1@example.invalid");
     await signIn(admin, "admin1@example.invalid");
     const opening = fixtureId("opening", 1);
-    await company.goto(`/company/openings/${opening}/referrals?referral=${fixtureId("referral", 9)}`);
+    await company.goto(`/empresa/ofertas/${opening}?referral=${fixtureId("referral", 9)}#derivaciones`);
     await expect(company.getByText("Persona ficticia 009")).toBeVisible();
     await company.getByLabel("Estado", { exact: true }).selectOption("completed");
     await company.getByLabel("Fecha realizada (Funes)").fill("2026-09-24T14:00");
@@ -201,7 +201,7 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
     await company.reload();
     await expect(company.getByText("Persona ficticia 009")).toHaveCount(0);
 
-    await company.goto(`/company/openings/${opening}/referrals?referral=${fixtureId("referral", 10)}`);
+    await company.goto(`/empresa/ofertas/${opening}?referral=${fixtureId("referral", 10)}#derivaciones`);
     await expect(company.getByText("Persona ficticia 010")).toBeVisible();
     await company.getByLabel("Resultado informado").selectOption("process_cancelled");
     await company.getByRole("button", { name: "Enviar informe" }).click();
@@ -237,7 +237,7 @@ test("la Oficina registra contacto y nota interna sin mostrarlos a la empresa", 
   try {
     const company = await companyContext.newPage();
     await signIn(company, "company1@example.invalid");
-    await company.goto(`/company/openings/${fixtureId("opening", 1)}/referrals?referral=${fixtureId("referral", 7)}`);
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 1)}?referral=${fixtureId("referral", 7)}#derivaciones`);
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado" })).toBeVisible();
     await expect(company.locator("body")).not.toContainText("Contacto municipal ficticio sobre seguimiento.");
     await expect(company.locator("body")).not.toContainText("Orientación ficticia sobre capacitación.");
@@ -286,7 +286,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await signIn(candidate, "candidate1@example.invalid");
     await signIn(company, "company2@example.invalid");
 
-    await candidate.goto("/candidato/perfil");
+    await candidate.goto("/account?section=perfil");
     await candidate.getByLabel("Categoría ficticia A", { exact: true }).check();
     await candidate.getByRole("button", { name: "Guardar correcciones" }).click();
     await expect(candidate.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
@@ -309,7 +309,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.getByLabel("Acción").selectOption("refer");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Derivada");
-    await company.goto(`/company/openings/${fixtureId("opening", 2)}/referrals`);
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 2)}#derivaciones`);
     await expect(company.getByText("Persona ficticia 001")).toBeVisible();
     await expect(company.locator("body")).not.toContainText(/DNI|domicilio|Preentrevista municipal ficticia/i);
 
@@ -387,7 +387,7 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     const company = await companyContext.newPage();
     await signIn(candidate, "candidate15@example.invalid");
     await signIn(company, "company2@example.invalid");
-    const referralPage = `/company/openings/${fixtureId("opening", 2)}/referrals?referral=${fixtureId("referral", 15)}`;
+    const referralPage = `/empresa/ofertas/${fixtureId("opening", 2)}?referral=${fixtureId("referral", 15)}#derivaciones`;
     await company.goto(referralPage);
     await expect(company.getByText("Persona ficticia 015")).toBeVisible();
     const snapshotCv = await company.getByRole("link", { name: "Descargar CV asociado a esta derivación" }).getAttribute("href");
@@ -484,9 +484,9 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
       -- Company authorization uses real time, unlike the injected job clock.
       update public.referrals set post_hire_access_until=clock_timestamp()+interval '1 day'
       where id='${hiredReferral}';`);
-    await company.goto(`/company/openings/${fixtureId("opening", 1)}/referrals?referral=${overdueReferral}`);
+    await company.goto(`/empresa/ofertas/${fixtureId("opening", 1)}?referral=${overdueReferral}#derivaciones`);
     await expect(company.getByText("Persona ficticia 210")).toBeVisible();
-    await hiredCompany.goto(`/company/openings/${fixtureId("opening", 3)}/referrals?referral=${hiredReferral}`);
+    await hiredCompany.goto(`/empresa/ofertas/${fixtureId("opening", 3)}?referral=${hiredReferral}#derivaciones`);
     await expect(hiredCompany.getByText("Persona ficticia 021")).toBeVisible();
 
     const sql = `update public.job_openings set closing_date = ('${maintenanceNow}'::timestamptz at time zone 'America/Buenos_Aires')::date - 1 where id = '${opening}';

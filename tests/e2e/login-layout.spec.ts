@@ -55,14 +55,25 @@ test("el diseño mantiene errores visibles y conserva datos sin enviar credencia
   const submissions: string[] = [];
   page.on("request", request => { if (request.method() === "POST") submissions.push(request.url()); });
   await page.goto("/");
+  const email = page.getByLabel("Correo electrónico");
+  const password = page.getByLabel("Contraseña", { exact: true });
+  // El panel fija su alto recién después de hidratar (useLayoutEffect + ResizeObserver),
+  // así que esperar ese estilo evita enviar antes de que React escuche el submit.
+  await expect(page.locator("#acceso")).toHaveAttribute("style", /height/);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page.locator("[data-field-error]")).toHaveCount(2);
-  await expect(page.getByLabel("Correo electrónico")).toBeFocused();
-  await page.getByLabel("Correo electrónico").fill("persona-ficticia@example.invalid");
-  await page.getByLabel("Contraseña", { exact: true }).fill("12");
+  // El login de la home usa missingFieldMessages="summary": los faltantes se agrupan en un
+  // resumen y Field suprime el mensaje inline de esos campos (hideError), así que no hay
+  // [data-field-error]. Tampoco aparecen globos nativos: el <form> se renderiza noValidate.
+  await expect(page.getByRole("alert").filter({ hasText: "Revisá los 2 campos indicados." })).toBeVisible();
+  await expect(page.locator('[aria-invalid="true"]')).toHaveCount(2);
+  await expect(page.locator("[data-field-error]")).toHaveCount(0);
+  await expect(email).toBeFocused();
+  await email.fill("persona-ficticia@example.invalid");
+  await password.fill("12");
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
+  await expect(page.locator("[data-field-error]")).toHaveCount(1);
   await expect(page.locator("[data-field-error]")).toContainText("Ingresá al menos 6 caracteres.");
-  await expect(page.getByLabel("Correo electrónico")).toHaveValue("persona-ficticia@example.invalid");
+  await expect(email).toHaveValue("persona-ficticia@example.invalid");
   expect(submissions).toEqual([]);
 });
 
