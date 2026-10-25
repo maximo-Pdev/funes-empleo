@@ -26,7 +26,7 @@ if (!localAcceptance) {
 const base = localAcceptance ? "http://127.0.0.1:3000" : "https://funes-empleo-demo.vercel.app";
 const fixtures = JSON.parse(await readFile("tests/fixtures/acceptance-manifest.json", "utf8"));
 const manifest = { ...fixtures, ...(localAcceptance ? fixtures.acceptance : fixtures.interactive) };
-const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/login?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
+const command = "npm.cmd exec --yes --package=vercel@50.35.0 -- vercel curl '/?x-vercel-set-bypass-cookie=true' --deployment https://funes-empleo-demo.vercel.app --scope pantherium-8487s-projects -- --silent --dump-header - --output NUL";
 let headers = "";
 try {
   if (!localAcceptance) headers = execFileSync("powershell.exe", ["-NoProfile", "-Command", command], { encoding: "utf8", timeout: 60000, stdio: ["ignore", "pipe", "pipe"] });
@@ -42,10 +42,10 @@ try {
   await context.addCookies(cookies);
   const page = await context.newPage();
   page.setDefaultTimeout(90000);
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(credentials.admin1.email);
   await page.getByLabel("Contraseña",{exact:true}).fill(credentials.admin1.password);
-  await page.getByRole("button",{name:"Iniciar sesión",exact:true}).click();
+  await page.getByRole("button",{name:"Ingresar",exact:true}).click();
   await page.waitForURL("**/account");
   if (scenario === "concurrent-admins") {
     const pages=[page];
@@ -53,10 +53,10 @@ try {
       const individual=await browser.newContext({baseURL:base,viewport:{width:1366,height:768}});
       await individual.addCookies(cookies);
       const p=await individual.newPage(); p.setDefaultTimeout(90000);
-      await p.goto("/login");
+      await p.goto("/");
       await p.getByLabel("Correo electrónico").fill(credentials[`admin${n}`].email);
       await p.getByLabel("Contraseña",{exact:true}).fill(credentials[`admin${n}`].password);
-      await p.getByRole("button",{name:"Iniciar sesión",exact:true}).click();
+      await p.getByRole("button",{name:"Ingresar",exact:true}).click();
       await p.waitForURL("**/account"); pages.push(p);
     }
     const fixture=manifest.concurrentAdmins;

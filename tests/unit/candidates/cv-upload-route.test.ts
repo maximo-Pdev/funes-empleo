@@ -36,7 +36,7 @@ beforeEach(() => {
 it("mantiene el redirect 303 para los clientes sin opt-in JSON", async () => {
   const response = await POST(request("text/html"));
   expect(response.status).toBe(303);
-  expect(response.headers.get("location")).toBe("http://127.0.0.1:3000/candidato/perfil?cv=invalid");
+  expect(response.headers.get("location")).toBe("http://127.0.0.1:3000/dashboard?section=perfil&cv=invalid");
   expect(response.headers.get("cache-control")).toBe("private, no-store");
 });
 

@@ -20,7 +20,7 @@ beforeEach(() => {
   });
 });
 
-it.each(["/", "/ofertas", "/ofertas/ficticia", "/candidato/perfil", "/empresa/perfil", "/admin/openings", "/company/openings/ficticia/referrals", "/account", "/update-password", "/api/cv/ficticio", "/auth/callback"])("renueva sesión en %s", url => {
+it.each(["/", "/ofertas", "/ofertas/ficticia", "/dashboard?section=perfil", "/empresa/perfil", "/admin/openings", "/company/openings/ficticia/referrals", "/account", "/update-password", "/api/cv/ficticio", "/auth/callback"])("renueva sesión en %s", url => {
   expect(unstable_doesMiddlewareMatch({ config, nextConfig: {}, url })).toBe(true);
 });
 
@@ -53,7 +53,7 @@ it("conserva cookies y cache headers de escrituras previas y chunks eliminados",
     await adapter.setAll([{ name: "auth.1", value: "synthetic-second", options: { path: "/", maxAge: 3600 } }], {});
     return { data: { user: null }, error: null };
   });
-  const response = await proxy(new NextRequest("https://portal.example.invalid/candidato/perfil"));
+  const response = await proxy(new NextRequest("https://portal.example.invalid/dashboard?section=perfil"));
   expect(response.cookies.get("auth.0")?.value).toBe("synthetic-first");
   expect(response.cookies.get("auth.1")?.value).toBe("synthetic-second");
   expect(response.cookies.get("auth.2")).toMatchObject({ value: "", maxAge: 0 });

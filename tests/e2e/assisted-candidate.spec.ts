@@ -10,10 +10,10 @@ test.beforeEach(() => {
 });
 async function signIn(page: Page, email = "admin1@example.invalid") {
   const password = localFixturePassword();
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 async function fillProfile(page: Page, name: string, dni: string) {
@@ -109,7 +109,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     const link = (mail.Text ?? mail.HTML ?? "").match(/https?:\/\/[^\s"<>]+/)?.[0]?.replaceAll("&amp;", "&");
     expect(link).toBeTruthy();
     await candidate.goto(link!);
-    await candidate.goto("/candidato/perfil");
+    await candidate.goto("/dashboard?section=perfil");
     await expect(candidate.locator("body")).toContainText(/presencial/);
     const before = runLocalMaintenanceSql(`select jsonb_build_object('origin',origin,'status',status,'consents',(select count(*) from public.candidate_consents where candidate_id='${id}'),'cases',(select count(*) from public.participations where candidate_id='${id}'),'notes',(select count(*) from public.internal_notes where candidate_id='${id}')) from public.candidate_profiles where id='${id}'`);
     await page.goto(maintenance);

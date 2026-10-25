@@ -10,10 +10,10 @@ export function fixtureId(kind: string, number: number) {
 }
 export async function loginFixture(page: Page, role: "candidate" | "company" | "admin", number = 1) {
   const password = localFixturePassword();
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(`${role}${number}@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 export function protectedPages() {

@@ -5,7 +5,7 @@ import { loginFixture } from "./fixtures/quality";
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("http://127.0.0.1:54321"), "Solo fixture local ficticio"));
 const journeys = {
-  candidate: ["/candidato/perfil", "/candidato/ofertas", "/candidato/postulaciones"],
+  candidate: ["/dashboard?section=perfil", "/dashboard?section=ofertas", "/dashboard?section=postulaciones"],
   company: ["/empresa/perfil", "/empresa/ofertas", "/empresa/ofertas/nueva"],
   admin: ["/admin/candidates", "/admin/candidates/assisted", "/admin/openings", "/admin/empresas", "/admin/participations", "/admin/imports/new", "/admin/metrics?from=2026-09-01&to=2026-09-20"],
 } as const;

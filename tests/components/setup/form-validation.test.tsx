@@ -4,6 +4,70 @@ import { useActionState } from "react";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 
+it("summarizes missing text fields without losing invalid state, hints or focus", () => {
+  const submit = vi.fn(event => event.preventDefault());
+  const view = render(<Form missingFieldMessages="summary" onSubmit={submit}>
+    <Field hint="Nombre completo">Nombre<input required /></Field>
+    <Field>Correo<input type="email" required /></Field><button>Guardar</button>
+  </Form>);
+  fireEvent.submit(view.container.querySelector("form")!);
+  expect(submit).not.toHaveBeenCalled();
+  expect(screen.queryByText("Completá este campo.")).toBeNull();
+  expect(screen.getByRole("alert").textContent).toBe("Revisá los 2 campos indicados.");
+  const name = screen.getByLabelText("Nombre");
+  expect(name.getAttribute("aria-invalid")).toBe("true");
+  expect(document.activeElement).toBe(name);
+  expect(name.getAttribute("aria-describedby")).toBe(`${name.id}-hint`);
+  expect(screen.getByLabelText("Correo").hasAttribute("aria-describedby")).toBe(false);
+  fireEvent.change(name, { target: { value: "Persona ficticia" } });
+  expect(name.getAttribute("aria-invalid")).not.toBe("true");
+  expect(screen.getByRole("alert").textContent).toBe("Revisá el campo indicado.");
+});
+
+it("keeps format and confirmation explanations alongside a quiet missing field", () => {
+  const view = render(<Form missingFieldMessages="summary">
+    <Field>Nombre<input required /></Field><Field>Correo<input type="email" required /></Field>
+    <Field>Contraseña<input name="password" defaultValue="Fictitious-only" /></Field>
+    <Field>Confirmación<input name="confirmation" defaultValue="Different-value" /></Field>
+  </Form>);
+  fireEvent.change(screen.getByLabelText("Correo"), { target: { value: "invalid-email" } });
+  fireEvent.submit(view.container.querySelector("form")!);
+  expect(screen.queryByText("Completá este campo.")).toBeNull();
+  expect(screen.getByText(/Ingresá un correo válido/)).toBeTruthy();
+  expect(screen.getByText("Las contraseñas deben coincidir.")).toBeTruthy();
+  expect(screen.getByRole("alert").textContent).toBe("Revisá los 3 campos indicados.");
+  for (const label of ["Correo", "Confirmación"]) {
+    const control = screen.getByLabelText(label);
+    expect(document.getElementById(control.getAttribute("aria-describedby")!)).not.toBeNull();
+  }
+});
+
+it("preserves supplied server errors in summary-only missing presentation", () => {
+  const view = render(<Form missingFieldMessages="summary"><Field error="No se pudo guardar este dato.">Nombre<input required /></Field></Form>);
+  fireEvent.submit(view.container.querySelector("form")!);
+  expect(screen.getByText("No se pudo guardar este dato.")).toBeTruthy();
+  const control = screen.getByLabelText("Nombre");
+  expect(document.getElementById(control.getAttribute("aria-describedby")!)?.textContent).toBe("No se pudo guardar este dato.");
+});
+
+it.each(["on-missing", "muted"] as const)("uses one %s marker only for missing required values after submit", policy => {
+  const view = render(<Form requiredMarkers={policy}><Field>Correo<input required type="email" /></Field><Field>Opcional<input /></Field></Form>);
+  const marker = () => view.container.querySelectorAll("[data-required-marker]");
+  expect(marker()).toHaveLength(policy === "muted" ? 1 : 0);
+  if (policy === "muted") expect(marker()[0]?.getAttribute("data-marker-state")).toBe("muted");
+  fireEvent.submit(view.container.querySelector("form")!);
+  expect(marker()).toHaveLength(1);
+  expect(marker()[0]?.getAttribute("data-marker-state")).toBe("missing");
+  fireEvent.change(screen.getByLabelText("Correo"), { target: { value: "not-an-email" } });
+  expect(screen.getByLabelText("Correo").getAttribute("aria-invalid")).toBe("true");
+  expect(marker()).toHaveLength(policy === "muted" ? 1 : 0);
+  if (policy === "muted") expect(marker()[0]?.getAttribute("data-marker-state")).toBe("muted");
+  fireEvent.change(screen.getByLabelText("Correo"), { target: { value: " " } });
+  expect(marker()[0]?.getAttribute("data-marker-state")).toBe("missing");
+  fireEvent.change(screen.getByLabelText("Correo"), { target: { value: "test@example.invalid" } });
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
 it("marca solo obligatorios con asterisco y conserva el nombre accesible", () => {
   render(<Form><Field>Nombre<input required /></Field><Field>Referencia<input /></Field></Form>);
   expect(screen.getByLabelText("Nombre")).toHaveProperty("required", true);

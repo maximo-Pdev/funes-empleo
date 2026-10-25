@@ -32,7 +32,7 @@ try {
       const s = getComputedStyle(el);
       return { background: s.backgroundColor, image: s.backgroundImage, border: s.borderBottomWidth, color: s.borderBottomColor, position: s.position };
     });
-    assert.deepEqual(navbar, { background: "rgb(255, 255, 255)", image: "none", border: "1px", color: "rgb(134, 141, 152)", position: "fixed" });
+    assert.deepEqual(navbar, { background: "rgb(255, 255, 255)", image: "none", border: "1px", color: "color(srgb 0.52549 0.552941 0.596078 / 0.35)", position: "fixed" });
     assert.equal(await navbarElement.getAttribute("aria-hidden"), width < 768 ? "false" : "true");
     assert.equal(await navbarElement.evaluate(el => getComputedStyle(el).visibility), width < 768 ? "visible" : "hidden");
     const mainTop = await page.locator("main").evaluate(el => el.getBoundingClientRect().top + scrollY);
@@ -97,7 +97,8 @@ try {
     const actionBox = await action.boundingBox();
     assert.ok(Math.abs(actionBox.x + actionBox.width / 2 - width / 2) < 1, "Offers action is horizontally centered");
     await action.click();
-    await page.waitForFunction(() => location.hash === "#ofertas-disponibles" && Math.abs(document.getElementById("ofertas-disponibles").getBoundingClientRect().top - 104) < 2);
+    await page.waitForFunction(() => location.hash === "#ofertas-disponibles" && Math.abs(document.getElementById("ofertas-disponibles").getBoundingClientRect().top) < 1);
+    assert.ok(await page.locator("#ofertas-disponibles").evaluate(el => el.previousElementSibling.getBoundingClientRect().bottom <= 1), "Hero is entirely outside the viewport after offers navigation");
     assert.equal(await page.locator("#ofertas-disponibles").evaluate(el => getComputedStyle(el).backgroundColor), "rgb(255, 255, 255)");
     assert.equal(await page.locator("#ofertas-disponibles").evaluate(el => getComputedStyle(el).borderTopWidth), "0px");
     await page.emulateMedia({ reducedMotion: "reduce" });

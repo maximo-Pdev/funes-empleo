@@ -38,7 +38,7 @@ beforeEach(() => {
 });
 
 it.each([
-  ["candidate", "/candidato/perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
+  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
 ])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label) => {
   readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
@@ -139,7 +139,7 @@ it.each([false, true])("renderiza detalle y campos opcionales solo si existen (%
   expect(screen.getByText(offer.requirements)).toBeTruthy();
   expect(Boolean(screen.queryByRole("heading", { name: "Salario" }))).toBe(optional);
   expect(Boolean(screen.queryByRole("heading", { name: "Beneficios" }))).toBe(optional);
-  expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/candidato/ofertas?oferta=${offer.slug}`);
+  expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/dashboard?section=ofertas&oferta=${offer.slug}`);
 });
 
 it("traduce solo NOT_FOUND a navegación notFound", async () => {

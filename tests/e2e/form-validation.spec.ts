@@ -6,10 +6,10 @@ test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => assertLocalTargets());
 
 async function signIn(page: Page, role: "candidate" | "admin" | "company") {
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(`${role}1@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-  await page.getByRole("button", { name: "Iniciar sesión", exact: true }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 
@@ -54,10 +54,10 @@ test("un rechazo real de Server Action no reinicia los datos del registro", asyn
 });
 
 test("credenciales rechazadas no borran el correo ni la contraseña", async ({ page }) => {
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill("inexistente-ficticio@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Wrong-2026!");
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("No pudimos iniciar sesión");
   await expect(page.getByLabel("Correo electrónico")).toHaveValue("inexistente-ficticio@example.invalid");
   await expect(page.getByLabel("Contraseña", { exact: true })).toHaveValue("Fictitious-Wrong-2026!");
@@ -94,7 +94,7 @@ test("empresa: errores de perfil y grupo de contacto sin guardar ni vaciar otros
 
 test("PDF rechazado: no navega, conserva el archivo elegido y el CV vigente", async ({ page }) => {
   await signIn(page, "candidate");
-  await page.goto("/candidato/perfil");
+  await page.goto("/dashboard?section=perfil");
   await expect(page.locator("[data-form-field]").filter({ has: page.getByLabel("Habilidades y experiencia") })).toHaveCSS("grid-column-end", "-1");
   const currentCv = await page.getByRole("link", { name: "Descargar mi CV" }).getAttribute("href");
   const input = page.getByLabel("Elegir PDF");
@@ -103,7 +103,7 @@ test("PDF rechazado: no navega, conserva el archivo elegido y el CV vigente", as
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
   expect((await response).status()).toBe(422);
   await expect(page.getByText(/El PDF fue rechazado/)).toBeVisible();
-  await expect(page).toHaveURL(/\/candidato\/perfil$/);
+  await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
   expect(await input.evaluate(element => (element as HTMLInputElement).files?.[0]?.name)).toBe("rechazado-ficticio.pdf");
   await expect(input).toHaveAttribute("aria-invalid", "true");
   await expect(input).toHaveCSS("border-top-color", "rgb(185, 28, 28)");

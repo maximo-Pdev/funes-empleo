@@ -20,10 +20,10 @@ function fixtureId(kind: string, number: number) {
 
 async function signIn(page: import("@playwright/test").Page, email: string) {
   const password = localFixturePassword();
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 
@@ -307,7 +307,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await expect(company.getByText("Persona ficticia 001")).toBeVisible();
     await expect(company.locator("body")).not.toContainText(/DNI|domicilio|Preentrevista municipal ficticia/i);
 
-    await candidate.goto("/candidato/postulaciones");
+    await candidate.goto("/dashboard?section=postulaciones");
     const nominated = candidate.locator("li").filter({ has: candidate.getByRole("heading", { name: "Oferta ficticia 002" }) });
     await expect(nominated).toContainText("Recibida");
     await expect(nominated).not.toContainText(/Preentrevista|Preseleccionada|Derivada/);
@@ -355,7 +355,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     const publicSlug = openingSlug(fixtureId("opening", 4));
     await candidate.goto(`/ofertas/${publicSlug}`);
     await candidate.getByRole("link", { name: "Postularme con mi cuenta" }).click();
-    await expect(candidate).toHaveURL(new RegExp(`/candidato/ofertas\\?oferta=${publicSlug}$`));
+    await expect(candidate).toHaveURL(new RegExp(`/dashboard\\?section=ofertas&oferta=${publicSlug}$`));
     const chosenOffer = candidate.getByRole("region", { name: "Oferta elegida" });
     await expect(chosenOffer).toContainText("Oferta ficticia 004");
     await chosenOffer.getByRole("button", { name: "Postularme" }).click();
@@ -389,14 +389,14 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     const snapshotCv = await company.getByRole("link", { name: "Descargar CV asociado a esta derivación" }).getAttribute("href");
     expect(snapshotCv).toBe(`/api/cv/${fixtureId("cv", 15)}`);
 
-    await candidate.goto("/candidato/perfil");
+    await candidate.goto("/dashboard?section=perfil");
     await candidate.getByLabel("Teléfono (opcional)").fill("3415550015");
     await candidate.getByRole("button", { name: "Guardar teléfono" }).click();
     await expect(candidate.getByText("Contacto actualizado.")).toBeVisible();
     await candidate.reload();
     await candidate.getByLabel("Elegir PDF").setInputFiles("tests/fixtures/cv-fictitious.pdf");
     await candidate.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-    await expect(candidate).toHaveURL(/\/candidato\/perfil$/);
+    await expect(candidate).toHaveURL(/\/dashboard\?section=perfil$/);
     await expect(candidate.getByText("CV guardado.", { exact: true })).toBeVisible();
     await expect(candidate.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", snapshotCv!);
     await company.reload();
@@ -408,17 +408,17 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     await candidate.getByLabel("Confirmo esta decisión y entiendo sus efectos.").check();
     await candidate.getByRole("button", { name: "Guardar consentimiento" }).click();
     await expect(candidate.getByText("Estado actual: retirado.")).toBeVisible();
-    await candidate.goto("/candidato/postulaciones");
+    await candidate.goto("/dashboard?section=postulaciones");
     await expect(candidate.locator("li").filter({ hasText: "Oferta ficticia 002" })).toContainText("Retirada");
     await expect(candidate.locator("li").filter({ hasText: "Oferta ficticia 052" })).toContainText("Retirada");
     await company.reload();
     await expect(company.getByText("Persona ficticia 015")).toHaveCount(0);
 
-    await candidate.goto("/candidato/perfil");
+    await candidate.goto("/dashboard?section=perfil");
     await candidate.getByLabel("Confirmo esta decisión y entiendo sus efectos.").check();
     await candidate.getByRole("button", { name: "Guardar consentimiento" }).click();
     await expect(candidate.getByText("Estado actual: aceptado.")).toBeVisible();
-    await candidate.goto("/candidato/postulaciones");
+    await candidate.goto("/dashboard?section=postulaciones");
     await expect(candidate.locator("li").filter({ hasText: "Oferta ficticia 002" })).toContainText("Retirada");
     await company.reload();
     await expect(company.getByText("Persona ficticia 015")).toHaveCount(0);

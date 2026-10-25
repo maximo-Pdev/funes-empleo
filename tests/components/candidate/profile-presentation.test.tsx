@@ -1,6 +1,35 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ComponentProps } from "react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AttachmentAction } from "@/components/ui/attachment";
+
+it("conserva el slot oficial de AttachmentAction y sus controles de 44px", () => {
+  render(<AttachmentAction aria-label="Acción del adjunto">PDF</AttachmentAction>);
+  const action = screen.getByRole("button", { name: "Acción del adjunto" });
+  expect(action.getAttribute("data-slot")).toBe("attachment-action");
+  expect(action.classList.contains("min-h-11")).toBe(true);
+  expect(action.classList.contains("min-w-11")).toBe(true);
+});
+
+it("conserva los className funcionales del Avatar Base sin ampliar cn", () => {
+  const { container } = render(<Avatar className={() => "custom-avatar"}><AvatarFallback className={() => "custom-fallback"}>PF</AvatarFallback></Avatar>);
+  expect(container.querySelector('[data-slot="avatar"]')?.classList.contains("custom-avatar")).toBe(true);
+  expect(container.querySelector('[data-slot="avatar-fallback"]')?.classList.contains("custom-fallback")).toBe(true);
+});
+
+it("adapta Button al render oficial sin perder su contrato municipal", () => {
+  const { rerender } = render(<Button render={<a download href="/api/cv/ficticio" />} nativeButton={false} role="link" variant="ghost" size="icon-xs" aria-label="Descargar">PDF</Button>);
+  expect(screen.getByRole("link", { name: "Descargar" })).toHaveProperty("href", "http://localhost:3000/api/cv/ficticio");
+  rerender(<Button type="submit" name="command" value="save" busy busyLabel="Guardando…">Guardar</Button>);
+  const button = screen.getByRole("button", { name: "Guardando…" });
+  expect(button).toHaveProperty("disabled", true);
+  expect(button).toHaveProperty("type", "submit");
+  expect(button).toHaveProperty("name", "command");
+  expect(button.classList.contains("bg-primary")).toBe(true);
+  expect(button.classList.contains("min-h-11")).toBe(true);
+});
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 vi.mock("@/features/candidates/profile-actions", () => ({
@@ -22,6 +51,42 @@ const props: ComponentProps<typeof CandidateProfilePanel> = {
 };
 
 describe("presentación de consentimiento y activación", () => {
+  it("explica el catálogo ausente y los requisitos pendientes sin inventar categorías", () => {
+    render(<CandidateProfilePanel {...props} categories={[]} selectedCategories={[]} />);
+    const categories = screen.getByRole("group", { name: "Categorías laborales" });
+    expect(categories.querySelector('[data-slot="empty"]')).not.toBeNull();
+    expect(within(categories).getByText("No hay categorías laborales disponibles.")).toBeTruthy();
+    expect(within(categories).queryAllByRole("checkbox")).toHaveLength(0);
+    const activation = screen.getByRole("region", { name: "Activación del perfil" });
+    expect(activation.querySelector('[data-slot="empty"]')).not.toBeNull();
+    expect(within(activation).getByText("Seleccioná y guardá al menos una categoría laboral.")).toBeTruthy();
+  });
+  it("presenta el CV persistido con Attachment y un Empty cuando todavía no hay CV", () => {
+    const { rerender } = render(<CandidateProfilePanel {...props} />);
+    let cvRegion = screen.getByRole("region", { name: "CV PDF" });
+    expect(cvRegion.querySelector('[data-slot="attachment"]')).not.toBeNull();
+    expect(cvRegion.querySelector('[data-slot="attachment-title"]')?.textContent).toBe("cv-ficticio.pdf");
+    expect(within(cvRegion).getByRole("link", { name: "Descargar mi CV" }).getAttribute("href")).toBe(`/api/cv/${categoryId}`);
+    expect(within(cvRegion).queryByRole("button", { name: /eliminar/i })).toBeNull();
+    rerender(<CandidateProfilePanel {...props} cv={null} />);
+    cvRegion = screen.getByRole("region", { name: "CV PDF" });
+    expect(cvRegion.querySelector('[data-slot="empty"]')).not.toBeNull();
+    expect(within(cvRegion).getByText("Todavía no hay un CV vigente.")).toBeTruthy();
+    expect(within(cvRegion).getByRole("button", { name: "Cargar o reemplazar CV" })).toBeTruthy();
+  });
+  it.each([
+    ["active", "active", "Perfil activo"],
+    ["draft", "incomplete", "Borrador"],
+    ["needs_update", "incomplete", "Necesita actualización"],
+    ["unavailable", "neutral", "No disponible"],
+    ["consent_withdrawn", "neutral", "Consentimiento retirado"],
+    ["archived", "neutral", "Archivado"],
+    ["unknown", "neutral", "En revisión"],
+  ])("muestra un indicador veraz para %s", (status, tone, label) => {
+    const { container } = render(<CandidateProfilePanel {...props} profile={{ ...props.profile, status }} cv={null} />);
+    expect(container.querySelector("[data-profile-status]")?.getAttribute("data-tone")).toBe(tone);
+    expect(within(screen.getByRole("region", { name: "Activación del perfil" })).getByText(label, { exact: true })).toBeTruthy();
+  });
   it("integra teléfono opcional en la tarjeta de datos sin formularios anidados y coloca CV antes del consentimiento", () => {
     const { container } = render(<CandidateProfilePanel {...props} phone="3415550100" />);
     const details = screen.getByRole("region", { name: "Datos laborales y personales" });
@@ -39,7 +104,11 @@ describe("presentación de consentimiento y activación", () => {
   it.each(["draft", "needs_update", "unavailable", "consent_withdrawn"])("ofrece activación primero para %s elegible", status => {
     const { container } = render(<CandidateProfilePanel {...props} profile={{ ...props.profile, status }} />);
     const activation = screen.getByRole("region", { name: "Activación del perfil" });
-    expect(container.firstElementChild?.firstElementChild).toBe(activation);
+    const photo = screen.getByRole("region", { name: "Foto de perfil" });
+    expect(container.firstElementChild?.firstElementChild).toBe(photo);
+    expect(within(photo).getByRole("button", { name: "Subir foto" })).toBeTruthy();
+    expect(within(photo).getByRole("button", { name: "Eliminar foto" })).toHaveProperty("disabled", true);
+    expect(photo.compareDocumentPosition(activation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const form = within(activation).getByRole("button", { name: "Activar perfil" }).closest("form")!;
     expect(form.querySelector('input[name="version"]')).toHaveProperty("value", "3");
     expect(screen.getAllByRole("button", { name: "Activar perfil" })).toHaveLength(1);

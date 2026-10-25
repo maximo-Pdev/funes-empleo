@@ -32,9 +32,9 @@ it.each([false, true])("returns account uploads to the selected profile for vali
  expect(response.headers.get("cache-control")).toBe("private, no-store");
  if (!valid) { expect(mocks.rpc).not.toHaveBeenCalled(); expect(mocks.upload).not.toHaveBeenCalled(); }
 });
-it.each([undefined, "https://evil.example.test", "//evil.example.test", "/account?section=ofertas", "/admin/candidates/other"])("preserves the legacy destination for unsupported returnTo=%s", async returnTo => {
+it.each([undefined, "https://evil.example.test", "//evil.example.test", "/account?section=ofertas", "/admin/candidates/other"])("uses the dashboard profile for unsupported returnTo=%s", async returnTo => {
  const response = await submit(returnTo);
- expect(new URL(response.headers.get("location")!).pathname).toBe("/candidato/perfil");
+ expect(response.headers.get("location")).toBe("https://portal.example.test/dashboard?section=perfil&cv=invalid");
 });
 it("preserves the administrative destination regardless of candidate return context", async () => {
  mocks.session.mockResolvedValue(session("admin"));
@@ -43,7 +43,7 @@ it("preserves the administrative destination regardless of candidate return cont
 });
 it.each(["/account?section=perfil&x=1", "/account?section=perfil#x", "/account?section=%70erfil", "/account/?section=perfil", "/account?section=perfil "])("rejects nonexact account return %s", async value => {
  const response = await submit(value);
- expect(response.headers.get("location")).toBe("https://portal.example.test/candidato/perfil?cv=invalid");
+ expect(response.headers.get("location")).toBe("https://portal.example.test/dashboard?section=perfil&cv=invalid");
  expect(mocks.rpc).not.toHaveBeenCalled(); expect(mocks.upload).not.toHaveBeenCalled();
 });
 it.each(["company", "candidate-suspended"])("denies ineligible session %s without writes", async mode => {
@@ -51,7 +51,7 @@ it.each(["company", "candidate-suspended"])("denies ineligible session %s withou
  if (mode === "candidate-suspended") value.account.status = "suspended";
  mocks.session.mockResolvedValue(value);
  const response = await submit("/account?section=perfil", true);
- expect(response.headers.get("location")).toBe("https://portal.example.test/login?cv=denied");
+ expect(response.headers.get("location")).toBe("https://portal.example.test/?cv=denied");
  expect(mocks.profile).not.toHaveBeenCalled(); expect(mocks.rpc).not.toHaveBeenCalled(); expect(mocks.upload).not.toHaveBeenCalled();
 });
 it.each(["foreign", "archived", "stale"])("preserves profile protection %s without writes", async mode => {
@@ -63,6 +63,27 @@ it.each(["foreign", "archived", "stale"])("preserves profile protection %s witho
 it("preserves authentication denial before parsing return context", async () => {
  mocks.session.mockResolvedValue(null);
  const response = await submit("/account?section=perfil");
- expect(response.headers.get("location")).toBe("https://portal.example.test/login?cv=denied");
+ expect(response.headers.get("location")).toBe("https://portal.example.test/?cv=denied");
  expect(mocks.profile).not.toHaveBeenCalled();
+});
+
+it.each([false, true])("returns dashboard uploads to the profile with feedback for valid=%s", async valid => {
+ const response = await submit("/dashboard?section=perfil", valid);
+ expect(response.status).toBe(303);
+ expect(response.headers.get("location")).toBe(`https://portal.example.test/dashboard?section=perfil&cv=${valid ? "ok" : "invalid"}`);
+ expect(response.headers.get("cache-control")).toBe("private, no-store");
+});
+
+it.each(["/dashboard?section=perfil&x=1", "/dashboard?section=perfil#x", "/dashboard?section=%70erfil"])("rejects nonexact dashboard return %s", async value => {
+ const response = await submit(value);
+ expect(response.headers.get("location")).toBe("https://portal.example.test/dashboard?section=perfil&cv=invalid");
+ expect(mocks.rpc).not.toHaveBeenCalled(); expect(mocks.upload).not.toHaveBeenCalled();
+});
+
+it("returns malformed administrative uploads to the candidate administration list", async () => {
+ mocks.session.mockResolvedValue(session("admin"));
+ const response = await POST(new Request("https://portal.example.test/api/candidate/cv", { method: "POST", body: new FormData() }));
+ expect(response.status).toBe(303);
+ expect(response.headers.get("location")).toBe("https://portal.example.test/admin/candidates?cv=invalid");
+ expect(mocks.rpc).not.toHaveBeenCalled(); expect(mocks.upload).not.toHaveBeenCalled();
 });

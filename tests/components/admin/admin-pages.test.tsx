@@ -1,5 +1,11 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import accountStyles from "@/app/(auth)/account/account.module.css";
+import homeStyles from "@/app/(public)/home.module.css";
+import formStyles from "@/components/forms/form.module.css";
+import adminStyles from "@/app/(admin)/_components/admin-workspace.module.css";
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), search: vi.fn(), categories: vi.fn(), candidate: vi.fn(), nominations: vi.fn(), assisted: vi.fn(), openings: vi.fn(), opening: vi.fn(), participations: vi.fn(), participation: vi.fn(), contacts: vi.fn(), imports: vi.fn(), preview: vi.fn(), metrics: vi.fn(), metricCategories: vi.fn(), from: vi.fn(), range: vi.fn(), company: vi.fn(), account: vi.fn(), companyOffers: vi.fn(), moderate: vi.fn() }));
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/candidates/search-service", () => ({ searchCandidates: mocks.search, listCandidateSearchCategories: mocks.categories, getAdminCandidate: mocks.candidate }));
@@ -19,7 +25,8 @@ vi.mock("@/features/candidates/claim-actions", () => ({ claimAssistedAction: vi.
 vi.mock("@/features/participations/evaluation-actions", () => ({ recordEvaluationAction: vi.fn(), adminParticipationAction: vi.fn(), confirmFeedbackAction: vi.fn() }));
 vi.mock("@/features/participations/nomination-actions", () => ({ createAdminNominationAction: vi.fn() }));
 vi.mock("@/features/imports/actions", () => ({ resolveImportAction: vi.fn() }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), notFound: () => { throw new Error("NOT_FOUND"); } }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/admin/empresas", useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), notFound: () => { throw new Error("NOT_FOUND"); } }));
+vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn() }));
 import Candidates from "@/app/(admin)/admin/candidates/page";
 import Candidate from "@/app/(admin)/admin/candidates/[candidateId]/page";
 import Assisted from "@/app/(admin)/admin/candidates/assisted/page";
@@ -51,7 +58,7 @@ const rows = [
 ];
 const preview = { id, status: "blocked", version: 1, total: 1, valid: 0, invalid: 1, duplicates: 0, rows: [{ id, number: 1, name: candidate.display_name, dni: "90000001", email: "persona@example.invalid", phone: "", locality: "Funes", categories: ["DEMO-A"], availability: "available", summary: "Experiencia ficticia", errors: ["UNKNOWN_CATEGORY"], matches: [], fields: [], decision: null }], hash: "ficticio", mapping: "demo-v1", retryOf: null, failure: null };
 beforeEach(() => {
- vi.clearAllMocks(); mocks.guard.mockResolvedValue({ client: { from: mocks.from } });
+ vi.clearAllMocks(); mocks.guard.mockResolvedValue({ user: { email: "admin@example.invalid" }, client: { from: mocks.from } });
  mocks.from.mockImplementation(() => { const query = { select: () => query, order: () => query, eq: () => query, range: mocks.range, maybeSingle: mocks.company, single: mocks.account, limit: mocks.companyOffers }; return query; });
  mocks.range.mockResolvedValue({ data: [company], count: 11, error: null }); mocks.company.mockResolvedValue({ data: company, error: null }); mocks.account.mockResolvedValue({ data: { id, status: "active", version: 1 }, error: null }); mocks.companyOffers.mockResolvedValue({ data: [opening], error: null });
  mocks.categories.mockResolvedValue(categories); mocks.search.mockResolvedValue({ total: 11, page: 1, pageCount: 2, items: [{ id, displayName: candidate.display_name, locality: "Funes", availability: "Disponible", categories, referralEligible: true }] });
@@ -118,8 +125,55 @@ it("mantiene DNI oculto y vinculación inhabilitada sin solicitud", async () => 
  render(await AssistedDetail({ params: Promise.resolve({ candidateId: id }) })); expect(screen.getByLabelText("DNI exhibido")).toHaveProperty("type", "password"); expect(screen.getByRole("button", { name: "Vincular conservando historial" })).toHaveProperty("disabled", true);
 });
 it("ofrece navegación completa y un único encabezado principal", async () => {
- render(await Companies({ searchParams: Promise.resolve({}) })); const nav = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }); expect(within(nav).getByRole("link", { name: "Empresas" }).getAttribute("aria-current")).toBe("page"); expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+ render(await Companies({ searchParams: Promise.resolve({}) })); const nav = screen.getByRole("navigation", { name: "Secciones de mi cuenta" }); expect(within(nav).getByRole("link", { name: "Empresas" }).getAttribute("aria-current")).toBe("page"); expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
 });
+it.each([
+ ["candidates", () => Candidates({ searchParams: Promise.resolve({}) }), "/admin/candidates"],
+ ["candidate", () => Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }), "/admin/candidates"],
+ ["assisted", () => Assisted(), "/admin/candidates"],
+ ["assisted-detail", () => AssistedDetail({ params: Promise.resolve({ candidateId: id }) }), "/admin/candidates"],
+ ["companies", () => Companies({ searchParams: Promise.resolve({}) }), "/admin/empresas"],
+ ["company", () => Company({ params: Promise.resolve({ companyId: id }) }), "/admin/empresas"],
+ ["openings", () => Openings({ searchParams: Promise.resolve({}) }), "/admin/openings"],
+ ["opening", () => Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }), "/admin/openings"],
+ ["participations", () => Participations({ searchParams: Promise.resolve({}) }), "/admin/participations"],
+ ["participation", () => Participation({ params: Promise.resolve({ participationId: id }) }), "/admin/participations"],
+ ["imports", () => Imports(), "/admin/imports"],
+ ["import-new", () => ImportNew({ searchParams: Promise.resolve({}) }), "/admin/imports"],
+ ["import-preview", () => ImportPreviewPage({ params: Promise.resolve({ batchId: id }) }), "/admin/imports"],
+ ["metrics", () => Metrics({ searchParams: Promise.resolve(metricFilters) }), "/admin/metrics"],
+] as const)("renders %s in the shared administrator workspace", async (section, page, active) => {
+ const view = render(await page());
+ const sidebar = screen.getByRole("complementary", { name: "Panel de administración" });
+ const main = screen.getByRole("main");
+ expect(screen.getAllByRole("main")).toHaveLength(1);
+ expect(main.querySelector('[data-slot="admin-canvas"]')).toBeTruthy();
+ expect(main.querySelectorAll("h1")).toHaveLength(1);
+ expect(within(sidebar).getByText("Administración")).toBeTruthy();
+ expect(within(sidebar).getByTitle("admin@example.invalid")).toBeTruthy();
+ const nav = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin/candidates", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/imports", "/admin/metrics", "/account"]);
+ expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
+ expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
+ expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
+ expect(document.querySelector("header[data-home]")).toBeTruthy();
+ expect(within(main).getByText(/Información de uso interno/)).toBeTruthy();
+ saveFixture(section, view.container.innerHTML);
+});
+
+function saveFixture(section: string, html: string) {
+ const output = process.env.ADMIN_WORKSPACE_FIXTURE_DIR;
+ if (!output) return;
+ const modules = [
+  ["src/app/(auth)/account/account.module.css", accountStyles],
+  ["src/app/(public)/home.module.css", homeStyles],
+  ["src/components/forms/form.module.css", formStyles],
+  ["src/app/(admin)/_components/admin-workspace.module.css", adminStyles],
+ ] as const;
+ const css = modules.map(([file, names]) => readFileSync(file, "utf8").replace(/\.([a-zA-Z_][\w-]*)/g, (selector, name: string) => names[name] ? `.${names[name]}` : selector)).join("\n");
+ mkdirSync(output, { recursive: true });
+ writeFileSync(path.join(output, `${section}.json`), JSON.stringify({ section, html, css }));
+}
 it.each([
  ["alta presencial", () => Assisted()],
  ["historial de importaciones", () => Imports()],

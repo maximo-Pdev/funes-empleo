@@ -25,10 +25,10 @@ function fixtureId(kind: string, number: number) {
 
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
   assertLocalTargets();
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Iniciar sesión" }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 

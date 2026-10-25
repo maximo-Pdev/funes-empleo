@@ -34,7 +34,7 @@ try {
       checks.push({ width, mode, keyboardHome: "PASS" });
     }
   }
-  await page.goto(`${baseURL}/login`, { waitUntil: "networkidle" });
+  await page.goto(`${baseURL}/recover`, { waitUntil: "networkidle" });
   await page.keyboard.press("Tab");
   assert.equal(await page.locator('body > a[href="#contenido"]').evaluate(el => el === document.activeElement), true, "Other routes preserve their existing keyboard skip link");
   console.log(JSON.stringify({ status: "PASS", checks, standaloneSkipLink: "preserved" }));

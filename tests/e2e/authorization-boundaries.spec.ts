@@ -31,7 +31,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
       const upload = await page.request.post("/api/candidate/cv", { multipart: { candidateId: fixtureId("profile", n), version: "1",
         cv: { name: "cv-ficticio.pdf", mimeType: "application/pdf", buffer: readFileSync("tests/fixtures/cv-fictitious.pdf") } }, maxRedirects: 0 });
       expect(upload.status()).toBe(303);
-      expect(upload.headers().location).toContain("/login?cv=denied");
+      expect(upload.headers().location).toContain("/?cv=denied");
       const cv = await page.request.get(`/api/cv/${fixtureId("cv", 1)}`);
       expect([401,403,404]).toContain(cv.status());
       expect(cv.headers()["cache-control"]).toContain("no-store");
@@ -123,13 +123,13 @@ test("sesión administrativa existente no sobrevive a suspensión en base", asyn
 });
 test("Server Action en vuelo: suspensión antes de ejecutar impide escritura", async ({ page }) => {
   await loginFixture(page, "candidate", 400);
-  await page.goto("/candidato/perfil");
+  await page.goto("/dashboard?section=perfil");
   await expect(page.getByRole("button", { name: "Guardar correcciones", exact: true })).toBeVisible();
   const profile = fixtureId("profile", 400);
   const actor = fixtureId("candidate", 400);
   const before = runLocalMaintenanceSql(`select version from public.candidate_profiles where id='${profile}'`);
   let intercepted = false;
-  await page.route("**/candidato/perfil", async (route) => {
+  await page.route(url => url.pathname === "/dashboard" && url.searchParams.get("section") === "perfil", async (route) => {
     if (route.request().method() === "POST" && route.request().headers()["next-action"]) {
       intercepted = true;
       runLocalMaintenanceSql(`update public.accounts set status='suspended', suspended_reason='Prueba ficticia en vuelo', suspended_at=clock_timestamp(), suspended_by=(select id from public.accounts where auth_user_id='${fixtureId("admin",1)}') where auth_user_id='${actor}'`);

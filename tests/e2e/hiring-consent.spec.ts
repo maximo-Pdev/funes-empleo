@@ -8,10 +8,10 @@ test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => assertLocalTargets());
 
 async function signIn(page: Page, identity: string) {
-  await page.goto("/login");
+  await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(`${identity}@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
-  await page.getByRole("button", { name: "Iniciar sesión", exact: true }).click();
+  await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
 }
 
