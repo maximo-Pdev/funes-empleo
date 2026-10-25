@@ -1591,10 +1591,12 @@ export type Database = {
     }
     Functions: {
       authorize_candidate_photo_mutation: { Args: { p_candidate: string; p_expected_version: number }; Returns: string }
-      ingest_candidate_photo: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string; p_expected_version: number; p_command: string; p_photo: string; p_size: number; p_sha256: string }; Returns: number }
       candidate_photo_cleanup: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string }; Returns: { id: string; storage_path: string }[] }
-      complete_candidate_photo_cleanup: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string; p_photo: string }; Returns: undefined }
       candidate_photo_cleanup_pending: { Args: { p_candidate: string }; Returns: boolean }
+      complete_candidate_photo_cleanup: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string; p_photo: string }; Returns: undefined }
+      get_record_references: { Args: { p_kind: string; p_ids: string[] }; Returns: Json }
+      ingest_candidate_photo: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string; p_expected_version: number; p_command: string; p_photo: string; p_size: number; p_sha256: string }; Returns: number }
+      resolve_record_reference: { Args: { p_kind: string; p_reference: string }; Returns: string | null }
       metrics_history_start: { Args: Record<PropertyKey, never>; Returns: string | null }
       admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }
       export_admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }
@@ -1635,6 +1637,20 @@ export type Database = {
           p_fields?: string[]
           p_reason?: string | null
           p_review?: string | null
+        }
+        Returns: Json
+      }
+      create_active_assisted_candidate: {
+        Args: {
+          p_data: Json
+          p_confirmed: boolean
+          p_policy_version: string
+          p_policy_hash: string
+          p_expected_version?: number | null
+          p_review?: string | null
+          p_decision?: string | null
+          p_reason?: string | null
+          p_fields?: string[]
         }
         Returns: Json
       }

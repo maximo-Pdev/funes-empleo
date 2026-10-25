@@ -1,4 +1,5 @@
 "use client";
+import { reasonLabel } from "@/domain/presentation/labels";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useState } from "react";
@@ -8,8 +9,8 @@ import { IMPORT_FIELDS, IMPORT_MESSAGES } from "../mapping";
 import { resolveImportAction } from "../actions";
 import { Button } from "@/components/ui/button";
 const labels = { name: "Nombre", dni: "DNI", email: "Correo", phone: "Teléfono", locality: "Localidad",
-  categories: "Categorías (DEMO-A|DEMO-B)", summary: "Experiencia", availability: "Disponibilidad (available/unavailable)", reference: "Referencia ficticia" };
-export function ImportBatch({ initial }: { initial: ImportPreview }) {
+  categories: "Categorías (DEMO-A|DEMO-B)", summary: "Experiencia", availability: "Disponibilidad", reference: "Referencia ficticia" };
+export function ImportBatch({ initial, reference, retryReference }: { initial: ImportPreview; reference: string; retryReference?: string }) {
   const [preview, setPreview] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -24,8 +25,8 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
       {" "}{preview.rows.filter(r => r.decision === "use_or_update_existing").length} usos o actualizaciones expresas,
       {" "}{preview.rows.filter(r => r.decision === "reject").length} rechazos.</p>
     {error && <p role="alert">{error} Recargá la página antes de reintentar.</p>}
-    {preview.status === "failed" && <><p>Código seguro: {preview.failure}</p><Link href={`/admin/imports/new?retry=${preview.id}`}>Cargar archivo corregido como nuevo intento</Link></>}
-    {preview.retryOf && <Link href={`/admin/imports/${preview.retryOf}`}>Ver intento anterior</Link>}
+    {preview.status === "failed" && <><p>Motivo: {reasonLabel(preview.failure ?? "")}</p><Link href={`/admin/imports/new?retry=${reference}`}>Cargar archivo corregido como nuevo intento</Link></>}
+    {retryReference && <Link href={`/admin/imports/${retryReference}`}>Ver intento anterior</Link>}
     <nav aria-label="Páginas de filas"><Button variant="secondary" disabled={!page || busy} onClick={() => setPage(page - 1)}>Anterior</Button>{" "}
       <span>Página {page + 1} de {Math.max(1, Math.ceil(preview.rows.length / 50))}</span>{" "}
       <Button variant="secondary" disabled={(page + 1) * 50 >= preview.rows.length || busy} onClick={() => setPage(page + 1)}>Siguiente</Button></nav>
@@ -54,11 +55,11 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
         }}>
           <Field>Decisión<select name="decision" required defaultValue="correct_and_create" onChange={event => setDecisions(previous => ({ ...previous, [row.id]: event.target.value }))}><option value="correct_and_create">Corregir y crear separado</option><option value="use_or_update_existing">Usar o actualizar existente</option><option value="reject">Rechazar fila</option></select></Field>
           <Field>Motivo interno<textarea name="reason" required maxLength={1000} /></Field>
-          <Field>Perfil coincidente<select name="candidate" required={decisions[row.id] === "use_or_update_existing"}><option value="">Seleccioná si usás existente</option>{row.matches.map(m => <option key={m.id} value={m.id}>{m.name} · {m.id}</option>)}</select></Field>
+          <Field>Perfil coincidente<select name="candidate" required={decisions[row.id] === "use_or_update_existing"}><option value="">Seleccioná si usás existente</option>{row.matches.map(m => <option key={m.id} value={m.id}>{m.name} (coincidencia {row.matches.indexOf(m) + 1})</option>)}</select></Field>
           <fieldset><legend>Actualizar existente: marcar solo los campos autorizados del CSV</legend>{IMPORT_FIELDS.map(field => <Field className="block" key={field}><input type="checkbox" name="fields" value={field} /> {labels[field]}</Field>)}</fieldset>
-          <fieldset disabled={Boolean(decisions[row.id] && decisions[row.id] !== "correct_and_create")}><legend>Corregir y crear: volver a ingresar la fila completa con datos ficticios</legend>{Object.entries(labels).map(([key, label]) => <Field className="block" key={key}>{label}<input name={key}
-            required={["name", "dni", "availability"].includes(key)} type={key === "email" ? "email" : key === "phone" ? "tel" : "text"}
-            defaultValue={key === "availability" ? "available" : ""} /></Field>)}</fieldset>
+          <fieldset disabled={Boolean(decisions[row.id] && decisions[row.id] !== "correct_and_create")}><legend>Corregir y crear: volver a ingresar la fila completa con datos ficticios</legend>{Object.entries(labels).map(([key, label]) => <Field className="block" key={key}>{label}{key === "availability"
+            ? <select name={key} required defaultValue="available"><option value="available">Disponible</option><option value="unavailable">No disponible</option></select>
+            : <input name={key} required={["name", "dni"].includes(key)} type={key === "email" ? "email" : key === "phone" ? "tel" : "text"} defaultValue="" />}</Field>)}</fieldset>
           <Button type="submit" disabled={busy}>Guardar decisión y revalidar</Button>
         </Form>
       </details>}
@@ -66,7 +67,7 @@ export function ImportBatch({ initial }: { initial: ImportPreview }) {
     {editable && <Button disabled={busy || preview.status !== "preview_ready" || !preview.valid} onClick={async () => {
       setBusy(true); setError("");
       try {
-        const response = await fetch(`/api/admin/imports/${preview.id}/confirm`, { method: "POST", headers: { "Content-Type": "application/json" },
+        const response = await fetch(`/api/admin/imports/${reference}/confirm`, { method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ version: preview.version, hash: preview.hash, mapping: preview.mapping }) });
         const result = await response.json();
         if (!response.ok) setError(result.error); else setPreview(result.preview);

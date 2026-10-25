@@ -266,3 +266,8 @@ it("enfoca el error y conserva la acción de reintentar", () => {
  fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
  expect(reset).toHaveBeenCalledOnce();
 });
+
+vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
+vi.mock("@/lib/records/page-references", async () => (await import("../../fixtures/record-references")).pageReferenceMocks);
+vi.mock("@/lib/records/reference-url", async () => ({ referenceUrl: async (href: string) => (await import("../../fixtures/record-references")).fixtureHref(href) }));
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

@@ -24,8 +24,8 @@ describe("Home access panel", () => {
     ["Postulante", "Tu próximo paso laboral empieza acá.", [
       "Creá tu cuenta y prepará tu perfil para postularte a las ofertas del portal.",
       "Completá tus datos de acceso en este formulario.",
-      "Seguí el enlace que recibirás por email.",
-      "Después de ingresar, agregá tu experiencia, intereses y CV desde tu panel.",
+      "Seguí el enlace que recibirás por correo electrónico.",
+      "Después de ingresar, agregá tu experiencia, categorías laborales y CV desde tu panel.",
       "La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.",
     ]],
     ["Empresa", "Encontrá talento para tu empresa.", [

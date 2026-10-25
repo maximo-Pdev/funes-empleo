@@ -10,19 +10,27 @@ const initial: ImportPreview = { id: "ee500000-0000-4000-8000-000000000001", ver
     phone: "", matches: [], fields: [], locality: "Funes", summary: "Prueba", categories: [], availability: "available" }] };
 describe("revisión de importación", () => {
   it("impide confirmar inválidos y muestra error accionable sin DNI completo", () => {
-    render(<ImportBatch initial={initial} />);
+    render(<ImportBatch reference="imp-111111111111111111111111" initial={initial} />);
     expect(screen.getByRole<HTMLButtonElement>("button", { name: "Confirmar importación" }).disabled).toBe(true);
     expect(screen.getByText(/Revisá nombre/)).toBeTruthy();
     expect(screen.getByText(/DNI \*\*\*001/)).toBeTruthy();
   });
+  it("identifica coincidencias por nombre y orden, sin mostrar el UUID interno", () => {
+    const candidateId = "ee500000-0000-4000-8000-000000000003";
+    render(<ImportBatch reference="imp-111111111111111111111111" initial={{ ...initial,
+      rows: [{ ...initial.rows[0]!, matches: [{ id: candidateId, name: "Persona coincidente ficticia", version: 1 }] }] }} />);
+    const option = screen.getByText("Persona coincidente ficticia (coincidencia 1)");
+    expect(option.getAttribute("value")).toBe(candidateId);
+    expect(document.body.textContent).not.toContain(candidateId);
+  });
   it("fallido ofrece nuevo intento y no confirmación", () => {
-    render(<ImportBatch initial={{ ...initial, status: "failed", failure: "IMPORT_FAILED" }} />);
+    render(<ImportBatch reference="imp-111111111111111111111111" initial={{ ...initial, status: "failed", failure: "IMPORT_FAILED" }} />);
     expect(screen.queryByRole("button", { name: "Confirmar importación" })).toBeNull();
-    expect(screen.getByRole<HTMLAnchorElement>("link", { name: /Cargar archivo corregido/ }).href).toContain(`retry=${initial.id}`);
+    expect(screen.getByRole<HTMLAnchorElement>("link", { name: /Cargar archivo corregido/ }).href).toContain("retry=imp-111111111111111111111111");
   });
   it("error de confirmación es visible y exige recargar", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, json: async () => ({ error: "El lote cambió." }) }));
-    render(<ImportBatch initial={{ ...initial, status: "preview_ready", valid: 1, invalid: 0 }} />);
+    render(<ImportBatch reference="imp-111111111111111111111111" initial={{ ...initial, status: "preview_ready", valid: 1, invalid: 0 }} />);
     fireEvent.click(screen.getByRole("button", { name: "Confirmar importación" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Recargá"));
     vi.unstubAllGlobals();

@@ -3,7 +3,8 @@ import { z } from "zod";
 import { companySession, getCompanyWorkspace } from "@/features/companies/service";
 import { AppError } from "@/lib/errors/public-error";
 import { workflowRpcError } from "@/lib/errors/workflow-rpc";
-import { openingDraftSchema, openingSubmitSchema } from "@/validation/opening";
+import { openingDraftSchema, openingSubmitSchema, openingCancelSchema } from "@/validation/opening";
+import { openingStatusSchema } from "@/domain/states";
 import { databaseUuidSchema } from "@/validation/common";
 
 const offerShape = z.object({
@@ -49,7 +50,7 @@ export async function saveCompanyOpening(input: unknown) {
     p_salary: v.salary, p_benefits: v.benefits, p_categories: v.categories,
   });
   if (result.error) throw workflowRpcError(result.error.message);
-  return z.object({ id: z.string(), version: z.number() }).parse(result.data);
+  return z.object({ id: z.string(), version: z.number(), status: openingStatusSchema.optional() }).parse(result.data);
 }
 
 export async function submitCompanyOpening(input: unknown) {
@@ -59,6 +60,18 @@ export async function submitCompanyOpening(input: unknown) {
   const result = await session.client.rpc("transition_opening", {
     p_opening: parsed.data.id, p_expected_version: parsed.data.version,
     p_command: "submit", p_reason: null, p_company_message: null,
+  });
+  if (result.error) throw workflowRpcError(result.error.message);
+  return result.data;
+}
+
+export async function cancelCompanyOpening(input: unknown) {
+  const parsed = openingCancelSchema.safeParse(input);
+  if (!parsed.success) throw new AppError("VALIDATION_ERROR");
+  const session = await companySession();
+  const result = await session.client.rpc("transition_opening", {
+    p_opening: parsed.data.id, p_expected_version: parsed.data.version,
+    p_command: "cancel", p_reason: parsed.data.reason, p_company_message: null,
   });
   if (result.error) throw workflowRpcError(result.error.message);
   return result.data;

@@ -11,12 +11,14 @@ import styles from "@/app/(auth)/account/account.module.css";
 export type DashboardLink = { href: string; label: string; icon: LucideIcon; current: boolean };
 
 /** Shared account chrome; role-specific data and content stay with the caller. */
-export function DashboardShell({ panel, links, name, email, mainLabel, canvasSlot, children }: {
+export function DashboardShell({ panel, links, name, email, mainLabel, navigationLabel = "Secciones de mi cuenta", canvasSlot, children }: {
   panel: { href: string; label: string };
   links: readonly DashboardLink[];
   name: string;
   email?: string;
   mainLabel?: string;
+  /** Accessible name of the section navigation; role-specific callers supply their own. */
+  navigationLabel?: string;
   canvasSlot: string;
   children: ReactNode;
 }) {
@@ -25,7 +27,7 @@ export function DashboardShell({ panel, links, name, email, mainLabel, canvasSlo
     <div className={styles.workspace}>
       <Sidebar aria-label={panel.label} className={styles.sidebar}>
         <SidebarContent>
-          <nav aria-label="Secciones de mi cuenta" className={styles.navigation}>
+          <nav aria-label={navigationLabel} className={styles.navigation}>
             <SidebarMenu className={styles.menu}>
               {links.map(({ href, label, icon: Icon, current }) => <SidebarMenuItem key={href}>
                 <Link href={href} aria-current={current ? "page" : undefined} className={styles.menuLink}>

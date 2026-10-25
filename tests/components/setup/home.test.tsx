@@ -194,7 +194,7 @@ it("moves the municipal identity into the navbar without changing its official-s
   expect(screen.getByRole("region", { name: "Acceso al portal" }).id).toBe("acceso");
 });
 
-it("preserves a unique focusable skip-link target on the redesigned home", async () => {
+it("preserves a unique focusable target for the existing Inicio navigation", async () => {
   const { container } = render(await HomePage());
   const main = screen.getByRole("main");
   expect(main.id).toBe("contenido");

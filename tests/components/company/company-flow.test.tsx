@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { companyRegistrationSchema, companyProfileSchema } from "@/validation/company";
 import { openingDraftSchema } from "@/validation/opening";
@@ -8,7 +8,7 @@ vi.mock("@/features/companies/company-actions", () => ({
 }));
 vi.mock("@/features/companies/admin-actions", () => ({ adminCompanyAction: vi.fn() }));
 vi.mock("@/features/openings/company-actions", () => ({
-  saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn(),
+  saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn(), cancelCompanyOpeningAction: vi.fn(),
 }));
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
 import { CompanyProfileForm } from "@/features/companies/components/company-profile-form";
@@ -21,6 +21,23 @@ const categoryB = "0a000000-0000-4000-8000-000000000002";
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
 
 describe("autogestión de empresa", () => {
+  it("traduce estados y códigos legados sin reescribir los datos enviados", () => {
+    const { container } = render(<CompanyOpeningForm categories={[]} opening={{ id: categoryA, title: "Oferta ficticia",
+      tasks: "Tareas", requirements: "Requisitos", vacancies: 1, location: "Funes", modality: "onsite",
+      schedule: "Jornada completa", contract_type: "fixed_term", closingDate: "2027-10-01", salary: null,
+      benefits: null, status: "draft", version: 1, createdAt: "2026-10-22", categories: [], history: [] }} />);
+    expect(screen.getAllByRole("status").some(status => status.textContent?.includes("Borrador"))).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Editar oferta" }));
+    expect(screen.getByLabelText("Modalidad")).toHaveProperty("value", "Presencial");
+    expect(screen.getByLabelText("Tipo de contratación")).toHaveProperty("value", "Plazo fijo");
+    const form = container.querySelector("form")!;
+    expect(new FormData(form).get("modality")).toBe("onsite");
+    expect(new FormData(form).get("contractType")).toBe("fixed_term");
+    fireEvent.change(screen.getByLabelText("Modalidad"), { target: { value: "Remoto a convenir" } });
+    expect(new FormData(form).get("modality")).toBe("Remoto a convenir");
+    expect(new FormData(form).get("contractType")).toBe("fixed_term");
+  });
+
   it("exige identificación, responsable, contacto, actividad y localidad sin pedir documentos", () => {
     const valid = { legalName: "Empresa ficticia", cuit: "30-99999999-7", responsibleName: "Responsable ficticio",
       email: "empresa@example.invalid", phone: "", activity: "Servicios", locality: "Funes" };

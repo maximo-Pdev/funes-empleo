@@ -1,5 +1,15 @@
 # Contratos de comandos y estados
 
+EXTRA062,2026-10-24: empresa propia activa puede editar published y reenviar a
+pending_review en una transacción, con completitud/versión y auditoría de edición/
+envío. Published deja de ser pública; conserva slug y casos/permisos, sin nuevas
+derivaciones hasta publicación. Submit sigue permitido desde draft/changes_requested.
+Empresa también puede cancel con motivo en estados no finales (draft,pending_review,
+changes_requested,published,paused,suspended), siguiendo los mismos cierres/revocación
+y conservación de finales que admin. No puede aprobar/publicar/moderar/restaurar.
+Hired sigue retirando consentimiento global; proyección empresarial de solo nombre
+para su propia contratación confirmada es excepción explícita, sin reabrir permisos.
+
 Cada comando es atómico: valida actor, versión, estado y precondiciones; modifica el agregado e
 inserta el evento de historial dentro de la misma transacción.
 
@@ -10,6 +20,25 @@ perfil candidato, oferta, participación, permiso de derivación, consentimiento
 Toda transición usa la versión esperada, registra actor/fecha/estado anterior/nuevo y exige motivo
 solo cuando la fila lo indica. Los errores y conflictos se resuelven por la sección final de este
 contrato.
+
+## Alta presencial activa — EXTRA056,2026-10-24
+
+EXTRA057: única selección categories (máximo40); no se crean relaciones interest.
+El campo legado interests puede omitirse o ser [] en payloads antiguos; cualquier
+otro valor y confirmedFields que incluya interests se rechazan explícitamente.
+Consolidación de datos anteriores no ejecuta transiciones ni renueva consentimiento.
+
+create_active_assisted_candidate(p_data jsonb,p_confirmed boolean,p_policy_version
+text,p_policy_hash text,p_expected_version integer default null,p_review uuid
+default null,p_decision text default null,p_reason text default null,p_fields
+text[] default '{}') devuelve el resultado JSON existente saved/duplicates/rejected.
+Solo admin activo. Nuevo perfil: datos de activación completos/disponible y
+confirmación afirmativa de aceptación de la persona con política válida; guardar,
+evento accepted y activate en una transacción, con auditoría/actor/fecha. Falta
+de confirmación/política rechaza sin escritura. Duplicados/rechazo no consentir;
+use_or_update_existing conserva estados/consentimientos. No altera el RPC legado
+de importación/mantenimiento ni contratación normal/tardía (EXTRA035). Error en
+cualquier escritura o auditoría revierte el agregado completo.
 
 ## Cuenta
 

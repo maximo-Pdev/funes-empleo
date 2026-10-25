@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { activateProfileAction, savePhoneAction, saveProfileAction } from "../profile-actions";
 import { changeConsentAction } from "../consent-actions";
 import { candidateProfileStatusLabels } from "../candidate-profile-status";
+import { displayLabel } from "@/domain/presentation/labels";
 import { CvUploadForm } from "./cv-upload-form";
 import { CandidatePhotoForm } from "./candidate-photo-form";
 import styles from "./profile-panel.module.css";
@@ -27,12 +28,13 @@ function ActionMessage({ state }: { state: State }) {
 }
 
 export function CandidateProfilePanel({ profile, dni, address, phone, categories, selectedCategories,
-  consent, cv, photo, photoCleanupPending, photoUnavailable, policy, cvMessage, cvReturnTo }: {
+  consent, cv, cvReference, photo, photoCleanupPending, photoUnavailable, policy, cvMessage, cvReturnTo }: {
   profile: Profile; dni: string; address: string | null; phone: string | null;
   categories: Category[]; selectedCategories: string[];
   consent: { status: string; policy_version: string; recorded_at: string } | null;
   cv: { id: string; original_name_safe: string; byte_size: number } | null;
-  policy: Policy; cvMessage?: string; cvReturnTo?: string; photo?: { id: string } | null; photoCleanupPending?: boolean; photoUnavailable?: boolean;
+  cvReference?: string; policy: Policy; cvMessage?: string; cvReturnTo?: string;
+  photo?: { id: string } | null; photoCleanupPending?: boolean; photoUnavailable?: boolean;
 }) {
   const router = useRouter();
   const [saved, saveAction, saving] = useActionState(saveProfileAction, { message: "", success: false });
@@ -57,7 +59,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     <CandidatePhotoForm candidateId={profile.id} version={profile.version} photo={photo} name={profile.display_name} cleanupPending={photoCleanupPending} unavailable={photoUnavailable} />
     <section className={styles.section} aria-label="Activación del perfil">
       <p role="status" className={styles.status}>
-        <span data-profile-status data-tone={statusTone} className={styles.statusDot} aria-hidden="true" />{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{candidateProfileStatusLabels[profile.status] ?? "En revisión"}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
+        <span data-profile-status data-tone={statusTone} className={styles.statusDot} aria-hidden="true" />{profile.status === "active" ? <strong>Perfil activo</strong> : <>Estado del perfil: <strong>{displayLabel(candidateProfileStatusLabels, profile.status, "En revisión")}</strong></>}. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
       {canActivate && <Form action={activateAction} result={activation} className="grid gap-3" aria-busy={activating}>
         <h2 className="text-xl font-semibold">Activar perfil</h2><p>Tu perfil cumple los requisitos guardados. Activá tu perfil para postularte y ser considerado por la Oficina de Empleo.</p>
         <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />
@@ -93,12 +95,12 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     </section>
     <section className={styles.section} aria-label="CV PDF">
       <h2 className="text-xl font-semibold">CV PDF</h2>
-      {cv ? <Attachment className={styles.attachment}>
+      {cv && cvReference ? <Attachment className={styles.attachment}>
         <AttachmentMedia><FileText aria-hidden="true" /></AttachmentMedia>
         <AttachmentContent><AttachmentTitle title={cv.original_name_safe}>{cv.original_name_safe}</AttachmentTitle>
           <AttachmentDescription>CV vigente · PDF · {new Intl.NumberFormat("es-AR").format(cv.byte_size)} bytes</AttachmentDescription>
         </AttachmentContent>
-        <AttachmentActions><a className={styles.download} href={`/api/cv/${cv.id}`}>Descargar mi CV</a></AttachmentActions>
+        <AttachmentActions><a className={styles.download} href={`/api/cv/${cvReference}`}>Descargar mi CV</a></AttachmentActions>
       </Attachment> : <Empty className={styles.empty}><EmptyHeader><EmptyMedia variant="icon"><FileText aria-hidden="true" /></EmptyMedia>
         <EmptyTitle>Todavía no hay un CV vigente.</EmptyTitle><EmptyDescription>Cargá un PDF válido para completar este requisito del perfil.</EmptyDescription>
       </EmptyHeader></Empty>}
@@ -110,6 +112,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       <p>Al aceptar, autorizás a la Oficina de Empleo a registrar y usar tus datos para acompañar tu búsqueda laboral y gestionar futuras derivaciones. Es un consentimiento general, no una aceptación por cada oferta.</p>
       <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
       <p>Si la Oficina confirma una contratación, incluso tardía, en una de tus participaciones, tu consentimiento global vigente se retira automáticamente y se revocan los accesos de todas las empresas que dependan de él. No se cambian tus otras participaciones ni sus resultados y se conserva el historial.</p>
+      <p>La empresa que te contrató podrá seguir viendo únicamente tu nombre en el registro de esa contratación. Esto no le devuelve acceso a tu perfil, contactos ni CV.</p>
       <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
       <p>También podés retirarlo manualmente: se bloquean nuevas derivaciones, se revocan los accesos empresariales y se cierran como retiradas tus participaciones abiertas. Los resultados finales y el historial se conservan.</p>
       <details className={styles.group}>

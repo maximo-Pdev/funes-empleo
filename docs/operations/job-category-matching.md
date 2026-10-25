@@ -15,7 +15,8 @@ ya permiten selección múltiple. Las categorías anteriores siguen disponibles:
 no se borran ni se inventan equivalencias o asociaciones al catálogo nuevo.
 
 Desde el detalle administrativo de oferta se consultan candidatos que comparten
-al menos un rubro activo, sea ocupación o interés. Deben cumplir las condiciones
+al menos una categoría laboral activa. EXTRA057 consolidó los tipos previos sin
+alterar el conjunto efectivo de rubros. Deben cumplir las condiciones
 actuales de aptitud: perfil activo/disponible/vigente, consentimiento aceptado,
 cuenta activa si está vinculada y CV válido. Incluye perfiles asistidos sin cuenta.
 No hay ranking ni cambio de participación al consultar. La ampliación excluye

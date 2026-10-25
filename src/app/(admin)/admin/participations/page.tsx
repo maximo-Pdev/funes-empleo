@@ -1,6 +1,8 @@
+import { referenceFilters } from "@/lib/records/page-references";
+import { recordReference } from "@/lib/records/references";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { PARTICIPATION_STATUSES, participationStatusSchema } from "@/domain/states";
@@ -14,7 +16,8 @@ export default async function AdminParticipationsPage({ searchParams }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { user } = await requireActiveAccount(["admin"]);
-  const raw = await searchParams;
+  const original = await searchParams;
+  const raw = await referenceFilters("/admin/participations", original, { openingId: "opening", candidateId: "candidate" });
   const openingId = typeof raw.openingId === "string" ? raw.openingId : undefined;
   const candidateId = typeof raw.candidateId === "string" ? raw.candidateId : undefined;
   const status = raw.status ? participationStatusSchema.safeParse(raw.status) : null;
@@ -27,6 +30,8 @@ export default async function AdminParticipationsPage({ searchParams }: {
     openingId, candidateId,
     status: status?.success ? status.data : undefined, page,
   }) : null;
+  const openingReference = !invalid && openingId ? await recordReference("opening", openingId) : undefined;
+  const candidateReference = !invalid && candidateId ? await recordReference("candidate", candidateId) : undefined;
   const pageHref = (target: number) => `/admin/participations?${new URLSearchParams({
     ...(openingId ? { openingId } : {}),
     ...(candidateId ? { candidateId } : {}),
@@ -36,8 +41,8 @@ export default async function AdminParticipationsPage({ searchParams }: {
   return <AdminShell email={user?.email} active="/admin/participations" title="Participaciones" description="La Oficina evalúa cada caso y conserva su historial."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
     <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
-      {openingId && <input type="hidden" name="openingId" value={openingId} />}
-      {candidateId && <input type="hidden" name="candidateId" value={candidateId} />}
+      {openingReference && <input type="hidden" name="openingId" value={openingReference} />}
+      {candidateReference && <input type="hidden" name="candidateId" value={candidateReference} />}
       <div className="space-y-1"><Field className="block font-semibold" label={<>Estado</>}><select id="participation-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">
           <option value="">Todos</option>
           {PARTICIPATION_STATUSES.map((value) => <option key={value} value={value}>{participationStatusLabel(value)}</option>)}

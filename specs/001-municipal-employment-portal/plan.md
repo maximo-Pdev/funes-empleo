@@ -1,12 +1,146 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+**Rama**: `spec/municipal-employment-portal-mvp` | **Fecha**: 2026-09-20 | **Especificación**: [spec.md](./spec.md)
+
+**Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
+
 ## Authorized candidate-photo design — EXTRA-059
 
 Use an additive private photo metadata/bucket migration, session-authorized read endpoint, tightly scoped trusted server image ingestion, profile-version locks and durable physical-cleanup retries. JPEG/PNG up to 5 MiB and 16 megapixels normalize to metadata-free WebP <=1024px with explicit sharp dependency. Official shadcn Base-nova Avatar/Attachment/Empty use Base UI/CVA while preserving municipal styles and existing Button contracts. The narrow service-role photo exception and deployment/recovery/verification requirements are in `../../docs/implementation/candidate-profile-photos.md`; review it alongside this plan before rollout. No current database reset or remote migration is permitted.
 
-**Rama**: `spec/municipal-employment-portal-mvp` | **Fecha**: 2026-09-20 | **Especificación**: [spec.md](./spec.md)
+## Atención presencial integrada,2026-10-24 (EXTRA059)
 
-**Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
+### Incremento EXTRA062 —2026-10-24
+
+Migración conserva firmas/grants de tres RPC. company_referral agrega únicamente
+hiredCandidate/displayName/outcome para propia contratación confirmada, validando
+empresa/cuenta activas y pertenencia; permisos completos/CV intactos. save_company_opening
+admite published y llama transition_opening(submit) tras guardar dentro de la misma
+transacción. transition_opening permite submit/cancel a propia empresa activa, sin
+moderar. Edición/envío auditan sus versiones; cancelación reutiliza cierre/revocación
+y preservación de finales. Recuperación reaplica definiciones anteriores sin borrar datos.
+Listados admin excluyen draft antes de count/range; rol y métricas intactos.
+Historia recibida limita render a5 recientes y expansión por5/foco/anuncio, sin
+motivos internos para empresa. Componente servidor de derivaciones se integra en
+detalle empresarial; ruta vieja redirige canónicamente sin UUID, guard/proyección
+validan la oferta/referral. Formularios completos en publicada y parcial en borrador;
+mensajes correctos, cancelación confirmada y valores conservados ante error.
+La composición consulta el workspace: perfil empresarial incomplete conserva
+detalle/borrador y aviso, sin invocar RPC de derivaciones que exige empresa active.
+No captura autorizaciones fallidas para mostrar datos ni amplía permisos.
+Presentación R5: detalle de oferta existente de solo lectura; editor se abre por
+botón compartido y estado local ligado a identificador/versión editada. Cancelar vuelve al
+detalle, nueva versión guardada cierra editor; error conserva controles/valores.
+Foco al encabezado al abrir y al botón al cerrar; alta nueva directa. Sin rutas,
+comandos, contratos de servidor ni migraciones adicionales.
+
+EXTRA061: lista única de eventos visibles de candidatos; filtro antes de limit,
+selección id/action/occurred_at, orden descendente por fecha/id y lotes5+1. Cursor
+validado por Zod, ámbito perfil/cuenta actual reconstruido por servidor y guard
+admin activo/RLS en lectura inicial y Server Action de continuación. Sin migración
+ni cambios a escritura/retención. Cliente acumula lotes, maneja error/reintento,
+anuncia carga y enfoca entradas nuevas; usa componentes municipales existentes.
+
+Componer los formularios asistidos existentes en AdminCandidateDetailPage con
+guard admin previo y carga condicional de getAssistedWorkspace. Leer archived_at
+en la consulta administrativa y comprobar origen/cuenta otra vez en workspace.
+Conservar una sola sección de notas/historial/CV. Guardar y crear navegan al
+detalle principal; la ruta antigua resuelve referencia y redirige al detalle
+opaco autorizado. Sin SQL, contratos de comandos o autorización nuevos.
+
+EXTRA060: reutilizar los bloques de resumen/CV como elementos únicos; para
+origen assisted, CV después de edición y resumen antes de participaciones en la
+otra columna. Otros orígenes conservan orden. Sin duplicar forms/ids o datos.
+
+## Categorías laborales únicas,2026-10-24 (EXTRA057)
+
+EXTRA058: quitar NominationForm y listNominationOpenings del detalle; eliminar
+sus definiciones sin consumidores. Conservar createAdminNominationAction y
+createAdminNomination usados por el popup. Enlace asistido solo anuncia CV/notas/
+historial. Sin backend/SQL/roles nuevos; pruebas de ausencia y continuidad de oferta.
+
+Migración forward-only: bloquear candidate_categories durante consolidación,
+guardar filas interest originales con ambos timestamps/version en ledger
+privado append-only/RLS y capturar definiciones previas de los tres comandos.
+PK(candidate_id,category_id) ya garantiza unicidad: reclasificar kind a occupation
+sin insertar/borrar relaciones, comprobar unión y timestamps, CHECK kind=occupation. No actualizar perfiles,
+estados, versiones, consentimientos, CV, ofertas o participaciones por el backfill.
+Reemplazar save_assisted_candidate sin selección interests (acepta únicamente
+array vacío legado), create_active_assisted_candidate exige categories y
+save_candidate_profile admite40 selecciones, conservando las demás validaciones.
+Límite40 deriva de20+20 anteriores, CSV sin columna/mapping nuevo. No cambiar RPC
+de matching, búsqueda, preview, derivaciones o métricas: sus conjuntos efectivos
+son idénticos y ahora un solo tipo. Proyecciones TS aceptan kind occupation, UI
+solo muestra nombres de categorías. Semilla nueva usa occupation.
+
+Recuperación antes de escrituras posteriores: originales y definiciones previas
+privados permiten restaurar clasificación sin pérdida. Tras escrituras nuevas,
+no aplicar reversión destructiva: revisión/forward fix. Documento operativo con
+precondiciones, conteos, diagnóstico y pruebas. SQL antes de app; sin despliegue
+o aplicación alojada automática. T174–T178 y checklist categories-only cubren
+constituciónI–VI, FR010/011/012/014/032/035/040/052/070.
+
+## Alta presencial activa,2026-10-24 (EXTRA056)
+
+Nuevo RPC create_active_assisted_candidate, SECURITY DEFINER con search_path
+vacío, actor activo admin y EXECUTE limitado a authenticated. Reutiliza
+save_assisted_candidate y assisted_candidate_command para consentir y activar
+solo un registro nuevo con versión leída/bloqueada, en la misma transacción.
+La resolución use_or_update_existing/reject conserva la semántica anterior y no
+reactiva ni acepta. Validación duplicada TS/DB de datos completos/confirmación/
+política. Alta UI carga política pública autenticada, muestra texto y checkbox
+sin defaultChecked. Actualizaciones y CSV usan el RPC previo, sin cambio de
+contrato. Nueva migración aditiva sin backfill; recuperación por rollback de app
+y DROP del RPC nuevo sin borrar datos. No cambia contratación ni autorización
+de proyección empresarial. Pruebas de rollback/auditoría/duplicados/roles/alta
+y contratación existente; gate acotado de análisis antes de implementar.
+
+## Apartado de atención presencial,2026-10-23
+
+Nueva página servidor /admin/atencion-presencial bajo guard admin y RLS. Wrapper
+searchAssistedCandidates reutiliza el motor existente con origin=assisted fijo en
+SQL antes de conteo/paginación; búsqueda general conserva defaults. Página usa
+vigency/eligibility=all por defecto y controles/validación/paginación existentes.
+CandidateSearchForm recibe destino opcional con default actual; referencias de
+categoryId reconocen la nueva URL. Detalle lee origin y mantiene menú/regreso;
+AssistedProfileForm se monta directamente arriba de filtros/listado y reutiliza
+las categorías activas ya consultadas; guarda mediante la acción y redirección
+existentes. Alta y mantenimiento conservan sus rutas, formularios y funciones. Sin schema,
+RPC, permisos o dependencia nueva. Scope/listado no modifica estados ni identidad.
+Pruebas de defaults, scope, roles, filtros, referencias y continuidad US4; análisis
+constitucional acotado documentado en EXTRA055, sin replanificación arquitectónica.
+
+## CV vigente administrativo,2026-10-23
+
+getAdminCandidate agrega currentCv mediante consulta mínima a cv_documents con
+sesión administrativa, RLS, candidate_id exacto, status=valid y archived_at=null.
+Un error no equivale a ausencia. Server Component presenta metadatos y RecordAnchor
+hacia /api/cv/[referencia], conservando attachment/no-store y reautorización actual.
+Mover el CvUploadForm existente al mantenimiento presencial, sin alterar su POST
+ni capacidad FR-013. Sin visor embebido, nueva ruta, schema, grants o dependencias.
+Pruebas de consulta/UI, ausencia/error, regresión de permisos y flujo asistido;
+constituciónII/III/IV y contratos de negocio intactos (EXTRA054).
+
+## A16 — enlace global,2026-10-23
+
+Retirar el anchor sr-only de RootLayout sin reemplazo ni nuevas dependencias.
+Conservar regiones semánticas, main#contenido, tabIndex y enlaces Inicio existentes.
+Pruebas del layout raíz, primer foco de controles reales, ausencia del enlace,
+teclado escritorio/móvil y axe; actualizar el chequeo visual que exigía ese salto.
+ConstituciónIV/FR-070/SC-009 conservados mediante operabilidad y landmarks; no se
+declara equivalencia universal de Inicio con un skip link ni aceptación NVDA.
+Sin cambios de arquitectura, datos, autenticación, negocio o contratos.
+
+## A04 — referencias privadas,2026-10-23
+
+Addendum contracts/private-record-references.md: tabla privada de referencias y
+backfill INSERT para no disparar bump_version/append_only. Códigos aleatorios
+independientes y triggers AFTER INSERT, sin PK/FK nuevas en negocio. Dos RPC de
+lectura con sesión/autoridad por tipo; servidor conserva comandos UUID y genera
+URLs por referencias. SQL antes de app, sin despliegue alojado automático.
+Revisión de constitución: stack, permisos/RLS, historial, accesibilidad española y
+minimización intactos. No nueva infraestructura, claves, rankings o reglas legales.
+Análisis y pruebas de seguridad/compatibilidad antes del gate de implementación.
 
 ## Authorized route consolidation — 2026-10-23 (EXTRA-056)
 
@@ -153,6 +287,23 @@ los consumidores internos. No se agregan dependencias. Contrato, despliegue y re
 [public-offer-slugs](../../odd/tasks/public-offer-slugs.md). EXTRA-020 registra la autorización.
 
 ## Contexto técnico
+
+### EXTRA051 — etiquetas españolas, 2026-10-22
+
+Módulo domain/presentation/labels.ts sin dependencias servidor ni autorización:
+Record tipado por catálogos de estados ya existentes, etiquetas de acciones/
+motivos/canales/entrevistas y helper de fallback seguro. Reusar adaptadores
+existentes para no cambiar consumidores ni estados. Páginas y componentes
+renderizan etiquetas; select value/hidden/URLs/RPC y contenido libre se conservan.
+Historiales preservan eventos/detalle/orden y muestran etiquetas, no códigos.
+Traducciones de modalidad/contrato son compatibilidad de presentación, nunca
+nuevo catálogo validado. Importación conserva contrato CSV, edición con opciones
+españolas y mismos valores. FileInput cliente compartido con control real
+accesible, nombre de archivo/ausencia españoles y retención/error/reset iguales.
+Sin i18n framework, dependencia, backend/schema o migración nuevos. Pruebas de
+cobertura de catálogos, fallbacks, JSX/vistas por rol y accesibilidad/selectores,
+tipos/lint/cobertura/tooling/build y navegador local. Constitución y contratos de
+autorización/estados intactos; no traducir contenido personal o formatos técnicos.
 
 ### EXTRA040 — presentación del perfil candidato, 2026-10-22
 

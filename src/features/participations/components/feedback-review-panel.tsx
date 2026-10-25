@@ -35,11 +35,11 @@ export function FeedbackReviewPanel({ participationId, version, currentStatus, f
   const [pending, startTransition] = useTransition();
   const latest = [...feedback].filter((item) => item.reviewStatus === "pending_admin")
     .sort((a, b) => b.reportedAt.localeCompare(a.reportedAt))[0];
-  if (!latest) return <EmptyState title="Sin feedback pendiente" description="La empresa todavía no comunicó un resultado para revisar." />;
+  if (!latest) return <EmptyState title="Sin respuesta pendiente" description="La empresa todavía no comunicó un resultado para revisar." />;
   const outcome = proposedOutcome(latest.reportedOutcome);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!latest || !outcome) { setError("Este feedback requiere revisión manual antes de asignar un resultado."); return; }
+    if (!latest || !outcome) { setError("Esta respuesta requiere revisión manual antes de asignar un resultado."); return; }
     if ((outcome === "cancelled" || currentStatus === "no_company_response") && !reason.trim()) {
       setError("Registrá el motivo de la decisión administrativa."); return;
     }
@@ -55,7 +55,7 @@ export function FeedbackReviewPanel({ participationId, version, currentStatus, f
     });
   }
   return <section className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" aria-labelledby="feedback-title">
-    <h2 id="feedback-title" className="text-lg font-semibold">Feedback de la empresa</h2>
+    <h2 id="feedback-title" className="text-lg font-semibold">Respuesta de la empresa</h2>
     <p>Estado actual: <strong>{participationStatusLabel(currentStatus)}</strong>. El resultado comunicado está pendiente de confirmación administrativa.</p>
     <p>Comunicación recibida: <strong>{latest.reportedOutcome === "hired" ? "Contratación informada" : latest.reportedOutcome === "not_selected" ? "No selección informada" : latest.reportedOutcome === "process_cancelled" ? "Cancelación de este proceso informada" : "Otro resultado informado"}</strong>.</p>
     {latest.message && <p className="rounded-md bg-slate-100 p-3">{latest.message}</p>}

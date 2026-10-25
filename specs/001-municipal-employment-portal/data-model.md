@@ -1,19 +1,35 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+**Fecha**: 2026-09-19  
+**Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
+
+EXTRA062: no agrega tablas/campos. Publicada editada pasa a pending_review dentro
+del guardado/envío; historial audita ambas acciones/versiones, manteniendo slug,
+casos/resultados/permisos. Cancelación empresarial no final reutiliza el cierre
+existente, conserva finales y queda Cancelada. Proyección de propia contratación
+hiredCandidate/displayName/outcome mínima, sin restituir acceso completo o consentimiento.
+
 ## Candidate photos — EXTRA-059
 
 Add private metadata/current-photo and durable cleanup records in the additive `202610240001_candidate_photos.sql` migration; SQL is the exact executable schema. Objects use opaque immutable keys in a separate private candidate-photos bucket. Mutations lock and advance the existing candidate profile version, keep one current photo, attribute the authenticated actor in audit and revoke obsolete reads before physical object cleanup. Only current photos can be read using live full-profile authorization. No original filename, public URL, photo requirement or change to CV retention is added. Current photo bytes are permanently removed on owner replacement/removal, per explicit user decision; committed audit is not erased. Design: `../../docs/implementation/candidate-profile-photos.md`.
 
-**Fecha**: 2026-09-19  
-**Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
-
 ## A08 — catálogo y proyección administrativa (2026-10-19)
+
+EXTRA057,2026-10-24 sustituye los dos tipos operativos: candidate_categories
+conserva kind únicamente occupation. Unión histórica consolidada sin duplicados;
+private.legacy_candidate_interests conserva filas originales, created_at,
+updated_at original, versión del perfil y versión de migración, con RLS,
+append-only y sin grants a roles de aplicación. Definiciones anteriores de los
+tres comandos se conservan en private.category_command_recovery. No cambian
+IDs de personas/categorías, estados, versiones o consentimientos. Hasta40
+categorías por perfil mantiene la capacidad combinada20+20 previa. Matching y
+lecturas consumen las mismas relaciones efectivas, ahora categorías únicas.
 
 Quince filas nuevas en `job_categories(version=2)`; IDs generados en servidor,
 códigos estables y nombres del catálogo de la matriz. No nuevas tablas ni cambios
 a relaciones existentes. Se conservan v1 y sus referencias, sin equivalencias
-inferidas. Ambos tipos de candidate_categories (occupation/interest) participan
-en el cruce con opening_categories por category_id activo.
+inferidas. El cruce original admitía ambos tipos; desde EXTRA057 se usan solo
+categorías occupation, con los mismos category_id activos y coincidencias.
 Proyección: id, displayName, locality, matchedCategories (code/name),
 participationId null por compatibilidad: se excluyen participaciones no archivadas
 antes del total/paginación. Sin listas persistidas ni puntajes o selecciones.
@@ -22,6 +38,12 @@ permisos cliente. Preview laboral incorpora experiencia, disponibilidad/vigencia
 rubros, ID del CV vigente y versiones de candidato/oferta; no incorpora DNI,
 contactos ni notas. Nominación sigue creando una participación bajo el comando
 transaccional y auditoría existentes, sin tablas nuevas ni derivación implícita.
+
+## Referencias de presentación A04 — EXTRA052
+
+private.record_references agrega kind,entity_id,reference única y created_at.
+No sustituye identidades UUID; ver contrato private-record-references.md. Backfill
+INSERT aislado y triggers de creación, sin incrementar versiones de negocio.
 
 ## Convenciones
 
@@ -127,6 +149,10 @@ Contiene el perfil laboral y su estado, separado de identidad restringida.
 
 Reglas de activación y uso:
 
+- EXTRA056,2026-10-24: alta presencial interactiva crea y activa atómicamente con
+  datos completos y evento de aceptación presencial explícita sobre política
+  vigente. No acepta/activa por resolver un duplicado existente; no modifica
+  importación, mantenimiento ni perfiles históricos. Contratar aplica EXTRA035.
 - Requiere localidad, una o más categorías, resumen laboral, disponibilidad, al menos un contacto y
   consentimiento general vigente.
 - En autogestión, activar además requiere CV PDF válido, según FR-010.
@@ -245,7 +271,8 @@ a una oferta propia. Reemplazar no borra la versión anterior.
 
 `job_categories`: `id`, `code`, `name`, `description`, `version`, `active`, timestamps. Código y nombre
 son únicos dentro de la versión. `candidate_categories`: par único candidato/categoría más
-`kind` (`occupation` o `interest`) y timestamps.
+`kind` (solo `occupation` desde EXTRA057) y timestamps. Los antiguos `interest`
+se preservan en el historial privado descrito arriba y se consolidan por ID.
 
 El modelo permite multiselección y desactivar entradas sin romper historia. El seed final está
 bloqueado hasta resolver OQ-010; tests usan categorías ficticias.
@@ -451,6 +478,11 @@ crean nueva versión o evento; no se reescribe silenciosamente la nota original.
 ## Auditoría y concurrencia
 
 ### `audit_events`
+
+EXTRA061 no modifica este modelo append-only. La tarjeta administrativa de cuenta
+y perfil del candidato usa una proyección de ocho acciones, id técnico y fecha,
+paginada5 con cursor fecha/id. Actores, estados, motivos y eventos ocultos siguen
+persistidos íntegramente; la proyección no define retención ni elimina eventos.
 
 Append-only y sin `UPDATE`/`DELETE` para roles de aplicación.
 

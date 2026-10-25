@@ -1,3 +1,4 @@
+import { canonicalFixturePath } from "./fixtures/record-reference";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { loginFixture } from "./fixtures/quality";
@@ -7,7 +8,7 @@ test.beforeEach(() => test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWit
 const journeys = {
   candidate: ["/dashboard?section=perfil", "/dashboard?section=ofertas", "/dashboard?section=postulaciones"],
   company: ["/empresa/perfil", "/empresa/ofertas", "/empresa/ofertas/nueva"],
-  admin: ["/admin/candidates", "/admin/candidates/assisted", "/admin/openings", "/admin/empresas", "/admin/participations", "/admin/imports/new", "/admin/metrics?from=2026-09-01&to=2026-09-20"],
+  admin: ["/admin/candidates", "/admin/atencion-presencial", "/admin/candidates/assisted", "/admin/openings", "/admin/empresas", "/admin/participations", "/admin/imports/new", "/admin/metrics?from=2026-09-01&to=2026-09-20"],
 } as const;
 for (const role of ["candidate", "company", "admin"] as const) {
   for (const viewport of [{ width: 360, height: 800 }, { width: 1366, height: 768 }]) {
@@ -17,7 +18,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
       await loginFixture(page, role);
       for (const path of journeys[role]) {
         await page.goto(path);
-        await expect(page).toHaveURL(new RegExp(path.split("?")[0] + "(?:\\?|$)"));
+        await expect(page).toHaveURL(new RegExp(canonicalFixturePath(path).split("?")[0] + "(?:\\?|$)"));
         await expect(page.locator("h1").first()).toBeVisible();
         await expect(page.getByRole("heading", { name: "Ocurrió un problema", exact: true })).toHaveCount(0);
         expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

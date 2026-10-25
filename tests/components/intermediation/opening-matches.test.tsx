@@ -16,7 +16,7 @@ const matches: OpeningMatches = { available: true, total: 42, page: 2, pageSize:
 
 beforeEach(() => {
   vi.resetAllMocks();
-  preview.mockResolvedValue({ code: "OK", profile: openingPreview });
+  preview.mockResolvedValue({ code: "OK", profile: { ...openingPreview, cvReference: "cv-111111111111111111111111" } });
   nominate.mockResolvedValue({ code: "OK", participationId: id });
   Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true,
     value: function(this: HTMLDialogElement) { this.setAttribute("open", ""); this.querySelector("button")?.focus(); } });
@@ -25,7 +25,7 @@ beforeEach(() => {
 });
 
 it("explica OR e intermediación, muestra rubros y no ofrece derivación automática", () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   expect(screen.getByText(/comparten al menos un rubro/)).toBeTruthy();
   expect(screen.getByText("Rubros coincidentes: Comercio, Administración")).toBeTruthy();
   expect(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" })).toBeTruthy();
@@ -35,26 +35,26 @@ it("explica OR e intermediación, muestra rubros y no ofrece derivación automá
 });
 
 it("pagina conservando contexto de oferta y ancla accesible", () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   expect(screen.getByRole("navigation", { name: "Páginas de coincidencias" })).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Anterior" }).getAttribute("href")).toBe(`/admin/openings/${id}?matchPage=1#opening-matches`);
-  expect(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe(`/admin/openings/${id}?matchPage=3#opening-matches`);
+  expect(screen.getByRole("link", { name: "Anterior" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchPage=1#opening-matches`);
+  expect(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchPage=3#opening-matches`);
 });
 
 it("no muestra una participación existente aunque llegue una respuesta anterior", () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={{ ...matches,
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches,
     items: [{ ...matches.items[0]!, participationId: id }] }} />);
   expect(screen.queryByRole("button", { name: "Ver perfil de Persona ficticia" })).toBeNull();
 });
 
 it("muestra vacío y recuperación de página fuera de rango", () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={{ ...matches, items: [], page: 9 }} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches, items: [], page: 9 }} />);
   expect(screen.getByText("Sin candidatos en esta página")).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href")).toBe(`/admin/openings/${id}#opening-matches`);
+  expect(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111#opening-matches`);
 });
 
 it("no muestra candidatos cuando la oferta no habilita matching", () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={{ ...matches, available: false, items: [], total: 0 }} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches, available: false, items: [], total: 0 }} />);
   expect(screen.getByText("Coincidencias no disponibles")).toBeTruthy();
   expect(screen.queryByRole("navigation")).toBeNull();
 });
@@ -73,14 +73,14 @@ it("resuelve componente servidor y pagina en el servicio real por contrato", asy
 });
 
 it("abre bajo demanda, muestra perfil laboral y cierra devolviendo foco", async () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   expect(preview).not.toHaveBeenCalled();
   const button = screen.getByRole("button", { name: "Ver perfil de Persona ficticia" });
   fireEvent.click(button);
   expect(await screen.findByText("Experiencia laboral ficticia")).toBeTruthy();
   expect(preview).toHaveBeenCalledWith({ openingId: id, candidateId: id });
   expect(screen.getByText("Oferta ficticia actual")).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Abrir CV PDF en otra pestaña" }).getAttribute("href")).toBe(`/api/cv/${openingPreview.cvId}`);
+  expect(screen.getByRole("link", { name: "Abrir CV PDF en otra pestaña" }).getAttribute("href")).toBe("/api/cv/cv-111111111111111111111111");
   fireEvent.click(screen.getByRole("button", { name: "Cerrar" }));
   expect(screen.queryByRole("dialog")).toBeNull();
   await waitFor(() => expect(document.activeElement).toBe(button));
@@ -88,7 +88,7 @@ it("abre bajo demanda, muestra perfil laboral y cierra devolviendo foco", async 
 });
 
 it("nomina exactamente a esta oferta con las versiones del preview y retira la ficha", async () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   fireEvent.click(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" }));
   fireEvent.click(await screen.findByRole("button", { name: "Nominar a esta oferta" }));
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
@@ -101,7 +101,7 @@ it("nomina exactamente a esta oferta con las versiones del preview y retira la f
 
 it("conserva ficha y diálogo si hay conflicto de versión", async () => {
   nominate.mockResolvedValue({ code: "CONFLICT_STALE_DATA" });
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   fireEvent.click(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" }));
   fireEvent.click(await screen.findByRole("button", { name: "Nominar a esta oferta" }));
   expect((await screen.findByRole("alert")).textContent).toContain("El registro cambió");
@@ -112,7 +112,7 @@ it("conserva ficha y diálogo si hay conflicto de versión", async () => {
 it("ignora una respuesta tardía después de cerrar el popup", async () => {
   let resolvePreview!: (value: { code: "OK"; profile: typeof openingPreview }) => void;
   preview.mockReturnValue(new Promise(resolve => { resolvePreview = resolve; }));
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   fireEvent.click(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" }));
   expect(screen.getByRole("status").textContent).toBe("Cargando perfil…");
   fireEvent.click(screen.getByRole("button", { name: "Cerrar" }));
@@ -122,7 +122,7 @@ it("ignora una respuesta tardía después de cerrar el popup", async () => {
 });
 
 it("permite cerrar con Escape mediante cancel y devuelve el foco", async () => {
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   const button = screen.getByRole("button", { name: "Ver perfil de Persona ficticia" });
   fireEvent.click(button);
   await screen.findByRole("button", { name: "Nominar a esta oferta" });
@@ -133,7 +133,7 @@ it("permite cerrar con Escape mediante cancel y devuelve el foco", async () => {
 
 it("muestra error seguro y permite recargar sin nominar", async () => {
   preview.mockResolvedValueOnce({ code: "NOT_FOUND", profile: null });
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   fireEvent.click(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" }));
   expect((await screen.findByRole("alert")).textContent).toContain("No encontramos el recurso");
   expect(screen.queryByRole("button", { name: "Nominar a esta oferta" })).toBeNull();
@@ -145,7 +145,7 @@ it("muestra error seguro y permite recargar sin nominar", async () => {
 it("bloquea doble envío y cierre mientras confirma", async () => {
   let resolveNomination!: (value: { code: "OK"; participationId: string }) => void;
   nominate.mockReturnValue(new Promise(resolve => { resolveNomination = resolve; }));
-  render(<OpeningCandidateMatchesList openingId={id} matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   fireEvent.click(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" }));
   const button = await screen.findByRole("button", { name: "Nominar a esta oferta" });
   fireEvent.click(button);
@@ -163,3 +163,5 @@ it("presenta error seguro sin mostrar el error interno", async () => {
   expect(screen.getByRole("alert").textContent).toContain("No pudimos cargar");
   expect(screen.queryByText(/Detalle SQL/)).toBeNull();
 });
+
+vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);

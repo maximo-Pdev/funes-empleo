@@ -1,6 +1,6 @@
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
-import Link from "next/link";
+import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { COMPANY_PROFILE_STATUSES, companyProfileStatusSchema } from "@/domain/states";

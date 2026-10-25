@@ -34,6 +34,8 @@ it("guards the candidate dashboard before forwarding its selected section", asyn
  expect(mocks.guard).toHaveBeenCalledOnce();
  expect(mocks.candidate).toHaveBeenCalledWith({ params: { section: "ofertas" }, email: undefined });
 });
+
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);
 it.each([
  [Recovery, "Solicitar enlace de recuperación"], [Pending, "Reenviar verificación"],
  [Expired, "Reenviar verificación"], [Invalid, "Solicitar enlace de recuperación"],
@@ -71,9 +73,10 @@ it("no ofrece archivo a administración y mantiene la exclusión del propio admi
  expect(screen.getAllByRole("button", { name: "Cerrar sesión" })).toHaveLength(1);
  expect(within(screen.getByRole("main")).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
  expect(screen.getByRole("main").querySelector('[data-slot="admin-canvas"]')).toBeTruthy();
- const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
+ const navigation = within(sidebar).getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
  expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("aria-current")).toBe("page");
- expect(within(navigation).getAllByRole("link")).toHaveLength(7);
+ expect(within(navigation).getAllByRole("link")).toHaveLength(8);
+ expect(within(navigation).getByRole("link", { name: "Atención presencial" }).getAttribute("href")).toBe("/admin/atencion-presencial");
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
  expect(mocks.neq).toHaveBeenCalledWith("id", "cuenta-ficticia");
  expect(screen.queryByRole("button", { name: "Archivar mi cuenta" })).toBeNull();

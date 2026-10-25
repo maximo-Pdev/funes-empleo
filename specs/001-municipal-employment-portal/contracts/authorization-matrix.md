@@ -1,5 +1,14 @@
 # Contrato de autorización y visibilidad
 
+EXTRA062: empresa/cuenta activas pueden leer hiredCandidate{displayName,outcome:hired}
+en su propia derivación/caso/oferta no archivados con contratación confirmada. Sin
+permiso completo no se devuelven perfil/contactos/CV/entrevistas; nombres de casos
+ajenos o solo informados no se entregan. No se modifica RLS de datos candidatos.
+Empresa activa edita propia publicada y la envía a revisión atómicamente; cancela
+propia no final con motivo, conservando auditoría/casos finales. Sin facultad de
+moderar; actor/propiedad/versión se revalidan transaccionalmente. Admin no lista
+draft, pero conserva su rol/autorizaciones operativas y métricas actuales.
+
 ## Candidate photo authorization exception — EXTRA-059
 
 Owner mutations require an active candidate session, exact profile ownership and expected version. Read current images only for the owner, active Office administrator or currently authorized referred company; Storage RLS independently recomputes permission. Anonymous, suspended, foreign and stale operations are denied. No public/signed URLs or company metadata-table browsing.
@@ -7,6 +16,12 @@ Owner mutations require an active candidate session, exact profile ownership and
 The earlier privileged-operation restriction below gains one narrow exception: server-only validated candidate-photo ingestion/physical cleanup, never a general interactive client. Trusted SQL independently checks the explicit session actor against active accounts/profile ownership and locks versions. Authenticated/anonymous grants cannot ingest or write objects; reads never use service role. Physical deletion failure remains pending and visible, not falsely successful. See `../../../docs/implementation/candidate-profile-photos.md`.
 
 ## Actores
+
+EXTRA061: lectura incremental de historial candidato exige admin activo en cada
+llamada. Entrada candidateId/cursor fecha/id validada; scope perfil/cuenta actual
+resuelto por servidor. No acepta entidades, cuenta, filtros o sort del cliente.
+Solo devuelve eventos visibles id técnico/acción/fecha y cursor. Anónimo/candidato/
+empresa/admin inactivo se rechazan antes de leer datos. Auditoría íntegra sin cambios.
 
 - **Público**: sin sesión.
 - **Candidato**: cuenta activa asociada a un perfil propio.
@@ -86,6 +101,12 @@ existencia expondría información.
 | Suspender/reactivar cuentas | No | No | No | Sí; una cuenta admin solo por otro admin activo y nunca si deja cero admins activos | No |
 | Cerrar oferta vencida | No | No | No | Puede consultar historial | Solo oferta publicada vencida |
 
+EXTRA056: create_active_assisted_candidate exige administrador activo y una
+confirmación expresa de aceptación presencial sobre política vigente para cada
+alta nueva. Solo authenticated puede invocarlo y la función revalida el rol real;
+empresa/candidato/anónimo no crean perfiles mediante este comando. No cambia
+la matriz de lectura ni acepta/reactiva perfiles existentes al resolver duplicados.
+
 ## Proyección pública de oferta
 
 La proyección pública de una oferta `published` y vigente contiene solo nombre de la empresa,
@@ -102,7 +123,7 @@ derivación esté `active`, el consentimiento continúe vigente y las cuentas/re
 
 - nombre de presentación;
 - localidad laboral;
-- categorías/intereses;
+- categorías laborales (selección única multivalor desde EXTRA057);
 - resumen de habilidades y experiencia;
 - disponibilidad;
 - todos los contactos vigentes y no archivados;

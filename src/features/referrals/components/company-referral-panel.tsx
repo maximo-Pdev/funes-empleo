@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { availabilityLabel, interviewStatusLabels, displayLabel } from "@/domain/presentation/labels";
+import { RecordLink as Link, RecordLabel } from "@/components/ui/record-link";
 import type { CompanyReferral } from "@/features/referrals/service";
 import { FeedbackForm, InterviewForm } from "./referral-forms";
 
@@ -6,9 +7,10 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
   const candidate = referral.candidate;
   return (
     <section aria-labelledby="detalle-derivacion" className="rounded-lg border border-slate-300 bg-white p-5">
-      <h2 id="detalle-derivacion" className="text-xl font-semibold">Derivación {referral.referralId}</h2>
-      <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? referral.openingId}</p>
+      <h2 id="detalle-derivacion" className="text-xl font-semibold">Derivación <RecordLabel kind="referral" id={referral.referralId} /></h2>
+      <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? "Oferta sin título"}</p>
       <p className="text-sm text-slate-700">Fecha de derivación: {new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Buenos_Aires" }).format(new Date(referral.referredAt))}</p>
+      {referral.hiredCandidate && <p className="mt-4 font-semibold">{candidate ? "Contratado" : `${referral.hiredCandidate.displayName} · Contratado`}</p>}
       {candidate ? (
         <div className="mt-6 space-y-5">
           <div>
@@ -16,11 +18,11 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
             <dl className="mt-2 grid gap-2 sm:grid-cols-2">
               <div><dt className="font-semibold">Nombre</dt><dd>{candidate.displayName}</dd></div>
               <div><dt className="font-semibold">Localidad</dt><dd>{candidate.locality ?? "No informada"}</dd></div>
-              <div><dt className="font-semibold">Disponibilidad</dt><dd>{candidate.availability ?? "No informada"}</dd></div>
+              <div><dt className="font-semibold">Disponibilidad</dt><dd>{availabilityLabel(candidate.availability)}</dd></div>
               <div><dt className="font-semibold">Experiencia y habilidades</dt><dd className="whitespace-pre-wrap">{candidate.skillsExperienceSummary ?? "No informadas"}</dd></div>
             </dl>
-            <h4 className="mt-4 font-semibold">Categorías e intereses</h4>
-            {candidate.categories.length ? <ul className="list-disc pl-6">{candidate.categories.map((category, index) => <li key={`${category.name}-${index}`}>{category.name} ({category.kind === "occupation" ? "ocupación" : "interés"})</li>)}</ul> : <p>No se informaron categorías.</p>}
+            <h4 className="mt-4 font-semibold">Categorías laborales</h4>
+            {candidate.categories.length ? <ul className="list-disc pl-6">{candidate.categories.map((category, index) => <li key={`${category.name}-${index}`}>{category.name}</li>)}</ul> : <p>No se informaron categorías.</p>}
           </div>
           <div>
             <h3 className="text-lg font-semibold">Contactos vigentes</h3>
@@ -30,18 +32,18 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
           <p className="text-sm text-slate-700">El acceso puede revocarse en cualquier momento. Una copia ya descargada no puede retirarse técnicamente.</p>
           <div>
             <h3 className="text-lg font-semibold">Entrevistas registradas</h3>
-            {referral.interviews?.length ? <ul className="mt-2 list-disc pl-6">{referral.interviews.map((interview) => <li key={interview.id}>{interview.status}: {interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" }) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
+            {referral.interviews?.length ? <ul className="mt-2 list-disc pl-6">{referral.interviews.map((interview) => <li key={interview.id}>{displayLabel(interviewStatusLabels, interview.status)}: {interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" }) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
           </div>
           {referral.participationVersion && <InterviewForm openingId={openingId} referralId={referral.referralId} version={referral.participationVersion} />}
         </div>
       ) : (
         <p role="status" className="mt-5 rounded-md border border-amber-300 bg-amber-50 p-4 text-amber-950">
-          El acceso a los datos de esta persona finalizó. Solo se conserva esta referencia no personal para informar una respuesta pendiente.
+          {referral.hiredCandidate ? "La contratación fue confirmada. Se conserva únicamente el nombre; el perfil, los contactos y el CV ya no están disponibles." : "El acceso a los datos de esta persona finalizó. Solo se conserva esta referencia no personal para informar una respuesta pendiente."}
         </p>
       )}
-      <div className="mt-6">
+      {!referral.hiredCandidate && <div className="mt-6">
         <FeedbackForm openingId={openingId} referralId={referral.referralId} />
-      </div>
+      </div>}
     </section>
   );
 }

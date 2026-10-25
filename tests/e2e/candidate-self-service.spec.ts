@@ -1,3 +1,4 @@
+import { referenceIdentifier } from "./fixtures/record-reference";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { join } from "node:path";
@@ -33,6 +34,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
   await page.goto("/registro/candidato");
+  await expect(page.locator("body")).not.toContainText("intereses");
   await page.getByLabel("Nombre y apellido").fill(name);
   await page.getByLabel("DNI").fill(dni);
   await page.getByLabel("Correo electrónico").fill(email);
@@ -67,6 +69,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en tareas administrativas");
   await page.getByLabel("Categoría ficticia A").check();
   await page.getByLabel("Categoría ficticia B").check();
+  await expect(page.getByRole("group", { name: "Intereses laborales" })).toHaveCount(0);
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
   await expect(page.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
   await page.reload();
@@ -219,14 +222,16 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Reactivación ficticia E2E");
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
-    await expect(admin.getByText("Cuenta: active", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
     await signIn(page, email, password);
     await page.goto("/dashboard?section=perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("No disponible");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
     await page.goto("/account");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
-    const profileId = new URL(admin.url()).pathname.split("/").at(-1)!;
+    const profileReference = new URL(admin.url()).pathname.split("/").at(-1)!;
+    expect(profileReference).toMatch(/^can-[0-9a-f]{24}$/);
+    const profileId = referenceIdentifier("candidate", profileReference);
     expect(profileId).toMatch(/^[0-9a-f-]{36}$/);
     runLocalMaintenanceSql(`begin;
       select set_config('request.jwt.claim.sub',account.auth_user_id::text,true),
@@ -242,7 +247,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Restauración ficticia E2E");
     await admin.getByLabel("Confirmo la restauración").check();
     await admin.getByRole("button", { name: "Restaurar a borrador" }).click();
-    await expect(admin.getByText("Estado: draft", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Estado: Borrador", { exact: false })).toBeVisible();
     await signIn(page, email, password);
     await page.goto("/dashboard?section=perfil");
     await expect(page.getByText("Estado del perfil:")).toContainText("Borrador");

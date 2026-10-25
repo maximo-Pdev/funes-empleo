@@ -7,6 +7,7 @@ import styles from "./admin-workspace.module.css";
 
 const navigation = [
   { href: "/admin/candidates", label: "Candidatos", icon: Users },
+  { href: "/admin/atencion-presencial", label: "Atención presencial", icon: Users },
   { href: "/admin/empresas", label: "Empresas", icon: Building2 },
   { href: "/admin/openings", label: "Ofertas", icon: BriefcaseBusiness },
   { href: "/admin/participations", label: "Participaciones", icon: ShieldCheck },
@@ -30,6 +31,7 @@ export function AdminShell({ title, description, active, email, navigation: page
   return (
     <DashboardShell panel={{ href: "/account", label: "Panel de administración" }}
       links={navigation.map(link => ({ ...link, current: active === link.href }))}
+      navigationLabel="Navegación de Oficina de Empleo"
       name="Administración" email={email} canvasSlot="admin-canvas">
       <div className={accountStyles.sectionContent}>
           <header className={accountStyles.heading}><h1>{title}</h1>{description && <p>{description}</p>}</header>

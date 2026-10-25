@@ -185,11 +185,59 @@ underline for Inicio on `/`, and Ofertas on `/ofertas` and its detail routes.
 Mi cuenta retains its own button hover treatment when its destination is current.
 Ingresar is an in-page shortcut, not a separate current page. Preserve all anchor
 destinations and navbar visibility rules; do not extend this navbar to other shells.
-On the homepage only, hide the root skip-link bar completely, including from the
-tab order. Use the navbar's existing `Inicio` link to return to the page start.
-Preserve the global skip link on other routes and retain the homepage's unique
-focusable `main#contenido` landmark. Verify repeated Tab navigation and Enter on
-`Inicio` on both desktop and mobile; hiding the bar is not equivalent to a skip link.
+
+At Mateo's explicit request (A16 / EXTRA-053, 2026-10-23), remove the root
+“Ir al contenido principal” link on all routes, not merely its styling or tab stop.
+Keep the unique `main#contenido` landmark, page headings, named navigation,
+existing focus targets and visible keyboard focus. The homepage navbar's `Inicio`
+link still returns to and focuses the main landmark. Verify repeated Tab/Enter
+on desktop and mobile. Landmarks preserve assistive-technology navigation
+([W3C ARIA11](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA11)); `Inicio` is not
+a universal replacement for a skip link, nor does plain Tab skip every header.
+
+## Administrative assisted-service section
+
+EXTRA057 removes the independent “Intereses laborales” field. Candidate,
+assisted/admin, employer referral and offer-preview screens use only “Categorías
+laborales” with category names, without occupation/interest type labels. Reuse
+the existing category controls, errors and focus; do not introduce a new selector.
+
+EXTRA056: the interactive creation form requires activation data and available
+status, displays the current consent policy and an unchecked explicit attestation
+of the person's in-person acceptance. Saving creates an active profile atomically;
+PDF remains optional for internal evaluation. Existing-profile maintenance and
+duplicate resolution never silently reactivate or renew consent. Hiring retains
+the existing global withdrawal, labelled “Consentimiento retirado”.
+
+The existing administrative sidebar includes “Atención presencial”, linking to
+`/admin/atencion-presencial`. Use the same menu treatment, responsive layout and
+aria-current behavior; do not introduce a second sidebar. The list is restricted
+on the server to origin=assisted, including profiles that later claimed an account.
+Default vigency/eligibility filters to all so unfinished profiles remain visible;
+preserve the existing eligibility calculation and show Spanish states. Cards open
+the existing candidate detail; archived entries retain its read-only restrictions.
+The section itself renders the existing AssistedProfileForm above the filters
+and list, so administrators can create a profile without first leaving this page.
+Keep its validation, duplicate resolution, save action and maintenance destination.
+The current creation route `/admin/candidates/assisted` and maintenance routes stay
+intact, with a return link to the new section. Filter submission and pagination
+stay inside the section and use opaque category/candidate references (EXTRA-055).
+
+## Administrative candidate CV
+
+EXTRA058: the candidate detail has no nomination form/offer selector. Its existing
+Ofertas navigation remains; nomination stays in the offer's candidate preview.
+Assisted maintenance links to CV/notes/history without promising nomination there.
+
+The administrative candidate detail shows the current valid, non-archived CV's
+safe filename and size, with a native protected download link using its opaque
+reference. Do not embed Storage paths, signed URLs or historical files as current.
+Without a current CV show “El candidato no tiene un CV vigente.” and no download.
+Keep the existing archived-profile restriction. The existing upload/replacement
+form lives in the assisted-maintenance screen, reached through “Mantener perfil
+y atención presencial”; its validation, version checks and permission rules stay
+unchanged. Candidate self-service and company referral access are unaffected.
+See EXTRA-054. No embedded PDF viewer or new file exposure is introduced.
 
 ## Landing access state and missing-field feedback
 
@@ -436,6 +484,39 @@ separate access-panel clearance; do not apply a navbar offset to this full-scree
 section jump. Scrolling becomes instant for reduced-motion preferences. Do not
 add placeholder job offers to this section.
 
+## Atención presencial integrada — EXTRA059
+
+EXTRA062: oferta empresarial muestra en su misma página derivaciones y moderación;
+conservar sanitización por rol y enlaces canónicos previos. Moderación empresa/admin
+presenta5 recientes con Ver más por5/foco/anuncio. Editar publicada explica que vuelve
+a revisión; controles compartidos/asteriscos/errores y valores conservados. Eliminar
+requiere motivo/confirmación y deja visible Cancelada; no borrar historial. Contratado
+propio puede mostrar solo nombre cuando el permiso completo ya no está disponible.
+Las ofertas empresariales existentes abren en consulta: «Editar oferta» revela
+el formulario solo si su estado permite edición; «Cancelar edición» vuelve al
+detalle. Guardado correcto vuelve al detalle actualizado, error conserva valores.
+Alta nueva directa; conservar foco, validación y reenvío a revisión de publicadas.
+
+EXTRA061: «Historial de cuenta y perfil» de candidatos muestra solo los eventos
+elegidos en spec, con evento y fecha/hora. Sin actor/código/estados/motivo en cada
+entrada. Cinco iniciales y Ver más incremental, con progreso accesible/error/
+reintento/foco en entradas nuevas. Reutilizar controles compartidos y conservar
+registro interno íntegro; vacío dice «Sin eventos para mostrar», sin afirmar
+que no existen registros auditados. Otros historiales sin cambios.
+La fecha usa America/Buenos_Aires y hora24h explícita para evitar ambigüedad AM/PM.
+
+En el detalle administrativo del candidato, reutilizar los formularios de edición,
+consentimiento/activación, carga de CV y vinculación solo si el origen es presencial,
+no tiene cuenta vinculada y no está archivado. No duplicar notas/historial/CV ni
+mostrar el enlace intermedio de mantenimiento. Después de vincular, conservar la
+consulta administrativa y retirar esos formularios. Mantener componentes, campos,
+validación, foco y reglas vigentes; diseño en dos columnas que apila en móvil.
+El perfil asistido vinculado ofrece los mismos controles administrativos que
+un perfil normal con igual estado de cuenta. El origen histórico se conserva.
+EXTRA060: en origen presencial, CV PDF va debajo de Mantener perfil y Perfil
+candidato antes de Participaciones recientes, en la columna derecha. En móvil
+se apilan las columnas respetando ese orden de lectura. No duplicar tarjetas.
+
 ## Verification
 
 - Run `npm run test:unit -- tests/components/foundation/municipal-visuals.test.tsx`
@@ -458,6 +539,8 @@ add placeholder job offers to this section.
 - Run `node tests/visual/home-responsive-layout-check.mjs` against a local server
   for full-height registration, width animation, required markers and mobile
   overlay/contact-row layouts; it never submits forms or resets data.
+- Run `node tests/visual/home-keyboard-navigation-check.mjs` to verify the removed
+  global link, first visible controls and preserved `Inicio` focus behavior.
 - Do not use `npm run test:e2e` for a visual spot check: its wrapper resets the
   acceptance database. A filename filter does not make that wrapper read-only.
 - Check loading, errors, keyboard navigation and long forms in a real browser.

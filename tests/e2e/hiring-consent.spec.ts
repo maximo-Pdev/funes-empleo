@@ -99,6 +99,15 @@ for (const late of [false, true]) {
       await expect(company.getByText(name, { exact: true })).toHaveCount(0);
       await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
       expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
+      await companyContext.clearCookies();
+      await signIn(company, "company1");
+      await company.goto(`/company/openings/${openingId}/referrals`);
+      await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}(?:#derivaciones)?$/);
+      await expect(company.getByText(`${name} · Contratado`, { exact: true })).toBeVisible();
+      await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
+      await expect(company.getByRole("link", { name: /Descargar CV/ })).toHaveCount(0);
+      await expect(company.getByRole("button", { name: "Enviar informe" })).toHaveCount(0);
+      expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
     } finally {
       if (!blocker.stdin.writableEnded) blocker.stdin.end("rollback;\n");
       await blockerDone;

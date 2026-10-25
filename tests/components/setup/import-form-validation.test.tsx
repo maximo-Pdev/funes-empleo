@@ -12,7 +12,7 @@ const preview: ImportPreview = { id: "ficticio", status: "blocked", version: 1, 
 beforeEach(() => { vi.clearAllMocks(); vi.mocked(resolveImportAction).mockResolvedValue({ ok: false, error: "No se pudo guardar." }); });
 
 it("rechazar una fila no exige completar datos de corrección y conserva el motivo ante un fallo", async () => {
-  render(<ImportBatch initial={preview} />);
+  render(<ImportBatch reference="imp-111111111111111111111111" initial={preview} />);
   fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "reject" } });
   fireEvent.change(screen.getByLabelText("Motivo interno"), { target: { value: "Decisión ficticia" } });
   fireEvent.click(screen.getByRole("button", { name: "Guardar decisión y revalidar" }));
@@ -22,7 +22,7 @@ it("rechazar una fila no exige completar datos de corrección y conserva el moti
 });
 
 it("corregir exige nombre, DNI y un contacto; usar existente exige elegir un perfil", () => {
-  render(<ImportBatch initial={preview} />);
+  render(<ImportBatch reference="imp-111111111111111111111111" initial={preview} />);
   fireEvent.change(screen.getByLabelText("Motivo interno"), { target: { value: "Corrección ficticia" } });
   fireEvent.click(screen.getByRole("button", { name: "Guardar decisión y revalidar" }));
   expect(screen.getByLabelText("Nombre", { selector: 'input[name="name"]' }).getAttribute("aria-invalid")).toBe("true");

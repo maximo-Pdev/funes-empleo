@@ -75,6 +75,7 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',1)::text,'session_id','ee240000-0000-4000-8000-000000000002')::text,true);
 select ok((public.company_referral(private.fixture_id('hc-referral',1))->'candidate') is not null,'Antes de contratar la empresa ve su perfil derivado');
+select ok(not(public.company_referral(private.fixture_id('hc-referral',1)) ? 'hiredCandidate'),'Sin contratación confirmada no existe la excepción de nombre');
 select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire','Intento ficticio')$$,
  'P0001','NOT_FOUND','La empresa no confirma contratación ni retira consentimiento');
 select set_config('request.jwt.claim.sub',private.fixture_id('candidate',200)::text,true);
@@ -126,10 +127,28 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',1)::text,'session_id','ee240000-0000-4000-8000-000000000002')::text,true);
 select ok(not(public.company_referral(private.fixture_id('hc-referral',1)) ? 'candidate'),'Empresa contratante pierde perfil y contactos');
+select is(public.company_referral(private.fixture_id('hc-referral',1))->'hiredCandidate',
+ jsonb_build_object('displayName','Persona ficticia contratación 1','outcome','hired'),'Contratación normal conserva solo nombre y resultado confirmado');
+select is((select count(*) from jsonb_object_keys(public.company_referral(private.fixture_id('hc-referral',1)))),5::bigint,'Respuesta revocada tiene solo cuatro metadatos y nombre/resultado mínimos');
+reset role;
+update public.company_profiles set status='suspended' where account_id=private.fixture_id('company',1);
+set local role authenticated;
+select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Empresa suspendida tampoco consulta nombre contratado');
+reset role;
+update public.company_profiles set status='active' where account_id=private.fixture_id('company',1);
+update public.accounts set status='suspended',suspended_at=clock_timestamp(),suspended_by=private.fixture_id('admin',1),
+ suspended_reason='Suspensión ficticia' where id=private.fixture_id('company',1);
+set local role authenticated;
+select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Cuenta inactiva no consulta nombre contratado');
+reset role;
+update public.accounts set status='active',suspended_at=null,suspended_by=null,suspended_reason=null where id=private.fixture_id('company',1);
+set local role authenticated;
 select ok(not private.can_read_cv(private.fixture_id('hc-cv',1)),'Empresa contratante pierde CV');
 select set_config('request.jwt.claim.sub',private.fixture_id('company',2)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',2)::text,'session_id','ee240000-0000-4000-8000-000000000003')::text,true);
 select ok(not(public.company_referral(private.fixture_id('hc-referral',2)) ? 'candidate'),'La otra empresa tampoco recupera datos');
+select ok(not(public.company_referral(private.fixture_id('hc-referral',2)) ? 'hiredCandidate'),'Caso no contratado no revela nombre tras retiro global');
+select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Empresa ajena no puede leer el nombre contratado');
 select ok(not private.can_read_cv(private.fixture_id('hc-cv',1)),'La otra empresa pierde CV');
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee240000-0000-4000-8000-000000000001')::text,true);
@@ -154,6 +173,14 @@ select ok(not private.current_consent(private.fixture_id('hc-profile',2)),'Corre
 select is((select access_status::text from public.referrals where id=private.fixture_id('hc-referral',6)),'revoked','Corrección tardía revoca otro permiso vigente');
 select is((select access_status::text from public.referrals where id=private.fixture_id('hc-referral',5)),'revoked','Nunca revive el permiso tardío ya revocado');
 select is((select status::text from public.participations where id=private.fixture_id('hc-part',6)),'referred','El otro caso sigue derivado, no se cierra');
+select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
+select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',1)::text,'session_id','ee240000-0000-4000-8000-000000000002')::text,true);
+select is(public.company_referral(private.fixture_id('hc-referral',5))->'hiredCandidate',
+ jsonb_build_object('displayName','Persona ficticia contratación 2','outcome','hired'),'Contratación tardía conserva la misma proyección mínima');
+select ok(not(public.company_referral(private.fixture_id('hc-referral',5)) ? 'candidate'),'El nombre tardío no restaura el perfil');
+select ok(not private.can_read_cv(private.fixture_id('hc-cv',2)),'El nombre tardío no restaura acceso al CV');
+select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
+select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee240000-0000-4000-8000-000000000001')::text,true);
 reset role;
 select ok(not exists(select 1 from unchanged_parts original join public.participations current using(id)
  where to_jsonb(original)<>to_jsonb(current)),'La contratación tardía también conserva todos los campos de otros casos y contrataciones previas');

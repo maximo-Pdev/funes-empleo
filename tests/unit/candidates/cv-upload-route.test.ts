@@ -76,3 +76,5 @@ it("permite al administrador cargar y solo confirma éxito luego del commit", as
   expect(upload).toHaveBeenCalledOnce();
   expect(rpc).toHaveBeenNthCalledWith(2, "commit_candidate_cv", expect.objectContaining({ p_candidate: candidateId }));
 });
+
+vi.mock("@/lib/records/reference-url", async () => ({ referenceUrl: async (href: string) => (await import("../../fixtures/record-references")).fixtureHref(href) }));

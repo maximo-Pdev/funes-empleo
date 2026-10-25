@@ -1,4 +1,5 @@
 import { getCandidatePhoto, getPhotoCleanupPending } from "@/features/candidates/photo-service";
+import { recordReference } from "@/lib/records/references";
 import { UserRound } from "lucide-react";
 import { Card } from "@/components/ui";
 import type { getCandidateWorkspace } from "@/features/candidates/profile-service";
@@ -28,7 +29,7 @@ export async function renderCandidateProfileContent({ workspace, cvMessage, cvRe
     <CandidateProfilePanel profile={workspace.profile} dni={workspace.privateData.dni_display}
       address={workspace.privateData.address} phone={workspace.contacts.find((item) => item.kind === "phone")?.value ?? null}
       categories={workspace.allCategories} selectedCategories={workspace.categories.map((item) => item.category_id)}
-      consent={workspace.consent} cv={workspace.cv} policy={policy}
+      consent={workspace.consent} cv={workspace.cv} cvReference={workspace.cv ? await recordReference("cv", workspace.cv.id) : undefined} policy={policy}
       photo={photos.photo} photoCleanupPending={photos.cleanupPending} photoUnavailable={photos.unavailable} cvMessage={cvMessage} cvReturnTo={cvReturnTo} />
   </>;
 }

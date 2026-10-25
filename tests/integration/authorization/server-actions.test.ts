@@ -11,6 +11,7 @@ vi.mock("next/navigation", () => ({ redirect: vi.fn(() => { throw new Error("Une
 import { readAccountSession } from "@/lib/auth/session";
 import { revalidatePath } from "next/cache";
 import * as candidateAdmin from "@/features/candidates/admin-actions";
+import * as candidateHistory from "@/features/candidates/history-actions";
 import * as assisted from "@/features/candidates/assisted-actions";
 import * as claim from "@/features/candidates/claim-actions";
 import * as duplicate from "@/features/candidates/duplicate-actions";
@@ -27,13 +28,13 @@ import * as companyAdmin from "@/features/companies/admin-actions";
 import * as accounts from "@/features/accounts/actions";
 import * as imports from "@/features/imports/actions";
 import * as feedback from "@/features/referrals/feedback-actions";
-const actions = { ...candidateAdmin, ...assisted, ...claim, ...duplicate, ...candidateProfile,
+const actions = { ...candidateAdmin, ...candidateHistory, ...assisted, ...claim, ...duplicate, ...candidateProfile,
   ...consent, ...participation, ...evaluation, ...nomination, ...matching, ...openingAdmin, ...openingCompany,
   ...company, ...companyAdmin, ...accounts, ...imports, ...feedback };
 
 const id = "00000000-0000-4000-8000-000000000001";
 const profile = { name: "Persona ficticia", dni: "99000001", locality: "Funes", summary: "",
-  availability: "available", detail: "", address: "", categories: [], phone: "", email: "fixture@example.invalid", interests: [] };
+  availability: "available", detail: "", address: "", categories: [], phone: "", email: "fixture@example.invalid" };
 const common = { version: "1", candidateVersion: "1", expectedVersion: "1", accountVersion: "1",
   id, accountId: id, candidateId: id, openingId: id, participationId: id, referralId: id,
   confirmed: "on", reason: "Prueba ficticia", command: "archive" };
@@ -52,6 +53,7 @@ function add(file: string, role: Entry["role"], name: string, input: unknown, as
   entries.push({ file, name, role, args: () => asForm ? [state, form(input as Record<string, unknown>)] : [input], databaseRoleCheck });
 }
 add("candidates/admin-actions", "admin", "candidateAccountDecisionAction", { resource: "candidate_account", resourceId: id, version: 1, action: "suspend", reason: "Prueba ficticia", confirmed: true });
+add("candidates/history-actions", "admin", "loadCandidateHistoryAction", { candidateId:id, cursor:null });
 add("candidates/assisted-actions", "admin", "saveAssistedAction", { candidateId: null, version: null, data: profile, resolution: null });
 add("candidates/assisted-actions", "admin", "assistedCommandAction", { candidateId: id, version: 1, command: "activate", confirmed: true });
 add("candidates/claim-actions", "admin", "claimAssistedAction", { candidateId: id, accountId: id, version: 1, dni: profile.dni, verifiedInPerson: true });
@@ -67,6 +69,7 @@ add("candidates/matching-actions", "admin", "openingCandidatePreviewAction", { c
 add("openings/admin-actions", "admin", "moderateOpeningAction", { openingId: id, version: 1, decision: "approved" });
 add("openings/company-actions", "company", "saveCompanyOpeningAction", { title: "", tasks: "", requirements: "", location: "", modality: "", schedule: "", contractType: "", closingDate: "", salary: "", benefits: "" }, true);
 add("openings/company-actions", "company", "submitCompanyOpeningAction", {}, true);
+add("openings/company-actions", "company", "cancelCompanyOpeningAction", { id, version:1, cancelReason:"Cancelación ficticia", cancelConfirmed:"on" }, true);
 add("companies/company-actions", "company", "saveCompanyProfileAction", { legalName: "Empresa ficticia", cuit: "30999999991", responsibleName: "Contacto ficticio", email: "fixture@example.invalid", phone: "", activity: "Prueba", locality: "Funes" }, true);
 add("companies/admin-actions", "admin", "adminCompanyAction", {}, true);
 add("accounts/actions", "admin", "accountStatusAction", {}, true);

@@ -1,4 +1,5 @@
 "use server";
+import { recordReference } from "@/lib/records/references";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { publicErrorFrom, AppError } from "@/lib/errors/public-error";
@@ -11,8 +12,9 @@ export async function saveAssistedAction(input: unknown) {
   try {
     const result = await saveAssistedCandidate(input);
     revalidatePath("/admin/candidates");
-    if (result.candidateId) revalidatePath(`/admin/candidates/${result.candidateId}`);
-    return { ...result, message: result.status === "duplicates" ? "Hay coincidencias por DNI o correo. Registrá una decisión explícita." : result.status === "rejected" ? "Alta rechazada con motivo registrado." : "Perfil guardado." };
+    revalidatePath("/admin/atencion-presencial");
+    if (result.candidateId) revalidatePath("/admin/candidates/[candidateId]", "page");
+    return { ...result, candidateReference: result.candidateId ? await recordReference("candidate", result.candidateId) : undefined, message: result.status === "duplicates" ? "Hay coincidencias por DNI o correo. Registrá una decisión explícita." : result.status === "rejected" ? "Alta rechazada con motivo registrado." : "Perfil guardado." };
   } catch (error) { return { status: "error" as const, message: publicErrorFrom(error).message }; }
 }
 const commandSchema = z.object({ candidateId: databaseUuidSchema, version: z.number().int().positive(),
@@ -28,8 +30,9 @@ export async function assistedCommandAction(input: unknown) {
     const result = await session.client.rpc("assisted_candidate_command", { p_candidate: data.candidateId,
       p_expected_version: data.version, p_command: data.command, p_policy_version: data.policyVersion ?? null, p_policy_hash: data.policyHash ?? null });
     if (result.error) throw workflowRpcError(result.error.message);
-    revalidatePath("/admin/candidates"); revalidatePath(`/admin/candidates/${data.candidateId}`);
-    revalidatePath(`/admin/candidates/assisted/${data.candidateId}`);
+    revalidatePath("/admin/candidates"); revalidatePath("/admin/candidates/[candidateId]", "page");
+    revalidatePath("/admin/atencion-presencial");
+    revalidatePath("/admin/candidates/assisted/[candidateId]", "page");
     return { success: true, message: data.command === "activate" ? "Perfil activo para evaluación interna." : "Consentimiento registrado." };
   } catch (error) { return { success: false, message: publicErrorFrom(error).message }; }
 }

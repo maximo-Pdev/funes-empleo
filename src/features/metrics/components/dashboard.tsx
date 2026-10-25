@@ -1,3 +1,4 @@
+import { RecordLabel } from "@/components/ui/record-link";
 import type { MetricRow } from "@/validation/metrics";
 const labels: Record<string, string> = {
   active_candidates: "Candidatos activos", companies: "Empresas", applications: "Postulaciones y nominaciones",
@@ -10,9 +11,9 @@ const states: Record<string, string> = { active: "activas", incomplete: "incompl
   draft: "en borrador", pending_review: "pendientes de revisión", changes_requested: "con correcciones solicitadas", published: "publicadas",
   paused: "pausadas", closed: "cerradas", rejected: "rechazadas", cancelled: "canceladas" };
 export function metricLabel(indicator: string) {
-  if (indicator.startsWith("companies_")) return `Empresas ${states[indicator.slice(10)] ?? indicator}`;
-  if (indicator.startsWith("openings_")) return `Ofertas ${states[indicator.slice(9)] ?? indicator}`;
-  return labels[indicator] ?? indicator;
+  if (indicator.startsWith("companies_")) return `Empresas ${states[indicator.slice(10)] ?? "con estado no reconocido"}`;
+  if (indicator.startsWith("openings_")) return `Ofertas ${states[indicator.slice(9)] ?? "con estado no reconocido"}`;
+  return labels[indicator] ?? "Indicador no reconocido";
 }
 export function Dashboard({ rows }: { rows: readonly MetricRow[] }) {
   const durations = rows.filter((r) => r.unit === "days");
@@ -32,7 +33,7 @@ export function Dashboard({ rows }: { rows: readonly MetricRow[] }) {
       {durations.length === 0 ? <p>No hay ofertas publicadas en este período y categoría. Los conteos cero no equivalen a tiempos de cero días.</p> :
         <ul className="grid gap-3 sm:grid-cols-2">{durations.map((r) => <li key={`${r.indicator}:${r.opening_id}`} data-testid={`duration-${r.indicator}-${r.opening_id}`} className="rounded border bg-white p-4">
           <h3 className="font-semibold break-words">{r.opening_title ?? "Oferta sin título"}</h3>
-          <p className="break-all text-sm">Código: {r.opening_id}</p>
+          <p className="break-all text-sm">Código: {r.opening_id && <RecordLabel kind="opening" id={r.opening_id} />}</p>
           <p>{metricLabel(r.indicator)}: <strong>{r.state === "pending" ? (r.indicator === "coverage_days" ? "Pendiente de cubrir todas las vacantes" : "Pendiente de primera contratación") : `${r.value?.toLocaleString("es-AR", { maximumFractionDigits: 2 })} días`}</strong></p>
         </li>)}</ul>}
     </section>

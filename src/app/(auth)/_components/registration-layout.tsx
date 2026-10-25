@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { registrationContent as content } from "@/features/accounts/registration-content";
 import styles from "./registration.module.css";
 
-
 export function RegistrationLayout({ role, children }: { role: keyof typeof content; children: ReactNode }) {
   const copy = content[role];
   const Icon = role === "candidate" ? UserRoundPlus : Building2;

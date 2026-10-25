@@ -25,6 +25,18 @@ describe("métricas y seguimiento", () => {
     expect(csv).toContain('"\'=DEMO"');
     expect(csv).not.toMatch(/dni|candidate_id|email|summary_internal/);
   });
+  it("exporta códigos de categoría y oferta sin UUID ni pérdida de precisión", async () => {
+    const id = "0a000000-0000-4000-8000-000000000001";
+    const reference = "ofe-0123456789abcdef01234567";
+    const category = "rub-0123456789abcdef01234567";
+    const csv = await new Response(metricsCsv({ from: "2026-09-01", to: "2026-09-20", category: id }, [
+      { indicator: "first_hire_days", value: 1.25, unit: "days", state: "calculated", category_id: id, category_name: "Categoría ficticia", opening_id: id, opening_title: "Oferta ficticia" },
+    ], { categories: { [id]: category }, openings: { [id]: reference } })).text();
+    expect(csv).toContain(reference);
+    expect(csv).toContain(category);
+    expect(csv).toContain('"1.25"');
+    expect(csv).not.toContain(id);
+  });
   it("ordena contactos cronológicamente de manera determinista sin mutar entrada", () => {
     const values = [{ id: "b", occurred_at: "2026-09-20T00:00:00Z" }, { id: "a", occurred_at: "2026-09-19T00:00:00Z" }];
     expect(orderContacts(values).map((v) => v.id)).toEqual(["a", "b"]);

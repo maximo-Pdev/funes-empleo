@@ -1,3 +1,4 @@
+import { persistedReference } from "./fixtures/record-reference";
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
@@ -41,7 +42,7 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   const next = section.getByRole("link", { name: "Siguiente", exact: true });
   await next.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(new RegExp(`/admin/openings/${id}\\?matchPage=2#opening-matches$`));
+  await expect(page).toHaveURL(new RegExp(`/admin/openings/${persistedReference("opening", id)}\\?matchPage=2#opening-matches$`));
   await expect(section.getByText(/Página 2 de/)).toBeVisible();
   const secondNames = await section.getByRole("heading", { level: 3 }).allTextContents();
   expect(secondNames.some(name => firstNames.includes(name))).toBe(false);
@@ -55,6 +56,8 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("button", { name: "Nominar a esta oferta", exact: true })).toBeVisible();
   await expect(dialog.getByRole("heading", { name: "Habilidades y experiencia", exact: true })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: "Categorías laborales", exact: true })).toBeVisible();
+  await expect(dialog).not.toContainText("interés");
   expect((await new AxeBuilder({ page }).include("dialog[open]").analyze()).violations).toEqual([]);
   expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
   await page.keyboard.press("Escape");
@@ -92,7 +95,7 @@ test("nomina desde el popup a esta oferta y no vuelve a mostrar al candidato", a
   await expect(section.getByRole("button", { name: name!, exact: true })).toHaveCount(0);
   await page.reload();
   await expect(section.getByRole("button", { name: name!, exact: true })).toHaveCount(0);
-  await expect(page).toHaveURL(new RegExp(`/admin/openings/${id}$`));
+  await expect(page).toHaveURL(new RegExp(`/admin/openings/${persistedReference("opening", id)}$`));
   expect(runLocalMaintenanceSql(`select count(*) from public.participations where candidate_id='${candidate}' and opening_id='${id}' and origin='admin_nomination' and status='under_review'`)).toBe("1");
   expect(runLocalMaintenanceSql("select count(*) from public.referrals")).toBe(referralsBefore);
 });

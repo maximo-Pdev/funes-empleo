@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { recordReference, routeIdentifier } from "@/lib/records/references";
+import { databaseIdentifierPattern } from "@/lib/records/reference-format";
 import { readAccountSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -17,10 +18,15 @@ function denied(status: number) {
 }
 
 export async function GET(_request: Request, context: { params: Promise<{ cvId: string }> }) {
-  const { cvId } = await context.params;
-  if (!z.guid().safeParse(cvId).success) return denied(404);
+  const { cvId: reference } = await context.params;
   const session = await readAccountSession();
   if (!session || session.account.status !== "active") return denied(401);
+
+  let cvId: string;
+  try { cvId = await routeIdentifier("cv", reference); } catch { return denied(404); }
+  if (databaseIdentifierPattern.test(reference)) {
+    return new Response(null, { status: 307, headers: { ...headers, Location: `/api/cv/${await recordReference("cv", cvId)}` } });
+  }
 
   // Both the RPC and Storage RLS recompute the active ownership/referral permission
   // for this request. No signed URL or storage path is sent to the browser.

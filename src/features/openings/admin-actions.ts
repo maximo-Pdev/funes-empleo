@@ -12,7 +12,7 @@ export async function moderateOpeningAction(input: unknown): Promise<AdminMutati
       typeof input.openingId === "string" ? input.openingId : "";
     revalidatePath("/admin/openings");
     revalidatePath("/admin/participations");
-    if (openingId) revalidatePath(`/admin/openings/${openingId}`);
+    if (openingId) revalidatePath("/admin/openings/[openingId]", "page");
     return { code: "OK", ...result };
   } catch (error) { return adminActionFailure(error); }
 }

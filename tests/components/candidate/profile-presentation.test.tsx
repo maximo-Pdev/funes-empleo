@@ -47,6 +47,7 @@ const props: ComponentProps<typeof CandidateProfilePanel> = {
   categories: [{ id: categoryId, name: "Categoría ficticia", code: "FICT" }], selectedCategories: [categoryId],
   consent: { status: "accepted", policy_version: "demo-not-approved", recorded_at: "2026-10-22" },
   cv: { id: categoryId, original_name_safe: "cv-ficticio.pdf", byte_size: 608 },
+  cvReference: "CV-FICTICIA-0001",
   policy: { version: "demo-not-approved", policy_text: "Política ficticia íntegra para pruebas.", policy_hash: "0".repeat(64) },
 };
 
@@ -66,7 +67,7 @@ describe("presentación de consentimiento y activación", () => {
     let cvRegion = screen.getByRole("region", { name: "CV PDF" });
     expect(cvRegion.querySelector('[data-slot="attachment"]')).not.toBeNull();
     expect(cvRegion.querySelector('[data-slot="attachment-title"]')?.textContent).toBe("cv-ficticio.pdf");
-    expect(within(cvRegion).getByRole("link", { name: "Descargar mi CV" }).getAttribute("href")).toBe(`/api/cv/${categoryId}`);
+    expect(within(cvRegion).getByRole("link", { name: "Descargar mi CV" }).getAttribute("href")).toBe("/api/cv/CV-FICTICIA-0001");
     expect(within(cvRegion).queryByRole("button", { name: /eliminar/i })).toBeNull();
     rerender(<CandidateProfilePanel {...props} cv={null} />);
     cvRegion = screen.getByRole("region", { name: "CV PDF" });

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Form } from "@/components/forms/form";
-import { Field } from "@/components/forms/field";
+import { FileInput } from "@/components/forms/file-input";
 import { Button } from "@/components/ui/button";
 
 const messages = {
@@ -40,10 +40,8 @@ export function CvUploadForm({ candidateId, version, returnTo, label = "Elegir P
       } finally { setBusy(false); }
     }}>
     <input type="hidden" name="candidateId" value={candidateId} /><input type="hidden" name="version" value={version} />{returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-    <Field className="grid gap-1" label={label} hint="PDF válido de hasta 5 MiB." error={error}>
-      <input className="min-h-11 w-full min-w-0 py-2" type="file" name="cv" accept=".pdf,application/pdf" required
-        data-max-bytes={5 * 1024 * 1024} data-file-error="Elegí un PDF no vacío de hasta 5 MiB." />
-    </Field>
+    <FileInput label={label} hint="PDF válido de hasta 5 MiB." error={error} name="cv" accept=".pdf,application/pdf" required
+      data-max-bytes={5 * 1024 * 1024} data-file-error="Elegí un PDF no vacío de hasta 5 MiB." />
     {saved && <p role="status">CV guardado.</p>}
     {refreshing && <p role="status">CV guardado; actualizando el perfil…</p>}
     <Button type="submit" disabled={busy || refreshing}>{busy || refreshing ? "Cargando CV…" : buttonLabel}</Button>

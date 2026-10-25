@@ -9,7 +9,7 @@
   "interactive": {
     "version": "funes-demo-v2-10-accounts",
     "seedFile": "supabase/seed.sql",
-    "seedSha256": "13ec9c149d5b9cbe48acf5282aa7bb1c8b69f739c9096450e4f7d457867c57ec",
+    "seedSha256": "482cf8be4fb5357abef6b56639162c98d5677afa5c2a186a86875d74496b8da4",
     "counts": {
       "administrators": 2,
       "candidates": 4,
@@ -47,7 +47,7 @@
     "version": "funes-acceptance-v2-test-only",
     "localOnly": true,
     "seedFile": "tests/fixtures/acceptance-seed.sql",
-    "seedSha256": "88fd1c86d2c97901cce8ea12328988e1b0b1b0e600a5f6034bc9aaeffea798db",
+    "seedSha256": "b03bf3e2109b54fe922a2748bf211c96aafa819daa0f11b38e46f4488ec53272",
     "counts": {
       "administrators": 4,
       "candidates": 500,

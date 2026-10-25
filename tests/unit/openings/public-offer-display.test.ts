@@ -1,12 +1,15 @@
 import { expect, it } from "vitest";
 import { formatPublicClosingDate, publicContractTypeLabel, publicModalityLabel } from "@/features/openings/public-offer-display";
 
-it("traduce únicamente los códigos legacy observados", () => {
+it("traduce códigos conocidos solo en presentación", () => {
   expect(publicModalityLabel("onsite")).toBe("Presencial");
   expect(publicContractTypeLabel("fixed_term")).toBe("Plazo fijo");
+  expect(publicModalityLabel("remote")).toBe("Remoto");
+  expect(publicModalityLabel("hybrid")).toBe("Híbrido");
+  expect(publicContractTypeLabel("permanent")).toBe("Permanente");
 });
 
-it.each(["", "remote", "presencial", "tiempo_indeterminado", "ONSITE", " onsite ", "toString", "__proto__", "Texto municipal sin normalizar"])("conserva valores desconocidos verbatim: %s", (value) => {
+it.each(["", "legacy-remote", "presencial", "tiempo_indeterminado", "ONSITE", " onsite ", "toString", "__proto__", "Texto municipal sin normalizar"])("conserva valores desconocidos verbatim: %s", (value) => {
   expect(publicModalityLabel(value)).toBe(value);
   expect(publicContractTypeLabel(value)).toBe(value);
 });

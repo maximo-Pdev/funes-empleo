@@ -32,16 +32,17 @@ flujos de una vez. Con el servidor propio iniciado según la preparación:
 1. Abrir <http://127.0.0.1:3000> sin iniciar sesión, en Chrome o Edge normal.
    Restablecer el zoom real a **100 % con Ctrl+0**. No usar emulación de viewport
    o escala como prueba de zoom real. Apartar el mouse durante el recorrido.
-2. Desde la página recién abierta, pulsar **Tab** para revelar el enlace de salto,
-   **Enter** para ir al contenido principal y luego **Tab**. El destino esperado
-   es `main#contenido` y el siguiente control esperado es el CTA principal de
-   registro de candidato. Son expectativas a comprobar, no observaciones humanas.
-   Anotar qué recibió realmente el foco, si se vio y si hubo bloqueo; no activar
-   el registro ni enviar formularios.
+2. Desde la página recién abierta, pulsar **Tab** y comprobar foco visible en la
+   navegación existente: `Ofertas` de «Accesos principales» en escritorio; enlace
+   municipal de la cabecera en móvil. El enlace global «Ir al contenido principal»
+   se retira por A16/EXTRA053. Continuar con Tab sin activar enlaces externos ni
+   enviar formularios. En portada, comprobar además que el enlace visible Inicio
+   de la cabecera devuelve el foco a `main#contenido`. Son expectativas a
+   comprobar, no observaciones humanas. Anotar foco real y cualquier bloqueo.
 3. Detenerse y pedir este informe breve antes de avanzar:
    - ¿Qué navegador y versión usaste, con qué resolución y qué zoom mostró el navegador?
-   - ¿Apareció el enlace de salto con Tab y dónde quedó el foco después de Enter?
-   - ¿Qué control quedó enfocado con el siguiente Tab, se veía el foco y hubo contenido oculto o bloqueo?
+   - ¿Qué control recibió el primer Tab y se veía el foco?
+   - ¿Inicio devolvió el foco al contenido, y hubo contenido oculto o bloqueo al continuar con Tab?
 
 El coordinador asignará un seudónimo y registrará las respuestas reales. Solo después
 se propondrá repetir el mismo caso usando **el menú de zoom del navegador al 200 %**,

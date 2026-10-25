@@ -1,4 +1,7 @@
-import Link from "next/link";
+import { referenceFilters } from "@/lib/records/page-references";
+import { recordReferences } from "@/lib/records/references";
+import { RecordLink as Link } from "@/components/ui/record-link";
+import { availabilityLabel } from "@/domain/presentation/labels";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { EmptyState, FeedbackMessage } from "@/components/ui";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
@@ -12,9 +15,10 @@ type SearchParams = Record<string, string | string[] | undefined>;
 
 export default async function AdminCandidatesPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const { user } = await requireActiveAccount(["admin"]);
-  const raw = await searchParams;
+  const raw = await referenceFilters("/admin/candidates", await searchParams, { categoryId: "category" });
   const parsed = candidateSearchSchema.safeParse(raw);
   const categories = await listCandidateSearchCategories();
+  const categoryReferences = await recordReferences("category", categories.map(category => category.id));
   const results = parsed.success ? await searchCandidates(parsed.data) : null;
   const pageUrl = (page: number) => {
     const params = new URLSearchParams();
@@ -28,7 +32,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
   return <AdminShell email={user?.email} active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/admin/imports", label: "Importaciones" }, { href: "/admin/metrics", label: "Métricas" }, { href: "/account", label: "Mi cuenta" }]}>
     <Link href="/admin/candidates/assisted" className="inline-block rounded bg-blue-800 p-3 text-white">Nueva atención presencial</Link>
-    <CandidateSearchForm categories={categories.map((category) => ({ id: category.id, name: category.name }))}
+    <CandidateSearchForm categories={categories.map((category) => ({ id: category.id, name: category.name, reference: categoryReferences[category.id]! }))}
       initial={parsed.success ? parsed.data : undefined} />
     {!parsed.success && <div className="mt-5"><FeedbackMessage tone="error">Revisá los filtros y volvé a buscar. No se aceptan caracteres especiales en los términos.</FeedbackMessage></div>}
     {results && <section aria-label="Resultados de búsqueda" className="mt-8 space-y-4">
@@ -37,7 +41,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
         <ul className="grid gap-3 md:grid-cols-2">
           {results.items.map((candidate) => <li key={candidate.id} className="rounded-lg border border-slate-300 bg-white p-5">
             <h3 className="text-lg font-semibold"><Link className="text-blue-800 underline" href={`/admin/candidates/${candidate.id}`}>{candidate.displayName}</Link></h3>
-            <p className="mt-1">{candidate.locality ?? "Localidad no informada"} · {candidate.availability ?? "Disponibilidad no informada"}</p>
+            <p className="mt-1">{candidate.locality ?? "Localidad no informada"} · {availabilityLabel(candidate.availability)}</p>
             <p className="mt-1 text-sm">{candidate.categories.length ? candidate.categories.map((category) => category.name).join(", ") : "Sin categorías activas"}</p>
             <p className="mt-2 font-medium">{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</p>
           </li>)}

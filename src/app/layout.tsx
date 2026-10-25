@@ -10,7 +10,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="es-AR">
       <body>
-        <a href="#contenido" className="sr-only focus:not-sr-only focus:block focus:p-4">Ir al contenido principal</a>
         {children}
       </body>
     </html>

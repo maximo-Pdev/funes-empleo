@@ -1,3 +1,4 @@
+import { persistedReference } from "./fixtures/record-reference";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
@@ -25,7 +26,7 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
   await expect(page.getByRole("heading", { name: "Métricas operativas" })).toBeVisible();
   await page.getByLabel("Desde", { exact: true }).fill("2026-09-01");
   await page.getByLabel("Hasta", { exact: true }).fill("2026-09-20");
-  await page.getByRole("combobox", { name: "Categoría", exact: true }).selectOption(fixtureId("category",1));
+  await page.getByRole("combobox", { name: "Categoría", exact: true }).selectOption({ label: "Categoría ficticia A (DEMO-A, v1)" });
   const started = Date.now();
   await page.getByRole("button", { name: "Aplicar filtros" }).click();
   await expect(page.getByTestId("metric-active_candidates").locator("dd")).toHaveText("200");
@@ -47,11 +48,11 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
   expect(rows.find((r) => r.indicador === "active_candidates")?.valor).toBe("200");
   expect(rows.find((r) => r.indicador === "companies")?.categoria_codigo).toBe("");
   expect(rows.filter((r) => r.unidad === "days")).toHaveLength(100);
-  expect(rows.find((r) => r.indicador === "coverage_days" && r.oferta_codigo === fixtureId("opening",22))?.valor).toBe("");
+  expect(rows.find((r) => r.indicador === "coverage_days" && r.oferta_codigo === persistedReference("opening", fixtureId("opening",22)))?.valor).toBe("");
   expect(rows.every((r) => r.periodo_desde === "2026-09-01" && r.periodo_hasta === "2026-09-20")).toBe(true);
   expect(rows.filter((r) => r.unidad !== "days").every((r) => !r.oferta_codigo && !r.oferta_titulo)).toBe(true);
   expect(csv).toContain("'=OFERTA FICTICIA");
-  expect(csv).not.toMatch(/Persona ficticia|@example.invalid|dni|summary_internal/);
+  expect(csv).not.toMatch(/Persona ficticia|@example.invalid|dni|summary_internal|[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i);
   expect(Number(runLocalMaintenanceSql("select count(*) from private.metrics_exports"))).toBe(auditBefore + 1);
   expect(runLocalMaintenanceSql("select count(*) from public.audit_events e join private.metrics_exports x on x.id=e.entity_id and x.request_id=e.request_id where e.action='metrics_exported' and e.actor_account_id=x.actor_id and x.period_from='2026-09-01' and x.period_to='2026-09-20'")).not.toBe("0");
   await page.setViewportSize({ width: 360, height: 800 });

@@ -1,56 +1,88 @@
 "use client";
+import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveCompanyOpeningAction, submitCompanyOpeningAction } from "../../company-actions";
 import type { CompanyOffer } from "../../company-service";
+import { publicModalityLabel, publicContractTypeLabel } from "../../public-offer-display";
+import { Button } from "@/components/ui";
+import { canEditCompanyOpening, canCancelCompanyOpening } from "../../company-opening-policy";
+import { CompanyOpeningCancel } from "./company-opening-cancel";
+import { ModerationHistory } from "../moderation-history";
+import { CompanyOpeningDetails } from "./company-opening-details";
+
+function OpeningTextField({ name, label, initial, format, className, required = false }: {
+  name: string; label: string; initial: string; format: (value: string) => string; className: string; required?: boolean;
+}) {
+  const [value, setValue] = useState(initial);
+  return <>
+    <input type="hidden" name={name} value={value} />
+    <Field className="grid gap-1">{label}<input className={className} name={`${name}Display`} required={required} value={format(value)}
+      onChange={event => setValue(event.target.value)} maxLength={100} /></Field>
+  </>;
+}
 
 export function CompanyOpeningForm({ opening, categories }: { opening: CompanyOffer | null; categories: { id: string; name: string }[] }) {
   const router = useRouter();
+  const openingId = opening?.id;
+  const [editingTarget, setEditingTarget] = useState<string | null>(null);
+  const openingTarget = opening ? `${opening.id}:${opening.version}` : null;
+  const editButton = useRef<HTMLButtonElement>(null);
+  const editorHeading = useRef<HTMLHeadingElement>(null);
+  const wasEditing = useRef(false);
   const [saved, saveAction, saving] = useActionState(saveCompanyOpeningAction, { message: "", success: false });
   const [submitted, submitAction, submitting] = useActionState(submitCompanyOpeningAction, { message: "", success: false });
   const feedback = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
     if (saved.message) feedback.current?.focus();
     if (saved.success && saved.id) {
-      if (!opening) router.push(`/empresa/ofertas/${saved.id}`);
+      if (!openingId && saved.reference) router.push(`/empresa/ofertas/${saved.reference}`);
       else router.refresh();
     }
-  }, [saved, opening, router]);
+  }, [saved, openingId, router]);
   useEffect(() => { if (submitted.success) router.refresh(); }, [submitted, router]);
-  const editable = !opening || opening.status === "draft" || opening.status === "changes_requested";
+  const publishedEditing = opening?.status === "published";
+  const editable = !opening || canEditCompanyOpening(opening.status);
+  const editing = !opening || (editable && editingTarget === openingTarget);
+  useEffect(() => {
+    if (openingId && editing) editorHeading.current?.focus();
+    else if (wasEditing.current) editButton.current?.focus();
+    wasEditing.current = editing;
+  }, [editing, openingId]);
   const field = "w-full rounded border border-slate-500 p-2";
   return <div className="space-y-6">
-    {opening && <p role="status" className="rounded bg-blue-50 p-3">Estado: <strong>{opening.status}</strong>. {opening.status === "closed" ? "La fecha de cierre terminó. La oferta ya no recibe postulaciones." : "Solo la Oficina puede publicar o confirmar resultados."}</p>}
-    {editable && <Form action={saveAction} result={saved} className="grid gap-4 rounded border bg-white p-5" aria-busy={saving}>
+    {opening && <p role="status" className="rounded bg-blue-50 p-3">Estado: <strong>{displayLabel(openingStatusLabels, opening.status)}</strong>. {opening.status === "closed" ? "La fecha de cierre terminó. La oferta ya no recibe postulaciones." : "Solo la Oficina puede publicar o confirmar resultados."}</p>}
+    {opening && editable && <Button ref={editButton} variant="secondary" className="justify-self-start" aria-expanded={editing} disabled={saving || submitting}
+      onClick={() => setEditingTarget(editing ? null : openingTarget)}>{editing ? "Cancelar edición" : "Editar oferta"}</Button>}
+    {opening && !editing && <CompanyOpeningDetails opening={opening} />}
+    {publishedEditing && editing && <p>Al guardar los cambios, la oferta volverá a revisión municipal y dejará de estar publicada hasta su aprobación. Las participaciones y sus resultados se conservan.</p>}
+    <p ref={feedback} tabIndex={-1} role={saved.success ? "status" : "alert"} aria-live="polite">{saved.message}</p>
+    {editing && <Form action={saveAction} result={saved} requirements={publishedEditing ? [{ names: ["categories"], message: "Seleccioná al menos una categoría laboral." }] : []} className="grid gap-4 rounded border bg-white p-5" aria-busy={saving}>
+      {opening && <h2 ref={editorHeading} tabIndex={-1} className="text-xl font-semibold md:col-span-2">Editar oferta</h2>}
       {opening && <><input type="hidden" name="id" value={opening.id} /><input type="hidden" name="version" value={opening.version} /></>}
-      <Field className="grid gap-1">Título<input className={field} name="title" defaultValue={opening?.title ?? ""} maxLength={200} /></Field>
-      <Field className="grid gap-1">Tareas<textarea className={field} name="tasks" defaultValue={opening?.tasks ?? ""} maxLength={5000} rows={4} /></Field>
-      <Field className="grid gap-1">Requisitos<textarea className={field} name="requirements" defaultValue={opening?.requirements ?? ""} maxLength={5000} rows={4} /></Field>
-      <Field className="grid gap-1">Vacantes<input className={field} name="vacancies" type="number" min={1} defaultValue={opening?.vacancies ?? ""} /></Field>
-      <Field className="grid gap-1">Ubicación<input className={field} name="location" defaultValue={opening?.location ?? ""} maxLength={200} /></Field>
-      <Field className="grid gap-1">Modalidad<input className={field} name="modality" defaultValue={opening?.modality ?? ""} maxLength={100} /></Field>
-      <Field className="grid gap-1">Horario<input className={field} name="schedule" defaultValue={opening?.schedule ?? ""} maxLength={500} /></Field>
-      <Field className="grid gap-1">Tipo de contratación<input className={field} name="contractType" defaultValue={opening?.contract_type ?? ""} maxLength={100} /></Field>
-      <Field className="grid gap-1">Fecha de cierre<input className={field} name="closingDate" type="date" defaultValue={opening?.closingDate ?? ""} /></Field>
+      <Field className="grid gap-1">Título<input className={field} name="title" required={publishedEditing} defaultValue={opening?.title ?? ""} maxLength={200} /></Field>
+      <Field className="grid gap-1">Tareas<textarea className={field} name="tasks" required={publishedEditing} defaultValue={opening?.tasks ?? ""} maxLength={5000} rows={4} /></Field>
+      <Field className="grid gap-1">Requisitos<textarea className={field} name="requirements" required={publishedEditing} defaultValue={opening?.requirements ?? ""} maxLength={5000} rows={4} /></Field>
+      <Field className="grid gap-1">Vacantes<input className={field} name="vacancies" required={publishedEditing} type="number" min={1} defaultValue={opening?.vacancies ?? ""} /></Field>
+      <Field className="grid gap-1">Ubicación<input className={field} name="location" required={publishedEditing} defaultValue={opening?.location ?? ""} maxLength={200} /></Field>
+      <OpeningTextField name="modality" required={publishedEditing} label="Modalidad" className={field} initial={opening?.modality ?? ""} format={publicModalityLabel} />
+      <Field className="grid gap-1">Horario<input className={field} name="schedule" required={publishedEditing} defaultValue={opening?.schedule ?? ""} maxLength={500} /></Field>
+      <OpeningTextField name="contractType" required={publishedEditing} label="Tipo de contratación" className={field} initial={opening?.contract_type ?? ""} format={publicContractTypeLabel} />
+      <Field className="grid gap-1">Fecha de cierre<input className={field} name="closingDate" required={publishedEditing} type="date" defaultValue={opening?.closingDate ?? ""} /></Field>
       <Field className="grid gap-1">Salario (opcional)<input className={field} name="salary" defaultValue={opening?.salary ?? ""} maxLength={500} /></Field>
       <Field className="grid gap-1">Beneficios (opcional)<textarea className={field} name="benefits" defaultValue={opening?.benefits ?? ""} maxLength={2000} /></Field>
       <fieldset className="rounded border p-3"><legend className="font-semibold">Categorías</legend><div className="grid gap-2 sm:grid-cols-2">{categories.map((category) => <Field key={category.id} className="flex gap-2"><input type="checkbox" name="categories" value={category.id} defaultChecked={opening?.categories.some((selected) => selected.id === category.id)} />{category.name}</Field>)}</div></fieldset>
-      <p ref={feedback} tabIndex={-1} role={saved.success ? "status" : "alert"} aria-live="polite">{saved.message}</p>
-      <button disabled={saving} className="rounded bg-blue-800 p-3 text-white">Guardar borrador</button>
+      <Button type="submit" busy={saving}>{publishedEditing ? "Guardar cambios y enviar a revisión" : "Guardar borrador"}</Button>
     </Form>}
-    {opening && editable && <Form action={submitAction} result={submitted} className="grid gap-3 rounded border bg-white p-5" aria-busy={submitting}>
+    {opening && editable && !editing && !publishedEditing && <Form action={submitAction} result={submitted} className="grid gap-3 rounded border bg-white p-5" aria-busy={submitting}>
       <input type="hidden" name="id" value={opening.id} /><input type="hidden" name="version" value={opening.version} />
       <p>Completá todos los datos laborales y guardá los cambios antes de enviar. El envío no publica la oferta.</p>
       <p role={submitted.success ? "status" : "alert"} aria-live="polite">{submitted.message}</p>
-      <button disabled={submitting} className="rounded bg-green-800 p-3 text-white">Enviar a revisión municipal</button>
+      <Button type="submit" busy={submitting}>Enviar a revisión municipal</Button>
     </Form>}
-    {opening && <section className="rounded border bg-white p-5"><h2 className="text-xl font-semibold">Historial de moderación</h2>
-      {opening.history.length === 0 ? <p className="mt-2">Todavía no hay decisiones.</p> : <ol className="mt-3 grid gap-3">{opening.history.map((event, index) => <li key={`${event.at}-${index}`} className="rounded border p-3">
-        <p>{new Date(event.at).toLocaleString("es-AR")}: <strong>{event.newStatus}</strong></p>
-        {event.message && <p>Mensaje de la Oficina: {event.message}</p>}
-      </li>)}</ol>}
-    </section>}
+    {opening && canCancelCompanyOpening(opening.status) && <CompanyOpeningCancel openingId={opening.id} version={opening.version} />}
+    {opening && <ModerationHistory key={`${opening.id}:${opening.version}`} events={opening.history.map((event, index) => ({ id: `${event.at}:${index}`, ...event })).reverse()} />}
   </div>;
 }

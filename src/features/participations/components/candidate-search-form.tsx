@@ -8,10 +8,11 @@ import type { CandidateSearchFilters } from "@/validation/candidate-search";
 
 type SearchValues = Omit<CandidateSearchFilters, "page" | "pageSize">;
 
-export function CandidateSearchForm({ categories, initial, onSearch }: {
-  categories: readonly { id: string; name: string }[];
+export function CandidateSearchForm({ categories, initial, onSearch, destination = "/admin/candidates" }: {
+  categories: readonly { id: string; name: string; reference?: string }[];
   initial?: Partial<SearchValues>;
   onSearch?: (filters: SearchValues) => void;
+  destination?: "/admin/candidates" | "/admin/atencion-presencial";
 }) {
   const router = useRouter();
   const [term, setTerm] = useState(initial?.term ?? "");
@@ -29,7 +30,12 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
     if (onSearch) { onSearch(filters); return; }
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
-    router.push(`/admin/candidates?${params.toString()}`);
+    if (categoryId) {
+      const reference = categories.find(category => category.id === categoryId)?.reference;
+      if (!reference) return;
+      params.set("categoryId", reference);
+    }
+    router.push(`${destination}?${params.toString()}`);
   }
 
   return <Form onSubmit={submit} className="grid gap-4 rounded-lg border border-slate-300 bg-white p-5 sm:grid-cols-2" role="search">
@@ -37,7 +43,9 @@ export function CandidateSearchForm({ categories, initial, onSearch }: {
     <SelectField id="candidate-category" label="Categoría" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}
       options={categories.map((category) => ({ value: category.id, label: category.name }))} placeholder="Todas las categorías" />
     <TextField id="candidate-skills" label="Habilidades" value={skills} onChange={(event) => setSkills(event.target.value)} maxLength={100} />
-    <TextField id="candidate-availability" label="Disponibilidad" value={availability} onChange={(event) => setAvailability(event.target.value)} maxLength={100} />
+    <SelectField id="candidate-availability" label="Disponibilidad" value={availability} onChange={(event) => setAvailability(event.target.value)}
+      placeholder="Todas las disponibilidades" options={[{ value: "available", label: "Disponible" }, { value: "unavailable", label: "No disponible" },
+        ...(!["", "available", "unavailable"].includes(availability) ? [{ value: availability, label: "Filtro anterior" }] : [])]} />
     <TextField id="candidate-locality" label="Localidad" value={locality} onChange={(event) => setLocality(event.target.value)} maxLength={100} />
     <SelectField id="candidate-vigency" label="Vigencia" value={vigency} onChange={(event) => setVigency(event.target.value as SearchValues["vigency"])}
       options={[{ value: "current", label: "Vigente" }, { value: "needs_update", label: "Necesita actualización" }, { value: "all", label: "Todas" }]} />

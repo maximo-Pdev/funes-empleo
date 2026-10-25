@@ -1,3 +1,4 @@
+import { recordReference } from "@/lib/records/references";
 import { FeedbackMessage } from "@/components/ui";
 import { getOpeningMatches } from "@/features/candidates/matching-service";
 import { openingMatchingInput, type OpeningMatches } from "@/validation/opening-matching";
@@ -13,5 +14,5 @@ export async function OpeningCandidateMatches({ openingId, page }: { openingId: 
   } catch {
     return <FeedbackMessage tone="error">No pudimos cargar las coincidencias. Recargá la página para intentarlo nuevamente.</FeedbackMessage>;
   }
-  return <OpeningCandidateMatchesList openingId={openingId} matches={matches} />;
+  return <OpeningCandidateMatchesList openingId={openingId} openingReference={await recordReference("opening", openingId)} matches={matches} />;
 }

@@ -6,7 +6,7 @@ export function csvCell(value: string | number | null): string {
   return `"${safe.replaceAll('"', '""')}"`;
 }
 // Bounded chunks; no CSV contents in logs, storage or audit.
-export function metricsCsv(filters: MetricsFilters, rows: readonly MetricRow[]): ReadableStream<Uint8Array> {
+export function metricsCsv(filters: MetricsFilters, rows: readonly MetricRow[], references: { categories: Record<string, string>; openings: Record<string, string> } = { categories: {}, openings: {} }): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   let index = -1;
   return new ReadableStream({
@@ -17,8 +17,8 @@ export function metricsCsv(filters: MetricsFilters, rows: readonly MetricRow[]):
       } else if (index < rows.length) {
         const r = rows[index++];
         if (!r) { controller.close(); return; }
-        controller.enqueue(encoder.encode([filters.from, filters.to, r.category_id, r.category_name,
-          r.indicator, r.value, r.unit, r.state, r.opening_id, r.opening_title].map(csvCell).join(",") + "\r\n"));
+        controller.enqueue(encoder.encode([filters.from, filters.to, r.category_id ? references.categories[r.category_id] ?? null : null, r.category_name,
+          r.indicator, r.value, r.unit, r.state, r.opening_id ? references.openings[r.opening_id] ?? null : null, r.opening_title].map(csvCell).join(",") + "\r\n"));
       } else controller.close();
     },
   });
