@@ -4169,3 +4169,141 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   CI40205272342, pendiente nueva suite completa tras publicar este ajuste.
   T202 verificada también en CI; T203 implementada/verificada local. PR75
   permanece abierto sin merge y cambios ajenos excluidos; sin cambios alojados.
+
+## EXTRA-070 — Perfil y CV antes de notas en el detalle administrativo
+
+- **Fecha/origen/autorización:**2026-10-25, pedido explícito de Mateo; FR-010,
+  FR-011, FR-013, FR-052 y FR-070. Cambio visual autorizado; revisión pendiente.
+- **Evidencia:** el detalle normal coloca resumen/CV después de notas; el
+  presencial separa el resumen en la otra columna. EXTRA060 fijaba ese orden,
+  sustituido únicamente en su composición por esta solicitud posterior.
+- **Propuesta mínima:** renderizar una vez Perfil candidato y luego CV PDF del
+  candidato antes del formulario y listado de notas, en la primera columna.
+  Mantener edición presencial antes de esas tarjetas y controles/participaciones
+  en la segunda. En móvil conservar el mismo orden de lectura del DOM.
+- **Archivos/contratos:** página admin/candidates/[candidateId], expectativas
+  existentes de admin-pages, spec/plan/tasks y UI_GUIDELINES. Sin contratos de
+  datos, consultas, permisos, formularios, dependencias o migraciones nuevos.
+- **Riesgos:** duplicar tarjetas/IDs, cambiar visibilidad de CV archivado o
+  mantenimiento presencial. Conservar condiciones y acciones sin modificarlas.
+- **Verificación prevista:** pruebas existentes de normales/presenciales/vinculados/
+  archivados y CV vigente/ausente; tipos/lint/unitarias/build, composición de
+  navegador ficticia en escritorio/móvil. No reset ni datos alojados necesarios.
+- **Git:** main actualizado a a3cd69f, PR75 confirmado mergeado; rama anterior
+  eliminada local/remota y fix/admin-candidate-card-order creada. next-env.d.ts
+  ajeno preservado. Estado: registrado antes de implementar; CI/revisión pendientes.
+- **Implementación/verificación:** página coloca profileDetails/candidateCv una
+  sola vez antes de InternalNoteForm y Notas internas. Mantiene guard, consultas,
+  CV archivado oculto, carga asistida/vinculación y segunda columna intactos.
+  Expectativas existentes actualizadas para orígenes/estados, sin pruebas nuevas
+  redundantes. Spec/plan/UI alineados; análisis acotado: presentación sin nueva
+  arquitectura, contrato o decisión municipal; sin gates arquitectónicos nuevos.
+- **Resultados2026-10-25:**1195 pruebas/90 archivos y cobertura configurada PASS;
+  57 pruebas del componente administrativo PASS. Lint, tipos y build PASS;
+  tipos/build en copia aislada con todos los archivos src comparados por hash.
+  Primera suite tuvo timeout del escaneo español con build/navegador simultáneos;
+  repetición completa sin esa carga:1195 PASS en42.19s, límites sin alterar.
+  Navegador con composición real y servicios ficticios: normal/presencial sin
+  cuenta,1440/390px, cuatro escenarios PASS; orden geométrico perfil→CV→notas,
+  controles contenidos y sin desborde horizontal. Capturas revisadas en
+  test-results/admin-card-order-visual/admin-workspace-I2nc75 (ignorado).
+  Esta prueba visual no acredita sesiones/datos vivos; no se tocaron servicios
+  locales/hosted ni se ejecutaron resets. diff-check PASS; hash next-env.d.ts
+  ajeno idéntico al inicial. T204 implementada/verificada; commit/PR/CI/revisión
+  humana pendientes, sin afirmar aceptación municipal.
+
+## EXTRA-071 — Mostrar u ocultar identificación en el perfil propio
+
+- **Fecha/origen/autorización:**2026-10-25, Mateo solicita mostrar DNI/CUIT y
+  aclara: candidato solo su DNI y empresa solo su CUIT, junto al campo oculto
+  del formulario propio. FR-010/FR-020/FR-070; no amplía consulta administrativa.
+- **Evidencia/propuesta:** CandidateProfilePanel y CompanyProfileForm usan
+  input password sin forma de revelarlo. Componer Field/Input nativo y Button
+  municipal con estado local oculto inicial, Mostrar/Ocultar DNI o CUIT, icono,
+  nombre accesible, aria-controls/pressed y type=button. Conservar valor editado,
+  validación nativa, errores y contrato de guardado; sin persistir visibilidad.
+- **Justificación/archivos:** componente de formulario compartido mínimo y dos
+  consumidores propios, expectativas existentes, spec/plan/tasks/UI. Sin
+  migración, backend, nuevas consultas/permisos o dependencias. Mantener trabajo
+  EXTRA070 y next-env.d.ts ajeno en fix/admin-candidate-card-order.
+- **Fuente técnica:** documentación oficial Button e Input Group de shadcn Base
+  y fuente registry/base-nova/ui/button.tsx consultada por HTTPS en
+  https://ui.shadcn.com/r/styles/base-nova/button.json; reutilizar adaptación
+  existente, sin sobrescribir primitivas. Revisión React según skill disponible.
+- **Riesgos/verificación:** asociación etiqueta/error, envío accidental y pérdida
+  de edición. Comprobar toggle/reocultado, valor/FormData, teclado, default
+  oculto, validación, perfiles/privacidad existentes, tipos/lint/unitarias/build
+  y navegador ficticio. Estado previo a implementación; revisión/CI pendientes.
+- **Resultado:** IdentifierField compuesto con Field/input/Button se usa solo en
+  CandidateProfilePanel y CompanyProfileForm. DNI/CUIT ocultos inicialmente;
+  botón de ojo revela/reoculta conservando edición y contrato de guardado.
+  Registro, datos de terceros y atención presencial permanecen sin esos botones.
+  Sin consultas, backend, migraciones, almacenamiento de visibilidad o permisos.
+- **Verificación2026-10-25:**1195 pruebas/90 archivos y cobertura configurada PASS;
+  11 pruebas de formularios PASS tras ajustar selectores al tipo de Testing
+  Library (nombre de rol ya es exacto; sin opción exact de Playwright). Primera
+  corrida acotada encontró import faltante de fireEvent en la prueba, corregido
+  antes de la suite completa. Lint, tipos/build aislados y diff-check PASS;
+  archivos src de la copia de build comparados por hash con el trabajo actual.
+- **Navegador:** componente real montado con React/Form/Button existentes y datos
+  ficticios; cuatro combinaciones DNI/CUIT×1440/390 PASS, Enter/Espacio/foco,
+  aria-controls/pressed, edición conservada, FormData correcto, sin submit por
+  toggle y errores/corrección de patrón intactos; axe sin infracciones ni
+  desborde horizontal. Capturas/harness ignorados en test-results/identifier-toggle-browser;
+  emplea Vite ya instalado solo para verificación, sin cambios de dependencias.
+  No acredita sesión/base viva: la autorización no se modifica. Harness axe
+  requirió contexto de navegador explícito; corregido y repetido con éxito.
+- **Revisión técnica:** guía React aplicada: estado booleano local, useId estable,
+  actualización funcional, sin efectos/consultas/rerenders globales; controles
+  con etiquetas y type=button fuera del label. Componentes compartidos existentes
+  conservados. EXTRA070 y hash ajeno next-env.d.ts preservados. T205 verificada;
+  commit/PR/CI/revisión humana pendientes; sin cambios alojados ni resets.
+
+## EXTRA-072 — Consentimiento resumido y Más información
+
+- **Fecha/origen/autorización:**2026-10-25, Mateo entrega los seis párrafos
+  exactos y pide dos visibles, cuatro en Más información y retirar el apartado
+  de política. Solicitud de presentación de Consentimiento de prueba propio;
+  no constituye aprobación municipal de una política para datos reales.
+- **Evidencia/cambio propuesto:** CandidateProfilePanel muestra seis párrafos
+  abiertos y un details de política demo. Reubicar los cuatro párrafos indicados
+  en ese details, cerrado inicialmente y rotulado Más información. Reemplazar el
+  párrafo de contratación por el texto literal solicitado. Retirar texto/versión/
+  aviso de política de esta vista, conservando su contrato técnico y las reglas
+  de consentimiento, aceptación, retirada y contratación actuales.
+- **Archivos/contratos:** panel, expectativas existentes de presentación/flujo y
+  E2E candidato, spec/plan/tasks/UI_GUIDELINES. Sin acciones, queries, migración,
+  permisos, persistencia, dependencia o cambios en atención presencial/empresa.
+  Mantener EXTRA070/071 y next-env.d.ts ajeno de la rama actual.
+- **Riesgos/verificación:** texto oculto inaccesible por teclado, pruebas E2E con
+  referencias antiguas, pérdida de checkbox/estado/acción. Revisar los seis
+  párrafos, dos fuera/cuatro dentro, ausencia del apartado de política, apertura/
+  cierre por teclado y aceptación/retiro sin cambios. Tipos/lint/unitarias/build
+  y navegador ficticio escritorio/móvil; sin acceder a base alojada ni reset.
+- **Estado:** registrado antes de implementar; alcance visual autorizado,
+  requisitos/arquitectura de negocio intactos, revisión/CI pendientes.
+- **Implementado:** dos párrafos visibles y los cuatro restantes dentro del
+  details existente, rotulado Más información y cerrado de inicio, con la copia
+  solicitada. Retirados el contenido/versión/aviso de la política y su título de
+  esta vista. Se conserva el contrato de props, política técnica del servidor,
+  estado, checkbox, select, acción y lógica de aceptación/retiro/contratación.
+- **Verificación2026-10-25:**1195 pruebas/90 archivos y cobertura configurada
+  PASS; expectativas antiguas de política ajustadas también en E2E candidato
+  para evitar regresión en CI. Tipos/build PASS en copia aislada, con archivos
+  src comparados por hash; lint y diff-check PASS. Prueba real de navegador con
+  composición de página y servicios ficticios a1440/390 PASS: dos textos visibles,
+  cuatro ocultos/expandibles, Enter/foco/cierre, checkbox sin marcar/obligatorio,
+  sin apartado de política, sin desborde y axe0. Capturas revisadas/harness
+  ignorados en test-results/consent-information-browser.
+- **Límites/estado:** no se ejecutó el recorrido E2E completo de registro y
+  mutaciones con base; esta verificación prueba presentación/teclado, no una
+  nueva aceptación persistida. No cambió backend ni se accedió a datos alojados,
+  ni hubo reset/servidor del usuario detenido. EXTRA070/071 y next-env.d.ts ajeno
+  preservados. T206 implementada/verificada; commit/PR/CI/revisión pendientes.
+- **Preparación de entrega2026-10-25:** Mateo solicita el PR conjunto de
+  EXTRA070/071/072. main remoto coincide con la base a3cd69f; diff-check y evidencias
+  finales revisadas. Publicar en fix/admin-candidate-card-order sin firma,
+  signoff ni coautor. Excluir next-env.d.ts ajeno (hash inicial preservado),
+  capturas/harness/logs ignorados y cualquier configuración local. Verificación
+  local completa según entradas anteriores; CI completa y revisión por PR siguen
+  pendientes hasta evidencia del repositorio remoto.

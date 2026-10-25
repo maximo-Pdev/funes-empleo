@@ -7,6 +7,16 @@ manual or evidence of stakeholder acceptance.
 
 ## Before changing a page
 
+EXTRA072: Consentimiento de prueba del perfil propio muestra dos párrafos
+visibles y cuatro dentro de Más información, cerrado inicialmente. Usar el texto
+literal de Mateo; retirar el apartado de política/versión/aviso de esta vista.
+Reutilizar details/summary y su foco; mantener estado, acción y aceptación explícita.
+
+EXTRA071: DNI/CUIT del perfil propio permanecen ocultos al abrir; botón de ojo
+Mostrar/Ocultar junto al input, operable por teclado y con nombre/estado accesibles.
+Conservar valor, foco, validación y errores; reutilizar Field/Button municipales.
+No incorporar estos botones en registros, vistas de terceros o atención presencial.
+
 Home's left introduction follows the access selection: login retains its municipal
 message; candidate and company registration reuse the original registration guide,
 steps and privacy notice. Company registration also retains the documentary
@@ -514,9 +524,11 @@ consulta administrativa y retirar esos formularios. Mantener componentes, campos
 validación, foco y reglas vigentes; diseño en dos columnas que apila en móvil.
 El perfil asistido vinculado ofrece los mismos controles administrativos que
 un perfil normal con igual estado de cuenta. El origen histórico se conserva.
-EXTRA060: en origen presencial, CV PDF va debajo de Mantener perfil y Perfil
-candidato antes de Participaciones recientes, en la columna derecha. En móvil
-se apilan las columnas respetando ese orden de lectura. No duplicar tarjetas.
+EXTRA070 sustituye el orden EXTRA060: para todos los candidatos, Perfil candidato
+y CV PDF del candidato van antes del formulario y listado de notas internas, en
+la primera columna. Mantener perfil presencial, si corresponde, sigue primero.
+Participaciones y demás controles conservan la segunda columna. En móvil se
+apilan las columnas respetando el DOM. No duplicar tarjetas ni cambiar visibilidad.
 
 ## Verification
 

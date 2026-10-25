@@ -4,6 +4,11 @@
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+EXTRA071: componer IdentifierField con Field/input nativo y Button municipal;
+useId/useState local, tipo password/text, aria-controls/pressed y botón sin
+submit. Usar únicamente en CandidateProfilePanel/CompanyProfileForm propios,
+con atributos/valores/acciones originales. Sin cambios de contratos o SQL.
+
 ## Nombre en derivaciones propias — EXTRA069,2026-10-25
 
 RPC aditivo company_referral_summaries(uuid) devuelve las mismas referencias
@@ -66,9 +71,11 @@ Conservar una sola sección de notas/historial/CV. Guardar y crear navegan al
 detalle principal; la ruta antigua resuelve referencia y redirige al detalle
 opaco autorizado. Sin SQL, contratos de comandos o autorización nuevos.
 
-EXTRA060: reutilizar los bloques de resumen/CV como elementos únicos; para
-origen assisted, CV después de edición y resumen antes de participaciones en la
-otra columna. Otros orígenes conservan orden. Sin duplicar forms/ids o datos.
+EXTRA070 sustituye la composición EXTRA060: reutilizar profileDetails y
+candidateCv una vez, para todos los orígenes, después de la edición presencial
+condicional y antes de InternalNoteForm/Notas internas en la primera columna.
+Retirar inserciones condicionales anteriores; conservar guards y visibilidad
+de CV/mantenimiento, segunda columna y apilado móvil. Sin contratos/SQL nuevos.
 
 ## Categorías laborales únicas,2026-10-24 (EXTRA057)
 
@@ -346,8 +353,8 @@ Contacto y consentimiento usan ancho completo para que la explicación no estire
 una tarjeta vecina vacía; datos laborales conserva sus dos columnas internas.
 
 Texto auxiliar de consentimiento alineado con FR-036/038/055 y EXTRA035, distinto
-de la política devuelta por el servidor, que se conserva literalmente con aviso
-demo y su versión/hash actuales. Aclarar alcance global al contratar sin cerrar
+de la política devuelta por el servidor, cuyo contrato técnico conserva su
+versión/hash; EXTRA072 retira su presentación en el perfil propio. Aclarar alcance global al contratar sin cerrar
 otros casos, revocación y nueva aceptación explícita. Sin persistencia, RPC,
 Actions nuevas, migración, dependencia, entorno o modificación de reglas.
 RED de componente para visibilidad/orden/faltantes y texto, más navegador con
@@ -360,11 +367,12 @@ Una section de Datos laborales y personales contiene los formularios hermanos
 de datos y teléfono opcional, cada uno con su Action/version/resultado; sin
 anidamiento ni encadenar mutaciones no atómicas. Botón Guardar teléfono explícito.
 El Form conserva valores ante error y el éxito telefónico no reinicia el form
-de datos. Reubicar CV antes del Form de consentimiento en DOM. Reemplazar banner
-por details/summary cerrado con la política literal y versión consultables;
-conservar advertencia demo dentro del detalle, no inventar aprobación municipal.
+de datos. Reubicar CV antes del Form de consentimiento en DOM. EXTRA072 reutiliza
+details/summary cerrado como Más información: cuatro párrafos explicativos,
+con dos párrafos visibles antes. Retira política/versión/aviso de esta vista;
+no sustituye contrato ni política técnica y no inventa aprobación municipal.
 Sin backend/migraciones/contratos/dependencias. Tests de ubicación, opcionalidad,
-guardado, retención, teclado, política expandible y contacto empresarial derivado.
+guardado, retención, teclado, información expandible y contacto empresarial derivado.
 
 ### EXTRA039 — retirar autoarchivo, 2026-10-22
 
