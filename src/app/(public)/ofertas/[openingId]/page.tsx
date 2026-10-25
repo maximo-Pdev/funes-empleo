@@ -164,7 +164,7 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
               <h2 id="postulacion-title" className="mt-3 text-2xl font-bold text-primary-900">¿Te interesa esta oferta?</h2>
               <p className="mt-3 text-sm leading-6">Revisá los requisitos y postulate desde tu cuenta de candidato.</p>
               <Link
-                href={`/candidato/ofertas?oferta=${offer.slug}`}
+                href={`/dashboard?section=ofertas&oferta=${offer.slug}`}
                 className="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-center text-sm font-bold leading-6 text-primary-foreground transition-colors hover:bg-primary-700"
               >
                 Postularme con mi cuenta
