@@ -1,5 +1,11 @@
 # Contrato de autorización y visibilidad
 
+## Candidate photo authorization exception — EXTRA-059
+
+Owner mutations require an active candidate session, exact profile ownership and expected version. Read current images only for the owner, active Office administrator or currently authorized referred company; Storage RLS independently recomputes permission. Anonymous, suspended, foreign and stale operations are denied. No public/signed URLs or company metadata-table browsing.
+
+The earlier privileged-operation restriction below gains one narrow exception: server-only validated candidate-photo ingestion/physical cleanup, never a general interactive client. Trusted SQL independently checks the explicit session actor against active accounts/profile ownership and locks versions. Authenticated/anonymous grants cannot ingest or write objects; reads never use service role. Physical deletion failure remains pending and visible, not falsely successful. See `../../../docs/implementation/candidate-profile-photos.md`.
+
 ## Actores
 
 - **Público**: sin sesión.
@@ -22,9 +28,9 @@ Nueva aceptación afirmativa no restaura un permiso revocado. No cambia el
 flujo manual de retiro, que sigue cerrando los casos abiertos.
 
 A02/A03 (2026-10-17): la navegación pública obtiene href/label en servidor desde
-Auth y la cuenta de aplicación activa. Candidato: `/candidato/perfil`; empresa:
+Auth y la cuenta de aplicación activa. Candidato: `/dashboard?section=perfil`; empresa:
 `/empresa/perfil`; administrador: `/account`. Cuenta ausente, bloqueada o identidad
-no verificable: `/login`. Esta proyección no contiene nombres, IDs, tokens ni
+no verificable: `/` (login de portada). Esta proyección no contiene nombres, IDs, tokens ni
 datos privados, y el enlace nunca sustituye autorización al acceder al destino.
 Las respuestas de navegación personalizadas y renovación de cookies no se
 comparten en caché. El proxy renueva en páginas y handlers dinámicos; no extiende

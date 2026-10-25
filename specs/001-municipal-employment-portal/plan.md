@@ -1,8 +1,23 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## Authorized candidate-photo design — EXTRA-059
+
+Use an additive private photo metadata/bucket migration, session-authorized read endpoint, tightly scoped trusted server image ingestion, profile-version locks and durable physical-cleanup retries. JPEG/PNG up to 5 MiB and 16 megapixels normalize to metadata-free WebP <=1024px with explicit sharp dependency. Official shadcn Base-nova Avatar/Attachment/Empty use Base UI/CVA while preserving municipal styles and existing Button contracts. The narrow service-role photo exception and deployment/recovery/verification requirements are in `../../docs/implementation/candidate-profile-photos.md`; review it alongside this plan before rollout. No current database reset or remote migration is permitted.
+
 **Rama**: `spec/municipal-employment-portal-mvp` | **Fecha**: 2026-09-20 | **Especificación**: [spec.md](./spec.md)
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
+
+## Authorized route consolidation — 2026-10-23 (EXTRA-056)
+
+Remove candidate profile/offers/participations page entrypoints and the temporary
+login redirect. Let Next.js return 404; do not emulate retirement with redirects.
+Reuse shared server-rendered content from the candidate dashboard without cloning.
+Migrate links, CV return defaults and cache invalidation to the dashboard sections;
+preserve exact CV return allowlisting, JSON/303 responses and admin destinations.
+Keep `/account` role dispatch, session/role guards and public offer browsing.
+Verify negative HTTP routes, panel content, selected-offer pagination, account
+navigation and auth/CV return flows with isolated tests and production build.
 
 ## A08 — diseño focalizado, 2026-10-19
 

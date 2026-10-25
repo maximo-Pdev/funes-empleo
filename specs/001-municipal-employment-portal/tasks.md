@@ -5,6 +5,10 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## Authorized profile follow-up — EXTRA-059
+
+This increment is tracked in `../../odd/tasks/candidate-profile-rebuild.md` (T1-T3, S1-S7) rather than renumbering the existing MVP ledger. Pending: private persisted image flow and SQL proof; official component profile rebuild; integration/regression/browser gates and independent high-risk verification. Existing checked tasks are not evidence that this increment is accepted. No commits, resets or remote deployment authorized.
+
 **Input**: Design documents from `specs/001-municipal-employment-portal/`
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
@@ -28,6 +32,12 @@ casillas ni acredita el cierre de tareas originales de aceptación del MVP. EXTR
 registra autorización, superficies, riesgos y comprobaciones.
 
 ## Format: `[ID] [P?] [Story] Description`
+
+Routing follow-up authorized on 2026-10-23 is recorded in `cambios-extra.md`,
+EXTRA-056. Candidate page locations below are historical implementation evidence:
+their content is now served through `/dashboard?section=perfil|ofertas|postulaciones`.
+`/login` and the three old candidate URLs return 404; login lives at `/`.
+This does not close or reopen the original MVP acceptance tasks.
 
 - **[P]**: Can run in parallel because it changes different files and has no dependency on another
   incomplete task in the same group.

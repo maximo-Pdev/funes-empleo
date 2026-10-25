@@ -1,5 +1,9 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+## Candidate photos — EXTRA-059
+
+Add private metadata/current-photo and durable cleanup records in the additive `202610240001_candidate_photos.sql` migration; SQL is the exact executable schema. Objects use opaque immutable keys in a separate private candidate-photos bucket. Mutations lock and advance the existing candidate profile version, keep one current photo, attribute the authenticated actor in audit and revoke obsolete reads before physical object cleanup. Only current photos can be read using live full-profile authorization. No original filename, public URL, photo requirement or change to CV retention is added. Current photo bytes are permanently removed on owner replacement/removal, per explicit user decision; committed audit is not erased. Design: `../../docs/implementation/candidate-profile-photos.md`.
+
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 

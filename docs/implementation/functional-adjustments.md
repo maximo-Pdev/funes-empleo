@@ -64,7 +64,7 @@ Criterios:
    al navegador, conservando opciones, eliminación de chunks y cabeceras de no caché,
    incluso si el SDK realiza más de una escritura.
 4. Inicio, listado y detalle público de oferta muestran “Mi perfil” para candidato
-   activo (`/candidato/perfil`) y empresa activa (`/empresa/perfil`), “Mi cuenta”
+   activo (`/dashboard?section=perfil`, actualizado por EXTRA-056) y empresa activa (`/empresa/perfil`), “Mi cuenta”
    para administración activa (`/account`) o “Iniciar sesión” si no existe una
    cuenta activa validada. El menú solo recibe enlace y etiqueta, nunca datos personales.
 5. Login y logout invalidan la navegación previa. El cierre voluntario se ejecuta
