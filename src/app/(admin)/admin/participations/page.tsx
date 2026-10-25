@@ -4,8 +4,9 @@ import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { PARTICIPATION_STATUSES, participationStatusSchema } from "@/domain/states";
+import { participationStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { listAdminParticipations } from "@/features/participations/admin-query";
 import { participationStatusLabel } from "@/features/participations/components/participation-timeline";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -55,7 +56,7 @@ export default async function AdminParticipationsPage({ searchParams }: {
       {result.items.length === 0 ? <EmptyState title="Sin participaciones" description="No hay casos con estos filtros." /> :
         <ul className="space-y-3">{result.items.map((item) => <li key={item.id} className="rounded-lg border border-slate-300 bg-white p-4">
           <Link href={`/admin/participations/${item.id}`} className="font-semibold text-blue-800 underline">{item.candidate_profiles?.display_name ?? "Perfil sin nombre"} · {item.job_openings?.title ?? "Oferta sin título"}</Link>
-          <p className="text-sm text-slate-700">{participationStatusLabel(item.status)} · {item.origin === "admin_nomination" ? "Nominación administrativa" : "Postulación"}</p>
+          <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700"><Badge variant="status" tone={statusTone(participationStatusTones, item.status)}>{participationStatusLabel(item.status)}</Badge> {item.origin === "admin_nomination" ? "Nominación administrativa" : "Postulación"}</p>
         </li>)}</ul>}
       {result.pageCount > 1 && <nav aria-label="Páginas de participaciones" className="flex gap-4">
         {result.page > 1 && <Link href={pageHref(result.page - 1)} className="text-blue-800 underline">Anterior</Link>}

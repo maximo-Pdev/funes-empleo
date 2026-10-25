@@ -1,5 +1,6 @@
 "use client";
-import { reasonLabel } from "@/domain/presentation/labels";
+import { reasonLabel, importBatchStatusLabels, displayLabel } from "@/domain/presentation/labels";
+import { importBatchStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import type { ImportPreview } from "../preview-service";
 import { IMPORT_FIELDS, IMPORT_MESSAGES } from "../mapping";
 import { resolveImportAction } from "../actions";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 const labels = { name: "Nombre", dni: "DNI", email: "Correo", phone: "Teléfono", locality: "Localidad",
   categories: "Categorías (DEMO-A|DEMO-B)", summary: "Experiencia", availability: "Disponibilidad", reference: "Referencia ficticia" };
 export function ImportBatch({ initial, reference, retryReference }: { initial: ImportPreview; reference: string; retryReference?: string }) {
@@ -18,6 +20,7 @@ export function ImportBatch({ initial, reference, retryReference }: { initial: I
   const [decisions, setDecisions] = useState<Record<string, string>>({});
   const editable = ["blocked", "preview_ready"].includes(preview.status);
   return <div className="grid gap-6 [&_input:not([type=checkbox])]:block [&_input:not([type=checkbox])]:w-full [&_input]:rounded [&_input]:border [&_input]:border-slate-500 [&_input]:p-2 [&_select]:block [&_select]:max-w-full [&_select]:rounded [&_select]:border [&_select]:p-2 [&_textarea]:block [&_textarea]:w-full [&_textarea]:rounded [&_textarea]:border [&_textarea]:p-2">
+    <p className="flex flex-wrap items-center gap-2">Estado del lote <Badge variant="status" tone={statusTone(importBatchStatusTones, preview.status)}>{displayLabel(importBatchStatusLabels, preview.status)}</Badge></p>
     <p role="status">{preview.status === "completed" ? "Importación completada" : preview.status === "preview_ready" ? "Listo para confirmar" : preview.status === "failed" ? "Importación fallida: no se incorporaron cambios" : "Importación bloqueada"}</p>
     <p>Total: {preview.total}. Aceptables: {preview.valid}. Inválidas o categorías sin mapear: {preview.invalid}. Duplicadas: {preview.duplicates}.</p>
     <p>Los perfiles nuevos serán borradores sin consentimiento ni CV. Las filas rechazadas no se incorporan.</p>

@@ -1,8 +1,9 @@
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { RecordLink as Link, RecordAnchor } from "@/components/ui/record-link";
 import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel } from "@/domain/presentation/labels";
+import { accountStatusTones, availabilityTones, candidateProfileStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { EmptyState } from "@/components/ui";
+import { Badge, EmptyState } from "@/components/ui";
 import { getAdminCandidate } from "@/features/candidates/search-service";
 import { getAssistedWorkspace } from "@/features/candidates/assisted-service";
 import { AssistedProfileForm, AssistedCommands, ClaimForm } from "@/features/candidates/components/assisted/assisted-forms";
@@ -35,11 +36,11 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
 
   const profileDetails = <section aria-labelledby="candidate-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-details" className="text-xl font-semibold">Perfil candidato</h2>
-        <p>Estado: <strong>{displayLabel(candidateProfileStatusLabels, candidate.status)}</strong></p>
-        <p>Cuenta: {candidate.accounts ? displayLabel(accountStatusLabels, candidate.accounts.status) : "Perfil asistido sin cuenta vinculada"}</p>
+        <p className="flex flex-wrap items-center gap-2">Estado <Badge variant="status" tone={statusTone(candidateProfileStatusTones, candidate.status)}>{displayLabel(candidateProfileStatusLabels, candidate.status)}</Badge></p>
+        <p className="flex flex-wrap items-center gap-2">Cuenta {candidate.accounts ? <Badge variant="status" tone={statusTone(accountStatusTones, candidate.accounts.status)}>{displayLabel(accountStatusLabels, candidate.accounts.status)}</Badge> : "Perfil asistido sin cuenta vinculada"}</p>
         <p>Derivación: <strong>{referralEligible ? "Puede evaluarse" : "No disponible actualmente"}</strong></p>
         <p>Localidad: {candidate.locality ?? "Sin informar"}</p>
-        <p>Disponibilidad: {availabilityLabel(candidate.availability)}</p>
+        <p className="flex flex-wrap items-center gap-2">Disponibilidad <Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></p>
         <p>Vigencia hasta: {candidate.refresh_due_at ?? "Sin definir"}</p>
         <p>Habilidades: {candidate.skills_experience_summary ?? "Sin informar"}</p>
         <p>Categorías: {candidate.candidate_categories.map((item) => item.job_categories?.name).filter(Boolean).join(", ") || "Sin categorías"}</p>

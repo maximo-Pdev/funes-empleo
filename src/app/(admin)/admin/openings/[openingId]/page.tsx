@@ -2,6 +2,8 @@ import { recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
+import { openingStatusTones, statusTone } from "@/domain/presentation/status-tone";
+import { Badge } from "@/components/ui";
 import { publicModalityLabel, publicContractTypeLabel } from "@/features/openings/public-offer-display";
 import { Suspense } from "react";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
@@ -34,7 +36,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
       <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="opening-details" className="text-xl font-semibold">Oferta y empresa</h2>
         <p>Empresa: <strong>{opening.company_profiles?.legal_name ?? "Sin nombre"}</strong></p>
-        <p>Estado: <strong>{displayLabel(openingStatusLabels, opening.status)}</strong></p>
+        <p className="flex flex-wrap items-center gap-2">Estado <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
         <p>Fecha de cierre: {opening.closing_date ?? "Sin definir"}</p>
         <p>Vacantes: {opening.vacancies ?? "Sin definir"}</p>
         <p>Localidad: {opening.location ?? "Sin definir"}</p>

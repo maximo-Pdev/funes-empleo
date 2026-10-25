@@ -2,8 +2,9 @@ import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
+import { openingStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, Button, EmptyState, FeedbackMessage } from "@/components/ui";
 import { OPENING_STATUSES, openingStatusSchema } from "@/domain/states";
 import { listAdminOpenings } from "@/features/openings/admin-service";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -38,7 +39,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
       {result.items.length === 0 ? <EmptyState title="Sin ofertas" description="No hay ofertas con estos filtros." /> :
         <ul className="space-y-3">{result.items.map((opening) => <li key={opening.id} className="rounded-lg border border-slate-300 bg-white p-4">
           <Link href={`/admin/openings/${opening.id}`} className="font-semibold text-blue-800 underline">{opening.title ?? "Oferta sin título"}</Link>
-          <p className="text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} · Estado: {displayLabel(openingStatusLabels, opening.status)}</p>
+          <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
         </li>)}</ul>}
       {result.pageCount > 1 && <nav aria-label="Páginas de ofertas" className="flex gap-4">
         {result.page > 1 && <Link href={urlForPage(result.page - 1)} className="text-blue-800 underline">Anterior</Link>}

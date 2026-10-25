@@ -1,9 +1,10 @@
 import { recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
-import { contactChannelLabels, feedbackOutcomeLabels, displayLabel } from "@/domain/presentation/labels";
+import { contactChannelLabels, feedbackOutcomeLabels, displayLabel, referralAccessLabels } from "@/domain/presentation/labels";
+import { feedbackReviewTones, referralAccessTones, statusTone } from "@/domain/presentation/status-tone";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, EmptyState, FeedbackMessage } from "@/components/ui";
 import { getAdminParticipation } from "@/features/participations/admin-query";
 import { ParticipationActionForm } from "@/features/participations/components/participation-action-form";
 import { ContactRecordForm } from "@/features/participations/components/contact-record-form";
@@ -65,7 +66,7 @@ export default async function AdminParticipationDetailPage({ params }: {
           <p>Origen: {participation.origin === "admin_nomination" ? "Nominación administrativa" : "Postulación"}</p>
           <p>Ingresó: {localDate(participation.created_at)}</p>
           <p>Respuesta esperada: {participation.feedback_due_at ? localDate(participation.feedback_due_at) : "Aún no derivada"}</p>
-          {referral && <p>Acceso empresarial: <strong>{referral.access_status === "active" ? "Activo bajo condiciones vigentes" : "Revocado"}</strong></p>}
+          {referral && <p className="flex flex-wrap items-center gap-2">Acceso empresarial <Badge variant="status" tone={statusTone(referralAccessTones, referral.access_status)}>{displayLabel(referralAccessLabels, referral.access_status)}</Badge>{referral.access_status === "active" ? <span className="text-sm text-muted-foreground">bajo condiciones vigentes</span> : null}</p>}
           {referral?.post_hire_access_until && <p>Fin de ventana poscontratación: {localDate(referral.post_hire_access_until)}</p>}
         </section>
         <ParticipationTimeline currentStatus={participation.status} events={audit.map((event) => ({
@@ -91,7 +92,7 @@ export default async function AdminParticipationDetailPage({ params }: {
           {feedback.length === 0 ? <EmptyState title="Sin respuesta" description="La empresa todavía no comunicó un resultado." /> :
             <ul className="space-y-3">{feedback.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
               <p><strong>{displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}</strong> · {localDate(item.reported_at)}</p>
-              <p>{item.review_status === "pending_admin" ? "Pendiente de confirmación administrativa" : "Revisado"}</p>
+              <p className="flex flex-wrap items-center gap-2"><Badge variant="status" tone={statusTone(feedbackReviewTones, item.review_status)}>{item.review_status === "pending_admin" ? "Pendiente de confirmación administrativa" : "Revisado"}</Badge></p>
               {item.message && <p className="whitespace-pre-wrap">{item.message}</p>}
             </li>)}</ul>}
           {feedback.some((item) => item.review_status === "pending_admin") && <FeedbackMessage tone="info">Un resultado informado por la empresa no cambia el resultado final hasta la confirmación de la Oficina.</FeedbackMessage>}

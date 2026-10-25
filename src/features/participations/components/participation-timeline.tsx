@@ -1,6 +1,7 @@
-import { FeedbackMessage } from "@/components/ui";
+import { Badge, FeedbackMessage } from "@/components/ui";
 import type { ParticipationStatus } from "@/domain/states";
 import { participationStatusLabels, displayLabel, auditActionLabel, reasonLabel } from "@/domain/presentation/labels";
+import { participationStatusTones, statusTone } from "@/domain/presentation/status-tone";
 
 export type ParticipationHistoryEvent = {
   id: string; occurredAt: string; action: string; actorLabel: string;
@@ -20,8 +21,8 @@ export function ParticipationTimeline({ currentStatus, events }: {
     events.some((event) => event.previousStatus === "no_company_response");
   return <section aria-labelledby="participation-history-title" className="space-y-4">
     <h2 id="participation-history-title" className="text-lg font-semibold">Historial de la participación</h2>
-    <div role="status" className="rounded-md border border-blue-400 bg-blue-50 p-4 font-semibold text-blue-950">
-      Resultado o estado vigente: {participationStatusLabel(currentStatus)}
+    <div role="status" className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface-muted p-4 font-semibold text-foreground">
+      Resultado o estado vigente <Badge variant="status" tone={statusTone(participationStatusTones, currentStatus)}>{participationStatusLabel(currentStatus)}</Badge>
     </div>
     {hasLateCorrection && <FeedbackMessage tone="info">Sin respuesta empresarial: cierre automático anterior reemplazado por el resultado vigente. El historial se conserva.</FeedbackMessage>}
     {events.length === 0 ? <p>No hay eventos registrados todavía.</p> : <ol className="space-y-3 border-l-2 border-slate-300 pl-5">
