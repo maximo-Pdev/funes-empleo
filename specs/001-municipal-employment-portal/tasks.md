@@ -5,6 +5,20 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## Consentimiento resumido — EXTRA072,2026-10-25
+
+- [x] T207 Alinear la expectativa E2E restante de PR76 con «tu consentimiento vigente» y revocación a todas las empresas; RED original/GREEN recorrido candidato completo27.9s, cero reintentos/omisiones, tipos/lint/build/diff PASS. Solo prueba/trazabilidad, sin cambios de producto/SQL/reglas. EXTRA072; publicación/nueva CI completa/revisión pendientes.
+
+- [x] T206 Mostrar los dos párrafos solicitados y cuatro bajo Más información, sin apartado de política; conservar checkbox/estado/acciones y reglas. Expectativas de componentes/E2E actualizadas;1195 pruebas/90 archivos, tipos/lint/build/diff PASS; composición real con datos ficticios a1440/390, teclado/plegado/checkbox/axe0 PASS. EXTRA072 registra alcance visual y E2E completo con base no ejecutado; commit/PR/CI/revisión pendientes.
+
+## Identificación propia — EXTRA071,2026-10-25
+
+- [x] T205 Agregar Mostrar/Ocultar DNI/CUIT únicamente en perfiles propios, mediante composición compartida Field/Button; oculto inicial, valor/validación/errores intactos y sin submit/permiso nuevo.1195 pruebas/90 archivos,11 regresiones de formularios, tipos/lint/build/diff PASS; navegador real con componentes/datos ficticios, DNI/CUIT×1440/390, teclado/edición/errores/FormData/axe PASS. EXTRA071 registra evidencia y ajustes de harness/selectores; commit/PR/CI/revisión pendientes.
+
+## Orden del detalle administrativo — EXTRA070,2026-10-25
+
+- [x] T204 Situar Perfil candidato/CV PDF antes de formulario y listado de notas, en todos los orígenes; conservar edición presencial, visibilidad/privacidad y participaciones. Expectativas existentes actualizadas;1195 unit/componentes/90 archivos, tipos/lint/build/diff PASS; composición real con servicios ficticios normal/presencial sin cuenta a1440/390px,4 escenarios PASS. EXTRA070 registra evidencia y timeout por carga resuelto sin alterar límites. Sin backend/SQL/controles nuevos; commit/PR/CI/revisión pendientes.
+
 ## Authorized profile follow-up — EXTRA-059
 
 This increment is tracked in `../../odd/tasks/candidate-profile-rebuild.md` (T1-T3, S1-S7) rather than renumbering the existing MVP ledger. Pending: private persisted image flow and SQL proof; official component profile rebuild; integration/regression/browser gates and independent high-risk verification. Existing checked tasks are not evidence that this increment is accepted. No commits, resets or remote deployment authorized.

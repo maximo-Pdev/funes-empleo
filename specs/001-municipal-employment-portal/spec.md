@@ -116,6 +116,12 @@ segura de datos prevista en EXTRA057.
 
 ## Perfil candidato — presentación autorizada 2026-10-22 (EXTRA040)
 
+EXTRA071,2026-10-25: el DNI en el formulario de perfil propio y el CUIT en el
+perfil propio de empresa permanecen ocultos inicialmente y ofrecen un botón
+Mostrar/Ocultar. Alternar conserva edición/validación y no envía el formulario.
+Solo presentación de datos ya autorizados: no agrega acceso a datos de terceros,
+administración, registros públicos o formularios presenciales.
+
 La primera tarjeta del perfil presenta estado y vigencia. Si el estado guardado
 es active muestra Perfil activo y nunca el botón de activación. En draft,
 needs_update, unavailable o consent_withdrawn, Activar perfil solo aparece si los
@@ -141,9 +147,14 @@ Teléfono opcional pasa a la misma tarjeta de Datos laborales y personales,
 sin tarjeta Contacto adicional. Mantiene guardado explícito independiente y las
 reglas actuales, sin prometer una transacción conjunta con los demás campos.
 La carga de CV se coloca antes del consentimiento en el orden real de lectura.
-Se retira el cartel amarillo de política demo de la vista inicial; texto y
-versión siguen consultables en un desplegable accesible cerrado inicialmente.
-No implica política municipal aprobada ni cambia versión/hash/aceptación.
+EXTRA072,2026-10-25 sustituye la presentación de política de EXTRA041: se
+retiran su texto/versión/aviso de esta vista. Consentimiento de prueba muestra
+los dos párrafos aportados por Mateo sobre autorización general y retiro al
+contratar. Más información, cerrado inicialmente y accesible por teclado,
+contiene los otros cuatro sobre datos compartidos, nombre retenido, nueva
+aceptación y retiro manual. Copia literal solicitada en CandidateProfilePanel;
+no cambia política técnica, versión/hash, aceptación o reglas de negocio ni
+implica aprobación municipal. Atención presencial queda fuera del cambio.
 
 ## Atención presencial integrada, solicitud2026-10-24 (EXTRA059)
 
@@ -200,10 +211,12 @@ con igual estado de cuenta, sin borrar el origen o historial. La ruta antigua
 de mantenimiento conduce al mismo detalle autorizado. No modifica reglas ni
 permisos de los comandos existentes ni reintroduce nominación desde el perfil.
 
-EXTRA060,2026-10-24: en perfiles de origen presencial, la tarjeta CV queda
-inmediatamente después de Mantener perfil cuando ese formulario esté disponible;
-Perfil candidato se ubica inmediatamente antes de Participaciones recientes.
-Solo cambia la composición visual, conservando visibilidad y controles aprobados.
+EXTRA070,2026-10-25 (sustituye el orden visual EXTRA060): en el detalle
+administrativo de todo candidato, Perfil candidato y después CV PDF del candidato
+aparecen antes del formulario y listado de notas internas, en la primera columna.
+Mantener perfil, cuando corresponda, sigue primero; participaciones y controles
+restantes conservan su columna. El orden de lectura móvil es el mismo.
+Se conservan visibilidad, datos y controles aprobados, sin tarjetas duplicadas.
 
 ## Categorías laborales únicas, decisión2026-10-24 (EXTRA057)
 
