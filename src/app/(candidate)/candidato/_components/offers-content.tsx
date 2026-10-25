@@ -15,7 +15,7 @@ function OfferSummary({ offer }: { offer: PublicOffer }) {
     <p className="flex items-start gap-2"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {offer.closing_date}</p>
   </div>;
 }
-export async function renderCandidateOffersContent({ workspace, page, oferta, profileHref = "/candidato/perfil", offersHref = "/candidato/ofertas" }: {
+export async function renderCandidateOffersContent({ workspace, page, oferta, profileHref = "/dashboard?section=perfil", offersHref = "/dashboard?section=ofertas" }: {
   workspace: Awaited<ReturnType<typeof getCandidateWorkspace>>;
   page?: string; oferta?: string; profileHref?: string; offersHref?: string;
 }) {
@@ -24,7 +24,7 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
     const [path, query] = offersHref.split("?");
     const params = new URLSearchParams(query);
     params.set("page", String(number));
-    if (oferta && offersHref.startsWith("/account?")) params.set("oferta", oferta);
+    if (oferta) params.set("oferta", oferta);
     return `${path}?${params}`;
   };
   const joinedOfferIds = new Set(participations.map((item) => item.opening_id));

@@ -26,16 +26,18 @@ export async function POST(request: Request) {
     request.headers.get("accept")?.includes("application/json") ?? false);
   const session = await readAccountSession();
   if (!session || session.account.status !== "active" || !["candidate", "admin"].includes(session.account.role)) {
-    return result("denied", "/login");
+    return result("denied", "/");
   }
   const form = await request.formData().catch(() => null);
   const requestedId = form?.get("candidateId");
   const candidateId = typeof requestedId === "string" && databaseUuidSchema.safeParse(requestedId).success ? requestedId : null;
   const version = versionSchema.safeParse(form?.get("version"));
-  const candidateDestination = form?.get("returnTo") === "/account?section=perfil"
-    ? "/account?section=perfil" : "/candidato/perfil";
+  const allowedReturns = new Set(["/account?section=perfil", "/dashboard?section=perfil"]);
+  const requestedReturn = form?.get("returnTo");
+  const candidateDestination = typeof requestedReturn === "string" && allowedReturns.has(requestedReturn)
+    ? requestedReturn : "/dashboard?section=perfil";
   const destination = session.account.role === "admin"
-    ? (candidateId ? `/admin/candidates/${candidateId}` : "/candidato/perfil")
+    ? (candidateId ? `/admin/candidates/${candidateId}` : "/admin/candidates")
     : candidateDestination;
   const file = form?.get("cv");
   if (!candidateId || !version.success || !(file instanceof File)) return result("invalid", destination);

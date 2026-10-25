@@ -9,6 +9,12 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      candidate_photos: {
+        Row: { id: string; candidate_id: string; storage_path: string; byte_size: number; sha256: string; state: string; uploaded_by: string; created_at: string; deleted_at: string | null }
+        Insert: { id: string; candidate_id: string; storage_path: string; byte_size: number; sha256: string; state: string; uploaded_by: string; created_at?: string; deleted_at?: string | null }
+        Update: { state?: string; deleted_at?: string | null }
+        Relationships: []
+      }
       accounts: {
         Row: {
           archive_reason: string | null
@@ -1584,6 +1590,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authorize_candidate_photo_mutation: { Args: { p_candidate: string; p_expected_version: number }; Returns: string }
+      ingest_candidate_photo: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string; p_expected_version: number; p_command: string; p_photo: string; p_size: number; p_sha256: string }; Returns: number }
+      candidate_photo_cleanup: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string }; Returns: { id: string; storage_path: string }[] }
+      complete_candidate_photo_cleanup: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string; p_photo: string }; Returns: undefined }
+      candidate_photo_cleanup_pending: { Args: { p_candidate: string }; Returns: boolean }
       metrics_history_start: { Args: Record<PropertyKey, never>; Returns: string | null }
       admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }
       export_admin_metrics: { Args: { p_from: string; p_to: string; p_category?: string | null }; Returns: Json }

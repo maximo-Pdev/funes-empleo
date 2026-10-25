@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 import { BriefcaseBusiness, ClipboardList, Home, ShieldCheck, UserRound, Settings } from "lucide-react";
 
 const links = [
-  { href: "/candidato/perfil", label: "Mi perfil", icon: UserRound },
-  { href: "/candidato/ofertas", label: "Ofertas", icon: BriefcaseBusiness },
-  { href: "/candidato/postulaciones", label: "Mis participaciones", icon: ClipboardList },
+  { href: "/dashboard?section=perfil", label: "Mi perfil", icon: UserRound },
+  { href: "/dashboard?section=ofertas", label: "Ofertas", icon: BriefcaseBusiness },
+  { href: "/dashboard?section=postulaciones", label: "Mis participaciones", icon: ClipboardList },
   { href: "/account", label: "Mi cuenta", icon: Settings },
 ];
 
