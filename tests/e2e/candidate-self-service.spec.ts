@@ -79,7 +79,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.reload();
   await expect(page.getByLabel("Categoría ficticia A")).toBeChecked();
   await expect(page.getByLabel("Categoría ficticia B")).toBeChecked();
-  await expect(page.getByText(/tu consentimiento global vigente se retira automáticamente/)).toBeVisible();
+  await expect(page.getByText(/tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas/)).toBeVisible();
   await page.getByLabel("Acción").selectOption("accepted");
   await page.getByLabel("Confirmo esta decisión").check();
   await page.getByRole("button", { name: "Guardar consentimiento" }).click();

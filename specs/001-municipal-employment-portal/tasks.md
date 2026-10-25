@@ -7,6 +7,8 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 ## Consentimiento resumido — EXTRA072,2026-10-25
 
+- [x] T207 Alinear la expectativa E2E restante de PR76 con «tu consentimiento vigente» y revocación a todas las empresas; RED original/GREEN recorrido candidato completo27.9s, cero reintentos/omisiones, tipos/lint/build/diff PASS. Solo prueba/trazabilidad, sin cambios de producto/SQL/reglas. EXTRA072; publicación/nueva CI completa/revisión pendientes.
+
 - [x] T206 Mostrar los dos párrafos solicitados y cuatro bajo Más información, sin apartado de política; conservar checkbox/estado/acciones y reglas. Expectativas de componentes/E2E actualizadas;1195 pruebas/90 archivos, tipos/lint/build/diff PASS; composición real con datos ficticios a1440/390, teclado/plegado/checkbox/axe0 PASS. EXTRA072 registra alcance visual y E2E completo con base no ejecutado; commit/PR/CI/revisión pendientes.
 
 ## Identificación propia — EXTRA071,2026-10-25

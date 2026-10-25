@@ -4307,3 +4307,25 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   capturas/harness/logs ignorados y cualquier configuración local. Verificación
   local completa según entradas anteriores; CI completa y revisión por PR siguen
   pendientes hasta evidencia del repositorio remoto.
+- **Diagnóstico CI PR76 antes de editar2026-10-25:** ejecución40231016807,
+  headb9ab97f: application falla en candidate-self-service.spec.ts:82 porque
+  busca «tu consentimiento global vigente» mientras EXTRA072 exige «tu
+  consentimiento vigente».120 E2E PASS, uno falla y uno no corre por dependencia;
+  tipos/lint/tooling/cobertura/build/SQL y database/Vercel PASS. Propuesta mínima:
+  alinear esa expectativa con el párrafo autorizado y mantener su comprobación
+  de revocación a todas las empresas, sin cambios de producto ni reglas.
+  Revisar el recorrido entero y otras expectativas del texto; RED/GREEN local
+  aislado, tipos/lint/diff, misma rama/PR sin firma y nueva CI completa. T207.
+- **Corrección PR76 verificada2026-10-25:** expectativa en
+  candidate-self-service.spec.ts:82 alineada con la copia autorizada, incluyendo
+  revocación de accesos de todas las empresas. RED original reproducido con la
+  misma ausencia de texto; GREEN del recorrido candidato entero en27.9s
+  (registro/correo/consentimiento/CV/activación/dos postulaciones/retiro/suspensión/
+  reactivación/archivo/restauración), cero reintentos/omisiones. Resto de pruebas
+  de texto revisado; no quedan expectativas positivas del texto eliminado.
+  Build local con configuración real del fixture aislado, tipos y lint PASS.
+  Reutilizado solo proyecto funes-admin-cv-check/54341/54342, sin reset, cambios
+  alojados o servidor3000 detenido; servicios propios cerrados con respaldo.
+  next-env.d.ts ajeno preservado; diff-check PASS. Cambian prueba y trazabilidad,
+  producto/SQL/reglas intactos. T207 implementada/verificada; publicación/nueva
+  CI completa y revisión pendientes.
