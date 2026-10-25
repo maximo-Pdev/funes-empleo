@@ -106,6 +106,14 @@ personas u ofertas. No inferir equivalencias; importación sintética v1 sin cam
 OQ-010 solo se resuelve para el catálogo amplio aprobado, no para equivalencias
 históricas o un catálogo exhaustivo de ocupaciones; OQ-018 permanece abierta.
 
+### Compatibilidad de preview,2026-10-25 (EXTRA068)
+
+Las categorías laborales del popup se presentan como código/nombre. El tipo
+interno histórico de la relación no es requisito de lectura ni campo visible;
+su presencia en respuestas legadas no impide abrir el perfil. No reintroduce
+Intereses, no cambia aptitud/matching/nominación y no reemplaza la consolidación
+segura de datos prevista en EXTRA057.
+
 ## Perfil candidato — presentación autorizada 2026-10-22 (EXTRA040)
 
 La primera tarjeta del perfil presenta estado y vigencia. Si el estado guardado

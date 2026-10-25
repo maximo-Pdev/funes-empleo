@@ -58,6 +58,13 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   await expect(dialog.getByRole("heading", { name: "Habilidades y experiencia", exact: true })).toBeVisible();
   await expect(dialog.getByRole("heading", { name: "Categorías laborales", exact: true })).toBeVisible();
   await expect(dialog).not.toContainText("interés");
+  const cv = dialog.getByRole("link", { name: "Abrir CV PDF en otra pestaña", exact: true });
+  const cvPath = await cv.getAttribute("href");
+  expect(cvPath).toMatch(/^\/api\/cv\/cv-[0-9a-f]{24}$/);
+  const cvResponse = await page.request.get(cvPath!);
+  expect(cvResponse.status()).toBe(200);
+  expect(cvResponse.headers()["content-type"]).toContain("application/pdf");
+  expect((await cvResponse.body()).subarray(0, 5).toString()).toBe("%PDF-");
   expect((await new AxeBuilder({ page }).include("dialog[open]").analyze()).violations).toEqual([]);
   expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
   await page.keyboard.press("Escape");

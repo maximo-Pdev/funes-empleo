@@ -239,6 +239,14 @@ fijas o recortes. Clases exclusivas
 de login; AuthForm, enlaces, registros y reglas de acceso intactos. Verificar
 alineación, encaje, dimensiones, accesibilidad y mensajes/retención existentes.
 
+## Corrección de preview — EXTRA068,2026-10-25
+
+La validación de categorías de openingCandidatePreviewSchema proyecta solo
+code/name, descartando kind histórico recibido por RPC. No necesita ese metadato
+para mostrar ni nominar; las demás validaciones y guards siguen intactos.
+Sin SQL o escrituras de compatibilidad: no sustituye la migración EXTRA057.
+Pruebas de respuestas legadas/mixtas/actuales y navegador de nominación.
+
 ## Resumen
 
 ### Incremento A01 autorizado el 2026-10-17

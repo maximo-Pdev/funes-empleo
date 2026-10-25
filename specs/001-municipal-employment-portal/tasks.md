@@ -674,6 +674,11 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T169 RED/GREEN de listado assisted en servidor, defaults generales intactos, menú activo, ausencia/error, filtros/paginación/referencias y acceso a detalle/alta existentes; implementar reutilizando motor y controles. RED7/8, GREEN64/64 focalizadas. Ajuste2026-10-24: formulario de alta existente en la misma pantalla arriba del listado; RED2/26 y GREEN35/35, alta integrada probada en navegador.
 - [x] T170 Verificar tipos/lint/unit/tooling/build y navegador ficticio con roles, teclado, listado vacío, borrador/claim/paginación y continuidad asistida; registrar evidencia y límites sin tocar alojado o base habitual. Tipos/lint/build,873 unit/componentes,57 tooling,6 E2E,1440/390px y advisor local PASS; límites en EXTRA055.
 
+## Reparar preview de nominación — EXTRA068,2026-10-25
+
+- [x] T196 Registrar evidencia y contrato mínimo de categorías; RED3/45 y reparar proyección code/name sin cambios de matching, SQL o permisos. EXTRA068/spec/plan/contrato alineados; sin reintroducir Intereses ni sustituir consolidación057.
+- [x] T197 Respuestas legadas/mixtas/actuales, roles, campos privados/CV/identidad cruzada PASS;1178 unit/componentes/89 archivos,57 tooling,56 SQL, cinco recorridos de navegador sin omisiones/reintentos, tipos/lint/build/diff-check PASS.1440/390px, axe/foco/CV200/nominación/auditoría/exclusión verificados en fixture aislado. EXTRA068 registra diagnóstico y migraciones previas pendientes; commit/PR/CI/revisión/despliegue pendientes.
+
 ## Español transversal — EXTRA051, 2026-10-22
 
 - [x] T151 Registrar evidencia y alinear alcance/spec/plan: presentación española en todos los roles, valores técnicos/contratos/contenido libre intactos; análisis sin nueva arquitectura o regla municipal.
