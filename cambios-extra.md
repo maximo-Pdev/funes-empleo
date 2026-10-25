@@ -4120,3 +4120,9 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
   Aplicación de migración completa; commit/PR/CI/revisión y despliegue de interfaz
   siguen pendientes. next-env.d.ts ajeno preservado.
+- **Publicación2026-10-25:** por solicitud de Mateo, commit07751d0 publicado
+  sin firma/signoff/coautor en fix/company-referral-names y
+  [PR75](https://github.com/maximo-Pdev/funes-empleo/pull/75) abierto hacia main,
+  sin borrador y adjunto a la conversación. Incluye27 archivos del incremento;
+  next-env.d.ts ajeno y respaldos ignorados excluidos. Migración alojada ya
+  aplicada/registrada; CI/revisión/merge/despliegue de interfaz pendientes.

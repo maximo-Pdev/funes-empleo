@@ -1405,3 +1405,9 @@ en test-results ignorado; no reset, backfill o reparación de versiones previas.
 Advisor56→57 WARN, cero ERROR: solo nuevo0029 del RPC autenticado intencional.
 Guía y EXTRA069 actualizados. Interfaz aún requiere commit/PR/CI/despliegue;
 esta ejecución no acredita revisión humana ni aceptación municipal.
+
+Publicación solicitada2026-10-25: commit07751d0 sin firma/signoff/coautor y
+[PR75](https://github.com/maximo-Pdev/funes-empleo/pull/75) abierto hacia main,
+sin borrador, en fix/company-referral-names; adjunto a la conversación. Incluye
+el cambio probado y evidencia de migración ya aplicada. next-env.d.ts y respaldo
+ignorados excluidos. CI/revisión/merge/despliegue de interfaz pendientes.
