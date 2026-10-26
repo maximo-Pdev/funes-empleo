@@ -63,15 +63,15 @@ Rama base: `main` (ya contiene el rescate del árbol sucio + los 25 fixes e2e). 
 |---|---|---|---|
 | T1 | S1 | inline | ✅ `d90bfa1` |
 | T2 | S2 S11 S29 | inline | ✅ `d90bfa1` + `5af46af` (S2 ya tenía navigation en admin-shell) |
-| T3 | S3 S4 S12 | inline | ✅ `c32df95` (S3 localidad combobox, S12 horarios popover; S4 ya validado) |
+| T3 | S3 S4 | inline | ✅ `c32df95` (S3 localidad combobox; S4 ya validado). S12 revertido `ec4baa7`: el horario de atención no va en el registro de empresa |
 | T4 | S5 S28 | inline | ✅ `d90bfa1` |
 | T5 | S6 S7 S8 S9 | inline | parcial: S6 S8 S9 ✅; S7 pendiente |
-| T6 | S10 S18 S23 S24 | inline | parcial: S10 ✅ `7890794`, S18 ✅ `d90bfa1`; S23 S24 pendiente |
+| T6 | S10 S18 S23 S24 | inline | ✅ S10 `7890794`, S18 `d90bfa1`, S23 `ba895c2` (consentimiento solo al registrarse, sin retiro), S24 cubierto (perfiles asistidos no archivados; vencidos se muestran) |
 | T7 | S13 S17 | inline | ✅ `d90bfa1` (S17 favicon) + `dbd3085` (S13 paginación base-nova en español) |
 | T8 | S19 S20 S21 S22 | inline | ✅ `7862687` + `80d5564` (S19) + `ac8c00a`/`7379c24` (S20 hover-card, S21 carga, S22 data table) |
 | T9 | S25 S26 S27 | inline | ✅ `90e1e69` (S25 cubierto por form compartido de S19; S26 categorías combobox; S27 data table) |
-| T10 | S30 S31 | inline | pendiente (requiere shadcn combobox/hover-card) |
-| T11 | S14 S15 S16 | inline | parcial: S16 ✅ `72c6e82` (404/error/verification-expired al tema institucional); S14 S15 pendiente |
+| T10 | S30 S31 | inline | ✅ `21747c2` (modalidad Presencial/Remoto/Híbrido/Especial y contratación en combobox + hover-card de ayuda) |
+| T11 | S14 S15 S16 | inline | parcial: S16 ✅ `72c6e82` (404/error/verification-expired al tema); S14 descartado por ahora (lo verá el usuario); S15 pendiente |
 
 ## Log
 
@@ -80,3 +80,4 @@ Rama base: `main` (ya contiene el rescate del árbol sucio + los 25 fixes e2e). 
 - **L3 (progreso, tanda 1):** `d90bfa1` (S1 ofertas header, S5 panel por rol, S6 cursor, S8 sin "MVP", S11 "Perfil asistido"/"Cuenta", S17 favicon, S18 quitar "Continuar en el portal", S28 quitar "Nueva atención presencial", S29 "Mi cuenta"→"Cuenta"). S4 verificado ya resuelto en `validation/common.ts` (normaliza separadores).
 - **L4 (progreso, tanda 2):** `7890794` (S10 retiro completo de Importaciones: rutas `(admin)/admin/imports`, `api/admin/imports`, `features/imports`, `validation/candidate-import`, tests + refs de nav/reference-url). `5af46af` (S11/S29 en breadcrumbs restantes + `accountAccess.admin.label`). Gates: typecheck ✅, lint ✅, unit 1219/1219 ✅.
 - **L5 (progreso, tanda shadcn):** `dbd3085` (S13 paginación base-nova en español, 9 listas). `c32df95` (S3 localidad combobox, S12 popover horarios). `7862687` + `80d5564` (S19 rediseño búsqueda: "Búsqueda por palabra" en nombre/resumen/localidad, quitar "Habilidades" y "Vigencia", localidad combobox, categorías combobox múltiple, quitar "Seleccioná una opción" de aptitud). `ac8c00a`/`7379c24` (S20 hover-card informativo por campo, S21 barra de carga con `useTransition`, S22 data table de candidatos). `90e1e69` (S26 categorías laborales en combobox múltiple, S27 data table en candidatos con rubros coincidentes). Gates por cada tanda: typecheck ✅, lint ✅, unit 1219/1219 ✅, build ✅.
+- **L6 (progreso, tanda final):** `720a3dd` (EXTRA-082: drafts de login/registro independientes, ya pendiente en el árbol). `21747c2` (S30 modalidad Presencial/Remoto/Híbrido/Especial y S30/S31 contratación en combobox con hover-card de ayuda). `ec4baa7` (revert S12: quitar horario de atención del registro de empresa, a pedido). `ba895c2` (S23 eliminar consentimiento presencial, consentimiento solo como Términos y condiciones al registrarse sin retiro manual + migración `20261026120000_remove_assisted_consent.sql`). S24 verificado: búsqueda asistida filtra `origin=assisted` y `archived_at is null`, sin ocultar vencidos. Gates: typecheck ✅, lint ✅, unit 1216/1216 ✅, build ✅.
