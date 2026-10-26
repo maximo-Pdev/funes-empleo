@@ -8,7 +8,7 @@ test.beforeEach(() => test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWit
 const journeys = {
   candidate: ["/dashboard?section=perfil", "/dashboard?section=ofertas", "/dashboard?section=postulaciones"],
   company: ["/empresa/perfil", "/empresa/ofertas", "/empresa/ofertas/nueva"],
-  admin: ["/admin/candidates", "/admin/atencion-presencial", "/admin/candidates/assisted", "/admin/openings", "/admin/empresas", "/admin/participations", "/admin/imports/new", "/admin/metrics?from=2026-09-01&to=2026-09-20"],
+  admin: ["/admin/candidates", "/admin/atencion-presencial", "/admin/candidates/assisted", "/admin/openings", "/admin/empresas", "/admin/participations", "/admin/metrics?from=2026-09-01&to=2026-09-20"],
 } as const;
 for (const role of ["candidate", "company", "admin"] as const) {
   for (const viewport of [{ width: 360, height: 800 }, { width: 1366, height: 768 }]) {

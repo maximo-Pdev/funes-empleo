@@ -26,7 +26,7 @@ it.each([["candidate", "Postulante", "Tu próximo paso laboral empieza acá.", 5
 
 it("preserva el aviso empresarial y la intermediación municipal", () => {
   render(<HomeHero authenticated={false} initialView="company" />);
-  expect(screen.getByText("Sin verificación documental en el MVP")).toBeTruthy();
+  expect(screen.getByText("Sin verificación documental")).toBeTruthy();
   expect(screen.getByText(/no acredita la identidad de la empresa/)).toBeTruthy();
   expect(screen.getByText(/únicamente a los candidatos derivados/)).toBeTruthy();
 });

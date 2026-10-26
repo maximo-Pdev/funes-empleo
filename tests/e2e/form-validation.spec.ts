@@ -119,21 +119,6 @@ test("los filtros GET siguen funcionando y no pasan a ser obligatorios", async (
   await expect(page).toHaveURL(/\/ofertas\?.*q=Administrativo/);
 });
 
-test("CSV rechazado: conserva archivo y confirmación y señala el problema junto al archivo", async ({ page }) => {
-  await signIn(page, "admin");
-  await page.goto("/admin/imports/new");
-  const input = page.getByLabel("CSV ficticio");
-  await input.setInputFiles({ name: "encabezados-ficticios.csv", mimeType: "text/csv", buffer: Buffer.from("invalid,header\nx,y\n") });
-  const confirmation = page.getByLabel("Confirmo que contiene solo datos ficticios");
-  await confirmation.check();
-  await page.getByRole("button", { name: "Previsualizar" }).click();
-  await expect(input).toHaveAttribute("aria-invalid", "true");
-  await expect(page.locator("[data-field-error]")).toBeVisible();
-  await expect(confirmation).toBeChecked();
-  expect(await input.evaluate(element => (element as HTMLInputElement).files?.[0]?.name)).toBe("encabezados-ficticios.csv");
-  await expect(page).toHaveURL(/\/admin\/imports\/new$/);
-});
-
 test("métricas: un período invertido conserva fechas y muestra el error junto a Hasta", async ({ page }) => {
   await signIn(page, "admin");
   await page.goto("/admin/metrics");

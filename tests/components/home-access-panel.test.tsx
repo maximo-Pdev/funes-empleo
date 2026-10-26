@@ -33,7 +33,7 @@ describe("Home access panel", () => {
       "Registrá tu empresa y verificá tu correo para ingresar.",
       "Guardá un borrador y envialo a revisión municipal antes de su publicación.",
       "La Oficina preselecciona y deriva candidatos para tus ofertas.",
-      "Sin verificación documental en el MVP",
+      "Sin verificación documental",
       "Verificar el correo confirma el acceso a la cuenta; no acredita la identidad de la empresa. Cada oferta requiere revisión municipal.",
       "Las empresas acceden únicamente a los candidatos derivados por la Oficina a sus propias ofertas.",
     ]],

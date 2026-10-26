@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, BarChart3, BriefcaseBusiness, Building2, FileSpreadsheet, Settings, ShieldCheck, Users } from "lucide-react";
+import { ArrowLeft, BarChart3, BriefcaseBusiness, Building2, Settings, ShieldCheck, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { DashboardShell } from "@/components/ui/dashboard-shell";
 import accountStyles from "@/app/(auth)/account/account.module.css";
@@ -11,7 +11,6 @@ const navigation = [
   { href: "/admin/empresas", label: "Empresas", icon: Building2 },
   { href: "/admin/openings", label: "Ofertas", icon: BriefcaseBusiness },
   { href: "/admin/participations", label: "Participaciones", icon: ShieldCheck },
-  { href: "/admin/imports", label: "Importaciones", icon: FileSpreadsheet },
   { href: "/admin/metrics", label: "Métricas", icon: BarChart3 },
   { href: "/account", label: "Cuenta", icon: Settings },
 ];

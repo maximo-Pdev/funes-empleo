@@ -26,11 +26,10 @@ import * as openingCompany from "@/features/openings/company-actions";
 import * as company from "@/features/companies/company-actions";
 import * as companyAdmin from "@/features/companies/admin-actions";
 import * as accounts from "@/features/accounts/actions";
-import * as imports from "@/features/imports/actions";
 import * as feedback from "@/features/referrals/feedback-actions";
 const actions = { ...candidateAdmin, ...candidateHistory, ...assisted, ...claim, ...duplicate, ...candidateProfile,
   ...consent, ...participation, ...evaluation, ...nomination, ...matching, ...openingAdmin, ...openingCompany,
-  ...company, ...companyAdmin, ...accounts, ...imports, ...feedback };
+  ...company, ...companyAdmin, ...accounts, ...feedback };
 
 const id = "00000000-0000-4000-8000-000000000001";
 const profile = { name: "Persona ficticia", dni: "99000001", locality: "Funes", summary: "",
@@ -74,7 +73,6 @@ add("companies/company-actions", "company", "saveCompanyProfileAction", { legalN
 add("companies/admin-actions", "admin", "adminCompanyAction", {}, true);
 add("accounts/actions", "admin", "accountStatusAction", {}, true);
 add("accounts/actions", "active", "passwordAction", { password: "Fictitious-Test-Only!", confirmation: "Fictitious-Test-Only!" }, true);
-add("imports/actions", "admin", "resolveImportAction", {});
 add("referrals/feedback-actions", "company", "submitFeedbackAction", { reportedOutcome: "hired" }, true);
 add("referrals/feedback-actions", "company", "submitInterviewAction", { status: "scheduled", scheduledAt: "2026-09-27T10:00" }, true);
 add("referrals/feedback-actions", "admin", "confirmOutcomeAction", { outcome: "hired" }, true);

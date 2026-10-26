@@ -17,7 +17,6 @@ vi.mock("@/features/candidates/assisted-service", () => ({ getAssistedWorkspace:
 vi.mock("@/features/openings/admin-service", () => ({ listAdminOpenings: mocks.openings, getAdminOpening: mocks.opening }));
 vi.mock("@/features/participations/admin-query", () => ({ listAdminParticipations: mocks.participations, getAdminParticipation: mocks.participation }));
 vi.mock("@/features/participations/contact-service", () => ({ getContactTimeline: mocks.contacts }));
-vi.mock("@/features/imports/preview-service", () => ({ listImports: mocks.imports, getImportPreview: mocks.preview }));
 vi.mock("@/features/metrics/service", () => ({ getMetrics: mocks.metrics, metricsCategories: mocks.metricCategories, MetricsHistoryUnavailable: class extends Error {} }));
 vi.mock("@/features/openings/admin-actions", () => ({ moderateOpeningAction: mocks.moderate }));
 vi.mock("@/features/candidates/admin-actions", () => ({ candidateAccountDecisionAction: vi.fn() }));
@@ -26,7 +25,6 @@ vi.mock("@/features/candidates/assisted-actions", () => ({ saveAssistedAction: v
 vi.mock("@/features/candidates/claim-actions", () => ({ claimAssistedAction: vi.fn() }));
 vi.mock("@/features/participations/evaluation-actions", () => ({ recordEvaluationAction: vi.fn(), adminParticipationAction: vi.fn(), confirmFeedbackAction: vi.fn() }));
 vi.mock("@/features/participations/nomination-actions", () => ({ createAdminNominationAction: vi.fn() }));
-vi.mock("@/features/imports/actions", () => ({ resolveImportAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/admin/empresas", useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), redirect: (url: string) => { throw new Error(`REDIRECT:${url}`); }, notFound: () => { throw new Error("NOT_FOUND"); } }));
 vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn() }));
 import Candidates from "@/app/(admin)/admin/candidates/page";
@@ -40,9 +38,6 @@ import Openings from "@/app/(admin)/admin/openings/page";
 import Opening from "@/app/(admin)/admin/openings/[openingId]/page";
 import Participations from "@/app/(admin)/admin/participations/page";
 import Participation from "@/app/(admin)/admin/participations/[participationId]/page";
-import Imports from "@/app/(admin)/admin/imports/page";
-import ImportNew from "@/app/(admin)/admin/imports/new/page";
-import ImportPreviewPage from "@/app/(admin)/admin/imports/[batchId]/page";
 import Metrics from "@/app/(admin)/admin/metrics/page";
 const id = "0a000000-0000-4000-8000-000000000001";
 const date = "2026-10-19T12:00:00Z";
@@ -211,12 +206,6 @@ it("conserva los IDs de filtro al paginar participaciones", async () => {
 it("conserva la confirmación obligatoria en las decisiones de empresa", async () => {
  render(await Company({ params: Promise.resolve({ companyId: id }) })); expect(screen.getAllByRole("checkbox")).toHaveLength(2); for (const checkbox of screen.getAllByRole("checkbox")) expect(checkbox).toHaveProperty("required", true);
 });
-it("bloquea confirmación de una importación inválida", async () => {
- render(await ImportPreviewPage({ params: Promise.resolve({ batchId: id }) })); expect(screen.getByRole("button", { name: "Confirmar importación" })).toHaveProperty("disabled", true);
-});
-it("mantiene el dato ficticio como requisito antes de cargar un CSV", async () => {
- render(await ImportNew({ searchParams: Promise.resolve({ retry: id }) })); expect(screen.getByRole("checkbox")).toHaveProperty("required", true); expect(screen.getByLabelText("CSV ficticio").getAttribute("accept")).toBe(".csv,text/csv");
-});
 it("exporta los filtros consultados y conserva cobertura pendiente", async () => {
  render(await Metrics({ searchParams: Promise.resolve(metricFilters) })); expect(screen.getByRole("link", { name: "Descargar CSV filtrado" }).getAttribute("href")).toContain("from=2026-10-01&to=2026-10-19"); expect(screen.getByText("Pendiente de cubrir todas las vacantes")).toBeTruthy();
 });
@@ -308,9 +297,6 @@ it.each([
  ["opening", () => Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }), "/admin/openings"],
  ["participations", () => Participations({ searchParams: Promise.resolve({}) }), "/admin/participations"],
  ["participation", () => Participation({ params: Promise.resolve({ participationId: id }) }), "/admin/participations"],
- ["imports", () => Imports(), "/admin/imports"],
- ["import-new", () => ImportNew({ searchParams: Promise.resolve({}) }), "/admin/imports"],
- ["import-preview", () => ImportPreviewPage({ params: Promise.resolve({ batchId: id }) }), "/admin/imports"],
  ["metrics", () => Metrics({ searchParams: Promise.resolve(metricFilters) }), "/admin/metrics"],
 ] as const)("renders %s in the shared administrator workspace", async (section, page, active) => {
  const view = render(await page());
@@ -322,7 +308,7 @@ it.each([
  expect(within(sidebar).getByText("Administración")).toBeTruthy();
  expect(within(sidebar).getByTitle("admin@example.invalid")).toBeTruthy();
  const nav = within(sidebar).getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
- expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/imports", "/admin/metrics", "/account"]);
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/metrics", "/account"]);
  expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
  expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
@@ -355,20 +341,14 @@ it("muestra los estados con el badge compartido en las superficies administrativ
  expect(participationBadge?.textContent?.trim()).toBe("Recibida");
  expect(participationBadge?.className).toContain("border-status-neutral");
  participationsView.unmount();
- const importsView = render(await Imports());
- const importBadge = importsView.container.querySelector<HTMLElement>("[class*='border-status-']");
- expect(importBadge?.textContent?.trim()).toBe("Bloqueado");
- expect(importBadge?.className).toContain("border-status-red");
- expect(importBadge?.querySelector("[aria-hidden='true']")).toBeTruthy();
 });
 
 it.each([
  ["alta presencial", () => Assisted()],
- ["historial de importaciones", () => Imports()],
  ["seguimiento", () => Participation({ params: Promise.resolve({ participationId: id }) })],
 ] as const)("protege %s antes de leer datos", async (_name, page) => {
  mocks.guard.mockRejectedValue(new Error("FORBIDDEN")); await expect(page()).rejects.toThrow("FORBIDDEN");
- expect(mocks.assisted).not.toHaveBeenCalled(); expect(mocks.imports).not.toHaveBeenCalled(); expect(mocks.participation).not.toHaveBeenCalled();
+ expect(mocks.assisted).not.toHaveBeenCalled(); expect(mocks.participation).not.toHaveBeenCalled();
 });
 
 vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);

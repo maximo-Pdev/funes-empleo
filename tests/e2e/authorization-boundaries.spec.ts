@@ -3,7 +3,6 @@ import { fixtureId, loginFixture, protectedPages } from "./fixtures/quality";
 import { runLocalMaintenanceSql } from "./local-maintenance";
 import { readFileSync } from "node:fs";
 
-const deniedMessage = /No tenés permiso|Iniciá sesión|No encontramos el recurso solicitado o no tenés acceso a él/;
 for (const role of ["candidate", "company", "admin"] as const) {
   test(`${role}: sesión suspendida rechazada por todas sus páginas y handlers`, async ({ page }) => {
     test.setTimeout(120000);
@@ -19,15 +18,6 @@ for (const role of ["candidate", "company", "admin"] as const) {
       }
       const exportResponse = await page.request.get("/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20");
       expect(exportResponse.status()).toBe(403);
-      const headers = { Origin: "http://127.0.0.1:3000", "x-fictional-data": "true", "Content-Type": "text/csv" };
-      for (const response of [
-        await page.request.post("/api/admin/imports/preview", { data: "dni,nombre\n99000001,Prueba", headers }),
-        await page.request.post("/api/admin/imports/00000000-0000-4000-8000-000000000001/confirm", { data: "{}", headers }),
-      ]) {
-        expect(response.status()).toBe(400);
-        expect(await response.text()).toMatch(deniedMessage);
-        expect(response.headers()["cache-control"]).toContain("no-store");
-      }
       const upload = await page.request.post("/api/candidate/cv", { multipart: { candidateId: fixtureId("profile", n), version: "1",
         cv: { name: "cv-ficticio.pdf", mimeType: "application/pdf", buffer: readFileSync("tests/fixtures/cv-fictitious.pdf") } }, maxRedirects: 0 });
       expect(upload.status()).toBe(303);
@@ -85,17 +75,10 @@ test("handlers administrativos: anónimo, candidato y empresa sin permiso ni con
   for (const role of ["anonymous", "candidate", "company"] as const) {
     await page.context().clearCookies();
     if (role !== "anonymous") await loginFixture(page, role);
-    const headers = { Origin: "http://127.0.0.1:3000", "x-fictional-data": "true", "Content-Type": "text/csv" };
     const responses = [
       await page.request.get("/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20"),
-      await page.request.post("/api/admin/imports/preview", { data: "dni,nombre\n99000001,Prueba", headers }),
-      await page.request.post("/api/admin/imports/00000000-0000-4000-8000-000000000001/confirm", { data: "{}", headers }),
     ];
     expect(responses[0]?.status()).toBe(403);
-    for (const response of responses.slice(1)) {
-      expect(response.status()).toBe(400);
-      expect(await response.text()).toMatch(deniedMessage);
-    }
     for (const response of responses) {
       expect(response.headers()["cache-control"]).toContain("no-store");
       expect(await response.text()).not.toMatch(/Persona ficticia|dni_normalized|storage_path|stack trace/i);

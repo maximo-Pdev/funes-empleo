@@ -5,11 +5,12 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { signIn, requestRecovery, resendVerification, updatePassword, changeAccountStatus, registerAccount } from "./service";
 import type { AccountFormState } from "./form-state";
 import { getAccessHref } from "./access-notices";
-import { getPanelHref } from "./navigation";
 import type { UserRole } from "@/domain/catalogs";
 import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/validation/password";
 
 const genericRenewal = { message: "Si corresponde, recibirás un enlace en tu correo. Revisá también la carpeta de correo no deseado.", success: true };
+
+const panelHref: Record<UserRole, string> = { candidate: "/dashboard", company: "/empresa", admin: "/account" };
 
 export async function loginAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   let result: { status: "active" | "invalid" | "suspended" | "already-active"; role?: UserRole } = { status: "invalid" };
@@ -19,7 +20,7 @@ export async function loginAction(_previous: AccountFormState, form: FormData): 
   if (result.status === "suspended") redirect(getAccessHref("suspended"));
   if (result.status !== "active") return { message: "No pudimos iniciar sesión. Revisá el correo, la contraseña y su verificación.", success: false };
   revalidatePath("/", "layout");
-  redirect(result.role ? getPanelHref(result.role) : "/account");
+  redirect(result.role ? panelHref[result.role] : "/account");
 }
 export async function recoveryAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   try { await requestRecovery({ email: form.get("email") }); } catch { /* same non-enumerating response */ }

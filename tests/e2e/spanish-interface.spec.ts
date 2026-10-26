@@ -42,7 +42,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
         : ["/account", "/admin/candidates", `/admin/candidates/${fixtureId("profile", 2)}`, "/admin/candidates/assisted",
           "/admin/empresas", `/admin/empresas/${fixtureId("business", 2)}`, "/admin/openings",
           `/admin/openings/${fixtureId("opening", 2)}`, "/admin/participations",
-          `/admin/participations/${fixtureId("participation", 3)}`, "/admin/imports", "/admin/imports/new", "/admin/metrics"];
+          `/admin/participations/${fixtureId("participation", 3)}`, "/admin/metrics"];
     for (const path of paths) await check(page, path);
     if (role === "candidate") {
       await page.goto("/account?section=perfil");

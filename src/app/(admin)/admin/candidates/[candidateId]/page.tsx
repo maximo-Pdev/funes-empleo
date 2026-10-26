@@ -62,7 +62,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
 
   return <AdminShell email={user?.email} active={assisted ? "/admin/atencion-presencial" : "/admin/candidates"} title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
-    navigation={[{ href: assisted ? "/admin/atencion-presencial" : "/admin/candidates", label: assisted ? "Volver a atención presencial" : "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
+    navigation={[{ href: assisted ? "/admin/atencion-presencial" : "/admin/candidates", label: assisted ? "Volver a perfil asistido" : "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
       {editable && <AssistedProfileForm key={`assisted-profile:${candidateId}:${editable.profile.version}`} candidateId={candidateId}

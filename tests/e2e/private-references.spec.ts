@@ -8,7 +8,7 @@ const journeys = {
   admin: ["/account", "/admin/candidates", "/admin/atencion-presencial", `/admin/candidates/${fixtureId("profile", 1)}?cv=ok`,
     "/admin/empresas", `/admin/empresas/${fixtureId("business", 1)}`,
     "/admin/openings", `/admin/openings/${fixtureId("opening", 1)}?matchPage=1`, "/admin/participations",
-    `/admin/participations/${fixtureId("participation", 301)}`, "/admin/imports", "/admin/imports/new", "/admin/metrics"],
+    `/admin/participations/${fixtureId("participation", 301)}`, "/admin/metrics"],
   candidate: ["/account?section=perfil", "/account?section=ofertas", "/account?section=postulaciones"],
   company: ["/account", "/empresa", "/empresa/perfil", "/empresa/ofertas", `/empresa/ofertas/${fixtureId("opening", 1)}`,
     `/empresa/ofertas/${fixtureId("opening", 1)}#derivaciones`],

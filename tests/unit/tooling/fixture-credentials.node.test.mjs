@@ -141,7 +141,7 @@ test("local credentials require exact loopback origins for both destinations", (
   assert.throws(() => localFixturePassword({ ...local, NEXT_PUBLIC_SUPABASE_URL: "https://remote.invalid" }), { message: /LOCAL_FIXTURE_TARGET_REQUIRED/ });
 });
 test("all direct E2E consumers use centralized guarded credentials", () => {
-  const consumers = ["accounts", "admin-metrics", "assisted-candidate", "candidate-import", "candidate-self-service", "company-offers", "intermediation"];
+  const consumers = ["accounts", "admin-metrics", "assisted-candidate", "candidate-self-service", "company-offers", "intermediation"];
   for (const name of consumers) {
     const source = readFileSync(`tests/e2e/${name}.spec.ts`, "utf8");
     assert(source.includes("assertLocalTargets"));
