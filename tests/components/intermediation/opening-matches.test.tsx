@@ -27,11 +27,11 @@ beforeEach(() => {
 it("explica OR e intermediación, muestra rubros y no ofrece derivación automática", () => {
   render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
   expect(screen.getByText(/comparten al menos un rubro/)).toBeTruthy();
-  expect(screen.getByText("Rubros coincidentes: Comercio, Administración")).toBeTruthy();
+  expect(screen.getByText("Comercio, Administración")).toBeTruthy();
   expect(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" })).toBeTruthy();
   expect(nominate).not.toHaveBeenCalled();
   expect(screen.getByText("Coincidencias: 42")).toBeTruthy();
-  expect(screen.getAllByRole("list").some(list => list.className.includes("md:grid-cols-2"))).toBe(true);
+  expect(screen.getByRole("table")).toBeTruthy();
 });
 
 it("pagina conservando contexto de oferta y ancla accesible", () => {

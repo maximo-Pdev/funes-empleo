@@ -39,7 +39,8 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
     await page.getByLabel("Localidad laboral", { exact: true }).fill("Funes");
     await page.getByLabel("Habilidades y experiencia", { exact: true }).fill("Experiencia presencial ficticia");
-    await page.getByLabel(number === 1 ? "Categoría ficticia A" : "Categoría ficticia B", { exact: true }).check();
+    await page.getByLabel("Categorías laborales").click();
+    await page.getByRole("option", { name: number === 1 ? "Categoría ficticia A" : "Categoría ficticia B" }).click();
     const acceptance = page.getByLabel(/Confirmo que la persona aceptó/);
     await expect(acceptance).not.toBeChecked();
     await acceptance.check();

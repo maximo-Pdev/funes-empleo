@@ -10,6 +10,7 @@ import type { AssistedConsentPolicy } from "../../assisted-service";
 import { assistedFields, type AssistedInput } from "@/validation/duplicate-resolution";
 import { DUPLICATE_DECISIONS } from "@/domain/catalogs";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
+import { CategoryMultiSelect } from "../category-multi-select";
 const field = "w-full rounded border border-slate-500 bg-white p-2";
 const button = "rounded bg-blue-800 p-3 text-white disabled:opacity-50";
 const labels = { name: "Nombre y apellido", dni: "DNI", phone: "Teléfono", email: "Correo de contacto (opcional)",
@@ -59,10 +60,9 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
           autoComplete={key === "dni" ? "off" : undefined} maxLength={key === "name" ? 200 : key === "dni" ? 20 : key === "phone" ? 50 : key === "email" ? 320 : key === "locality" ? 150 : 500} />}</Field>)}
     <Field className="grid gap-1">Disponibilidad<select name="availability" required className={field} defaultValue={initial?.availability ?? "available"}>
       <option value="available">Disponible</option>{candidateId && <option value="unavailable">No disponible</option>}</select></Field>
-    <fieldset className="rounded border p-3"><legend>{labels.categories}</legend>
+    <fieldset className="grid gap-2 rounded border p-3"><legend>{labels.categories}</legend>
       {categories.length === 0 && <p>No hay categorías vigentes disponibles.</p>}
-      <div className="grid gap-2 sm:grid-cols-2">{categories.map((c) => <Field key={c.id} className="flex gap-2"><input name="categories" type="checkbox" value={c.id}
-        defaultChecked={initial?.categories.includes(c.id)} />{c.name}</Field>)}</div></fieldset>
+      <CategoryMultiSelect categories={categories} defaultSelected={initial?.categories ?? []} /></fieldset>
     {!candidateId && <fieldset className="grid gap-3 rounded border p-4"><legend className="font-semibold">Consentimiento presencial</legend>
       <p>La persona autoriza el uso de sus datos laborales por la Oficina de Empleo y su comunicación a empresas únicamente después de una derivación municipal. Al confirmar una contratación se retira el consentimiento global y se revocan los accesos empresariales.</p>
       {creationPolicy ? <p>{creationPolicy.policy_text} Versión {creationPolicy.version}.</p> : <p>No se pudo cargar la política. Volvé a abrir esta página antes de crear el perfil.</p>}

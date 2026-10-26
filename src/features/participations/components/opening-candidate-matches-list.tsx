@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
+import { Button, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import { openingCandidatePreviewAction } from "@/features/candidates/matching-actions";
 import { createAdminNominationAction } from "@/features/participations/nomination-actions";
 import { adminMutationError } from "@/lib/errors/admin-mutation-result";
@@ -105,13 +105,29 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
     {!matches.available ? <EmptyState title="Coincidencias no disponibles" description="La oferta debe estar publicada o pausada, vigente y pertenecer a una empresa activa." /> : <>
       <p aria-live="polite">Coincidencias: {total}</p>
       {!visible.length ? <EmptyState title="Sin candidatos en esta página" description="No hay perfiles aptos sin participación previa. Revisá los rubros o volvé a la primera página." /> :
-        <ul className="grid gap-3 md:grid-cols-2">{visible.map(candidate => <li key={candidate.id} className="min-w-0 rounded-lg border border-slate-200 p-3">
-          <h3 className="truncate font-semibold" title={candidate.displayName}>{candidate.displayName}</h3>
-          <p className="truncate text-sm">{candidate.locality ?? "Localidad no informada"}</p>
-          <p className="line-clamp-2 text-sm text-slate-700">Rubros coincidentes: {candidate.matchedCategories.map(category => category.name).join(", ")}</p>
-          <button type="button" className="mt-2 rounded border border-blue-800 px-3 py-1.5 text-sm font-medium text-blue-800"
-            aria-label={`Ver perfil de ${candidate.displayName}`} onClick={event => openProfile({ id: candidate.id, name: candidate.displayName }, event.currentTarget)}>Ver perfil y nominar</button>
-        </li>)}</ul>}
+        <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Candidato</TableHead>
+                <TableHead>Localidad</TableHead>
+                <TableHead>Rubros coincidentes</TableHead>
+                <TableHead className="text-right">Acción</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {visible.map(candidate => <TableRow key={candidate.id}>
+                <TableCell className="font-semibold">{candidate.displayName}</TableCell>
+                <TableCell>{candidate.locality ?? "Localidad no informada"}</TableCell>
+                <TableCell>{candidate.matchedCategories.map(category => category.name).join(", ")}</TableCell>
+                <TableCell className="text-right">
+                  <button type="button" className="rounded border border-blue-800 px-3 py-1.5 text-sm font-medium text-blue-800"
+                    aria-label={`Ver perfil de ${candidate.displayName}`} onClick={event => openProfile({ id: candidate.id, name: candidate.displayName }, event.currentTarget)}>Ver perfil y nominar</button>
+                </TableCell>
+              </TableRow>)}
+            </TableBody>
+          </Table>
+        </div>}
       {matches.page > 1 && !visible.length && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, 1, order)}>Volver a la primera página</Link>}
       {pageCount > 1 && <Pagination aria-label="Páginas de coincidencias">
         <PaginationContent>
