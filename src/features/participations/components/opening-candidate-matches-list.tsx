@@ -8,10 +8,13 @@ import { openingCandidatePreviewAction } from "@/features/candidates/matching-ac
 import { createAdminNominationAction } from "@/features/participations/nomination-actions";
 import { adminMutationError } from "@/lib/errors/admin-mutation-result";
 import type { OpeningCandidatePreview, OpeningMatches } from "@/validation/opening-matching";
+import { DEFAULT_OPENING_MATCH_ORDER, openingMatchOrderOptions, type OpeningMatchOrder } from "@/domain/catalogs/opening-match-order";
+import { openingMatchesHref } from "@/features/candidates/matching-navigation";
+import { SelectField } from "@/components/ui/select-field";
 
 type Selection = { id: string; name: string };
 
-export function OpeningCandidateMatchesList({ openingId, openingReference, matches }: { openingId: string; openingReference: string; matches: OpeningMatches }) {
+export function OpeningCandidateMatchesList({ openingId, openingReference, matches, order = DEFAULT_OPENING_MATCH_ORDER }: { openingId: string; openingReference: string; matches: OpeningMatches; order?: OpeningMatchOrder }) {
   const router = useRouter();
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -90,6 +93,14 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
   return <section aria-labelledby="opening-matches" className="my-6 space-y-3 rounded-lg border border-slate-300 bg-white p-4">
     <h2 ref={heading} tabIndex={-1} id="opening-matches" className="text-xl font-semibold">Candidatos con rubros coincidentes</h2>
     <p className="text-sm">Perfiles aptos que comparten al menos un rubro y aún no participan de esta oferta. La nominación inicia la evaluación municipal, no una derivación.</p>
+    <div className="max-w-sm">
+      <SelectField id="opening-match-order" label="Última actualización del perfil" placeholder={null}
+        options={openingMatchOrderOptions} value={order} disabled={!matches.available}
+        onChange={event => {
+          const next = openingMatchOrderOptions.find(option => option.value === event.currentTarget.value);
+          if (next) router.push(openingMatchesHref(openingReference, 1, next.value), { scroll: false });
+        }} />
+    </div>
     {notice && <p role="status" className="rounded border border-green-300 bg-green-50 p-3 text-green-950">{notice}</p>}
     {!matches.available ? <EmptyState title="Coincidencias no disponibles" description="La oferta debe estar publicada o pausada, vigente y pertenecer a una empresa activa." /> : <>
       <p aria-live="polite">Coincidencias: {total}</p>
@@ -101,11 +112,11 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
           <button type="button" className="mt-2 rounded border border-blue-800 px-3 py-1.5 text-sm font-medium text-blue-800"
             aria-label={`Ver perfil de ${candidate.displayName}`} onClick={event => openProfile({ id: candidate.id, name: candidate.displayName }, event.currentTarget)}>Ver perfil y nominar</button>
         </li>)}</ul>}
-      {matches.page > 1 && !visible.length && <Link className="text-blue-800 underline" href={`/admin/openings/${openingReference}#opening-matches`}>Volver a la primera página</Link>}
+      {matches.page > 1 && !visible.length && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, 1, order)}>Volver a la primera página</Link>}
       {pageCount > 1 && <nav aria-label="Páginas de coincidencias" className="flex flex-wrap gap-4">
-        {matches.page > 1 && <Link className="text-blue-800 underline" href={`/admin/openings/${openingReference}?matchPage=${matches.page - 1}#opening-matches`}>Anterior</Link>}
+        {matches.page > 1 && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, matches.page - 1, order)}>Anterior</Link>}
         <span>Página {matches.page} de {pageCount}</span>
-        {matches.page < pageCount && <Link className="text-blue-800 underline" href={`/admin/openings/${openingReference}?matchPage=${matches.page + 1}#opening-matches`}>Siguiente</Link>}
+        {matches.page < pageCount && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, matches.page + 1, order)}>Siguiente</Link>}
       </nav>}
     </>}
     <dialog ref={dialog} aria-labelledby="candidate-preview-title" className="m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-2xl overflow-y-auto rounded-xl border border-slate-300 bg-white p-5 text-slate-950 shadow-xl backdrop:bg-slate-950/50"

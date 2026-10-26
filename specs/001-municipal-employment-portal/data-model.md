@@ -3,6 +3,12 @@
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 
+EXTRA073: sin nuevas entidades/campos/índices ni escrituras. El RPC administrativo
+ordenado usa candidate_profiles.updated_at existente (nonnull, mantenido por
+trigger de cambios del perfil) exclusivamente como clave de orden. No lo añade
+a la proyección del candidato. Comparte IDs/pool/aptitud con el RPC previo;
+total y privacidad se conservan. Desempate nombre e ID; sin snapshot de fechas.
+
 EXTRA069: sin tablas/campos persistidos nuevos ni backfill. company_referral
 agrega candidateName y el RPC aditivo company_referral_summaries agrega
 candidate_name a cada referencia autorizada, leyendo el display_name actual

@@ -26,6 +26,6 @@ export function ModerationHistory({ events }: { events: ModerationHistoryEvent[]
         {event.internalReason && <p className="mt-2">Motivo interno: {event.internalReason}</p>}
       </li>)}</ol>}
     <p role="status" aria-live="polite" className="sr-only">{visible > 5 ? `${Math.min(visible, events.length)} de ${events.length} eventos visibles.` : ""}</p>
-    {visible < events.length && <Button variant="secondary" onClick={() => { setFocusIndex(visible); setVisible(Math.min(visible + 5, events.length)); }}>Ver más</Button>}
+    {visible < events.length && <Button variant="secondary" onClick={() => { setFocusIndex(visible); setVisible(Math.min(visible + 5, events.length)); }}>Mostrar más</Button>}
   </section>;
 }

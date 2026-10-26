@@ -20,6 +20,43 @@ See [public count contract](contracts/public-portal-counts.md) and
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+## Oferta administrativa/orden de matching — EXTRA073,2026-10-25
+
+Incremento de feature001 existente, sin reinitializar ni reemplazar artefactos.
+Constitución I–VI: intermediación/roles intactos, proyección mínima, lectura sin
+auditorías o DML, control nativo accesible/orden DOM móvil, stack/dependencias
+existentes. Scope y última actualización aclarados por Mateo; sin incógnitas.
+
+Añadir match_opening_candidates_ordered(uuid,text,integer,integer), con nombre
+único y mismos guard/grants/forma que el legado. Reutilizar el pool privado sin
+alterarlo; join PK de candidate_profiles solo para updated_at. CASE asc/desc,
+desempate display_name/id y mismo orden en jsonb_agg; materializar elegibles una
+vez y contar antes de limit/offset. RPC anterior se conserva literalmente, con
+su orden alfabético. No nuevos índices/tablas/timestamps/backfill. updated_at
+incluye modificaciones de notas/CV/foto/estado que tocan el perfil. El RPC nuevo
+es VOLATILE como el legado: el guard toma FOR SHARE. SQL antes que aplicación;
+rollback de app deja RPC sin uso, recuperación revoca/retira solo el RPC nuevo.
+
+Dominio centraliza updated_desc/updated_asc (default desc) y etiquetas españolas.
+Entrada TS valida matchOrder escalar/lista ilegal antes de sesión/RPC; servicio
+usa RPC aditivo. Mantener DTO de respuesta sin fechas/PII nuevos. Query matchOrder
+viaja en anterior/siguiente/regreso; cambiar select reinicia matchPage a1 y
+Suspense se identifica por orden/página. Diálogo/nominar no cambian.
+
+Página mantiene información izquierda; columna derecha contiene ModerationForm
+y ModerationHistory. El historial compartido conserva cinco eventos iniciales
+y bloques de cinco; botón Mostrar más solo si quedan otros, con foco/anuncio
+accesibles vigentes. LinkButton cliente compone NextLink y buttonVariants sin
+alterar el rol link; href lleva referencia opaca ya resuelta en servidor.
+El data-slot link-button conserva sus variantes de color frente al override
+genérico de enlaces del panel: excluirlo de ese color y hover, sin modificar
+los otros enlaces. Verificar contraste real y axe en la sección informativa.
+SelectField acepta placeholder=null solo para omitir la opción vacía en este
+selector de dos órdenes; callers previos conservan defaults/contrato/validación.
+Sin reemplazar primitives o introducir paleta/dependencias. Validar SQL/roles/
+privacidad/compatibilidad, URL/query repetida, navegación/popup, UI a1440/390,
+teclado/axe, tipos/lint/unitarias/build y recuperación documentada.
+
 EXTRA071: componer IdentifierField con Field/input nativo y Button municipal;
 useId/useState local, tipo password/text, aria-controls/pressed y botón sin
 submit. Usar únicamente en CandidateProfilePanel/CompanyProfileForm propios,

@@ -1,11 +1,11 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { openingPreview } from "../../fixtures/opening-preview";
-const { service, preview, nominate, refresh } = vi.hoisted(() => ({ service: vi.fn(), preview: vi.fn(), nominate: vi.fn(), refresh: vi.fn() }));
+const { service, preview, nominate, refresh, push } = vi.hoisted(() => ({ service: vi.fn(), preview: vi.fn(), nominate: vi.fn(), refresh: vi.fn(), push: vi.fn() }));
 vi.mock("@/features/candidates/matching-service", () => ({ getOpeningMatches: service }));
 vi.mock("@/features/candidates/matching-actions", () => ({ openingCandidatePreviewAction: preview }));
 vi.mock("@/features/participations/nomination-actions", () => ({ createAdminNominationAction: nominate }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh, push }) }));
 import { OpeningCandidateMatches, OpeningCandidateMatchesList } from "@/features/participations/components/opening-candidate-matches";
 import type { OpeningMatches } from "@/validation/opening-matching";
 
@@ -35,10 +35,20 @@ it("explica OR e intermediación, muestra rubros y no ofrece derivación automá
 });
 
 it("pagina conservando contexto de oferta y ancla accesible", () => {
-  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} order="updated_asc" />);
   expect(screen.getByRole("navigation", { name: "Páginas de coincidencias" })).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Anterior" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchPage=1#opening-matches`);
-  expect(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchPage=3#opening-matches`);
+  expect(screen.getByRole("link", { name: "Anterior" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchOrder=updated_asc#opening-matches`);
+  expect(screen.getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchOrder=updated_asc&matchPage=3#opening-matches`);
+});
+
+it("ordena por actualización y reinicia a página uno sin perder la oferta", () => {
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
+  const select = screen.getByRole("combobox", { name: "Última actualización del perfil" });
+  expect(select).toHaveProperty("value", "updated_desc");
+  expect(screen.getAllByRole("option")).toHaveLength(2);
+  fireEvent.change(select, { target: { value: "updated_asc" } });
+  expect(push).toHaveBeenCalledWith("/admin/openings/ofe-111111111111111111111111?matchOrder=updated_asc#opening-matches", { scroll: false });
+  expect(nominate).not.toHaveBeenCalled();
 });
 
 it("no muestra una participación existente aunque llegue una respuesta anterior", () => {
@@ -50,12 +60,13 @@ it("no muestra una participación existente aunque llegue una respuesta anterior
 it("muestra vacío y recuperación de página fuera de rango", () => {
   render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches, items: [], page: 9 }} />);
   expect(screen.getByText("Sin candidatos en esta página")).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111#opening-matches`);
+  expect(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href")).toBe(`/admin/openings/ofe-111111111111111111111111?matchOrder=updated_desc#opening-matches`);
 });
 
 it("no muestra candidatos cuando la oferta no habilita matching", () => {
   render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches, available: false, items: [], total: 0 }} />);
   expect(screen.getByText("Coincidencias no disponibles")).toBeTruthy();
+  expect(screen.getByRole("combobox")).toHaveProperty("disabled", true);
   expect(screen.queryByRole("navigation")).toBeNull();
 });
 
@@ -68,7 +79,7 @@ it("rechaza arrays sin convertirlos en una página válida", async () => {
 it("resuelve componente servidor y pagina en el servicio real por contrato", async () => {
   service.mockResolvedValue(matches);
   render(await OpeningCandidateMatches({ openingId: id, page: "2" }));
-  expect(service).toHaveBeenCalledWith({ openingId: id, page: 2, pageSize: 12 });
+  expect(service).toHaveBeenCalledWith({ openingId: id, page: 2, pageSize: 12, order: "updated_desc" });
   expect(screen.getByText("Persona ficticia")).toBeTruthy();
 });
 

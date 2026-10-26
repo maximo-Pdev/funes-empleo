@@ -4489,3 +4489,160 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   next-env.d.ts ajeno preservado; diff-check PASS. Cambian prueba y trazabilidad,
   producto/SQL/reglas intactos. T207 implementada/verificada; publicación/nueva
   CI completa y revisión pendientes.
+
+## EXTRA-073 — Oferta administrativa y orden de candidatos coincidentes
+
+- **Fecha/origen/autorización:**2026-10-25, Mateo pide Decisión municipal a la
+  derecha de Oferta y empresa, acceso destacado a sus participaciones y orden
+  nuevo/antiguo. Aclara: solo candidatos coincidentes de cada oferta, por última
+  actualización del perfil. FR-023/031/032/034/070; coordinación autorizada por
+  el pedido. PR76 mergeado confirmado; base main9569a88, rama
+  feat/admin-opening-workspace; rama anterior eliminada local/remota.
+- **Evidencia/propuesta antes de implementar:** página actual coloca decisión
+  bajo información; enlace de participaciones es texto simple. Matching RPC
+  existente ordena por nombre antes de paginar. Añadir RPC con nombre distinto
+  que reutilice private.opening_candidate_pool y una candidate_profiles por PK
+  para ordenar globalmente por updated_at asc/desc, desempate nombre/ID. Mantener
+  RPC anterior, helper, aptitud, total y forma mínima de respuesta intactos.
+- **Semántica:** updated_at ya representa la última modificación persistida del
+  perfil; también cambia por notas/CV/foto/estado que tocan ese registro. No usar
+  edad, created_at, última confirmación ni inventar un nuevo reloj. Predeterminar
+  Más recientes primero; cambiar orden vuelve a página1 y paginación lo conserva.
+- **Archivos/contratos:** detalle de oferta, componentes matching, validación/
+  servicio/tipos RPC, migración nueva y pruebas; spec/plan/modelo/research/
+  contratos/quickstart/checklist/tasks. Reusar SelectField con placeholder null
+  opcional para ofrecer exactamente dos órdenes sin cambiar sus defaults en
+  otros usos. LinkButton compone NextLink y variantes del Button compartido en
+  cliente; evita invocar helpers cliente desde el servidor y conserva rol link.
+- **Justificación técnica:** ordenar solo doce fichas en cliente sería incorrecto;
+  descargar todo en varias RPC añadiría viajes y duplicación. RPC aditivo evita
+  sobrecargas ambiguas/ruptura de clientes existentes. Orden CASE parametrizado,
+  guard admin/sesión y grants authenticated restringidos; sin nuevo índice hasta
+  evidencia de plan de consulta. Nueva migración necesaria, sin backfill ni DML.
+- **Riesgos/verificación:** paginar antes de ordenar, empates, parámetros repetidos/
+  inválidos, pérdida de orden en enlaces, cambios a aptitud/nominación, permisos,
+  enlaces con UUID, responsive/foco/formularios. SQL para orden global/empates/
+  roles/integridad/compatibilidad; unit/componentes/E2E para URL y UI; tipos/lint/
+  build, SQL relevante y navegador ficticio. Migración antes de nueva app;
+  recuperación revierte app y retira solo RPC nuevo, sin borrar datos.
+- **Investigación:** subagente de lectura según fase0 speckit-plan confirma
+  triggers de updated_at y pool/contrato compartidos, sin editar archivos. Guías
+  oficiales shadcn Button/Native Select y sus fuentes base-nova consultadas;
+  Supabase recomienda nombres RPC únicos y ACL explícitas. Registro previo,
+  etapas incrementales en feature001 existente; revisión/CI/despliegue pendientes.
+- **Gate previo:** spec/clarificaciones revisadas; setup-plan y setup-tasks
+  resuelven feature001 sin sobrescribir plan ni archivos gestionados. Research
+  documentado; plan/modelo/contrato/quickstart y calidad de requisitos alineados.
+  Análisis de solo lectura: R1–R5 cubiertos por T208–211,100%, cero críticos/altos,
+  tareas sin mapear o contradicciones nuevas con constitución I–VI. Casillas de
+  revisión final EXTRA062 (incremento anterior) se conservan sin marcarlas como
+  revisadas; no son requisitos previos de este alcance. No se ejecuta una nueva
+  implementación global del MVP ni se cierran validaciones humanas históricas.
+- **Adición necesaria detectada antes de corregir estilos:** la captura real de
+  Chromium muestra el LinkButton sin texto legible. admin-workspace.module.css
+  aplica color verde a todos los enlaces con mayor prioridad que text-white;
+  regresión E2E RED confirma rgb(7,74,31) en lugar de blanco. Propuesta mínima:
+  identificar LinkButton con data-slot y excluir solo ese componente de los
+  overrides de color/hover del panel, sin cambiar los demás enlaces ni paleta.
+  Afecta ese CSS, LinkButton y E2E; verificar contraste, foco, axe y capturas
+  escritorio/móvil, build/lint/tipos. Deriva de R2 y autorización técnica AGENTS;
+  sin cambio funcional ni permisos nuevos. Revisión humana pendiente.
+- **Regresión necesaria de pruebas:** el helper E2E nominateFromOpening calcula
+  la página de una persona por nombre; ese cálculo quedaría desalineado con el
+  nuevo default. Actualizar solo tests/e2e/fixtures/nomination.ts para localizar
+  por updated_at DESC/nombre/ID y pedir updated_desc explícito. Verificar sus
+  consumidores presencial e intermediación; no cambia nominación ni fixtures
+  persistidos de producto. Deriva de R4/R5/T211, autorizado dentro del alcance.
+- **Sincronización de regresión E2E:** el consumidor intermediation.spec.ts inicia
+  otra navegación antes de terminar la redirección UUID→referencia del perfil.
+  Evidencia: page.goto interrupted by /admin/candidates/can-… en la primera
+  corrida focalizada, mientras presencial y moderación pasan. Esperar explícitamente
+  la URL canónica antes de llamar al helper; no agregar sleeps, reintentos ni
+  cambios de producto. Verificar de nuevo el recorrido afectado.
+- **Implementado/verificado localmente:** migración nueva
+  20261025222811_admin_opening_candidate_order.sql y prueba045; catálogo/validación,
+  servicio/tipos, navegación de matching, dos componentes, detalle de oferta,
+  LinkButton/SelectField y CSS acotado. Artefactos actualizados y recuperación
+  en docs/operations/admin-opening-workspace.md; helper E2E y espera canónica
+  alineados. Ningún archivo de migración anterior, pool o RPC legado modificado.
+- **Resultados:**1200 unitarias/componentes en90 archivos y57 tooling PASS;
+  73 componentes pertinentes repetidos tras corrección de contraste PASS.
+  pgTAP completo1314/25 archivos PASS desde migraciones frescas con fixture
+  ficticio500 candidatos/50 empresas/100 ofertas/1000 participaciones/500PDF.
+  Advisor security local sin incidencias. EXPLAIN ANALYZE del pool/orden con
+  12 elegibles sobre500 perfiles:9.218ms, medición sintética sin promesa de SLO.
+  Primer intento de medición usó helpers pgTAP fuera de su sesión y se corrigió
+  el harness; no se cambió SQL de producto por ese diagnóstico.
+- **Navegador final:**5 recorridos de job-category-matching PASS23.2s, cero
+  reintentos/omisiones; orden global comparado contra consulta independiente,
+  paginación/reload/reinicio por teclado, parámetros repetidos, referencia opaca,
+  acceso filtrado a participaciones, popup/CV/nominación/exclusión, empresa
+  denegada y geometría1440/390. Axe0 en matching/popup/sección informativa,
+  contraste blanco normal/hover y foco comprobados. Tres consumidores adicionales
+  del helper verificados: presencial21.7s, moderación20.6s y nominación completa
+  21.4s tras corregir su carrera de redirección; sin reintentos automáticos.
+- **Cierre técnico:** tipos, lint, build final y diff-check PASS; fuentes del
+  snapshot verificadas por hash contra los11 archivos de producto del incremento.
+  Revisión propia React: orden en servidor, DTO acotado, catálogo ligero, estado
+  local/acciones vigentes y componentes compartidos; sin dependencias nuevas.
+  Cotejo R1–R5 cubierto5/5, sin nuevo trabajo de implementación pendiente dentro
+  del incremento; no se ejecuta converge global ni se cierran validaciones ajenas.
+  Cobertura configurada100% corresponde solo a env/schema, no a todo el producto.
+- **Límites/entrega:** pruebas en funes-admin-cv-check54341/54342/app3001; no
+  modificar base habitual ni Supabase alojado. Migración alojada debe preceder
+  despliegue de esta app; pendiente de autorización operativa. next-env.d.ts
+  preexistente conserva hashB8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+  No commit/PR/CI global/revisión humana/aceptación municipal realizados. Avisos
+  previos de canvas-jsdom, lockfile externo y stream cerrado temprano de Next
+  observados sin fallos funcionales en recorridos finales; sin cambios ajenos.
+- **Aplicación alojada autorizada por Mateo:** solicitud posterior «hace la
+  migracion». CLI vinculado a kyjycjojzhwggjuqjnki; conector sin acceso, CLI con
+  acceso operativo verificado. Preflight guarda definiciones/ACL de pool, guard
+  y RPC legado en test-results ignorado; función nueva ausente y updated_at
+  compatible. Aplicar únicamente20261025222811 en transacción, comprobar cuerpo,
+  ACL/guard y registrar esa versión con SQL exacto antes de commit. Conservar
+  historial previo y todos los registros; verificar hashes anteriores después.
+- **Resultado alojado:**20261025222811/admin_opening_candidate_order aplicada y
+  registrada atómicamente el2026-10-25. Cuerpo normalizado9a948e68a1c754695a901d53580e180c;
+  SQL del historialb1623b94ea78a2d9c5079b8a8600748a coincide con archivo. Grants,
+  VOLATILE/definer/path y denegación AUTH_REQUIRED sin sesión PASS. Pool/guard/
+  RPC legado conservan hash y ACL; ningún reset ni migración anterior aplicada.
+  Guía operativa actualizada. Esta ejecución no publica interfaz ni acredita
+  pruebas de usuario sobre el alojamiento; commit/PR/CI/revisión pendientes.
+- **Advisor posterior:**57→58 WARN, cero ERROR; solo nuevo0029 del RPC autenticado
+  SECURITY DEFINER, intencional y protegido por sesión/admin antes del pool,
+  ACL y path fijados; enlace de diagnóstico en guía operativa. Primer intento
+  falló por autenticación de cli_login_postgres; repetición serial completó en6s.
+  Posible interferencia de credenciales temporales entre conexiones paralelas,
+  sin atribución definitiva; no cambiar contraseñas/secretos ni repetir migración.
+- **Ampliación visual posterior autorizada:** Mateo solicita cinco eventos
+  iniciales en Historial de moderación y botón Mostrar más cuando haya otros.
+  Evidencia: ModerationHistory compartido ya usa5 y revela5 por interacción;
+  administración y empresa lo reutilizan. Cambio mínimo: conservar ese límite,
+  orden, foco y anuncio accesible; renombrar Ver más a Mostrar más y ajustar
+  expectativas/bordes0/1/5/12. Archivos: componente, pruebas de historial y
+  expectativas E2E afectadas, spec/plan/tasks/guía. Sin backend, SQL, permisos
+  ni borrado de eventos. Verificar componentes, tipos/lint/build y control real
+  en navegador; revisión humana pendiente. Trabajo previo preservado en misma rama.
+- **Cierre de ampliación visual:** el límite5 y el agregado por5 ya estaban
+  implementados en el componente compartido. Solo se cambió el rótulo a Mostrar
+  más y se alinearon expectativas de componentes/E2E, sin reemplazar controles.
+  RED por rótulo previo observado; GREEN59 pruebas en2 archivos pertinentes.
+  Casos0/1/5 sin botón,12 con5→10→12, foco y anuncio PASS. Chromium con componente/
+  CSS reales y datos ficticios:8 escenarios0/5/6/12×1440/390, Enter/Espacio,
+  ocultar al completar, foco, sin overflow y axe0 PASS; captura móvil inspeccionada.
+  Tipos/lint/diff PASS. Build falló por worker CSS de Turbopack y reprodujo error
+  cacheado aun fuera del sandbox; limpiar únicamente .next de la copia aislada
+  resolvió y build limpio PASS. Sin cambios de configuración/código por ese fallo.
+  Artefactos/guía/T212 alineados. Sin SQL nuevo ni migración adicional, commit/PR,
+  revisión humana o despliegue. Auditoría completa y cambios previos preservados.
+- **Publicación solicitada:** Mateo pide «hace el pr» tras la ampliación. Rama
+  feat/admin-opening-workspace alineada con main9569a88 al preparar entrega;
+  publicar solo este incremento y su evidencia, excluyendo next-env.d.ts y
+  test-results/secretos. Commit sin firma, signoff ni coautoría; PR hacia main.
+  No acredita revisión humana, merge, despliegue de interfaz ni CI completo.
+- **Entrega publicada:** commit00f06cc sin firma/signoff/coautoría en
+  feat/admin-opening-workspace y [PR77](https://github.com/maximo-Pdev/funes-empleo/pull/77)
+  abierto hacia main, sin borrador, adjunto a la conversación. Incluye migración
+  ya aplicada y ampliación del historial. next-env.d.ts y respaldos ignorados
+  excluidos; CI/revisión/merge/despliegue de interfaz pendientes.
