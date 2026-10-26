@@ -148,21 +148,28 @@ describe("presentación de consentimiento y activación", () => {
     expect(within(activation).getByText(missing)).toBeTruthy();
   });
 
-  it("aclara el consentimiento global al contratar y conserva la política y aceptación explícita", () => {
+  it("resume el consentimiento, agrupa Más información y conserva la aceptación explícita sin apartado de política", () => {
     render(<CandidateProfilePanel {...props} />);
     const consent = screen.getByRole("heading", { name: "Consentimiento de prueba" }).closest("form")!;
-    expect(within(consent).getByText(/autorizás a la Oficina de Empleo/)).toBeTruthy();
+    expect(within(consent).getByText(/autorizás a la Oficina de Empleo/).closest("details")).toBeNull();
     expect(within(consent).getByText(/solo puede ver tu perfil laboral, tus contactos vigentes y el CV/)).toBeTruthy();
     expect(within(consent).getByText(/No puede ver tu DNI, domicilio ni notas internas/)).toBeTruthy();
-    expect(within(consent).getByText(/contratación, incluso tardía/).textContent).toMatch(/consentimiento global vigente se retira automáticamente/);
-    expect(within(consent).getByText(/contratación, incluso tardía/).textContent).toMatch(/todas las empresas/);
+    const hiring = within(consent).getByText(/Si la Oficina confirma una contratación en/);
+    expect(hiring.textContent).toMatch(/consentimiento vigente se retira automáticamente/);
+    expect(hiring.textContent).toMatch(/todas las empresas/);
+    expect(hiring.closest("details")).toBeNull();
     expect(within(consent).getByText(/otras participaciones ni sus resultados/)).toBeTruthy();
     expect(within(consent).getByText(/volver a aceptarlo expresamente/)).toBeTruthy();
     expect(within(consent).getByText(/retirarlo manualmente/)).toBeTruthy();
-    const policy = within(consent).getByText(props.policy.policy_text, { exact: false }).closest("details")!;
-    expect(policy).toHaveProperty("open", false);
-    expect(within(policy).getByText(/no es texto municipal aprobado/)).toBeTruthy();
-    expect(within(policy).getByText("Ver política de consentimiento")).toBeTruthy();
+    const more = within(consent).getByText("Más información", { exact: true }).closest("details")!;
+    expect(more).toHaveProperty("open", false);
+    expect(more.querySelectorAll("p")).toHaveLength(4);
+    expect(within(more).getByText(/Una empresa solo puede ver/)).toBeTruthy();
+    expect(within(more).getByText(/seguir viendo únicamente tu nombre/)).toBeTruthy();
+    expect(within(more).getByText(/Corregir un resultado no restablece/)).toBeTruthy();
+    expect(within(more).getByText(/También podés retirarlo manualmente/)).toBeTruthy();
+    expect(within(consent).queryByText(props.policy.policy_text, { exact: false })).toBeNull();
+    expect(within(consent).queryByText("Ver política de consentimiento")).toBeNull();
     expect(within(consent).getByRole("checkbox")).toHaveProperty("required", true);
     expect(within(consent).getByRole("combobox")).toHaveProperty("value", "withdrawn");
   });

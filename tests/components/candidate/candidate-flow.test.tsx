@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { candidateRegistrationSchema } from "@/validation/candidate-registration";
 import { candidateProfileSchema } from "@/validation/candidate-profile";
@@ -50,10 +50,24 @@ describe("autogestión candidata", () => {
       categories={[{ id: categoryA, name: "Categoría A", code: "A" }, { id: categoryB, name: "Categoría B", code: "B" }]}
       selectedCategories={[categoryA, categoryB]} consent={null} cv={null}
       policy={{ version: "demo-not-approved", policy_text: "Texto ficticio de prueba", policy_hash: "0".repeat(64) }} />);
-    expect(screen.getByLabelText(/DNI/)).toHaveProperty("type", "password");
+    const dni = screen.getByLabelText("DNI") as HTMLInputElement;
+    const form = dni.form!;
+    const submit = vi.fn((event: Event) => event.preventDefault());
+    form.addEventListener("submit", submit);
+    expect(dni).toHaveProperty("type", "password");
+    const reveal = screen.getByRole("button", { name: "Mostrar DNI" });
+    expect(reveal.getAttribute("aria-controls")).toBe(dni.id);
+    fireEvent.click(reveal);
+    expect(dni).toHaveProperty("type", "text");
+    expect(dni.value).toBe("90000001");
+    fireEvent.change(dni, { target: { value: "90000002" } });
+    fireEvent.click(screen.getByRole("button", { name: "Ocultar DNI" }));
+    expect(dni).toHaveProperty("type", "password");
+    expect(new FormData(form).get("dni")).toBe("90000002");
+    expect(submit).not.toHaveBeenCalled();
     expect(screen.getByLabelText("Categoría A")).toHaveProperty("checked", true);
     expect(screen.getByLabelText("Categoría B")).toHaveProperty("checked", true);
-    expect(screen.getByText(/no es texto municipal aprobado/i)).toBeTruthy();
+    expect(screen.queryByText(/no es texto municipal aprobado/i)).toBeNull();
     expect(screen.queryByRole("button", { name: "Activar perfil" })).toBeNull();
     expect(screen.queryByRole("button", { name: /archivar|eliminar perfil/i })).toBeNull();
     expect(screen.getByRole("button", { name: "Eliminar foto" })).toHaveProperty("disabled", true);

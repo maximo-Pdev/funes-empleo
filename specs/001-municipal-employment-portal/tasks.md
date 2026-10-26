@@ -5,6 +5,20 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## Consentimiento resumido — EXTRA072,2026-10-25
+
+- [x] T207 Alinear la expectativa E2E restante de PR76 con «tu consentimiento vigente» y revocación a todas las empresas; RED original/GREEN recorrido candidato completo27.9s, cero reintentos/omisiones, tipos/lint/build/diff PASS. Solo prueba/trazabilidad, sin cambios de producto/SQL/reglas. EXTRA072; publicación/nueva CI completa/revisión pendientes.
+
+- [x] T206 Mostrar los dos párrafos solicitados y cuatro bajo Más información, sin apartado de política; conservar checkbox/estado/acciones y reglas. Expectativas de componentes/E2E actualizadas;1195 pruebas/90 archivos, tipos/lint/build/diff PASS; composición real con datos ficticios a1440/390, teclado/plegado/checkbox/axe0 PASS. EXTRA072 registra alcance visual y E2E completo con base no ejecutado; commit/PR/CI/revisión pendientes.
+
+## Identificación propia — EXTRA071,2026-10-25
+
+- [x] T205 Agregar Mostrar/Ocultar DNI/CUIT únicamente en perfiles propios, mediante composición compartida Field/Button; oculto inicial, valor/validación/errores intactos y sin submit/permiso nuevo.1195 pruebas/90 archivos,11 regresiones de formularios, tipos/lint/build/diff PASS; navegador real con componentes/datos ficticios, DNI/CUIT×1440/390, teclado/edición/errores/FormData/axe PASS. EXTRA071 registra evidencia y ajustes de harness/selectores; commit/PR/CI/revisión pendientes.
+
+## Orden del detalle administrativo — EXTRA070,2026-10-25
+
+- [x] T204 Situar Perfil candidato/CV PDF antes de formulario y listado de notas, en todos los orígenes; conservar edición presencial, visibilidad/privacidad y participaciones. Expectativas existentes actualizadas;1195 unit/componentes/90 archivos, tipos/lint/build/diff PASS; composición real con servicios ficticios normal/presencial sin cuenta a1440/390px,4 escenarios PASS. EXTRA070 registra evidencia y timeout por carga resuelto sin alterar límites. Sin backend/SQL/controles nuevos; commit/PR/CI/revisión pendientes.
+
 ## Authorized profile follow-up — EXTRA-059
 
 This increment is tracked in `../../odd/tasks/candidate-profile-rebuild.md` (T1-T3, S1-S7) rather than renumbering the existing MVP ledger. Pending: private persisted image flow and SQL proof; official component profile rebuild; integration/regression/browser gates and independent high-risk verification. Existing checked tasks are not evidence that this increment is accepted. No commits, resets or remote deployment authorized.
@@ -673,6 +687,22 @@ El rollout SQL ya no está pendiente; CI, PR/revisión y gates históricos sí.
 - [x] T168 Revisar modelo origin/US4 y alinear spec/plan/UI; registrar EXTRA055 y análisis de alcance sin cambios de permisos, datos o negocio.
 - [x] T169 RED/GREEN de listado assisted en servidor, defaults generales intactos, menú activo, ausencia/error, filtros/paginación/referencias y acceso a detalle/alta existentes; implementar reutilizando motor y controles. RED7/8, GREEN64/64 focalizadas. Ajuste2026-10-24: formulario de alta existente en la misma pantalla arriba del listado; RED2/26 y GREEN35/35, alta integrada probada en navegador.
 - [x] T170 Verificar tipos/lint/unit/tooling/build y navegador ficticio con roles, teclado, listado vacío, borrador/claim/paginación y continuidad asistida; registrar evidencia y límites sin tocar alojado o base habitual. Tipos/lint/build,873 unit/componentes,57 tooling,6 E2E,1440/390px y advisor local PASS; límites en EXTRA055.
+
+## Reparar preview de nominación — EXTRA068,2026-10-25
+
+- [x] T196 Registrar evidencia y contrato mínimo de categorías; RED3/45 y reparar proyección code/name sin cambios de matching, SQL o permisos. EXTRA068/spec/plan/contrato alineados; sin reintroducir Intereses ni sustituir consolidación057.
+- [x] T197 Respuestas legadas/mixtas/actuales, roles, campos privados/CV/identidad cruzada PASS;1178 unit/componentes/89 archivos,57 tooling,56 SQL, cinco recorridos de navegador sin omisiones/reintentos, tipos/lint/build/diff-check PASS.1440/390px, axe/foco/CV200/nominación/auditoría/exclusión verificados en fixture aislado. EXTRA068 registra diagnóstico y migraciones previas pendientes; commit/PR/CI/revisión/despliegue pendientes.
+
+## Identificar derivaciones empresariales — EXTRA069,2026-10-25
+
+- [x] T202 Corregir frontera de acceso entre roles del PR75: actor candidato distinto del recurso protegido, identidad propia tras redirección y nombre ajeno ausente; RED determinista/GREEN cuatro actores sin omisiones/reintentos, tipos aislados/lint/diff PASS. Fronteras también PASS en CI40205272342/044f40b; restantes119 PASS, dos expectativas antiguas de contratación requieren T203. Sin cambios de permisos/producto/SQL; evidencia EXTRA069.
+
+- [x] T203 Alinear contratación normal/tardía con excepción mínima de nombre en derivaciones propias revocadas; mantener retiro/atomicidad/participaciones intactas/CV denegado y exigir perfil/contactos ausentes. RED2/GREEN6 junto con fronteras, tipos aislados/lint/diff PASS; nueva CI completa pendiente de publicación. Solo E2E/documentación; EXTRA069.
+
+- [x] T198 Decisión humana/spec/plan/modelo/contratos/checklist alineados antes de código; análisisN1–N6 cobertura100%, sin críticos/altos. Rama desde main0bd10b1, cambios ajenos preservados; EXTRA069.
+- [x] T199 Migración20261025135805 aditiva summaries VOLATILE para guard FOR SHARE y nombre mínimo en company_referral; grants/firmas previas intactos. DTO/identidades validados, categorías legadas compatibles, lista/encabezado/aviso/explicación alineados; sin reactivar accesos o cambiar informes.
+- [x] T200 Roles/sesión/propiedad/archivo/activo/revocado/finales, ausencia de PII/CV y escrituras;1275 SQL/24 archivos (41 nuevas),1195 unit/componentes/90 archivos y17 E2E finales sin omisiones/reintentos PASS; contratación normal/tardía e informe sin reactivación conservados.
+- [x] T201 Tipos/lint/build/diff-check,57 tooling, advisor local y1440/390px/teclado/axe0 PASS. Guía/recuperación y convergencia sin brechas nuevas; EXTRA069 registra diagnósticos. Tras pedido posterior de Mateo,20261025135805 aplicada y registrada alojada2026-10-25: cuerpos/grants/volatilidad/guard/helpers verificados; advisor56→57 WARN (solo RPC autenticado previsto), cero ERROR. Commit/PR/CI/revisión/despliegue de UI pendientes.
 
 ## Español transversal — EXTRA051, 2026-10-22
 

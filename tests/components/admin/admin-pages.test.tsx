@@ -158,6 +158,16 @@ it.each([
  expect(screen.queryByRole("button", { name: "Crear nominación" })).toBeNull();
  expect(screen.queryByRole("combobox", { name: "Oferta" })).toBeNull();
  expect(screen.getByRole("heading", { name: "Participaciones recientes" })).toBeTruthy();
+ const profileDetails = screen.getByRole("region", { name: "Perfil candidato" });
+ const noteForm = screen.getByRole("heading", { name: "Nota interna de la Oficina" }).closest("form");
+ if (state.status === "archived") {
+   expect(screen.queryByRole("region", { name: "CV PDF del candidato" })).toBeNull();
+   expect(profileDetails.nextElementSibling).toBe(noteForm);
+ } else {
+   const cvDetails = screen.getByRole("region", { name: "CV PDF del candidato" });
+   expect(profileDetails.nextElementSibling).toBe(cvDetails);
+   expect(cvDetails.nextElementSibling).toBe(noteForm);
+ }
  expect(within(screen.getByRole("complementary", { name: "Panel de administración" })).getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/admin/openings");
  expect(mocks.nominations).not.toHaveBeenCalled();
 });
@@ -211,9 +221,11 @@ it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mante
  expect(screen.getByRole("heading", { name: "Mantener perfil" })).toBeTruthy();
  expect(screen.getByRole("heading", { name: "Consentimiento y activación" })).toBeTruthy();
  const maintenanceForm = screen.getByRole("heading", { name: "Mantener perfil" }).closest("form");
- expect(maintenanceForm?.nextElementSibling).toBe(screen.getByRole("region", { name: "CV PDF del candidato" }));
  const profileDetails = screen.getByRole("region", { name: "Perfil candidato" });
- expect(profileDetails.nextElementSibling).toBe(screen.getByRole("region", { name: "Participaciones recientes" }));
+ const cvDetails = screen.getByRole("region", { name: "CV PDF del candidato" });
+ expect(maintenanceForm?.nextElementSibling).toBe(profileDetails);
+ expect(profileDetails.nextElementSibling).toBe(cvDetails);
+ expect(cvDetails.nextElementSibling).toBe(screen.getByRole("heading", { name: "Nota interna de la Oficina" }).closest("form"));
  expect(screen.getByLabelText("DNI exhibido")).toHaveProperty("type", "password"); expect(screen.getByRole("button", { name: "Vincular conservando historial" })).toHaveProperty("disabled", true);
  expect(screen.getByLabelText("Archivo PDF").getAttribute("accept")).toBe(".pdf,application/pdf");
  expect(screen.getByRole("button", { name: "Cargar CV" })).toBeTruthy();

@@ -20,6 +20,29 @@ See [public count contract](contracts/public-portal-counts.md) and
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.
 
+EXTRA071: componer IdentifierField con Field/input nativo y Button municipal;
+useId/useState local, tipo password/text, aria-controls/pressed y botón sin
+submit. Usar únicamente en CandidateProfilePanel/CompanyProfileForm propios,
+con atributos/valores/acciones originales. Sin cambios de contratos o SQL.
+
+## Nombre en derivaciones propias — EXTRA069,2026-10-25
+
+RPC aditivo company_referral_summaries(uuid) devuelve las mismas referencias
+autorizadas por company_referral_references más candidate_name actual por join
+a referrals/participations/candidate_profiles. Revalida sesión/rol y reutiliza
+propiedad/cuenta/empresa/archivo del RPC existente, sin N+1 o snapshots. No cambia
+la firma anterior. company_referral añade candidateName mínimo antes del guard
+de datos completos; hiredCandidate permanece compatible. No cambia helper de
+lectura completa, CV, RLS, comandos o estados. Servidor valida ambas proyecciones,
+vincula oferta/derivación y descarta campos extra; UI muestra nombre en navegación
+y encabezado, código secundario y aviso de datos revocados. Explicación candidata
+se alinea sin sustituir política/version/hash. SQL antes que aplicación;
+recuperación restaura definición previa y retira RPC nuevo tras revertir app.
+Categorías del perfil completo proyectan únicamente name, descartando kind
+histórico no usado; evita que una clasificación antigua bloquee toda la ficha.
+Summaries se declara VOLATILE para que PostgREST permita FOR SHARE del guard
+de sesión; no añade DML ni elimina el bloqueo de autorización existente.
+
 ## Authorized candidate-photo design — EXTRA-059
 
 Use an additive private photo metadata/bucket migration, session-authorized read endpoint, tightly scoped trusted server image ingestion, profile-version locks and durable physical-cleanup retries. JPEG/PNG up to 5 MiB and 16 megapixels normalize to metadata-free WebP <=1024px with explicit sharp dependency. Official shadcn Base-nova Avatar/Attachment/Empty use Base UI/CVA while preserving municipal styles and existing Button contracts. The narrow service-role photo exception and deployment/recovery/verification requirements are in `../../docs/implementation/candidate-profile-photos.md`; review it alongside this plan before rollout. No current database reset or remote migration is permitted.
@@ -64,9 +87,11 @@ Conservar una sola sección de notas/historial/CV. Guardar y crear navegan al
 detalle principal; la ruta antigua resuelve referencia y redirige al detalle
 opaco autorizado. Sin SQL, contratos de comandos o autorización nuevos.
 
-EXTRA060: reutilizar los bloques de resumen/CV como elementos únicos; para
-origen assisted, CV después de edición y resumen antes de participaciones en la
-otra columna. Otros orígenes conservan orden. Sin duplicar forms/ids o datos.
+EXTRA070 sustituye la composición EXTRA060: reutilizar profileDetails y
+candidateCv una vez, para todos los orígenes, después de la edición presencial
+condicional y antes de InternalNoteForm/Notas internas en la primera columna.
+Retirar inserciones condicionales anteriores; conservar guards y visibilidad
+de CV/mantenimiento, segunda columna y apilado móvil. Sin contratos/SQL nuevos.
 
 ## Categorías laborales únicas,2026-10-24 (EXTRA057)
 
@@ -255,6 +280,14 @@ fijas o recortes. Clases exclusivas
 de login; AuthForm, enlaces, registros y reglas de acceso intactos. Verificar
 alineación, encaje, dimensiones, accesibilidad y mensajes/retención existentes.
 
+## Corrección de preview — EXTRA068,2026-10-25
+
+La validación de categorías de openingCandidatePreviewSchema proyecta solo
+code/name, descartando kind histórico recibido por RPC. No necesita ese metadato
+para mostrar ni nominar; las demás validaciones y guards siguen intactos.
+Sin SQL o escrituras de compatibilidad: no sustituye la migración EXTRA057.
+Pruebas de respuestas legadas/mixtas/actuales y navegador de nominación.
+
 ## Resumen
 
 ### Incremento A01 autorizado el 2026-10-17
@@ -336,8 +369,8 @@ Contacto y consentimiento usan ancho completo para que la explicación no estire
 una tarjeta vecina vacía; datos laborales conserva sus dos columnas internas.
 
 Texto auxiliar de consentimiento alineado con FR-036/038/055 y EXTRA035, distinto
-de la política devuelta por el servidor, que se conserva literalmente con aviso
-demo y su versión/hash actuales. Aclarar alcance global al contratar sin cerrar
+de la política devuelta por el servidor, cuyo contrato técnico conserva su
+versión/hash; EXTRA072 retira su presentación en el perfil propio. Aclarar alcance global al contratar sin cerrar
 otros casos, revocación y nueva aceptación explícita. Sin persistencia, RPC,
 Actions nuevas, migración, dependencia, entorno o modificación de reglas.
 RED de componente para visibilidad/orden/faltantes y texto, más navegador con
@@ -350,11 +383,12 @@ Una section de Datos laborales y personales contiene los formularios hermanos
 de datos y teléfono opcional, cada uno con su Action/version/resultado; sin
 anidamiento ni encadenar mutaciones no atómicas. Botón Guardar teléfono explícito.
 El Form conserva valores ante error y el éxito telefónico no reinicia el form
-de datos. Reubicar CV antes del Form de consentimiento en DOM. Reemplazar banner
-por details/summary cerrado con la política literal y versión consultables;
-conservar advertencia demo dentro del detalle, no inventar aprobación municipal.
+de datos. Reubicar CV antes del Form de consentimiento en DOM. EXTRA072 reutiliza
+details/summary cerrado como Más información: cuatro párrafos explicativos,
+con dos párrafos visibles antes. Retira política/versión/aviso de esta vista;
+no sustituye contrato ni política técnica y no inventa aprobación municipal.
 Sin backend/migraciones/contratos/dependencias. Tests de ubicación, opcionalidad,
-guardado, retención, teclado, política expandible y contacto empresarial derivado.
+guardado, retención, teclado, información expandible y contacto empresarial derivado.
 
 ### EXTRA039 — retirar autoarchivo, 2026-10-22
 
@@ -660,7 +694,8 @@ del compañero pendiente.
   retención, no esta ventana de acceso.
 - La empresa puede enviar feedback tardío sobre una derivación propia cuyo acceso a datos fue
   revocado. Para ubicarla ve solo su identificador de derivación, el identificador y título de su
-  oferta y la fecha de derivación, sin nombre, perfil, contactos ni CV del candidato. Una
+  oferta, la fecha de derivación y solo el nombre actual del candidato según EXTRA069;
+  no recupera perfil, contactos, foto o CV revocados. Una
   corrección tardía de `no_company_response` a `hired` conserva el acceso revocado: “mantener” una
   autorización de contratación no equivale a restaurar una autorización que ya terminó.
 - Administrador activo: operación municipal completa, siempre con actor identificado.

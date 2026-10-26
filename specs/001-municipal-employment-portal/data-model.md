@@ -3,6 +3,12 @@
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 
+EXTRA069: sin tablas/campos persistidos nuevos ni backfill. company_referral
+agrega candidateName y el RPC aditivo company_referral_summaries agrega
+candidate_name a cada referencia autorizada, leyendo el display_name actual
+del perfil relacionado. No copias/historial de nombres, cambios de estado,
+versiones, consentimiento, permisos, referencias o auditoría por la consulta.
+
 EXTRA062: no agrega tablas/campos. Publicada editada pasa a pending_review dentro
 del guardado/envío; historial audita ambas acciones/versiones, manteniendo slug,
 casos/resultados/permisos. Cancelación empresarial no final reutiliza el cierre

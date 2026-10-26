@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Attachment, AttachmentMedia, AttachmentContent, AttachmentTitle, AttachmentDescription, AttachmentActions } from "@/components/ui/attachment";
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
+import { IdentifierField } from "@/components/forms/identifier-field";
 
 type State = { message: string; success: boolean };
 type Category = { id: string; name: string; code: string };
@@ -30,7 +31,7 @@ function ActionMessage({ state }: { state: State }) {
 }
 
 export function CandidateProfilePanel({ profile, dni, address, phone, categories, selectedCategories,
-  consent, cv, cvReference, photo, photoCleanupPending, photoUnavailable, policy, cvMessage, cvReturnTo }: {
+  consent, cv, cvReference, photo, photoCleanupPending, photoUnavailable, cvMessage, cvReturnTo }: {
   profile: Profile; dni: string; address: string | null; phone: string | null;
   categories: Category[]; selectedCategories: string[];
   consent: { status: string; policy_version: string; recorded_at: string } | null;
@@ -78,7 +79,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       <h2 className="text-xl font-semibold">Datos laborales y personales</h2>
       <input type="hidden" name="version" value={profile.version} />
       <Field className="grid gap-1">Nombre y apellido<input className={field} name="name" defaultValue={profile.display_name} required minLength={2} maxLength={200} /></Field>
-      <Field className="grid gap-1">DNI <span className="text-sm">(oculto en pantalla)</span><input {...dniField} className={field} type="password" name="dni" defaultValue={dni} required inputMode="numeric" autoComplete="off" /></Field>
+      <IdentifierField label="DNI" {...dniField} className={field} name="dni" defaultValue={dni} required inputMode="numeric" autoComplete="off" />
       <Field className="grid gap-1">Localidad laboral<input className={field} name="locality" defaultValue={profile.locality ?? ""} maxLength={150} required /></Field>
       <Field className="grid gap-1">Habilidades y experiencia<textarea className={field} name="summary" defaultValue={profile.skills_experience_summary ?? ""} maxLength={5000} rows={4} required /></Field>
       <Field className="grid gap-1">Disponibilidad<select className={field} name="availability" required defaultValue={profile.availability ?? "available"}><option value="available">Disponible</option><option value="unavailable">No disponible</option></select></Field>
@@ -112,14 +113,15 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     <Form action={consentAction} result={consentState} className={styles.section} aria-busy={changingConsent}>
       <h2 className="text-xl font-semibold">Consentimiento de prueba</h2>
       <p>Al aceptar, autorizás a la Oficina de Empleo a registrar y usar tus datos para acompañar tu búsqueda laboral y gestionar futuras derivaciones. Es un consentimiento general, no una aceptación por cada oferta.</p>
-      <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
-      <p>Si la Oficina confirma una contratación, incluso tardía, en una de tus participaciones, tu consentimiento global vigente se retira automáticamente y se revocan los accesos de todas las empresas que dependan de él. No se cambian tus otras participaciones ni sus resultados y se conserva el historial.</p>
-      <p>La empresa que te contrató podrá seguir viendo únicamente tu nombre en el registro de esa contratación. Esto no le devuelve acceso a tu perfil, contactos ni CV.</p>
-      <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
-      <p>También podés retirarlo manualmente: se bloquean nuevas derivaciones, se revocan los accesos empresariales y se cierran como retiradas tus participaciones abiertas. Los resultados finales y el historial se conservan.</p>
+      <p>Si la Oficina confirma una contratación en una de tus participaciones, tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas que dependan de él. No se cambian tus otras participaciones ni sus resultados y se conserva el historial.</p>
       <details className={styles.group}>
-        <summary className={styles.policySummary}>Ver política de consentimiento</summary>
-        <p className="mt-3">{policy.policy_text} Esta versión <strong>{policy.version}</strong> no es texto municipal aprobado.</p>
+        <summary className={styles.policySummary}>Más información</summary>
+        <div className="mt-3 space-y-3">
+          <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
+          <p>Las empresas a las que la Oficina ya te haya derivado podrán seguir viendo únicamente tu nombre para identificar esas derivaciones e informar sus resultados, incluso cuando termine el permiso. Esto no les devuelve acceso a tu perfil, contactos, foto ni CV.</p>
+          <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
+          <p>También podés retirarlo manualmente: se bloquean nuevas derivaciones, se revocan los accesos empresariales y se cierran como retiradas tus participaciones abiertas. Los resultados finales y el historial se conservan.</p>
+        </div>
       </details>
       <p>Estado actual: {consent?.status === "accepted" ? "aceptado" : consent?.status === "withdrawn" ? "retirado" : "pendiente"}.</p>
       <input type="hidden" name="version" value={profile.version} />

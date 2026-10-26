@@ -7,18 +7,19 @@ import { FeedbackForm, InterviewForm } from "./referral-forms";
 
 export function CompanyReferralPanel({ referral, openingId }: { referral: CompanyReferral; openingId: string }) {
   const candidate = referral.candidate;
+  const candidateName = referral.candidateName ?? candidate?.displayName ?? referral.hiredCandidate?.displayName;
   return (
     <section aria-labelledby="detalle-derivacion" className="rounded-lg border border-slate-300 bg-white p-5">
-      <h2 id="detalle-derivacion" className="text-xl font-semibold">Derivación <RecordLabel kind="referral" id={referral.referralId} /></h2>
+      <h2 id="detalle-derivacion" className="break-words text-xl font-semibold">{candidateName ? `Derivación de ${candidateName}` : <>Derivación <RecordLabel kind="referral" id={referral.referralId} /></>}</h2>
+      {candidateName && <p className="mt-2 break-all text-xs text-slate-700">Referencia: <RecordLabel kind="referral" id={referral.referralId} /></p>}
       <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? "Oferta sin título"}</p>
       <p className="text-sm text-slate-700">Fecha de derivación: {new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Buenos_Aires" }).format(new Date(referral.referredAt))}</p>
-      {referral.hiredCandidate && <p className="mt-4 font-semibold">{candidate ? "Contratado" : `${referral.hiredCandidate.displayName} · Contratado`}</p>}
+      {referral.hiredCandidate && <p className="mt-4 font-semibold">Contratado</p>}
       {candidate ? (
         <div className="mt-6 space-y-5">
           <div>
             <h3 className="text-lg font-semibold">Perfil laboral derivado</h3>
             <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-              <div><dt className="font-semibold">Nombre</dt><dd>{candidate.displayName}</dd></div>
               <div><dt className="font-semibold">Localidad</dt><dd>{candidate.locality ?? "No informada"}</dd></div>
               <div><dt className="font-semibold">Disponibilidad</dt><dd><Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></dd></div>
               <div><dt className="font-semibold">Experiencia y habilidades</dt><dd className="whitespace-pre-wrap">{candidate.skillsExperienceSummary ?? "No informadas"}</dd></div>
@@ -40,7 +41,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
         </div>
       ) : (
         <p role="status" className="mt-5 rounded-md border border-amber-300 bg-amber-50 p-4 text-amber-950">
-          {referral.hiredCandidate ? "La contratación fue confirmada. Se conserva únicamente el nombre; el perfil, los contactos y el CV ya no están disponibles." : "El acceso a los datos de esta persona finalizó. Solo se conserva esta referencia no personal para informar una respuesta pendiente."}
+          {referral.hiredCandidate ? "La contratación fue confirmada. Se conserva únicamente el nombre; el perfil, los contactos y el CV ya no están disponibles." : candidateName ? "El acceso al perfil de esta persona finalizó. Se conserva únicamente su nombre para identificar esta derivación; sus contactos, foto y CV ya no están disponibles." : "El acceso al perfil de esta persona finalizó. No hay un nombre disponible para identificar esta derivación. Consultá a la Oficina de Empleo antes de informar un resultado."}
         </p>
       )}
       {!referral.hiredCandidate && <div className="mt-6">

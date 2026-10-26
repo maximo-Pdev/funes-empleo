@@ -1,9 +1,18 @@
 # Contrato de autorización y visibilidad
 
+EXTRA069,2026-10-25: excepción ampliada a toda derivación propia. Cuenta/empresa
+activas y oferta/caso/derivación no archivados reciben solo candidateName actual
+en company_referral y candidate_name en company_referral_summaries. No exige
+consentimiento/permiso completo para ese nombre; el resto de la información
+sigue dependiendo del helper vigente. No revela datos a otras empresas, roles
+no autorizados o sesiones revocadas. Foto/CV/contactos/perfil no se restablecen.
+
 EXTRA062: empresa/cuenta activas pueden leer hiredCandidate{displayName,outcome:hired}
 en su propia derivación/caso/oferta no archivados con contratación confirmada. Sin
-permiso completo no se devuelven perfil/contactos/CV/entrevistas; nombres de casos
-ajenos o solo informados no se entregan. No se modifica RLS de datos candidatos.
+permiso completo no se devuelven perfil/contactos/CV/entrevistas; casos ajenos
+no se entregan. EXTRA069 permite nombre propio aunque el resultado todavía no
+esté confirmado; hiredCandidate sigue exigiendo contratación confirmada.
+No se modifica RLS de datos candidatos.
 Empresa activa edita propia publicada y la envía a revisión atómicamente; cancela
 propia no final con motivo, conservando auditoría/casos finales. Sin facultad de
 moderar; actor/propiedad/versión se revalidan transaccionalmente. Admin no lista
@@ -151,7 +160,8 @@ La empresa nunca recibe:
 
 Una empresa activa cuyo permiso fue revocado conserva únicamente el identificador de la derivación,
 el identificador y título de su propia oferta y la fecha de derivación para comunicar feedback
-tardío. Esa vista no incluye nombre, perfil, contactos, CV ni ningún dato de otras participaciones.
+tardío, junto con el nombre mínimo autorizado por EXTRA069. Esa vista no incluye
+perfil, contactos, foto, CV ni ningún dato de otras participaciones.
 Las nuevas confirmaciones `hired` retiran el consentimiento global y revocan todos sus permisos;
 solo las contrataciones históricas anteriores a EXTRA035 conservaban acceso hasta 720 horas.
 `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo revocan. Una corrección tardía a

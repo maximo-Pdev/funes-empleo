@@ -67,7 +67,8 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       <div className="space-y-6">
       {editable && <AssistedProfileForm key={`assisted-profile:${candidateId}:${editable.profile.version}`} candidateId={candidateId}
         version={editable.profile.version} categories={maintenance!.categories} initial={editable.data} />}
-      {assisted && candidateCv}
+      {profileDetails}
+      {candidateCv}
       <InternalNoteForm key={`${candidate.id}:${candidate.version}`} candidateId={candidate.id}
         version={candidate.version} onSubmit={recordEvaluationAction} />
       <section aria-labelledby="candidate-notes" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
@@ -78,8 +79,6 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
             <p className="whitespace-pre-wrap">{item.body}</p>
           </li>)}</ul>}
       </section>
-      {!assisted && profileDetails}
-      {!assisted && candidateCv}
       <CandidateHistory key={`history:${candidate.id}:${candidate.version}:${audit[0]?.id ?? "empty"}`}
         candidateId={candidate.id} initialEvents={audit} initialCursor={nextAuditCursor ?? null} />
       </div>
@@ -95,7 +94,6 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
           version={candidate.accounts.version}
           action={candidate.accounts.status === "active" ? "suspend" : candidate.accounts.status === "suspended" ? "reactivate" : "restore"}
           onSubmit={candidateAccountDecisionAction} />}
-      {assisted && profileDetails}
       <section aria-labelledby="candidate-participations" className="space-y-4">
         <h2 id="candidate-participations" className="text-xl font-semibold">Participaciones recientes</h2>
         {participations.length === 0 ? <EmptyState title="Sin participaciones" description="Aún no hay postulaciones o nominaciones para este perfil." /> :

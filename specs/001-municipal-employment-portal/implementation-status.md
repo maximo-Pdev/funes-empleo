@@ -1338,3 +1338,76 @@ medición y≤5000ms por cada una de cuatro operaciones, barrera y auditorías c
 Prueba fría local íntegra con SQL/500PDF PASS en2.7m; tipos/lint/diff-check y57 tooling
 PASS. Sin cambios de aplicación/SQL ni omisiones/reintentos. Protocolo en performance.md;
 nueva CI completa del PR72 se confirma en sus checks, sin éxito anticipado.
+
+### Reparar preview administrativo — EXTRA068,2026-10-25
+
+PR72 confirmado mergeado; main actualizado a a2001e5 (incluye PR73), rama local
+anterior eliminada y nueva fix/admin-candidate-preview. next-env.d.ts ajeno
+conservado. Popup fallaba porque exigía kind=occupation a categorías históricas
+interest; lectura agregada local y versiones remotas evidencian consolidación057
+pendiente. No se leyeron perfiles alojados ni se aplicaron migraciones.
+
+Preview ahora proyecta solo code/name y descarta metadatos internos; conserva
+categorías únicas visibles, validaciones de identidad/versiones/CV/fechas,
+roles/aptitud/matching y comando auditado de nominación. Sin SQL ni cambios de UI.
+
+RED3/45; GREEN1178/89 unit/componentes,57 tooling, tipos/lint/build/diff-check PASS.
+56 aserciones pgTAP023/024 y cinco recorridos E2E sin omisiones/reintentos PASS,
+incluido fixture temporal de categoría antigua, restaurado al terminar. CV200/PDF
+por referencia opaca, nominación/auditoría/exclusión, consultas sin escrituras,
+Escape/foco y1440/390px/axe0 verificados. Node24.22.0; solo entorno propio54341/
+54342/app3001, sin reset, .env.local o mutaciones a base habitual/alojada.
+
+Evidencia/diagnósticos y versiones anteriores pendientes en EXTRA068. No precisa
+migración nueva; no sustituye el rollout de cambios anteriores. T196/T197 completos
+técnicamente; commit/PR/CI, revisión humana, despliegue y aceptación pendientes.
+
+Publicación solicitada2026-10-25: commit4d3922f sin firma/signoff/coautor y
+[PR74](https://github.com/maximo-Pdev/funes-empleo/pull/74) abierto hacia main,
+no borrador, en fix/admin-candidate-preview. Cambio ajeno next-env.d.ts fuera
+del commit; sin migración nueva ni cambios alojados. CI/revisión/merge y
+despliegue permanecen pendientes; no acredita aceptación municipal.
+
+### Nombre en derivaciones empresariales — EXTRA069,2026-10-25
+
+PR74 confirmado mergeado; main0bd10b1, rama previa local/remota eliminada y
+nueva fix/company-referral-names. next-env.d.ts ajeno preservado. Mateo confirmó
+nombre mínimo en toda derivación propia aunque termine el permiso, resolviendo
+el conflicto con stub039; empresa/cuenta activas y oferta/caso/derivación no
+archivados. No recupera perfil, contactos, foto, CV o consentimiento revocados.
+
+Migración20261025135805 añade company_referral_summaries y candidateName en
+company_referral; no cambia firma del RPC previo de referencias, hiredCandidate,
+helpers de perfil/CV, RLS o comandos de informes. Sin tablas/backfill/copias de
+nombres o cambios de estados/versiones por consulta. UI identifica nombres en
+lista/encabezado, código secundario, aviso claro y explicación candidata alineada.
+Proyección descarta clasificación histórica de categorías no usada por la ficha.
+
+Gates acotados: N1–N6 cubiertos100%, sin críticos/altos; convergencia final sin
+brechas nuevas y revisión React sin hallazgos.1195/90 unit/componentes,57 tooling,
+1275/24 SQL (41 nuevas),17 E2E finales sin omisiones/reintentos, tipos/lint/build/
+diff-check, advisor local y1440/390px/teclado/axe0 PASS. Cubre contratación normal/
+tardía, informe, retiro/reaceptación, suspensión/reactivación y CV denegado.
+
+Primer HTTP detectó25006: guard FOR SHARE requiere summaries VOLATILE; no se
+retiró el bloqueo. Fixture propio rehecho y suite íntegra final PASS. Solo
+funes-admin-cv-check54341/54342/app3001,500PDF ficticios; base habitual/alojada
+sin cambios. Recuperación y despliegue SQL antes que app en guía operativa.
+T198–201 completos técnicamente; migración alojada, commit/PR/CI, revisión
+humana, despliegue y aceptación pendientes. EXTRA069 conserva diagnósticos.
+
+Aplicación alojada posterior, autorizada por Mateo2026-10-25: únicamente
+20261025135805_company_referral_names ejecutada y registrada applied en el
+proyecto vinculado kyjycjojzhwggjuqjnki. Cuerpos por hash contra archivo, grants,
+VOLATILE/search_path del RPC y denegación sin sesión verificados; helpers de
+perfil/CV y contrato previo intactos. Respaldo exacto de definición/ACL anterior
+en test-results ignorado; no reset, backfill o reparación de versiones previas.
+Advisor56→57 WARN, cero ERROR: solo nuevo0029 del RPC autenticado intencional.
+Guía y EXTRA069 actualizados. Interfaz aún requiere commit/PR/CI/despliegue;
+esta ejecución no acredita revisión humana ni aceptación municipal.
+
+Publicación solicitada2026-10-25: commit07751d0 sin firma/signoff/coautor y
+[PR75](https://github.com/maximo-Pdev/funes-empleo/pull/75) abierto hacia main,
+sin borrador, en fix/company-referral-names; adjunto a la conversación. Incluye
+el cambio probado y evidencia de migración ya aplicada. next-env.d.ts y respaldo
+ignorados excluidos. CI/revisión/merge/despliegue de interfaz pendientes.

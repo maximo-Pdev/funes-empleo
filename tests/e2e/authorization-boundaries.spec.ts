@@ -68,10 +68,15 @@ test.beforeEach(() => test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWit
 for (const actor of ["anonymous", "candidate", "company", "admin"] as const) {
   test(`${actor}: todas las páginas de otros roles rechazan acceso directo`, async ({ page }) => {
     test.setTimeout(120000);
-    if (actor !== "anonymous") await loginFixture(page, actor);
+    // Los recursos protegidos pertenecen al candidato 1; la cuenta propia debe
+    // seguir visible al rechazar el acceso sin confundirse con datos ajenos.
+    if (actor !== "anonymous") await loginFixture(page, actor, actor === "candidate" ? 2 : 1);
     for (const target of protectedPages().filter((p) => p.role !== actor)) {
       await page.goto(target.path);
       await expect(page).toHaveURL(/\/account$|\?acceso=sesion-vencida$/);
+      if (actor === "candidate") {
+        await expect(page.getByText("Persona ficticia 002", { exact: true })).toBeVisible();
+      }
       await expect(page.locator("body")).not.toContainText("Persona ficticia 001");
     }
   });

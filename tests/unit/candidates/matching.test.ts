@@ -66,6 +66,30 @@ it("carga el perfil de la pareja candidata/oferta y elimina campos ajenos al con
   expect(rpc).toHaveBeenCalledWith("preview_opening_candidate", { p_opening: id, p_candidate: id });
 });
 
+it.each(["interest", "occupation"])("preview lee categorías históricas %s sin transmitir su clasificación", async kind => {
+  const categories = openingPreview.categories.map(category => ({ ...category, kind }));
+  rpc.mockResolvedValue({ data: { ...openingPreview, categories }, error: null });
+  const profile = await getOpeningCandidatePreview({ openingId: id, candidateId: id });
+  expect(profile.categories).toEqual(categories.map(({ code, name }) => ({ code, name })));
+});
+
+it("preview conserva categorías mixtas sin intereses ni datos privados", async () => {
+  const categories = [
+    { code: "COMERCIO", name: "Comercio", kind: "occupation" },
+    { code: "TECNOLOGIA", name: "Tecnología", kind: "interest", privateNote: "no transmitir" },
+  ];
+  rpc.mockResolvedValue({ data: { ...openingPreview, categories, contacts: ["privado"], dni: "privado" }, error: null });
+  const profile = await getOpeningCandidatePreview({ openingId: id, candidateId: id });
+  expect(profile).toEqual({ ...openingPreview, categories: categories.map(({ code, name }) => ({ code, name })) });
+});
+
+it.each([[{ name: "Falta código", kind: "interest" }], [{ code: "COMERCIO", name: null, kind: "occupation" }]])(
+  "preview sigue rechazando categorías malformadas %j", async categories => {
+    rpc.mockResolvedValue({ data: { ...openingPreview, categories }, error: null });
+    await expect(getOpeningCandidatePreview({ openingId: id, candidateId: id })).rejects.toMatchObject({ code: "INTERNAL_ERROR" });
+  },
+);
+
 it.each([null, { role: "company", status: "active" }, { role: "candidate", status: "active" },
   { role: "admin", status: "suspended" }])("preview deniega actor %j", async account => {
   session.mockResolvedValue(account && { account, client: { rpc } });

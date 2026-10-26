@@ -4094,3 +4094,398 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   1440px y 390px. Corredores existentes: responsive 15 estados y navbar 12
   estados PASS en dos pasadas (un primer intento falló por el retraso de
   hidratación de la navbar, ajeno a este cambio). Servidor propio cerrado.
+
+## EXTRA-068 — Compatibilidad del perfil del candidato al nominar
+
+- **Fecha/estado:** 2026-10-25; propuesto antes de implementar. Autorizado por
+  Mateo al solicitar reparar «Ver perfil y nominar» en administración.
+- **Evidencia:** el listado funciona pero el diálogo responde INTERNAL_ERROR.
+  `openingCandidatePreviewSchema` exige kind=occupation en cada categoría,
+  aunque el diálogo solo consume code/name. Lectura agregada de la base local:
+  occupation30/interest500 y migración de consolidación20261024124316 ausente.
+  El historial remoto consultado por CLI también carece de esa versión; esto no
+  prueba los valores remotos. El conector SQL remoto denegó acceso, sin cambios.
+- **Origen aprobado:** A08/FR-031/032/070, EXTRA057 (categorías únicas) y EXTRA058
+  (nominación desde la oferta). No se recupera el campo Intereses ni se interpreta
+  como nueva selección. El pool SQL ya usa las relaciones de ambas clases.
+- **Cambio mínimo:** proyectar categorías de preview como code/name, descartando
+  el metadato interno kind legado igual que otros campos fuera del contrato.
+  Mantener validación de identidad, versiones, CV, disponibilidad y vigencia;
+  conservar autorización, matching OR, exclusiones, comandos y auditoría.
+- **Archivos/contratos:** src/validation/opening-matching.ts, fixture de preview,
+  pruebas de matching/acciones y E2E; spec/plan/contracts/README/tasks y estado.
+  Sin nuevo SQL, dependencias, permisos ni cambios visuales. Las migraciones
+  anteriores pendientes conservan su propósito y no se aplican por este arreglo.
+- **Riesgos/recuperación:** no relajar code/name ni otras precondiciones para
+  ocultar respuestas inválidas. Revertir el cambio de proyección recupera el
+  fallo con categorías legadas. No borrar/reclasificar datos como atajo.
+- **Verificación prevista:** RED/GREEN con payload legado, mixto y actual,
+  guard de roles, IDs cruzados, contrato mínimo sin campos privados; navegador
+  ficticio con apertura/CV/nominación/exclusión, errores/reintento y foco;
+  tipos, lint, suite relevante/global, tooling, build y diff-check.
+- **Git:** PR72 confirmado mergeado; main actualizado a a2001e5, rama anterior
+  local eliminada (remota ya eliminada), nueva fix/admin-candidate-preview.
+  next-env.d.ts ajeno preservado (SHA256 B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000).
+- **Revisión previa acotada:** cubre lectura y nominación ya aprobadas, sin nueva
+  arquitectura o decisión municipal. Constitución I–VI y spec/plan/contrato
+  compatibles; sin críticos/altos abiertos en este delta. Revisión humana,
+  verificación y publicación pendientes; no se marca aceptación global.
+- **Resultado:** implementado y verificado localmente. RED3/45 (INTERNAL_ERROR
+  con interest y mezcla; occupation todavía exponía kind). GREEN1178 pruebas en89
+  archivos, incluida cadena real Action/servicio/validador/referencia con RPC
+  simulado, roles denegados, CV inaccesible e identidad cruzada. Lint, tooling57,
+  tipos, build de producción y diff-check PASS con Node24.22.0.
+- **Navegador/SQL:** cinco recorridos sin reintentos/omisiones PASS: cuatro de
+  matching existentes y uno local adicional reconstruyendo clasificación interest
+  solo en fixture propio. Abre/reintenta, CV200/PDF por referencia opaca, conserva
+  conteos al consultar, nomina exactamente una vez, registra auditoría y excluye
+  tras recarga. Capturas1440/390px revisadas, sin overflow, axe0 y Escape devuelve
+  foco. La clasificación temporal y su constraint se restauraron en finally.
+  pgTAP existentes023/024:35+21=56 aserciones PASS (transacciones con rollback).
+- **Entorno/diagnósticos:** base funes-admin-cv-check54341/54342 reanudada con
+  fixture ficticio500 personas, sin reset. Código actual copiado a test-results
+  con guards locales conservados y sin .env.local. Dependencias aprobadas de main
+  sincronizadas con npm ci --ignore-scripts; primer intento bloqueado por Next
+  del proyecto, cerrado temporalmente según autorización. El intento intermedio
+  npm install se detuvo y la instalación final usa exactamente el lockfile.
+  Selector SQL del CLI falló al traducir rutas Windows; psql ejecutó pgTAP
+  habilitado solo en fixture, comprobando plan, conteos y ausencia de not ok.
+  No se modificaron manifiestos, umbrales, servicios alojados ni la base habitual.
+- **Límites/entrega:** no hay migración nueva ni aplicación remota. El historial
+  alojado también muestra pendientes20261022202940/20261024033056/
+  20261024124316/20261024184354, con nombres históricos diferentes; no reparar
+  masivamente ni aplicar migraciones antiguas por este arreglo. Esta corrección
+  no reemplaza su rollout ni acredita que esos cambios estén desplegados.
+  T196/T197 técnicamente completos; revisión humana, commit, PR, CI y despliegue
+  pendientes. next-env.d.ts conserva la huella inicial. Convergencia acotada:
+  sin brechas nuevas en lectura, permisos, privacidad y nominación aprobadas.
+- **Publicación2026-10-25:** por pedido de Mateo, commit4d3922f publicado sin
+  firma/signoff/coautor en fix/admin-candidate-preview y
+  [PR74](https://github.com/maximo-Pdev/funes-empleo/pull/74) abierto hacia main,
+  sin borrador y adjunto a esta conversación. next-env.d.ts ajeno excluido;
+  no hay migración nueva. CI/revisión humana/merge/despliegue pendientes.
+
+## EXTRA-069 — Nombre identificable en derivaciones empresariales
+
+- **Fecha/estado:** 2026-10-25; propuesto antes de implementar, autorizado por
+  Mateo. PR74 confirmado mergeado, main actualizado0bd10b1; nueva rama
+  fix/company-referral-names, anterior local eliminada; next-env.d.ts preservado.
+- **Problema/evidencia:** captura de empresa con acceso terminado, encabezado
+  y lista muestran solo oferta/código; imposible identificar a quién informar.
+  company_referral devuelve nombre solo con permiso completo o hired confirmado;
+  company_referral_references nunca lo devuelve. FR039 original lo prohibía.
+- **Decisión explícita:** consultado el conflicto, Mateo confirma «Sí, conservar
+  solo el nombre en sus derivaciones», aun por retiro de consentimiento, falta
+  de respuesta u otro cierre. Amplía la excepción062 a toda derivación propia
+  no archivada; empresa/cuenta deben seguir activas. No autoriza datos reales,
+  política municipal, retención definitiva ni acceso a candidatos no derivados.
+- **Cambio propuesto:** company_referral añade candidateName mínimo antes del
+  guard de perfil completo. RPC aditivo company_referral_summaries retorna las
+  referencias propias con candidate_name; reutiliza el ámbito autorizado del RPC
+  anterior sin cambiar su firma. UI usa nombre en lista y encabezado, con código
+  secundario y fallback seguro para datos antiguos; mensaje de revocación claro.
+  Conservar hiredCandidate y sus controles; no reactivar permisos o consentimiento.
+- **Archivos/contratos:** migración nueva, database.types.ts, referrals/service.ts,
+  componentes de derivaciones, explicación en perfil candidato y pruebas TS/SQL/
+  E2E. Spec/plan/modelo/contratos/tasks/checklist, OQ020, guía operativa/UI y estado.
+  Firma/grants anteriores, RLS/Storage y comandos de informe permanecen iguales.
+- **Riesgos:** no exponer otras categorías/contactos/CV, referencias de candidatos
+  ajenos o datos por cuenta empresarial inactiva. No hacer consultas N+1 ni
+  persistir copias de nombres. Nombre actual del perfil, no snapshot nuevo.
+  Recuperación restaura definición anterior de company_referral y retira solo
+  RPC nuevo después de revertir aplicación; sin borrar registros/historia.
+- **Verificación prevista:** roles/sesión/propiedad/archivos, activo/revocado/
+  retirado/no respuesta/cancelado/contratado, mismo dato en lista/detalle,
+  prohibición de PII/CV/Storage, consulta sin escrituras, informe tardío sin
+  reactivación. Regresiones contratación normal/tardía, tipos/lint/unit/tooling/
+  SQL/build y navegador móvil/escritorio/teclado/axe. Migración solo local aislada;
+  aplicación alojada no forma parte de este pedido.
+- **Gates:** actualización acotada de requisitos con aclaración humana anterior;
+  luego plan/contratos, checklist/tasks y análisis antes de implementar. Estado
+  propuesto no acredita implementación, verificación, revisión humana o aceptación.
+- **Análisis previo:** speckit-analyze acotado N1–N6/T198–201, prerrequisitos
+  satisfechos, sin hooks. Seis requisitos cubiertos100%, cuatro tareas, cero
+  críticos/altos o tareas sin alcance. Constitución I–VI preservada; excepción
+  humana explícita sustituye stub039 solo para nombre, OQ001/002 no cerradas.
+- **Prerrequisito derivado antes del ajuste:** la proyección empresarial completa
+  también exige kind=occupation aunque solo muestra name; con categorías legadas
+  interest fallaría antes de mostrar el nombre, como EXTRA068. Proyectar solo
+  name en esas categorías (sin reintroducir Intereses), preservando validación
+  de contactos/CV/identidades. Agregar regresión del payload activo legado.
+- **Prerrequisito HTTP detectado antes de corregir:** el primer navegador falló
+  porque summaries STABLE llama require_workflow_actor, que bloquea la cuenta
+  FOR SHARE. PostgREST ejecuta esa RPC en transacción read-only y responde25006.
+  Declararla VOLATILE para admitir el guard vigente, sin DML propio; prueba SQL
+  de volatilidad y nueva corrida completa HTTP desde fixture limpio. No quitar
+  el bloqueo/guard ni ampliar permisos para evitar el error.
+- **Implementado/verificado:** migración20261025135805 añade summaries y
+  candidateName, mantiene firmas anteriores/hiredCandidate/grants mínimos y
+  no cambia helper de perfil/CV/Storage o informes. Servicio valida DTO y pareja
+  oferta/derivación; categorías legadas proyectan solo name. Lista y encabezado
+  muestran nombre, código secundario y aviso de acceso terminado; explicación
+  candidata alineada sin cambiar política/version/hash. Guía de recuperación en
+  docs/operations/company-referral-names.md; archivos reales coinciden con el plan.
+- **Pruebas finales:** Node24.22.0,1195 tests/90 archivos con coverage,57 tooling,
+  tipos/lint/build/diff-check PASS. Fixture íntegro reconstruido solo en
+  funes-admin-cv-check54341/54342:1275 pgTAP/24 archivos PASS, incluidos41 nuevos,
+  contratación normal/tardía, rollback y acceso;500 PDF/volúmenes verificados.
+  Diecisiete E2E finales PASS sin omisiones/reintentos en2.1m: nombre propio
+  activo/revocado/contratado, CV404 sin permiso, informe/confirmación, retiro/
+  reaceptación, suspensión/reactivación, mantenimiento y respuesta tardía.
+  Advisor local security warn/error: sin incidencias. Revisión1440/390px,
+  teclado/axe0 y capturas ficticias inspeccionadas; sin estado compartido o N+1.
+- **Diagnósticos conservados:** RED inicial9/39; test nuevo de status requirió
+  ámbito del panel porque la página tiene varios anuncios, sin cambios de producto.
+  SQL suspendido ficticio exigió completar sus campos de trazabilidad, corregidos
+  antes de la corrida íntegra. Primera tanda HTTP interrumpida por25006;
+  VOLATILE corregido en migración aún no publicada y suite completa repetida
+  desde fixture limpio, sin quitar guard o pruebas. Avisos previos de jsdom
+  canvas y raíz Turbopack múltiple de la copia aislada no impidieron gates.
+- **Convergencia/cierre local:** speckit-converge acotado N1–N6/T198–201: seis
+  requisitos, siete decisiones y seis principios, cero brechas nuevas; tasks
+  byte-idéntico durante evaluación. Revisión React sin hallazgos. La actualización
+  posterior de casillas registra evidencia técnica, no aceptación humana.
+  Rama anterior eliminada también remotamente tras comprobar su merge; rama
+  actual fix/company-referral-names. next-env.d.ts conserva huella inicial.
+  Base habitual y proyecto alojado sin cambios. Migración alojada, commit, PR,
+  CI, revisión humana y despliegue pendientes; no se acredita aceptación municipal.
+- **Aplicación alojada autorizada2026-10-25:** Mateo pide «aplica la migracion».
+  Destino vinculado kyjycjojzhwggjuqjnki; aplicar únicamente20261025135805 tras
+  preflight/historial y respaldo ignorado de definiciones/ACL. Conector MCP
+  deniega consultas; fallback al CLI autenticado autorizado, sin .env.local ni
+  credenciales expuestas. Verificar objetos/volatilidad/grants/guards y conteos,
+  registrar solo esta versión si la transacción finaliza, comparar advisor.
+  No ejecutar db push masivo ni reparar versiones anteriores. Estado: preparación.
+- **Resultado alojado2026-10-25:** aplicada transacción del archivo exacto
+  (SHA25690D8008A3057C54211AF6A3D3C294274669E4323BC881A476A0A620F90BBDC06)
+  por CLI db query al proyecto vinculado. Ambos cuerpos remotos verificados por
+  hash contra archivo, summaries VOLATILE/security definer/search_path vacío,
+  EXECUTE solo authenticated; anon/service_role denegados. Hashes de helpers de
+  perfil completo/CV y contrato anterior de referencias idénticos al respaldo.
+  Prueba remota sin sesión deniega summaries y detalle, sin cuentas/datos reales.
+  Solo20261025135805 registrada applied tras verificar SQL; nombre confirmado
+  company_referral_names. No se aplicaron ni repararon versiones anteriores.
+- **Respaldo/recuperación:** test-results/referral-names-remote-backup.json
+  ignorado contiene definición/ACL realmente anteriores. El remoto todavía tenía
+  la proyección original sin hiredCandidate de062; para recuperación remota usar
+  ese respaldo exacto y no introducir cambios adicionales restaurando062 entera.
+  Consulta inicial más amplia no llegó a completar: CLI28P01 del rol temporal;
+  respaldo/consulta acotados secuenciales funcionaron sin solicitar/exponer claves.
+  No se afirma comparación de conteos que esa consulta no produjo. SQL aplicado
+  es DDL, sin escritura de negocio, reset o backfill.
+- **Advisor remoto:**56 WARN previos/57 posteriores, cero ERROR en ambos. Único
+  nuevo0029 para company_referral_summaries, ejecución authenticated SECURITY
+  DEFINER intencional según contrato, guard de sesión/propiedad y grants
+  verificados; avisos anteriores idénticos. Referencia técnica:
+  https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
+  Aplicación de migración completa; commit/PR/CI/revisión y despliegue de interfaz
+  siguen pendientes. next-env.d.ts ajeno preservado.
+- **Publicación2026-10-25:** por solicitud de Mateo, commit07751d0 publicado
+  sin firma/signoff/coautor en fix/company-referral-names y
+  [PR75](https://github.com/maximo-Pdev/funes-empleo/pull/75) abierto hacia main,
+  sin borrador y adjunto a la conversación. Incluye27 archivos del incremento;
+  next-env.d.ts ajeno y respaldos ignorados excluidos. Migración alojada ya
+  aplicada/registrada; CI/revisión/merge/despliegue de interfaz pendientes.
+- **CI PR75, preparación de corrección2026-10-25:** ejecución40203520389,
+  head41f7047, application falla en authorization-boundaries.spec.ts:75. El
+  candidato1 vuelve correctamente a /account, cuyo panel muestra su propio
+  nombre; la prueba lo confunde con exposición ajena.29 E2E pasan y92 no corren
+  por dependencia; database/Vercel PASS. Antes de editar: usar candidato2 para
+  conservar prohibición de Persona ficticia001, verificar su propia identidad
+  en la redirección y mantener URLs/roles/ausencia de PII. Sin cambios a producto,
+  permisos, SQL o migración aplicada. Verificar RED/GREEN y los cuatro actores,
+  tipos/lint/diff-check, publicar en mismo PR sin firma y seguir CI completa.
+- **Corrección local PR75 verificada2026-10-25:** authorization-boundaries.spec.ts
+  inicia candidato2 frente a recursos del candidato1 y espera su nombre propio
+  antes de comprobar ausencia del ajeno. RED determinista en copia ficticia:
+  candidato1 con espera de carga reproduce la aserción contradictoria de CI;
+  la prueba original podía pasar antes de que llegara el contenido transmitido.
+  GREEN cuatro actores, cero reintentos/omisiones (21s). Lint y diff-check PASS;
+  tipos PASS en copia aislada de fuentes actuales. Typecheck raíz incluye
+  snapshots históricos ignorados y falla por sus contratos antiguos; no se
+  modifican esos snapshots ni tsconfig para ocultarlo. next typegen regeneró
+  next-env.d.ts: restaurados sus bytes ajenos exactos por SHA256 previo
+  B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+  Producto/build/SQL sin cambios respecto al head anterior, cuyos gates pasaron
+  en CI. Pendiente publicación y nueva ejecución completa del mismo PR.
+- **Segundo diagnóstico CI PR75, antes de editar2026-10-25:** commit044f40b,
+  ejecución40205272342: frontera corregida PASS,119 E2E PASS, dos fallos en
+  hiring-consent.spec.ts:99 y una dependencia sin ejecutar. Ambas variantes de
+  contratación esperaban cero apariciones del nombre para la otra empresa con
+  derivación propia revocada; contradicen la excepción mínima EXTRA069 aprobada.
+  Propuesta: esperar nombre/listado y encabezado identificable también allí,
+  añadir ausencia de perfil/contactos, conservar denegación de CV y todas las
+  aserciones de consentimiento global, bloqueo transaccional y casos intactos.
+  Solo prueba E2E; producto, SQL, permisos y migración sin cambios. Verificación:
+  RED/GREEN normal+tardía, cuatro actores, tipos/lint/diff y nueva CI completa.
+- **Segundo ajuste local verificado2026-10-25:** hiring-consent.spec.ts mantiene
+  bloqueo/atomicidad, retiro global, acceso revocado en todas las derivaciones,
+  caso ajeno byte a byte y CV403/404. Nombre/encabezado y distintivo Contratado
+  se comprueban por separado según la presentación actual; ausencia de perfil
+  laboral/contactos se exige también a la otra empresa con derivación propia.
+  RED2/2 reproduce CI; GREEN6/6 normal/tardía/cuatro actores (34.2s), cero
+  reintentos/omisiones; tipos aislados, lint y diff-check PASS. Se recorrieron
+  expectativas de nombres revocados de E2E: los restantes119 casos pasaron en
+  CI40205272342, pendiente nueva suite completa tras publicar este ajuste.
+  T202 verificada también en CI; T203 implementada/verificada local. PR75
+  permanece abierto sin merge y cambios ajenos excluidos; sin cambios alojados.
+
+## EXTRA-070 — Perfil y CV antes de notas en el detalle administrativo
+
+- **Fecha/origen/autorización:**2026-10-25, pedido explícito de Mateo; FR-010,
+  FR-011, FR-013, FR-052 y FR-070. Cambio visual autorizado; revisión pendiente.
+- **Evidencia:** el detalle normal coloca resumen/CV después de notas; el
+  presencial separa el resumen en la otra columna. EXTRA060 fijaba ese orden,
+  sustituido únicamente en su composición por esta solicitud posterior.
+- **Propuesta mínima:** renderizar una vez Perfil candidato y luego CV PDF del
+  candidato antes del formulario y listado de notas, en la primera columna.
+  Mantener edición presencial antes de esas tarjetas y controles/participaciones
+  en la segunda. En móvil conservar el mismo orden de lectura del DOM.
+- **Archivos/contratos:** página admin/candidates/[candidateId], expectativas
+  existentes de admin-pages, spec/plan/tasks y UI_GUIDELINES. Sin contratos de
+  datos, consultas, permisos, formularios, dependencias o migraciones nuevos.
+- **Riesgos:** duplicar tarjetas/IDs, cambiar visibilidad de CV archivado o
+  mantenimiento presencial. Conservar condiciones y acciones sin modificarlas.
+- **Verificación prevista:** pruebas existentes de normales/presenciales/vinculados/
+  archivados y CV vigente/ausente; tipos/lint/unitarias/build, composición de
+  navegador ficticia en escritorio/móvil. No reset ni datos alojados necesarios.
+- **Git:** main actualizado a a3cd69f, PR75 confirmado mergeado; rama anterior
+  eliminada local/remota y fix/admin-candidate-card-order creada. next-env.d.ts
+  ajeno preservado. Estado: registrado antes de implementar; CI/revisión pendientes.
+- **Implementación/verificación:** página coloca profileDetails/candidateCv una
+  sola vez antes de InternalNoteForm y Notas internas. Mantiene guard, consultas,
+  CV archivado oculto, carga asistida/vinculación y segunda columna intactos.
+  Expectativas existentes actualizadas para orígenes/estados, sin pruebas nuevas
+  redundantes. Spec/plan/UI alineados; análisis acotado: presentación sin nueva
+  arquitectura, contrato o decisión municipal; sin gates arquitectónicos nuevos.
+- **Resultados2026-10-25:**1195 pruebas/90 archivos y cobertura configurada PASS;
+  57 pruebas del componente administrativo PASS. Lint, tipos y build PASS;
+  tipos/build en copia aislada con todos los archivos src comparados por hash.
+  Primera suite tuvo timeout del escaneo español con build/navegador simultáneos;
+  repetición completa sin esa carga:1195 PASS en42.19s, límites sin alterar.
+  Navegador con composición real y servicios ficticios: normal/presencial sin
+  cuenta,1440/390px, cuatro escenarios PASS; orden geométrico perfil→CV→notas,
+  controles contenidos y sin desborde horizontal. Capturas revisadas en
+  test-results/admin-card-order-visual/admin-workspace-I2nc75 (ignorado).
+  Esta prueba visual no acredita sesiones/datos vivos; no se tocaron servicios
+  locales/hosted ni se ejecutaron resets. diff-check PASS; hash next-env.d.ts
+  ajeno idéntico al inicial. T204 implementada/verificada; commit/PR/CI/revisión
+  humana pendientes, sin afirmar aceptación municipal.
+
+## EXTRA-071 — Mostrar u ocultar identificación en el perfil propio
+
+- **Fecha/origen/autorización:**2026-10-25, Mateo solicita mostrar DNI/CUIT y
+  aclara: candidato solo su DNI y empresa solo su CUIT, junto al campo oculto
+  del formulario propio. FR-010/FR-020/FR-070; no amplía consulta administrativa.
+- **Evidencia/propuesta:** CandidateProfilePanel y CompanyProfileForm usan
+  input password sin forma de revelarlo. Componer Field/Input nativo y Button
+  municipal con estado local oculto inicial, Mostrar/Ocultar DNI o CUIT, icono,
+  nombre accesible, aria-controls/pressed y type=button. Conservar valor editado,
+  validación nativa, errores y contrato de guardado; sin persistir visibilidad.
+- **Justificación/archivos:** componente de formulario compartido mínimo y dos
+  consumidores propios, expectativas existentes, spec/plan/tasks/UI. Sin
+  migración, backend, nuevas consultas/permisos o dependencias. Mantener trabajo
+  EXTRA070 y next-env.d.ts ajeno en fix/admin-candidate-card-order.
+- **Fuente técnica:** documentación oficial Button e Input Group de shadcn Base
+  y fuente registry/base-nova/ui/button.tsx consultada por HTTPS en
+  https://ui.shadcn.com/r/styles/base-nova/button.json; reutilizar adaptación
+  existente, sin sobrescribir primitivas. Revisión React según skill disponible.
+- **Riesgos/verificación:** asociación etiqueta/error, envío accidental y pérdida
+  de edición. Comprobar toggle/reocultado, valor/FormData, teclado, default
+  oculto, validación, perfiles/privacidad existentes, tipos/lint/unitarias/build
+  y navegador ficticio. Estado previo a implementación; revisión/CI pendientes.
+- **Resultado:** IdentifierField compuesto con Field/input/Button se usa solo en
+  CandidateProfilePanel y CompanyProfileForm. DNI/CUIT ocultos inicialmente;
+  botón de ojo revela/reoculta conservando edición y contrato de guardado.
+  Registro, datos de terceros y atención presencial permanecen sin esos botones.
+  Sin consultas, backend, migraciones, almacenamiento de visibilidad o permisos.
+- **Verificación2026-10-25:**1195 pruebas/90 archivos y cobertura configurada PASS;
+  11 pruebas de formularios PASS tras ajustar selectores al tipo de Testing
+  Library (nombre de rol ya es exacto; sin opción exact de Playwright). Primera
+  corrida acotada encontró import faltante de fireEvent en la prueba, corregido
+  antes de la suite completa. Lint, tipos/build aislados y diff-check PASS;
+  archivos src de la copia de build comparados por hash con el trabajo actual.
+- **Navegador:** componente real montado con React/Form/Button existentes y datos
+  ficticios; cuatro combinaciones DNI/CUIT×1440/390 PASS, Enter/Espacio/foco,
+  aria-controls/pressed, edición conservada, FormData correcto, sin submit por
+  toggle y errores/corrección de patrón intactos; axe sin infracciones ni
+  desborde horizontal. Capturas/harness ignorados en test-results/identifier-toggle-browser;
+  emplea Vite ya instalado solo para verificación, sin cambios de dependencias.
+  No acredita sesión/base viva: la autorización no se modifica. Harness axe
+  requirió contexto de navegador explícito; corregido y repetido con éxito.
+- **Revisión técnica:** guía React aplicada: estado booleano local, useId estable,
+  actualización funcional, sin efectos/consultas/rerenders globales; controles
+  con etiquetas y type=button fuera del label. Componentes compartidos existentes
+  conservados. EXTRA070 y hash ajeno next-env.d.ts preservados. T205 verificada;
+  commit/PR/CI/revisión humana pendientes; sin cambios alojados ni resets.
+
+## EXTRA-072 — Consentimiento resumido y Más información
+
+- **Fecha/origen/autorización:**2026-10-25, Mateo entrega los seis párrafos
+  exactos y pide dos visibles, cuatro en Más información y retirar el apartado
+  de política. Solicitud de presentación de Consentimiento de prueba propio;
+  no constituye aprobación municipal de una política para datos reales.
+- **Evidencia/cambio propuesto:** CandidateProfilePanel muestra seis párrafos
+  abiertos y un details de política demo. Reubicar los cuatro párrafos indicados
+  en ese details, cerrado inicialmente y rotulado Más información. Reemplazar el
+  párrafo de contratación por el texto literal solicitado. Retirar texto/versión/
+  aviso de política de esta vista, conservando su contrato técnico y las reglas
+  de consentimiento, aceptación, retirada y contratación actuales.
+- **Archivos/contratos:** panel, expectativas existentes de presentación/flujo y
+  E2E candidato, spec/plan/tasks/UI_GUIDELINES. Sin acciones, queries, migración,
+  permisos, persistencia, dependencia o cambios en atención presencial/empresa.
+  Mantener EXTRA070/071 y next-env.d.ts ajeno de la rama actual.
+- **Riesgos/verificación:** texto oculto inaccesible por teclado, pruebas E2E con
+  referencias antiguas, pérdida de checkbox/estado/acción. Revisar los seis
+  párrafos, dos fuera/cuatro dentro, ausencia del apartado de política, apertura/
+  cierre por teclado y aceptación/retiro sin cambios. Tipos/lint/unitarias/build
+  y navegador ficticio escritorio/móvil; sin acceder a base alojada ni reset.
+- **Estado:** registrado antes de implementar; alcance visual autorizado,
+  requisitos/arquitectura de negocio intactos, revisión/CI pendientes.
+- **Implementado:** dos párrafos visibles y los cuatro restantes dentro del
+  details existente, rotulado Más información y cerrado de inicio, con la copia
+  solicitada. Retirados el contenido/versión/aviso de la política y su título de
+  esta vista. Se conserva el contrato de props, política técnica del servidor,
+  estado, checkbox, select, acción y lógica de aceptación/retiro/contratación.
+- **Verificación2026-10-25:**1195 pruebas/90 archivos y cobertura configurada
+  PASS; expectativas antiguas de política ajustadas también en E2E candidato
+  para evitar regresión en CI. Tipos/build PASS en copia aislada, con archivos
+  src comparados por hash; lint y diff-check PASS. Prueba real de navegador con
+  composición de página y servicios ficticios a1440/390 PASS: dos textos visibles,
+  cuatro ocultos/expandibles, Enter/foco/cierre, checkbox sin marcar/obligatorio,
+  sin apartado de política, sin desborde y axe0. Capturas revisadas/harness
+  ignorados en test-results/consent-information-browser.
+- **Límites/estado:** no se ejecutó el recorrido E2E completo de registro y
+  mutaciones con base; esta verificación prueba presentación/teclado, no una
+  nueva aceptación persistida. No cambió backend ni se accedió a datos alojados,
+  ni hubo reset/servidor del usuario detenido. EXTRA070/071 y next-env.d.ts ajeno
+  preservados. T206 implementada/verificada; commit/PR/CI/revisión pendientes.
+- **Preparación de entrega2026-10-25:** Mateo solicita el PR conjunto de
+  EXTRA070/071/072. main remoto coincide con la base a3cd69f; diff-check y evidencias
+  finales revisadas. Publicar en fix/admin-candidate-card-order sin firma,
+  signoff ni coautor. Excluir next-env.d.ts ajeno (hash inicial preservado),
+  capturas/harness/logs ignorados y cualquier configuración local. Verificación
+  local completa según entradas anteriores; CI completa y revisión por PR siguen
+  pendientes hasta evidencia del repositorio remoto.
+- **Diagnóstico CI PR76 antes de editar2026-10-25:** ejecución40231016807,
+  headb9ab97f: application falla en candidate-self-service.spec.ts:82 porque
+  busca «tu consentimiento global vigente» mientras EXTRA072 exige «tu
+  consentimiento vigente».120 E2E PASS, uno falla y uno no corre por dependencia;
+  tipos/lint/tooling/cobertura/build/SQL y database/Vercel PASS. Propuesta mínima:
+  alinear esa expectativa con el párrafo autorizado y mantener su comprobación
+  de revocación a todas las empresas, sin cambios de producto ni reglas.
+  Revisar el recorrido entero y otras expectativas del texto; RED/GREEN local
+  aislado, tipos/lint/diff, misma rama/PR sin firma y nueva CI completa. T207.
+- **Corrección PR76 verificada2026-10-25:** expectativa en
+  candidate-self-service.spec.ts:82 alineada con la copia autorizada, incluyendo
+  revocación de accesos de todas las empresas. RED original reproducido con la
+  misma ausencia de texto; GREEN del recorrido candidato entero en27.9s
+  (registro/correo/consentimiento/CV/activación/dos postulaciones/retiro/suspensión/
+  reactivación/archivo/restauración), cero reintentos/omisiones. Resto de pruebas
+  de texto revisado; no quedan expectativas positivas del texto eliminado.
+  Build local con configuración real del fixture aislado, tipos y lint PASS.
+  Reutilizado solo proyecto funes-admin-cv-check/54341/54342, sin reset, cambios
+  alojados o servidor3000 detenido; servicios propios cerrados con respaldo.
+  next-env.d.ts ajeno preservado; diff-check PASS. Cambian prueba y trazabilidad,
+  producto/SQL/reglas intactos. T207 implementada/verificada; publicación/nueva
+  CI completa y revisión pendientes.
