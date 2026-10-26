@@ -81,7 +81,7 @@ it("no consulta candidatos con filtros inválidos", async () => {
 it("lista perfiles presenciales sin exigir activación y reutiliza sus detalles", async () => {
  render(await AssistedCandidates({ searchParams: Promise.resolve({}) }));
  expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
- expect(mocks.assistedSearch).toHaveBeenCalledWith(expect.objectContaining({ vigency: "all", eligibility: "all" }));
+ expect(mocks.assistedSearch).toHaveBeenCalledWith(expect.objectContaining({ eligibility: "all" }));
  expect(mocks.search).not.toHaveBeenCalled();
  expect(screen.getByText("Borrador")).toBeTruthy();
  expect(screen.getByRole("link", { name: candidate.display_name }).getAttribute("href")).toBe(`/admin/candidates/${fixtureReference("candidate", id)}`);
@@ -96,7 +96,6 @@ it("conserva filtros y categoría opaca al paginar atención presencial", async 
  expect(url.pathname).toBe("/admin/atencion-presencial");
  expect(url.searchParams.get("categoryId")).toBe(fixtureReference("category", id));
  expect(url.searchParams.get("locality")).toBe("Funes");
- expect(url.searchParams.get("vigency")).toBe("all");
  expect(url.searchParams.get("page")).toBe("2");
 });
 it("informa ausencia de perfiles presenciales sin crear registros", async () => {

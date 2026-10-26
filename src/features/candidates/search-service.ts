@@ -101,19 +101,15 @@ async function searchCandidatePool(input: unknown, now: Date, assistedOnly: bool
       .order("display_name").order("id")
       .range(offset, offset + BATCH_SIZE - 1);
     if (assistedOnly) query = query.eq("origin", "assisted");
-    if (filters.vigency !== "all") query = query.is("archived_at", null);
+    query = query.is("archived_at", null);
     if (filters.term) {
       const pattern = `%${filters.term}%`;
-      query = query.or(`display_name.ilike.${pattern},skills_experience_summary.ilike.${pattern}`);
+      query = query.or(`display_name.ilike.${pattern},skills_experience_summary.ilike.${pattern},locality.ilike.${pattern}`);
     }
-    if (filters.skills) query = query.ilike("skills_experience_summary", `%${filters.skills}%`);
     if (filters.availability) query = query.ilike("availability", `%${filters.availability}%`);
     if (filters.locality) query = query.ilike("locality", `%${filters.locality}%`);
-    if (filters.vigency === "current" || filters.eligibility === "eligible") {
+    if (filters.eligibility === "eligible") {
       query = query.eq("status", "active").gt("refresh_due_at", now.toISOString());
-    } else if (filters.vigency === "needs_update") {
-      query = query.in("status", ["active", "needs_update"])
-        .or(`status.eq.needs_update,refresh_due_at.lte.${now.toISOString()}`);
     }
     const result = await query;
     if (result.error) throw new AppError("INTERNAL_ERROR");

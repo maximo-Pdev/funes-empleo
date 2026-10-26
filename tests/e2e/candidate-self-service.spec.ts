@@ -224,8 +224,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     const admin = await adminContext.newPage();
     await signIn(admin, "admin1@example.invalid", localFixturePassword());
     await admin.goto("/admin/candidates");
-    await admin.getByLabel("Término").fill(name);
-    await admin.getByLabel("Vigencia").selectOption("all");
+    await admin.getByLabel("Búsqueda por palabra").fill(name);
     await admin.getByLabel("Aptitud para derivación").selectOption("all");
     await admin.getByRole("button", { name: "Buscar candidatos" }).click();
     await admin.getByRole("link", { name }).click();

@@ -10,7 +10,7 @@ const current = new Date("2026-09-23T12:00:00Z");
 describe("búsqueda administrativa de candidatos", () => {
   it("normaliza paginación y rechaza patrones de búsqueda no seguros", () => {
     expect(candidateSearchSchema.parse({ page: "2", pageSize: "10", term: " Persona ficticia " })).toMatchObject({
-      page: 2, pageSize: 10, term: "Persona ficticia", vigency: "current", eligibility: "eligible",
+      page: 2, pageSize: 10, term: "Persona ficticia", eligibility: "eligible",
     });
     expect(candidateSearchSchema.safeParse({ term: "%,status.eq.active" }).success).toBe(false);
     expect(candidateSearchSchema.safeParse({ pageSize: "10000" }).success).toBe(false);

@@ -23,12 +23,11 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await menu.getByRole("link", { name: "Perfil asistido", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/atencion-presencial$/);
   await expect(menu.getByRole("link", { name: "Perfil asistido", exact: true })).toHaveAttribute("aria-current", "page");
-  await expect(page.getByLabel("Vigencia")).toHaveValue("all");
   await expect(page.getByLabel("Aptitud para derivación")).toHaveValue("all");
   const suffix = Date.now().toString().slice(-5);
   const name = `Mesa presencial E2E ${suffix}`;
   const before = Number(runLocalMaintenanceSql("select count(*) from public.candidate_profiles"));
-  await page.getByLabel("Término").fill(name);
+  await page.getByLabel("Búsqueda por palabra").fill(name);
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page.getByText("Sin perfiles de atención presencial")).toBeVisible();
   let firstReference = "";

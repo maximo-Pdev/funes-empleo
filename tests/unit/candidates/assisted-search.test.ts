@@ -33,16 +33,16 @@ beforeEach(() => {
   mocks.session.mockResolvedValue({ account: { role: "admin", status: "active" }, client: { from: mocks.from, rpc: mocks.rpc } });
 });
 
-it("fija origen asistido antes del total/paginación e incluye borrador, vinculado y archivo", async () => {
-  const result = await service.searchAssistedCandidates({ vigency: "all", eligibility: "all", page: 2, pageSize: 1 }, current);
+it("fija origen asistido antes del total/paginación e incluye borrador y vinculado", async () => {
+  const result = await service.searchAssistedCandidates({ eligibility: "all", page: 2, pageSize: 1 }, current);
   expect(query.eq).toHaveBeenCalledWith("origin", "assisted");
   expect(query.eq).not.toHaveBeenCalledWith("status", "active");
-  expect(result).toMatchObject({ total: 3, page: 2, pageCount: 3 });
+  expect(result).toMatchObject({ total: 2, page: 2, pageCount: 2 });
   expect(result.items.map(item => item.id)).toEqual(["linked"]);
 });
 it("el cliente no puede cambiar el origen del listado", async () => {
-  const result = await service.searchAssistedCandidates({ origin: "self_service", vigency: "all", eligibility: "all" }, current);
-  expect(result.items.map(item => item.id)).toEqual(["draft", "linked", "archived"]);
+  const result = await service.searchAssistedCandidates({ origin: "self_service", eligibility: "all" }, current);
+  expect(result.items.map(item => item.id)).toEqual(["draft", "linked"]);
 });
 it("conserva defaults y ámbito de la búsqueda general", async () => {
   const result = await service.searchCandidates({}, current);

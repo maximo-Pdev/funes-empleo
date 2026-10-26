@@ -25,17 +25,15 @@ describe("intermediación administrativa", () => {
     }));
   });
 
-  it("filtra candidatos por categoría, disponibilidad, localidad y vigencia con controles etiquetados", () => {
+  it("filtra candidatos por palabra, categoría y disponibilidad con controles etiquetados", () => {
     const search = vi.fn();
     render(<CandidateSearchForm categories={[{ id: "cat-1", name: "Categoría ficticia" }]} onSearch={search} />);
-    fireEvent.change(screen.getByLabelText("Término"), { target: { value: "Persona ficticia" } });
+    fireEvent.change(screen.getByLabelText("Búsqueda por palabra"), { target: { value: "Persona ficticia" } });
     fireEvent.change(screen.getByLabelText("Categoría"), { target: { value: "cat-1" } });
     fireEvent.change(screen.getByLabelText("Disponibilidad"), { target: { value: "available" } });
-    fireEvent.change(screen.getByLabelText("Localidad"), { target: { value: "Funes" } });
-    fireEvent.change(screen.getByLabelText("Vigencia"), { target: { value: "current" } });
     fireEvent.click(screen.getByRole("button", { name: "Buscar candidatos" }));
     expect(search).toHaveBeenCalledWith(expect.objectContaining({
-      term: "Persona ficticia", categoryId: "cat-1", availability: "available", locality: "Funes", vigency: "current",
+      term: "Persona ficticia", categoryId: "cat-1", availability: "available",
     }));
   });
 

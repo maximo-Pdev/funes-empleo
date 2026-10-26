@@ -16,10 +16,8 @@ const pageNumber = (defaultValue: number, maximum: number) => z.preprocess(
 export const candidateSearchSchema = z.object({
   term: optionalText(100),
   categoryId: optionalId,
-  skills: optionalText(100),
   availability: optionalText(100),
   locality: optionalText(100),
-  vigency: z.enum(["current", "needs_update", "all"]).default("current"),
   eligibility: z.enum(["eligible", "ineligible", "all"]).default("eligible"),
   page: pageNumber(1, 1000),
   pageSize: pageNumber(20, 50),

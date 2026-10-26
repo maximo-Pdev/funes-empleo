@@ -166,7 +166,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     const after = runLocalMaintenanceSql(`select jsonb_build_object('origin',origin,'status',status,'consents',(select count(*) from public.candidate_consents where candidate_id='${id}'),'cases',(select count(*) from public.participations where candidate_id='${id}'),'notes',(select count(*) from public.internal_notes where candidate_id='${id}')) from public.candidate_profiles where id='${id}'`);
     expect(after).toBe(before);
     await page.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }).getByRole("link", { name: "Perfil asistido", exact: true }).click();
-    await page.getByLabel("Término").fill(name);
+    await page.getByLabel("Búsqueda por palabra").fill(name);
     await page.getByRole("button", { name: "Buscar candidatos" }).click();
     const assistedResults = page.getByRole("region", { name: "Perfiles de atención presencial" });
     await expect(assistedResults.getByRole("heading", { name: "Perfiles: 1", exact: true })).toBeVisible();

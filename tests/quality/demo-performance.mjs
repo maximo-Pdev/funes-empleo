@@ -93,7 +93,7 @@ try {
     if(concurrentResults.some(r=>!r.pass)) process.exitCode=1;
   } else if (scenario === "candidate") {
     await page.goto("/admin/candidates");
-    await page.getByLabel("Término",{exact:true}).fill(manifest.sc008a.candidateSearch.term);
+    await page.getByLabel("Búsqueda por palabra",{exact:true}).fill(manifest.sc008a.candidateSearch.term);
     await page.getByLabel("Categoría",{exact:true}).selectOption({label:"Categoría ficticia B"});
     await page.getByLabel("Disponibilidad",{exact:true}).selectOption("available");
     const start=performance.now();

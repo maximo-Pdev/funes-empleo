@@ -41,7 +41,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
     <h2 className="mb-4 text-xl font-semibold">Perfiles creados</h2>
     <CandidateSearchForm destination="/admin/atencion-presencial"
       categories={categories.map(category => ({ id: category.id, name: category.name, reference: references[category.id]! }))}
-      initial={parsed.success ? parsed.data : { vigency: "all", eligibility: "all" }} />
+      initial={parsed.success ? parsed.data : { eligibility: "all" }} />
     {!parsed.success && <div className="mt-5"><FeedbackMessage tone="error">Revisá los filtros y volvé a buscar. No se aceptan caracteres especiales en los términos.</FeedbackMessage></div>}
     {results && <section aria-label="Perfiles de atención presencial" className="mt-8 space-y-4">
       <h2 className="text-xl font-semibold">Perfiles: {results.total}</h2>

@@ -4,6 +4,7 @@ import { Form } from "@/components/forms/form";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button, SelectField, TextField } from "@/components/ui";
+import { LocalityCombobox } from "@/features/companies/components/locality-combobox";
 import type { CandidateSearchFilters } from "@/validation/candidate-search";
 
 type SearchValues = Omit<CandidateSearchFilters, "page" | "pageSize">;
@@ -17,16 +18,14 @@ export function CandidateSearchForm({ categories, initial, onSearch, destination
   const router = useRouter();
   const [term, setTerm] = useState(initial?.term ?? "");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
-  const [skills, setSkills] = useState(initial?.skills ?? "");
   const [availability, setAvailability] = useState(initial?.availability ?? "");
   const [locality, setLocality] = useState(initial?.locality ?? "");
-  const [vigency, setVigency] = useState<SearchValues["vigency"]>(initial?.vigency ?? "current");
   const [eligibility, setEligibility] = useState<SearchValues["eligibility"]>(initial?.eligibility ?? "eligible");
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const filters: SearchValues = { term: term.trim(), categoryId: categoryId || undefined,
-      skills: skills.trim(), availability: availability.trim(), locality: locality.trim(), vigency, eligibility };
+      availability: availability.trim(), locality: locality.trim(), eligibility };
     if (onSearch) { onSearch(filters); return; }
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
@@ -39,18 +38,15 @@ export function CandidateSearchForm({ categories, initial, onSearch, destination
   }
 
   return <Form onSubmit={submit} className="grid gap-4 rounded-lg border border-slate-300 bg-white p-5 sm:grid-cols-2" role="search">
-    <TextField id="candidate-term" label="Término" value={term} onChange={(event) => setTerm(event.target.value)} maxLength={100} />
+    <TextField id="candidate-term" label="Búsqueda por palabra" value={term} onChange={(event) => setTerm(event.target.value)} maxLength={100} />
     <SelectField id="candidate-category" label="Categoría" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}
       options={categories.map((category) => ({ value: category.id, label: category.name }))} placeholder="Todas las categorías" />
-    <TextField id="candidate-skills" label="Habilidades" value={skills} onChange={(event) => setSkills(event.target.value)} maxLength={100} />
     <SelectField id="candidate-availability" label="Disponibilidad" value={availability} onChange={(event) => setAvailability(event.target.value)}
       placeholder="Todas las disponibilidades" options={[{ value: "available", label: "Disponible" }, { value: "unavailable", label: "No disponible" },
         ...(!["", "available", "unavailable"].includes(availability) ? [{ value: availability, label: "Filtro anterior" }] : [])]} />
-    <TextField id="candidate-locality" label="Localidad" value={locality} onChange={(event) => setLocality(event.target.value)} maxLength={100} />
-    <SelectField id="candidate-vigency" label="Vigencia" value={vigency} onChange={(event) => setVigency(event.target.value as SearchValues["vigency"])}
-      options={[{ value: "current", label: "Vigente" }, { value: "needs_update", label: "Necesita actualización" }, { value: "all", label: "Todas" }]} />
+    <LocalityCombobox value={locality} onChange={(value) => setLocality(value ?? "")} aria-label="Localidad" placeholder="Todas las localidades" />
     <SelectField id="candidate-eligibility" label="Aptitud para derivación" value={eligibility} onChange={(event) => setEligibility(event.target.value as SearchValues["eligibility"])}
-      options={[{ value: "eligible", label: "Aptos" }, { value: "ineligible", label: "No aptos" }, { value: "all", label: "Todos" }]} />
+      placeholder={null} options={[{ value: "eligible", label: "Aptos" }, { value: "ineligible", label: "No aptos" }, { value: "all", label: "Todos" }]} />
     <div className="flex items-end"><Button type="submit">Buscar candidatos</Button></div>
   </Form>;
 }
