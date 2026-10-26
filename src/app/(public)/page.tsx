@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { HomeHero } from "./home-hero";
+import { HomeRegistrationLink } from "./home-registration-link";
+import { getRegistrationRole } from "@/features/accounts/registration-navigation";
+import { getAccessState } from "@/features/accounts/access-notices";
 import { HomeNavbar } from "./home-navbar";
 import { HomeOffersCarousel } from "./home-offers-carousel";
-import { ArrowRight, Building2, ChevronDown, Clock, Mail, MapPin, Phone, Users } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Building2, ChevronDown, Clock, Mail, MapPin, Phone, Users } from "lucide-react";
+import { getPublicPortalCounts } from "@/features/metrics/public-service";
 import { getSiteAccess } from "@/features/accounts/navigation";
 import { listPublicOffers, type PublicOffer } from "@/features/openings/public-service";
 import styles from "./home.module.css";
@@ -23,10 +27,11 @@ const processSteps = [
   "Solo los perfiles derivados se comparten con la empresa.",
 ];
 
-const roleCards = [
-  { icon: Users, title: "Postulantes", description: "Completá tu perfil, cargá tu CV y postulá a búsquedas aprobadas por la Oficina de Empleo.", href: "/registro/candidato", linkLabel: "Crear cuenta de postulante" },
-  { icon: Building2, title: "Empresas", description: "Registrá tu empresa, prepará ofertas y recibí perfiles solo cuando exista una derivación municipal.", href: "/registro/empresa", linkLabel: "Registrar empresa" },
-];
+const portalMetrics = [
+  { key: "candidates", icon: Users, label: "Postulantes registrados" },
+  { key: "companies", icon: Building2, label: "Empresas registradas" },
+  { key: "offers", icon: BriefcaseBusiness, label: "Ofertas vigentes" },
+] as const;
 
 const faqs = [
   { q: "¿Necesito una cuenta para ver las ofertas?", a: "No. Todas las búsquedas vigentes son públicas y podés consultarlas sin registrarte. La cuenta es necesaria para postularte, cargar tu CV o publicar búsquedas." },
@@ -36,13 +41,18 @@ const faqs = [
   { q: "¿Quién aprueba las ofertas que se publican?", a: "Cada búsqueda que envía una empresa pasa por revisión municipal antes de publicarse. Solo se muestran ofertas aprobadas." },
 ];
 
-export default async function HomePage() {
-  const [{ panel }, offers] = await Promise.all([getSiteAccess(), getPreviewOffers()]);
+export default async function HomePage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> } = {}) {
+  const params = await searchParams;
+  const initialView = getRegistrationRole(params?.registro) ?? "login";
+  const accessState = getAccessState(params?.acceso);
+  const [{ panel }, offers, counts] = await Promise.all([
+    getSiteAccess(), getPreviewOffers(), getPublicPortalCounts().catch(() => null),
+  ]);
   return (
     <>
       <HomeNavbar panel={panel} />
       <main id="contenido" tabIndex={-1} className={styles.page}>
-        <HomeHero authenticated={panel !== null} panelHref={panel?.href} panelLabel={panel ? `Ir al ${panel.label.toLowerCase()}` : undefined} />
+        <HomeHero key={initialView} authenticated={panel !== null} panelHref={panel?.href} panelLabel={panel ? `Ir al ${panel.label.toLowerCase()}` : undefined} initialView={initialView} accessState={accessState} />
         <section id="ofertas-disponibles" tabIndex={-1} className={styles.information} aria-labelledby="ofertas-titulo">
           <div className={styles.offersSection}>
             <div className={styles.offersHeader}>
@@ -79,23 +89,23 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className={styles.rolesSection} aria-labelledby="roles-title">
+        <section className={styles.rolesSection} aria-labelledby="metrics-title" data-metrics-status={counts ? "ready" : "unavailable"}>
           <div className={styles.sectionInner}>
-            <p className={styles.sectionEyebrow}>Guía por rol</p>
-            <h2 id="roles-title" className={styles.sectionTitle}>Cada perfil entra por el camino correcto</h2>
-            <div className={styles.roleCards}>
-              {roleCards.map(card => {
-                const Icon = card.icon;
+            <p className={styles.sectionEyebrow}>Métricas del portal</p>
+            <h2 id="metrics-title" className={styles.sectionTitle}>El portal en números</h2>
+            <p className={styles.sectionLead}>Perfiles registrados sin archivar y ofertas publicadas vigentes.</p>
+            <dl className={styles.metricsGrid}>
+              {portalMetrics.map(metric => {
+                const Icon = metric.icon;
                 return (
-                  <article key={card.title} className={styles.roleCard}>
-                    <span className={styles.roleCardIcon} aria-hidden="true"><Icon size={24} /></span>
-                    <h3 className={styles.roleCardTitle}>{card.title}</h3>
-                    <p className={styles.roleCardDescription}>{card.description}</p>
-                    <Link href={card.href} className={styles.roleCardLink}>{card.linkLabel}<ArrowRight size={16} aria-hidden="true" /></Link>
-                  </article>
+                  <div key={metric.key} className={styles.metricCard}>
+                    <dt className={styles.metricLabel}><Icon size={22} aria-hidden="true" />{metric.label}</dt>
+                    <dd className={styles.metricValue}>{counts ? new Intl.NumberFormat("es-AR").format(counts[metric.key]) : "—"}</dd>
+                  </div>
                 );
               })}
-            </div>
+            </dl>
+            {!counts && <p role="status" className={styles.sectionLead}>No pudimos cargar las métricas del portal. Volvé a intentarlo más tarde.</p>}
           </div>
         </section>
 
@@ -121,8 +131,8 @@ export default async function HomePage() {
                 <h2 id="closing-title" className={styles.closingTitle}>¿Listo para dar el siguiente paso?</h2>
                 <p className={styles.closingLead}>Creá tu cuenta y empezá a usar el portal, o acercate a la Oficina de Empleo para que te acompañemos en el proceso.</p>
                 <div className={styles.closingActions}>
-                  <Link href="/registro/candidato" className={styles.closingPrimary}>Registrarme como postulante<ArrowRight size={16} aria-hidden="true" /></Link>
-                  <Link href="/registro/empresa" className={styles.closingSecondary}>Registrar empresa</Link>
+                  <HomeRegistrationLink role="candidate" className={styles.closingPrimary}>Registrarme como postulante<ArrowRight size={16} aria-hidden="true" /></HomeRegistrationLink>
+                  <HomeRegistrationLink role="company" className={styles.closingSecondary}>Registrar empresa</HomeRegistrationLink>
                 </div>
               </div>
               <div className={styles.closingContact}>

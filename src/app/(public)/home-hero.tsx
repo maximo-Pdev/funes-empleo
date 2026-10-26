@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { ArrowDown, Building2, ShieldCheck, Users } from "lucide-react";
 import { registrationContent } from "@/features/accounts/registration-content";
+import type { AccessState } from "@/features/accounts/access-notices";
 import { HomeAccessPanel, type HomeAccessView } from "./home-access-panel";
 import { HomeRibbons } from "./home-ribbons";
 import styles from "./home.module.css";
 
-export function HomeHero({ authenticated, panelHref, panelLabel }: { authenticated: boolean; panelHref?: string; panelLabel?: string }) {
-  const [view, setView] = useState<HomeAccessView>("login");
+export function HomeHero({ authenticated, panelHref, panelLabel, initialView = "login", accessState = null }: { authenticated: boolean; panelHref?: string; panelLabel?: string; initialView?: HomeAccessView; accessState?: AccessState | null }) {
+  const [view, setView] = useState<HomeAccessView>(initialView);
   const copy = view === "login" ? null : registrationContent[view];
 
   return (
@@ -52,13 +53,13 @@ export function HomeHero({ authenticated, panelHref, panelLabel }: { authenticat
         </div>
       </div>
       <div className={styles.access}>
-        <HomeAccessPanel authenticated={authenticated} panelHref={panelHref} panelLabel={panelLabel} onViewChange={setView} />
-      </div>
-      <div className={styles.offersFooter}>
-        <a className={styles.offersAction} href="#ofertas-disponibles">
-          Ver ofertas disponibles
-          <ArrowDown size={18} aria-hidden="true" />
-        </a>
+        <HomeAccessPanel authenticated={authenticated} panelHref={panelHref} panelLabel={panelLabel} onViewChange={setView} initialView={initialView} accessState={accessState} />
+        <div className={styles.offersFooter}>
+          <a className={styles.offersAction} href="#ofertas-disponibles">
+            Ver ofertas disponibles
+            <ArrowDown size={18} aria-hidden="true" />
+          </a>
+        </div>
       </div>
     </div>
   );

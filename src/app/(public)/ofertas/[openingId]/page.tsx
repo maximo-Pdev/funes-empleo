@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getRegistrationHref } from "@/features/accounts/registration-navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -170,7 +171,7 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
                 Postularme con mi cuenta
                 <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </Link>
-              <p className="mt-4 text-sm leading-6">¿Todavía no tenés cuenta? <Link href="/registro/candidato" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Registrate</Link></p>
+              <p className="mt-4 text-sm leading-6">¿Todavía no tenés cuenta? <Link href={getRegistrationHref("candidate")} className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Registrate</Link></p>
             </div>
             <div className="flex items-start gap-3 px-5 py-5 sm:px-6">
               <CalendarDays className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />

@@ -1778,6 +1778,10 @@ export type Database = {
         Args: { p_slug: string }
         Returns: Json
       }
+      public_portal_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       published_offers: {
         Args: { p_id?: string; p_page?: number; p_page_size?: number }
         Returns: Json

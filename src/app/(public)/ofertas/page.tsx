@@ -7,6 +7,7 @@ import { PublicOfferSearchForm } from "@/features/openings/components/public-off
 import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
 import { publicOfferSearchSchema } from "@/validation/public-offer-search";
 import { getAccountAccess } from "@/features/accounts/navigation";
+import { getRegistrationHref } from "@/features/accounts/registration-navigation";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 
 export const dynamic = "force-dynamic";
@@ -111,7 +112,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
             <ShieldCheck className="h-7 w-7 text-primary" aria-hidden="true" />
             <h2 id="acompanamiento-title" className="mt-4 text-xl font-bold text-primary-900">Te acompañamos en la búsqueda</h2>
             <p className="mt-3 text-sm leading-6 text-foreground">Para postularte necesitás una cuenta de candidato y tu perfil completo con CV.</p>
-            <Link href="/registro/candidato" className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-700">Crear cuenta<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+            <Link href={getRegistrationHref("candidate")} className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-700">Crear cuenta<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
             <p className="mt-4 text-sm leading-6 text-foreground">¿Ya tenés cuenta? <Link href="/" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Iniciá sesión</Link></p>
           </Card>
           <div className="rounded-xl border border-border px-6 py-5">
