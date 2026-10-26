@@ -99,7 +99,13 @@ Suggested structure:
 4. CTA for candidate login/registration/application path as existing behavior allows.
 5. Clear statement that publication is municipal-approved.
 
-### Candidate registration: `src/app/(auth)/registro/candidato/page.tsx`
+### Candidate registration: Home (`/?registro=candidato`)
+
+EXTRA-072 (2026-10-25) retires the standalone candidate registration page.
+Use the existing Home access panel and shared candidate form, not a new page.
+`/registro/candidato` must return HTTP 404 without a redirect or `Location`.
+The split-layout suggestions below apply to Home and do not require equal-height
+standalone cards.
 
 Goal: reduce form intimidation and clarify why data is requested.
 
@@ -110,7 +116,17 @@ Suggested structure:
 3. Loading state if async route behavior needs it.
 4. Preserve existing validation and actions.
 
-### Company registration: `src/app/(auth)/registro/empresa/page.tsx`
+### Company registration: Home (`/?registro=empresa`)
+
+EXTRA-072 retires the standalone company registration page. `/registro/empresa`
+must return HTTP 404 without a redirect or `Location`. Use the same Home panel
+and shared company form. Registration links activated normally within Home
+select the matching role, synchronize the introduction, return to `scrollY=0`
+and focus `#acceso` without changing the URL or triggering focus-induced scrolling.
+Repeat activation and keyboard access must work; reduced motion disables smooth
+scrolling. Other-page links use the canonical URLs above. Only exact single
+`registro=candidato` or `registro=empresa` values select registration; unsupported
+or array values fall back to login. Preserve registration actions and rules.
 
 Goal: explain moderation and no-documentary-verification MVP constraint.
 

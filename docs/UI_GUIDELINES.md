@@ -1,5 +1,31 @@
 # Municipal visual reference
 
+## Home live public totals — EXTRA-079
+
+Replace the former role-guide cards with “El portal en números”: Postulantes
+registrados, Empresas registradas and Ofertas vigentes. Use three balanced cards
+on desktop and a single column below 768px, the existing institutional tokens,
+Sora numbers, Be Vietnam labels and decorative Lucide icons. Counts come from
+`public_portal_counts`, never constants or the twelve-card carousel limit.
+Count nonarchived profiles, including assisted/imported, incomplete and suspended
+registrations; count offers through the same public eligibility view as the catalog.
+Render genuine zero as zero; render unavailable totals as an em dash with an
+explanation, never zero. Keep all other Home sections and closing shortcuts intact.
+This supersedes older guidance preserving the “Cada perfil entra por el camino
+correcto” cards, not the role-specific registration guide in the hero.
+
+## Opaque navigation surfaces (current override)
+
+The navbar and Home's offers shortcut now use opaque white backgrounds, with
+no backdrop blur. Keep the shortcut's existing opaque light-green hover state.
+The navbar has no divider border or scroll shadow; this supersedes the older
+frosted-glass references below without changing visibility, timing or navigation.
+Desktop dashboards share a white navbar/sidebar junction with a 24px inward
+curve at the 264px sidebar edge and 64px header bottom. A non-interactive fixed
+pseudo-element rounds the green workspace corner without moving content. Do not
+draw this corner in the stacked mobile layout. Preserve the current mobile sidebar
+collapse behavior and top navigation.
+
 Use the official Funes website as a visual reference, not as a template dependency.
 This guide records the portal's current implementation choices so future sessions
 and both developers can keep pages consistent. It is not a municipal identity
@@ -11,6 +37,66 @@ Home's left introduction follows the access selection: login retains its municip
 message; candidate and company registration reuse the original registration guide,
 steps and privacy notice. Company registration also retains the documentary
 verification disclaimer. Switching back to login restores its original copy.
+
+EXTRA-072 (2026-10-25): Home is also the only registration surface. Retire
+`/registro/candidato` and `/registro/empresa` with HTTP 404 and no redirect or
+`Location`, including query variants; keep the shared forms and actions.
+Normal activation of registration links within Home selects the intended role
+in the existing access panel, keeps the current URL/page unchanged, scrolls the
+document to `scrollY=0` and focuses `#acceso` with focus-induced scrolling
+prevented. Keep selector and introduction synchronized, including repeat clicks
+and keyboard activation. Reduced motion uses immediate rather than smooth scroll.
+From other pages, new contexts or without JavaScript, use `/?registro=candidato`
+or `/?registro=empresa`; only exact single values select registration. Missing,
+unsupported or array values default to login. A fragment alone is not a role
+selector. Do not restore a standalone registration layout or redirect alias.
+
+EXTRA-073 (2026-10-25): account lifecycle states also live in Home's access card.
+Retire `/account-suspended`, `/recovery-invalid`, `/session-expired` and
+`/verification-pending` with real HTTP 404 (no redirect or `Location`) and send
+their consumers to one validated state: `/?acceso=suspendido`,
+`/?acceso=sesion-vencida` or `/?acceso=recuperacion-invalida`. Only exact single
+values select a state; anything else shows the plain login card, and a verified
+active session always keeps its own panel instead of any notice. Suspension shows
+the Office contact message with no login form (the submission cannot succeed);
+the expired session shows the notice above the login form; an invalid recovery
+link shows the notice above the recovery renewal form and a "Volver a iniciar
+sesión" link to `/`. Use the shared `AccessNotice` (`src/features/accounts/
+components/access-notice.tsx`): semantic `info` tone with `--color-feedback-info`
+for the expired session and `alert` tone with the established error red for
+suspension and the invalid link. Do not add a live-region role to a notice that is
+present at first render; the card already has one status region in the active
+session state. `/verification-expired` keeps its URL and "Reenviar verificación"
+form and adopts Home's paper: principal-green field with `--shadow-inner-panel`,
+the same `.panel`/`surface-bevel` card, Sora heading, shared underlined controls
+and the `recoveryLink` back-home shortcut. The pending-verification information
+stays in the registration card's existing informational response.
+
+EXTRA-075 (2026-10-25): after a registration submit returns its safe response, the
+card stops being a form. It shows one compact confirmation state instead: the
+"Revisá tu correo electrónico" heading (focused, `tabIndex=-1`, one `h2`), the
+safe response, the confirmation resend and a "Volver a iniciar sesión" link. The
+role selector, the form and the required-fields note leave together, so the card
+shrinks — measured 738px to 372px at 1440×900, with the hero staying at exactly
+the viewport — instead of growing past the fold. Never append the resend as an
+extra block under a full registration form: that stretched the card and the
+desktop hero. The resend control prompts "¿No recibiste el correo de
+confirmación?", uses the shared secondary `Button`, stays disabled for 30 seconds
+with a visible countdown ("Reenviar en 30 s") and is then labelled "Reenviar
+correo de confirmación". It calls the existing non-enumerating
+`verificationAction` with the email captured at submit time — never with the
+editable field — reports the safe response in a polite status region and restarts
+the wait. The countdown is a client-side UX guard, not a security control: one
+`setInterval` per cycle driven by a local counter, with the button remounted per
+cycle (`key`) so a reset never needs `setState` inside an effect. The submitted
+form stays mounted but `hidden` while the confirmation is shown (and while the
+session tab is active after a submission), so returning to "Registrarse" restores
+every entered value and registering again is one click; do not unmount it there
+or the user retypes everything. "Volver a iniciar sesión" must switch the card to
+login and clean the URL — a plain `Link href="/"` alone is not enough, because the
+navigation resolves after the visible state and a user can end up on the login
+card with `?registro=` still in the address. Keep the control at 44px and do not
+add a new server action, endpoint or enumeration surface.
 
 1. Read this guide and `src/app/globals.css`.
 2. Reuse `Button`, `TextField` and `SelectField` from `src/components/ui` where
@@ -97,6 +183,33 @@ bevel gradient and shadows are portal adaptations, not extracted brand rules.
 The old `brand-primary-light` name remains as a compatibility alias to the exact
 institutional green; do not treat it as a second official green.
 
+## Status badges
+
+Every displayed domain status uses the shared `Badge` with `variant="status"`:
+a pill with a 7px dot on the left, a 1px border and the label in the solid
+state colour, over the same colour at ~8% over white. Do not hand-roll dots,
+coloured chips or local label maps for a status.
+
+```tsx
+<Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>
+  {displayLabel(openingStatusLabels, opening.status)}
+</Badge>
+```
+
+- Tokens: `--color-status-{green,red,amber,blue,violet,neutral}` and
+  `--color-status-*-soft` in `globals.css`; the status → tone mapping lives only
+  in `src/domain/presentation/status-tone.ts`, next to the labels it pairs with.
+- Colour meaning: green = active/published/hired/valid; red = rejected,
+  suspended, blocked, failed, no-show, withdrawn consent; amber = pending,
+  awaiting action, needs update; blue = in progress (review, pre-interview,
+  preselected, uploaded, scheduled); violet = referred and company interview;
+  neutral = draft, paused, closed, cancelled, archived, unavailable.
+- Excluded surfaces: `<select>` filters and decisions keep plain labels;
+  moderation and audit histories stay as text; the public offers pages only list
+  published openings; import rows do not show a row status.
+- `default`, `secondary` and `outline` keep their previous meaning and must not
+  be used for a domain status.
+
 ## Typography
 
 - **Be Vietnam** (not Be Vietnam Pro): body, field values and labels. Bundled
@@ -154,12 +267,13 @@ it open even after that delay; leaving hides it only once the delay has expired.
 Cancel pending timers on renewed scrolling, breakpoint changes and unmount.
 The initial desktop top state remains hidden. The desktop transition lasts
 280ms and is disabled for reduced motion; hidden navigation is inert.
-Below 768px it is fixed at the bottom, visible and interactive without scrolling,
-with no slide transition. Preserve a 64px control row plus the device bottom safe
-area, move the divider/shadow to its upper edge, and reserve 88px plus the safe
-area at the end of Home and the candidate workspace so content remains reachable.
-Remove the workspace's former top reservation; Home's introduction starts 24px
-from the top and its access anchor uses 24px clearance on mobile (88px desktop).
+Below 768px it is fixed at the top, visible and interactive without scrolling,
+with no slide transition and a 64px control row. Home's introduction starts at
+88px, leaving 24px below the navbar; its access anchor uses 88px clearance.
+The shared account workspace reserves 64px above its stacked sidebar. Do not
+retain the bottom-navbar padding or bottom safe-area height from EXTRA-058:
+EXTRA-076 restores upper navigation without changing the current opaque white
+material, lack of borders/shadows or desktop behavior.
 A media-query subscription updates visibility on viewport changes.
 The left navbar brand uses the user-supplied `public/brand/funes-navbar-emblem.svg`
 (225×235 viewBox, copied without alteration) and links to `https://funes.gob.ar/`.
@@ -276,6 +390,22 @@ confirmation, custom or supplied server errors. Suppressed paragraphs must not
 leave dangling error IDs in `aria-describedby`; preserve hints and labels.
 Other forms retain the default inline explanations.
 
+### Keeping typed values across the access tabs
+
+The access card keeps one form mounted at a time. Before every mode, role or
+submit change it reads the mounted form with `FormData` and stores the values in
+panel state (`data-access-key` on the content node names the current form), then
+the next form mounts with them as `defaultValue`. Never keep a second, hidden
+copy of a form to preserve values: two mounted forms duplicate labels and make
+`getByLabelText` ambiguous for every test and for assistive technology.
+
+`email`, `password` and `confirmation` describe the same account identity, so
+they are shared across login and both registrations; every other field stays
+with its own form, so candidate and company data never leak into each other. The
+shared copy wins over a stale per-form copy, and clearing a field clears it
+everywhere. Keep this state in memory only — no `localStorage`, cookies or
+server writes — and keep it in scope of the card, so a reload starts clean.
+
 ## Shared account workspace
 
 Candidate, company and administrator panels use the same `DashboardShell` in
@@ -305,20 +435,24 @@ and peer-administration controls, with logout only in the sidebar (EXTRA-068).
 ### Candidate account workspace
 
 Candidate `/dashboard` (also rendered by `/account`) uses one shared centered white,
-natural-height canvas capped at 960px for Perfil, Panel de usuario, Postulaciones
-and Ofertas. The exterior is flat `--color-brand-primary`: no gradient or exterior
+natural-height canvas capped at 1280px for Perfil, Panel de usuario, Postulaciones
+and Ofertas. Company and administrator canvases share this same cap (EXTRA-071).
+The exterior is flat `--color-brand-primary`: no gradient or exterior
 animation. Desktop main and the 264px fixed sidebar start at top 0 behind the
 existing frosted navbar. Main padding-top is 96px (64px navbar + 32px clearance);
 sidebar uses the same internal top padding, preserving unobscured links. The
 canvas itself starts below the navbar, not behind it. Outer gutters are 24px on
 desktop and 16px on mobile. Nonprofile headings/content share one padded inner
 wrapper; the profile panel retains its own padding and `data-slot="profile-canvas"`.
+Its separate heading uses the same inset as the panel: 28px top/sides on desktop,
+20px top and 16px sides below 640px. Keep its bottom margin at zero so the panel's
+own top padding provides the heading-to-photo separation without a doubled gap.
 Other sections expose `data-slot="candidate-canvas"`; all use `candidateCanvas`.
 Below 768px the sidebar remains stacked in document flow, main uses 24px top padding
-rather than desktop clearance, and workspace reserves 88px plus the bottom safe
-area for the unchanged bottom navbar. This supersedes the earlier profile-only
+rather than desktop clearance, and workspace reserves 64px above the sidebar for
+the top navbar, without a bottom-navbar reservation. This supersedes the earlier profile-only
 animated-gradient treatment (EXTRA-063; `odd/tasks/candidate-panel-finalize.md` S2–S4).
-The non-collapsible composition in `src/components/ui/sidebar.tsx`
+The composition in `src/components/ui/sidebar.tsx`
 adapts the [shadcn Base sidebar anatomy](https://ui.shadcn.com/docs/components/base/sidebar)
 to existing local primitives and municipal tokens; it is not a full registry install
 and does not introduce Base UI dependencies, a theme reset or a second palette.
@@ -338,6 +472,18 @@ pointer exit resets the desktop position. Keep the complete email as its title
 and accessible original text, and disable movement for reduced-motion preferences,
 including while hovered. Addresses that fit must remain static without a duplicate.
 Below 768px the sidebar moves into normal document flow before the main content.
+All three account roles use `DashboardSidebar` for mobile collapse (EXTRA-069).
+Initially expanded, it places a 44px circular green double-chevron Button below
+the existing identity. Collapse hides navigation and logout with `display: none`,
+removing their controls from keyboard and accessibility navigation, while keeping
+the avatar, account name and verified email visible. The control exposes Spanish
+expand/collapse labels, `aria-expanded` and both controlled region IDs. Its arrow
+points down when collapsed and up when expanded. No animation or stored preference
+is introduced. At 768px and wider the toggle disappears and navigation/logout
+remain visible regardless of mobile state; desktop geometry is unchanged.
+Keep the icon-bearing navigation server-rendered; pass composed React nodes into
+the small client controller instead of sending Lucide component functions across
+the server/client boundary. This does not add photo fetching or change identity.
 
 Views are selected with `/dashboard?section=perfil|postulaciones|ofertas` and rendered
 on the server, without iframes or duplicate main landmarks. Missing/unsupported
@@ -446,17 +592,24 @@ the existing lower offers shortcut.
 
 Below 768px, show the complete municipal introduction first, followed by the
 login/registration card, then the offers footer. Reuse the same content and DOM
-order as desktop, without duplicating text. Use 24px introduction top padding
-with the navbar now below, and leave 32px between introduction and card.
+order as desktop, without duplicating text. Use 88px introduction top padding
+to clear the 64px top navbar by 24px. Leave a separate 32px top margin before the
+green access area plus its 32px inner top padding before the white card.
 Use 32px before the intermediary notice on mobile; preserve all its wording.
 The card remains horizontally centered and naturally sized in every access mode;
 do not vertically center login independently or add a second top clearance for
 registration. Let the document scroll instead of clipping any content.
 
-Keep one animated ribbons background covering the whole mobile hero, behind both
-information and forms. The decorative wrapper uses display: contents while the
-absolute canvas/overlay layers fill the hero. The access wrapper stays transparent
-and has no separate green background or inner shadow. The removed portal title
+Keep one animated ribbons background covering the mobile hero; its decorative
+wrapper uses display: contents while the absolute canvas/overlay layers fill the
+hero. The mobile access wrapper retains the same primary-green background and
+shared inner shadow as desktop, with the unchanged white card above it. Use 32px
+top and 20px horizontal inner padding. Its existing offers footer belongs inside
+this same surface, below login or either naturally sized registration card, with
+24px above and below the shortcut. The green continues uninterrupted to the
+available-offers section, with no bottom margin or separate canvas strip.
+These revisions supersede the transparent mobile access treatment and its
+subsequent card-only green area (EXTRA-077, EXTRA-078). The removed portal title
 remains absent. Desktop/tablet two-column composition is unchanged.
 
 Only homepage login includes a subtle “Recuperar acceso” text link below
@@ -533,8 +686,7 @@ se apilan las columnas respetando ese orden de lectura. No duplicar tarjetas.
   under Hermes scratch (or `CANDIDATE_WORKSPACE_OUTPUT_DIR`). Services use explicitly
   fictitious mocked fixtures: this proves layout, not live authenticated data.
   It checks flat primary green, white centered natural-height canvas, navbar/sidebar
-  clearance, bottom-navbar reservation and overflow. Headless safe-area env is zero;
-  the additive `env(safe-area-inset-bottom)` declaration is checked separately.
+  clearance, mobile top-navbar reservation and overflow.
   `profile-gradient-check.mjs` is retained only as an entrypoint to this static proof.
 - Run repository-required unit tests, lint, typecheck and production build.
 - Run `node tests/visual/home-responsive-layout-check.mjs` against a local server

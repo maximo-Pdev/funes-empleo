@@ -48,11 +48,11 @@ Rama: `feature/status-badges`. Estrategia de entrega: `ask-on-risk` (un solo PR,
 
 | ID | Specs | Ruta | Estado |
 |---|---|---|---|
-| T1 | S1 S2 S3 S6 S7 | inline | tokens, variante `status`, catálogo de tonos y prueba unitaria |
-| T2 | S3 S4 | inline | diez superficies administrativas |
-| T3 | S3 S4 | inline | candidato: `/dashboard`, postulaciones, panel de perfil, `/account` |
-| T4 | S3 S4 | inline | empresa: `/empresa`, `/empresa/ofertas`, panel de derivación |
-| T5 | S4 S6 | inline | `docs/UI_GUIDELINES.md` y cierre del registro `EXTRA-074` |
+| T1 | S1 S2 S3 S6 S7 | inline | completado — `e050e72`, `d2466ea` (alto por variante) |
+| T2 | S3 S4 | inline | completado — `bfc764d` |
+| T3 | S3 S4 | inline | completado — `1f1b2bd` |
+| T4 | S3 S4 | inline | completado — `5c4a572`, `ae0c1b0` (prueba de páginas) |
+| T5 | S4 S6 | inline | documentación escrita; sin commit porque esos archivos ya traen cambios ajenos sin confirmar |
 
 ## Log
 
@@ -74,3 +74,26 @@ Rama: `feature/status-badges`. Estrategia de entrega: `ask-on-risk` (un solo PR,
   `default|secondary|outline` y `cn` sin `tailwind-merge`, por lo que la base no
   puede declarar padding que la variante `status` necesite contradecir: el
   padding pasa a cada variante.
+- **L5 (desvíos decididos durante la implementación, sin ampliar alcance):**
+  (a) la disponibilidad del candidato también usa badge en `/admin/candidates`
+  y en el detalle, porque el mismo dato ya lo usa en `/admin/atencion-presencial`
+  y el catálogo de tonos aprobado incluye `Disponibilidad`; (b) en
+  `/admin/empresas` las etiquetas locales eran femeninas («Incompleta/Activa») y
+  al eliminarlas rige el catálogo compartido («Incompleto/Activo»), que es el
+  mismo que ya usa `/empresa`; (c) el tono del perfil del candidato ahora sigue
+  el catálogo aprobado (`draft` gris, `consent_withdrawn` rojo) en lugar del
+  punto propio verde/ámbar; (d) el aviso azul de estado vigente en el historial
+  de la participación pasó a fondo neutro para que el color lo aporte el badge.
+- **L6 (verificación observada, 2026-10-25):** suite completa `vitest run`
+  1190/1190 en 93 archivos. Pruebas nuevas: catálogo de tonos (3), contrato del
+  badge (4), badge sobre páginas reales de administración (3 estados) y de
+  empresa (borrador y publicada), más la actualización del contrato de
+  `profile-presentation`. `npx tsc --noEmit` sin errores propios: los únicos
+  tres errores del proyecto están en `tests/components/home-registration-
+  navigation.test.tsx`, trabajo en curso ajeno. `npm run build` PASS con
+  `tests` excluido del `tsconfig` (restaurado sin diferencias). `eslint` limpio
+  sobre los archivos del cambio; `npm run lint` completo falla solo por
+  `src/features/accounts/components/resend-verification.tsx`, archivo sin
+  seguimiento de la otra sesión. Comprobación real del CSS compilado en el
+  servidor de desarrollo: 26px de alto, punto de 7×7, borde de 1px y texto en
+  el color del estado (`rgb(11,122,59)` para verde), fondo `rgb(233,246,238)`.

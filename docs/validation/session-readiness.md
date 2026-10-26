@@ -6,7 +6,20 @@ Rama: `docs/status-handoff`. HEAD comprobado:
 La tabla registra evidencia técnica aportada por el coordinador, no aceptación humana.
 Los documentos previos de step 4 y el código se conservan sin cambios.
 
-## Disponibilidad observada
+## Nota de vigencia — 2026-10-25 (EXTRA-072)
+
+La tabla siguiente conserva observaciones del 2026-10-06, no disponibilidad
+actual. Los HTTP 200 de `/registro/candidato` y `/registro/empresa` fueron válidos
+para aquella preparación; no deben reemplazarse por supuestos resultados 404.
+El contrato actual retira ambas rutas con HTTP 404 sin redirección ni `Location`
+y reúne los registros en Home: `/?registro=candidato` y `/?registro=empresa`.
+Dentro de Home, los accesos seleccionan el rol, sincronizan la introducción,
+suben a `scrollY=0` y enfocan `#acceso` sin cambiar URL. El retiro previo de
+`/login` también supersede su disponibilidad histórica; ingreso está en `/`.
+Esta actualización documental no ejecuta HTTP, navegador ni pruebas de Auth;
+los resultados actuales de EXTRA-072 deben registrarse por separado.
+
+## Disponibilidad observada (histórica, 2026-10-06)
 
 | Control | Evidencia de preparación | Estado / límite |
 | --- | --- | --- |

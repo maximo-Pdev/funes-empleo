@@ -1,6 +1,25 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## Authorized public metrics increment — EXTRA-079
+
+On 2026-10-25 Maxi requested replacing Home's “Cada perfil entra por el camino
+correcto” section with real counts, and approved counting candidate/company
+profiles that are not archived (including assisted, incomplete and suspended
+profiles) plus currently public eligible job openings. Only the three aggregate
+totals are public; existing personal-data and administrator-metric protections
+remain unchanged. Count openings independently of vacancies and pagination.
+Show unavailable rather than fabricated zero when the data cannot be read.
+Maxi also authorized six explicitly fictitious offers in the existing hosted demo
+through the current Supabase CLI session, without deleting/replacing data, and
+approved the additive aggregate function there. This does not authorize an
+application publication, account replacement or municipal production changes.
+
 ## Authorized profile increment — EXTRA-059
+
+**Canvas revision, 2026-10-25 (EXTRA-071):** Maxi approved increasing the shared
+candidate/company/administrator canvas maximum to 1280px, preserving flexible
+width, centering, desktop/mobile gutters and existing content. This supersedes
+the original 960px dimension below, not the profile functionality or privacy scope.
 
 The requesting developer authorized rebuilding Perfil inside its existing 960px canvas and persisted candidate-photo upload/change/removal. Previous photo bytes must be physically deleted on replacement/removal; metadata/audit may remain. Access follows full-profile privacy (owner, active Office staff, company only through a live authorized referral); photos are optional for profile activation. Preserve all existing profile fields, phone/CV transports, consent text and effects, roles and intermediary policy. Company logos, new legal wording, unrelated page redesign and remote deployment are excluded. Full acceptance checks and user strings: `../../odd/tasks/candidate-profile-rebuild.md`; design/recovery: `../../docs/implementation/candidate-profile-photos.md`. Implementation/review status is tracked separately, not automatically accepted.
 

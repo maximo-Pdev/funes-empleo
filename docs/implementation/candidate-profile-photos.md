@@ -36,6 +36,40 @@ Profile rendering isolates failures from both current-photo and cleanup-state re
 
 ## Deployment and recovery
 
+Hosted rollout, 2026-10-25: Maxi explicitly authorized applying only the photo
+migration. Supabase project `kyjycjojzhwggjuqjnki` (Funes-empleo/main), confirmed
+against Vercel Production's public Supabase URL, now records version
+`202610240001`, name `candidate_photos`, source MD5
+`9d2d6aed8547c10753e98f3f631db0ab` (LF-normalized repository SQL). Schema and ledger
+were committed in one guarded transaction after live prerequisite checks;
+account/profile/audit/Storage object counts were asserted unchanged. No other
+migration, database reset, secret configuration or Vercel deployment was performed.
+Fresh post-commit schema/security readback passed9/9 Boolean checks plus the exact
+ledger identity. An independent reviewer checked the wrapper/source and exported
+results; a second independent SQL execution was not performed because foreground
+approval was withdrawn. Evidence and limits are tracked in
+`odd/tasks/hosted-candidate-photo-migration.md`.
+
+Subsequent configuration, 2026-10-25: Maxi requested `SUPABASE_SECRET_KEY` in
+Vercel and entered/saved the value directly. A fresh dashboard read confirmed the
+variable exists as Secret for Production in `pantherium-8487s-projects/funes-empleo`.
+No secret value was read, copied or included in logs. Vercel explicitly reports
+that a new deployment is required for changes to take effect. Redeployment and
+hosted upload verification remain pending; variable presence does not prove key
+validity or that the existing deployment has received it.
+
+Authorized redeployment, 2026-10-25: after Maxi requested continuation from the
+Redeploy confirmation, the current Production source `main/a3cd69f` (PR75) was
+redeployed using the latest project settings. Vercel reports Ready/Latest,
+Production and the public domain assigned. A fresh public GET returned200 with
+the expected portal title and access content. No local dirty code was published.
+Independent review confirmed Ready/Latest/Production for deployment
+`https://funes-empleo-ox4o30v3j-pantherium-8487s-projects.vercel.app` and public
+Home HTTP200 with the exact title/h1; parent public GET spot-check also passed.
+Authenticated photo upload/readback is not yet verified, so deployment success
+alone is not a completed photo-flow proof. Four collapsed build warnings were
+visible but not investigated; Vercel's terminal status was Ready.
+
 1. Review the additive `202610240001_candidate_photos.sql` migration and pgTAP proof on an isolated disposable database before rollout.
 2. Apply migration **locally first**; production/remote application requires separate authorization for the destination and session. Never use a linked-project push or repair as implicit authorization.
 3. Deploy application only after schema and the existing server-only secret are available. No new public environment variable or external service is introduced.

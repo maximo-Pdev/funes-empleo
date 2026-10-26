@@ -1,5 +1,110 @@
 # Diseño de las páginas de acceso restantes
 
+## Datos conservados entre ingreso y registro — 2026-10-25 (EXTRA-080)
+
+Pedido de Maxi: «si completo mail o contraseña en login que se mantenga si
+selecciono "Registrarse" y lo mismo al revés». El recuadro de acceso lee el
+formulario montado antes de cada cambio de pestaña, de rol o de envío y lo
+restituye como `defaultValue` en el formulario siguiente.
+
+- Correo, contraseña y confirmación son una sola identidad: viajan entre ingreso,
+  postulante y empresa. Los demás campos pertenecen a su formulario, así que
+  volver a la pestaña anterior conserva nombre, DNI, CUIT y demás datos sin
+  mezclar roles.
+- La copia compartida pisa a la copia vieja de cada formulario: lo último escrito
+  es lo que aparece. Vaciar un campo lo vacía en todas las pestañas.
+- Vive solo en memoria del componente y se pierde al recargar. No usa
+  `localStorage`, cookies ni el servidor, y no altera validación, acciones,
+  autenticación ni autorización.
+- Después de una confirmación de registro, el correo registrado queda disponible
+  al volver a cualquiera de las dos pestañas.
+- Solo se monta un formulario a la vez: mantener el otro oculto duplicaba
+  etiquetas y rompía la accesibilidad y las consultas por etiqueta.
+- Verificado con 4 pruebas nuevas de persistencia (`tests/components/accounts/access-form-persistence.test.tsx`)
+  en ambos sentidos, entre roles y conservando los campos propios de cada
+  formulario.
+
+## Reenvío del correo de confirmación — 2026-10-25 (EXTRA-075)
+
+Después de un registro enviado, la tarjeta deja de ser un formulario: muestra un
+estado de confirmación compacto con el título «Revisá tu correo electrónico», la
+respuesta segura, el reenvío con su espera y un acceso para volver a iniciar
+sesión. El selector de tipo de cuenta, el formulario y la nota de campos
+obligatorios se retiran juntos, de modo que la tarjeta se reduce (738 px → 372 px
+medidos a 1440×900) en lugar de empujar el hero más allá de la pantalla. El
+formulario enviado queda montado pero oculto, así que volver a «Registrarse» —o
+pasar por la pestaña de ingreso y regresar— conserva todos los datos ingresados y
+registrarse de nuevo es un solo clic. «Volver a iniciar sesión» cambia la tarjeta
+al ingreso y limpia la URL.
+
+El reenvío usa la acción existente `verificationAction` con su respuesta no
+enumeradora, apunta al correo capturado en el envío del alta —no al campo
+editable— y queda deshabilitado durante 30 segundos con una cuenta regresiva
+visible; al reenviar muestra el mensaje seguro en una región `status` y reinicia
+la espera. Es una guía de interfaz del lado del cliente, no un control de
+seguridad: no agrega acciones, endpoints ni superficies de enumeración, y no
+cambia autenticación, autorización ni datos.
+
+## Avisos de ciclo de cuenta dentro de Home — 2026-10-25 (EXTRA-073)
+
+Los estados de cuenta que antes tenían pantalla propia se muestran ahora en el
+recuadro de acceso de Home. `/account-suspended`, `/recovery-invalid`,
+`/session-expired` y `/verification-pending` se retiran: responden HTTP 404 sin
+redirección ni `Location`, también con parámetros de consulta. Sus consumidores
+—`requireActiveAccount`, `loginAction` y `/auth/callback`— redirigen a un único
+estado validado: `/?acceso=suspendido`, `/?acceso=sesion-vencida` o
+`/?acceso=recuperacion-invalida`.
+
+Solo los valores exactos y únicos seleccionan el aviso; valores ausentes, no
+admitidos o repetidos muestran el ingreso normal. Una sesión verificada activa
+conserva su panel y no muestra avisos. La suspensión muestra el mensaje de
+contacto con la Oficina sin formulario de ingreso, porque el envío no puede
+prosperar; la sesión vencida muestra el aviso sobre el formulario de ingreso; el
+enlace de recuperación inválido muestra el aviso sobre el formulario de
+recuperación y un acceso para volver al ingreso.
+
+`/verification-expired` conserva su URL y su formulario «Reenviar verificación» y
+adopta la superficie de Home: campo verde principal, tarjeta blanca con el mismo
+bisel, tipografía y controles compartidos. La verificación pendiente no necesita
+pantalla: el recuadro de registro ya informa que se enviará un enlace.
+
+El aviso compartido vive en `src/features/accounts/components/access-notice.tsx`
+y reutiliza los tokens existentes, el rojo de error ya establecido y la
+tipografía municipal, sin paleta nueva; el catálogo de estados y sus destinos
+viven en `src/features/accounts/access-notices.ts`. No se modifican
+autenticación, autorización, RLS ni base de datos.
+
+Las secciones siguientes conservan decisiones y resultados históricos, incluida
+la lista de nueve pantallas con armazón propio, que ya no es la arquitectura
+vigente para los estados enumerados arriba.
+
+## Navegación vigente de registro en Home — 2026-10-25 (EXTRA-072)
+
+Home (`/`) reúne ingreso y ambos autorregistros. Las rutas
+`/registro/candidato` y `/registro/empresa` se retiran: deben responder HTTP 404
+sin redirección ni cabecera `Location`, también con parámetros de consulta.
+Los formularios, acciones, validaciones, ayuda de verificación y avisos por rol
+se conservan; no se retira la funcionalidad de registro.
+
+Los accesos de registro dentro de Home, incluidos “Registrarme como postulante”
+y “Registrar empresa” al pie, seleccionan el formulario correspondiente en el
+recuadro existente sin cambiar URL ni abandonar la página. Devuelven el documento
+a `scrollY=0` y enfocan `#acceso` sin que el foco provoque otro desplazamiento.
+La introducción y el selector muestran el mismo rol; repetir clic o activación
+por teclado vuelve a realizar la selección, el retorno y el foco. Respetar
+movimiento reducido, sin desplazamiento suave en ese caso.
+
+Desde otras páginas, nuevos contextos o sin JavaScript, los enlaces canónicos son
+`/?registro=candidato` y `/?registro=empresa`. Solo esos valores exactos y únicos
+seleccionan registro; valores no admitidos, ausentes o repetidos (arrays) muestran
+ingreso. No usar un fragmento como sustituto de la selección de rol.
+
+Las secciones siguientes conservan decisiones y resultados históricos.
+RegistrationLayout, navegación entre páginas y simetría de tarjetas separadas
+no son la arquitectura vigente. El diseño de Home se rige por UI_GUIDELINES.md.
+La verificación funcional actual de EXTRA-072 se registra por separado; los PASS
+anteriores no acreditan este retiro ni su comportamiento de foco/desplazamiento.
+
 La rama `codex/frontend-auth-design` aplica la identidad municipal del login y
 registros a nueve pantallas: recuperación, recuperación inválida, verificación
 pendiente, verificación vencida, sesión vencida, acceso suspendido, actualización
@@ -80,7 +185,7 @@ registros intactos. Móvil360×800, reflow960×540 y escritorio bajo1280×540 co
 accesos/teclado/axe; errores y datos conservados. Captura1920×1080 revisada. Sin
 alta/envío, cambios alojados ni suite privada/NVDA/zoom real repetidos.
 
-## Disposición vigente del login — esquema de Mateo, 2026-10-20
+## Disposición histórica del login — esquema de Mateo, 2026-10-20
 
 EXTRA033/T132 sustituye la disposición anterior de EXTRA031/032: en escritorio,
 la información municipal ocupa toda la columna izquierda; la derecha apila la

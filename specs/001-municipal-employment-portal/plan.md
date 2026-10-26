@@ -1,5 +1,21 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## Authorized public metrics design — EXTRA-079
+
+Use a no-argument SQL `public_portal_counts()` RPC with SECURITY DEFINER and
+empty search_path, fixed schema-qualified sources and exactly three numeric
+keys. Grant only anonymous/authenticated execution; preserve table RLS and
+private-view denial. Candidate/company counts exclude archived timestamps or
+archived status, without freshness, consent, completeness or suspension filters.
+Offer counts reuse `private.public_offer_rows`, preserving catalog eligibility.
+The server-only service uses the ordinary request Supabase client, validates the
+exact response and exposes no privileged client. Home isolates aggregate errors
+from carousel/session loading. Apply only this reviewed additive migration to
+the authorized demo, atomically recording its migration identity; preserve
+existing records when adding the six manifest-identified fictitious offers.
+See [public count contract](contracts/public-portal-counts.md) and
+`odd/tasks/home-public-metrics-demo-offers.md` for scope and observed proof.
+
 **Rama**: `spec/municipal-employment-portal-mvp` | **Fecha**: 2026-09-20 | **Especificación**: [spec.md](./spec.md)
 
 **Entrada**: Especificación integral del MVP en `specs/001-municipal-employment-portal/spec.md`.

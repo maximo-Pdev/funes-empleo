@@ -87,7 +87,9 @@ pruebas realizadas ni aprobación municipal. Registrar también los intentos fal
    con un buzón ajeno al fixture hace que el reset aborte; no borrar esa cuenta
    silenciosamente para recuperar la posibilidad de reset.
 2. El propietario abre la demo con su acceso de Vercel y entra a
-   `/registro/candidato`. Usa nombre/DNI ficticios únicos y el buzón controlado que
+   `/?registro=candidato` en Home (no la ruta retirada `/registro/candidato`).
+   Comprueba que el recuadro y la introducción muestran Postulante. Usa nombre/DNI
+   ficticios únicos y el buzón controlado que
    aportó por canal privado, permitido por el remitente integrado como miembro del
    equipo de Supabase. No registrar contactos reales de postulantes.
 3. El propietario introduce una contraseña exclusiva de prueba y envía el registro

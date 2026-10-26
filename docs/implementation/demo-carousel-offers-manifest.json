@@ -1,0 +1,91 @@
+{
+  "project_ref": "kyjycjojzhwggjuqjnki",
+  "authorization": "EXTRA-079",
+  "admin_actor": "369eb658-cc1e-5647-8925-8080aab7dd1f",
+  "offers": [
+    {
+      "id": "b6c2d9fd-1caa-4ade-9f8f-b109f5463bc3",
+      "company_id": "da04d554-f0a7-505e-95bc-74b8fcb1011f",
+      "company_actor": "5f47ad8a-369f-56fb-9e15-80cb2e350273",
+      "category_id": "9b5d95d7-cb00-41bd-9dca-dfcbbde81e0f",
+      "title": "Auxiliar administrativo (prueba)",
+      "tasks": "OFERTA FICTICIA: no corresponde a una búsqueda laboral real. Organización de archivos y carga de datos ficticios.",
+      "requirements": "Manejo básico de planillas y organización.",
+      "vacancies": 1,
+      "modality": "onsite",
+      "schedule": "Lunes a viernes, 8 a 16 h",
+      "contract_type": "permanent",
+      "days": 30
+    },
+    {
+      "id": "40d890ba-0efb-4b51-99b4-c70b235ad1bd",
+      "company_id": "da04d554-f0a7-505e-95bc-74b8fcb1011f",
+      "company_actor": "5f47ad8a-369f-56fb-9e15-80cb2e350273",
+      "category_id": "b37ac6ba-307a-4787-9bd5-97dabae07cf4",
+      "title": "Atención al cliente (prueba)",
+      "tasks": "OFERTA FICTICIA: no corresponde a una búsqueda laboral real. Atención de consultas simuladas y seguimiento de pedidos ficticios.",
+      "requirements": "Comunicación clara y disposición para aprender.",
+      "vacancies": 2,
+      "modality": "onsite",
+      "schedule": "Lunes a viernes, 9 a 17 h",
+      "contract_type": "fixed_term",
+      "days": 45
+    },
+    {
+      "id": "e6646768-a7b8-49f7-92c8-09a3da316735",
+      "company_id": "da04d554-f0a7-505e-95bc-74b8fcb1011f",
+      "company_actor": "5f47ad8a-369f-56fb-9e15-80cb2e350273",
+      "category_id": "819f36b0-c2f3-4432-ab42-c4d1994b8c19",
+      "title": "Asistente de ventas (prueba)",
+      "tasks": "OFERTA FICTICIA: no corresponde a una búsqueda laboral real. Apoyo comercial y registro de ventas de demostración.",
+      "requirements": "Organización y conocimientos básicos de atención comercial.",
+      "vacancies": 1,
+      "modality": "hybrid",
+      "schedule": "Lunes a viernes, 10 a 18 h",
+      "contract_type": "permanent",
+      "days": 60
+    },
+    {
+      "id": "919ed65d-1a46-4594-b1b1-8fec8f0f55a4",
+      "company_id": "c1ca52fa-119c-5d9e-bacf-53c303ece3d6",
+      "company_actor": "738baaf8-f402-595b-9c49-0db661e589c9",
+      "category_id": "09169869-c750-49a9-98b2-6a8ddefefd05",
+      "title": "Operario de depósito (prueba)",
+      "tasks": "OFERTA FICTICIA: no corresponde a una búsqueda laboral real. Preparación de pedidos y control de inventario ficticio.",
+      "requirements": "Trabajo en equipo y atención al detalle.",
+      "vacancies": 3,
+      "modality": "onsite",
+      "schedule": "Lunes a viernes, 7 a 15 h",
+      "contract_type": "fixed_term",
+      "days": 30
+    },
+    {
+      "id": "810ffdc7-6ee0-4cc2-9863-8174db9b78c3",
+      "company_id": "c1ca52fa-119c-5d9e-bacf-53c303ece3d6",
+      "company_actor": "738baaf8-f402-595b-9c49-0db661e589c9",
+      "category_id": "09169869-c750-49a9-98b2-6a8ddefefd05",
+      "title": "Auxiliar de logística (prueba)",
+      "tasks": "OFERTA FICTICIA: no corresponde a una búsqueda laboral real. Coordinación de entregas y documentación de práctica.",
+      "requirements": "Manejo básico de herramientas digitales y planificación.",
+      "vacancies": 2,
+      "modality": "hybrid",
+      "schedule": "Lunes a viernes, 8 a 16 h",
+      "contract_type": "permanent",
+      "days": 45
+    },
+    {
+      "id": "d500459e-3a53-4887-9788-e4049953cd11",
+      "company_id": "c1ca52fa-119c-5d9e-bacf-53c303ece3d6",
+      "company_actor": "738baaf8-f402-595b-9c49-0db661e589c9",
+      "category_id": "a28df241-79e3-419c-a6b6-54b88c8a59ec",
+      "title": "Soporte informático (prueba)",
+      "tasks": "OFERTA FICTICIA: no corresponde a una búsqueda laboral real. Resolución de consultas técnicas simuladas y documentación de prueba.",
+      "requirements": "Conocimientos básicos de sistemas operativos y redes.",
+      "vacancies": 1,
+      "modality": "remote",
+      "schedule": "Lunes a viernes, 9 a 17 h",
+      "contract_type": "fixed_term",
+      "days": 60
+    }
+  ]
+}
