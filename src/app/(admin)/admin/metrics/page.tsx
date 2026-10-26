@@ -27,7 +27,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
   }
   const categoryReferences = await recordReferences("category", categories.map(category => category.id));
   return <AdminShell email={user?.email} active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
-    navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Seguimiento" }, { href: "/account", label: "Mi cuenta" }]}>
+    navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Seguimiento" }, { href: "/account", label: "Cuenta" }]}>
     <Form method="get" requirements={[{ names: ["from", "to"], rule: "date-order", message: "La fecha Hasta debe ser igual o posterior a Desde." }]} className="mb-6 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
       <Field>Desde<input className="mt-1 block rounded border p-2" name="from" type="date" required max={today} defaultValue={typeof raw.from === "string" ? raw.from : `${today.slice(0, 7)}-01`} /></Field>
       <Field>Hasta<input className="mt-1 block rounded border p-2" name="to" type="date" required max={today} defaultValue={typeof raw.to === "string" ? raw.to : today} /></Field>

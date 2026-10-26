@@ -8,7 +8,7 @@ import { getAccountAccess, getSiteAccess } from "@/features/accounts/navigation"
 beforeEach(() => vi.clearAllMocks());
 
 it.each([
-  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
+  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Cuenta"],
 ])("limita la proyección de %s a enlace y etiqueta sin PII", async (role, href, label) => {
   mocks.readSession.mockResolvedValue({ account: { role, status: "active", id: "private-id" }, user: { email: "private@example.invalid", user_metadata: { role: "admin" } } });
   expect(await getAccountAccess()).toEqual({ href, label });
@@ -40,7 +40,7 @@ it.each([
 ] as const)("expone el panel de %s solo con sesión activa", async (role, accountHref, panelHref, panelLabel) => {
   mocks.readSession.mockResolvedValue({ account: { role, status: "active", id: "private-id" } });
   expect(await getSiteAccess()).toEqual({
-    account: { href: accountHref, label: role === "admin" ? "Mi cuenta" : "Mi perfil" },
+    account: { href: accountHref, label: role === "admin" ? "Cuenta" : "Mi perfil" },
     panel: { href: panelHref, label: panelLabel },
   });
 });

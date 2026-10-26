@@ -25,7 +25,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
   })}`;
 
   return <AdminShell email={user?.email} active="/admin/openings" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
-    navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Mi cuenta" }]}>
+    navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Cuenta" }]}>
     <Form method="get" className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-300 bg-white p-5">
       <div className="space-y-1"><Field className="block font-semibold" label={<>Estado de la oferta</>}><select id="opening-status" name="status" defaultValue={status?.success ? status.data : ""} className="min-h-11 rounded-md border border-slate-500 px-3">
           <option value="">Todos</option>

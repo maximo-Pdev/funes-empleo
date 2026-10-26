@@ -38,7 +38,7 @@ beforeEach(() => {
 });
 
 it.each([
-  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Mi cuenta"],
+  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Cuenta"],
 ])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label) => {
   readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });

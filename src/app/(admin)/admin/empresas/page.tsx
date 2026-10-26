@@ -20,7 +20,7 @@ export default async function AdminCompaniesPage({ searchParams }: { searchParam
   if (status?.success) query = query.eq("status", status.data);
   const result = invalid ? null : await query.range((page - 1) * 10, page * 10 - 1);
   const pageUrl = (target: number) => `/admin/empresas?${new URLSearchParams({page:String(target), ...(status?.success ? {status:status.data} : {})})}`;
-  return <AdminShell email={user?.email} active="/admin/empresas" title="Empresas" navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }, { href: "/account", label: "Mi cuenta" }]}>
+  return <AdminShell email={user?.email} active="/admin/empresas" title="Empresas" navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }, { href: "/account", label: "Cuenta" }]}>
     <Form method="get" className="mb-5 flex flex-wrap items-end gap-3 rounded border bg-white p-4">
       <Field>Estado de la empresa<select name="status" defaultValue={status?.success ? status.data : ""} className="block min-h-11 rounded border p-2">
         <option value="">Todos</option>{COMPANY_PROFILE_STATUSES.map(value=><option key={value} value={value}>{companyProfileStatusLabels[value]}</option>)}

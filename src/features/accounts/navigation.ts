@@ -5,7 +5,7 @@ import type { UserRole } from "@/domain/catalogs";
 const accountAccess: Record<UserRole, { href: string; label: string }> = {
   candidate: { href: "/dashboard?section=perfil", label: "Mi perfil" },
   company: { href: "/empresa/perfil", label: "Mi perfil" },
-  admin: { href: "/account", label: "Mi cuenta" },
+  admin: { href: "/account", label: "Cuenta" },
 };
 const panelAccess: Record<UserRole, string> = {
   candidate: "/dashboard",
