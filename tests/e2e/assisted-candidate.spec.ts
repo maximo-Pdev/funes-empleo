@@ -10,17 +10,17 @@ test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => {
   assertLocalTargets();
 });
-async function signIn(page: Page, email = "admin1@example.invalid") {
+async function signIn(page: Page, email: string, role: "admin" | "company") {
   const password = localFixturePassword();
   await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL({ company: /\/empresa$/, admin: /\/account$/ }[role]);
 }
 async function fillProfile(page: Page, name: string, dni: string) {
   await page.goto("/admin/candidates/assisted");
-  await expect(page.getByRole("heading", { name: "Perfil asistido" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Perfil asistido", exact: true })).toBeVisible();
   await page.getByLabel("Nombre y apellido").fill(name);
   await page.getByLabel("DNI", { exact: true }).fill(dni);
   await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
@@ -35,7 +35,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   const suffix = Date.now().toString().slice(-5);
   const name = `Persona asistida E2E ${suffix}`;
   const dni = `98${suffix}1`;
-  await signIn(page);
+  await signIn(page, "admin1@example.invalid", "admin");
   await fillProfile(page, name, dni);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
@@ -49,9 +49,10 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await page.getByLabel("Localidad laboral").fill("Funes");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
   await page.getByLabel("Categorías laborales").click();
-  await page.getByRole("option", { name: "Categoría ficticia A" }).click();
+  await expect(page.getByRole("option", { name: "Categoría ficticia A", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("group", { name: "Intereses laborales" })).toHaveCount(0);
-  await page.getByRole("option", { name: "Categoría ficticia B" }).click();
+  await page.getByRole("option", { name: "Categoría ficticia B", exact: true }).click();
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Guardar perfil asistido" }).click();
   await expect(page.getByText("Perfil guardado.", { exact: true })).toBeVisible();
   await page.reload();
@@ -103,7 +104,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   const companyContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
     const company = await companyContext.newPage();
-    await signIn(company, "company1@example.invalid");
+    await signIn(company, "company1@example.invalid", "company");
     await company.goto(`/empresa/ofertas/${opening}#derivaciones`);
     await expect(company.getByText(name, { exact: true })).toBeVisible();
     const referredProfile = company.locator("#derivaciones");
@@ -158,7 +159,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     const after = runLocalMaintenanceSql(`select jsonb_build_object('origin',origin,'status',status,'consents',(select count(*) from public.candidate_consents where candidate_id='${id}'),'cases',(select count(*) from public.participations where candidate_id='${id}'),'notes',(select count(*) from public.internal_notes where candidate_id='${id}')) from public.candidate_profiles where id='${id}'`);
     expect(after).toBe(before);
     await page.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }).getByRole("link", { name: "Perfil asistido", exact: true }).click();
-    await page.getByLabel("Búsqueda por palabra").fill(name);
+    await page.getByLabel("Búsqueda por palabra", { exact: true }).fill(name);
     await page.getByRole("button", { name: "Buscar candidatos" }).click();
     const assistedResults = page.getByRole("region", { name: "Perfiles de atención presencial" });
     await expect(assistedResults.getByRole("heading", { name: "Perfiles: 1", exact: true })).toBeVisible();
@@ -176,7 +177,7 @@ test("duplicados exige las tres decisiones, campos confirmados y corrección ant
   const suffix = Date.now().toString().slice(-5);
   const dni = `97${suffix}1`;
   const name = `Duplicado ficticio ${suffix}`;
-  await signIn(page);
+  await signIn(page, "admin1@example.invalid", "admin");
   await fillProfile(page, name, dni);
   await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
   await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);

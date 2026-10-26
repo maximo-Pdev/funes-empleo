@@ -20,13 +20,13 @@ function fixtureId(kind: string, number: number) {
   return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20)}`;
 }
 
-async function signIn(page: import("@playwright/test").Page, email: string) {
+async function signIn(page: import("@playwright/test").Page, email: string, role: "candidate" | "admin" | "company") {
   const password = localFixturePassword();
   await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
 }
 
 // The business-flow suite uses exclusively the reset local fictitious dataset.
@@ -41,13 +41,13 @@ test("una sesión anónima no consulta el padrón administrativo", async ({ page
 });
 
 test("administración filtra el padrón ficticio con conteo y paginación seguros", async ({ page }) => {
-  await signIn(page, "admin1@example.invalid");
+  await signIn(page, "admin1@example.invalid", "admin");
   await page.goto("/admin/candidates");
   await expect(page.getByRole("heading", { name: "Buscar candidatos" })).toBeVisible();
-  await page.getByLabel("Búsqueda por palabra").fill(fixture.sc008a.candidateSearch.term);
-  await page.getByLabel("Categorías").click();
+  await page.getByLabel("Búsqueda por palabra", { exact: true }).fill(fixture.sc008a.candidateSearch.term);
+  await page.getByLabel("Categorías", { exact: true }).click();
   await page.getByRole("option", { name: "Categoría ficticia B" }).click();
-  await page.getByLabel("Disponibilidad").selectOption(fixture.sc008a.candidateSearch.availability);
+  await page.getByLabel("Disponibilidad", { exact: true }).selectOption(fixture.sc008a.candidateSearch.availability);
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page.getByRole("heading", { name: `Resultados: ${fixture.sc008a.candidateSearch.expectedTotal}` })).toBeVisible();
   await expect(page.getByRole("link", { name: fixture.sc008a.candidateSearch.term })).toBeVisible();
@@ -55,7 +55,7 @@ test("administración filtra el padrón ficticio con conteo y paginación seguro
 });
 
 test("solo la Oficina consulta ofertas pendientes de seguimiento y su historial", async ({ page }) => {
-  await signIn(page, "admin1@example.invalid");
+  await signIn(page, "admin1@example.invalid", "admin");
   await page.goto("/admin/openings?status=published");
   await expect(page.getByRole("heading", { name: `Ofertas: ${fixture.sc008a.openingList.expectedTotal}` })).toBeVisible();
   await expect(page.getByRole("link", { name: "Oferta ficticia 001" })).toBeVisible();
@@ -65,7 +65,7 @@ test("solo la Oficina consulta ofertas pendientes de seguimiento y su historial"
 });
 
 test("la Oficina ve estado vigente y trazas sin borrar el cierre anterior", async ({ page }) => {
-  await signIn(page, "admin1@example.invalid");
+  await signIn(page, "admin1@example.invalid", "admin");
   await page.goto(`/admin/participations/${fixtureId("participation", 1)}`);
   await expect(page.getByRole("heading", { name: "Seguimiento de participación" })).toBeVisible();
   await expect(page.getByRole("status")).toContainText("Persona contratada");
@@ -74,7 +74,7 @@ test("la Oficina ve estado vigente y trazas sin borrar el cierre anterior", asyn
 });
 
 test("una empresa no puede abrir el padrón ni las participaciones administrativas", async ({ page }) => {
-  await signIn(page, "company1@example.invalid");
+  await signIn(page, "company1@example.invalid", "company");
   await page.goto("/admin/candidates");
   await expect(page).toHaveURL(/\/account$/);
   await page.goto(`/admin/participations/${fixtureId("participation", 1)}`);
@@ -92,10 +92,10 @@ test("CV privado: solo permisos vigentes permiten descargar y la última revocac
     const company = await companyContext.newPage();
     const otherCompany = await otherCompanyContext.newPage();
     const admin = await adminContext.newPage();
-    await signIn(candidate, "candidate5@example.invalid");
-    await signIn(company, "company1@example.invalid");
-    await signIn(otherCompany, "company2@example.invalid");
-    await signIn(admin, "admin1@example.invalid");
+    await signIn(candidate, "candidate5@example.invalid", "candidate");
+    await signIn(company, "company1@example.invalid", "company");
+    await signIn(otherCompany, "company2@example.invalid", "company");
+    await signIn(admin, "admin1@example.invalid", "admin");
 
     const cvUrl = `/api/cv/${persistedReference("cv", fixtureId("cv", 5))}`;
     for (const authorized of [candidate, company]) {
@@ -154,8 +154,8 @@ test("la empresa informa una contratación y solo la Oficina confirma el resulta
   try {
     const company = await companyContext.newPage();
     const admin = await adminContext.newPage();
-    await signIn(company, "company1@example.invalid");
-    await signIn(admin, "admin1@example.invalid");
+    await signIn(company, "company1@example.invalid", "company");
+    await signIn(admin, "admin1@example.invalid", "admin");
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 1)}?referral=${fixtureId("referral", 6)}#derivaciones`);
     await company.getByLabel("Resultado informado").selectOption("hired");
     await company.getByRole("button", { name: "Enviar informe" }).click();
@@ -180,8 +180,8 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
   try {
     const company = await companyContext.newPage();
     const admin = await adminContext.newPage();
-    await signIn(company, "company1@example.invalid");
-    await signIn(admin, "admin1@example.invalid");
+    await signIn(company, "company1@example.invalid", "company");
+    await signIn(admin, "admin1@example.invalid", "admin");
     const opening = fixtureId("opening", 1);
     await company.goto(`/empresa/ofertas/${opening}?referral=${fixtureId("referral", 9)}#derivaciones`);
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 009", exact: true })).toBeVisible();
@@ -219,7 +219,7 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
 });
 
 test("la Oficina registra contacto y nota interna sin mostrarlos a la empresa", async ({ page, browser }) => {
-  await signIn(page, "admin1@example.invalid");
+  await signIn(page, "admin1@example.invalid", "admin");
   await page.goto(`/admin/participations/${fixtureId("participation", 7)}`);
   await page.getByLabel("Canal", { exact: true }).selectOption("phone");
   await page.getByLabel("Dirección").selectOption("inbound");
@@ -237,7 +237,7 @@ test("la Oficina registra contacto y nota interna sin mostrarlos a la empresa", 
   const companyContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
     const company = await companyContext.newPage();
-    await signIn(company, "company1@example.invalid");
+    await signIn(company, "company1@example.invalid", "company");
     await company.goto(`/empresa/ofertas/${fixtureId("opening", 1)}?referral=${fixtureId("referral", 7)}#derivaciones`);
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado" })).toBeVisible();
     await expect(company.locator("body")).not.toContainText("Contacto municipal ficticio sobre seguimiento.");
@@ -252,8 +252,8 @@ test("suspender y reactivar una cuenta candidata no restaura el acceso empresari
   try {
     const admin = await adminContext.newPage();
     const company = await companyContext.newPage();
-    await signIn(admin, "admin1@example.invalid");
-    await signIn(company, "company1@example.invalid");
+    await signIn(admin, "admin1@example.invalid", "admin");
+    await signIn(company, "company1@example.invalid", "company");
     const cvUrl = `/api/cv/${persistedReference("cv", fixtureId("cv", 8))}`;
     expect((await company.context().request.get(cvUrl)).status()).toBe(200);
 
@@ -283,9 +283,9 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     const admin = await adminContext.newPage();
     const candidate = await candidateContext.newPage();
     const company = await companyContext.newPage();
-    await signIn(admin, "admin1@example.invalid");
-    await signIn(candidate, "candidate1@example.invalid");
-    await signIn(company, "company2@example.invalid");
+    await signIn(admin, "admin1@example.invalid", "admin");
+    await signIn(candidate, "candidate1@example.invalid", "candidate");
+    await signIn(company, "company2@example.invalid", "company");
 
     await candidate.goto("/account?section=perfil");
     await candidate.getByLabel("Categoría ficticia A", { exact: true }).check();
@@ -388,8 +388,8 @@ test("cambiar CV y contactos conserva la instantánea derivada", async ({ browse
   try {
     const candidate = await candidateContext.newPage();
     const company = await companyContext.newPage();
-    await signIn(candidate, "candidate15@example.invalid");
-    await signIn(company, "company2@example.invalid");
+    await signIn(candidate, "candidate15@example.invalid", "candidate");
+    await signIn(company, "company2@example.invalid", "company");
     const referralPage = `/empresa/ofertas/${fixtureId("opening", 2)}?referral=${fixtureId("referral", 15)}#derivaciones`;
     await company.goto(referralPage);
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 015", exact: true })).toBeVisible();
@@ -427,10 +427,10 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     const hiredCompany = await hiredCompanyContext.newPage();
     const admin = await adminContext.newPage();
     const offerCompany = await offerCompanyContext.newPage();
-    await signIn(company, "company1@example.invalid");
-    await signIn(hiredCompany, "company3@example.invalid");
-    await signIn(admin, "admin1@example.invalid");
-    await signIn(offerCompany, "company30@example.invalid");
+    await signIn(company, "company1@example.invalid", "company");
+    await signIn(hiredCompany, "company3@example.invalid", "company");
+    await signIn(admin, "admin1@example.invalid", "admin");
+    await signIn(offerCompany, "company30@example.invalid", "company");
     const opening = fixtureId("opening", 80);
     const overdueParticipation = fixtureId("e2e-overdue-participation", 1);
     const overdueReferral = fixtureId("e2e-overdue-referral", 1);
@@ -549,8 +549,8 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
   try {
     const company = await companyContext.newPage();
     const admin = await adminContext.newPage();
-    await signIn(company, "company1@example.invalid");
-    await signIn(admin, "admin1@example.invalid");
+    await signIn(company, "company1@example.invalid", "company");
+    await signIn(admin, "admin1@example.invalid", "admin");
     async function submittedOffer(title: string) {
       await company.goto("/empresa/ofertas/nueva");
       await company.getByLabel("Título").fill(title);

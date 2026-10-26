@@ -11,7 +11,7 @@ test.beforeEach(() => {
   assertLocalTargets();
 });
 
-async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
+async function signIn(page: import("@playwright/test").Page, email: string, password: string, role: "candidate" | "admin") {
   assertLocalTargets();
   // The login form lives on the home page and is replaced by a session notice while a session is active
   // (here the candidate is re-entered after a suspension or an archive). Drop the stale session first.
@@ -21,7 +21,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, admin: /\/account$/ }[role]);
 }
 
 test("registro, dos postulaciones independientes, retiro, suspensión y archivo restaurable", async ({ page, browser, request }) => {
@@ -80,8 +80,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByLabel("Categoría ficticia A")).toBeChecked();
   await expect(page.getByLabel("Categoría ficticia B")).toBeChecked();
   await expect(page.getByText(/tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas/)).toBeVisible();
-  await page.getByLabel("Acción").selectOption("accepted");
-  await page.getByLabel("Confirmo esta decisión").check();
+  await page.getByLabel("Confirmo esta decisión y entiendo sus efectos.", { exact: true }).check();
   await page.getByRole("button", { name: "Guardar consentimiento" }).click();
   await expect(page.getByText("Consentimiento registrado.", { exact: false })).toBeVisible();
   await page.reload();
@@ -222,10 +221,10 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
     const admin = await adminContext.newPage();
-    await signIn(admin, "admin1@example.invalid", localFixturePassword());
+    await signIn(admin, "admin1@example.invalid", localFixturePassword(), "admin");
     await admin.goto("/admin/candidates");
-    await admin.getByLabel("Búsqueda por palabra").fill(name);
-    await admin.getByLabel("Aptitud para derivación").selectOption("all");
+    await admin.getByLabel("Búsqueda por palabra", { exact: true }).fill(name);
+    await admin.getByLabel("Aptitud para derivación", { exact: true }).selectOption("all");
     await admin.getByRole("button", { name: "Buscar candidatos" }).click();
     await admin.getByRole("link", { name }).click();
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Suspensión ficticia E2E");
@@ -238,7 +237,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
     await expect(admin.getByText("Activa", { exact: true })).toBeVisible();
-    await signIn(page, email, password);
+    await signIn(page, email, password, "candidate");
     await page.goto("/dashboard?section=perfil");
     await expect(page.locator("[data-profile-status]")).toContainText("No disponible");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
@@ -263,7 +262,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByLabel("Confirmo la restauración").check();
     await admin.getByRole("button", { name: "Restaurar a borrador" }).click();
     await expect(admin.getByText("Borrador", { exact: true })).toBeVisible();
-    await signIn(page, email, password);
+    await signIn(page, email, password, "candidate");
     await page.goto("/dashboard?section=perfil");
     await expect(page.getByText("Borrador", { exact: true })).toBeVisible();
     await page.goto("/dashboard?section=postulaciones");

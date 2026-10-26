@@ -7,12 +7,12 @@ import { runLocalMaintenanceSql } from "./local-maintenance";
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => assertLocalTargets());
 
-async function signIn(page: Page, identity: string) {
+async function signIn(page: Page, identity: string, role: "admin" | "company") {
   await page.goto("/");
   await page.getByLabel("Correo electrónico").fill(`${identity}@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL({ company: /\/empresa$/, admin: /\/account$/ }[role]);
 }
 
 for (const late of [false, true]) {
@@ -58,7 +58,7 @@ for (const late of [false, true]) {
     try {
       const admin = await adminContext.newPage();
       const company = await companyContext.newPage();
-      await signIn(admin, "admin1"); await signIn(company, "company2");
+      await signIn(admin, "admin1", "admin"); await signIn(company, "company2", "company");
       await company.goto(`/empresa/ofertas/${otherOpeningId}#derivaciones`);
       await expect(company.getByText(name, { exact: true })).toBeVisible();
       await admin.goto(`/admin/participations/${participationId}`);
@@ -103,7 +103,7 @@ for (const late of [false, true]) {
       await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
       expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
       await companyContext.clearCookies();
-      await signIn(company, "company1");
+      await signIn(company, "company1", "company");
       await company.goto(`/empresa/ofertas/${openingId}#derivaciones`);
       // El detalle canoniza la referencia privada; el fragmento no sobrevive al redirect de servidor.
       await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
