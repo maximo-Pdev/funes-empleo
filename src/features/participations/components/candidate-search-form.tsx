@@ -2,7 +2,7 @@
 import { Form } from "@/components/forms/form";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition, type FormEvent } from "react";
+import { useRef, useState, useTransition, type FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { Button, Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxTrigger, SelectField, TextField } from "@/components/ui";
 import { LocalityCombobox } from "@/features/companies/components/locality-combobox";
@@ -24,6 +24,7 @@ export function CandidateSearchForm({ categories, initial, onSearch, destination
   const [availability, setAvailability] = useState(initial?.availability ?? "");
   const [locality, setLocality] = useState(initial?.locality ?? "");
   const [eligibility, setEligibility] = useState<SearchValues["eligibility"]>(initial?.eligibility ?? "eligible");
+  const categoryActions = useRef<{ unmount: () => void; close: () => void } | null>(null);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,15 +47,16 @@ export function CandidateSearchForm({ categories, initial, onSearch, destination
     <TextField id="candidate-term" label="Búsqueda por palabra" help="Busca una palabra en el nombre, el resumen de habilidades y la localidad del perfil del candidato." value={term} onChange={(event) => setTerm(event.target.value)} maxLength={100} />
     <div className="grid gap-1">
       <span className="text-sm font-semibold inline-flex items-center gap-1">Categorías<FieldHelp label="Categorías" description="Elegí una o varias categorías laborales. El candidato debe tener al menos una de las seleccionadas." /></span>
-      <Combobox multiple value={categoryIds} onValueChange={setCategoryIds}>
+      <Combobox multiple value={categoryIds} actionsRef={categoryActions}
+        onValueChange={next => { setCategoryIds(next); categoryActions.current?.close(); }}>
         <ComboboxTrigger aria-label="Categorías">
           <span className={categoryIds.length ? "" : "text-muted-foreground"}>
             {categoryIds.length ? `${categoryIds.length} seleccionadas` : "Todas las categorías"}
           </span>
         </ComboboxTrigger>
-        <ComboboxContent>
+        <ComboboxContent aria-label="Elegir categorías">
           <ComboboxInput placeholder="Buscar categoría…" aria-label="Buscar categoría" />
-          <ComboboxList>
+          <ComboboxList aria-label="Categorías: opciones">
             {categories.map(category => <ComboboxItem key={category.id} value={category.id}>{category.name}</ComboboxItem>)}
           </ComboboxList>
           <ComboboxEmpty>Sin resultados</ComboboxEmpty>

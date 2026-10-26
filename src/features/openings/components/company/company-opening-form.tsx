@@ -28,7 +28,7 @@ function OpeningComboboxField({ name, label, initial, options, required = false 
           <span className={value ? "" : "text-muted-foreground"}>{selected?.label ?? "Seleccionar…"}</span>
         </ComboboxTrigger>
         <ComboboxContent>
-          <ComboboxList>
+          <ComboboxList aria-label={`${label}: opciones`}>
             {options.map(option => <ComboboxItem key={option.value} value={option.value}>{option.label}</ComboboxItem>)}
           </ComboboxList>
         </ComboboxContent>

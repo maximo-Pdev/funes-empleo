@@ -27,9 +27,9 @@ export function CategoryMultiSelect({ categories, name = "categories", defaultSe
             {selected.length ? `${selected.length} seleccionadas` : "Seleccionar categorías"}
           </span>
         </ComboboxTrigger>
-        <ComboboxContent>
+        <ComboboxContent aria-label="Elegir categorías laborales">
           <ComboboxInput placeholder="Buscar categoría…" aria-label="Buscar categoría" />
-          <ComboboxList>
+          <ComboboxList aria-label="Categorías laborales: opciones">
             {categories.map(category => <ComboboxItem key={category.id} value={category.id}>{category.name}</ComboboxItem>)}
           </ComboboxList>
           <ComboboxEmpty>Sin resultados</ComboboxEmpty>

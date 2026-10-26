@@ -47,7 +47,7 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
     await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
     if (number === 1) firstReference = new URL(page.url()).pathname.split("/").pop()!;
-    await page.getByRole("link", { name: "Volver a atención presencial", exact: true }).click();
+    await page.getByRole("link", { name: "Volver a perfil asistido", exact: true }).click();
   }
   await page.goto(`/admin/atencion-presencial?term=${encodeURIComponent(name)}&pageSize=1`);
   const results = page.getByRole("region", { name: "Perfiles de atención presencial" });
