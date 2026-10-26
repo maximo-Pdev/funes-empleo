@@ -8,6 +8,8 @@ export function FieldHelp({ description, label }: { description: string; label: 
     <span className="ml-1 inline-flex align-middle">
       <HoverCard>
         <HoverCardTrigger
+          role="button"
+          tabIndex={0}
           aria-label={`Ayuda sobre ${label}`}
           className="inline-flex size-4 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
