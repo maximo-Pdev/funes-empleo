@@ -126,7 +126,7 @@ it.each([false, true])("renderiza detalle y campos opcionales solo si existen (%
   getPublicOffer.mockResolvedValue({ ...offer, salary: optional ? "Salario ficticio" : null, benefits: optional ? "Beneficio ficticio" : null });
   const { container } = render(await detailPage());
   expect(screen.getByText("Presencial")).toBeTruthy();
-  expect(screen.getByText("Plazo fijo")).toBeTruthy();
+  expect(screen.getByText("A plazo fijo")).toBeTruthy();
   const dates = container.querySelectorAll("time");
   expect(dates).toHaveLength(2);
   for (const date of dates) {

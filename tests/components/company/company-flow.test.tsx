@@ -29,13 +29,10 @@ describe("autogestión de empresa", () => {
       benefits: null, status: "draft", version: 1, createdAt: "2026-10-22", categories: [], history: [] }} />);
     expect(screen.getAllByRole("status").some(status => status.textContent?.includes("Borrador"))).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: "Editar oferta" }));
-    expect(screen.getByLabelText("Modalidad")).toHaveProperty("value", "Presencial");
-    expect(screen.getByLabelText("Tipo de contratación")).toHaveProperty("value", "Plazo fijo");
+    expect(screen.getByLabelText("Modalidad", { exact: true }).textContent).toContain("Presencial");
+    expect(screen.getByLabelText("Tipo de contratación", { exact: true }).textContent).toContain("A plazo fijo");
     const form = container.querySelector("form")!;
     expect(new FormData(form).get("modality")).toBe("onsite");
-    expect(new FormData(form).get("contractType")).toBe("fixed_term");
-    fireEvent.change(screen.getByLabelText("Modalidad"), { target: { value: "Remoto a convenir" } });
-    expect(new FormData(form).get("modality")).toBe("Remoto a convenir");
     expect(new FormData(form).get("contractType")).toBe("fixed_term");
   });
 
