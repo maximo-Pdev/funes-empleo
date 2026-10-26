@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-// Non-collapsible composition adapted from shadcn/ui's Base Nova sidebar.
+// Composition adapted from shadcn/ui's Base Nova sidebar.
 // Reference: https://ui.shadcn.com/docs/components/base/sidebar
 // Kept local to reuse the portal's tokens without replacing existing primitives.
 export function Sidebar({ className, ...props }: ComponentProps<"aside">) {

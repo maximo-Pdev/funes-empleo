@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { LogOut, UserRound, type LucideIcon } from "lucide-react";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+import { DashboardSidebar } from "@/components/ui/dashboard-sidebar";
 import { Form } from "@/components/forms/form";
 import { logoutAction } from "@/features/accounts/actions";
 import { HomeNavbar } from "@/app/(public)/home-navbar";
@@ -25,8 +26,7 @@ export function DashboardShell({ panel, links, name, email, mainLabel, navigatio
   return <div className={styles.page}>
     <HomeNavbar alwaysVisible panel={panel} />
     <div className={styles.workspace}>
-      <Sidebar aria-label={panel.label} className={styles.sidebar}>
-        <SidebarContent>
+      <DashboardSidebar label={panel.label} navigation={
           <nav aria-label={navigationLabel} className={styles.navigation}>
             <SidebarMenu className={styles.menu}>
               {links.map(({ href, label, icon: Icon, current }) => <SidebarMenuItem key={href}>
@@ -36,17 +36,16 @@ export function DashboardShell({ panel, links, name, email, mainLabel, navigatio
               </SidebarMenuItem>)}
             </SidebarMenu>
           </nav>
-        </SidebarContent>
-        <SidebarFooter className={styles.footer}>
+      } logout={
           <Form action={logoutAction} className={styles.logoutForm}>
             <button type="submit" className={styles.logout}><LogOut className="h-4 w-4" aria-hidden="true" />Cerrar sesión</button>
           </Form>
+      } identity={
           <div className={styles.identity}>
             <span role="img" aria-label="Foto de perfil de ejemplo" className={styles.avatar}><UserRound className="h-6 w-6" aria-hidden="true" /></span>
             <div className={styles.identityText}><p className={styles.name}>{name}</p><SidebarEmail email={email || "Correo no disponible"} /></div>
           </div>
-        </SidebarFooter>
-      </Sidebar>
+      } />
       <main id="contenido" tabIndex={-1} aria-label={mainLabel} className={`${styles.main} ${styles.candidateWorkspace}`}>
         <div className={styles.candidateCanvas} data-slot={canvasSlot}>{children}</div>
       </main>
