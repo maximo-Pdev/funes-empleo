@@ -1464,3 +1464,9 @@ no se repite el recorrido con base porque solo cambia la etiqueta del control.
 Build inicial falló en worker CSS y cacheó el error; limpieza de .next únicamente
 en snapshot resolvió. Sin migración adicional ni cambios de negocio/permisos.
 Publicación/revisión humana pendientes; next-env.d.ts preexistente intacto.
+
+Publicación solicitada por Mateo: commit00f06cc sin firma/signoff/coautoría y
+[PR77](https://github.com/maximo-Pdev/funes-empleo/pull/77) abierto hacia main,
+sin borrador, desde feat/admin-opening-workspace; adjunto a la conversación.
+Incluye EXTRA073/T208–212 y migración alojada ya aplicada. next-env.d.ts y todos
+los respaldos ignorados quedan fuera. CI/revisión/merge/despliegue pendientes.

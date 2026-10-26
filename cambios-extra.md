@@ -4481,3 +4481,8 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   publicar solo este incremento y su evidencia, excluyendo next-env.d.ts y
   test-results/secretos. Commit sin firma, signoff ni coautoría; PR hacia main.
   No acredita revisión humana, merge, despliegue de interfaz ni CI completo.
+- **Entrega publicada:** commit00f06cc sin firma/signoff/coautoría en
+  feat/admin-opening-workspace y [PR77](https://github.com/maximo-Pdev/funes-empleo/pull/77)
+  abierto hacia main, sin borrador, adjunto a la conversación. Incluye migración
+  ya aplicada y ampliación del historial. next-env.d.ts y respaldos ignorados
+  excluidos; CI/revisión/merge/despliegue de interfaz pendientes.
