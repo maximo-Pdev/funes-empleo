@@ -61,19 +61,21 @@ Rama base: `main` (ya contiene el rescate del árbol sucio + los 25 fixes e2e). 
 
 | ID | Specs | Ruta | Estado |
 |---|---|---|---|
-| T1 | S1 | inline | pendiente |
-| T2 | S2 S11 S29 | inline | pendiente |
-| T3 | S3 S4 S12 | inline | pendiente |
-| T4 | S5 S28 | inline | pendiente |
-| T5 | S6 S7 S8 S9 | inline | pendiente |
-| T6 | S10 S18 S23 S24 | inline | pendiente |
-| T7 | S13 S17 | inline | pendiente |
-| T8 | S19 S20 S21 S22 | inline | pendiente |
-| T9 | S25 S26 S27 | inline | pendiente |
-| T10 | S30 S31 | inline | pendiente |
+| T1 | S1 | inline | ✅ `d90bfa1` |
+| T2 | S2 S11 S29 | inline | ✅ `d90bfa1` + `5af46af` (S2 ya tenía navigation en admin-shell) |
+| T3 | S3 S4 S12 | inline | parcial: S4 ✅ (ya validaba); S3 S12 pendiente |
+| T4 | S5 S28 | inline | ✅ `d90bfa1` |
+| T5 | S6 S7 S8 S9 | inline | parcial: S6 S8 S9 ✅; S7 pendiente |
+| T6 | S10 S18 S23 S24 | inline | parcial: S10 ✅ `7890794`, S18 ✅ `d90bfa1`; S23 S24 pendiente |
+| T7 | S13 S17 | inline | parcial: S17 ✅ `d90bfa1`; S13 pendiente |
+| T8 | S19 S20 S21 S22 | inline | pendiente (requiere shadcn combobox/hover-card/data-table) |
+| T9 | S25 S26 S27 | inline | pendiente (requiere shadcn combobox/data-table) |
+| T10 | S30 S31 | inline | pendiente (requiere shadcn combobox/hover-card) |
 | T11 | S14 S15 S16 | inline | pendiente |
 
 ## Log
 
 - **L1 (pedido, verbatim):** «Tengo un amplio listado de cambios para que hagas» + adjunto `Cosas a implementar.txt` (1298 tokens, transcrito en los Specs de arriba sin resumir los fragmentos pedidos).
 - **L2 (decisión):** «Pushear a origin/main ahora (dispara deploy a producción Vercel) y arrancar el listado nuevo». Rescate + fix + merge de PR #77 + push a `main` completados; `main` en `809aac5`.
+- **L3 (progreso, tanda 1):** `d90bfa1` (S1 ofertas header, S5 panel por rol, S6 cursor, S8 sin "MVP", S11 "Perfil asistido"/"Cuenta", S17 favicon, S18 quitar "Continuar en el portal", S28 quitar "Nueva atención presencial", S29 "Mi cuenta"→"Cuenta"). S4 verificado ya resuelto en `validation/common.ts` (normaliza separadores).
+- **L4 (progreso, tanda 2):** `7890794` (S10 retiro completo de Importaciones: rutas `(admin)/admin/imports`, `api/admin/imports`, `features/imports`, `validation/candidate-import`, tests + refs de nav/reference-url). `5af46af` (S11/S29 en breadcrumbs restantes + `accountAccess.admin.label`). Gates: typecheck ✅, lint ✅, unit 1219/1219 ✅.
