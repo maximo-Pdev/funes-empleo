@@ -63,13 +63,13 @@ Rama base: `main` (ya contiene el rescate del árbol sucio + los 25 fixes e2e). 
 |---|---|---|---|
 | T1 | S1 | inline | ✅ `d90bfa1` |
 | T2 | S2 S11 S29 | inline | ✅ `d90bfa1` + `5af46af` (S2 ya tenía navigation en admin-shell) |
-| T3 | S3 S4 S12 | inline | parcial: S4 ✅ (ya validaba); S3 S12 pendiente |
+| T3 | S3 S4 S12 | inline | ✅ `c32df95` (S3 localidad combobox, S12 horarios popover; S4 ya validado) |
 | T4 | S5 S28 | inline | ✅ `d90bfa1` |
 | T5 | S6 S7 S8 S9 | inline | parcial: S6 S8 S9 ✅; S7 pendiente |
 | T6 | S10 S18 S23 S24 | inline | parcial: S10 ✅ `7890794`, S18 ✅ `d90bfa1`; S23 S24 pendiente |
 | T7 | S13 S17 | inline | parcial: S17 ✅ `d90bfa1`; S13 pendiente |
-| T8 | S19 S20 S21 S22 | inline | pendiente (requiere shadcn combobox/hover-card/data-table) |
-| T9 | S25 S26 S27 | inline | pendiente (requiere shadcn combobox/data-table) |
+| T8 | S19 S20 S21 S22 | inline | ✅ `7862687` + `80d5564` (S19) + `ac8c00a`/`7379c24` (S20 hover-card, S21 carga, S22 data table) |
+| T9 | S25 S26 S27 | inline | ✅ `90e1e69` (S25 cubierto por form compartido de S19; S26 categorías combobox; S27 data table) |
 | T10 | S30 S31 | inline | pendiente (requiere shadcn combobox/hover-card) |
 | T11 | S14 S15 S16 | inline | pendiente |
 
@@ -79,3 +79,4 @@ Rama base: `main` (ya contiene el rescate del árbol sucio + los 25 fixes e2e). 
 - **L2 (decisión):** «Pushear a origin/main ahora (dispara deploy a producción Vercel) y arrancar el listado nuevo». Rescate + fix + merge de PR #77 + push a `main` completados; `main` en `809aac5`.
 - **L3 (progreso, tanda 1):** `d90bfa1` (S1 ofertas header, S5 panel por rol, S6 cursor, S8 sin "MVP", S11 "Perfil asistido"/"Cuenta", S17 favicon, S18 quitar "Continuar en el portal", S28 quitar "Nueva atención presencial", S29 "Mi cuenta"→"Cuenta"). S4 verificado ya resuelto en `validation/common.ts` (normaliza separadores).
 - **L4 (progreso, tanda 2):** `7890794` (S10 retiro completo de Importaciones: rutas `(admin)/admin/imports`, `api/admin/imports`, `features/imports`, `validation/candidate-import`, tests + refs de nav/reference-url). `5af46af` (S11/S29 en breadcrumbs restantes + `accountAccess.admin.label`). Gates: typecheck ✅, lint ✅, unit 1219/1219 ✅.
+- **L5 (progreso, tanda shadcn):** `dbd3085` (S13 paginación base-nova en español, 9 listas). `c32df95` (S3 localidad combobox, S12 popover horarios). `7862687` + `80d5564` (S19 rediseño búsqueda: "Búsqueda por palabra" en nombre/resumen/localidad, quitar "Habilidades" y "Vigencia", localidad combobox, categorías combobox múltiple, quitar "Seleccioná una opción" de aptitud). `ac8c00a`/`7379c24` (S20 hover-card informativo por campo, S21 barra de carga con `useTransition`, S22 data table de candidatos). `90e1e69` (S26 categorías laborales en combobox múltiple, S27 data table en candidatos con rubros coincidentes). Gates por cada tanda: typecheck ✅, lint ✅, unit 1219/1219 ✅, build ✅.
