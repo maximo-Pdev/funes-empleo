@@ -7,6 +7,7 @@ vi.mock("@/features/companies/company-actions", () => ({
   registerCompanyAction: vi.fn(), saveCompanyProfileAction: vi.fn(),
 }));
 vi.mock("@/features/companies/admin-actions", () => ({ adminCompanyAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn() }));
 vi.mock("@/features/openings/company-actions", () => ({
   saveCompanyOpeningAction: vi.fn(), submitCompanyOpeningAction: vi.fn(), cancelCompanyOpeningAction: vi.fn(),
 }));

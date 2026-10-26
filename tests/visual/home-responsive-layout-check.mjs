@@ -50,7 +50,7 @@ try {
         const p = photo.getBoundingClientRect();
         return { heading: getComputedStyle(hero.querySelector("h1").parentElement).display, photoPosition: getComputedStyle(photo).position, background: getComputedStyle(area).backgroundColor, overlap: p.top <= a.top && p.bottom >= a.bottom };
       });
-      assert.deepEqual(composition, { heading: "block", photoPosition: "absolute", background: "rgba(0, 0, 0, 0)", overlap: true });
+      assert.deepEqual(composition, { heading: "block", photoPosition: "absolute", background: "rgb(7, 74, 31)", overlap: true });
       assert.equal(await page.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal.", exact: true }).isVisible(), true);
     }
     let candidateWidth;
@@ -75,11 +75,26 @@ try {
 
           const introduction = document.querySelector("h1").parentElement;
           const intro = introduction.getBoundingClientRect();
-          return { padding: [f.paddingTop, f.paddingBottom], above: a.top - box.top, below: box.bottom - a.bottom, introGap: el.getBoundingClientRect().top - intro.bottom, introClearance: introduction.firstElementChild.getBoundingClientRect().top + scrollY };
+          const area = el.parentElement.parentElement;
+          const style = getComputedStyle(area);
+          const access = area.getBoundingClientRect();
+          const card = el.getBoundingClientRect();
+          const offers = document.getElementById("ofertas-disponibles").getBoundingClientRect();
+          return { padding: [f.paddingTop, f.paddingBottom], above: a.top - box.top, below: box.bottom - a.bottom, introGap: card.top - intro.bottom, introClearance: introduction.firstElementChild.getBoundingClientRect().top + scrollY, background: style.backgroundColor, shadow: style.boxShadow, cardBackground: getComputedStyle(el).backgroundImage, accessWidth: access.width, cardGutters: [card.left - access.left, access.right - card.right], cardBottomClearance: access.bottom - card.bottom, quadrantTopGap: access.top - intro.bottom, containsFooter: area.contains(footer), sectionGap: offers.top - access.bottom, actionBottomClearance: access.bottom - a.bottom };
         });
         assert.deepEqual(mobileSpacing.padding, ["24px", "24px"]);
-        assert.ok(Math.abs(mobileSpacing.introGap - 32) < 1, "All mobile access modes follow the complete introduction with consistent spacing");
-        assert.equal(mobileSpacing.introClearance, 24, "Introduction retains top spacing without the former upper navbar reservation");
+        assert.equal(mobileSpacing.background, "rgb(7, 74, 31)", "All mobile access modes retain the desktop green quadrant");
+        assert.ok(mobileSpacing.shadow.includes("inset"), "Access retains the shared inner shadow");
+        assert.match(mobileSpacing.cardBackground, /linear-gradient\(rgb\(255, 255, 255\)/, "The nested card stays white over the green quadrant");
+        assert.equal(mobileSpacing.accessWidth, width, "The green quadrant spans the mobile viewport");
+        assert.ok(mobileSpacing.cardGutters.every(gap => gap >= 20), "Green stays visible beside the white card");
+        assert.ok(mobileSpacing.cardBottomClearance >= 31, "Green surrounds the complete naturally sized card");
+        assert.equal(mobileSpacing.containsFooter, true, "The offers shortcut belongs to the same green access quadrant");
+        assert.ok(Math.abs(mobileSpacing.sectionGap) < 1, "Green ends directly against the available-offers section");
+        assert.ok(Math.abs(mobileSpacing.quadrantTopGap - 32) < 1, "The mobile green quadrant has a separate 32px top margin");
+        assert.ok(Math.abs(mobileSpacing.actionBottomClearance - 24) < 1, "Green continues below the offers shortcut to the section boundary");
+        assert.ok(Math.abs(mobileSpacing.introGap - 64) < 1, "Mobile spacing includes the quadrant margin and its existing inner padding");
+        assert.equal(mobileSpacing.introClearance, 88, "Introduction clears the 64px top navbar by 24px");
         assert.ok(Math.abs(mobileSpacing.above - 24) < 1 && Math.abs(mobileSpacing.below - 24) < 1);
       } else if (mode !== "login") {
         const spacing = await card.evaluate(el => {

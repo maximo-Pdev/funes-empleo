@@ -100,6 +100,8 @@ describe("Home access panel", () => {
     expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
     expect(view.container.querySelectorAll('[data-marker-state="muted"]')).toHaveLength(5);
+    // The login email arrives filled, so clear it to measure a fully empty registration.
+    fireEvent.change(screen.getByLabelText("Correo electrónico"), { target: { value: "" } });
     fireEvent.submit(view.container.querySelector("form")!);
     expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(5);
     fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
@@ -229,5 +231,40 @@ describe("Home access panel", () => {
     expect(screen.getByRole("button", { name: "Crear cuenta de empresa" })).toBeTruthy();
     expect((screen.getByLabelText("Teléfono de contacto (opcional)") as HTMLInputElement).required).toBe(false);
     expect(document.querySelector("[data-company-field-row]")).toBeNull();
+  });
+
+  it("shows a suspended account inside the login card without an unusable form", async () => {
+    const view = render(await HomePage({ searchParams: Promise.resolve({ acceso: "suspendido" }) }));
+    expect(screen.getByRole("heading", { name: "Acceso suspendido" })).toBeTruthy();
+    expect(screen.getByText(/Contactá a la Oficina de Empleo para consultar tu situación/)).toBeTruthy();
+    expect(screen.getByText(/no muestra los motivos internos/)).toBeTruthy();
+    expect(view.container.querySelector("form")).toBeNull();
+    expect(screen.queryByRole("link", { name: "Recuperar acceso" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
+    expect(screen.getByLabelText("DNI")).toBeTruthy();
+  });
+
+  it("keeps the sign-in form under the expired-session notice", async () => {
+    render(await HomePage({ searchParams: Promise.resolve({ acceso: "sesion-vencida" }) }));
+    expect(screen.getByRole("heading", { name: "Volvé a iniciar sesión" })).toBeTruthy();
+    expect(screen.getByLabelText("Correo electrónico")).toBeTruthy();
+    expect(screen.getByLabelText("Contraseña", { exact: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Ingresar" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Recuperar acceso" }).getAttribute("href")).toBe("/recover");
+  });
+
+  it("shows the renewal form inside the login card for an invalid recovery link", async () => {
+    render(await HomePage({ searchParams: Promise.resolve({ acceso: "recuperacion-invalida" }) }));
+    expect(screen.getByRole("heading", { name: "Enlace de recuperación inválido o vencido" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Solicitar enlace" })).toBeTruthy();
+    expect(screen.queryByLabelText("Contraseña")).toBeNull();
+    expect(screen.getByRole("link", { name: "Volver a iniciar sesión" }).getAttribute("href")).toBe("/");
+  });
+
+  it("ignores an access notice while a verified session is active", async () => {
+    vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status: "active" } } as never);
+    render(await HomePage({ searchParams: Promise.resolve({ acceso: "suspendido" }) }));
+    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+    expect(screen.queryByText("Acceso suspendido")).toBeNull();
   });
 });

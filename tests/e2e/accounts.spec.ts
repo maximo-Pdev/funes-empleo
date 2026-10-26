@@ -5,7 +5,7 @@ import { assertLocalTargets, localFixturePassword } from "../fixtures/credential
 test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ page }) => {
   assertLocalTargets();
   await page.goto("/account");
-  await expect(page).toHaveURL(/\/session-expired$/);
+  await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
   await page.goto("/");
   const headline = page.getByRole("heading", { level: 1 });
   await expect(headline).toBeVisible();
@@ -24,7 +24,7 @@ test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ pa
   await page.getByRole("button", { name: "Cerrar sesión" }).click();
   await expect(page).toHaveURL(/\/$/);
   await page.goto("/account");
-  await expect(page).toHaveURL(/\/session-expired$/);
+  await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
 });
 
 test("recuperación responde igual para correo existente y desconocido", async ({ page }) => {

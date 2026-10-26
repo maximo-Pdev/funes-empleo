@@ -37,7 +37,7 @@ test.beforeEach(() => {
 
 test("una sesión anónima no consulta el padrón administrativo", async ({ page }) => {
   await page.goto("/admin/candidates");
-  await expect(page).toHaveURL(/\/session-expired$/);
+  await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
 });
 
 test("administración filtra el padrón ficticio con conteo y paginación seguros", async ({ page }) => {

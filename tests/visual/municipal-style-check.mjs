@@ -67,7 +67,7 @@ try {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     const access = page.getByRole("region", { name: "Acceso al portal" });
     assert.match(await access.evaluate(el => getComputedStyle(el).backgroundImage), /rgb\(255, 255, 255\)/);
-    assert.equal(await access.evaluate(el => getComputedStyle(el.parentElement.parentElement).backgroundColor), width > 767 ? "rgb(7, 74, 31)" : "rgba(0, 0, 0, 0)");
+    assert.equal(await access.evaluate(el => getComputedStyle(el.parentElement.parentElement).backgroundColor), "rgb(7, 74, 31)");
     assert.equal(await page.getByText("Portal Municipal de Empleo de Funes", { exact: true }).count(), 0);
     assert.equal(await access.evaluate(el => getComputedStyle(el).transitionProperty), "height");
     assert.equal(await access.evaluate(el => getComputedStyle(el).transitionDuration), "0.36s");

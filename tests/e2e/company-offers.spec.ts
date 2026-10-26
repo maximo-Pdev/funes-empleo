@@ -27,7 +27,7 @@ function fixtureId(kind: string, number: number) {
 async function signIn(page: import("@playwright/test").Page, email: string, password: string) {
   assertLocalTargets();
   // The login form lives on the home page and is replaced by a session notice while a session is active
-  // (this journey reaches this point after the company was redirected to /account-suspended). Drop the
+  // (this journey reaches this point after the company was redirected to Home's suspension notice). Drop the
   // stale session so the form is rendered again.
   await page.context().clearCookies();
   await page.goto("/");
@@ -47,7 +47,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   const name = `Empresa E2E ${suffix}`;
   const title = `Oferta E2E ${suffix}`;
   const startedAt = Date.now();
-  await page.goto("/registro/empresa");
+  await page.goto("/?registro=empresa");
   await expect(page.getByRole("heading", { name: "Registro de empresas" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByLabel("Nombre de la empresa").fill(name);
@@ -58,7 +58,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Localidad").fill("Funes");
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Crear cuenta de empresa" }).click();
+  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("recibirás un enlace");
 
   let mailId: string | undefined;
@@ -158,7 +158,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByRole("button", { name: "Suspender empresa" }).click();
     await expect(admin.getByText("Decisión registrada", { exact: false })).toBeVisible();
     await page.goto("/empresa/ofertas");
-    await expect(page).toHaveURL(/\/account-suspended$/);
+    await expect(page).toHaveURL(/\?acceso=suspendido$/);
     await admin.reload();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").first().fill("Reactivación ficticia");
     await admin.getByLabel("Confirmo esta decisión.").first().check();
@@ -176,7 +176,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
     await admin.getByRole("button", { name: "Archivar empresa" }).click();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await page.goto("/empresa/perfil");
-    await expect(page).toHaveURL(/\/session-expired$/);
+    await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
     await admin.reload();
     await admin.getByLabel("Motivo interno (no visible a la empresa)").first().fill("Restauración ficticia");
     await admin.getByLabel("Confirmo esta decisión.").first().check();
@@ -211,7 +211,7 @@ test("otra empresa no ve ofertas ni derivaciones ajenas; administración archiva
     await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     await company.goto("/empresa/ofertas");
-    await expect(company).toHaveURL(/\/session-expired$/);
+    await expect(company).toHaveURL(/\?acceso=sesion-vencida$/);
     await admin.reload();
     await expect(admin.getByText("Cuenta: Archivada", { exact: false })).toBeVisible();
     const restore = decision("Restaurar empresa");

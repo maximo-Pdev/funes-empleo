@@ -37,14 +37,14 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByRole("heading", { name: "Ofertas laborales vigentes" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
-  await page.goto("/registro/candidato");
+  await page.goto("/?registro=candidato");
   await expect(page.locator("body")).not.toContainText("intereses");
   await page.getByLabel("Nombre y apellido").fill(name);
   await page.getByLabel("DNI").fill(dni);
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Crear cuenta candidata" }).click();
+  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("recibirás un enlace");
 
   let mailId: string | undefined;
@@ -228,7 +228,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("button", { name: "Suspender cuenta" }).click();
     await expect(admin.getByRole("button", { name: "Reactivar cuenta" })).toBeVisible();
     await page.goto("/dashboard?section=perfil");
-    await expect(page).toHaveURL(/\/account-suspended$/);
+    await expect(page).toHaveURL(/\?acceso=suspendido$/);
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Reactivación ficticia E2E");
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
@@ -252,7 +252,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
       from public.candidate_profiles profile join public.accounts account on account.id=profile.account_id where profile.id='${profileId}';
       commit;`);
     await page.goto("/dashboard?section=perfil");
-    await expect(page).toHaveURL(/\/session-expired$/);
+    await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
     await admin.reload();
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Restauración ficticia E2E");
     await admin.getByLabel("Confirmo la restauración").check();

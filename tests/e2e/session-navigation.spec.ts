@@ -71,9 +71,9 @@ for (const account of [
         await page.goto("/");
         await expect(page.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
         await page.goto(account.href);
-        await expect(page).toHaveURL(/\/session-expired$/);
+        await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
         await tab.goto(account.href);
-        await expect(tab).toHaveURL(/\/session-expired$/);
+        await expect(tab).toHaveURL(/\?acceso=sesion-vencida$/);
         await tab.goto("/");
         await expect(tab.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
       } finally { await resumed.close(); }

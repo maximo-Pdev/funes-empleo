@@ -28,7 +28,26 @@ test("base pública en español sin barreras automáticas detectadas", async ({ 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
-for (const path of ["/", "/registro/candidato", "/registro/empresa", "/recover", "/verification-pending"]) {
+for (const state of ["suspendido", "sesion-vencida", "recuperacion-invalida"]) {
+  test(`aviso de acceso en Home sin barreras automáticas: ${state}`, async ({ page }) => {
+    await page.goto(`/?acceso=${state}`);
+    await expect(page.getByRole("main")).toHaveCount(1);
+    await expect(page.getByRole("main")).toHaveAttribute("id", "contenido");
+    await waitForHeroEntrance(page);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  });
+}
+
+test("enlace de verificación vencido: una sola main, un solo h1 y sin barreras", async ({ page }) => {
+  await page.goto("/verification-expired");
+  await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Enlace de verificación inválido o vencido");
+  await expect(page.getByRole("button", { name: "Reenviar verificación" })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+for (const path of ["/", "/?registro=candidato", "/?registro=empresa", "/recover"]) {
   test(`navegación existente sin enlace global en ${path}`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole("link", { name: "Ir al contenido principal", includeHidden: true })).toHaveCount(0);

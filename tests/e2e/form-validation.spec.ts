@@ -14,10 +14,10 @@ async function signIn(page: Page, role: "candidate" | "admin" | "company") {
 }
 
 test("registro: errores junto a cada input, color, foco, corrección y accesibilidad móvil", async ({ page }) => {
-  await page.goto("/registro/candidato");
+  await page.goto("/?registro=candidato");
   const name = page.getByLabel("Nombre y apellido");
   const email = page.getByLabel("Correo electrónico");
-  await page.getByRole("button", { name: "Crear cuenta candidata" }).click();
+  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
   await expect(name).toBeFocused();
   await expect(page.locator("[data-field-error]")).toHaveCount(5);
   await expect(page.locator("[data-required-marker]")).toHaveCount(5);
@@ -38,13 +38,13 @@ test("registro: errores junto a cada input, color, foco, corrección y accesibil
 });
 
 test("un rechazo real de Server Action no reinicia los datos del registro", async ({ page }) => {
-  await page.goto("/registro/candidato");
+  await page.goto("/?registro=candidato");
   await page.getByLabel("Nombre y apellido").fill(" P");
   await page.getByLabel("DNI", { exact: true }).fill("99123456");
   await page.getByLabel("Correo electrónico").fill("retencion-ficticia@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Validation-2026!");
   await page.getByLabel("Confirmar contraseña").fill("Fictitious-Validation-2026!");
-  await page.getByRole("button", { name: "Crear cuenta candidata" }).click();
+  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
   await expect(page.locator("form").getByRole("alert")).toContainText("Revisá nombre, DNI, correo y contraseña");
   await expect(page.getByLabel("Nombre y apellido")).toHaveValue(" P");
   await expect(page.getByLabel("DNI", { exact: true })).toHaveValue("99123456");

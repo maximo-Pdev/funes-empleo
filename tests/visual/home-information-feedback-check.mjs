@@ -76,16 +76,8 @@ try {
       checks.push({ width, mode, status: "PASS" });
     }
   }
-  // Homepage-only styling must not leak into the standalone registration surface.
-  await page.goto(`${baseURL}/registro/candidato`, { waitUntil: "networkidle" });
-  const standalone = page.locator('form p[role="status"], form p[role="alert"]').last();
-  await standalone.evaluate(element => {
-    element.setAttribute("role", "status");
-    element.textContent = "Standalone style fixture";
-  });
-  assert.ok(!(await standalone.evaluate(element => getComputedStyle(element, "::before").content)).includes("🛈"));
   assert.deepEqual(blockedRequests, [], "No account mutations attempted");
-  console.log(JSON.stringify({ status: "PASS", fixtureOnly: true, checks, standalone: "PASS", blockedRequests }));
+  console.log(JSON.stringify({ status: "PASS", fixtureOnly: true, checks, blockedRequests }));
 } finally {
   await browser.close();
 }

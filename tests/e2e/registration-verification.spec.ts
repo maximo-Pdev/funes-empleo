@@ -11,7 +11,7 @@ for (const role of ["candidate", "company"] as const) {
     const email = `registration-check-${role}-${suffix}@example.invalid`;
     const password = "Fictitious-Registration-Check-2026!";
     const startedAt = Date.now();
-    await page.goto(role === "candidate" ? "/registro/candidato" : "/registro/empresa");
+    await page.goto(role === "candidate" ? "/?registro=candidato" : "/?registro=empresa");
     if (role === "candidate") {
       await page.getByLabel("Nombre y apellido").fill(`Persona ficticia ${suffix}`);
       await page.getByLabel("DNI").fill(`98${suffix.slice(-6)}`);
@@ -47,7 +47,7 @@ for (const role of ["candidate", "company"] as const) {
     expect(destination.pathname).toBe("/auth/callback");
 
     await page.goto("/account");
-    await expect(page).toHaveURL(/\/session-expired$/);
+    await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
     await page.goto(link!);
     await expect(page).toHaveURL("http://127.0.0.1:3000/account");
     if (role === "candidate") {

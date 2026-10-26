@@ -29,7 +29,7 @@ it("returns existing-session feedback for direct login submissions without redir
   mocks.readSession.mockResolvedValue({ account: { status: "active" } });
   const form = new FormData();
   Object.entries(credentials).forEach(([key, value]) => form.set(key, value));
-  expect(await loginAction({ message: "", success: false }, form)).toEqual({ message: "Ya tenés la sesión iniciada", success: false });
+  expect(await loginAction({ message: "", success: false }, form)).toEqual({ message: "Ya tenés la sesión iniciada", success: false, tone: "info" });
   expect(mocks.signIn).not.toHaveBeenCalled();
   expect(mocks.signOut).not.toHaveBeenCalled();
   expect(mocks.redirect).not.toHaveBeenCalled();

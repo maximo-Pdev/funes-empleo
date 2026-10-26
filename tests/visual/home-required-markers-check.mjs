@@ -22,7 +22,7 @@ try {
       const expected = mode === "login" ? 2 : mode === "candidate" ? 5 : 8;
       assert.equal(await markers.count(), mode === "login" ? 0 : expected);
       if (mode !== "login") assert.ok((await markers.evaluateAll(elements => elements.map(el => getComputedStyle(el).color))).every(color => color === "rgb(134, 141, 152)"));
-      const intro = page.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." }).locator("..");
+      const intro = page.getByRole("heading", { level: 1 }).locator("..");
       assert.equal(await intro.locator("a").count(), 0);
       const generated = await form.locator("label").evaluateAll(labels => labels.some(label => getComputedStyle(label, "::after").content.includes("*") || Array.from(label.children).some(child => getComputedStyle(child, "::after").content.includes("*"))));
       assert.equal(generated, false, "No duplicate CSS asterisks");
@@ -37,15 +37,13 @@ try {
       checks.push({ width, mode, status: "PASS" });
     }
   }
-  for (const path of ["/login", "/candidato/perfil", "/candidato/ofertas", "/candidato/postulaciones"]) {
+  for (const path of ["/login", "/candidato/perfil", "/candidato/ofertas", "/candidato/postulaciones", "/registro/candidato", "/registro/empresa"]) {
     const response = await page.request.get(`${baseURL}${path}?cv=denied`, { maxRedirects: 0 });
     assert.equal(response.status(), 404);
     assert.equal(response.headers().location, undefined);
   }
-  await page.goto(`${baseURL}/registro/candidato`, { waitUntil: "networkidle" });
-  assert.ok(await page.locator('[data-required-marker][data-marker-state="required"]').count() > 0, "Standalone defaults preserved");
   assert.equal(posts.length, 0);
-  console.log(JSON.stringify({ status: "PASS", checks, retiredRoutes: "PASS", standalone: "PASS", posts: posts.length }));
+  console.log(JSON.stringify({ status: "PASS", checks, retiredRoutes: "PASS", posts: posts.length }));
 } finally {
   await browser.close();
 }

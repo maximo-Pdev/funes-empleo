@@ -55,7 +55,7 @@ try {
     }
     if (role !== "admin") {
       await page.goto("/admin/candidates");
-      await page.waitForURL(/\/(account|session-expired)$/);
+      await page.waitForURL(/\/account$|\?acceso=sesion-vencida$/);
     }
     assert.equal(errors.length,0,`Errores de navegador ${role}`);
     console.log(`PASS demo: ${role}, navegación, aislamiento y CV.`);

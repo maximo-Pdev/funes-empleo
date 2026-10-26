@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui";
 
 describe("badge de estado", () => {
   it("dibuja el punto de color y la etiqueta dentro de la misma píldora", () => {
-    const { container } = render(<Badge variant="status" tone="green">Publicada</Badge>);
+    render(<Badge variant="status" tone="green">Publicada</Badge>);
     const badge = screen.getByText("Publicada");
     const dot = badge.firstElementChild!;
     expect(badge.classList.contains("rounded-full")).toBe(true);

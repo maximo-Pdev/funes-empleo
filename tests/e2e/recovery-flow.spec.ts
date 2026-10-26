@@ -37,8 +37,10 @@ test("enlace ficticio de recuperación habilita nueva contraseña una sola vez",
   await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Recovered-2026!");
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
+  // The invalid-link notice belongs to the anonymous access card: a verified session keeps its own panel.
+  await page.context().clearCookies();
   await page.goto(verifyUrl!);
-  await expect(page).toHaveURL(/\/recovery-invalid#?$/);
+  await expect(page).toHaveURL(/\?acceso=recuperacion-invalida#?$/);
   expect(page.url()).not.toMatch(/access_token|refresh_token|error_description/);
-  await expect(page.getByRole("button", { name: "Solicitar enlace de recuperación" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Solicitar enlace" })).toBeVisible();
 });

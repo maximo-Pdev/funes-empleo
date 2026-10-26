@@ -22,7 +22,7 @@ const failures = [];
 try {
   for (const section of ["candidates", "candidate", "assisted", "assisted-detail", "companies", "company", "openings", "opening", "participations", "participation", "imports", "import-new", "import-preview", "metrics", "account", "account-error"]) {
     const fixture = JSON.parse(await readFile(path.join(output, `${section}.json`), "utf8"));
-    for (const width of [1440, 1024, 768, 390, 320]) for (const reducedMotion of ["no-preference", "reduce"]) {
+    for (const width of [1920, 1440, 1366, 1024, 768, 390, 320]) for (const reducedMotion of ["no-preference", "reduce"]) {
       const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion });
       await page.route("**/*", async route => {
         const url = new URL(route.request().url());
@@ -53,8 +53,8 @@ try {
         assert.equal(geometry.mainStyle.image, "none");
         assert.equal(geometry.mainStyle.animation, "none");
         assert.equal(geometry.canvasStyle.background, "rgb(255, 255, 255)");
-        assert.equal(geometry.canvasStyle.maxWidth, "960px");
-        assert.equal(geometry.canvas.width, Math.min(960, geometry.main.width - (width < 768 ? 32 : 48)));
+        assert.equal(geometry.canvasStyle.maxWidth, "1280px");
+        assert.equal(geometry.canvas.width, Math.min(1280, geometry.main.width - (width < 768 ? 32 : 48)));
         assert.ok(Math.abs(geometry.canvas.left - geometry.main.left - (geometry.main.right - geometry.canvas.right)) < 1);
         assert.equal(geometry.overflow, false, "no horizontal overflow");
         assert.equal(geometry.contained, true, "forms stay inside the canvas");
@@ -68,10 +68,13 @@ try {
           assert.equal(geometry.canvas.top, geometry.navbar.bottom + 32);
         } else {
           assert.equal(geometry.sidebarStyle.position, "static");
-          assert.equal(geometry.navbar.bottom, 900);
-          assert.equal(geometry.workspaceStyle.paddingBottom, "88px");
+          assert.equal(geometry.navbar.top, 0);
+          assert.equal(geometry.navbar.bottom, 64);
+          assert.equal(geometry.sidebar.top, 64);
+          assert.ok(geometry.firstLink.top >= geometry.navbar.bottom);
+          assert.equal(geometry.workspaceStyle.paddingBottom, "0px");
           await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
-          assert.ok(await page.evaluate(() => document.querySelector("header[data-home]").getBoundingClientRect().top - document.querySelector("main").firstElementChild.getBoundingClientRect().bottom >= 23));
+          assert.ok(await page.evaluate(() => innerHeight - document.querySelector("main").firstElementChild.getBoundingClientRect().bottom >= 23));
         }
         await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
         if ([1440, 390].includes(width) && reducedMotion === "no-preference") await page.screenshot({ path: path.join(output, `${section}-${width}.png`), fullPage: true });
@@ -84,4 +87,4 @@ try {
 await writeFile(path.join(output, "results.json"), JSON.stringify({ output, passed: results.length, failed: failures.length, failures }, null, 2));
 console.log(JSON.stringify({ output, passed: results.length, failed: failures.length, failures }, null, 2));
 assert.equal(failures.length, 0);
-assert.equal(results.length, 160);
+assert.equal(results.length, 224);

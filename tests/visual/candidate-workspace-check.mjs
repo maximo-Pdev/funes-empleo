@@ -21,7 +21,7 @@ await writeFile(path.join(output, "composition.txt"), generation.stdout + genera
 const globals = await readFile("src/app/globals.css", "utf8");
 const globalCss = (await postcss([tailwind({ optimize: false })]).process(globals, { from: path.resolve("src/app/globals.css") })).css;
 const sections = ["dashboard", "perfil", "postulaciones", "ofertas", "cuenta"];
-const widths = [1440, 1024, 768, 390, 320];
+const widths = [1920, 1440, 1366, 1024, 768, 390, 320];
 const motionPreferences = ["no-preference", "reduce"];
 const results = [];
 const failures = [];
@@ -52,24 +52,50 @@ try {
         return { main: rect(main), canvas: rect(canvas), sidebar: rect(sidebar), nav: rect(nav), firstLink: rect(sidebar.querySelector("a")), workspace: style(main.parentElement), mainStyle: style(main), canvasStyle: style(canvas), sidebarStyle: style(sidebar), navStyle: style(nav), overflow: document.documentElement.scrollWidth > innerWidth, animations: main.getAnimations({ subtree: true }).length, slot: canvas.dataset.slot };
       });
       try {
+        if (section === "perfil") {
+          const inset = await page.evaluate(() => {
+            const canvas = document.querySelector('[data-slot="profile-canvas"]');
+            const bounds = canvas.getBoundingClientRect();
+            const heading = canvas.querySelector("h1").getBoundingClientRect();
+            const details = canvas.querySelector("[data-profile-details]").getBoundingClientRect();
+            return { left: heading.left - bounds.left, top: heading.top - bounds.top, detailsLeft: details.left - bounds.left };
+          });
+          assert.equal(inset.left, width < 640 ? 16 : 28, "profile heading shares the panel's horizontal inset");
+          assert.equal(inset.top, width < 640 ? 20 : 28, "profile heading has the panel's top padding");
+          assert.equal(inset.left, inset.detailsLeft, "profile heading aligns with the remaining fields");
+        }
         assert.equal(geometry.mainStyle.color, "rgb(7, 74, 31)", "flat municipal green exterior");
         assert.equal(geometry.mainStyle.image, "none", "no gradient");
         assert.equal(geometry.mainStyle.animation, "none");
         assert.equal(geometry.animations, 0, "no canvas/exterior animations");
         assert.equal(geometry.canvasStyle.color, "rgb(255, 255, 255)");
-        assert.equal(geometry.canvasStyle.maxWidth, "960px");
+        assert.equal(geometry.canvasStyle.maxWidth, "1280px");
         assert.equal(geometry.canvasStyle.minHeight, "0px", "canvas must not stretch to viewport");
         assert.equal(geometry.canvasStyle.maxHeight, "none");
         assert.equal(geometry.canvasStyle.overflowY, "visible");
-        assert.ok(geometry.canvas.width <= 960);
+        assert.ok(geometry.canvas.width <= 1280);
         const gutter = width < 768 ? 16 : 24;
-        assert.equal(geometry.canvas.width, Math.min(960, geometry.main.width - gutter * 2), "canvas uses the full available width up to 960px");
+        assert.equal(geometry.canvas.width, Math.min(1280, geometry.main.width - gutter * 2), "canvas uses the full available width up to 1280px");
         assert.ok(Math.abs((geometry.canvas.left - geometry.main.left) - (geometry.main.right - geometry.canvas.right)) < 1, "centered within main");
         assert.ok(geometry.canvas.left - geometry.main.left >= gutter - 1);
         assert.equal(geometry.overflow, false, "no horizontal overflow");
         assert.equal(geometry.slot, section === "perfil" ? "profile-canvas" : "candidate-canvas");
         assert.equal(geometry.navStyle.position, "fixed");
-        assert.ok(["rgba(255, 255, 255, 0.85)", "color(srgb 1 1 1 / 0.85)"].includes(geometry.navStyle.color), "existing 85%-white frosted navbar preserved");
+        assert.equal(geometry.navStyle.color, "rgb(255, 255, 255)", "navbar is opaque white");
+        const chrome = await page.evaluate(() => {
+          const header = document.querySelector("header[data-home]");
+          const style = getComputedStyle(header);
+          const corner = getComputedStyle(header.parentElement, "::after");
+          return { blur: style.backdropFilter, border: style.borderBottomWidth, corner: { content: corner.content, left: corner.left, top: corner.top, width: corner.width, image: corner.backgroundImage } };
+        });
+        assert.equal(chrome.blur, "none");
+        assert.equal(chrome.border, "0px");
+        if (width >= 768) {
+          assert.equal(chrome.corner.left, "264px");
+          assert.equal(chrome.corner.top, "64px");
+          assert.equal(chrome.corner.width, "24px");
+          assert.ok(chrome.corner.image.startsWith("radial-gradient("));
+        } else assert.equal(chrome.corner.content, "none");
         const contentFits = await page.evaluate(() => {
           const canvas = document.querySelector("main").firstElementChild;
           const bounds = canvas.getBoundingClientRect();
@@ -114,16 +140,16 @@ try {
           assert.equal(geometry.nav.top, 0);
         } else {
           assert.equal(geometry.sidebarStyle.position, "static");
-          assert.equal(geometry.sidebar.top, 0);
+          assert.equal(geometry.sidebar.top, 64);
           assert.ok(geometry.main.top >= geometry.sidebar.bottom);
           assert.equal(geometry.mainStyle.paddingTop, "24px", "no desktop navbar gap on mobile");
-          assert.equal(geometry.nav.bottom, 900);
-          assert.equal(geometry.workspace.paddingBottom, "88px");
+          assert.equal(geometry.nav.top, 0);
+          assert.equal(geometry.nav.bottom, 64);
+          assert.equal(geometry.workspace.paddingBottom, "0px");
+          assert.ok(geometry.firstLink.top >= geometry.nav.bottom, "mobile sidebar controls clear the top navbar");
           await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
-          const clearance = await page.evaluate(() => document.querySelector("header[data-home]").getBoundingClientRect().top - document.querySelector("main").firstElementChild.getBoundingClientRect().bottom);
-          assert.ok(clearance >= 23, "last content scrolls above bottom navbar");
-          // Real env() is zero in headless desktop Chromium. Also prove the additive safe-area expression.
-          assert.match(fixture.css, /padding-bottom:\s*calc\(88px \+ env\(safe-area-inset-bottom, 0px\)\)/);
+          const clearance = await page.evaluate(() => innerHeight - document.querySelector("main").firstElementChild.getBoundingClientRect().bottom);
+          assert.ok(clearance >= 23, "last content retains the canvas bottom spacing");
         }
         // A temporary geometric probe (not business data) proves natural growth without an inner scroll container.
         const growth = await page.evaluate(() => {

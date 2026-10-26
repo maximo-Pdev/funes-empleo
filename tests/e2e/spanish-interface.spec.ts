@@ -24,7 +24,7 @@ async function check(page: Page, path: string) {
 }
 
 test("público: navegación, búsqueda y registros con textos españoles", async ({ page }) => {
-  for (const path of ["/", "/ofertas", "/registro/candidato", "/registro/empresa", "/recover"])
+  for (const path of ["/", "/ofertas", "/?registro=candidato", "/?registro=empresa", "/recover"])
     await check(page, path);
 });
 

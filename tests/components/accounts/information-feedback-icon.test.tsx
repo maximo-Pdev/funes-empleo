@@ -6,7 +6,7 @@ import { CandidateRegistrationForm } from "@/features/candidates/components/cand
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
 import { HomeAccessPanel } from "@/app/(public)/home-access-panel";
 
-const response = vi.hoisted(() => ({ state: { message: "", success: false }, pending: false }));
+const response = vi.hoisted(() => ({ state: { message: "", success: false } as { message: string; success: boolean; tone?: "info" }, pending: false }));
 vi.mock("react", async importOriginal => ({
   ...await importOriginal<typeof import("react")>(),
   useActionState: () => [response.state, vi.fn(), response.pending],
@@ -67,6 +67,16 @@ it("uses the same icon for the existing active-session notice", () => {
   render(<HomeAccessPanel authenticated panelHref="/dashboard" />);
   expect(screen.getByRole("status").querySelector("svg.lucide-info")).not.toBeNull();
   expect(screen.getByRole("link", { name: "Ir al panel de usuario" }).getAttribute("href")).toBe("/dashboard");
+});
+
+it("presents an existing session discovered after submission as information, not a login error", () => {
+  response.state = { message: "Ya tenés la sesión iniciada", success: false, tone: "info" };
+  renderForm("login");
+  const feedback = screen.getByRole("status");
+  expect(feedback.classList.contains("text-red-700")).toBe(false);
+  expect(feedback.querySelector("svg.lucide-info")).not.toBeNull();
+  expect(feedback.textContent).toBe("Ya tenés la sesión iniciada");
+  expect(document.activeElement).toBe(feedback);
 });
 
 it("defines the approved informational color as a global semantic token", () => {

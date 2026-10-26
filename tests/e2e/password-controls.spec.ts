@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 for (const registration of [
-  { path: "/registro/candidato", button: "Crear cuenta candidata" },
-  { path: "/registro/empresa", button: "Crear cuenta de empresa" },
+  { path: "/?registro=candidato", button: "Crear cuenta candidata" },
+  { path: "/?registro=empresa", button: "Crear cuenta de empresa" },
 ]) {
   test(`confirmación y controles de contraseña en ${registration.path}`, async ({ page }) => {
     await page.goto(registration.path);

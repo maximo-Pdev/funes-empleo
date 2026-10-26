@@ -15,7 +15,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
     try {
       for (const target of protectedPages().filter(p => p.role === role)) {
         await page.goto(target.path);
-        await expect(page).toHaveURL(/\/(account-suspended|session-expired)$/);
+        await expect(page).toHaveURL(/\?acceso=(suspendido|sesion-vencida)$/);
       }
       const exportResponse = await page.request.get("/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20");
       expect(exportResponse.status()).toBe(403);
@@ -71,7 +71,7 @@ for (const actor of ["anonymous", "candidate", "company", "admin"] as const) {
     if (actor !== "anonymous") await loginFixture(page, actor);
     for (const target of protectedPages().filter((p) => p.role !== actor)) {
       await page.goto(target.path);
-      await expect(page).toHaveURL(/\/(account|session-expired|login)$/);
+      await expect(page).toHaveURL(/\/account$|\?acceso=sesion-vencida$/);
       await expect(page.locator("body")).not.toContainText("Persona ficticia 001");
     }
   });
@@ -117,7 +117,7 @@ test("sesión administrativa existente no sobrevive a suspensión en base", asyn
   runLocalMaintenanceSql(`update public.accounts set status='suspended', suspended_reason='Prueba ficticia de frontera', suspended_at=clock_timestamp(), suspended_by=(select id from public.accounts where auth_user_id='${fixtureId("admin",1)}') where auth_user_id='${actor}'`);
   try {
     await page.goto("/admin/candidates");
-    await expect(page).toHaveURL(/\/account-suspended$/);
+    await expect(page).toHaveURL(/\?acceso=suspendido$/);
     expect((await page.request.get("/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20")).status()).toBe(403);
   } finally {
     runLocalMaintenanceSql(`update public.accounts set status='active', suspended_reason=null,suspended_at=null,suspended_by=null where auth_user_id='${actor}'`);

@@ -134,10 +134,10 @@ it("restores the municipal introduction and complete intermediary information", 
   ]) expect(within(intro).getByText(text)).toBeTruthy();
 });
 
-it("renders the process, role, FAQ and closing sections below the offers", async () => {
+it("renders the process, metrics, FAQ and closing sections below the offers", async () => {
   render(await HomePage());
   expect(screen.getByRole("heading", { name: "Simple para usar, cuidadoso con los datos." })).toBeTruthy();
-  expect(screen.getByRole("heading", { name: "Cada perfil entra por el camino correcto" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "El portal en números" })).toBeTruthy();
   expect(screen.getByRole("heading", { name: "Lo que más nos preguntan" })).toBeTruthy();
   expect(screen.getByRole("heading", { name: "¿Listo para dar el siguiente paso?" })).toBeTruthy();
   for (const step of [
@@ -145,11 +145,10 @@ it("renders the process, role, FAQ and closing sections below the offers", async
     "La Oficina publica la oferta y evalúa postulantes.",
     "Solo los perfiles derivados se comparten con la empresa.",
   ]) expect(screen.getByText(step)).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Crear cuenta de postulante" }).getAttribute("href")).toBe("/registro/candidato");
-  const roles = screen.getByRole("region", { name: "Cada perfil entra por el camino correcto" });
-  expect(within(roles).getAllByRole("heading", { level: 3 }).map(heading => heading.textContent)).toEqual(["Postulantes", "Empresas"]);
-  expect(within(roles).queryByRole("link", { name: "Ingresar al panel" })).toBeNull();
-  expect(screen.getByRole("link", { name: "Registrarme como postulante" }).getAttribute("href")).toBe("/registro/candidato");
+  const metrics = screen.getByRole("region", { name: "El portal en números" });
+  for (const label of ["Postulantes registrados", "Empresas registradas", "Ofertas vigentes"]) expect(within(metrics).getByText(label)).toBeTruthy();
+  expect(within(metrics).queryByRole("link")).toBeNull();
+  expect(screen.getByRole("link", { name: "Registrarme como postulante" }).getAttribute("href")).toBe("/?registro=candidato");
   expect(screen.getByText("¿Necesito una cuenta para ver las ofertas?")).toBeTruthy();
   expect(screen.getByText("¿Quién puede ver mi CV?")).toBeTruthy();
 });

@@ -14,11 +14,7 @@ vi.mock("@/features/companies/service", () => ({ getCompanyWorkspace: vi.fn().mo
 vi.mock("next/navigation", () => ({ usePathname: () => "/account", useRouter: () => ({ refresh: vi.fn() }) }));
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: mocks.logout, accountStatusAction: vi.fn() }));
 import Recovery from "@/app/(auth)/recover/page";
-import Pending from "@/app/(auth)/verification-pending/page";
 import Expired from "@/app/(auth)/verification-expired/page";
-import Invalid from "@/app/(auth)/recovery-invalid/page";
-import Session from "@/app/(auth)/session-expired/page";
-import Suspended from "@/app/(auth)/account-suspended/page";
 import Logout from "@/app/(auth)/logout/page";
 import Password from "@/app/(auth)/update-password/page";
 import Account from "@/app/(auth)/account/page";
@@ -37,8 +33,8 @@ it("guards the candidate dashboard before forwarding its selected section", asyn
 
 vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);
 it.each([
- [Recovery, "Solicitar enlace de recuperación"], [Pending, "Reenviar verificación"],
- [Expired, "Reenviar verificación"], [Invalid, "Solicitar enlace de recuperación"],
+ [Recovery, "Solicitar enlace de recuperación"],
+ [Expired, "Reenviar verificación"],
 ])("conserva el formulario de correo de %s", (Page, button) => {
  render(<Page />);
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
@@ -108,12 +104,6 @@ function saveAdminFixture(section: string, html: string) {
  mkdirSync(output, { recursive: true });
  writeFileSync(path.join(output, `${section}.json`), JSON.stringify({ section, html, css }));
 }
-it("conserva los mensajes seguros de sesión y suspensión", () => {
- const view = render(<Session />);
- expect(screen.getByText(/No hay una sesión habilitada/)).toBeTruthy();
- view.unmount(); render(<Suspended />);
- expect(screen.getByText(/no muestra motivos internos/)).toBeTruthy();
-});
 it("mantiene la confirmación explícita de cierre de sesión", () => {
  render(<Logout />);
  expect(screen.getByRole("button", { name: "Confirmar cierre de sesión" })).toBeTruthy();

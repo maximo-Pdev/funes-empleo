@@ -1,4 +1,4 @@
-// Read-only mobile bottom-navbar proof. No form submissions or fixture resets.
+// Read-only mobile top-navbar proof. No form submissions or fixture resets.
 import assert from "node:assert/strict";
 import { chromium } from "@playwright/test";
 const browser = await chromium.launch();
@@ -18,26 +18,29 @@ try {
         return { top: rect.top, bottom: rect.bottom, height: rect.height, viewport: innerHeight, position: getComputedStyle(el).position, inert: el.inert };
       });
       assert.equal(geometry.position, "fixed");
-      assert.ok(Math.abs(geometry.bottom - geometry.viewport) < 1, "Mobile navbar belongs at the bottom edge");
-      assert.ok(geometry.top > 0);
-      assert.ok(geometry.height >= 64);
+      assert.equal(geometry.top, 0, "Mobile navbar belongs at the top edge");
+      assert.equal(geometry.height, 64);
       assert.equal(geometry.inert, false);
       assert.equal(await header.getAttribute("aria-hidden"), "false");
       await header.getByRole("link", { name: "Ingresar", exact: true }).click();
-      await page.waitForFunction(() => document.activeElement.id === "acceso" && Math.abs(document.getElementById("acceso").getBoundingClientRect().top - 24) < 2);
+      await page.waitForFunction(() => document.activeElement.id === "contenido" && scrollY < 2);
+      await page.locator("#acceso").evaluate(el => el.scrollIntoView({ behavior: "instant" }));
+      await page.waitForFunction(() => Math.abs(document.getElementById("acceso").getBoundingClientRect().top - 88) < 2);
       await page.getByRole("link", { name: "Ver ofertas disponibles", exact: true }).click();
       await page.waitForFunction(() => document.activeElement.id === "ofertas-disponibles" && Math.abs(document.getElementById("ofertas-disponibles").getBoundingClientRect().top) < 2);
       await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
       const clearance = await page.evaluate(() => {
         const main = document.getElementById("contenido");
-        return document.querySelector("header[data-home]").getBoundingClientRect().top - main.lastElementChild.getBoundingClientRect().bottom;
+        return innerHeight - main.lastElementChild.getBoundingClientRect().bottom;
       });
-      assert.ok(clearance >= 23, "The last content can scroll fully above the navbar");
+      assert.ok(clearance >= -1, "The last content remains reachable without a bottom overlay");
       await header.getByRole("link", { name: "Inicio", exact: true }).click();
       await page.waitForFunction(() => document.activeElement.id === "contenido" && scrollY < 2);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
-      if (process.env.BOTTOM_NAVBAR_SHOT && mode === "login") await page.screenshot({ path: `${process.env.BOTTOM_NAVBAR_SHOT}-${width}.png` });
-      checks.push({ width, mode, bottomNavbar: "PASS", anchors: "PASS", finalClearance: clearance });
+      const introTop = await page.locator("h1").evaluate(el => el.parentElement.firstElementChild.getBoundingClientRect().top + scrollY);
+      assert.equal(introTop, 88, "Introduction clears the 64px top navbar by 24px");
+      if (process.env.TOP_NAVBAR_SHOT && mode === "login") await page.screenshot({ path: `${process.env.TOP_NAVBAR_SHOT}-${width}.png` });
+      checks.push({ width, mode, topNavbar: "PASS", anchors: "PASS", finalClearance: clearance });
     }
   }
   await page.setViewportSize({ width: 768, height: 900 });
