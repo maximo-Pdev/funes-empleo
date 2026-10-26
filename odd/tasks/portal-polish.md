@@ -67,11 +67,11 @@ Rama base: `main` (ya contiene el rescate del árbol sucio + los 25 fixes e2e). 
 | T4 | S5 S28 | inline | ✅ `d90bfa1` |
 | T5 | S6 S7 S8 S9 | inline | parcial: S6 S8 S9 ✅; S7 pendiente |
 | T6 | S10 S18 S23 S24 | inline | parcial: S10 ✅ `7890794`, S18 ✅ `d90bfa1`; S23 S24 pendiente |
-| T7 | S13 S17 | inline | parcial: S17 ✅ `d90bfa1`; S13 pendiente |
+| T7 | S13 S17 | inline | ✅ `d90bfa1` (S17 favicon) + `dbd3085` (S13 paginación base-nova en español) |
 | T8 | S19 S20 S21 S22 | inline | ✅ `7862687` + `80d5564` (S19) + `ac8c00a`/`7379c24` (S20 hover-card, S21 carga, S22 data table) |
 | T9 | S25 S26 S27 | inline | ✅ `90e1e69` (S25 cubierto por form compartido de S19; S26 categorías combobox; S27 data table) |
 | T10 | S30 S31 | inline | pendiente (requiere shadcn combobox/hover-card) |
-| T11 | S14 S15 S16 | inline | pendiente |
+| T11 | S14 S15 S16 | inline | parcial: S16 ✅ `72c6e82` (404/error/verification-expired al tema institucional); S14 S15 pendiente |
 
 ## Log
 
