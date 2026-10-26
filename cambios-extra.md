@@ -1,5 +1,15 @@
 # Cambios extra necesarios
 
+## EXTRA-084 — Restore PR 78 browser checks and required locality validation
+
+- **Date/authorization:** 2026-10-26; Maxi requested: «Falló el PR en github. Arreglalo para que salga en verde».
+- **Evidence:** the exact PR head fails 27 browser scenarios. Several helpers expect the retired universal login landing or card markup; help controls make substring labels ambiguous. Company locality uses a required hidden input, which native constraint validation ignores, so the eight-field summary misses locality.
+- **Origin/scope:** approved portal-polish behavior and existing registration/validation requirements; recovery tracked in `odd/tasks/pr78-green.md`. Preserve permission, pagination, ordering, consent and keyboard proofs; do not skip tests or lower the required-field count.
+- **Minimal change:** align browser locators with the approved role landings/table/combobox controls and restore locality's integration with required validation, invalid state, focus and correction. Keep current server validation, field meaning and layout.
+- **Affected surfaces:** company locality/registration components, focused component regressions and the reported E2E specifications. No migrations, Auth/provider changes or dependency updates.
+- **Risks/recovery:** locality is shared by company forms; test optional, controlled and default-value consumers. Revert the focused correction to recover the prior implementation. Preserve curated local accounts by using isolated GitHub acceptance runs instead of the local reset wrapper.
+- **Verification/status:** implemented. Required-locality RED reproduced; five new focused tests pass and independent scratch baseline comparison fails four of them. Integration found five old-test/inventory failures; corrected without scanner suppression, and 34 focused tests now pass. Initial lint/types/build and 57 tooling tests passed; post-correction full recheck and exact-head GitHub E2E/database results pending. Table authorization recovered from `odd/tasks/portal-polish.md` S27 and reconciled with the older spec/UI guide. Not human-reviewed or accepted.
+
 ## EXTRA-082 — Independent Home access form drafts
 
 - **Date/authorization:** 2026-10-26, Maxi explicitly requested independent login and registration fields. Supersedes EXTRA-080's cross-form identity sharing, not per-form draft retention.

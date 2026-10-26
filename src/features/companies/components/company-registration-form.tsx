@@ -29,7 +29,7 @@ export function CompanyRegistrationForm({ submitLabel = "Crear cuenta de empresa
         <Field className="grid gap-1">Actividad<input className={field} name="activity" required minLength={2} maxLength={500} defaultValue={defaultValues?.activity ?? ""} /></Field>
       </div>
       <div data-company-field-row>
-        <div className="grid gap-1"><span>Localidad<span aria-hidden="true" data-required-marker data-marker-state="muted" className="ml-1 font-bold text-red-700">*</span></span><LocalityCombobox name="locality" aria-label="Localidad" defaultValue={defaultValues?.locality ?? ""} /></div>
+        <LocalityCombobox label="Localidad" name="locality" aria-label="Localidad" defaultValue={defaultValues?.locality ?? ""} />
         <Field className="grid gap-1">{phoneLabel}<input {...companyPhoneField} className={field} name="phone" type="tel" maxLength={50} defaultValue={defaultValues?.phone ?? ""} /></Field>
       </div>
     </> : <>
@@ -38,7 +38,7 @@ export function CompanyRegistrationForm({ submitLabel = "Crear cuenta de empresa
       <Field className="grid gap-1">Correo electrónico<input className={field} name="email" type="email" required maxLength={320} autoComplete="email" defaultValue={defaultValues?.email ?? ""} /></Field>
       <Field className="grid gap-1">Teléfono de contacto (opcional)<input {...companyPhoneField} className={field} name="phone" type="tel" maxLength={50} defaultValue={defaultValues?.phone ?? ""} /></Field>
       <Field className="grid gap-1">Actividad<input className={field} name="activity" required minLength={2} maxLength={500} defaultValue={defaultValues?.activity ?? ""} /></Field>
-      <div className="grid gap-1"><span>Localidad<span aria-hidden="true" data-required-marker data-marker-state="muted" className="ml-1 font-bold text-red-700">*</span></span><LocalityCombobox name="locality" aria-label="Localidad" defaultValue={defaultValues?.locality ?? ""} /></div>
+      <LocalityCombobox label="Localidad" name="locality" aria-label="Localidad" defaultValue={defaultValues?.locality ?? ""} />
     </>}
     <PasswordField name="password" label="Contraseña" autoComplete="new-password" help="Entre 6 y 128 caracteres. No compartas tu contraseña." defaultValue={defaultValues?.password} />
     <PasswordField name="confirmation" label="Confirmar contraseña" autoComplete="new-password" defaultValue={defaultValues?.confirmation} />

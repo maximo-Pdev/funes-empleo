@@ -1,5 +1,19 @@
 # Municipal visual reference
 
+## PR 78 validation and matching corrections — EXTRA-084
+
+Company Localidad remains a required catalog combobox. Its validation participates
+in the shared Form summary, required marker, invalid description and first-error
+focus; a hidden FormData value alone is not native required-field validation.
+The registration keeps eight required fields and an optional contact phone.
+User-facing focus/touch checks exclude library auxiliary inputs and explicitly
+exercise the real combobox with the keyboard.
+
+`odd/tasks/portal-polish.md` S22/S27 supersedes the older matching-card geometry:
+candidate and matching results use the adapted table, retaining twelve matching
+results per page, global ordering, accessible profile preview and nomination.
+This records the existing authorized migration, not a new listing redesign.
+
 ## Home live public totals — EXTRA-079
 
 Replace the former role-guide cards with “El portal en números”: Postulantes
