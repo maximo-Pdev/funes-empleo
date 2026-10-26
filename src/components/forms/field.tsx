@@ -1,6 +1,7 @@
 "use client";
 import { Children, cloneElement, isValidElement, useContext, useId, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { FormErrorsContext, FormMarkersContext, FormSummarizedFieldsContext } from "./form";
+import { FieldHelp } from "./field-help";
 
 type ElementProps = { children?: ReactNode; id?: string; required?: boolean; type?: string; "aria-labelledby"?: string;
   "aria-describedby"?: string; "aria-invalid"?: boolean | "true" | "false" };
@@ -33,8 +34,8 @@ function captionWithoutControl(children: ReactNode, control?: ReactElement<Eleme
   });
 }
 
-type FieldProps = ComponentProps<"label"> & { label?: ReactNode; error?: string; hint?: string };
-export function Field({ children, label, error: suppliedError, hint, className, ...attributes }: FieldProps) {
+type FieldProps = ComponentProps<"label"> & { label?: ReactNode; error?: string; hint?: string; help?: string };
+export function Field({ children, label, error: suppliedError, hint, help, className, ...attributes }: FieldProps) {
   const generatedId = useId();
   const errors = useContext(FormErrorsContext);
   const summarizedFields = useContext(FormSummarizedFieldsContext);
@@ -47,7 +48,8 @@ export function Field({ children, label, error: suppliedError, hint, className, 
   const showMarker = control?.props.required && (policy !== "on-missing" || missing.includes(id));
   const marker = showMarker ? <span aria-hidden="true" data-required-marker data-marker-state={markerState} className="ml-1 font-bold text-red-700">*</span> : null;
   const decorated = control ? decorate(label ? children : control, control, id, error, hint, hideError) : children;
-  const caption = <span><span id={`${id}-label`}>{label || captionWithoutControl(children, control)}</span>{marker}</span>;
+  const helpIcon = help ? <FieldHelp description={help} label={typeof label === "string" ? label : "este campo"} /> : null;
+  const caption = <span><span id={`${id}-label`}>{label || captionWithoutControl(children, control)}</span>{marker}{helpIcon}</span>;
   const checkbox = control?.props.type === "checkbox" || control?.props.type === "radio";
   return <div className="min-w-0" data-form-field>
     <label {...attributes} htmlFor={control ? id : attributes.htmlFor} className={className}>
