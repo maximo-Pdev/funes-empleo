@@ -25,15 +25,14 @@ describe("intermediación administrativa", () => {
     }));
   });
 
-  it("filtra candidatos por palabra, categoría y disponibilidad con controles etiquetados", () => {
+  it("filtra candidatos por palabra y disponibilidad con controles etiquetados", () => {
     const search = vi.fn();
     render(<CandidateSearchForm categories={[{ id: "cat-1", name: "Categoría ficticia" }]} onSearch={search} />);
     fireEvent.change(screen.getByLabelText("Búsqueda por palabra"), { target: { value: "Persona ficticia" } });
-    fireEvent.change(screen.getByLabelText("Categoría"), { target: { value: "cat-1" } });
     fireEvent.change(screen.getByLabelText("Disponibilidad"), { target: { value: "available" } });
     fireEvent.click(screen.getByRole("button", { name: "Buscar candidatos" }));
     expect(search).toHaveBeenCalledWith(expect.objectContaining({
-      term: "Persona ficticia", categoryId: "cat-1", availability: "available",
+      term: "Persona ficticia", categoryId: [], availability: "available",
     }));
   });
 

@@ -133,8 +133,52 @@ function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
   );
 }
 
+function ComboboxChips({ className, ...props }: ComboboxPrimitive.Chips.Props) {
+  return (
+    <ComboboxPrimitive.Chips
+      data-slot="combobox-chips"
+      className={state => cn(
+        "flex min-h-11 flex-wrap items-center gap-1 rounded-sm border border-brand-text bg-surface px-2.5 py-1 text-sm",
+        typeof className === "function" ? className(state) : className
+      )}
+      {...props}
+    />
+  );
+}
+
+function ComboboxChip({ className, children, ...props }: ComboboxPrimitive.Chip.Props) {
+  return (
+    <ComboboxPrimitive.Chip
+      data-slot="combobox-chip"
+      className={state => cn(
+        "flex h-7 items-center gap-1 rounded-sm bg-surface-muted px-1.5 text-xs font-medium whitespace-nowrap",
+        typeof className === "function" ? className(state) : className
+      )}
+      {...props}
+    >
+      {children}
+      <ComboboxPrimitive.ChipRemove className="opacity-50 hover:opacity-100">
+        <X className="size-3" />
+      </ComboboxPrimitive.ChipRemove>
+    </ComboboxPrimitive.Chip>
+  );
+}
+
+function ComboboxChipsInput(props: ComboboxPrimitive.Input.Props) {
+  return (
+    <ComboboxPrimitive.Input
+      data-slot="combobox-chip-input"
+      className="min-w-16 flex-1 bg-transparent outline-none"
+      {...props}
+    />
+  );
+}
+
 export {
   Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
   ComboboxClear,
   ComboboxCollection,
   ComboboxContent,

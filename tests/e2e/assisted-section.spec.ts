@@ -56,7 +56,8 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await page.getByRole("link", { name: "Siguiente", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/atencion-presencial\?.*page=2/);
   await expect(results.getByRole("link", { name: `${name} 2`, exact: true })).toBeVisible();
-  await page.getByLabel("Categoría", { exact: true }).selectOption({ label: "Categoría ficticia A" });
+  await page.getByLabel("Categorías", { exact: true }).click();
+  await page.getByRole("option", { name: "Categoría ficticia A" }).click();
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page).toHaveURL(/categoryId=rub-[0-9a-f]{24}/);
   await expect(results.getByRole("heading", { name: "Perfiles: 1", exact: true })).toBeVisible();

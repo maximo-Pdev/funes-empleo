@@ -115,7 +115,7 @@ async function searchCandidatePool(input: unknown, now: Date, assistedOnly: bool
     if (result.error) throw new AppError("INTERNAL_ERROR");
     const rows = (result.data ?? []) as unknown as CandidateSearchRow[];
     for (const row of rows) {
-      if (filters.categoryId && !row.candidate_categories.some((entry) => entry.category_id === filters.categoryId)) continue;
+      if (filters.categoryId.length > 0 && !row.candidate_categories.some((entry) => filters.categoryId.includes(entry.category_id))) continue;
       const eligible = candidateIsReferralEligible(row, now);
       if (filters.eligibility === "eligible" && !eligible) continue;
       if (filters.eligibility === "ineligible" && eligible) continue;

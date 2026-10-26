@@ -27,8 +27,14 @@ export async function referenceUrl(href: string): Promise<string> {
   if (url.pathname === "/admin/metrics" || url.pathname === "/api/admin/exports/operations.csv") queries.push(["category", "category"]);
   if (/^\/empresa\/ofertas\/[^/]+$/.test(url.pathname)) queries.push(["referral", "referral"]);
   for (const [key, kind] of queries) {
-    const value = url.searchParams.get(key);
-    if (value && databaseIdentifierPattern.test(value)) url.searchParams.set(key, await recordReference(kind, value));
+    const values = url.searchParams.getAll(key);
+    if (values.length === 0) continue;
+    const converted = await Promise.all(values.map(value =>
+      value && databaseIdentifierPattern.test(value) ? recordReference(kind, value) : value));
+    let index = 0;
+    const rebuilt: [string, string][] = Array.from(url.searchParams.entries()).map(([k, value]) =>
+      k === key ? [k, converted[index++]!] : [k, value]);
+    url.search = `?${rebuilt.map(([k, value]) => `${encodeURIComponent(k)}=${encodeURIComponent(value)}`).join("&")}`;
   }
   return url.pathname + url.search + url.hash;
 }

@@ -25,6 +25,10 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
   const pageUrl = (page: number) => {
     const params = new URLSearchParams();
     if (parsed.success) for (const [key, value] of Object.entries(parsed.data)) {
+      if (key === "categoryId") {
+        for (const id of value as string[]) params.append("categoryId", id);
+        continue;
+      }
       if (value !== undefined && value !== "") params.set(key, String(value));
     }
     params.set("page", String(page));

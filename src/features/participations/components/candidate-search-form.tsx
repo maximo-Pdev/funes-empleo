@@ -3,7 +3,7 @@ import { Form } from "@/components/forms/form";
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { Button, SelectField, TextField } from "@/components/ui";
+import { Button, Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxTrigger, SelectField, TextField } from "@/components/ui";
 import { LocalityCombobox } from "@/features/companies/components/locality-combobox";
 import type { CandidateSearchFilters } from "@/validation/candidate-search";
 
@@ -17,30 +17,47 @@ export function CandidateSearchForm({ categories, initial, onSearch, destination
 }) {
   const router = useRouter();
   const [term, setTerm] = useState(initial?.term ?? "");
-  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
+  const [categoryIds, setCategoryIds] = useState<string[]>(initial?.categoryId ?? []);
   const [availability, setAvailability] = useState(initial?.availability ?? "");
   const [locality, setLocality] = useState(initial?.locality ?? "");
   const [eligibility, setEligibility] = useState<SearchValues["eligibility"]>(initial?.eligibility ?? "eligible");
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const filters: SearchValues = { term: term.trim(), categoryId: categoryId || undefined,
+    const filters: SearchValues = { term: term.trim(), categoryId: categoryIds,
       availability: availability.trim(), locality: locality.trim(), eligibility };
     if (onSearch) { onSearch(filters); return; }
     const params = new URLSearchParams();
-    for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
-    if (categoryId) {
-      const reference = categories.find(category => category.id === categoryId)?.reference;
-      if (!reference) return;
-      params.set("categoryId", reference);
+    for (const [key, value] of Object.entries(filters)) {
+      if (key === "categoryId") continue;
+      if (value) params.set(key, String(value));
+    }
+    for (const id of categoryIds) {
+      const reference = categories.find(category => category.id === id)?.reference;
+      if (reference) params.append("categoryId", reference);
     }
     router.push(`${destination}?${params.toString()}`);
   }
 
   return <Form onSubmit={submit} className="grid gap-4 rounded-lg border border-slate-300 bg-white p-5 sm:grid-cols-2" role="search">
     <TextField id="candidate-term" label="Búsqueda por palabra" value={term} onChange={(event) => setTerm(event.target.value)} maxLength={100} />
-    <SelectField id="candidate-category" label="Categoría" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}
-      options={categories.map((category) => ({ value: category.id, label: category.name }))} placeholder="Todas las categorías" />
+    <div className="grid gap-1">
+      <span className="text-sm font-semibold">Categorías</span>
+      <Combobox multiple value={categoryIds} onValueChange={setCategoryIds}>
+        <ComboboxTrigger aria-label="Categorías">
+          <span className={categoryIds.length ? "" : "text-muted-foreground"}>
+            {categoryIds.length ? `${categoryIds.length} seleccionadas` : "Todas las categorías"}
+          </span>
+        </ComboboxTrigger>
+        <ComboboxContent>
+          <ComboboxInput placeholder="Buscar categoría…" aria-label="Buscar categoría" />
+          <ComboboxList>
+            {categories.map(category => <ComboboxItem key={category.id} value={category.id}>{category.name}</ComboboxItem>)}
+          </ComboboxList>
+          <ComboboxEmpty>Sin resultados</ComboboxEmpty>
+        </ComboboxContent>
+      </Combobox>
+    </div>
     <SelectField id="candidate-availability" label="Disponibilidad" value={availability} onChange={(event) => setAvailability(event.target.value)}
       placeholder="Todas las disponibilidades" options={[{ value: "available", label: "Disponible" }, { value: "unavailable", label: "No disponible" },
         ...(!["", "available", "unavailable"].includes(availability) ? [{ value: availability, label: "Filtro anterior" }] : [])]} />

@@ -20,13 +20,17 @@ type SearchParams = Record<string, string | string[] | undefined>;
 export default async function AssistedCandidatesPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   await requireActiveAccount(["admin"]);
   const raw = await referenceFilters("/admin/atencion-presencial", await searchParams, { categoryId: "category" });
-  const parsed = candidateSearchSchema.safeParse({ vigency: "all", eligibility: "all", ...raw });
+  const parsed = candidateSearchSchema.safeParse({ eligibility: "all", ...raw });
   const [categories, creationPolicy] = await Promise.all([listCandidateSearchCategories(), getAssistedCreationPolicy()]);
   const references = await recordReferences("category", categories.map(category => category.id));
   const results = parsed.success ? await searchAssistedCandidates(parsed.data) : null;
   const pageUrl = (page: number) => {
     const params = new URLSearchParams();
     if (parsed.success) for (const [key, value] of Object.entries(parsed.data)) {
+      if (key === "categoryId") {
+        for (const id of value as string[]) params.append("categoryId", id);
+        continue;
+      }
       if (value !== undefined && value !== "") params.set(key, String(value));
     }
     params.set("page", String(page));

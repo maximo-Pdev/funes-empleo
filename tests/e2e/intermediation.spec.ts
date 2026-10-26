@@ -45,7 +45,8 @@ test("administración filtra el padrón ficticio con conteo y paginación seguro
   await page.goto("/admin/candidates");
   await expect(page.getByRole("heading", { name: "Buscar candidatos" })).toBeVisible();
   await page.getByLabel("Búsqueda por palabra").fill(fixture.sc008a.candidateSearch.term);
-  await page.getByLabel("Categoría").selectOption({ label: "Categoría ficticia B" });
+  await page.getByLabel("Categorías").click();
+  await page.getByRole("option", { name: "Categoría ficticia B" }).click();
   await page.getByLabel("Disponibilidad").selectOption(fixture.sc008a.candidateSearch.availability);
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page.getByRole("heading", { name: `Resultados: ${fixture.sc008a.candidateSearch.expectedTotal}` })).toBeVisible();
