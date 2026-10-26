@@ -1,6 +1,6 @@
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { RecordLink as Link } from "@/components/ui/record-link";
-import { EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
+import { EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { referenceFilters } from "@/lib/records/page-references";
 import { referenceUrl } from "@/lib/records/reference-url";
@@ -51,13 +51,30 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
       <h2 className="text-xl font-semibold">Perfiles: {results.total}</h2>
       {results.items.length === 0 ? <EmptyState title="Sin perfiles de atención presencial"
         description="No encontramos perfiles para estos filtros. Podés ampliar la búsqueda o iniciar una nueva atención presencial." /> :
-        <ul className="grid gap-3 md:grid-cols-2">{results.items.map(candidate => <li key={candidate.id} className="rounded-lg border border-border bg-surface p-5">
-          <h3 className="text-lg font-semibold"><Link href={`/admin/candidates/${candidate.id}`} className="text-primary underline underline-offset-4">{candidate.displayName}</Link></h3>
-          <p className="mt-1 flex flex-wrap items-center gap-2">Estado <Badge variant="status" tone={statusTone(candidateProfileStatusTones, candidate.status)}>{displayLabel(candidateProfileStatusLabels, candidate.status)}</Badge></p>
-          <p className="mt-1 flex flex-wrap items-center gap-2">{candidate.locality ?? "Localidad no informada"} <Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></p>
-          <p className="mt-1 text-sm">{candidate.categories.map(category => category.name).join(", ") || "Sin categorías activas"}</p>
-          <p className="mt-2 text-sm">{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</p>
-        </li>)}</ul>}
+        <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Candidato</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Localidad</TableHead>
+                <TableHead>Disponibilidad</TableHead>
+                <TableHead>Categorías</TableHead>
+                <TableHead>Aptitud para derivación</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {results.items.map(candidate => <TableRow key={candidate.id}>
+                <TableCell className="font-semibold"><Link href={`/admin/candidates/${candidate.id}`} className="text-primary underline underline-offset-4">{candidate.displayName}</Link></TableCell>
+                <TableCell><Badge variant="status" tone={statusTone(candidateProfileStatusTones, candidate.status)}>{displayLabel(candidateProfileStatusLabels, candidate.status)}</Badge></TableCell>
+                <TableCell>{candidate.locality ?? "Localidad no informada"}</TableCell>
+                <TableCell><Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></TableCell>
+                <TableCell>{candidate.categories.map(category => category.name).join(", ") || "Sin categorías activas"}</TableCell>
+                <TableCell>{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</TableCell>
+              </TableRow>)}
+            </TableBody>
+          </Table>
+        </div>}
       {results.pageCount > 1 && <Pagination aria-label="Páginas de atención presencial">
         <PaginationContent>
           {results.page > 1 && <PaginationItem><PaginationPrevious href={await pageUrl(results.page - 1)} /></PaginationItem>}
