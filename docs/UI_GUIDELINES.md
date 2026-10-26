@@ -14,6 +14,16 @@ candidate and matching results use the adapted table, retaining twelve matching
 results per page, global ordering, accessible profile preview and nomination.
 This records the existing authorized migration, not a new listing redesign.
 
+## Favicon — EXTRA-083
+
+Use `public/brand/funes-favicon-white.png` for root icon metadata, with the
+`?v=white-emblem-1` URL revision to invalidate the browser's prior favicon cache.
+It is the
+user-supplied municipal emblem recolored white, preserving its original alpha
+channel and proportions on a transparent 256×256 canvas. Keep the navbar and
+other in-page municipal logos unchanged. The white silhouette is intended for
+dark browser chrome; transparency does not provide contrast on white tabs.
+
 ## Home live public totals — EXTRA-079
 
 Replace the former role-guide cards with “El portal en números”: Postulantes

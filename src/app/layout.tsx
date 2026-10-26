@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Portal Municipal de Empleo de Funes",
   description: "Oficina de Empleo de la Municipalidad de Funes",
-  icons: { icon: "/brand/funes-navbar-seal.png" },
+  icons: { icon: { url: "/brand/funes-favicon-white.png?v=white-emblem-1", type: "image/png", sizes: "256x256" } },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
