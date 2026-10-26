@@ -12,7 +12,7 @@ it.each([["candidate", "Postulante", "Tu próximo paso laboral empieza acá.", 5
   const panel = screen.getByRole("region", { name: "Acceso al portal" });
   const form = panel.querySelector("form")!;
   const inputNames = [...form.querySelectorAll("input")].map(input => input.getAttribute("name")).filter((name): name is string => name !== null);
-  if (role === "company") expect(inputNames).toEqual(["legalName", "responsibleName", "email", "cuit", "activity", "locality", "phone", "schedule", "password", "confirmation"]);
+  if (role === "company") expect(inputNames).toEqual(["legalName", "responsibleName", "email", "cuit", "activity", "locality", "phone", "password", "confirmation"]);
   else expect(inputNames).toHaveLength(fields);
   expect(view.container.querySelectorAll("#acceso")).toHaveLength(1);
   expect(screen.getByRole("radio", { name: label })).toHaveProperty("checked", true);
