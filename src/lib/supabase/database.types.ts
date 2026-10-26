@@ -1800,6 +1800,10 @@ export type Database = {
         }
         Returns: Json
       }
+      match_opening_candidates_ordered: {
+        Args: { p_opening: string; p_order?: string; p_page?: number; p_page_size?: number }
+        Returns: Json
+      }
       preview_opening_candidate: {
         Args: { p_opening: string; p_candidate: string }
         Returns: Json

@@ -185,6 +185,12 @@ it("muestra candidatos después de la información e historial de oferta y fuera
  const details = screen.getByRole("region", { name: "Oferta y empresa" });
  const history = screen.getByRole("region", { name: "Historial de moderación" });
  const matches = screen.getByRole("region", { name: "Candidatos coincidentes de prueba" });
+ const decision = screen.getByRole("heading", { name: "Decisión municipal sobre la oferta" }).closest("form");
+ expect(details.parentElement).not.toBe(decision?.parentElement);
+ expect(history.parentElement).toBe(decision?.parentElement);
+ const link = screen.getByRole("link", { name: "Ver participaciones de esta oferta" });
+ expect(link.getAttribute("href")).toBe(`/admin/participations?openingId=${fixtureReference("opening", id)}`);
+ expect(link.className).toContain("min-h-11");
  expect(details.compareDocumentPosition(matches) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(history.compareDocumentPosition(matches) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(matches.closest(".grid")).toBeNull();

@@ -31,6 +31,12 @@
 
 ## Notes
 
+- Incremento EXTRA073: revisión de calidad de requisitos integrada en feature001.
+  Scope/R1–R5, última actualización, orden global/empates, página inicial,
+  compatibilidad/roles/errores y móvil/teclado están definidos; las respuestas de
+  Mateo resuelven las dos dudas del alcance. No quedan marcadores nuevos de
+  aclaración ni se modifican checkboxes de checklists de revisión humana.
+
 - Validation iteration 1 passed all specification-quality criteria.
 - Open stakeholder decisions are preserved explicitly under `Open Questions and Validation
   Dependencies`; their documented safe positions are constraints, not approved answers.

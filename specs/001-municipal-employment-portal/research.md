@@ -3,6 +3,27 @@
 **Fecha**: 2026-09-19  
 **Alcance**: decisiones necesarias para completar el plan técnico; no modifica requisitos de producto.
 
+## EXTRA073 — Orden global y navegación administrativa
+
+Decisión: RPC aditivo con nombre único y pool elegible existente; no modificar
+firmas/helper ni descargar todas las páginas al servidor web. Ordenar antes de
+paginar por candidate_profiles.updated_at, luego nombre/ID. Evidencia:
+20261019205940_opening_candidate_preview.sql:1–50 y versión/trigger
+202609190003_authorization_audit.sql:26–27,294. Notas/CV/foto también actualizan
+ese reloj; no equivale solo a edición de la persona o última confirmación.
+
+Alternativas descartadas: sort de doce fichas (no global), cargar todas las RPC
+(viajes extra) y sobrecarga de nombre (resolución ambigua para clientes/PostgREST).
+No agregar índice sin EXPLAIN representativo. Investigar/verificar sobre fixture
+ficticio, sin tocar producción. Investigación de lectura delegada según fase0.
+
+Fuentes: https://supabase.com/docs/guides/database/functions;
+https://ui.shadcn.com/docs/components/base/button y
+https://ui.shadcn.com/docs/components/base/native-select, más fuentes base-nova.
+Conservar link nativo usando buttonVariants dentro de componente cliente: el
+helper del Button actual vive en módulo use client y no debe invocarse en RSC.
+Selector compartido necesita omitir placeholder sin alterar callers existentes.
+
 ## 1. Versiones reproducibles del stack
 
 **Decisión**: usar Node.js 24.21.0 LTS con npm 11.19.0, Next.js 16.3.8, React/React DOM

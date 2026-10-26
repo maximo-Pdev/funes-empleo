@@ -5,6 +5,15 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## Oferta administrativa y matching ordenado — EXTRA073
+
+- [x] T212 Mantener cinco eventos iniciales de moderación y revelar cinco con Mostrar más solo cuando queden otros. Conservar foco/orden/auditoría y reutilizar el componente empresa/admin; expectativas de componentes/E2E alineadas.59 pruebas pertinentes PASS, bordes0/1/5/12, navegador8 escenarios0/5/6/12×1440/390 con teclado/foco/axe0 PASS; tipos/lint/build limpio/diff PASS. Ampliación visual posterior de EXTRA073, sin backend ni migración; revisión/publicación pendientes.
+
+- [x] T208 Registrar R1–R5/clarificaciones e investigación, plan/modelo/contratos/quickstart, calidad de requisitos y análisis de consistencia antes de implementar; cobertura5/5, cero críticos/altos, constitución I–VI sin conflictos. Base/trabajo ajeno preservados, sin nueva arquitectura/dependencias o decisiones municipales inventadas; EXTRA073.
+- [x] T209 Crear migración aditiva match_opening_candidates_ordered, compartiendo pool y ordenando updated_at con desempate antes de paginar; validar órdenes/límites/sesión/admin/ACL. Conservar RPC legado y proyección; actualizar src/validation/opening-matching.ts, servicio/tipos, catálogo y contratos de despliegue/recuperación. Migración20261025222811; pgTAP1314/25 archivos PASS.
+- [x] T210 Colocar decisión/historial a la derecha de oferta, destacar enlace canónico con LinkButton compartido y selector de última actualización en matching; extender SelectField sin romper defaults. Reinicio página1, orden en enlaces/Suspense y preservación de popup/nominación. R1–R5; depende T209. Contraste blanco corregido con data-slot y exclusión CSS acotada.
+- [x] T211 Verificar orden global/tres páginas/empates/roles/privacidad/integridad/compatibilidad SQL y medición sintética, validación/query/URL/UI/regresiones con unit/E2E, móvil/escritorio/teclado/axe, tipos/lint/build. Unit1200/90, tooling57, SQL1314/25,5 E2E principales y3 consumidores de nominación PASS; tipos/lint/build/diff y advisor local PASS. Cotejo final R1–R5 sin faltantes del alcance; recuperación en docs/operations/admin-opening-workspace.md. EXTRA073 registra defectos de contraste/race corregidos y limitaciones. Migración alojada aplicada después por solicitud de Mateo; commit/PR/CI/revisión pendientes.
+
 ## Consentimiento resumido — EXTRA072,2026-10-25
 
 - [x] T207 Alinear la expectativa E2E restante de PR76 con «tu consentimiento vigente» y revocación a todas las empresas; RED original/GREEN recorrido candidato completo27.9s, cero reintentos/omisiones, tipos/lint/build/diff PASS. Solo prueba/trazabilidad, sin cambios de producto/SQL/reglas. EXTRA072; publicación/nueva CI completa/revisión pendientes.

@@ -11,9 +11,9 @@ export async function getOpeningMatches(input: unknown) {
   if (!session || session.account.role !== "admin" || session.account.status !== "active") {
     throw new AppError("ACCESS_DENIED");
   }
-  const { openingId, page, pageSize } = parsed.data;
-  const result = await session.client.rpc("match_opening_candidates", {
-    p_opening: openingId, p_page: page, p_page_size: pageSize,
+  const { openingId, page, pageSize, order } = parsed.data;
+  const result = await session.client.rpc("match_opening_candidates_ordered", {
+    p_opening: openingId, p_page: page, p_page_size: pageSize, p_order: order,
   });
   if (result.error) throw workflowRpcError(result.error.message);
   const response = openingMatchesSchema.safeParse(result.data);

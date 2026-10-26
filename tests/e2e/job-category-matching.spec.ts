@@ -42,7 +42,7 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   const next = section.getByRole("link", { name: "Siguiente", exact: true });
   await next.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(new RegExp(`/admin/openings/${persistedReference("opening", id)}\\?matchPage=2#opening-matches$`));
+  await expect(page).toHaveURL(new RegExp(`/admin/openings/${persistedReference("opening", id)}\\?matchOrder=updated_desc&matchPage=2#opening-matches$`));
   await expect(section.getByText(/Página 2 de/)).toBeVisible();
   const secondNames = await section.getByRole("heading", { level: 3 }).allTextContents();
   expect(secondNames.some(name => firstNames.includes(name))).toBe(false);
@@ -77,16 +77,71 @@ test("matching inválido y vacío se explican sin ampliar resultados", async ({ 
   const id = openingId();
   await signIn(page, "admin1@example.invalid");
   await page.goto(`/admin/openings/${id}?matchPage=1&matchPage=2`);
-  await expect(page.getByRole("main").getByRole("alert")).toContainText("Revisá la página de coincidencias");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Revisá la página o el orden de coincidencias");
+  await page.goto(`/admin/openings/${id}?matchOrder=updated_asc&matchOrder=updated_desc`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Revisá la página o el orden de coincidencias");
   await page.goto(`/admin/openings/${id}?matchPage=10000`);
   await expect(page.getByText("Sin candidatos en esta página", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Volver a la primera página", exact: true }).click();
   await expect(page.getByRole("region", { name: "Candidatos con rubros coincidentes", exact: true }).getByText(/^Coincidencias:/)).toBeVisible();
 });
 
+test("ordena globalmente por actualización, conserva orden al paginar y reinicia al cambiarlo", async ({ page }) => {
+  const id = openingId();
+  const expected = (direction: "asc" | "desc", offset = 0) => JSON.parse(runLocalMaintenanceSql(`
+    select jsonb_agg(display_name order by updated_at ${direction},display_name,id) from (
+      select pool.id,pool.display_name,candidate.updated_at from private.opening_candidate_pool('${id}') pool
+      join public.candidate_profiles candidate on candidate.id=pool.id
+      order by candidate.updated_at ${direction},pool.display_name,pool.id limit 12 offset ${offset}
+    ) ordered`)) as string[];
+  await signIn(page, "admin1@example.invalid");
+  await page.goto(`/admin/openings/${id}`);
+  const section = page.getByRole("region", { name: "Candidatos con rubros coincidentes", exact: true });
+  const selector = section.getByRole("combobox", { name: "Última actualización del perfil" });
+  await expect(selector).toHaveValue("updated_desc");
+  await expect(section.getByRole("heading", { level: 3 })).toHaveText(expected("desc"));
+  await selector.selectOption("updated_asc");
+  await expect(page).toHaveURL(/\?matchOrder=updated_asc#opening-matches$/);
+  await expect(section.getByRole("heading", { level: 3 })).toHaveText(expected("asc"));
+  await section.getByRole("link", { name: "Siguiente", exact: true }).click();
+  await expect(page).toHaveURL(/\?matchOrder=updated_asc&matchPage=2#opening-matches$/);
+  await expect(section.getByRole("heading", { level: 3 })).toHaveText(expected("asc", 12));
+  await page.reload();
+  await expect(selector).toHaveValue("updated_asc");
+  await selector.focus();
+  await page.keyboard.press("ArrowUp");
+  await expect(page).toHaveURL(/\?matchOrder=updated_desc#opening-matches$/);
+  await expect(section.getByRole("heading", { level: 3 })).toHaveText(expected("desc"));
+  const details = page.getByRole("region", { name: "Oferta y empresa" });
+  const decision = page.getByRole("heading", { name: "Decisión municipal sobre la oferta" });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const info = await details.boundingBox();
+  const moderation = await decision.boundingBox();
+  expect(moderation!.x).toBeGreaterThan(info!.x + info!.width);
+  const participationLink = details.getByRole("link", { name: "Ver participaciones de esta oferta" });
+  await expect(participationLink).toHaveCSS("color", "rgb(255, 255, 255)");
+  await participationLink.hover();
+  await expect(participationLink).toHaveCSS("color", "rgb(255, 255, 255)");
+  await participationLink.focus();
+  await expect(participationLink).toBeFocused();
+  expect((await new AxeBuilder({ page }).include('[aria-labelledby="opening-details"]').analyze()).violations).toEqual([]);
+  expect((await participationLink.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  expect(await participationLink.getAttribute("href")).toBe(`/admin/participations?openingId=${persistedReference("opening", id)}`);
+  await page.screenshot({ path: "test-results/admin-opening-desktop.png", fullPage: true });
+  await details.screenshot({ path: "test-results/admin-opening-details-desktop.png" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: "test-results/admin-opening-mobile.png", fullPage: true });
+  await details.screenshot({ path: "test-results/admin-opening-details-mobile.png" });
+  const mobileInfo = await details.boundingBox();
+  expect((await decision.boundingBox())!.y).toBeGreaterThan(mobileInfo!.y + mobileInfo!.height);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await participationLink.click();
+  await expect(page).toHaveURL(new RegExp(`/admin/participations\\?openingId=${persistedReference("opening", id)}$`));
+});
+
 test("nomina desde el popup a esta oferta y no vuelve a mostrar al candidato", async ({ page }) => {
   const id = openingId();
-  const candidate = runLocalMaintenanceSql(`select id from private.opening_candidate_pool('${id}') order by display_name,id limit 1`);
+  const candidate = runLocalMaintenanceSql(`select pool.id from private.opening_candidate_pool('${id}') pool join public.candidate_profiles candidate on candidate.id=pool.id order by candidate.updated_at desc,pool.display_name,pool.id limit 1`);
   expect(candidate).toMatch(/^[0-9a-f-]{36}$/);
   const referralsBefore = runLocalMaintenanceSql("select count(*) from public.referrals");
   await signIn(page, "admin1@example.invalid");

@@ -294,6 +294,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await candidate.getByRole("button", { name: "Guardar correcciones" }).click();
     await expect(candidate.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
     await admin.goto(`/admin/candidates/${fixtureId("profile", 1)}`);
+    await expect(admin).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
     await expect(admin.getByRole("button", { name: "Crear nominación" })).toHaveCount(0);
     await nominateFromOpening(admin, fixtureId("profile", 1), fixtureId("opening", 2));
     await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
