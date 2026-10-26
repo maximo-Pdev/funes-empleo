@@ -50,7 +50,7 @@ export async function renderCandidateAccount({ params, email, basePath = "/accou
     name={name} email={email} mainLabel={section === "perfil" ? "Perfil" : undefined}
     canvasSlot={section === "perfil" ? "profile-canvas" : "candidate-canvas"}>
           {section === "perfil" ? <>
-            <header className={styles.heading}><h1>{title}</h1><p>{description}</p></header>
+            <header className={`${styles.heading} ${styles.profileHeading}`}><h1>{title}</h1><p>{description}</p></header>
             {content}
             <p className={styles.profileNotice}>La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.</p>
           </> : <div className={styles.sectionContent}>

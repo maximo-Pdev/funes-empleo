@@ -8,6 +8,7 @@ type PasswordFieldProps = {
   label: string;
   autoComplete: "current-password" | "new-password";
   help?: string;
+  defaultValue?: string;
 };
 
 function updateConfirmationValidity(event: ChangeEvent<HTMLInputElement>) {
@@ -20,13 +21,13 @@ function updateConfirmationValidity(event: ChangeEvent<HTMLInputElement>) {
   }
 }
 
-export function PasswordField({ name, label, autoComplete, help }: PasswordFieldProps) {
+export function PasswordField({ name, label, autoComplete, help, defaultValue }: PasswordFieldProps) {
   const inputId = useId();
   const [visible, setVisible] = useState(false);
   const description = name === "confirmation" ? "confirmación de contraseña" : "contraseña";
   return <Field label={label} hint={help} className="block font-semibold">
     <div className="mt-1 flex items-stretch gap-2">
-      <input id={inputId} name={name} type={visible ? "text" : "password"}
+      <input id={inputId} name={name} type={visible ? "text" : "password"} defaultValue={defaultValue}
         required minLength={6} maxLength={128} autoComplete={autoComplete}
         onChange={updateConfirmationValidity}
         className="min-w-0 w-full rounded border border-slate-500 bg-white p-3" />

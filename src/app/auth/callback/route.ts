@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getClientEnvironment } from "@/lib/env/client";
+import { getAccessHref } from "@/features/accounts/access-notices";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     if (code) valid = !(await client.auth.exchangeCodeForSession(code)).error;
     else if (hash && (type === "signup" || type === "recovery" || type === "invite")) valid = !(await client.auth.verifyOtp({ token_hash: hash, type })).error;
   } catch { /* Never log URL, token, Auth response or secret. */ }
-  const redirectUrl = new URL(valid ? destination : recovery ? "/recovery-invalid" : "/verification-expired", getClientEnvironment().NEXT_PUBLIC_APP_URL);
+  const redirectUrl = new URL(valid ? destination : recovery ? getAccessHref("recovery-invalid") : "/verification-expired", getClientEnvironment().NEXT_PUBLIC_APP_URL);
   // Explicit empty fragment stops browsers inheriting Auth's fragment during an HTTP redirect.
   // Never carry access tokens or Auth error details onto a user-facing page URL.
   redirectUrl.hash = "#";

@@ -1,0 +1,29 @@
+.resend {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.resend .lead {
+  color: var(--color-foreground-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: center;
+}
+
+.resend .message {
+  color: var(--color-feedback-info);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.resend .message:empty {
+  display: none;
+}
