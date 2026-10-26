@@ -26,11 +26,11 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
   return (
     <main id="contenido" tabIndex={-1} className="min-h-screen bg-page text-foreground">
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link href="/" className="flex min-h-11 items-center gap-3 rounded-lg font-semibold text-primary-700">
-            <Image src="/brand/logo-funes-gris.svg" alt="Municipalidad de Funes — inicio" width={44} height={44} className="h-11 w-11 rounded-lg border border-border bg-surface" />
-            <span className="hidden leading-tight sm:block">Municipalidad de Funes<span className="block text-sm font-medium text-muted-foreground">Portal de Empleo</span></span>
-          </Link>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
+          <a href="https://funes.gob.ar/" aria-label="Ir al sitio de la Municipalidad de Funes" className="flex min-h-16 items-center gap-3">
+            <Image src="/brand/funes-navbar-emblem.svg" alt="Municipalidad de Funes" width={225} height={235} className="h-12 w-auto" />
+            <span className="hidden leading-tight sm:flex sm:flex-col"><strong className="text-sm font-bold">Oficina de Empleo</strong><span className="text-sm text-muted-foreground">Municipalidad de Funes</span></span>
+          </a>
           <nav aria-label="Accesos principales">
             <Link className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-secondary" href={accountAccess.href}>{accountAccess.label}</Link>
           </nav>

@@ -31,8 +31,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
   };
 
   return <AdminShell email={user?.email} active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
-    navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/admin/imports", label: "Importaciones" }, { href: "/admin/metrics", label: "Métricas" }, { href: "/account", label: "Mi cuenta" }]}>
-    <Link href="/admin/candidates/assisted" className="inline-block rounded bg-blue-800 p-3 text-white">Nueva atención presencial</Link>
+    navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/admin/imports", label: "Importaciones" }, { href: "/admin/metrics", label: "Métricas" }, { href: "/account", label: "Cuenta" }]}>
     <CandidateSearchForm categories={categories.map((category) => ({ id: category.id, name: category.name, reference: categoryReferences[category.id]! }))}
       initial={parsed.success ? parsed.data : undefined} />
     {!parsed.success && <div className="mt-5"><FeedbackMessage tone="error">Revisá los filtros y volvé a buscar. No se aceptan caracteres especiales en los términos.</FeedbackMessage></div>}

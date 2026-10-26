@@ -5,19 +5,21 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { signIn, requestRecovery, resendVerification, updatePassword, changeAccountStatus, registerAccount } from "./service";
 import type { AccountFormState } from "./form-state";
 import { getAccessHref } from "./access-notices";
+import { getPanelHref } from "./navigation";
+import type { UserRole } from "@/domain/catalogs";
 import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/validation/password";
 
 const genericRenewal = { message: "Si corresponde, recibirás un enlace en tu correo. Revisá también la carpeta de correo no deseado.", success: true };
 
 export async function loginAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
-  let status: "active" | "invalid" | "suspended" | "already-active" = "invalid";
-  try { status = (await signIn({ email: form.get("email"), password: form.get("password") })).status; }
+  let result: { status: "active" | "invalid" | "suspended" | "already-active"; role?: UserRole } = { status: "invalid" };
+  try { result = await signIn({ email: form.get("email"), password: form.get("password") }); }
   catch { return { message: "No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.", success: false }; }
-  if (status === "already-active") return { message: "Ya tenés la sesión iniciada", success: false, tone: "info" };
-  if (status === "suspended") redirect(getAccessHref("suspended"));
-  if (status !== "active") return { message: "No pudimos iniciar sesión. Revisá el correo, la contraseña y su verificación.", success: false };
+  if (result.status === "already-active") return { message: "Ya tenés la sesión iniciada", success: false, tone: "info" };
+  if (result.status === "suspended") redirect(getAccessHref("suspended"));
+  if (result.status !== "active") return { message: "No pudimos iniciar sesión. Revisá el correo, la contraseña y su verificación.", success: false };
   revalidatePath("/", "layout");
-  redirect("/account");
+  redirect(result.role ? getPanelHref(result.role) : "/account");
 }
 export async function recoveryAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   try { await requestRecovery({ email: form.get("email") }); } catch { /* same non-enumerating response */ }

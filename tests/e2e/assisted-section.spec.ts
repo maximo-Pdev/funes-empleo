@@ -20,9 +20,9 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   test.setTimeout(90_000);
   await loginFixture(page, "admin");
   const menu = page.getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
-  await menu.getByRole("link", { name: "Atención presencial", exact: true }).click();
+  await menu.getByRole("link", { name: "Perfil asistido", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/atencion-presencial$/);
-  await expect(menu.getByRole("link", { name: "Atención presencial", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(menu.getByRole("link", { name: "Perfil asistido", exact: true })).toHaveAttribute("aria-current", "page");
   await expect(page.getByLabel("Vigencia")).toHaveValue("all");
   await expect(page.getByLabel("Aptitud para derivación")).toHaveValue("all");
   const suffix = Date.now().toString().slice(-5);
@@ -69,7 +69,7 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Consentimiento y activación", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Vincular cuenta presencialmente", exact: true })).toBeVisible();
-  await expect(menu.getByRole("link", { name: "Atención presencial", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(menu.getByRole("link", { name: "Perfil asistido", exact: true })).toHaveAttribute("aria-current", "page");
   const id = referenceIdentifier("candidate", firstReference);
   expect(runLocalMaintenanceSql(`select origin from public.candidate_profiles where id='${id}'`)).toBe("assisted");
   expect(runLocalMaintenanceSql(`select status from public.candidate_profiles where id='${id}'`)).toBe("active");

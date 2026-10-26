@@ -125,9 +125,9 @@ it("conserva menú y regreso al apartado para un perfil asistido vinculado", asy
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted" }, currentCv: null, referralEligible: true, participations: [], notes: [], audit: [] });
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  const navigation = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
- expect(within(navigation).getByRole("link", { name: "Atención presencial" }).getAttribute("aria-current")).toBe("page");
+ expect(within(navigation).getByRole("link", { name: "Perfil asistido" }).getAttribute("aria-current")).toBe("page");
  expect(navigation.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
- expect(screen.getByRole("link", { name: "Volver a atención presencial" }).getAttribute("href")).toBe("/admin/atencion-presencial");
+ expect(screen.getByRole("link", { name: "Volver a perfil asistido" }).getAttribute("href")).toBe("/admin/atencion-presencial");
 });
 it("muestra ausencia de CV sin carga, descarga o nominación desde perfil", async () => {
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));

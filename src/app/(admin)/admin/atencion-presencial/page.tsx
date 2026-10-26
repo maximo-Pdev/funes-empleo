@@ -32,7 +32,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
     return `/admin/atencion-presencial?${params.toString()}`;
   };
 
-  return <AdminShell active="/admin/atencion-presencial" title="Atención presencial"
+  return <AdminShell active="/admin/atencion-presencial" title="Perfil asistido"
     description="Creá un perfil mediante atención presencial o consultá los ya creados, incluidos quienes vincularon una cuenta.">
     <section aria-label="Crear perfil presencial" className="mb-8">
       <AssistedProfileForm categories={categories} creationPolicy={creationPolicy} />

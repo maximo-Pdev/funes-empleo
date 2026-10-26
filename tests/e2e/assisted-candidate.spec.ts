@@ -20,7 +20,7 @@ async function signIn(page: Page, email = "admin1@example.invalid") {
 }
 async function fillProfile(page: Page, name: string, dni: string) {
   await page.goto("/admin/candidates/assisted");
-  await expect(page.getByRole("heading", { name: "Atención presencial" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Perfil asistido" })).toBeVisible();
   await page.getByLabel("Nombre y apellido").fill(name);
   await page.getByLabel("DNI", { exact: true }).fill(dni);
   await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
@@ -165,7 +165,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toHaveCount(0);
     const after = runLocalMaintenanceSql(`select jsonb_build_object('origin',origin,'status',status,'consents',(select count(*) from public.candidate_consents where candidate_id='${id}'),'cases',(select count(*) from public.participations where candidate_id='${id}'),'notes',(select count(*) from public.internal_notes where candidate_id='${id}')) from public.candidate_profiles where id='${id}'`);
     expect(after).toBe(before);
-    await page.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }).getByRole("link", { name: "Atención presencial", exact: true }).click();
+    await page.getByRole("navigation", { name: "Navegación de Oficina de Empleo" }).getByRole("link", { name: "Perfil asistido", exact: true }).click();
     await page.getByLabel("Término").fill(name);
     await page.getByRole("button", { name: "Buscar candidatos" }).click();
     const assistedResults = page.getByRole("region", { name: "Perfiles de atención presencial" });

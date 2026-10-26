@@ -7,13 +7,13 @@ import styles from "./admin-workspace.module.css";
 
 const navigation = [
   { href: "/admin/candidates", label: "Candidatos", icon: Users },
-  { href: "/admin/atencion-presencial", label: "Atención presencial", icon: Users },
+  { href: "/admin/atencion-presencial", label: "Perfil asistido", icon: Users },
   { href: "/admin/empresas", label: "Empresas", icon: Building2 },
   { href: "/admin/openings", label: "Ofertas", icon: BriefcaseBusiness },
   { href: "/admin/participations", label: "Participaciones", icon: ShieldCheck },
   { href: "/admin/imports", label: "Importaciones", icon: FileSpreadsheet },
   { href: "/admin/metrics", label: "Métricas", icon: BarChart3 },
-  { href: "/account", label: "Mi cuenta", icon: Settings },
+  { href: "/account", label: "Cuenta", icon: Settings },
 ];
 
 type AdminShellProps = {

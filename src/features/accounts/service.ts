@@ -30,7 +30,7 @@ export async function signIn(input: unknown) {
     await client.auth.signOut({ scope: "local" });
     return { status: session.account.status === "suspended" ? "suspended" as const : "invalid" as const };
   }
-  return { status: "active" as const };
+  return { status: "active" as const, role: session.account.role };
 }
 export async function requestRecovery(input: unknown) {
   const parsed = emailInput.safeParse(input);

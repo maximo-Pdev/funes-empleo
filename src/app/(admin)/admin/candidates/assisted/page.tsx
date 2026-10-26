@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export default async function AssistedPage() {
   const { user } = await requireActiveAccount(["admin"]);
   const [{ categories }, creationPolicy] = await Promise.all([getAssistedWorkspace(), getAssistedCreationPolicy()]);
-  return <AdminShell email={user?.email} active="/admin/atencion-presencial" title="Atención presencial" description="Alta y mantenimiento con responsabilidad municipal."
-    navigation={[{ href: "/admin/atencion-presencial", label: "Volver a atención presencial" }]}>
+  return <AdminShell email={user?.email} active="/admin/atencion-presencial" title="Perfil asistido" description="Alta y mantenimiento con responsabilidad municipal."
+    navigation={[{ href: "/admin/atencion-presencial", label: "Volver a perfil asistido" }]}>
     <AssistedProfileForm categories={categories} creationPolicy={creationPolicy} />
   </AdminShell>;
 }

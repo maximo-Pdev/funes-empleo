@@ -42,7 +42,7 @@ export function HomeHero({ authenticated, panelHref, panelLabel, initialView = "
           )}
           {view === "company" && (
             <div className={styles.introDisclaimer}>
-              <p><strong>Sin verificación documental en el MVP</strong></p>
+              <p><strong>Sin verificación documental</strong></p>
               <p>Verificar el correo confirma el acceso a la cuenta; no acredita la identidad de la empresa. Cada oferta requiere revisión municipal.</p>
             </div>
           )}
