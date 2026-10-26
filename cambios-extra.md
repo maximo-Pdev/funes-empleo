@@ -4647,3 +4647,16 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   abierto hacia main, sin borrador, adjunto a la conversación. Incluye migración
   ya aplicada y ampliación del historial. next-env.d.ts y respaldos ignorados
   excluidos; CI/revisión/merge/despliegue de interfaz pendientes.
+
+## EXTRA-081 — Localidad por combobox y horario de atención en el registro de empresa
+
+- **Fecha:** 2026-10-26.
+- **Origen:** listado "Cosas a implementar" (S3 localidad combobox múltiple; S12 popover de rango de horarios y días en el registro de empresa), aprobado por Maxi.
+- **Problema/evidencia:** la localidad era texto libre y el registro no capturaba horario de atención; S3/S12 lo piden explícitamente. No existía un catálogo de localidades en el código.
+- **Cambio:** `LocalityCombobox` (catálogo fijo de localidades del área, buscable) reemplaza el input de localidad; `SchedulePopover` (días de la semana + rango horario) agrega un campo nuevo opcional. Campo `schedule` (nullish) en el schema de registro, persistido como `company_schedule` en la metadata de Auth.
+- **Justificación:** un catálogo evita ortografía divergente; el horario es un dato nuevo pedido para el registro.
+- **Archivos/contratos:** `validation/company.ts`, `company-actions.ts`, `service.ts`, `company-registration-form.tsx`, `locality-combobox.tsx`, `schedule-popover.tsx`, `domain/catalogs/localities.ts`.
+- **Limitación:** `company_schedule` se guarda solo en la metadata de Auth. `company_profiles` no tiene columna `schedule`; persistirlo en el perfil requiere una migración de base de datos (pendiente, no bloquea el registro).
+- **Riesgos:** 2 (metadata de Auth, no PII sensible); el horario es texto serializado sin validación estructural fina.
+- **Verificación:** typecheck, lint, unit 1219/1219, form-inventory. Falta e2e/browser.
+- **Estado:** implementado y verificado (registrado durante implementación); revisión y deploy pendientes.

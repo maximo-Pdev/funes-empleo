@@ -13,7 +13,7 @@ export async function registerCompanyAction(_previous: CompanyActionState, form:
   try {
     await registerCompany({ legalName: form.get("legalName"), cuit: form.get("cuit"),
       responsibleName: form.get("responsibleName"), email: form.get("email"), phone: form.get("phone"),
-      activity: form.get("activity"), locality: form.get("locality"), ...passwords.data });
+      activity: form.get("activity"), locality: form.get("locality"), schedule: form.get("schedule"), ...passwords.data });
     return { message: "Si los datos son válidos, recibirás un enlace para verificar el correo. Revisá también spam.", success: true };
   } catch {
     return { message: "Revisá los datos de empresa, contacto y contraseña. Si el problema continúa, contactá a la Oficina.", success: false };

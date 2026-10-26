@@ -10,6 +10,7 @@ const companyFields = z.object({
   phone: z.string().trim().max(50),
   activity: z.string().trim().min(2).max(500),
   locality: z.string().trim().min(2).max(150),
+  schedule: z.string().trim().max(200).nullish(),
 }).superRefine((value, context) => {
   if (!value.email && !value.phone) context.addIssue({ code: "custom", path: ["email"], message: "Ingresá un contacto." });
   if (value.email && !emailContactSchema.safeParse(value.email).success) context.addIssue({ code: "custom", path: ["email"], message: "Ingresá un correo válido." });

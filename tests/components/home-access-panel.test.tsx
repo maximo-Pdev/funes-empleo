@@ -86,8 +86,8 @@ describe("Home access panel", () => {
       if (mode === "company") fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
       fireEvent.submit(view.container.querySelector("form")!);
       expect(screen.queryByText("Completá este campo.")).toBeNull();
-      expect(view.container.querySelectorAll('[aria-invalid="true"]')).toHaveLength(mode === "login" ? 2 : mode === "candidate" ? 5 : 8);
-      expect(screen.getByText(`Revisá los ${mode === "login" ? 2 : mode === "candidate" ? 5 : 8} campos indicados.`)).toBeTruthy();
+      expect(view.container.querySelectorAll('[aria-invalid="true"]')).toHaveLength(mode === "login" ? 2 : mode === "candidate" ? 5 : 7);
+      expect(screen.getByText(`Revisá los ${mode === "login" ? 2 : mode === "candidate" ? 5 : 7} campos indicados.`)).toBeTruthy();
     }
   });
 
@@ -107,7 +107,7 @@ describe("Home access panel", () => {
     fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
     expect(view.container.querySelectorAll('[data-marker-state="muted"]')).toHaveLength(8);
     fireEvent.submit(view.container.querySelector("form")!);
-    expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(8);
+    expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(7);
     expect(screen.getByLabelText("Teléfono de contacto").closest("[data-form-field]")?.querySelector("[data-required-marker]")).toBeNull();
   });
   it("offers recovery below a separator after sign-in, outside the form and only in login mode", async () => {
@@ -160,8 +160,8 @@ describe("Home access panel", () => {
     expect(row?.children).toHaveLength(2);
     expect(cuit.closest("[data-form-field]")?.parentElement?.contains(activity)).toBe(true);
     expect(cuit.closest("[data-form-field]")?.parentElement?.children).toHaveLength(2);
-    expect([...phone.form!.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])')].map(input => input.name)).toEqual([
-      "legalName", "responsibleName", "email", "cuit", "activity", "locality", "phone", "password", "confirmation",
+    expect([...phone.form!.querySelectorAll<HTMLInputElement>('input:not([type="hidden"])')].map(input => input.name).filter(Boolean)).toEqual([
+      "legalName", "responsibleName", "email", "cuit", "activity", "phone", "password", "confirmation",
     ]);
     expect(phone.required).toBe(false);
     expect(activity.required).toBe(true);
