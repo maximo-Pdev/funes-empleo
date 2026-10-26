@@ -43,7 +43,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   expect(id).toMatch(/^[0-9a-f-]{36}$/);
   // The assisted maintenance workspace (profile, consent, claim and CV) now lives on the candidate detail itself.
   const detail = `/admin/candidates/${id}`;
-  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado: Activo");
+  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
   expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("1");
   await page.getByLabel("Localidad laboral").fill("Funes");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
@@ -53,7 +53,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await page.getByRole("button", { name: "Guardar perfil asistido" }).click();
   await expect(page.getByText("Perfil guardado.", { exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado: Activo");
+  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
   await page.getByLabel("Acción asistida", { exact: true }).selectOption("withdraw_consent");
   await page.getByLabel("Confirmo la decisión de la persona atendida.", { exact: true }).check();
   await page.getByRole("button", { name: "Guardar consentimiento asistido", exact: true }).click();
@@ -63,7 +63,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await page.getByRole("button", { name: "Guardar consentimiento asistido", exact: true }).click();
   await expect(page.getByText("Consentimiento: aceptado.", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Activar para evaluación interna", exact: true }).click();
-  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado: Activo");
+  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
   await page.reload();
   await page.getByLabel("Tipo", { exact: true }).selectOption("record_training_guidance");
   await page.getByLabel("Contenido interno").fill("Orientación ficticia de entrevista presencial");
@@ -128,8 +128,8 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await candidate.getByLabel("Correo electrónico").fill(email);
     await candidate.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
     await candidate.getByLabel("Confirmar contraseña", { exact: true }).fill(localFixturePassword());
-    await candidate.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
-    await expect(candidate.getByRole("status")).toContainText("recibirás un enlace");
+    await candidate.locator("form").getByRole("button", { name: "Crear cuenta candidata", exact: true }).click();
+    await expect(candidate.getByText(/recibirás un enlace/)).toBeVisible();
     let mailId = "";
     await expect.poll(async () => {
       const inbox = await (await request.get("http://127.0.0.1:54324/api/v1/messages")).json() as { messages: { ID: string; To: { Address: string }[] }[] };
@@ -156,7 +156,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Consentimiento y activación", exact: true })).toHaveCount(0);
     await expect(page.getByLabel("Archivo PDF")).toHaveCount(0);
-    await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Cuenta: Activa");
+    await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Cuenta Activa");
     await expect(page.getByRole("button", { name: "Suspender cuenta", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Descargar CV vigente" })).toBeVisible();
     await expect(page.getByText("Orientación ficticia de entrevista presencial")).toBeVisible();

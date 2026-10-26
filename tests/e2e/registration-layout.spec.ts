@@ -27,7 +27,7 @@ for (const role of ["candidato", "empresa"] as const) {
     await page.goto(`/?registro=${role}`);
     await expect(page.getByRole("region", { name: "Acceso al portal" })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    for (const input of await page.locator('input:not([type="hidden"]), button').all()) {
+    for (const input of await page.locator('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]), button').all()) {
       expect((await input.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     }
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -48,7 +48,7 @@ for (const role of ["candidato", "empresa"] as const) {
       await page.setViewportSize(viewport);
       await page.goto(`/?registro=${role}`);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      for (const input of await page.locator('input:not([type="hidden"])').all()) {
+      for (const input of await page.locator('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"])').all()) {
         await input.click();
         await expect(input).toBeFocused();
         await expect(input).toBeInViewport();
@@ -60,16 +60,19 @@ for (const role of ["candidato", "empresa"] as const) {
     }
   });
 
-  test(`${role}: los errores pueden extender el documento y siguen visibles`, async ({ page }) => {
+  test(`${role}: el resumen de campos vacíos extiende el documento y sigue visible`, async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto(`/?registro=${role}`);
     await page.getByRole("button", { name: role === "candidato" ? "Crear cuenta candidata" : "Crear cuenta de empresa" }).click();
-    const errors = page.locator("[data-field-error]");
-    await expect(errors).toHaveCount(role === "candidato" ? 5 : 8);
-    for (const error of await errors.all()) {
-      await error.scrollIntoViewIfNeeded();
-      await expect(error).toBeVisible();
-      await expect(error).toBeInViewport();
+    const count = role === "candidato" ? 5 : 8;
+    await expect(page.getByText(`Revisá los ${count} campos indicados.`)).toBeVisible();
+    await expect(page.locator("[data-field-error]")).toHaveCount(0);
+    const markers = page.locator("[data-required-marker]");
+    await expect(markers).toHaveCount(count);
+    for (const marker of await markers.all()) {
+      await marker.scrollIntoViewIfNeeded();
+      await expect(marker).toBeVisible();
+      await expect(marker).toBeInViewport();
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });

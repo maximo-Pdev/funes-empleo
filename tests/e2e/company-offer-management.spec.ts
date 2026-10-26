@@ -86,7 +86,7 @@ test("empresa edita publicada, sigue moderación/derivaciones y cancela conserva
     await admin.goto(`/admin/openings/${opening}`);
     await admin.getByLabel("Decisión").selectOption("approved");
     await admin.getByRole("button", { name: "Guardar decisión" }).click();
-    await expect(admin.getByText("Estado:")).toContainText("Publicada");
+    await expect(admin.getByText("Publicada", { exact: true })).toBeVisible();
     await page.goto(`/ofertas/${slug}`);
     await expect(page.getByRole("heading", { name: `${title} editada`, exact: true })).toBeVisible();
     await page.goto(companyUrl);

@@ -55,16 +55,16 @@ for (const path of ["/", "/?registro=candidato", "/?registro=empresa", "/recover
     await expect(page.getByRole("main")).toHaveAttribute("id", "contenido");
     await waitForHeroEntrance(page);
     await page.keyboard.press("Tab");
-    if (path === "/") {
-      // En la home la navbar recién aparece al desplazarse y queda inerte mientras está
-      // oculta, por eso el primer foco cae en el conmutador del panel de acceso.
-      const modeSwitch = page.getByRole("button", { name: "Iniciar sesión", exact: true });
-      await expect(modeSwitch).toBeFocused();
-      await expect(modeSwitch).toHaveAttribute("aria-pressed", "true");
-    } else {
+    if (path === "/recover") {
       const focused = page.locator(":focus");
       await expect(focused).toBeVisible();
       await expect(focused).toHaveAttribute("href", "/");
+    } else {
+      // En la home (login y registro) la navbar queda inerte mientras está oculta,
+      // así que el primer foco cae en el conmutador del panel de acceso unificado.
+      const modeSwitch = page.getByRole("button", { name: "Iniciar sesión", exact: true });
+      await expect(modeSwitch).toBeFocused();
+      await expect(modeSwitch).toHaveAttribute("aria-pressed", path === "/" ? "true" : "false");
     }
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });

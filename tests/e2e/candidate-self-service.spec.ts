@@ -44,8 +44,8 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
-  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("recibirás un enlace");
+  await page.locator("form").getByRole("button", { name: "Crear cuenta candidata", exact: true }).click();
+  await expect(page.getByText(/recibirás un enlace/)).toBeVisible();
 
   let mailId: string | undefined;
   for (let attempt = 0; attempt < 30 && !mailId; attempt++) {
@@ -65,7 +65,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.goto("/dashboard?section=perfil");
   await expect(page.getByRole("heading", { name: "Mi perfil" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-  await expect(page.getByText("Estado del perfil:")).toContainText("Borrador");
+  await expect(page.getByText("Borrador", { exact: true })).toBeVisible();
   const activation = page.getByRole("region", { name: "Activación del perfil" });
   await expect(activation.getByText("Antes de activar tu perfil", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Activar perfil" })).toHaveCount(0);
@@ -110,14 +110,14 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   expect(top!.y + top!.height).toBeLessThanOrEqual(details!.y);
   await activation.getByRole("button", { name: "Activar perfil" }).focus();
   await page.keyboard.press("Enter");
-  await expect(activation.getByText("Perfil activo", { exact: true })).toBeVisible();
+  await expect(activation.getByText("Activo", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Activar perfil" })).toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.evaluate(() => window.scrollTo(0, 0));
   // The profile heading above the canvas pushes the activation state below the fold at 360px,
   // so the person reaches it by scrolling; the assertion still checks it is on screen.
-  const activeStatus = activation.getByText("Perfil activo", { exact: true });
+  const activeStatus = activation.getByText("Activo", { exact: true });
   await activeStatus.scrollIntoViewIfNeeded();
   await expect(activeStatus).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -217,7 +217,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByLabel("Habilidades y experiencia")).toHaveValue("Experiencia ficticia corregida directamente");
   await page.locator('select[name="availability"]').selectOption("unavailable");
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
-  await expect(page.getByText("Estado del perfil:")).toContainText("No disponible");
+  await expect(page.locator("[data-profile-status]")).toContainText("No disponible");
 
   const adminContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });
   try {
@@ -238,10 +238,10 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Reactivación ficticia E2E");
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
-    await expect(admin.getByText("Cuenta: Activa", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Activa", { exact: true })).toBeVisible();
     await signIn(page, email, password);
     await page.goto("/dashboard?section=perfil");
-    await expect(page.getByText("Estado del perfil:")).toContainText("No disponible");
+    await expect(page.locator("[data-profile-status]")).toContainText("No disponible");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
     await page.goto("/account");
     await expect(page.getByRole("button", { name: /archivar|eliminar/i })).toHaveCount(0);
@@ -263,10 +263,10 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
     await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Restauración ficticia E2E");
     await admin.getByLabel("Confirmo la restauración").check();
     await admin.getByRole("button", { name: "Restaurar a borrador" }).click();
-    await expect(admin.getByText("Estado: Borrador", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Borrador", { exact: true })).toBeVisible();
     await signIn(page, email, password);
     await page.goto("/dashboard?section=perfil");
-    await expect(page.getByText("Estado del perfil:")).toContainText("Borrador");
+    await expect(page.getByText("Borrador", { exact: true })).toBeVisible();
     await page.goto("/dashboard?section=postulaciones");
     await expect(page.locator("li").filter({ hasText: titles[0] })).toContainText("Retirada");
   } finally { await adminContext.close(); }

@@ -216,7 +216,7 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 010", exact: true })).toBeVisible();
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
     await admin.goto(`/admin/openings/${opening}`);
-    await expect(admin.getByText("Estado:")).toContainText("Publicada");
+    await expect(admin.getByText("Publicada", { exact: true })).toBeVisible();
   } finally { await Promise.all([companyContext.close(), adminContext.close()]); }
 });
 
@@ -270,7 +270,7 @@ test("suspender y reactivar una cuenta candidata no restaura el acceso empresari
     await admin.getByLabel("Confirmo la reactivación").check();
     await admin.getByRole("button", { name: "Reactivar cuenta" }).click();
     await expect(admin.getByRole("button", { name: "Suspender cuenta" })).toBeVisible();
-    await expect(admin.getByText("Estado: Activo", { exact: false })).toBeVisible();
+    await expect(admin.getByText("Activo", { exact: true })).toBeVisible();
     expect((await company.context().request.get(cvUrl)).status()).toBe(404);
   } finally { await Promise.all([adminContext.close(), companyContext.close()]); }
 });
@@ -507,7 +507,7 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     expect(JSON.parse(runs[1]!)).toMatchObject({ closedOpenings: 0, noCompanyResponse: 0, expiredPostHireAccess: 0 });
 
     await admin.goto(`/admin/openings/${opening}`);
-    await expect(admin.getByText("Estado:")).toContainText("Cerrada");
+    await expect(admin.getByText("Cerrada", { exact: true })).toBeVisible();
     await expect(admin.getByText("Sistema").first()).toBeVisible();
     await offerCompany.goto(`/empresa/ofertas/${opening}`);
     await expect(offerCompany.getByText("Estado:")).toContainText("Cerrada");
@@ -598,7 +598,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
       if (message) await admin.getByLabel("Explicación para la empresa").fill(message);
       await admin.getByRole("button", { name: "Guardar decisión" }).click();
       const expected = { approved: "Publicada", rejected: "Rechazada", closed: "Cerrada", cancelled: "Cancelada" }[decision];
-      await expect(admin.getByText("Estado:")).toContainText(expected);
+      await expect(admin.getByText(expected, { exact: true })).toBeVisible();
     }
 
     const rejected = await submittedOffer("Oferta ficticia rechazada E2E");

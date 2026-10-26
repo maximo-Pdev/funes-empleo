@@ -213,7 +213,7 @@ describe("Home access panel", () => {
     expect(screen.getByLabelText("DNI")).toBeTruthy();
     expect(screen.getByLabelText("Confirmar contraseña")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Registrarse", pressed: true })).toBeTruthy();
-    expect(document.querySelector('button[type="submit"]')?.textContent).toBe("Registrarse");
+    expect(document.querySelector('button[type="submit"]')?.textContent).toBe("Crear cuenta candidata");
     fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
     expect(screen.getByLabelText("CUIT")).toBeTruthy();
     expect(screen.queryByLabelText("DNI")).toBeNull();

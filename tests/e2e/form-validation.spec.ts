@@ -13,17 +13,17 @@ async function signIn(page: Page, role: "candidate" | "admin" | "company") {
   await expect(page).toHaveURL(/\/account$/);
 }
 
-test("registro: errores junto a cada input, color, foco, corrección y accesibilidad móvil", async ({ page }) => {
+test("registro: resumen de campos vacíos, color, foco, corrección y accesibilidad móvil", async ({ page }) => {
   await page.goto("/?registro=candidato");
   const name = page.getByLabel("Nombre y apellido");
   const email = page.getByLabel("Correo electrónico");
-  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
+  await page.locator("form").getByRole("button", { name: "Crear cuenta candidata", exact: true }).click();
   await expect(name).toBeFocused();
-  await expect(page.locator("[data-field-error]")).toHaveCount(5);
+  await expect(page.getByText("Revisá los 5 campos indicados.")).toBeVisible();
+  await expect(page.locator("[data-field-error]")).toHaveCount(0);
   await expect(page.locator("[data-required-marker]")).toHaveCount(5);
   await expect(name).toHaveCSS("border-top-color", "rgb(185, 28, 28)");
   await expect(page.locator("[data-required-marker]").first()).toHaveCSS("color", "rgb(185, 28, 28)");
-  await expect(name).toHaveAttribute("aria-describedby", /-error/);
   await name.fill("Persona ficticia");
   await page.getByLabel("DNI", { exact: true }).fill("99.123.456");
   await email.fill("correo inválido");
@@ -44,7 +44,7 @@ test("un rechazo real de Server Action no reinicia los datos del registro", asyn
   await page.getByLabel("Correo electrónico").fill("retencion-ficticia@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Validation-2026!");
   await page.getByLabel("Confirmar contraseña").fill("Fictitious-Validation-2026!");
-  await page.locator("form").getByRole("button", { name: "Registrarse", exact: true }).click();
+  await page.locator("form").getByRole("button", { name: "Crear cuenta candidata", exact: true }).click();
   await expect(page.locator("form").getByRole("alert")).toContainText("Revisá nombre, DNI, correo y contraseña");
   await expect(page.getByLabel("Nombre y apellido")).toHaveValue(" P");
   await expect(page.getByLabel("DNI", { exact: true })).toHaveValue("99123456");

@@ -183,8 +183,8 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
             )}
             {/* One form at a time: it is remounted from the captured draft, so every tab keeps what was typed. */}
             {mode === "register" && !sent && (role === "candidate"
-              ? <CandidateRegistrationForm submitLabel="Registrarse" homepageLayout onSent={handleSent} defaultValues={draftFor(role)} />
-              : <CompanyRegistrationForm submitLabel="Registrarse" homepageLayout onSent={handleSent} defaultValues={draftFor(role)} />)}
+              ? <CandidateRegistrationForm homepageLayout onSent={handleSent} defaultValues={draftFor(role)} />
+              : <CompanyRegistrationForm homepageLayout onSent={handleSent} defaultValues={draftFor(role)} />)}
             {mode === "login" && !authenticated && notice !== "suspended" && (
               <div className={styles.recovery}>
                 <hr className={styles.separator} />

@@ -14,7 +14,7 @@ it.each([["candidate", "Postulante", "Tu próximo paso laboral empieza acá.", 5
   expect(form.querySelectorAll("input")).toHaveLength(fields);
   expect(view.container.querySelectorAll("#acceso")).toHaveLength(1);
   expect(screen.getByRole("radio", { name: label })).toHaveProperty("checked", true);
-  expect(within(form).getByRole("button", { name: "Registrarse" }).getAttribute("type")).toBe("submit");
+  expect(within(form).getByRole("button", { name: role === "candidate" ? "Crear cuenta candidata" : "Crear cuenta de empresa" }).getAttribute("type")).toBe("submit");
   expect(screen.getByLabelText("Contraseña")).toHaveProperty("required", true);
   expect(screen.getByLabelText("Confirmar contraseña")).toHaveProperty("required", true);
   expect(screen.getByText("Los campos marcados con * son obligatorios.")).toBeTruthy();

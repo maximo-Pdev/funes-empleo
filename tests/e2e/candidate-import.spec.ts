@@ -16,7 +16,7 @@ test("importación ficticia: preview sin alta y confirmación explícita", async
     `nombre,dni,email,telefono,localidad,categorias,experiencia,disponibilidad,referencia\nPersona CSV,${dni},csv${dni}@example.invalid,,Funes,DEMO-A,Prueba,available,DEMO_1`) });
   await page.getByLabel("Confirmo que contiene solo datos ficticios").check();
   await page.getByRole("button", { name: "Previsualizar" }).click();
-  await expect(page.getByText("Listo para confirmar", { exact: true })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Listo para confirmar" })).toBeVisible();
   const id = page.url().split("/").pop()!;
   expect(id).toMatch(/^imp-[a-f0-9]{24}$/);
   expect(runLocalMaintenanceSql(`select count(*) from public.candidate_private_data where dni_normalized='${dni}'`)).toBe("0");
@@ -43,7 +43,7 @@ test("duplicados dentro del archivo: bloqueo, rechazo explícito y confirmación
   await second.getByRole("combobox", { name: "Decisión", exact: true }).selectOption("reject");
   await second.getByLabel("Motivo interno").fill("Fila repetida del ejemplo ficticio");
   await second.getByRole("button", { name: "Guardar decisión y revalidar" }).click();
-  await expect(page.getByText("Listo para confirmar", { exact: true })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Listo para confirmar" })).toBeVisible();
   const id = page.url().split("/").pop()!;
   expect(id).toMatch(/^imp-[a-f0-9]{24}$/);
   const hash = createHash("sha256").update(csv).digest("hex");
@@ -67,7 +67,7 @@ test("fallo transaccional visible y nueva carga vinculada recuperable", async ({
   await page.getByLabel("CSV ficticio").setInputFiles({ name: "demo.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
   await page.getByLabel("Confirmo que contiene solo datos ficticios").check();
   await page.getByRole("button", { name: "Previsualizar" }).click();
-  await expect(page.getByText("Listo para confirmar", { exact: true })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Listo para confirmar" })).toBeVisible();
   const failedId = page.url().split("/").pop()!;
   expect(failedId).toMatch(/^imp-[a-f0-9]{24}$/);
   runLocalMaintenanceSql(`create function private.e2e_import_failure() returns trigger language plpgsql as $$ begin

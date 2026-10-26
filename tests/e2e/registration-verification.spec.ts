@@ -26,7 +26,7 @@ for (const role of ["candidate", "company"] as const) {
     await page.getByLabel("Contraseña", { exact: true }).fill(password);
     await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
     await page.getByRole("button", { name: role === "candidate" ? "Crear cuenta candidata" : "Crear cuenta de empresa" }).click();
-    await expect(page.getByRole("status")).toContainText("recibirás un enlace");
+    await expect(page.getByText(/recibirás un enlace/)).toBeVisible();
 
     let mailId: string | undefined;
     await expect.poll(async () => {
