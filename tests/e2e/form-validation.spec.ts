@@ -10,7 +10,7 @@ async function signIn(page: Page, role: "candidate" | "admin" | "company") {
   await page.getByLabel("Correo electrónico").fill(`${role}1@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
 }
 
 test("registro: resumen de campos vacíos, color, foco, corrección y accesibilidad móvil", async ({ page }) => {

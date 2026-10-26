@@ -1,10 +1,11 @@
 import { referenceFilters } from "@/lib/records/page-references";
+import { referenceUrl } from "@/lib/records/reference-url";
 import { recordReferences } from "@/lib/records/references";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { availabilityLabel } from "@/domain/presentation/labels";
 import { availabilityTones, statusTone } from "@/domain/presentation/status-tone";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Badge, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
 import { listCandidateSearchCategories, searchCandidates } from "@/features/candidates/search-service";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -24,10 +25,14 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
   const pageUrl = (page: number) => {
     const params = new URLSearchParams();
     if (parsed.success) for (const [key, value] of Object.entries(parsed.data)) {
+      if (key === "categoryId") {
+        for (const id of value as string[]) params.append("categoryId", id);
+        continue;
+      }
       if (value !== undefined && value !== "") params.set(key, String(value));
     }
     params.set("page", String(page));
-    return `/admin/candidates?${params.toString()}`;
+    return referenceUrl(`/admin/candidates?${params.toString()}`);
   };
 
   return <AdminShell email={user?.email} active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
@@ -38,19 +43,35 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
     {results && <section aria-label="Resultados de búsqueda" className="mt-8 space-y-4">
       <h2 className="text-xl font-semibold">Resultados: {results.total}</h2>
       {results.items.length === 0 ? <EmptyState title="Sin candidatos" description="No encontramos perfiles para estos filtros. Probá ampliarlos." /> :
-        <ul className="grid gap-3 md:grid-cols-2">
-          {results.items.map((candidate) => <li key={candidate.id} className="rounded-lg border border-slate-300 bg-white p-5">
-            <h3 className="text-lg font-semibold"><Link className="text-blue-800 underline" href={`/admin/candidates/${candidate.id}`}>{candidate.displayName}</Link></h3>
-            <p className="mt-1 flex flex-wrap items-center gap-2">{candidate.locality ?? "Localidad no informada"} <Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></p>
-            <p className="mt-1 text-sm">{candidate.categories.length ? candidate.categories.map((category) => category.name).join(", ") : "Sin categorías activas"}</p>
-            <p className="mt-2 font-medium">{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</p>
-          </li>)}
-        </ul>}
-      {results.pageCount > 1 && <nav aria-label="Páginas de candidatos" className="flex items-center gap-4">
-        {results.page > 1 && <Link className="text-blue-800 underline" href={pageUrl(results.page - 1)}>Anterior</Link>}
-        <span>Página {results.page} de {results.pageCount}</span>
-        {results.page < results.pageCount && <Link className="text-blue-800 underline" href={pageUrl(results.page + 1)}>Siguiente</Link>}
-      </nav>}
+        <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Candidato</TableHead>
+                <TableHead>Localidad</TableHead>
+                <TableHead>Disponibilidad</TableHead>
+                <TableHead>Categorías</TableHead>
+                <TableHead>Aptitud para derivación</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {results.items.map((candidate) => <TableRow key={candidate.id}>
+                <TableCell className="font-semibold"><Link className="text-blue-800 underline" href={`/admin/candidates/${candidate.id}`}>{candidate.displayName}</Link></TableCell>
+                <TableCell>{candidate.locality ?? "Localidad no informada"}</TableCell>
+                <TableCell><Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></TableCell>
+                <TableCell>{candidate.categories.length ? candidate.categories.map((category) => category.name).join(", ") : "Sin categorías activas"}</TableCell>
+                <TableCell>{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</TableCell>
+              </TableRow>)}
+            </TableBody>
+          </Table>
+        </div>}
+      {results.pageCount > 1 && <Pagination aria-label="Páginas de candidatos">
+        <PaginationContent>
+          {results.page > 1 && <PaginationItem><PaginationPrevious href={await pageUrl(results.page - 1)} /></PaginationItem>}
+          <PaginationItem><span className="px-3 text-sm">Página {results.page} de {results.pageCount}</span></PaginationItem>
+          {results.page < results.pageCount && <PaginationItem><PaginationNext href={await pageUrl(results.page + 1)} /></PaginationItem>}
+        </PaginationContent>
+      </Pagination>}
     </section>}
   </AdminShell>;
 }

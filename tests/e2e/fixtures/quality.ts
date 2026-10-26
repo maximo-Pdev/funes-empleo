@@ -14,7 +14,7 @@ export async function loginFixture(page: Page, role: "candidate" | "company" | "
   await page.getByLabel("Correo electrónico").fill(`${role}${number}@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
 }
 export function protectedPages() {
   const root = join(process.cwd(), "src/app");

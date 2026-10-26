@@ -36,7 +36,7 @@ test("enlace ficticio de recuperación habilita nueva contraseña una sola vez",
   await page.getByLabel("Correo electrónico").fill("candidate3@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill("Fictitious-Recovered-2026!");
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   // The invalid-link notice belongs to the anonymous access card: a verified session keeps its own panel.
   await page.context().clearCookies();
   await page.goto(verifyUrl!);

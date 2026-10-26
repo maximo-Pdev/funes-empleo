@@ -31,5 +31,5 @@ it("todos los formularios y campos visibles usan los componentes compartidos", (
     visit(source);
   }
   expect(violations).toEqual([]);
-  expect(forms).toBeGreaterThanOrEqual(38);
+  expect(forms).toBeGreaterThanOrEqual(37);
 });

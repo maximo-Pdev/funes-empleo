@@ -10,6 +10,7 @@ import type { AssistedConsentPolicy } from "../../assisted-service";
 import { assistedFields, type AssistedInput } from "@/validation/duplicate-resolution";
 import { DUPLICATE_DECISIONS } from "@/domain/catalogs";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
+import { CategoryMultiSelect } from "../category-multi-select";
 const field = "w-full rounded border border-slate-500 bg-white p-2";
 const button = "rounded bg-blue-800 p-3 text-white disabled:opacity-50";
 const labels = { name: "Nombre y apellido", dni: "DNI", phone: "Teléfono", email: "Correo de contacto (opcional)",
@@ -59,14 +60,14 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
           autoComplete={key === "dni" ? "off" : undefined} maxLength={key === "name" ? 200 : key === "dni" ? 20 : key === "phone" ? 50 : key === "email" ? 320 : key === "locality" ? 150 : 500} />}</Field>)}
     <Field className="grid gap-1">Disponibilidad<select name="availability" required className={field} defaultValue={initial?.availability ?? "available"}>
       <option value="available">Disponible</option>{candidateId && <option value="unavailable">No disponible</option>}</select></Field>
-    <fieldset className="rounded border p-3"><legend>{labels.categories}</legend>
+    <fieldset className="grid gap-2 rounded border p-3"><legend>{labels.categories}</legend>
       {categories.length === 0 && <p>No hay categorías vigentes disponibles.</p>}
-      <div className="grid gap-2 sm:grid-cols-2">{categories.map((c) => <Field key={c.id} className="flex gap-2"><input name="categories" type="checkbox" value={c.id}
-        defaultChecked={initial?.categories.includes(c.id)} />{c.name}</Field>)}</div></fieldset>
-    {!candidateId && <fieldset className="grid gap-3 rounded border p-4"><legend className="font-semibold">Consentimiento presencial</legend>
-      <p>La persona autoriza el uso de sus datos laborales por la Oficina de Empleo y su comunicación a empresas únicamente después de una derivación municipal. Al confirmar una contratación se retira el consentimiento global y se revocan los accesos empresariales.</p>
-      {creationPolicy ? <p>{creationPolicy.policy_text} Versión {creationPolicy.version}.</p> : <p>No se pudo cargar la política. Volvé a abrir esta página antes de crear el perfil.</p>}
-      <Field className="flex gap-2"><input type="checkbox" name="consentConfirmed" required />Confirmo que la persona aceptó el consentimiento presencial informado.</Field>
+      <CategoryMultiSelect categories={categories} defaultSelected={initial?.categories ?? []} /></fieldset>
+    {!candidateId && <fieldset className="grid gap-2 rounded border p-3"><legend className="font-semibold">Términos y condiciones</legend>
+      <p>La persona acepta los términos y condiciones de la Oficina de Empleo para el uso de sus datos laborales y su comunicación a empresas solo después de una derivación municipal. La aceptación se registra una sola vez, al dar el alta, y no puede retirarse.</p>
+      {creationPolicy ? <details><summary>Ver el texto de la versión {creationPolicy.version}</summary><p>{creationPolicy.policy_text}</p></details>
+        : <p>No se pudo cargar el texto. Volvé a abrir esta página antes de crear el perfil.</p>}
+      <Field className="flex gap-2"><input type="checkbox" name="consentConfirmed" required />Confirmo que la persona leyó y aceptó los términos y condiciones.</Field>
     </fieldset>}
     {matches.length > 0 && <fieldset className="grid gap-3 rounded border border-amber-600 p-4"><legend className="font-semibold">Resolver coincidencias</legend>
       <p>No se fusionan perfiles. Corregir y crear exige que el DNI y correo dejen de coincidir; usar el existente solo modifica los campos que marques.</p>
@@ -84,30 +85,20 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
   </Form>;
 }
 
-export function AssistedCommands({ candidateId, version, status, consent, policy }: {
-  candidateId: string; version: number; status: string; consent?: string;
-  policy: { version: string; policy_text: string; policy_hash: string };
+export function AssistedCommands({ candidateId, version, status }: {
+  candidateId: string; version: number; status: string;
 }) {
   const router = useRouter(); const [pending, start] = useTransition(); const [message, setMessage] = useState("");
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = new FormData(event.currentTarget);
-    start(async () => { const result = await assistedCommandAction({ candidateId, version, command: form.get("command"),
-      confirmed: form.get("confirmed") === "on", policyVersion: policy.version, policyHash: policy.policy_hash });
+    start(async () => { const result = await assistedCommandAction({ candidateId, version, command: form.get("command"), confirmed: true });
       setMessage(result.message); if (result.success) router.refresh(); });
   }
-  return <section className="space-y-4 rounded border bg-white p-5"><h2 className="text-xl font-semibold">Consentimiento y activación</h2>
-    <p>{policy.policy_text} Versión {policy.version}; no es texto municipal aprobado.</p>
-    <p>Consentimiento: {consent === "accepted" ? "aceptado" : consent === "withdrawn" ? "retirado" : "pendiente"}.</p>
-    <Form onSubmit={submit} className="grid gap-3" aria-busy={pending}>
-      <Field>Acción asistida<select className={field} name="command" required defaultValue={consent === "accepted" ? "withdraw_consent" : "accept_consent"}>
-        <option value="accept_consent">Registrar aceptación presencial</option><option value="withdraw_consent">Registrar retiro del consentimiento</option></select></Field>
-      <p>El retiro cierra las participaciones abiertas y revoca accesos empresariales. Una nueva aceptación no los restablece.</p>
-      <Field className="flex gap-2"><input name="confirmed" type="checkbox" required />Confirmo la decisión de la persona atendida.</Field>
-      <button className={button} disabled={pending}>Guardar consentimiento asistido</button>
-    </Form>
+  return <section className="space-y-4 rounded border bg-white p-5"><h2 className="text-xl font-semibold">Activación</h2>
+    <p>Los términos y condiciones se aceptan una sola vez, en el alta del perfil, y no pueden retirarse.</p>
     {status !== "active" && <Form onSubmit={submit} className="grid gap-3" aria-busy={pending}>
-      <p>Para activar: localidad, experiencia, categorías, disponibilidad, contacto y consentimiento. El perfil asistido puede evaluarse sin PDF; derivarlo requiere un CV válido.</p>
-      <input type="hidden" name="command" value="activate" /><input type="hidden" name="confirmed" value="on" />
+      <p>Para activar: localidad, experiencia, categorías, disponibilidad y contacto. El perfil asistido puede evaluarse sin PDF; derivarlo requiere un CV válido.</p>
+      <input type="hidden" name="command" value="activate" />
       <button className={button} disabled={pending}>Activar para evaluación interna</button></Form>}
     <Message text={message} />
   </section>;

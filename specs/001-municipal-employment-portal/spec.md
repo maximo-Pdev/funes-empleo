@@ -104,8 +104,10 @@ múltiples coincidencias. No crear nominaciones ni derivaciones al consultar.
 
 Ampliación solicitada por Mateo el 2026-10-19: excluir antes del total/paginación
 cualquier participación no archivada en la oferta (incluye nominación/postulación
-previa, cualquiera sea su estado); sus casos siguen en Participaciones. Fichas
-compactas en dos columnas desde md y una en móvil, doce por página. El bloque de
+previa, cualquiera sea su estado); sus casos siguen en Participaciones. La revisión
+posterior S27 de `odd/tasks/portal-polish.md` sustituye las fichas compactas en dos
+columnas por una Data Table de candidatos con rubros coincidentes; conserva doce
+resultados por página, orden global, perfil modal y nominación explícita. El bloque de
 candidatos se ubica debajo de la información/moderación e historial de la oferta,
 conservando todo el ancho (ajuste solicitado por Mateo el 2026-10-19). Abrir el perfil
 laboral en diálogo accesible sin abandonar la oferta y nominar explícitamente a

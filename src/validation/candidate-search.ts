@@ -5,21 +5,19 @@ const optionalText = (maximum: number) => z.preprocess((value) => {
   const text = scalar(value);
   return typeof text === "string" && text.trim() === "" ? undefined : text;
 }, z.string().trim().max(maximum).regex(/^[\p{L}\p{N}\s'’-]+$/u, "Usá letras, números y espacios.").optional());
-const optionalId = z.preprocess((value) => {
-  const text = scalar(value);
-  return text === "" ? undefined : text;
-}, z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i).optional());
+const optionalIds = z.preprocess((value) => {
+  const list = value === undefined || value === null || value === "" ? [] : Array.isArray(value) ? value : [value];
+  return list.filter((item): item is string => typeof item === "string" && item !== "");
+}, z.array(z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)).max(20).default([]));
 const pageNumber = (defaultValue: number, maximum: number) => z.preprocess(
   (value) => scalar(value), z.coerce.number().int().min(1).max(maximum).default(defaultValue),
 );
 
 export const candidateSearchSchema = z.object({
   term: optionalText(100),
-  categoryId: optionalId,
-  skills: optionalText(100),
+  categoryId: optionalIds,
   availability: optionalText(100),
   locality: optionalText(100),
-  vigency: z.enum(["current", "needs_update", "all"]).default("current"),
   eligibility: z.enum(["eligible", "ineligible", "all"]).default("eligible"),
   page: pageNumber(1, 1000),
   pageSize: pageNumber(20, 50),

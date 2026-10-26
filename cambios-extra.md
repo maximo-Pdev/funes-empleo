@@ -1,5 +1,25 @@
 # Cambios extra necesarios
 
+## EXTRA-084 — Restore PR 78 browser checks and required locality validation
+
+- **Date/authorization:** 2026-10-26; Maxi requested: «Falló el PR en github. Arreglalo para que salga en verde».
+- **Evidence:** the exact PR head fails 27 browser scenarios. Several helpers expect the retired universal login landing or card markup; help controls make substring labels ambiguous. Company locality uses a required hidden input, which native constraint validation ignores, so the eight-field summary misses locality.
+- **Origin/scope:** approved portal-polish behavior and existing registration/validation requirements; recovery tracked in `odd/tasks/pr78-green.md`. Preserve permission, pagination, ordering, consent and keyboard proofs; do not skip tests or lower the required-field count.
+- **Minimal change:** align browser locators with the approved role landings/table/combobox controls and restore locality's integration with required validation, invalid state, focus and correction. Keep current server validation, field meaning and layout.
+- **Affected surfaces:** company locality/registration components, focused component regressions and the reported E2E specifications. No migrations, Auth/provider changes or dependency updates.
+- **Risks/recovery:** locality is shared by company forms; test optional, controlled and default-value consumers. Revert the focused correction to recover the prior implementation. Preserve curated local accounts by using isolated GitHub acceptance runs instead of the local reset wrapper.
+- **Verification/status:** implemented. Required-locality RED reproduced; five new focused tests pass and independent scratch baseline comparison fails four of them. Integration found five old-test/inventory failures; corrected without scanner suppression, and 34 focused tests now pass. Initial lint/types/build and 57 tooling tests passed; post-correction full recheck and exact-head GitHub E2E/database results pending. Table authorization recovered from `odd/tasks/portal-polish.md` S27 and reconciled with the older spec/UI guide. Not human-reviewed or accepted.
+
+## EXTRA-082 — Independent Home access form drafts
+
+- **Date/authorization:** 2026-10-26, Maxi explicitly requested independent login and registration fields. Supersedes EXTRA-080's cross-form identity sharing, not per-form draft retention.
+- **Evidence:** HomeAccessPanel merges drafts.common into every form and auto-fills confirmation from password.
+- **Change/scope:** keep all captured fields under their own login/candidate/company key; restore only that key. Keep one mounted form and memory-only drafts. Update persistence tests and UI guidance; preserve concurrent company edits.
+- **Risk/recovery:** client-side credential draft isolation, no actions, permissions, database, dependencies or shared form contracts changed. Reverting restores unwanted sharing.
+- **Verification plan:** RED reproduction, focused regressions, lint/types/build/unit suite and desktop/mobile browser switching without POST or database resets.
+- **Status:** implemented; commit referenced below. No push or deployment yet.
+- **Verification observed:** four isolation regressions failed before the fix; 33 focused tests then passed. Node 24.22.0 with matching native child: lint, type generation, TypeScript, production build and 1219 tests in 95 files passed. Independent review deleg_c8e4e60d reran 4/4 persistence tests and passed 22 production-browser scenario groups at 1440×900 and 390×844: distinct credentials, independent confirmation, repeated switches, clearing, both closing shortcuts, one mounted form and reload clearing. Zero write attempts or browser errors; owned server/browser closed. Parent repeated 4/4 tests successfully. Nonblocking jsdom Canvas and external-lockfile warnings remain. No database-resetting E2E wrapper run. Concurrent integration/commits were observed; this actor did not commit or publish these changes. Human review/publication are not established by these checks.
+
 ## EXTRA-080 — Conservar los datos escritos entre ingreso y registro
 
 - **Fecha/autorización:** 2026-10-25, pedido explícito de Maxi: «Requiero que la información de los campos del formulario de login y registro sean persistentes a los cambios entre pestañas. Es decir, si completo mail o contraseña en login que se mantenga si selecciono "Registrarse" y lo mismo al revés. Para mayor comodidad del usuario.»
@@ -4647,3 +4667,16 @@ Usar un ID consecutivo `EXTRA-NNN` y registrar:
   abierto hacia main, sin borrador, adjunto a la conversación. Incluye migración
   ya aplicada y ampliación del historial. next-env.d.ts y respaldos ignorados
   excluidos; CI/revisión/merge/despliegue de interfaz pendientes.
+
+## EXTRA-081 — Localidad por combobox y horario de atención en el registro de empresa
+
+- **Fecha:** 2026-10-26.
+- **Origen:** listado "Cosas a implementar" (S3 localidad combobox múltiple; S12 popover de rango de horarios y días en el registro de empresa), aprobado por Maxi.
+- **Problema/evidencia:** la localidad era texto libre y el registro no capturaba horario de atención; S3/S12 lo piden explícitamente. No existía un catálogo de localidades en el código.
+- **Cambio:** `LocalityCombobox` (catálogo fijo de localidades del área, buscable) reemplaza el input de localidad; `SchedulePopover` (días de la semana + rango horario) agrega un campo nuevo opcional. Campo `schedule` (nullish) en el schema de registro, persistido como `company_schedule` en la metadata de Auth.
+- **Justificación:** un catálogo evita ortografía divergente; el horario es un dato nuevo pedido para el registro.
+- **Archivos/contratos:** `validation/company.ts`, `company-actions.ts`, `service.ts`, `company-registration-form.tsx`, `locality-combobox.tsx`, `schedule-popover.tsx`, `domain/catalogs/localities.ts`.
+- **Limitación:** `company_schedule` se guarda solo en la metadata de Auth. `company_profiles` no tiene columna `schedule`; persistirlo en el perfil requiere una migración de base de datos (pendiente, no bloquea el registro).
+- **Riesgos:** 2 (metadata de Auth, no PII sensible); el horario es texto serializado sin validación estructural fina.
+- **Verificación:** typecheck, lint, unit 1219/1219, form-inventory. Falta e2e/browser.
+- **Estado:** implementado y verificado (registrado durante implementación); revisión y deploy pendientes.

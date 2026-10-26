@@ -16,7 +16,7 @@ for (const [number, state] of [[3, "revocado"], [8, "vigente"], [1, "contratado"
     await page.getByLabel("Correo electrónico").fill("company1@example.invalid");
     await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
     await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-    await expect(page).toHaveURL(/\/account$/);
+    await expect(page).toHaveURL(/\/empresa$/);
     const opening = persistedReference("opening", id("opening", 1));
     const referral = persistedReference("referral", id("referral", number));
     const name = `Persona ficticia ${String(number).padStart(3, "0")}`;

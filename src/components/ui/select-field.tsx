@@ -9,14 +9,15 @@ export type SelectFieldProps = Omit<ComponentProps<"select">, "id" | "children">
   placeholder?: string | null;
   hint?: string;
   error?: string;
+  help?: string;
 };
 
 export function SelectField({
-  id, label, options, placeholder = "Seleccioná una opción", hint, error, required,
+  id, label, options, placeholder = "Seleccioná una opción", hint, error, help, required,
   className = "", "aria-describedby": describedBy, ...props
 }: SelectFieldProps) {
   return (
-    <Field label={label} hint={hint} error={error} className="municipal-label block text-sm font-semibold">
+    <Field label={label} hint={hint} error={error} help={help} className="municipal-label block text-sm font-semibold">
       <select
         {...props}
         id={id}

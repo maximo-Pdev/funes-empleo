@@ -39,7 +39,6 @@ add("companies/company-actions", "company", "saveCompanyProfileAction", { legalN
 add("companies/admin-actions", "admin", "adminCompanyAction", {}, true);
 add("accounts/actions", "admin", "accountStatusAction", {}, true);
 add("accounts/actions", "active", "passwordAction", { password: "Fictitious-Test-Only!", confirmation: "Fictitious-Test-Only!" }, true);
-add("imports/actions", "admin", "resolveImportAction", {});
 add("referrals/feedback-actions", "company", "submitFeedbackAction", { reportedOutcome: "hired" }, true);
 add("referrals/feedback-actions", "company", "submitInterviewAction", { status: "scheduled", scheduledAt: "2026-09-27T10:00" }, true);
 add("referrals/feedback-actions", "admin", "confirmOutcomeAction", { outcome: "hired" }, true);

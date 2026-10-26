@@ -6,21 +6,34 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveCompanyOpeningAction, submitCompanyOpeningAction } from "../../company-actions";
 import type { CompanyOffer } from "../../company-service";
-import { publicModalityLabel, publicContractTypeLabel } from "../../public-offer-display";
-import { Button } from "@/components/ui";
+import { Button, Combobox, ComboboxContent, ComboboxItem, ComboboxList, ComboboxTrigger } from "@/components/ui";
+import { FieldHelp } from "@/components/forms/field-help";
+import { OPENING_MODALITY_OPTIONS, OPENING_CONTRACT_OPTIONS, type OpeningOption } from "@/domain/catalogs/opening-options";
 import { canEditCompanyOpening, canCancelCompanyOpening } from "../../company-opening-policy";
 import { CompanyOpeningCancel } from "./company-opening-cancel";
 import { ModerationHistory } from "../moderation-history";
 import { CompanyOpeningDetails } from "./company-opening-details";
 
-function OpeningTextField({ name, label, initial, format, className, required = false }: {
-  name: string; label: string; initial: string; format: (value: string) => string; className: string; required?: boolean;
+function OpeningComboboxField({ name, label, initial, options, required = false }: {
+  name: string; label: string; initial: string; options: readonly OpeningOption[]; required?: boolean;
 }) {
   const [value, setValue] = useState(initial);
+  const selected = options.find(option => option.value === value);
   return <>
-    <input type="hidden" name={name} value={value} />
-    <Field className="grid gap-1">{label}<input className={className} name={`${name}Display`} required={required} value={format(value)}
-      onChange={event => setValue(event.target.value)} maxLength={100} /></Field>
+    <input type="hidden" name={name} value={value} required={required} />
+    <div className="grid gap-1">
+      <span className="municipal-label text-sm font-semibold">{label}<FieldHelp label={label} description={options.map(option => `${option.label}: ${option.description}`).join(" ")} /></span>
+      <Combobox value={value} onValueChange={(next) => setValue(next ?? "")}>
+        <ComboboxTrigger aria-label={label}>
+          <span className={value ? "" : "text-muted-foreground"}>{selected?.label ?? "Seleccionar…"}</span>
+        </ComboboxTrigger>
+        <ComboboxContent>
+          <ComboboxList>
+            {options.map(option => <ComboboxItem key={option.value} value={option.value}>{option.label}</ComboboxItem>)}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </div>
   </>;
 }
 
@@ -67,9 +80,9 @@ export function CompanyOpeningForm({ opening, categories }: { opening: CompanyOf
       <Field className="grid gap-1">Requisitos<textarea className={field} name="requirements" required={publishedEditing} defaultValue={opening?.requirements ?? ""} maxLength={5000} rows={4} /></Field>
       <Field className="grid gap-1">Vacantes<input className={field} name="vacancies" required={publishedEditing} type="number" min={1} defaultValue={opening?.vacancies ?? ""} /></Field>
       <Field className="grid gap-1">Ubicación<input className={field} name="location" required={publishedEditing} defaultValue={opening?.location ?? ""} maxLength={200} /></Field>
-      <OpeningTextField name="modality" required={publishedEditing} label="Modalidad" className={field} initial={opening?.modality ?? ""} format={publicModalityLabel} />
+      <OpeningComboboxField name="modality" required={publishedEditing} label="Modalidad" initial={opening?.modality ?? ""} options={OPENING_MODALITY_OPTIONS} />
       <Field className="grid gap-1">Horario<input className={field} name="schedule" required={publishedEditing} defaultValue={opening?.schedule ?? ""} maxLength={500} /></Field>
-      <OpeningTextField name="contractType" required={publishedEditing} label="Tipo de contratación" className={field} initial={opening?.contract_type ?? ""} format={publicContractTypeLabel} />
+      <OpeningComboboxField name="contractType" required={publishedEditing} label="Tipo de contratación" initial={opening?.contract_type ?? ""} options={OPENING_CONTRACT_OPTIONS} />
       <Field className="grid gap-1">Fecha de cierre<input className={field} name="closingDate" required={publishedEditing} type="date" defaultValue={opening?.closingDate ?? ""} /></Field>
       <Field className="grid gap-1">Salario (opcional)<input className={field} name="salary" defaultValue={opening?.salary ?? ""} maxLength={500} /></Field>
       <Field className="grid gap-1">Beneficios (opcional)<textarea className={field} name="benefits" defaultValue={opening?.benefits ?? ""} maxLength={2000} /></Field>

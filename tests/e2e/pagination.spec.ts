@@ -13,12 +13,13 @@ test("SC-008A: entradas y conteos de paginación, sin acreditar latencia alojada
   ] as const) {
     await page.goto(`/admin/${route}?status=${entry.status}&page=1`);
     await expect(page.getByRole("heading",{name:`${label}: ${entry.expectedTotal}`,exact:true})).toBeVisible();
-    const first=await page.locator("main li a").evaluateAll(nodes=>nodes.map(n=>n.getAttribute("href")));
-    expect(first).toHaveLength(entry.pageSize);
+    const rows = page.locator(`main li a[href^="/admin/${route}/"]`);
+    await expect(rows).toHaveCount(entry.pageSize);
+    const first=await rows.evaluateAll(nodes=>nodes.map(n=>n.getAttribute("href")));
     await page.getByRole("link",{name:"Siguiente",exact:true}).click();
     await expect(page).toHaveURL(/page=2/);
-    const second=await page.locator("main li a").evaluateAll(nodes=>nodes.map(n=>n.getAttribute("href")));
-    expect(second).toHaveLength(entry.expectedRows);
+    await expect(rows).toHaveCount(entry.expectedRows);
+    const second=await rows.evaluateAll(nodes=>nodes.map(n=>n.getAttribute("href")));
     expect(second.some(id=>first.includes(id))).toBe(false);
     await page.goto(`/admin/${route}?status=INEXISTENTE`);
     await expect(page.getByRole("alert")).toBeVisible();

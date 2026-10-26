@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, CalendarDays, MapPin, ShieldCheck, CircleAlert } from "lucide-react";
-import { Card } from "@/components/ui";
+import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin, ShieldCheck, CircleAlert } from "lucide-react";
+import { Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import styles from "../_components/candidate-forms.module.css";
 import type { getCandidateWorkspace } from "@/features/candidates/profile-service";
 import { getPublicOffer, listPublicOffers, type PublicOffer } from "@/features/openings/public-service";
@@ -56,10 +56,12 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
             disabled={!enabled} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
         </Card>
       </li>)}</ul>}
-    <nav aria-label="Páginas de ofertas" className="mt-6 flex flex-wrap items-center justify-between gap-3">
-      {offers.page > 1 && <Link className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-primary hover:bg-secondary" href={pageHref(offers.page - 1)}><ArrowLeft className="h-4 w-4" aria-hidden="true" />Anterior</Link>}
-      <p className="text-sm text-muted-foreground">Página {offers.page}</p>
-      {offers.page * offers.pageSize < offers.total && <Link className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-primary hover:bg-secondary" href={pageHref(offers.page + 1)}>Siguiente<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
-    </nav>
+    <Pagination aria-label="Páginas de ofertas" className="mt-6">
+      <PaginationContent>
+        {offers.page > 1 && <PaginationItem><PaginationPrevious href={pageHref(offers.page - 1)} /></PaginationItem>}
+        <PaginationItem><span className="px-3 text-sm text-muted-foreground">Página {offers.page}</span></PaginationItem>
+        {offers.page * offers.pageSize < offers.total && <PaginationItem><PaginationNext href={pageHref(offers.page + 1)} /></PaginationItem>}
+      </PaginationContent>
+    </Pagination>
   </>;
 }

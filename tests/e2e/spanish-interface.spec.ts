@@ -35,7 +35,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
     await page.getByLabel("Correo electrónico").fill(`${role}1@example.invalid`);
     await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
     await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-    await expect(page).toHaveURL(/\/account$/);
+    await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
     const paths = role === "candidate" ? ["/account", "/account?section=perfil", "/account?section=ofertas", "/account?section=postulaciones"]
       : role === "company" ? ["/account", "/empresa", "/empresa/perfil", "/empresa/ofertas",
         `/empresa/ofertas/${fixtureId("opening", 1)}`]

@@ -19,8 +19,6 @@ export type HomeAccessView = "login" | "candidate" | "company";
 /** Values typed in one access form, so switching tabs does not erase them. */
 type FormDrafts = Record<string, Record<string, string>>;
 
-/** Field names that mean the same across the access forms: one identity, so they travel together. */
-const SHARED_FIELDS = ["email", "password", "confirmation"];
 
 export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel = "Ir al panel de usuario", onViewChange, initialView = "login", accessState = null }: { authenticated?: boolean; panelHref?: string; panelLabel?: string; onViewChange?: (view: HomeAccessView) => void; initialView?: HomeAccessView; accessState?: AccessState | null } = {}) {
   const [mode, setMode] = useState<"login" | "register">(initialView === "login" ? "login" : "register");
@@ -39,25 +37,18 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
     const key = content?.dataset.accessKey;
     if (!form || !key) return;
     const entries: Record<string, string> = {};
-    const shared: Record<string, string> = {};
     for (const [field, value] of new FormData(form).entries()) {
       if (typeof value !== "string") continue;
-      if (SHARED_FIELDS.includes(field)) shared[field] = value;
-      else entries[field] = value;
+      entries[field] = value;
     }
     setDrafts(previous => ({
       ...previous,
       [key]: { ...previous[key], ...entries },
-      common: { ...previous.common, ...shared },
     }));
   }, []);
 
-  /** The shared identity wins over a stale copy; a carried password also fills the confirmation. */
-  const draftFor = (key: string) => {
-    const draft = { ...drafts[key], ...drafts.common };
-    if (key !== "login" && draft.confirmation === undefined && draft.password) draft.confirmation = draft.password;
-    return draft;
-  };
+  /** Restore only this form's draft; credentials and confirmation never cross forms. */
+  const draftFor = (key: string) => drafts[key];
 
   /** Stable identity: the form reports success from an effect that lists this callback. */
   const handleSent = useCallback((result: { email: string; message: string }) => {

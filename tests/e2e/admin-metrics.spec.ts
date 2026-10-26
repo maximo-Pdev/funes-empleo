@@ -71,7 +71,7 @@ test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ p
   await page.getByLabel("Correo electrónico").fill("company1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/empresa$/);
   const denied = await page.request.get(url);
   for (const response of [anonymous, denied]) {
     expect(response.status()).toBe(403);

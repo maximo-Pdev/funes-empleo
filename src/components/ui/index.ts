@@ -1,8 +1,14 @@
 export { Badge } from "./badge";
 export { Button } from "./button";
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
+export { Combobox, ComboboxClear, ComboboxCollection, ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxLabel, ComboboxList, ComboboxTrigger, ComboboxValue } from "./combobox";
+export { ComboboxChip, ComboboxChips, ComboboxChipsInput } from "./combobox";
 export { EmptyState, LoadingState } from "./page-state";
+export { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
+export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./pagination";
+export { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "./popover";
 export { FeedbackMessage } from "./feedback-message";
 export { SelectField } from "./select-field";
+export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./table";
 export { Skeleton } from "./skeleton";
 export { TextField } from "./text-field";

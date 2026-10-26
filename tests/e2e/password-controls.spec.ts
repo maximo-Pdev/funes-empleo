@@ -33,7 +33,8 @@ for (const registration of [
       await page.getByLabel("CUIT", { exact: true }).fill("30999999997");
       await page.getByLabel("Persona responsable").fill("Responsable ficticio");
       await page.getByLabel("Actividad", { exact: true }).fill("Servicios");
-      await page.getByLabel("Localidad", { exact: true }).fill("Funes");
+      await page.getByLabel("Localidad", { exact: true }).click();
+      await page.getByRole("option", { name: "Funes", exact: true }).click();
     }
     await page.getByLabel("Correo electrónico", { exact: true }).fill("registro@example.invalid");
     await page.getByRole("button", { name: registration.button, exact: true }).click();

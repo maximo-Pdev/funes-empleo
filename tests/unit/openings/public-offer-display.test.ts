@@ -3,9 +3,10 @@ import { formatPublicClosingDate, publicContractTypeLabel, publicModalityLabel }
 
 it("traduce códigos conocidos solo en presentación", () => {
   expect(publicModalityLabel("onsite")).toBe("Presencial");
-  expect(publicContractTypeLabel("fixed_term")).toBe("Plazo fijo");
+  expect(publicContractTypeLabel("fixed_term")).toBe("A plazo fijo");
   expect(publicModalityLabel("remote")).toBe("Remoto");
   expect(publicModalityLabel("hybrid")).toBe("Híbrido");
+  expect(publicModalityLabel("special")).toBe("Especial");
   expect(publicContractTypeLabel("permanent")).toBe("Permanente");
 });
 

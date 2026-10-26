@@ -7,13 +7,14 @@ export type TextFieldProps = Omit<ComponentProps<"input">, "id"> & {
   label: string;
   hint?: string;
   error?: string;
+  help?: string;
 };
 
 export function TextField({
-  id, label, hint, error, required, className = "", "aria-describedby": describedBy, ...props
+  id, label, hint, error, help, required, className = "", "aria-describedby": describedBy, ...props
 }: TextFieldProps) {
   return (
-    <Field label={label} hint={hint} error={error} className="municipal-label block text-sm font-semibold">
+    <Field label={label} hint={hint} error={error} help={help} className="municipal-label block text-sm font-semibold">
       <input
         {...props}
         id={id}

@@ -23,12 +23,11 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await menu.getByRole("link", { name: "Perfil asistido", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/atencion-presencial$/);
   await expect(menu.getByRole("link", { name: "Perfil asistido", exact: true })).toHaveAttribute("aria-current", "page");
-  await expect(page.getByLabel("Vigencia")).toHaveValue("all");
-  await expect(page.getByLabel("Aptitud para derivación")).toHaveValue("all");
+  await expect(page.getByLabel("Aptitud para derivación", { exact: true })).toHaveValue("all");
   const suffix = Date.now().toString().slice(-5);
   const name = `Mesa presencial E2E ${suffix}`;
   const before = Number(runLocalMaintenanceSql("select count(*) from public.candidate_profiles"));
-  await page.getByLabel("Término").fill(name);
+  await page.getByLabel("Búsqueda por palabra", { exact: true }).fill(name);
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page.getByText("Sin perfiles de atención presencial")).toBeVisible();
   let firstReference = "";
@@ -40,8 +39,9 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
     await page.getByLabel("Localidad laboral", { exact: true }).fill("Funes");
     await page.getByLabel("Habilidades y experiencia", { exact: true }).fill("Experiencia presencial ficticia");
-    await page.getByLabel(number === 1 ? "Categoría ficticia A" : "Categoría ficticia B", { exact: true }).check();
-    const acceptance = page.getByLabel(/Confirmo que la persona aceptó/);
+    await page.getByLabel("Categorías laborales").click();
+    await page.getByRole("option", { name: number === 1 ? "Categoría ficticia A" : "Categoría ficticia B" }).click();
+    const acceptance = page.getByLabel(/Confirmo que la persona leyó y aceptó/);
     await expect(acceptance).not.toBeChecked();
     await acceptance.check();
     await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
@@ -57,7 +57,8 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await page.getByRole("link", { name: "Siguiente", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/atencion-presencial\?.*page=2/);
   await expect(results.getByRole("link", { name: `${name} 2`, exact: true })).toBeVisible();
-  await page.getByLabel("Categoría", { exact: true }).selectOption({ label: "Categoría ficticia A" });
+  await page.getByLabel("Categorías", { exact: true }).click();
+  await page.getByRole("option", { name: "Categoría ficticia A" }).click();
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page).toHaveURL(/categoryId=rub-[0-9a-f]{24}/);
   await expect(results.getByRole("heading", { name: "Perfiles: 1", exact: true })).toBeVisible();
@@ -67,7 +68,7 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await page.keyboard.press("Enter");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(`${name} 1`);
   await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Consentimiento y activación", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Activación", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Vincular cuenta presencialmente", exact: true })).toBeVisible();
   await expect(menu.getByRole("link", { name: "Perfil asistido", exact: true })).toHaveAttribute("aria-current", "page");
   const id = referenceIdentifier("candidate", firstReference);

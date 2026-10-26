@@ -50,7 +50,8 @@ async function registerCompany() {
   fireEvent.change(screen.getByLabelText("Persona responsable"), { target: { value: "Responsable ficticio" } });
   fireEvent.change(screen.getByLabelText("Correo electrónico"), { target: { value: "empresa@example.invalid" } });
   fireEvent.change(screen.getByLabelText("Actividad", { exact: true }), { target: { value: "Servicios ficticios" } });
-  fireEvent.change(screen.getByLabelText("Localidad", { exact: true }), { target: { value: "Funes" } });
+  fireEvent.click(screen.getByRole("combobox", { name: "Localidad" }));
+  fireEvent.click(screen.getByRole("option", { name: "Funes" }));
   fireEvent.change(screen.getByLabelText("Contraseña", { exact: true }), { target: { value: "Ficticia-2026" } });
   fireEvent.change(screen.getByLabelText("Confirmar contraseña"), { target: { value: "Ficticia-2026" } });
   await submitForm();

@@ -81,7 +81,7 @@ it("no consulta candidatos con filtros inválidos", async () => {
 it("lista perfiles presenciales sin exigir activación y reutiliza sus detalles", async () => {
  render(await AssistedCandidates({ searchParams: Promise.resolve({}) }));
  expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
- expect(mocks.assistedSearch).toHaveBeenCalledWith(expect.objectContaining({ vigency: "all", eligibility: "all" }));
+ expect(mocks.assistedSearch).toHaveBeenCalledWith(expect.objectContaining({ eligibility: "all" }));
  expect(mocks.search).not.toHaveBeenCalled();
  expect(screen.getByText("Borrador")).toBeTruthy();
  expect(screen.getByRole("link", { name: candidate.display_name }).getAttribute("href")).toBe(`/admin/candidates/${fixtureReference("candidate", id)}`);
@@ -96,7 +96,6 @@ it("conserva filtros y categoría opaca al paginar atención presencial", async 
  expect(url.pathname).toBe("/admin/atencion-presencial");
  expect(url.searchParams.get("categoryId")).toBe(fixtureReference("category", id));
  expect(url.searchParams.get("locality")).toBe("Funes");
- expect(url.searchParams.get("vigency")).toBe("all");
  expect(url.searchParams.get("page")).toBe("2");
 });
 it("informa ausencia de perfiles presenciales sin crear registros", async () => {
@@ -214,7 +213,7 @@ it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mante
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).toHaveBeenCalledWith(id);
  expect(screen.getByRole("heading", { name: "Mantener perfil" })).toBeTruthy();
- expect(screen.getByRole("heading", { name: "Consentimiento y activación" })).toBeTruthy();
+ expect(screen.getByRole("heading", { name: "Activación" })).toBeTruthy();
  const maintenanceForm = screen.getByRole("heading", { name: "Mantener perfil" }).closest("form");
  const profileDetails = screen.getByRole("region", { name: "Perfil candidato" });
  const cvDetails = screen.getByRole("region", { name: "CV PDF del candidato" });
@@ -239,7 +238,7 @@ it.each([
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).not.toHaveBeenCalled();
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
- expect(screen.queryByRole("heading", { name: "Consentimiento y activación" })).toBeNull();
+ expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
  expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
  expect(screen.getByRole("heading", { name: "Historial de cuenta y perfil" })).toBeTruthy();
@@ -262,7 +261,7 @@ it("retira formularios al refrescar tras vincular sin dejar nodos de edición an
  view.rerender(await Candidate(props));
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
  expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
- expect(screen.queryByRole("heading", { name: "Consentimiento y activación" })).toBeNull();
+ expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
  expect(screen.getAllByRole("heading", { name: "Nota interna de la Oficina" })).toHaveLength(1);
  expect(screen.getByRole("heading", { name: "Historial de cuenta y perfil" })).toBeTruthy();
@@ -353,4 +352,8 @@ it.each([
 
 vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
 vi.mock("@/lib/records/page-references", async () => (await import("../../fixtures/record-references")).pageReferenceMocks);
+vi.mock("@/lib/records/reference-url", async () => {
+  const { fixtureHref } = await import("../../fixtures/record-references");
+  return { referenceUrl: async (href: string) => fixtureHref(href), canonicalReferenceRoute: async () => {} };
+});
 vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

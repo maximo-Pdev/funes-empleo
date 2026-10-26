@@ -1,10 +1,11 @@
 import { referenceFilters } from "@/lib/records/page-references";
+import { referenceUrl } from "@/lib/records/reference-url";
 import { recordReference } from "@/lib/records/references";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Badge, Button, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, Button, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { PARTICIPATION_STATUSES, participationStatusSchema } from "@/domain/states";
 import { participationStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { listAdminParticipations } from "@/features/participations/admin-query";
@@ -33,11 +34,11 @@ export default async function AdminParticipationsPage({ searchParams }: {
   }) : null;
   const openingReference = !invalid && openingId ? await recordReference("opening", openingId) : undefined;
   const candidateReference = !invalid && candidateId ? await recordReference("candidate", candidateId) : undefined;
-  const pageHref = (target: number) => `/admin/participations?${new URLSearchParams({
+  const pageHref = (target: number) => referenceUrl(`/admin/participations?${new URLSearchParams({
     ...(openingId ? { openingId } : {}),
     ...(candidateId ? { candidateId } : {}),
     ...(status?.success ? { status: status.data } : {}), page: String(target),
-  })}`;
+  })}`);
 
   return <AdminShell email={user?.email} active="/admin/participations" title="Participaciones" description="La Oficina evalúa cada caso y conserva su historial."
     navigation={[{ href: "/admin/openings", label: "Ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
@@ -58,11 +59,13 @@ export default async function AdminParticipationsPage({ searchParams }: {
           <Link href={`/admin/participations/${item.id}`} className="font-semibold text-blue-800 underline">{item.candidate_profiles?.display_name ?? "Perfil sin nombre"} · {item.job_openings?.title ?? "Oferta sin título"}</Link>
           <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700"><Badge variant="status" tone={statusTone(participationStatusTones, item.status)}>{participationStatusLabel(item.status)}</Badge> {item.origin === "admin_nomination" ? "Nominación administrativa" : "Postulación"}</p>
         </li>)}</ul>}
-      {result.pageCount > 1 && <nav aria-label="Páginas de participaciones" className="flex gap-4">
-        {result.page > 1 && <Link href={pageHref(result.page - 1)} className="text-blue-800 underline">Anterior</Link>}
-        <span>Página {result.page} de {result.pageCount}</span>
-        {result.page < result.pageCount && <Link href={pageHref(result.page + 1)} className="text-blue-800 underline">Siguiente</Link>}
-      </nav>}
+      {result.pageCount > 1 && <Pagination aria-label="Páginas de participaciones">
+        <PaginationContent>
+          {result.page > 1 && <PaginationItem><PaginationPrevious href={await pageHref(result.page - 1)} /></PaginationItem>}
+          <PaginationItem><span className="px-3 text-sm">Página {result.page} de {result.pageCount}</span></PaginationItem>
+          {result.page < result.pageCount && <PaginationItem><PaginationNext href={await pageHref(result.page + 1)} /></PaginationItem>}
+        </PaginationContent>
+      </Pagination>}
     </section>}
   </AdminShell>;
 }

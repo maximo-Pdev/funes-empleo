@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CalendarDays, ChevronLeft, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
-import { Badge, Card, CardContent, CardHeader } from "@/components/ui";
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CalendarDays, MapPin, ShieldCheck } from "lucide-react";
+import { Badge, Card, CardContent, CardHeader, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { listPublicOffers, listPublicOfferFilters } from "@/features/openings/public-service";
 import { PublicOfferSearchForm } from "@/features/openings/components/public-offer-search-form";
 import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
@@ -99,11 +99,13 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
             </ul>
           )}
           {(hasPrevious || hasNext) && (
-            <nav aria-label="Páginas de ofertas" className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
-              {hasPrevious ? <Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary" href={publicOffersPageHref(filters, result.page - 1)} rel="prev"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Anterior</Link> : <span className="inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm text-muted-foreground" aria-disabled="true"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Anterior</span>}
-              <p className="text-sm font-medium text-muted-foreground">Página {result.page}</p>
-              {hasNext ? <Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary" href={publicOffersPageHref(filters, result.page + 1)} rel="next">Siguiente<ChevronRight className="h-4 w-4" aria-hidden="true" /></Link> : <span className="inline-flex min-h-11 items-center gap-2 px-4 py-2 text-sm text-muted-foreground" aria-disabled="true">Siguiente<ChevronRight className="h-4 w-4" aria-hidden="true" /></span>}
-            </nav>
+            <Pagination aria-label="Páginas de ofertas" className="mt-6 border-t border-border pt-5">
+              <PaginationContent className="w-full justify-between">
+                {hasPrevious && <PaginationItem><PaginationPrevious href={publicOffersPageHref(filters, result.page - 1)} rel="prev" /></PaginationItem>}
+                <PaginationItem><span className="text-sm font-medium text-muted-foreground">Página {result.page}</span></PaginationItem>
+                {hasNext && <PaginationItem><PaginationNext href={publicOffersPageHref(filters, result.page + 1)} rel="next" /></PaginationItem>}
+              </PaginationContent>
+            </Pagination>
           )}
         </section>
 
