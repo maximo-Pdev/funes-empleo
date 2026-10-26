@@ -1,5 +1,23 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
+## Incremento EXTRA073 — Oferta administrativa
+
+En fixture ficticio aislado con la nueva migración, abrir una oferta publicada
+como admin: información izquierda y decisión/historial derecha en escritorio;
+apilado en móvil. El enlace destacado debe ir a participaciones filtradas por
+la referencia opaca de esa oferta, operable por teclado.
+
+Preparar más de una página de candidatos aptos con updated_at diferentes y
+empates: Más recientes primero es default; Más antiguos primero invierte fechas
+en todo el conjunto, conservando total y desempate nombre/ID. Cambiar orden
+vuelve a página1; navegar páginas conserva matchOrder. Abrir/nominar mantiene
+la exclusión previa y sus versiones. Probar orden inválido/repetido y rol ajeno.
+
+Ejecutar SQL de orden/compatibilidad y regresiones de matching/preview/nominación,
+unit/componentes, tipos/lint/build y E2E relevante; fixtures y comandos locales
+según los guards/propiedad de esta guía. SQL se aplica antes de desplegar app;
+la aplicación alojada de la migración requiere una operación separada verificada.
+
 Esta guía define cómo comprobar la implementación. El esqueleto de la fase 1 y el fixture local
 ficticio reducido (10 identidades: 2 admin / 4 candidate / 4 company) de la fase 2 ya existe. Las fases 3 y 4 tienen evidencia automatizada
 parcial por escenario, registrada en `implementation-status.md`; los escenarios restantes siguen

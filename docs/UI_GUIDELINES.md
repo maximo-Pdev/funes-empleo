@@ -7,6 +7,18 @@ manual or evidence of stakeholder acceptance.
 
 ## Before changing a page
 
+EXTRA073: detalle administrativo de oferta conserva grilla responsive; Oferta y
+empresa izquierda, Decisión municipal e Historial de moderación derecha. Móvil
+apila en ese orden antes de matching. Enlace a participaciones usa variantes
+del Button municipal en link semántico (mínimo44px, foco visible, texto adaptable).
+Matching incluye selector de última actualización con dos órdenes; cambiarlo
+reinicia página y mantiene URLs opacas. Reutilizar SelectField con placeholder
+opcionalmente omitido; no alterar sus defaults ni controles de otros perfiles.
+El enlace destacado usa data-slot=link-button para conservar el texto blanco
+de sus variantes frente al override de enlaces del panel, también en hover.
+Historial de moderación conserva cinco eventos iniciales y revela cinco por
+Mostrar más; ocultar ese botón si no quedan otros. Mantener foco y anuncio.
+
 EXTRA072: Consentimiento de prueba del perfil propio muestra dos párrafos
 visibles y cuatro dentro de Más información, cerrado inicialmente. Usar el texto
 literal de Mateo; retirar el apartado de política/versión/aviso de esta vista.

@@ -6,7 +6,7 @@ export type SelectFieldProps = Omit<ComponentProps<"select">, "id" | "children">
   id: string;
   label: string;
   options: readonly { value: string; label: string }[];
-  placeholder?: string;
+  placeholder?: string | null;
   hint?: string;
   error?: string;
 };
@@ -25,7 +25,7 @@ export function SelectField({
         aria-describedby={describedBy}
         className={`municipal-control ${className}`}
       >
-        <option value="">{placeholder}</option>
+        {placeholder !== null && <option value="">{placeholder}</option>}
         {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
       </select>
     </Field>

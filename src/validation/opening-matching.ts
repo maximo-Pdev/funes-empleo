@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { databaseUuidSchema } from "./common";
+import { OPENING_MATCH_ORDERS, DEFAULT_OPENING_MATCH_ORDER } from "@/domain/catalogs/opening-match-order";
 
 const integerInput = (maximum: number, fallback: number) => z.union([z.string().regex(/^\d+$/), z.number()])
   .transform(Number).pipe(z.number().int().min(1).max(maximum)).default(fallback);
@@ -8,6 +9,7 @@ export const openingMatchingInput = z.object({
   openingId: databaseUuidSchema,
   page: integerInput(10000, 1),
   pageSize: integerInput(50, 20),
+  order: z.enum(OPENING_MATCH_ORDERS).default(DEFAULT_OPENING_MATCH_ORDER),
 });
 
 export const openingMatchesSchema = z.object({

@@ -1,6 +1,6 @@
-import { recordReferences } from "@/lib/records/references";
+import { recordReference, recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
-import { RecordLink as Link } from "@/components/ui/record-link";
+import { DEFAULT_OPENING_MATCH_ORDER } from "@/domain/catalogs/opening-match-order";
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { publicModalityLabel, publicContractTypeLabel } from "@/features/openings/public-offer-display";
 import { Suspense } from "react";
@@ -11,20 +11,22 @@ import { moderateOpeningAction } from "@/features/openings/admin-actions";
 import { ModerationForm } from "@/features/openings/components/moderation-form";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { OpeningCandidateMatches } from "@/features/participations/components/opening-candidate-matches";
+import { LinkButton } from "@/components/ui/link-button";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOpeningDetailPage({ params, searchParams }: {
   params: Promise<{ openingId: string }>;
-  searchParams: Promise<{ matchPage?: string | string[] }>;
+  searchParams: Promise<{ matchPage?: string | string[]; matchOrder?: string | string[] }>;
 }) {
   const { user } = await requireActiveAccount(["admin"]);
   const { openingId: reference } = await params;
   const openingId = await pageRecordIdentifier("opening", reference, `/admin/openings/${reference}`, await searchParams);
-  const { matchPage } = await searchParams;
+  const { matchPage, matchOrder } = await searchParams;
   const { opening, events } = await getAdminOpening(openingId);
 
   const actors = await recordReferences("account", events.map(event => event.actor_account_id));
+  const openingReference = await recordReference("opening", opening.id);
 
   return <AdminShell email={user?.email} active="/admin/openings" title={opening.title ?? "Oferta sin título"}
     description="Detalle e historial de decisiones visible solo para la Oficina de Empleo."
@@ -43,20 +45,22 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         <p>Contrato: {publicContractTypeLabel(opening.contract_type ?? "Sin definir")}</p>
         <div><h3 className="font-semibold">Tareas</h3><p className="whitespace-pre-wrap">{opening.tasks ?? "Sin definir"}</p></div>
         <div><h3 className="font-semibold">Requisitos</h3><p className="whitespace-pre-wrap">{opening.requirements ?? "Sin definir"}</p></div>
-        <Link href={`/admin/participations?openingId=${opening.id}`} className="inline-block text-blue-800 underline">Ver participaciones de esta oferta</Link>
+        <LinkButton href={`/admin/participations?openingId=${openingReference}`}>Ver participaciones de esta oferta</LinkButton>
       </section>
+      </div>
+      <div className="space-y-6">
       <ModerationForm key={`${opening.status}-${opening.version}`} openingId={opening.id}
         version={opening.version} status={opening.status} onSubmit={moderateOpeningAction} />
-      </div>
       <ModerationHistory key={`${opening.id}:${opening.version}`} events={events.map(event => ({
         id: event.id, decision: event.decision, previousStatus: event.previous_status, newStatus: event.new_status,
         at: event.created_at, message: event.company_message, internalReason: event.internal_reason,
         actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`,
       }))} />
+      </div>
     </div>
-    <Suspense key={Array.isArray(matchPage) ? matchPage.join(",") : matchPage ?? "1"}
+    <Suspense key={`${Array.isArray(matchOrder) ? matchOrder.join(",") : matchOrder ?? DEFAULT_OPENING_MATCH_ORDER}:${Array.isArray(matchPage) ? matchPage.join(",") : matchPage ?? "1"}`}
       fallback={<p role="status">Buscando candidatos con rubros coincidentes…</p>}>
-      <OpeningCandidateMatches openingId={opening.id} page={matchPage} />
+      <OpeningCandidateMatches openingId={opening.id} page={matchPage} order={matchOrder} />
     </Suspense>
   </AdminShell>;
 }

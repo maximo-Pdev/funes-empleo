@@ -19,12 +19,17 @@ beforeEach(() => {
 
 it("normaliza páginas y transporta únicamente los parámetros admitidos", async () => {
   expect(await getOpeningMatches({ openingId: id, page: "2", pageSize: "10", role: "company" })).toEqual(response);
-  expect(rpc).toHaveBeenCalledWith("match_opening_candidates", { p_opening: id, p_page: 2, p_page_size: 10 });
+  expect(rpc).toHaveBeenCalledWith("match_opening_candidates_ordered", { p_opening: id, p_page: 2, p_page_size: 10, p_order: "updated_desc" });
 });
 
 it("usa valores predeterminados acotados", async () => {
   await getOpeningMatches({ openingId: id });
-  expect(rpc).toHaveBeenCalledWith("match_opening_candidates", { p_opening: id, p_page: 1, p_page_size: 20 });
+  expect(rpc).toHaveBeenCalledWith("match_opening_candidates_ordered", { p_opening: id, p_page: 1, p_page_size: 20, p_order: "updated_desc" });
+});
+
+it("transporta el orden de actualización ascendente sin ordenar una página en memoria", async () => {
+  expect(await getOpeningMatches({ openingId: id, order: "updated_asc", page: 2, pageSize: 10 })).toEqual(response);
+  expect(rpc).toHaveBeenCalledWith("match_opening_candidates_ordered", { p_opening: id, p_order: "updated_asc", p_page: 2, p_page_size: 10 });
 });
 
 it.each([null, { role: "company", status: "active" }, { role: "candidate", status: "active" },
@@ -36,7 +41,8 @@ it.each([null, { role: "company", status: "active" }, { role: "candidate", statu
 
 it.each([{ openingId: "inválido" }, { openingId: id, page: ["1", "2"] }, { openingId: id, page: true },
   { openingId: id, page: "" }, { openingId: id, page: null }, { openingId: id, page: 0 },
-  { openingId: id, page: 1.5 }, { openingId: id, page: 10001 }, { openingId: id, pageSize: 51 }])("rechaza entrada %j", async input => {
+  { openingId: id, page: 1.5 }, { openingId: id, page: 10001 }, { openingId: id, pageSize: 51 },
+  { openingId: id, order: "created_desc" }, { openingId: id, order: null }, { openingId: id, order: ["updated_desc", "updated_asc"] }])("rechaza entrada %j", async input => {
   expect(openingMatchingInput.safeParse(input).success).toBe(false);
   await expect(getOpeningMatches(input)).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
   expect(session).not.toHaveBeenCalled();

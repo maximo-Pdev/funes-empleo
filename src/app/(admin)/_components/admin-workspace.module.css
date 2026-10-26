@@ -5,8 +5,8 @@
 .workspace :where(h2, h3, h4) { color: var(--color-primary-900); }
 .workspace :where(h2) { font-size: 1.125rem; font-weight: 700; }
 .workspace :where(h3, h4) { font-weight: 600; }
-.workspace :where(a) { color: var(--color-primary); text-underline-offset: 4px; }
-.workspace :where(a:hover) { color: var(--color-primary-700); }
+.workspace :where(a:not([data-slot="link-button"])) { color: var(--color-primary); text-underline-offset: 4px; }
+.workspace :where(a:not([data-slot="link-button"]):hover) { color: var(--color-primary-700); }
 .workspace :where(a:not([class*="bg-"])) { display: inline-flex; align-items: center; min-height: 44px; border-radius: var(--radius-sm); }
 .workspace :where(a[class*="bg-blue-"]) { display: inline-flex; align-items: center; min-height: 48px; padding: 12px 20px; border-radius: var(--radius-lg); background: var(--color-primary); color: white; font-size: .875rem; font-weight: 600; }
 .workspace :where(a[class*="bg-blue-"]:hover) { background: var(--color-primary-700); }

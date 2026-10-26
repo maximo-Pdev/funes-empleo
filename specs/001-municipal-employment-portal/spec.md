@@ -78,8 +78,9 @@ del candidato y categorías de ofertas son multiselección (EXTRA057 unificó la
 dos selecciones anteriores del candidato). Desde una
 oferta publicada o pausada y vigente de una empresa activa, solo administración
 puede consultar candidatos aptos para derivación con al menos un rubro activo
-compartido (OR, no todos). Mostrar rubros coincidentes, ordenar por nombre e ID
-sin puntaje y paginar después de filtrar/contar. No duplicar candidatos por
+compartido (OR, no todos). Mostrar rubros coincidentes, sin puntaje, y paginar
+después de filtrar/contar y del orden global. El RPC legado conserva nombre/ID;
+EXTRA073 permite en esta vista ordenar por última actualización. No duplicar candidatos por
 múltiples coincidencias. No crear nominaciones ni derivaciones al consultar.
 
 Ampliación solicitada por Mateo el 2026-10-19: excluir antes del total/paginación
@@ -105,6 +106,31 @@ El catálogo v2 se incorpora sin borrar/desactivar categorías previas ni reasig
 personas u ofertas. No inferir equivalencias; importación sintética v1 sin cambios.
 OQ-010 solo se resuelve para el catálogo amplio aprobado, no para equivalencias
 históricas o un catálogo exhaustivo de ocupaciones; OQ-018 permanece abierta.
+
+### Oferta administrativa y orden de coincidencias — EXTRA073,2026-10-25
+
+- R1: en escritorio, Decisión municipal aparece a la derecha de Oferta y empresa;
+  Historial de moderación permanece en esa columna debajo de la decisión. En
+  móvil se apilan información, decisión e historial, antes del matching completo.
+- R2: Ver participaciones de esta oferta se presenta como acción primaria visible,
+  de altura mínima44px y foco visible con los tokens compartidos; conserva
+  semántica de enlace y filtro a esa oferta mediante referencia opaca.
+- R3: solo Candidatos con rubros coincidentes ofrece Más recientes primero y Más
+  antiguos primero, según última actualización persistida del perfil. No es edad
+  ni fecha de creación; predeterminado recientes. No cambia el listado general.
+- R4: ordenar todo el conjunto elegible antes de paginar; empates por nombre/ID,
+  total independiente del orden. Cambiar orden reinicia página1, enlaces de
+  paginación y regreso lo conservan. Valores desconocidos o repetidos se rechazan.
+- R5: conservar aptitud, exclusión de participaciones, permisos, popup/nominación,
+  moderación, auditoría y respuesta mínima. No expone fechas ni datos privados
+  nuevos ni crea o cambia registros al consultar.
+- R6 (ampliación posterior): Historial de moderación muestra inicialmente hasta
+  cinco eventos; solo si quedan otros ofrece Mostrar más y revela cinco por
+  interacción hasta agotar el historial, conservando orden, foco y eventos.
+
+Clarificación de Mateo: «En los candidatos coincidentes dentro de cada oferta»;
+«Última actualización del perfil». Se usa el reloj existente del registro, que
+incluye cambios de datos/estado, CV, foto y notas que actualizan el perfil.
 
 ### Compatibilidad de preview,2026-10-25 (EXTRA068)
 
@@ -181,7 +207,7 @@ listado del detalle empresarial administrativo; no altera rol, métricas/restaur
 R3/R4: oferta empresarial incluye derivaciones y moderación en la misma página;
 empresa restaurada con perfil incompleto conserva su oferta, con aviso y sin
 consultar derivaciones hasta completar el perfil; no se restablecen accesos.
-enlaces previos funcionan. Historia empresa/admin: cinco recientes y Ver más por5,
+enlaces previos funcionan. Historia empresa/admin: cinco recientes y Mostrar más por5,
 conservando privacidad de mensajes públicos y motivos internos según rol.
 R5: editar propia publicada exige campos completos y la devuelve atómicamente a
 pending_review, sin publicación hasta aprobación. Mantiene slug, casos, resultados

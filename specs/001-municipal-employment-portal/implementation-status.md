@@ -1,6 +1,6 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-24 al final.** Los apartados previos son
+**Estado vigente: ver actualizaciones hasta 2026-10-25 al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -1411,3 +1411,62 @@ Publicación solicitada2026-10-25: commit07751d0 sin firma/signoff/coautor y
 sin borrador, en fix/company-referral-names; adjunto a la conversación. Incluye
 el cambio probado y evidencia de migración ya aplicada. next-env.d.ts y respaldo
 ignorados excluidos. CI/revisión/merge/despliegue de interfaz pendientes.
+
+## 2026-10-25 — Oferta administrativa y orden de coincidencias, EXTRA073
+
+Base main9569a88 (PR76 mergeado), rama feat/admin-opening-workspace. Rama
+anterior eliminada local/remota a pedido de Mateo; next-env.d.ts preexistente
+preservado. Contexto, artefactos y gates incrementales revisados antes de editar.
+R1–R5 y T208–211: decisión/historial a la derecha de información, enlace destacado
+a participaciones y orden por última actualización solo en matching de cada oferta.
+Más recientes por defecto; cambiar orden vuelve a página1 y paginar lo conserva.
+
+RPC nuevo match_opening_candidates_ordered en migración20261025222811; pool,
+aptitud, proyección, autorización, RPC legado y nominación conservados. Sin DML,
+backfill ni índices nuevos. LinkButton conserva semántica de enlace y referencia
+opaca. Override CSS acotado evita texto verde sobre verde; regresión RED/GREEN
+real. Helper E2E localiza candidatos por el mismo orden; consumidor de perfil
+espera la redirección canónica para evitar carreras. Detalle en EXTRA073.
+
+Verificado:1200 unitarias/componentes/90 archivos,57 tooling, SQL1314/25 archivos,
+tipos/lint/build/diff PASS. Advisor security local sin incidencias.5 recorridos
+principales Chromium PASS23.2s, más3 consumidores de nominación PASS (uno tras
+corregir carrera de redirección). Geometría1440/390, teclado/foco, contraste/axe0,
+orden global/paginación/reload, popup/CV/nominar y permisos comprobados.
+EXPLAIN sintético9.218ms para12 elegibles sobre500 perfiles; no es SLO alojado.
+Cotejo final acotado R1–R5:5/5, sin tareas nuevas del alcance; no aceptación global.
+
+Se usó únicamente snapshot y base ficticia funes-admin-cv-check54341/54342/app3001.
+La base habitual y alojada quedan sin cambios. Aplicar esta migración antes de
+desplegar app; recuperación en docs/operations/admin-opening-workspace.md.
+Migración alojada, commit/PR/CI completo/revisión humana/despliegue pendientes.
+
+Aplicación alojada posterior autorizada por Mateo2026-10-25: únicamente
+20261025222811/admin_opening_candidate_order ejecutada y registrada en
+kyjycjojzhwggjuqjnki, dentro de una transacción con validación de cuerpo,
+ACL/volatilidad/search_path y guard sin sesión. Hash del SQL registrado igual
+al archivo local; hashes y ACL de pool, guard y RPC legado intactos. Respaldo
+previo y evidencia ignorados en test-results/admin-opening-remote-*. Sin reset,
+backfill ni otras migraciones. Guía operativa actualizada; publicación de la
+interfaz, pruebas alojadas por usuario y revisión humana aún pendientes.
+Advisor alojado57→58 WARN, sin ERROR: único nuevo0029 por el RPC autenticado
+SECURITY DEFINER intencional y protegido por guard admin/sesión/ACL. Guía incluye
+el enlace y la justificación. Primer chequeo posterior falló con el rol temporal
+del CLI; repetido sin conexiones paralelas PASS. No se repitió la migración ni
+se modificaron credenciales o configuración de Auth.
+
+Ampliación visual posterior de EXTRA073/T212: historial de moderación conserva
+cinco iniciales y bloques de cinco; rótulo Mostrar más, ausente si no quedan
+más eventos. Componente compartido empresa/admin, foco/anuncio y datos intactos.
+59 pruebas pertinentes, tipos/lint/build limpio/diff PASS;8 escenarios Chromium
+0/5/6/12×1440/390 con teclado/foco/axe0 PASS. Expectativa E2E empresarial alineada;
+no se repite el recorrido con base porque solo cambia la etiqueta del control.
+Build inicial falló en worker CSS y cacheó el error; limpieza de .next únicamente
+en snapshot resolvió. Sin migración adicional ni cambios de negocio/permisos.
+Publicación/revisión humana pendientes; next-env.d.ts preexistente intacto.
+
+Publicación solicitada por Mateo: commit00f06cc sin firma/signoff/coautoría y
+[PR77](https://github.com/maximo-Pdev/funes-empleo/pull/77) abierto hacia main,
+sin borrador, desde feat/admin-opening-workspace; adjunto a la conversación.
+Incluye EXTRA073/T208–212 y migración alojada ya aplicada. next-env.d.ts y todos
+los respaldos ignorados quedan fuera. CI/revisión/merge/despliegue pendientes.

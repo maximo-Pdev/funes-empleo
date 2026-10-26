@@ -26,6 +26,15 @@ Contrato detallado y recuperación: [public-offer-slugs](../../../docs/validatio
 
 ## A08 — coincidencias administrativas por rubro
 
+EXTRA073 añade `match_opening_candidates_ordered(p_opening uuid,
+p_order text='updated_desc',p_page integer=1,p_page_size integer=20)`. Requiere
+sesión/admin activo y conserva exactamente el sobre/items/aptitud del RPC abajo.
+Solo acepta updated_desc/updated_asc (nulo/otro: INVALID_INPUT); orden global
+por updated_at desc/asc, desempate display_name/id, antes de paginar. La fecha
+no se transmite. RPC anterior y preview no cambian. URL administrativa acepta
+matchOrder escalar enum, omisión=updated_desc, repetidos/desconocidos inválidos;
+cambiar orden reinicia página1 y paginación lo mantiene. SQL previo al deploy.
+
 `match_opening_candidates(p_opening uuid,p_page integer=1,p_page_size integer=20)`
 requiere sesión vigente y cuenta administrativa activa, incluso por RPC directa.
 Entrada: UUID, página 1–10000, tamaño 1–50; nulos/ilegales rechazados.

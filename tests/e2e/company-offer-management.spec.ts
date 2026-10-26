@@ -53,7 +53,7 @@ test("empresa edita publicada, sigue moderación/derivaciones y cancela conserva
     const history = page.locator('section[aria-labelledby="opening-history"]');
     await expect(history.getByRole("listitem")).toHaveCount(5);
     await expect(page.locator("body")).not.toContainText("Privado ficticio");
-    await history.getByRole("button", { name: "Ver más" }).click();
+    await history.getByRole("button", { name: "Mostrar más" }).click();
     await expect(history.getByRole("listitem")).toHaveCount(7);
     await expect(page.getByRole("button", { name: "Eliminar oferta", exact: true })).toHaveCSS("background-color", "rgb(153, 27, 27)");
     await page.screenshot({ path: test.info().outputPath("oferta-empresa-1440.png"), fullPage: true });
