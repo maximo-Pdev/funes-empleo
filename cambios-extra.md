@@ -1,5 +1,16 @@
 # Cambios extra necesarios
 
+## EXTRA-085 — /ofertas al diseño vigente y nombres accesibles de los combobox
+
+- **Fecha/autorización:** 2026-10-26; Maxi pidió «rediseñes `src/app/(public)/ofertas/page.tsx` y lo adaptes al diseño que venimos trabajando» y arreglar los seis hallazgos del tablero de pruebas.
+- **Origen/alcance:** S1 de `odd/tasks/portal-polish.md` quedó cerrado solo con el reemplazo del emblema del encabezado. El catálogo público conservaba el encabezado propio, el degradado y los `Card`/`Badge` anteriores al pulido del portal. Alcance: composición visual de esa página y accesibilidad de los desplegables; sin cambios de contrato, datos ni permisos.
+- **Problema/evidencia:** (1) el popup del combobox se renderiza con `role="dialog"` (cuando el input de búsqueda vive dentro) y la lista con `role="listbox"`, ambos sin nombre accesible; la regla axe `aria-input-field-name` cubre `listbox`, así que quedaban violaciones al abrir el desplegable. (2) En el filtro de categorías de la búsqueda administrativa el popup quedaba abierto tras elegir y tapaba el botón «Buscar candidatos». (3) El input oculto de transporte de `LocalityCombobox` repetía el nombre accesible "Localidad" del disparador visible, dejando dos controles con el mismo nombre. (4) `tests/e2e/assisted-section.spec.ts` todavía buscaba «Volver a atención presencial» cuando la navegación dice «Volver a perfil asistido» desde S11.
+- **Cambio:** encabezado de `/ofertas` con el `HomeNavbar` compartido (`alwaysVisible`) sobre banda primaria, eyebrow, titular Sora y nota de intermediación; formulario de búsqueda migrado a `TextField`/`SelectField`/`Button` con el tratamiento municipal de campos; tarjetas, estados vacíos, paginación y barra lateral con los tokens vigentes; el acceso de cuenta sigue dentro de `nav[aria-label="Accesos principales"]` y la barra lateral muestra el panel cuando hay sesión. Nombres accesibles únicos: diálogo «Elegir …», lista «…: opciones», y el transporte oculto de localidad pasa a llamarse «Valor del formulario». El filtro de categorías administrativo cierra el popup al elegir, devolviendo el foco al disparador.
+- **Archivos/contratos:** `src/app/(public)/ofertas/page.tsx`, `public-offer-search-form.tsx`, `locality-combobox.tsx`, `category-multi-select.tsx`, `candidate-search-form.tsx`, `company-opening-form.tsx`, `tests/e2e/assisted-section.spec.ts`, pruebas nuevas de componentes del combobox de categorías y del cierre del filtro.
+- **Riesgo/recuperación:** 3 (los selectores de búsqueda y registro comparten `LocalityCombobox`); se conservan etiquetas, validación nativa, marcador requerido, foco del primer error y `FormData`. Revertir el commit restituye la presentación y los nombres anteriores.
+- **Verificación:** lint, `next typegen` + `tsc`, suite unitaria y build de producción; comprobación del render público en navegador real (nombres accesibles, teclado, axe y geometría). El wrapper E2E no se usa como prueba visual porque reinicia la base de aceptación.
+- **Estado:** implementado; registrado durante la implementación. Revisión humana, PR y despliegue pendientes.
+
 ## EXTRA-084 — Restore PR 78 browser checks and required locality validation
 
 - **Date/authorization:** 2026-10-26; Maxi requested: «Falló el PR en github. Arreglalo para que salga en verde».

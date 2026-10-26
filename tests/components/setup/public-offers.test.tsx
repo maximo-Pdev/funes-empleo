@@ -13,7 +13,7 @@ const { listPublicOffers, listPublicOfferFilters, getPublicOffer, notFound, read
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer, listPublicOfferFilters }));
-vi.mock("next/navigation", () => ({ notFound }));
+vi.mock("next/navigation", () => ({ notFound, usePathname: () => "/ofertas" }));
 
 import PublicOffersPage from "@/app/(public)/ofertas/page";
 import PublicOfferDetailPage from "@/app/(public)/ofertas/[openingId]/page";

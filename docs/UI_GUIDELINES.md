@@ -453,6 +453,30 @@ form's value. This supersedes EXTRA-080's identity-sharing behavior (EXTRA-082).
 Keep state in memory only — no `localStorage`, cookies or server writes —
 and in scope of the card, so a reload starts clean.
 
+## Public offers catalog — EXTRA-085
+
+`/ofertas` uses the same public design as Home: the shared `HomeNavbar` in its
+`alwaysVisible` variant (emblem, identity, Inicio, Ofertas, and Mi cuenta only
+when there is a session) over a primary-green header band with an uppercase
+eyebrow, a Sora `h1` and the intermediary notice. The body keeps the 1280px
+inner width and a `minmax(0,1fr)_20rem` grid: search panel, results and
+pagination on the left, a sticky aside with the candidate CTA and the
+in-office help card on the right.
+
+- Keep the session entry inside `nav[aria-label="Accesos principales"]` with the
+  label and destination from `getAccountAccess()`; the acceptance suite asserts
+  it on `/ofertas`, and anonymous visitors must still see "Iniciar sesión".
+- Use `TextField`, `SelectField` and `Button`/`buttonVariants` for the search
+  panel so labels, underlined controls, 44px targets and focus stay municipal.
+  The filters remain native `select` elements: the browser suite drives them
+  with `selectOption`. Keep the "no disponible" option for a retired filter value.
+- Offer links stay inside `<li>` elements, and the empty, filtered, invalid and
+  out-of-range states keep their literal Spanish copy.
+- Never rename the combobox popup to the field name: the popup renders
+  `role="dialog"` and the list `role="listbox"`, and both need an accessible
+  name (`Elegir <campo>` / `<campo>: opciones`) that does not duplicate the
+  trigger's, or queries and screen readers see two identically named controls.
+
 ## Shared account workspace
 
 Candidate, company and administrator panels use the same `DashboardShell` in
