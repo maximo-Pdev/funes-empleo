@@ -208,7 +208,7 @@ it("conserva la confirmación obligatoria en las decisiones de empresa", async (
 it("exporta los filtros consultados y conserva cobertura pendiente", async () => {
  render(await Metrics({ searchParams: Promise.resolve(metricFilters) })); expect(screen.getByRole("link", { name: "Descargar CSV filtrado" }).getAttribute("href")).toContain("from=2026-10-01&to=2026-10-19"); expect(screen.getByText("Pendiente de cubrir todas las vacantes")).toBeTruthy();
 });
-it.each(["active", "draft", "consent_withdrawn", "needs_update"])(`integra mantenimiento presencial %s, CV y vinculación sin duplicar notas`, async status => {
+it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mantenimiento presencial %s, consentimiento, CV y vinculación sin duplicar notas", async status => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", account_id: null, accounts: null, archived_at: null, status }, currentCv: null, referralEligible: false, participations: [], notes: [], audit: [] });
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).toHaveBeenCalledWith(id);

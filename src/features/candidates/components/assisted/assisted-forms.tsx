@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { saveAssistedAction, assistedCommandAction } from "../../assisted-actions";
 import { claimAssistedAction } from "../../claim-actions";
 import type { DuplicateMatch } from "../../duplicate-service";
+import type { AssistedConsentPolicy } from "../../assisted-service";
 import { assistedFields, type AssistedInput } from "@/validation/duplicate-resolution";
 import { DUPLICATE_DECISIONS } from "@/domain/catalogs";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
@@ -20,8 +21,8 @@ function Message({ text }: { text: string }) {
   useEffect(() => { if (text) ref.current?.focus(); }, [text]);
   return <p tabIndex={-1} ref={ref} role="status" aria-live="polite">{text}</p>;
 }
-export function AssistedProfileForm({ categories, candidateId, version, initial }: {
-  categories: { id: string; name: string }[]; candidateId?: string; version?: number; initial?: AssistedInput;
+export function AssistedProfileForm({ categories, candidateId, version, initial, creationPolicy }: {
+  categories: { id: string; name: string }[]; candidateId?: string; version?: number; initial?: AssistedInput; creationPolicy?: AssistedConsentPolicy;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -39,6 +40,7 @@ export function AssistedProfileForm({ categories, candidateId, version, initial 
     start(async () => {
       const result = await saveAssistedAction({ candidateId: candidateId ?? null,
         version: decision === "use_or_update_existing" ? match?.version : version ?? null, data,
+        ...(!candidateId && creationPolicy ? { consent: { confirmed: form.get("consentConfirmed") === "on", policyVersion: creationPolicy.version, policyHash: creationPolicy.policy_hash } } : {}),
         resolution: matches.length ? { reviewId, decision, reason: form.get("reason"), confirmedFields: form.getAll("confirmedFields") } : null });
       setMessage(result.message);
       if (result.status === "duplicates") { setMatches(result.matches ?? []); setDecision(""); setReviewId(""); }
@@ -61,6 +63,12 @@ export function AssistedProfileForm({ categories, candidateId, version, initial 
     <fieldset className="grid gap-2 rounded border p-3"><legend>{labels.categories}</legend>
       {categories.length === 0 && <p>No hay categorías vigentes disponibles.</p>}
       <CategoryMultiSelect categories={categories} defaultSelected={initial?.categories ?? []} /></fieldset>
+    {!candidateId && <fieldset className="grid gap-2 rounded border p-3"><legend className="font-semibold">Términos y condiciones</legend>
+      <p>La persona acepta los términos y condiciones de la Oficina de Empleo para el uso de sus datos laborales y su comunicación a empresas solo después de una derivación municipal. La aceptación se registra una sola vez, al dar el alta, y no puede retirarse.</p>
+      {creationPolicy ? <details><summary>Ver el texto de la versión {creationPolicy.version}</summary><p>{creationPolicy.policy_text}</p></details>
+        : <p>No se pudo cargar el texto. Volvé a abrir esta página antes de crear el perfil.</p>}
+      <Field className="flex gap-2"><input type="checkbox" name="consentConfirmed" required />Confirmo que la persona leyó y aceptó los términos y condiciones.</Field>
+    </fieldset>}
     {matches.length > 0 && <fieldset className="grid gap-3 rounded border border-amber-600 p-4"><legend className="font-semibold">Resolver coincidencias</legend>
       <p>No se fusionan perfiles. Corregir y crear exige que el DNI y correo dejen de coincidir; usar el existente solo modifica los campos que marques.</p>
       <Field>Perfil coincidente<select className={field} value={reviewId} onChange={(e) => setReviewId(e.target.value)} required><option value="">Seleccionar</option>
@@ -73,7 +81,7 @@ export function AssistedProfileForm({ categories, candidateId, version, initial 
       {decision === "use_or_update_existing" && <fieldset><legend>Campos que autorizo actualizar</legend><p>Sin marcar campos, solo se utiliza el perfil existente.</p>
         {assistedFields.map((key) => <Field key={key} className="flex gap-2"><input type="checkbox" name="confirmedFields" value={key} />{labels[key]}</Field>)}</fieldset>}
     </fieldset>}
-    <Message text={message} /><button className={button} disabled={pending}>{matches.length ? "Confirmar decisión" : candidateId ? "Guardar perfil asistido" : "Comprobar duplicados y guardar"}</button>
+    <Message text={message} /><button className={button} disabled={pending || !candidateId && !creationPolicy}>{matches.length ? "Confirmar decisión" : candidateId ? "Guardar perfil asistido" : "Comprobar duplicados y guardar"}</button>
   </Form>;
 }
 
@@ -83,14 +91,14 @@ export function AssistedCommands({ candidateId, version, status }: {
   const router = useRouter(); const [pending, start] = useTransition(); const [message, setMessage] = useState("");
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = new FormData(event.currentTarget);
-    start(async () => { const result = await assistedCommandAction({ candidateId, version, command: form.get("command"),
-      confirmed: form.get("confirmed") === "on" });
+    start(async () => { const result = await assistedCommandAction({ candidateId, version, command: form.get("command"), confirmed: true });
       setMessage(result.message); if (result.success) router.refresh(); });
   }
   return <section className="space-y-4 rounded border bg-white p-5"><h2 className="text-xl font-semibold">Activación</h2>
+    <p>Los términos y condiciones se aceptan una sola vez, en el alta del perfil, y no pueden retirarse.</p>
     {status !== "active" && <Form onSubmit={submit} className="grid gap-3" aria-busy={pending}>
-      <p>Para activar: localidad, experiencia, categorías, disponibilidad y contacto. El perfil asistido puede evaluarse sin PDF; derivarlo requiere un CV válido y una cuenta con consentimiento vigente.</p>
-      <input type="hidden" name="command" value="activate" /><input type="hidden" name="confirmed" value="on" />
+      <p>Para activar: localidad, experiencia, categorías, disponibilidad y contacto. El perfil asistido puede evaluarse sin PDF; derivarlo requiere un CV válido.</p>
+      <input type="hidden" name="command" value="activate" />
       <button className={button} disabled={pending}>Activar para evaluación interna</button></Form>}
     <Message text={message} />
   </section>;

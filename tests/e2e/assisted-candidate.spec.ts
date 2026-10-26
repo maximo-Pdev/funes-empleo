@@ -28,8 +28,9 @@ async function fillProfile(page: Page, name: string, dni: string) {
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
   await page.getByLabel("Categorías laborales").click();
   await page.getByRole("option", { name: "Categoría ficticia A" }).click();
+  await page.getByLabel(/Confirmo que la persona leyó y aceptó/).check();
 }
-test("atención sin PDF, derivación protegida y vinculación presencial con historial", async ({ page, browser, request }) => {
+test("atención sin PDF, derivación protegida, consentimiento y vinculación presencial con historial", async ({ page, browser, request }) => {
   test.setTimeout(120_000);
   const suffix = Date.now().toString().slice(-5);
   const name = `Persona asistida E2E ${suffix}`;
@@ -44,7 +45,7 @@ test("atención sin PDF, derivación protegida y vinculación presencial con his
   // The assisted maintenance workspace (profile, consent, claim and CV) now lives on the candidate detail itself.
   const detail = `/admin/candidates/${id}`;
   await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
-  expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("0");
+  expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("1");
   await page.getByLabel("Localidad laboral").fill("Funes");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
   await page.getByLabel("Categorías laborales").click();

@@ -169,5 +169,6 @@ describe("presentación de consentimiento y activación", () => {
     expect(within(consent).queryByText(props.policy.policy_text, { exact: false })).toBeNull();
     expect(within(consent).queryByText("Ver política de consentimiento")).toBeNull();
     expect(within(consent).getByRole("checkbox")).toHaveProperty("required", true);
+    expect(within(consent).queryByRole("combobox")).toBeNull();
   });
 });
