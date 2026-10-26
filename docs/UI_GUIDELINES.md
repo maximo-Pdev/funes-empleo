@@ -421,12 +421,13 @@ the next form mounts with them as `defaultValue`. Never keep a second, hidden
 copy of a form to preserve values: two mounted forms duplicate labels and make
 `getByLabelText` ambiguous for every test and for assistive technology.
 
-`email`, `password` and `confirmation` describe the same account identity, so
-they are shared across login and both registrations; every other field stays
-with its own form, so candidate and company data never leak into each other. The
-shared copy wins over a stale per-form copy, and clearing a field clears it
-everywhere. Keep this state in memory only — no `localStorage`, cookies or
-server writes — and keep it in scope of the card, so a reload starts clean.
+Every field belongs only to its own login, candidate-registration or
+company-registration draft, including `email`, `password` and `confirmation`.
+Never copy credentials between forms or auto-fill confirmation from password.
+Returning to a form restores its own values; clearing a field clears only that
+form's value. This supersedes EXTRA-080's identity-sharing behavior (EXTRA-082).
+Keep state in memory only — no `localStorage`, cookies or server writes —
+and in scope of the card, so a reload starts clean.
 
 ## Shared account workspace
 

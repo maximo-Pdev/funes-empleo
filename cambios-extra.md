@@ -1,5 +1,14 @@
 # Cambios extra necesarios
 
+## EXTRA-082 — Independent Home access form drafts
+
+- **Date/authorization:** 2026-10-26, Maxi explicitly requested independent login and registration fields. Supersedes EXTRA-080's cross-form identity sharing, not per-form draft retention.
+- **Evidence:** HomeAccessPanel merges drafts.common into every form and auto-fills confirmation from password.
+- **Change/scope:** keep all captured fields under their own login/candidate/company key; restore only that key. Keep one mounted form and memory-only drafts. Update persistence tests and UI guidance; preserve concurrent company edits.
+- **Risk/recovery:** client-side credential draft isolation, no actions, permissions, database, dependencies or shared form contracts changed. Reverting restores unwanted sharing.
+- **Verification plan:** RED reproduction, focused regressions, lint/types/build/unit suite and desktop/mobile browser switching without POST or database resets.
+- **Status:** implemented; commit referenced below. No push or deployment yet.
+
 ## EXTRA-080 — Conservar los datos escritos entre ingreso y registro
 
 - **Fecha/autorización:** 2026-10-25, pedido explícito de Maxi: «Requiero que la información de los campos del formulario de login y registro sean persistentes a los cambios entre pestañas. Es decir, si completo mail o contraseña en login que se mantenga si selecciono "Registrarse" y lo mismo al revés. Para mayor comodidad del usuario.»
