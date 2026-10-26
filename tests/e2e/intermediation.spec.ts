@@ -558,9 +558,11 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
       await company.getByLabel("Requisitos").fill("Requisitos ficticios");
       await company.getByLabel("Vacantes").fill("1");
       await company.getByLabel("Ubicación").fill("Funes");
-      await company.getByLabel("Modalidad").fill("Presencial");
+      await company.getByLabel("Modalidad", { exact: true }).click();
+      await company.getByRole("option", { name: "Presencial", exact: true }).click();
       await company.getByLabel("Horario").fill("Jornada completa");
-      await company.getByLabel("Tipo de contratación").fill("Plazo fijo");
+      await company.getByLabel("Tipo de contratación", { exact: true }).click();
+      await company.getByRole("option", { name: "A plazo fijo", exact: true }).click();
       await company.getByLabel("Fecha de cierre").fill("2026-12-31");
       await company.getByLabel("Categoría ficticia A").check();
       await company.getByRole("button", { name: "Guardar borrador" }).click();

@@ -21,7 +21,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
 }
 
 test("registro, dos postulaciones independientes, retiro, suspensión y archivo restaurable", async ({ page, browser, request }) => {

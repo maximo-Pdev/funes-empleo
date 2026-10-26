@@ -35,7 +35,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/empresa$/);
 }
 
 test("empresa registra, corrige, somete y archiva una oferta bajo decisión municipal", async ({ page, browser, request }) => {
@@ -55,7 +55,8 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Persona responsable").fill("Responsable ficticio");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Actividad").fill("Servicios ficticios");
-  await page.getByLabel("Localidad").fill("Funes");
+  await page.getByLabel("Localidad", { exact: true }).click();
+  await page.getByRole("option", { name: "Funes", exact: true }).click();
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
   await page.locator("form").getByRole("button", { name: "Crear cuenta de empresa", exact: true }).click();
@@ -86,9 +87,11 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Requisitos").fill("Experiencia ficticia");
   await page.getByLabel("Vacantes").fill("2");
   await page.getByLabel("Ubicación").fill("Funes");
-  await page.getByLabel("Modalidad").fill("Presencial");
+  await page.getByLabel("Modalidad", { exact: true }).click();
+  await page.getByRole("option", { name: "Presencial", exact: true }).click();
   await page.getByLabel("Horario").fill("Jornada completa");
-  await page.getByLabel("Tipo de contratación").fill("Plazo fijo");
+  await page.getByLabel("Tipo de contratación", { exact: true }).click();
+  await page.getByRole("option", { name: "A plazo fijo", exact: true }).click();
   await page.getByLabel("Fecha de cierre").fill("2026-12-31");
   await page.getByLabel("Categoría ficticia A").check();
   await page.getByLabel("Categoría ficticia B").check();

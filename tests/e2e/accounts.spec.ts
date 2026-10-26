@@ -16,7 +16,7 @@ test("cuenta ficticia: inicio de sesión, página privada y cierre", async ({ pa
   await page.getByLabel("Correo electrónico").fill("candidate1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Panel de usuario", exact: true })).toBeVisible();
   const sections = page.getByRole("navigation", { name: "Secciones de mi cuenta" });
   await expect(sections.getByRole("link", { name: "Panel de usuario", exact: true })).toHaveAttribute("aria-current", "page");
