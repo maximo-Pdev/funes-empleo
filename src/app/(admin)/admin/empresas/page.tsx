@@ -6,7 +6,7 @@ import { requireActiveAccount } from "@/lib/auth/guards";
 import { COMPANY_PROFILE_STATUSES, companyProfileStatusSchema } from "@/domain/states";
 import { companyProfileStatusLabels } from "@/domain/presentation/labels";
 import { companyProfileStatusTones, statusTone } from "@/domain/presentation/status-tone";
-import { Badge } from "@/components/ui";
+import { Badge, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 export default async function AdminCompaniesPage({ searchParams }: { searchParams: Promise<{ page?: string; status?: string }> }) {
@@ -33,11 +33,13 @@ export default async function AdminCompaniesPage({ searchParams }: { searchParam
         <Link href={`/admin/empresas/${company.id}`} className="text-blue-800 underline">{company.legal_name || "Empresa incompleta"}</Link>
         <p className="mt-1 flex flex-wrap items-center gap-2">Estado <Badge variant="status" tone={statusTone(companyProfileStatusTones, company.status)}>{companyProfileStatusLabels[company.status] ?? "Estado no reconocido"}</Badge>{company.archived_at ? <span className="text-sm text-muted-foreground">· archivada</span> : null}</p>
       </li>)}</ul>}
-    <nav aria-label="Páginas de empresas" className="mt-5 flex gap-4">
-      {page > 1 && <Link href={pageUrl(page - 1)} className="text-blue-800 underline">Anterior</Link>}
-      <span>Página {page} de {Math.max(1,Math.ceil((result.count ?? 0)/10))}</span>
-      {page * 10 < (result.count ?? 0) && <Link href={pageUrl(page + 1)} className="text-blue-800 underline">Siguiente</Link>}
-    </nav>
+    <Pagination aria-label="Páginas de empresas" className="mt-5">
+      <PaginationContent>
+        {page > 1 && <PaginationItem><PaginationPrevious href={pageUrl(page - 1)} /></PaginationItem>}
+        <PaginationItem><span className="px-3 text-sm">Página {page} de {Math.max(1,Math.ceil((result.count ?? 0)/10))}</span></PaginationItem>
+        {page * 10 < (result.count ?? 0) && <PaginationItem><PaginationNext href={pageUrl(page + 1)} /></PaginationItem>}
+      </PaginationContent>
+    </Pagination>
     </>}
   </AdminShell>;
 }

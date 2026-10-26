@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Button, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { openingCandidatePreviewAction } from "@/features/candidates/matching-actions";
 import { createAdminNominationAction } from "@/features/participations/nomination-actions";
 import { adminMutationError } from "@/lib/errors/admin-mutation-result";
@@ -113,11 +113,13 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
             aria-label={`Ver perfil de ${candidate.displayName}`} onClick={event => openProfile({ id: candidate.id, name: candidate.displayName }, event.currentTarget)}>Ver perfil y nominar</button>
         </li>)}</ul>}
       {matches.page > 1 && !visible.length && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, 1, order)}>Volver a la primera página</Link>}
-      {pageCount > 1 && <nav aria-label="Páginas de coincidencias" className="flex flex-wrap gap-4">
-        {matches.page > 1 && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, matches.page - 1, order)}>Anterior</Link>}
-        <span>Página {matches.page} de {pageCount}</span>
-        {matches.page < pageCount && <Link className="text-blue-800 underline" href={openingMatchesHref(openingReference, matches.page + 1, order)}>Siguiente</Link>}
-      </nav>}
+      {pageCount > 1 && <Pagination aria-label="Páginas de coincidencias">
+        <PaginationContent>
+          {matches.page > 1 && <PaginationItem><PaginationPrevious href={openingMatchesHref(openingReference, matches.page - 1, order)} /></PaginationItem>}
+          <PaginationItem><span className="px-3 text-sm">Página {matches.page} de {pageCount}</span></PaginationItem>
+          {matches.page < pageCount && <PaginationItem><PaginationNext href={openingMatchesHref(openingReference, matches.page + 1, order)} /></PaginationItem>}
+        </PaginationContent>
+      </Pagination>}
     </>}
     <dialog ref={dialog} aria-labelledby="candidate-preview-title" className="m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-2xl overflow-y-auto rounded-xl border border-slate-300 bg-white p-5 text-slate-950 shadow-xl backdrop:bg-slate-950/50"
       onCancel={event => { event.preventDefault(); if (!pending) closeDialog(); }}>

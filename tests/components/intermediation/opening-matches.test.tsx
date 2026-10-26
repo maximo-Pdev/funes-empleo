@@ -31,7 +31,7 @@ it("explica OR e intermediación, muestra rubros y no ofrece derivación automá
   expect(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" })).toBeTruthy();
   expect(nominate).not.toHaveBeenCalled();
   expect(screen.getByText("Coincidencias: 42")).toBeTruthy();
-  expect(screen.getByRole("list").className).toContain("md:grid-cols-2");
+  expect(screen.getAllByRole("list").some(list => list.className.includes("md:grid-cols-2"))).toBe(true);
 });
 
 it("pagina conservando contexto de oferta y ancla accesible", () => {

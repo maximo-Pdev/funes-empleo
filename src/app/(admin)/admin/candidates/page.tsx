@@ -1,10 +1,11 @@
 import { referenceFilters } from "@/lib/records/page-references";
+import { referenceUrl } from "@/lib/records/reference-url";
 import { recordReferences } from "@/lib/records/references";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { availabilityLabel } from "@/domain/presentation/labels";
 import { availabilityTones, statusTone } from "@/domain/presentation/status-tone";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Badge, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
 import { listCandidateSearchCategories, searchCandidates } from "@/features/candidates/search-service";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -27,7 +28,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
       if (value !== undefined && value !== "") params.set(key, String(value));
     }
     params.set("page", String(page));
-    return `/admin/candidates?${params.toString()}`;
+    return referenceUrl(`/admin/candidates?${params.toString()}`);
   };
 
   return <AdminShell email={user?.email} active="/admin/candidates" title="Buscar candidatos" description="Solo la Oficina de Empleo consulta el padrón y decide las derivaciones."
@@ -46,11 +47,13 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
             <p className="mt-2 font-medium">{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</p>
           </li>)}
         </ul>}
-      {results.pageCount > 1 && <nav aria-label="Páginas de candidatos" className="flex items-center gap-4">
-        {results.page > 1 && <Link className="text-blue-800 underline" href={pageUrl(results.page - 1)}>Anterior</Link>}
-        <span>Página {results.page} de {results.pageCount}</span>
-        {results.page < results.pageCount && <Link className="text-blue-800 underline" href={pageUrl(results.page + 1)}>Siguiente</Link>}
-      </nav>}
+      {results.pageCount > 1 && <Pagination aria-label="Páginas de candidatos">
+        <PaginationContent>
+          {results.page > 1 && <PaginationItem><PaginationPrevious href={await pageUrl(results.page - 1)} /></PaginationItem>}
+          <PaginationItem><span className="px-3 text-sm">Página {results.page} de {results.pageCount}</span></PaginationItem>
+          {results.page < results.pageCount && <PaginationItem><PaginationNext href={await pageUrl(results.page + 1)} /></PaginationItem>}
+        </PaginationContent>
+      </Pagination>}
     </section>}
   </AdminShell>;
 }

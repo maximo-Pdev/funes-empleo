@@ -4,7 +4,7 @@ import { RecordLink as Link } from "@/components/ui/record-link";
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { openingStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Badge, Button, EmptyState, FeedbackMessage } from "@/components/ui";
+import { Badge, Button, EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { OPENING_STATUSES, openingStatusSchema } from "@/domain/states";
 import { listAdminOpenings } from "@/features/openings/admin-service";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -41,11 +41,13 @@ export default async function AdminOpeningsPage({ searchParams }: {
           <Link href={`/admin/openings/${opening.id}`} className="font-semibold text-blue-800 underline">{opening.title ?? "Oferta sin título"}</Link>
           <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
         </li>)}</ul>}
-      {result.pageCount > 1 && <nav aria-label="Páginas de ofertas" className="flex gap-4">
-        {result.page > 1 && <Link href={urlForPage(result.page - 1)} className="text-blue-800 underline">Anterior</Link>}
-        <span>Página {result.page} de {result.pageCount}</span>
-        {result.page < result.pageCount && <Link href={urlForPage(result.page + 1)} className="text-blue-800 underline">Siguiente</Link>}
-      </nav>}
+      {result.pageCount > 1 && <Pagination aria-label="Páginas de ofertas">
+        <PaginationContent>
+          {result.page > 1 && <PaginationItem><PaginationPrevious href={urlForPage(result.page - 1)} /></PaginationItem>}
+          <PaginationItem><span className="px-3 text-sm">Página {result.page} de {result.pageCount}</span></PaginationItem>
+          {result.page < result.pageCount && <PaginationItem><PaginationNext href={urlForPage(result.page + 1)} /></PaginationItem>}
+        </PaginationContent>
+      </Pagination>}
     </section>}
   </AdminShell>;
 }

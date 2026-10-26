@@ -1,8 +1,9 @@
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { RecordLink as Link } from "@/components/ui/record-link";
-import { EmptyState, FeedbackMessage } from "@/components/ui";
+import { EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { referenceFilters } from "@/lib/records/page-references";
+import { referenceUrl } from "@/lib/records/reference-url";
 import { recordReferences } from "@/lib/records/references";
 import { searchAssistedCandidates, listCandidateSearchCategories } from "@/features/candidates/search-service";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
@@ -29,7 +30,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
       if (value !== undefined && value !== "") params.set(key, String(value));
     }
     params.set("page", String(page));
-    return `/admin/atencion-presencial?${params.toString()}`;
+    return referenceUrl(`/admin/atencion-presencial?${params.toString()}`);
   };
 
   return <AdminShell active="/admin/atencion-presencial" title="Perfil asistido"
@@ -53,11 +54,13 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
           <p className="mt-1 text-sm">{candidate.categories.map(category => category.name).join(", ") || "Sin categorías activas"}</p>
           <p className="mt-2 text-sm">{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</p>
         </li>)}</ul>}
-      {results.pageCount > 1 && <nav aria-label="Páginas de atención presencial" className="flex flex-wrap items-center gap-4">
-        {results.page > 1 && <Link href={pageUrl(results.page - 1)} className="text-primary underline">Anterior</Link>}
-        <span>Página {results.page} de {results.pageCount}</span>
-        {results.page < results.pageCount && <Link href={pageUrl(results.page + 1)} className="text-primary underline">Siguiente</Link>}
-      </nav>}
+      {results.pageCount > 1 && <Pagination aria-label="Páginas de atención presencial">
+        <PaginationContent>
+          {results.page > 1 && <PaginationItem><PaginationPrevious href={await pageUrl(results.page - 1)} /></PaginationItem>}
+          <PaginationItem><span className="px-3 text-sm">Página {results.page} de {results.pageCount}</span></PaginationItem>
+          {results.page < results.pageCount && <PaginationItem><PaginationNext href={await pageUrl(results.page + 1)} /></PaginationItem>}
+        </PaginationContent>
+      </Pagination>}
     </section>}
   </AdminShell>;
 }

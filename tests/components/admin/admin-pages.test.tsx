@@ -353,4 +353,8 @@ it.each([
 
 vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
 vi.mock("@/lib/records/page-references", async () => (await import("../../fixtures/record-references")).pageReferenceMocks);
+vi.mock("@/lib/records/reference-url", async () => {
+  const { fixtureHref } = await import("../../fixtures/record-references");
+  return { referenceUrl: async (href: string) => fixtureHref(href), canonicalReferenceRoute: async () => {} };
+});
 vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);

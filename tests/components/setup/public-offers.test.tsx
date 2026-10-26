@@ -81,7 +81,7 @@ it("ofrece volver al inicio del listado ante una página fuera de rango", async 
   listPublicOffers.mockResolvedValue({ total: 2, page: 9, pageSize: 10, items: [] });
   render(await listPage("9"));
   expect(screen.getByRole("link", { name: "Ver ofertas disponibles" }).getAttribute("href")).toBe("/ofertas");
-  expect(screen.queryByRole("list")).toBeNull();
+  expect(screen.getByText("No hay ofertas vigentes en esta página.")).toBeTruthy();
   expect(screen.queryByRole("link", { name: "Siguiente" })).toBeNull();
 });
 
