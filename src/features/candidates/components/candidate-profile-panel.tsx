@@ -120,12 +120,11 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
           <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
           <p>Las empresas a las que la Oficina ya te haya derivado podrán seguir viendo únicamente tu nombre para identificar esas derivaciones e informar sus resultados, incluso cuando termine el permiso. Esto no les devuelve acceso a tu perfil, contactos, foto ni CV.</p>
           <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
-          <p>También podés retirarlo manualmente: se bloquean nuevas derivaciones, se revocan los accesos empresariales y se cierran como retiradas tus participaciones abiertas. Los resultados finales y el historial se conservan.</p>
         </div>
       </details>
       <p>Estado actual: {consent?.status === "accepted" ? "aceptado" : consent?.status === "withdrawn" ? "retirado" : "pendiente"}.</p>
       <input type="hidden" name="version" value={profile.version} />
-      <Field className="grid gap-1">Acción<select className={field} name="status" required defaultValue={consent?.status === "accepted" ? "withdrawn" : "accepted"}><option value="accepted">Aceptar</option><option value="withdrawn">Retirar</option></select></Field>
+      <input type="hidden" name="status" value="accepted" />
       <Field className={styles.choice}><input type="checkbox" name="confirmed" required />Confirmo esta decisión y entiendo sus efectos.</Field>
       <ActionMessage state={consentState} /><Button type="submit" disabled={changingConsent}>Guardar consentimiento</Button>
     </Form>

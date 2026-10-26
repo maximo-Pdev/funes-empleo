@@ -8,6 +8,7 @@
 - **Risk/recovery:** client-side credential draft isolation, no actions, permissions, database, dependencies or shared form contracts changed. Reverting restores unwanted sharing.
 - **Verification plan:** RED reproduction, focused regressions, lint/types/build/unit suite and desktop/mobile browser switching without POST or database resets.
 - **Status:** implemented; commit referenced below. No push or deployment yet.
+- **Verification observed:** four isolation regressions failed before the fix; 33 focused tests then passed. Node 24.22.0 with matching native child: lint, type generation, TypeScript, production build and 1219 tests in 95 files passed. Independent review deleg_c8e4e60d reran 4/4 persistence tests and passed 22 production-browser scenario groups at 1440×900 and 390×844: distinct credentials, independent confirmation, repeated switches, clearing, both closing shortcuts, one mounted form and reload clearing. Zero write attempts or browser errors; owned server/browser closed. Parent repeated 4/4 tests successfully. Nonblocking jsdom Canvas and external-lockfile warnings remain. No database-resetting E2E wrapper run. Concurrent integration/commits were observed; this actor did not commit or publish these changes. Human review/publication are not established by these checks.
 
 ## EXTRA-080 — Conservar los datos escritos entre ingreso y registro
 

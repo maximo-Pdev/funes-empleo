@@ -1643,9 +1643,6 @@ export type Database = {
       create_active_assisted_candidate: {
         Args: {
           p_data: Json
-          p_confirmed: boolean
-          p_policy_version: string
-          p_policy_hash: string
           p_expected_version?: number | null
           p_review?: string | null
           p_decision?: string | null

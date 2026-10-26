@@ -28,9 +28,8 @@ async function fillProfile(page: Page, name: string, dni: string) {
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
   await page.getByLabel("Categorías laborales").click();
   await page.getByRole("option", { name: "Categoría ficticia A" }).click();
-  await page.getByLabel(/Confirmo que la persona aceptó/).check();
 }
-test("atención sin PDF, derivación protegida, consentimiento y vinculación presencial con historial", async ({ page, browser, request }) => {
+test("atención sin PDF, derivación protegida y vinculación presencial con historial", async ({ page, browser, request }) => {
   test.setTimeout(120_000);
   const suffix = Date.now().toString().slice(-5);
   const name = `Persona asistida E2E ${suffix}`;
@@ -45,7 +44,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   // The assisted maintenance workspace (profile, consent, claim and CV) now lives on the candidate detail itself.
   const detail = `/admin/candidates/${id}`;
   await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
-  expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("1");
+  expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("0");
   await page.getByLabel("Localidad laboral").fill("Funes");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
   await page.getByLabel("Categorías laborales").click();
@@ -55,16 +54,6 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await page.getByRole("button", { name: "Guardar perfil asistido" }).click();
   await expect(page.getByText("Perfil guardado.", { exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
-  await page.getByLabel("Acción asistida", { exact: true }).selectOption("withdraw_consent");
-  await page.getByLabel("Confirmo la decisión de la persona atendida.", { exact: true }).check();
-  await page.getByRole("button", { name: "Guardar consentimiento asistido", exact: true }).click();
-  await expect(page.getByText("Consentimiento: retirado.", { exact: true })).toBeVisible();
-  await page.getByLabel("Acción asistida", { exact: true }).selectOption("accept_consent");
-  await page.getByLabel("Confirmo la decisión de la persona atendida.", { exact: true }).check();
-  await page.getByRole("button", { name: "Guardar consentimiento asistido", exact: true }).click();
-  await expect(page.getByText("Consentimiento: aceptado.", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Activar para evaluación interna", exact: true }).click();
   await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Estado Activo");
   await page.reload();
   await page.getByLabel("Tipo", { exact: true }).selectOption("record_training_guidance");
@@ -156,7 +145,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await page.getByRole("button", { name: "Vincular conservando historial" }).click();
     await expect(page.getByRole("heading", { name: "Vincular cuenta presencialmente", exact: true })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Consentimiento y activación", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Activación", exact: true })).toHaveCount(0);
     await expect(page.getByLabel("Archivo PDF")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Cuenta Activa");
     await expect(page.getByRole("button", { name: "Suspender cuenta", exact: true })).toBeVisible();

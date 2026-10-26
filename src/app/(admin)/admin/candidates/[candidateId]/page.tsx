@@ -84,8 +84,8 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
       </div>
       <div className="space-y-6">
       {editable && <>
-        <AssistedCommands key={`consent:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version}
-          status={editable.profile.status} consent={editable.consent} policy={editable.policy} />
+        <AssistedCommands key={`activate:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version}
+          status={editable.profile.status} />
         <ClaimForm key={`claim:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version} requests={editable.requests} />
       </>}
       {candidate.account_id && candidate.accounts && candidate.accounts.status !== "pending_verification" &&

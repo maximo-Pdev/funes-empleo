@@ -9,7 +9,7 @@ import { candidateProfileSchema } from "@/validation/candidate-profile";
 const ids = Array.from({ length: 41 }, (_, i) => `04000000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`);
 const base = { name: "Persona ficticia", dni: "98000001", email: "", phone: "3410000000", locality: "Funes", summary: "Experiencia ficticia", availability: "available", detail: "", address: "", categories: ids.slice(0, 40) };
 it("solo permite elegir categorías y no ofrece el antiguo campo en el alta presencial", () => {
-  render(<AssistedProfileForm categories={[{ id: ids[0]!, name: "Rubro ficticio" }]} creationPolicy={{ version: "demo-not-approved", policy_text: "Política ficticia", policy_hash: "a".repeat(64) }} />);
+  render(<AssistedProfileForm categories={[{ id: ids[0]!, name: "Rubro ficticio" }]} />);
   expect(screen.getByRole("group", { name: "Categorías laborales" })).toBeTruthy();
   expect(screen.queryByRole("group", { name: "Intereses laborales" })).toBeNull();
   expect(screen.queryByLabelText("Interés: Rubro ficticio")).toBeNull();

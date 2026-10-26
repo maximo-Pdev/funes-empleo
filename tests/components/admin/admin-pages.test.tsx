@@ -208,12 +208,12 @@ it("conserva la confirmación obligatoria en las decisiones de empresa", async (
 it("exporta los filtros consultados y conserva cobertura pendiente", async () => {
  render(await Metrics({ searchParams: Promise.resolve(metricFilters) })); expect(screen.getByRole("link", { name: "Descargar CSV filtrado" }).getAttribute("href")).toContain("from=2026-10-01&to=2026-10-19"); expect(screen.getByText("Pendiente de cubrir todas las vacantes")).toBeTruthy();
 });
-it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mantenimiento presencial %s, consentimiento, CV y vinculación sin duplicar notas", async status => {
+it.each(["active", "draft", "consent_withdrawn", "needs_update"])(`integra mantenimiento presencial %s, CV y vinculación sin duplicar notas`, async status => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", account_id: null, accounts: null, archived_at: null, status }, currentCv: null, referralEligible: false, participations: [], notes: [], audit: [] });
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).toHaveBeenCalledWith(id);
  expect(screen.getByRole("heading", { name: "Mantener perfil" })).toBeTruthy();
- expect(screen.getByRole("heading", { name: "Consentimiento y activación" })).toBeTruthy();
+ expect(screen.getByRole("heading", { name: "Activación" })).toBeTruthy();
  const maintenanceForm = screen.getByRole("heading", { name: "Mantener perfil" }).closest("form");
  const profileDetails = screen.getByRole("region", { name: "Perfil candidato" });
  const cvDetails = screen.getByRole("region", { name: "CV PDF del candidato" });
@@ -238,7 +238,7 @@ it.each([
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).not.toHaveBeenCalled();
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
- expect(screen.queryByRole("heading", { name: "Consentimiento y activación" })).toBeNull();
+ expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
  expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
  expect(screen.getByRole("heading", { name: "Historial de cuenta y perfil" })).toBeTruthy();
@@ -261,7 +261,7 @@ it("retira formularios al refrescar tras vincular sin dejar nodos de edición an
  view.rerender(await Candidate(props));
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
  expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
- expect(screen.queryByRole("heading", { name: "Consentimiento y activación" })).toBeNull();
+ expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
  expect(screen.getAllByRole("heading", { name: "Nota interna de la Oficina" })).toHaveLength(1);
  expect(screen.getByRole("heading", { name: "Historial de cuenta y perfil" })).toBeTruthy();

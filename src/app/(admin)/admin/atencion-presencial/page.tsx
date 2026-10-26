@@ -8,7 +8,6 @@ import { recordReferences } from "@/lib/records/references";
 import { searchAssistedCandidates, listCandidateSearchCategories } from "@/features/candidates/search-service";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
 import { AssistedProfileForm } from "@/features/candidates/components/assisted/assisted-forms";
-import { getAssistedCreationPolicy } from "@/features/candidates/assisted-service";
 import { candidateSearchSchema } from "@/validation/candidate-search";
 import { availabilityLabel, candidateProfileStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { availabilityTones, candidateProfileStatusTones, statusTone } from "@/domain/presentation/status-tone";
@@ -21,7 +20,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
   await requireActiveAccount(["admin"]);
   const raw = await referenceFilters("/admin/atencion-presencial", await searchParams, { categoryId: "category" });
   const parsed = candidateSearchSchema.safeParse({ eligibility: "all", ...raw });
-  const [categories, creationPolicy] = await Promise.all([listCandidateSearchCategories(), getAssistedCreationPolicy()]);
+  const categories = await listCandidateSearchCategories();
   const references = await recordReferences("category", categories.map(category => category.id));
   const results = parsed.success ? await searchAssistedCandidates(parsed.data) : null;
   const pageUrl = (page: number) => {
@@ -40,7 +39,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
   return <AdminShell active="/admin/atencion-presencial" title="Perfil asistido"
     description="Creá un perfil mediante atención presencial o consultá los ya creados, incluidos quienes vincularon una cuenta.">
     <section aria-label="Crear perfil presencial" className="mb-8">
-      <AssistedProfileForm categories={categories} creationPolicy={creationPolicy} />
+      <AssistedProfileForm categories={categories} />
     </section>
     <h2 className="mb-4 text-xl font-semibold">Perfiles creados</h2>
     <CandidateSearchForm destination="/admin/atencion-presencial"

@@ -41,9 +41,6 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByLabel("Habilidades y experiencia", { exact: true }).fill("Experiencia presencial ficticia");
     await page.getByLabel("Categorías laborales").click();
     await page.getByRole("option", { name: number === 1 ? "Categoría ficticia A" : "Categoría ficticia B" }).click();
-    const acceptance = page.getByLabel(/Confirmo que la persona aceptó/);
-    await expect(acceptance).not.toBeChecked();
-    await acceptance.check();
     await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
     await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
     if (number === 1) firstReference = new URL(page.url()).pathname.split("/").pop()!;
@@ -68,12 +65,12 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await page.keyboard.press("Enter");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(`${name} 1`);
   await expect(page.getByRole("heading", { name: "Mantener perfil", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Consentimiento y activación", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Activación", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Vincular cuenta presencialmente", exact: true })).toBeVisible();
   await expect(menu.getByRole("link", { name: "Perfil asistido", exact: true })).toHaveAttribute("aria-current", "page");
   const id = referenceIdentifier("candidate", firstReference);
   expect(runLocalMaintenanceSql(`select origin from public.candidate_profiles where id='${id}'`)).toBe("assisted");
   expect(runLocalMaintenanceSql(`select status from public.candidate_profiles where id='${id}'`)).toBe("active");
-  expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("1");
+  expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("0");
   expect(Number(runLocalMaintenanceSql("select count(*) from public.candidate_profiles"))).toBe(before + 2);
 });

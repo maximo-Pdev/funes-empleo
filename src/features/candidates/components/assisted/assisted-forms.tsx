@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { saveAssistedAction, assistedCommandAction } from "../../assisted-actions";
 import { claimAssistedAction } from "../../claim-actions";
 import type { DuplicateMatch } from "../../duplicate-service";
-import type { AssistedConsentPolicy } from "../../assisted-service";
 import { assistedFields, type AssistedInput } from "@/validation/duplicate-resolution";
 import { DUPLICATE_DECISIONS } from "@/domain/catalogs";
 import { candidatePhoneField, dniField } from "@/components/forms/identifier-fields";
@@ -21,8 +20,8 @@ function Message({ text }: { text: string }) {
   useEffect(() => { if (text) ref.current?.focus(); }, [text]);
   return <p tabIndex={-1} ref={ref} role="status" aria-live="polite">{text}</p>;
 }
-export function AssistedProfileForm({ categories, candidateId, version, initial, creationPolicy }: {
-  categories: { id: string; name: string }[]; candidateId?: string; version?: number; initial?: AssistedInput; creationPolicy?: AssistedConsentPolicy;
+export function AssistedProfileForm({ categories, candidateId, version, initial }: {
+  categories: { id: string; name: string }[]; candidateId?: string; version?: number; initial?: AssistedInput;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -40,7 +39,6 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
     start(async () => {
       const result = await saveAssistedAction({ candidateId: candidateId ?? null,
         version: decision === "use_or_update_existing" ? match?.version : version ?? null, data,
-        ...(!candidateId && creationPolicy ? { consent: { confirmed: form.get("consentConfirmed") === "on", policyVersion: creationPolicy.version, policyHash: creationPolicy.policy_hash } } : {}),
         resolution: matches.length ? { reviewId, decision, reason: form.get("reason"), confirmedFields: form.getAll("confirmedFields") } : null });
       setMessage(result.message);
       if (result.status === "duplicates") { setMatches(result.matches ?? []); setDecision(""); setReviewId(""); }
@@ -63,11 +61,6 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
     <fieldset className="grid gap-2 rounded border p-3"><legend>{labels.categories}</legend>
       {categories.length === 0 && <p>No hay categorías vigentes disponibles.</p>}
       <CategoryMultiSelect categories={categories} defaultSelected={initial?.categories ?? []} /></fieldset>
-    {!candidateId && <fieldset className="grid gap-3 rounded border p-4"><legend className="font-semibold">Consentimiento presencial</legend>
-      <p>La persona autoriza el uso de sus datos laborales por la Oficina de Empleo y su comunicación a empresas únicamente después de una derivación municipal. Al confirmar una contratación se retira el consentimiento global y se revocan los accesos empresariales.</p>
-      {creationPolicy ? <p>{creationPolicy.policy_text} Versión {creationPolicy.version}.</p> : <p>No se pudo cargar la política. Volvé a abrir esta página antes de crear el perfil.</p>}
-      <Field className="flex gap-2"><input type="checkbox" name="consentConfirmed" required />Confirmo que la persona aceptó el consentimiento presencial informado.</Field>
-    </fieldset>}
     {matches.length > 0 && <fieldset className="grid gap-3 rounded border border-amber-600 p-4"><legend className="font-semibold">Resolver coincidencias</legend>
       <p>No se fusionan perfiles. Corregir y crear exige que el DNI y correo dejen de coincidir; usar el existente solo modifica los campos que marques.</p>
       <Field>Perfil coincidente<select className={field} value={reviewId} onChange={(e) => setReviewId(e.target.value)} required><option value="">Seleccionar</option>
@@ -80,33 +73,23 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
       {decision === "use_or_update_existing" && <fieldset><legend>Campos que autorizo actualizar</legend><p>Sin marcar campos, solo se utiliza el perfil existente.</p>
         {assistedFields.map((key) => <Field key={key} className="flex gap-2"><input type="checkbox" name="confirmedFields" value={key} />{labels[key]}</Field>)}</fieldset>}
     </fieldset>}
-    <Message text={message} /><button className={button} disabled={pending || !candidateId && !creationPolicy}>{matches.length ? "Confirmar decisión" : candidateId ? "Guardar perfil asistido" : "Comprobar duplicados y guardar"}</button>
+    <Message text={message} /><button className={button} disabled={pending}>{matches.length ? "Confirmar decisión" : candidateId ? "Guardar perfil asistido" : "Comprobar duplicados y guardar"}</button>
   </Form>;
 }
 
-export function AssistedCommands({ candidateId, version, status, consent, policy }: {
-  candidateId: string; version: number; status: string; consent?: string;
-  policy: { version: string; policy_text: string; policy_hash: string };
+export function AssistedCommands({ candidateId, version, status }: {
+  candidateId: string; version: number; status: string;
 }) {
   const router = useRouter(); const [pending, start] = useTransition(); const [message, setMessage] = useState("");
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = new FormData(event.currentTarget);
     start(async () => { const result = await assistedCommandAction({ candidateId, version, command: form.get("command"),
-      confirmed: form.get("confirmed") === "on", policyVersion: policy.version, policyHash: policy.policy_hash });
+      confirmed: form.get("confirmed") === "on" });
       setMessage(result.message); if (result.success) router.refresh(); });
   }
-  return <section className="space-y-4 rounded border bg-white p-5"><h2 className="text-xl font-semibold">Consentimiento y activación</h2>
-    <p>{policy.policy_text} Versión {policy.version}; no es texto municipal aprobado.</p>
-    <p>Consentimiento: {consent === "accepted" ? "aceptado" : consent === "withdrawn" ? "retirado" : "pendiente"}.</p>
-    <Form onSubmit={submit} className="grid gap-3" aria-busy={pending}>
-      <Field>Acción asistida<select className={field} name="command" required defaultValue={consent === "accepted" ? "withdraw_consent" : "accept_consent"}>
-        <option value="accept_consent">Registrar aceptación presencial</option><option value="withdraw_consent">Registrar retiro del consentimiento</option></select></Field>
-      <p>El retiro cierra las participaciones abiertas y revoca accesos empresariales. Una nueva aceptación no los restablece.</p>
-      <Field className="flex gap-2"><input name="confirmed" type="checkbox" required />Confirmo la decisión de la persona atendida.</Field>
-      <button className={button} disabled={pending}>Guardar consentimiento asistido</button>
-    </Form>
+  return <section className="space-y-4 rounded border bg-white p-5"><h2 className="text-xl font-semibold">Activación</h2>
     {status !== "active" && <Form onSubmit={submit} className="grid gap-3" aria-busy={pending}>
-      <p>Para activar: localidad, experiencia, categorías, disponibilidad, contacto y consentimiento. El perfil asistido puede evaluarse sin PDF; derivarlo requiere un CV válido.</p>
+      <p>Para activar: localidad, experiencia, categorías, disponibilidad y contacto. El perfil asistido puede evaluarse sin PDF; derivarlo requiere un CV válido y una cuenta con consentimiento vigente.</p>
       <input type="hidden" name="command" value="activate" /><input type="hidden" name="confirmed" value="on" />
       <button className={button} disabled={pending}>Activar para evaluación interna</button></Form>}
     <Message text={message} />

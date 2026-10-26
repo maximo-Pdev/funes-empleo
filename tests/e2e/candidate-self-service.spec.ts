@@ -147,7 +147,6 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(informationText).toBeVisible();
   await expect(consentCard.getByText(/seguir viendo únicamente tu nombre/)).toBeVisible();
   await expect(consentCard.getByText(/Corregir un resultado no restablece/)).toBeVisible();
-  await expect(consentCard.getByText(/También podés retirarlo manualmente/)).toBeVisible();
   await page.keyboard.press("Enter");
   await expect(informationText).toBeHidden();
   await page.evaluate(() => window.scrollTo(0, 0));

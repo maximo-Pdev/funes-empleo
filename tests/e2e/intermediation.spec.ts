@@ -381,7 +381,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
   } finally { await Promise.all([adminContext.close(), candidateContext.close(), companyContext.close()]); }
 });
 
-test("cambiar CV y contactos conserva la instantánea derivada; retirar y reaceptar consentimiento no recupera acceso", async ({ browser }) => {
+test("cambiar CV y contactos conserva la instantánea derivada", async ({ browser }) => {
   const context = { baseURL: "http://127.0.0.1:3000" };
   const candidateContext = await browser.newContext(context);
   const companyContext = await browser.newContext(context);
@@ -411,26 +411,6 @@ test("cambiar CV y contactos conserva la instantánea derivada; retirar y reacep
     await expect(company.getByText("candidate15@example.invalid")).toBeVisible();
     await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveAttribute("href", snapshotCv!);
     await expect(company.locator("body")).not.toContainText(/DNI|domicilio|nota interna/i);
-
-    await candidate.getByLabel("Confirmo esta decisión y entiendo sus efectos.").check();
-    await candidate.getByRole("button", { name: "Guardar consentimiento" }).click();
-    await expect(candidate.getByText("Estado actual: retirado.")).toBeVisible();
-    await candidate.goto("/dashboard?section=postulaciones");
-    await expect(candidate.locator("li").filter({ hasText: "Oferta ficticia 002" })).toContainText("Retirada");
-    await expect(candidate.locator("li").filter({ hasText: "Oferta ficticia 052" })).toContainText("Retirada");
-    await company.reload();
-    await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 015", exact: true })).toBeVisible();
-    await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
-
-    await candidate.goto("/dashboard?section=perfil");
-    await candidate.getByLabel("Confirmo esta decisión y entiendo sus efectos.").check();
-    await candidate.getByRole("button", { name: "Guardar consentimiento" }).click();
-    await expect(candidate.getByText("Estado actual: aceptado.")).toBeVisible();
-    await candidate.goto("/dashboard?section=postulaciones");
-    await expect(candidate.locator("li").filter({ hasText: "Oferta ficticia 002" })).toContainText("Retirada");
-    await company.reload();
-    await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 015", exact: true })).toBeVisible();
-    await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
   } finally { await Promise.all([candidateContext.close(), companyContext.close()]); }
 });
 

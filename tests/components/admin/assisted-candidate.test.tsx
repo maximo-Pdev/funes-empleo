@@ -39,16 +39,13 @@ describe("atención presencial", () => {
     expect(screen.getByLabelText(/Comprobé presencialmente/)).toHaveProperty("required", true);
     expect(screen.getByText(/correo verificado/i)).toBeTruthy();
   });
-  it("el alta exige datos laborales y aceptación sin marcar; mantenimiento no los agrega", () => {
-    const { unmount } = render(<AssistedProfileForm categories={[{ id, name: "Rubro ficticio" }]} creationPolicy={{ version: "demo-not-approved", policy_text: "Política ficticia", policy_hash: "a".repeat(64) }} />);
+  it("el alta exige datos laborales; mantenimiento no los agrega", () => {
+    const { unmount } = render(<AssistedProfileForm categories={[{ id, name: "Rubro ficticio" }]} />);
     expect(screen.getByLabelText("Localidad laboral")).toHaveProperty("required", true);
     expect(screen.getByLabelText("Habilidades y experiencia")).toHaveProperty("required", true);
-    const confirmation = screen.getByLabelText(/Confirmo que la persona aceptó/);
-    expect(confirmation).toHaveProperty("required", true); expect(confirmation).toHaveProperty("checked", false);
     expect(screen.queryByRole("option", { name: "No disponible" })).toBeNull();
     unmount();
     render(<AssistedProfileForm categories={[]} candidateId={id} version={2} initial={{ ...base, availability: "available" }} />);
-    expect(screen.queryByLabelText(/Confirmo que la persona aceptó/)).toBeNull();
     expect(screen.getByLabelText("Localidad laboral")).toHaveProperty("required", false);
     expect(screen.getByRole("option", { name: "No disponible" })).toBeTruthy();
   });
