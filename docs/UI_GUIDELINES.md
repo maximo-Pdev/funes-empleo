@@ -2,6 +2,11 @@
 
 ## Portal follow-ups — EXTRA085
 
+EXTRA089: the candidate-search locality wrapper is positioned relative so its
+visually hidden native FormData/validation input stays within the field under
+administrative full-width input rules. Preserve native validation and combobox
+focus; do not hide page overflow or relax viewport/accessibility checks.
+
 EXTRA088: Home shows the ten newest eligible offers by publication date. Keep the
 3D/mobile carousel with circular neighbors and previous/next navigation: last and
 penultimate left of first, first and second right of last. Mobile uses Embla loop

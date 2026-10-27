@@ -1,5 +1,43 @@
 # Cambios extra necesarios
 
+## EXTRA-089 — Corregir desbordamiento administrativo del PR80
+
+- **Fecha/origen:**2026-10-27, Mateo informa fallo GitHub de PR80 y solicita
+  corregirlo. Run40571403004/head1dd0dc0: database PASS; application pasa tipos,
+  lint, tooling,1250 pruebas y build, falla accesibilidad admin360/1366 al exigir
+  ausencia de scroll horizontal. Los demás roles pasan;98 recorridos dependientes
+  no se ejecutan tras el gate fallido, no se consideran verificados.
+- **Evidencia antes de código:** Chromium sobre copia ficticia reproduce
+  /admin/candidates:360→scrollWidth412 y1366→2188. Input sr-only name=locality
+  absoluto toma ancho del viewport (CSS administrativo width100%) sin contenedor
+  posicionado; su origenx52/822 lo excede. Las otras páginas medidas no desbordan.
+  El nombre nativo agregado en EXTRA085 expone este transporte auxiliar.
+- **Cambio propuesto/necesidad:** posicionar únicamente el contenedor de localidad
+  de CandidateSearchForm con relative. Mantiene nombre/valor, validación nativa,
+  combobox, GET/referencias y CSS compartido. No esconder overflow de body ni
+  relajar pruebas. Mejorar diagnóstico de ruta en gate y comprobar360/1366 en
+  buscadores general/asistido antes/después de filtros.
+- **Archivos/contratos/riesgos:** candidate-search-form.tsx, E2E accesibilidad/
+  portal-filters y documentación/estado. Sin datos, contratos API, SQL, permisos,
+  dependencias o configuración. Riesgo de posicionamiento/foco del combobox;
+  verificar controles/popup/selección/teclado y búsqueda con localidad opcional.
+- **Verificación prevista:** reproducción RED y GREEN de ancho real, gate completo
+  por roles y filtros de ambos destinos, tipos/lint/tests/build; publicar corrección
+  sin firma en mismo PR80 y comprobar CI. Preservar next-env.d.ts ajeno.
+- **Estado:** autorizado por pedido explícito y requisito técnico derivado de
+  EXTRA085/constitución IV. Análisis focal sin cambio arquitectónico. Implementación,
+  verificación y CI pendientes; revisión humana no acreditada.
+- **Implementado/verificado localmente:** una clase relative en el contenedor,
+  sin modificar CSS global/controles ni contratos. Dos regresiones nuevas fallan
+  antes del fix (general sin filtrar y asistidos filtrados) y pasan después. Ocho
+  E2E PASS sin omisiones/retries: seis de accesibilidad por roles360/1366 y dos de
+  filtros GET/general/asistido con categorías múltiples y navegación. Umbrales,
+  axe y foco conservados.13 componentes, tipos/lint/build/diff PASS. Hash del
+  componente igual a copia compilada y next-env.d.ts ajeno intacto. No reset/SQL.
+  T222 implementado; corrección se publica en mismo PR80 sin firma ni coautoría.
+  CI posterior y revisión humana se consultan en los checks del PR; no se declaran
+  aprobados por la verificación local. Logs ficticios en test-results ignorado.
+
 ### Publicación de EXTRA085–088 solicitada — 2026-10-27
 
 Mateo solicita commit y PR de la rama feat/portal-offers-metrics-filters. Main

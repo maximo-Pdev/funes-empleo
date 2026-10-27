@@ -84,6 +84,10 @@ for (const path of ["/admin/candidates", "/admin/atencion-presencial"]) {
     await expect(page).toHaveURL(/\/account$/);
     await page.goto(`${path}?page=2`);
     const form = page.getByRole("search");
+    for (const width of [360, 1366]) {
+      await page.setViewportSize({ width, height: 800 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} sin filtros a ${width}px`).toBe(true);
+    }
     await expect(form).toHaveAttribute("method", "get");
     await expect(form).toHaveAttribute("action", path);
     await form.getByLabel("Búsqueda por palabra", { exact: true }).fill("Persona");
@@ -99,6 +103,10 @@ for (const path of ["/admin/candidates", "/admin/atencion-presencial"]) {
     expect(params.has("page")).toBe(false);
     expect(params.get("locality")).toBe("");
     await expect(form.getByLabel("Categorías", { exact: true })).toContainText("2 seleccionadas");
+    for (const width of [360, 1366]) {
+      await page.setViewportSize({ width, height: 800 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} filtrado a ${width}px`).toBe(true);
+    }
     await page.reload();
     await expect(form.getByLabel("Búsqueda por palabra", { exact: true })).toHaveValue("Persona");
     await expect(form.getByLabel("Categorías", { exact: true })).toContainText("2 seleccionadas");

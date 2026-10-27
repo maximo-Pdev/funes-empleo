@@ -1534,3 +1534,14 @@ sin firma/coautoría, publicado en feat/portal-offers-metrics-filters. PR abiert
 (no draft): https://github.com/maximo-Pdev/funes-empleo/pull/80 . Comprende
 EXTRA085–088; next-env.d.ts ajeno excluido y preservado. CI/revisión humana/merge
 pendientes. No se ejecutó despliegue manual ni cambios alojados de base de datos.
+## 2026-10-27 — EXTRA089: recuperar accesibilidad del PR80
+
+Run40571403004 falló solo application en accesibilidad administrativa360/1366;
+database/tipos/lint/tooling1250pruebas/build pasaron. Input auxiliar de localidad
+ocupaba100% del viewport por falta de contenedor posicionado. CandidateSearchForm
+ahora posiciona su wrapper relativo; sin clipping global ni cambio de validación,
+GET, controles, permisos o datos. RED2/2 y GREEN8 E2E (seis roles/tamaños y dos
+filtros general/asistido),13 componentes y tipos/lint/build/diff PASS; hashes de
+fuente/build coinciden, next-env.d.ts ajeno intacto. T222 implementado. Publicación
+sin firma en PR80; CI posterior/revisión humana se verifican en los checks del PR.
+No se dan por aprobados por las pruebas locales. Sin reset o cambios alojados.

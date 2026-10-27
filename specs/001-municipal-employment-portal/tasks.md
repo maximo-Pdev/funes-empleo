@@ -5,6 +5,11 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T222 EXTRA089: recuperar PR80 corrigiendo contenedor del input auxiliar
+  de localidad, sin recorte global ni cambio de contrato; gate de accesibilidad
+  por roles y filtros general/asistido360/1366, tipos/lint/tests/build; publicación
+  y estado CI se registran en EXTRA089/PR80, sin confundirlos con aceptación humana.
+
 - [x] T221 EXTRA088: Home últimas10 públicas, coverflow/controles circulares y
   Embla loop; vecinos de extremos,0/1/N y3s verificados, documentación/tipos/lint/
   build/navegador coherentes. Sin cambiar catálogo/conteos ni persistencia.
