@@ -1526,3 +1526,11 @@ con vecinos/cruces de extremos1440/390, límite10, auto/hover y reduced-motion.
 Capturas primera/última revisadas y hashes de fuente/build coinciden. Incidencia
 solo de viewport de prueba documentada en EXTRA088. next-env.d.ts ajeno intacto.
 Sin reset/migración/dependencia/hosted/commit/PR/CI; revisión humana pendiente.
+## 2026-10-27 — Publicación del PR80
+
+Mateo solicita el PR. Base remota b900485 confirmada sin divergencia. Suite final
+1250/100 y cobertura env/schema100% PASS. Commit de implementación5936d25,
+sin firma/coautoría, publicado en feat/portal-offers-metrics-filters. PR abierto
+(no draft): https://github.com/maximo-Pdev/funes-empleo/pull/80 . Comprende
+EXTRA085–088; next-env.d.ts ajeno excluido y preservado. CI/revisión humana/merge
+pendientes. No se ejecutó despliegue manual ni cambios alojados de base de datos.

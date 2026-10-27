@@ -9,6 +9,10 @@ tipos/lint/build,57 tooling, pgTAP1314 y recorridos focales anteriores documenta
 arriba. Se publican47 archivos de producto/documentación/pruebas; next-env.d.ts
 preexistente queda fuera y conserva su hash. Sin migración, configuración alojada
 o deploy manual. Commit sin firma/coautoría; PR/CI y revisión humana pendientes.
+- Publicado: commit de implementación `5936d2514fc55f397f98c445117d8a6b8618f1a4`
+  sin firma ni trailers de coautoría; PR abierto y listo para revisión:
+  https://github.com/maximo-Pdev/funes-empleo/pull/80 . CI y revisión humana
+  permanecen pendientes; no se afirma aprobación ni merge.
 
 ## EXTRA-088 — Carrusel circular con diez ofertas recientes
 
