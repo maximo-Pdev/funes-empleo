@@ -5,6 +5,10 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T225 EXTRA092: sonda concurrente observa badges actuales y emite solo
+  diagnóstico numérico seguro, conservando cuatro actores/barrera/5s/auditorías;
+  aceptación fría real y checks de PR80, sin alterar condiciones del benchmark.
+
 - [x] T224 EXTRA091: evitar redirección por espacios en filtros ya opacos,
   preservar conversión UUID/orden/repetidos; RED/GREEN de idempotencia y frases,
   búsquedas por ambos destinos, regresiones de permisos y checks de PR80.

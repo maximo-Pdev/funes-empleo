@@ -1562,3 +1562,16 @@ finales PASS tras siete anteriores; seis casos originales recuperados y menús
 abiertos/frases verificadas sin alterar umbrales/timeouts ni force clicks. T223/224
 implementados; nueva CI/revisión humana en PR80. next-env.d.ts ajeno preservado.
 Sin migración/hosted/reset; Docker reiniciado en segundo plano por motor detenido.
+## 2026-10-27 — EXTRA092: observación concurrente de estados vigentes
+
+Run40601364799 pasa130 E2E, database/Vercel; falla solo SC-008A por textos antiguos
+con ':'. Sonda ahora usa texto exacto dentro de región Oferta y empresa/status
+Resultado o estado vigente, conservando todos los límites y comprobaciones.
+Primer ensayo local usó erróneamente data-slot ausente; SQL confirmó las cuatro
+mutaciones y se corrigió para observar texto real. Segundo control frío aislado
+PASS: cuatro actores, barrera común, cuatro acciones <=5s y auditorías/versiones
+íntegras. Dos resets solo del proyecto ficticio propio; entorno habitual intacto.
+Diagnóstico seguro del recibo agregado, sin stdout/stderr crudos.2 inventarios,
+57 tooling, tipos/lint/diff PASS; sin código de producto nuevo ni presupuesto
+relajado. T225 implementado, corrección en PR80 sin firma; nueva CI/revisión
+humana pendientes. Otros escenarios alojados de rendimiento no ejecutados.

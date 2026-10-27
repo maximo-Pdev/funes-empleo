@@ -1,5 +1,45 @@
 # Cambios extra necesarios
 
+## EXTRA-092 — Recuperar observación de éxito en SC-008A
+
+- **Origen/evidencia previa,2026-10-27:** Run40601364799/efbf768 pasa130 E2E y
+  falla solo aceptación concurrente; database y Vercel PASS. demo-performance.mjs
+  busca «Estado: Publicada» y «Resultado o estado vigente: Preseleccionada/Persona
+  contratada». La UI aprobada renderiza esas etiquetas como texto + Badge sin ':',
+  confirmado en página administrativa de oferta y ParticipationTimeline. El wrapper
+  comprueba exit status antes de leer recibo, ocultando cuál de cuatro acciones falla.
+- **Cambio mínimo propuesto:** observar badge Publicada dentro de región Oferta y
+  empresa, y badge de estado dentro del status «Resultado o estado vigente» para
+  preselección/contratación. Contacto conserva su texto único. No cambiar acciones,
+  reloj/barrier, cuatro cuentas,5s, fixture frío ni comprobaciones SQL de integridad.
+  Adaptar test de inventario español que aún obliga la cadena antigua. Mostrar
+  solo admin/PASS-FAIL/milisegundos numéricos del recibo en error, nunca stdout/
+  stderr crudos, claves o datos de formularios.
+- **Archivos/contratos/riesgos:** helper de medición, aceptación E2E, inventario
+  tooling, tareas/estado. Solo sonda de prueba acorde a UI; sin cambio funcional,
+  presupuesto de latencia, SQL/RLS, dependencias o configuración. Riesgo de aceptar
+  historial en lugar de estado actual: scope estricto de región/status y Badge.
+- **Verificación prevista:** reset único en Supabase ficticio propio aislado,
+  prueba real de cuatro acciones/actores/auditorías sin omisiones; tooling,
+  tipos/lint y nuevo CI completo. Preservar entorno habitual y next-env.d.ts.
+  Autorizado por recuperación de PR80; sin decisión de negocio/arquitectura nueva.
+  Implementación y verificación pendientes.
+- **Resultado:** sondas de texto exacto dentro de región/status vigentes, sin
+  depender de ':' ni atributos del Badge no declarados. Primera verificación
+  local detectó una suposición incorrecta de data-slot: SQL confirmó las cuatro
+  mutaciones efectivas, solo fallaba observarlas. Corregida la sonda y repetido
+  reset frío propio: SC-008A PASS, cuatro resultados <=5000ms, barrera común,
+  actores1–4 y todas las versiones/auditorías SQL verdaderas. No se alteraron
+  presupuesto, fixture, acciones o condiciones para pasar.
+- **Verificado:**2 inventarios,57 tooling, tipos/lint/diff PASS; app sin cambios
+  respecto a efbf768 que ya pasó130 E2E. Control frío local final PASS (2.9min,
+  preparación fuera del reloj de acciones). Se hicieron dos resets únicamente del
+  proyecto ficticio funes-admin-cv-check por la corrección intermedia de sonda;
+  entorno habitual intacto. Recibo de fallo ahora expone solo números/admin/
+  PASS-FAIL permitidos, nunca salida cruda. T225 implementado; publicación sin
+  firma en PR80, nueva CI/revisión humana pendientes; escenarios alojados del
+  helper no ejecutados ni ampliados.
+
 ## EXTRA-091 — Evitar redirecciones de filtros con espacios y referencias opacas
 
 - **Origen/evidencia previa,2026-10-27:** recuperación autorizada PR80. Al liberar
