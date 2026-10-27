@@ -1,5 +1,31 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA085 — Portal,2026-10-27
+
+- P1: EXTRA088: Home muestra hasta10 ofertas públicas vigentes, ordenadas por
+  publicación DESC/ID DESC antes de limitar en servidor. Carrusel circular: última/
+  penúltima a izquierda de primera, primera/segunda a derecha de última; flechas
+  atraviesan ambos extremos. Conservar diseño3D/móvil, enlaces y vacío/error/
+  elegibilidad actuales, sin duplicar registros para llenar huecos con pocos datos.
+  EXTRA087 sustituye EXTRA086: avanzar automáticamente cada3s, volver a la primera
+  al terminar y conservar solo flechas, sin botón Pausar/Reanudar. Hover/foco
+  pausan mientras dura la interacción y luego vuelve automáticamente; respetar
+  reduced-motion y pestaña oculta. No modificar orden ni elegibilidad.
+- P2: administración descarga PDF y Excel .xlsx reales del período/categoría
+  filtrados, foto as_of, indicadores españoles y datos autorizados actuales.
+  Conservar permisos/auditoría, precisión/cero/null pendiente y referencias opacas;
+  sin PII nueva o contenido activo. CSV compatible; no informe oficial/OQ005.
+- P3: preview Ver perfil y nominar bloquea solo scroll del documento de fondo,
+  conserva posición y scroll interior móvil. Cerrar/Escape/éxito/desmontaje
+  restablecen scroll y foco; no cambia nominación ni autorización.
+- P4: composición de filtros y consulta en servidor con GET/URL como fuente de
+  estado; islas cliente necesarias para combobox/validación/foco. Filtrar/contar/
+  paginar con validación y permisos servidor. Reiniciar página al cambiar filtro,
+  mantener selección múltiple OR/refs opacas/localidad opcional/defaults/asistidos.
+
+Mateo confirma explícitamente ambas descargas y bloqueo de fondo con scroll
+interno permitido. No se cambia retención, reglas municipales o criterios de matching.
+
 ## Authorized public metrics increment — EXTRA-079
 
 On 2026-10-25 Maxi requested replacing Home's “Cada perfil entra por el camino

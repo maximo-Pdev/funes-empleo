@@ -55,6 +55,13 @@ it("conserva categorías opacas en filtros del apartado presencial", async () =>
   expect(await referenceUrl(`/admin/atencion-presencial?categoryId=${id}&page=2`)).toBe(`/admin/atencion-presencial?categoryId=${category}&page=2`);
   expect(mocks.rpc).toHaveBeenCalledWith("get_record_references", { p_kind: "category", p_ids: [id] });
 });
+it.each(["csv", "pdf", "xlsx"])("canonicaliza el filtro de categoría del informe %s", async extension => {
+  const category = "rub-0123456789abcdef01234567";
+  mocks.rpc.mockResolvedValue({ data: { [id]: category }, error: null });
+  expect(await referenceUrl(`/api/admin/exports/operations.${extension}?from=2026-09-01&category=${id}`))
+    .toBe(`/api/admin/exports/operations.${extension}?from=2026-09-01&category=${category}`);
+  expect(mocks.rpc).toHaveBeenCalledWith("get_record_references", { p_kind: "category", p_ids: [id] });
+});
 it.each([null, { account: { status: "suspended" } }])("no consulta referencias sin sesión activa: %j", async session => {
   mocks.session.mockResolvedValue(session);
   await expect(recordReferences("candidate", [id])).rejects.toMatchObject({ code: "AUTH_REQUIRED" });

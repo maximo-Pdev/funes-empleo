@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { parse } from "csv-parse/sync";
+import readExcelFile from "read-excel-file/node";
 import { runLocalMaintenanceSql } from "./local-maintenance";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 test.beforeEach(() => assertLocalTargets());
@@ -11,7 +12,7 @@ const fixtureId = (kind: string, n: number) => {
   return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
 };
 test.use({ trace: "off", screenshot: "off" });
-test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 segundos", async ({ page }) => {
+test("administración: métricas filtradas, PDF, Excel y CSV compatible en menos de 30 segundos", async ({ page }) => {
   test.setTimeout(60000);
   expect(runLocalMaintenanceSql("select (select count(*) from public.candidate_profiles)||','||(select count(*) from public.company_profiles)||','||(select count(*) from public.job_openings)||','||(select count(*) from public.participations)" )).toBe("500,50,100,1000");
   const auditBefore = Number(runLocalMaintenanceSql("select count(*) from private.metrics_exports"));
@@ -35,15 +36,11 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
   await expect(page.getByTestId("metric-hired").locator("dd")).toHaveText("25");
   await expect(page.getByTestId(`duration-first_hire_days-${fixtureId("opening",22)}`)).toContainText("10 días");
   await expect(page.getByTestId(`duration-coverage_days-${fixtureId("opening",22)}`)).toContainText("Pendiente");
-  const download = page.waitForEvent("download");
-  await page.getByRole("link", { name: "Descargar CSV filtrado" }).click();
-  const file = await download;
-  expect(await file.failure()).toBeNull();
-  const stream = await file.createReadStream();
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
-  expect(Date.now() - started).toBeLessThan(30000);
-  const csv = Buffer.concat(chunks).toString("utf8");
+  const excelLink = page.getByRole("link", { name: "Descargar Excel filtrado" });
+  const csvPath = (await excelLink.getAttribute("href"))!.replace("operations.xlsx", "operations.csv");
+  const csvResponse = await page.request.get(csvPath);
+  expect(csvResponse.status()).toBe(200);
+  const csv = await csvResponse.text();
   const rows: Record<string,string>[] = parse(csv, { columns: true, bom: true });
   expect(rows.find((r) => r.indicador === "active_candidates")?.valor).toBe("200");
   expect(rows.find((r) => r.indicador === "companies")?.categoria_codigo).toBe("");
@@ -53,7 +50,27 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
   expect(rows.filter((r) => r.unidad !== "days").every((r) => !r.oferta_codigo && !r.oferta_titulo)).toBe(true);
   expect(csv).toContain("'=OFERTA FICTICIA");
   expect(csv).not.toMatch(/Persona ficticia|@example.invalid|dni|summary_internal|[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i);
-  expect(Number(runLocalMaintenanceSql("select count(*) from private.metrics_exports"))).toBe(auditBefore + 1);
+  for (const [extension, label] of [["pdf", "Descargar PDF filtrado"], ["xlsx", "Descargar Excel filtrado"]]) {
+    const download = page.waitForEvent("download");
+    await page.getByRole("link", { name: label, exact: true }).click();
+    const file = await download;
+    expect(await file.failure()).toBeNull();
+    expect(file.suggestedFilename()).toBe(`metricas.${extension}`);
+    const stream = await file.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+    const bytes = Buffer.concat(chunks);
+    expect(bytes.subarray(0, extension === "pdf" ? 5 : 2).toString()).toBe(extension === "pdf" ? "%PDF-" : "PK");
+    if (extension === "xlsx") {
+      const sheets = await readExcelFile(bytes);
+      const metrics = sheets.find(sheet => sheet.sheet === "Métricas")!.data;
+      expect(metrics.find(row => row[0] === "Candidatos activos")?.[1]).toBe(200);
+      expect(metrics.find(row => row[6] === "=OFERTA FICTICIA")?.[6]).toBe("=OFERTA FICTICIA");
+      expect(JSON.stringify(sheets)).not.toMatch(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/i);
+    }
+  }
+  expect(Date.now() - started).toBeLessThan(30000);
+  expect(Number(runLocalMaintenanceSql("select count(*) from private.metrics_exports"))).toBe(auditBefore + 3);
   expect(runLocalMaintenanceSql("select count(*) from public.audit_events e join private.metrics_exports x on x.id=e.entity_id and x.request_id=e.request_id where e.action='metrics_exported' and e.actor_account_id=x.actor_id and x.period_from='2026-09-01' and x.period_to='2026-09-20'")).not.toBe("0");
   await page.setViewportSize({ width: 360, height: 800 });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -65,15 +82,15 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
 });
 
 test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ page, request }) => {
-  const url = "/api/admin/exports/operations.csv?from=2026-09-01&to=2026-09-20";
-  const anonymous = await request.get(url);
+  const urls = ["csv", "pdf", "xlsx"].map(extension => `/api/admin/exports/operations.${extension}?from=2026-09-01&to=2026-09-20`);
+  const anonymous = await Promise.all(urls.map(url => request.get(url)));
   await page.goto("/");
   await page.getByLabel("Correo electrónico").fill("company1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(page).toHaveURL(/\/empresa$/);
-  const denied = await page.request.get(url);
-  for (const response of [anonymous, denied]) {
+  const denied = await Promise.all(urls.map(url => page.request.get(url)));
+  for (const response of [...anonymous, ...denied]) {
     expect(response.status()).toBe(403);
     const directives = (response.headers()["cache-control"] ?? "").split(",").map(directive => directive.trim().toLowerCase());
     expect(directives).toEqual(expect.arrayContaining(["private", "no-store"]));

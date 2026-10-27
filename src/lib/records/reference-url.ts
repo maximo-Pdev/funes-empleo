@@ -24,7 +24,7 @@ export async function referenceUrl(href: string): Promise<string> {
   const queries: [string, ReferenceKind][] = [];
   if (url.pathname === "/admin/candidates" || url.pathname === "/admin/atencion-presencial") queries.push(["categoryId", "category"]);
   if (url.pathname === "/admin/participations") queries.push(["openingId", "opening"], ["candidateId", "candidate"]);
-  if (url.pathname === "/admin/metrics" || url.pathname === "/api/admin/exports/operations.csv") queries.push(["category", "category"]);
+  if (url.pathname === "/admin/metrics" || /^\/api\/admin\/exports\/operations\.(csv|pdf|xlsx)$/.test(url.pathname)) queries.push(["category", "category"]);
   if (/^\/empresa\/ofertas\/[^/]+$/.test(url.pathname)) queries.push(["referral", "referral"]);
   for (const [key, kind] of queries) {
     const values = url.searchParams.getAll(key);

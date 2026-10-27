@@ -1,5 +1,34 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA087 sustituye EXTRA086: HomeOffersCarousel usa intervalo React de3s con
+cleanup y API Embla móvil. EXTRA088: Home pide10 ofertas, distancia circular
+centrada en coverflow y módulo en flechas; Embla loop:true con fallback nativo si
+hay pocas slides. Avance vuelve al índice0, sin discontinuidad de vecinos visibles.
+Sin Button de pausa/ref/pausa manual. Hover/foco temporales se restablecen al
+salir; reduced-motion y pestaña oculta detienen avance. Sin dependencias,
+consultas ni cambios de arquitectura.
+
+## EXTRA085 — Diseño 2026-10-27
+
+Constitución I–VI: preservar intermediación, permisos, historial y DTO; sin SQL/
+infra/variables nuevas. RPC público ya ordena globalmente; coverflow usa distancia
+modular centrada y flechas circulares (EXTRA088), sin alterar fuentes públicas.
+write-excel-file4.1.1 genera XLSX String/Number/null; PDFKit0.20.2 PDF con Be
+Vietnam TTF locales, texto/páginas. Solo servidor Node; externalizar PDFKit y
+trazar fuentes solo para ruta PDF; tipos0.17.6 con API estable. Generar en memoria
+el resultado autorizado actual; no introducir límite de filas silencioso.
+Handler compartido: guard→filtros/referencias→getMetrics(true)→serializar;
+duplicados/desconocidos inválidos, referencias opacas, no-store/nosniff/attachment.
+Centralizar etiquetas métricas fuera de JSX. Contexto/fechas/categoría/as_of,
+pendiente distinto de0; CSV permanece, interfaz ofrece ambos formatos nuevos.
+CandidateSearchForm servidor compone Form GET, campos nombrados sin handlers,
+LocalityCombobox autónomo required=false y categorías como isla cliente con
+categoryId opacos repetidos. Quitar onSearch solo de pruebas y router.push.
+Servidor de matching compone formulario GET de orden como ReactNode al cliente
+tabla/modal; mantiene preview/nominación/refresh. Otras composiciones ya servidor.
+html:has(dialog[data-candidate-preview][open]) bloquea fondo automáticamente;
+conservar overflow interior y comprobar posición/teclado/cierre/móvil.
+
 ## Authorized public metrics design — EXTRA-079
 
 Use a no-argument SQL `public_portal_counts()` RPC with SECURITY DEFINER and

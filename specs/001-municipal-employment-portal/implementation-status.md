@@ -1470,3 +1470,59 @@ Publicación solicitada por Mateo: commit00f06cc sin firma/signoff/coautoría y
 sin borrador, desde feat/admin-opening-workspace; adjunto a la conversación.
 Incluye EXTRA073/T208–212 y migración alojada ya aplicada. next-env.d.ts y todos
 los respaldos ignorados quedan fuera. CI/revisión/merge/despliegue pendientes.
+
+## 2026-10-27 — EXTRA085: ofertas recientes, archivos y filtros
+
+Implementado en `feat/portal-offers-metrics-filters` desde main b900485, sin
+commit/publicación. Home conserva orden servidor published_at DESC/ID DESC y
+carrusel 3D/móvil con extremos acotados. Métricas permite PDF y Excel reales,
+filtrados/autorizados/auditados, conservando CSV. Filtros compuestos en servidor
+GET con islas cliente para combobox/validación; matching aplica orden explícito.
+Popup bloquea fondo y conserva desplazamiento interior y restauración de foco.
+Sin migración ni variables nuevas. Inventario/operación:
+`docs/implementation/portal-filters-audit.md`; contrato
+`contracts/portal-reports-and-filters.md`.
+
+Tipos/lint/build/diff PASS;1242 pruebas/100 archivos y57 tooling;67 focales PASS.
+pgTAP1314/25 archivos y fixture aislado500 candidatos/50 empresas/100 ofertas/
+1000 participaciones/500 CV ficticios PASS. Diez E2E y repetición final del popup
+PASS, sin retries; binarios PDF/XLSX, permisos y auditoría+3, GET opaco múltiple,
+orden/paginación/nominación, desktop/móvil, bloqueo/restauración comprobados.
+PDF14p leído/renderizado con encabezados/acentos/última fila; XLSX parser/XML sin
+contenido activo ni UUID. Ambas fuentes en tracing;21 hashes runtime coinciden
+con build. Cobertura100% se limita al env/schema configurado. next-env.d.ts
+preexistente conservado. Audit mantiene los siete avisos del main; no se agregan
+avisos por las librerías de informes. Incidencias de entorno y resultados reales
+en EXTRA085. T213–218 completos; P1–P4 cubiertos y sin pendientes funcionales
+focales detectados. Revisión humana/CI/aceptación global pendientes.
+## 2026-10-27 — EXTRA086: carrusel automático
+
+T219 implementado: avance5s en desktop y móvil, retorno al inicio, controles
+manuales conservados y Button Pausar/Reanudar accesible. Hover de mouse pausa;
+foco/tacto pausa hasta acción expresa; reduced-motion inicia pausado y pestaña
+oculta no avanza. Sin dependencia, datos ni migración nuevos. Ocho focales PASS;
+suite1247/100 anterior al último ajuste táctil PASS, cubierto luego por focales.
+Tipos/lint/build PASS. Cinco recorridos browser finales cubiertos y PASS tras
+corregir el entorno aislado y una expectativa de espacios SSR (EXTRA086).
+Capturas1440/390 revisadas, código compilado coincide por hash. Trabajo existente
+y next-env.d.ts ajeno preservados. Sin commit/PR/CI/deploy; revisión humana pendiente.
+## 2026-10-27 — EXTRA087: tres segundos sin botón adicional
+
+T220 sustituye presentación/temporización de EXTRA086 por petición expresa:
+carrusel automático3000ms con solo flechas. Quita Button/iconos/ref/pausa manual;
+hover/foco son temporales y se reanuda solo al salir. Conserva reduced-motion,
+visibilidad, reinicio y cleanup. Seis focales, tipos/lint/build/diff PASS; cuatro
+E2E desktop/móvil sin retries PASS, ausencia de Pausar/Reanudar comprobada. Código
+compilado coincide por hash; next-env.d.ts ajeno preservado. Sin migración/reset/
+cambios alojados. Misma rama, sin commit/PR/CI; revisión humana pendiente.
+## 2026-10-27 — EXTRA088: diez ofertas y vecinos circulares
+
+T221 implementado: Home pide10 públicas, conserva orden publicación DESC/ID DESC;
+coverflow muestra última/penúltima a izquierda de primera y primera/segunda a
+derecha de última, con flechas modulares y Embla loop móvil. Mantiene auto3s y
+solo flechas, sin cambiar catálogo, conteos, elegibilidad ni SQL.31 focales PASS,
+tipos/lint/build/diff PASS; cuatro recorridos browser finales cubiertos y PASS,
+con vecinos/cruces de extremos1440/390, límite10, auto/hover y reduced-motion.
+Capturas primera/última revisadas y hashes de fuente/build coinciden. Incidencia
+solo de viewport de prueba documentada en EXTRA088. next-env.d.ts ajeno intacto.
+Sin reset/migración/dependencia/hosted/commit/PR/CI; revisión humana pendiente.

@@ -8,6 +8,7 @@ vi.mock("@/features/participations/nomination-actions", () => ({ createAdminNomi
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh, push }) }));
 import { OpeningCandidateMatches, OpeningCandidateMatchesList } from "@/features/participations/components/opening-candidate-matches";
 import type { OpeningMatches } from "@/validation/opening-matching";
+import { OpeningMatchOrderForm } from "@/features/participations/components/opening-match-order-form";
 
 const id = "00000000-0000-4000-8000-000000000001";
 const matches: OpeningMatches = { available: true, total: 42, page: 2, pageSize: 20,
@@ -42,12 +43,16 @@ it("pagina conservando contexto de oferta y ancla accesible", () => {
 });
 
 it("ordena por actualización y reinicia a página uno sin perder la oferta", () => {
-  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={matches} />);
+  render(<OpeningMatchOrderForm openingReference="ofe-111111111111111111111111" order="updated_desc" available />);
   const select = screen.getByRole("combobox", { name: "Última actualización del perfil" });
   expect(select).toHaveProperty("value", "updated_desc");
   expect(screen.getAllByRole("option")).toHaveLength(2);
   fireEvent.change(select, { target: { value: "updated_asc" } });
-  expect(push).toHaveBeenCalledWith("/admin/openings/ofe-111111111111111111111111?matchOrder=updated_asc#opening-matches", { scroll: false });
+  const form = screen.getByRole("form", { name: "Ordenar candidatos coincidentes" }) as HTMLFormElement;
+  expect(form.method).toBe("get");
+  expect(form.getAttribute("action")).toBe("/admin/openings/ofe-111111111111111111111111#opening-matches");
+  expect(new FormData(form).get("matchOrder")).toBe("updated_asc");
+  expect(new FormData(form).has("matchPage")).toBe(false);
   expect(nominate).not.toHaveBeenCalled();
 });
 
@@ -64,7 +69,8 @@ it("muestra vacío y recuperación de página fuera de rango", () => {
 });
 
 it("no muestra candidatos cuando la oferta no habilita matching", () => {
-  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches, available: false, items: [], total: 0 }} />);
+  render(<OpeningCandidateMatchesList openingId={id} openingReference="ofe-111111111111111111111111" matches={{ ...matches, available: false, items: [], total: 0 }}
+    orderForm={<OpeningMatchOrderForm openingReference="ofe-111111111111111111111111" order="updated_desc" available={false} />} />);
   expect(screen.getByText("Coincidencias no disponibles")).toBeTruthy();
   expect(screen.getByRole("combobox")).toHaveProperty("disabled", true);
   expect(screen.queryByRole("navigation")).toBeNull();
