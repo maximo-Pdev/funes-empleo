@@ -1,5 +1,10 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA091: referenceUrl reconstruye query únicamente al cambiar un identificador;
+no normalizar '+'/%20 de referencias ya opacas. La canonización debe ser idempotente
+y no provocar redirección por representaciones equivalentes de espacios. Guards,
+resolución, validación y orden/repetición de parámetros se conservan.
+
 EXTRA087 sustituye EXTRA086: HomeOffersCarousel usa intervalo React de3s con
 cleanup y API Embla móvil. EXTRA088: Home pide10 ofertas, distancia circular
 centrada en coverflow y módulo en flechas; Embla loop:true con fallback nativo si

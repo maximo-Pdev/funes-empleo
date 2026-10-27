@@ -1,5 +1,73 @@
 # Cambios extra necesarios
 
+## EXTRA-091 — Evitar redirecciones de filtros con espacios y referencias opacas
+
+- **Origen/evidencia previa,2026-10-27:** recuperación autorizada PR80. Al liberar
+  los menús de EXTRA090, dos recorridos quedan en «Cargando gestión municipal» y
+  repiten la misma URL con term='Persona ficticia 001' o nombre presencial +
+  categoryId opaco. canonicalReferenceRoute construye espacios como '+', mientras
+  referenceUrl reconstruye todos los parámetros como '%20' aun sin convertir un
+  UUID. Cada petición vuelve a redirigir por comparación de cadenas equivalente.
+- **Cambio mínimo propuesto:** en referenceUrl omitir reconstrucción del query
+  cuando los valores del campo no cambiaron tras conversión. Solo reescribir cuando
+  se sustituye realmente UUID por referencia. Mantener orden/repeticiones/encoding
+  original de URLs ya opacas. No tocar filtros, validación, guards ni resolución.
+- **Contratos/archivos:** helper reference-url.ts, regresiones unitarias de
+  idempotencia/espacios/+ y referencia legada, recorridos de búsqueda con espacios,
+  artefacto de referencias/plan/tareas/estado. Sin SQL/auth/estados/dependencias.
+- **Riesgos/verificación:** canonicalización de campos múltiples y referencias
+  repetidas, legados y datos codificados. Probar RED del bucle y GREEN sin redirect
+  espurio/ni RPC extra; conservar tests privados/autorización/UUID, ejecutar dos
+  búsquedas completas y seis flujos previos, tipos/lint/build y CI. No aumentar
+  timeouts ni ocultar estados de carga para sortear el fallo.
+- **Estado:** requisito técnico necesario de filtros GET/referencias aprobados,
+  autorizado por recuperación PR80; análisis focal sin cambio arquitectónico o de
+  negocio. Implementación/verificación pendientes. next-env.d.ts ajeno preservado.
+- **Resultado:** cuatro regresiones RED antes del guard;47 pruebas de referencias/
+  descargas GREEN. Suite final1254/100 y cobertura configurada env/schema100%
+  PASS, tipos/lint/build/diff PASS. Siete E2E finales PASS sin retries: alta/listado/
+  filtrado presencial, búsqueda general con frase, dos filtros GET con espacios y
+  tres menús abiertos/axe/foco. El diagnóstico confirmó bucle, no demora: se
+  corrigió sin aumentar timeouts ni modificar condiciones de resultados.
+  Fuente compilada coincide con workspace; T224 implementado. Publicación en
+  PR80 sin firma/coautoría; CI posterior se verifica en checks, revisión humana
+  pendiente. Sin cambios de datos alojados o migraciones.
+
+## EXTRA-090 — Completar recuperación de recorridos del PR80
+
+- **Origen/evidencia,2026-10-27:** continuación de Mateo «seguí». Run40573996246
+  pasa database, accesibilidad completa y121 E2E; seis fallos antes ocultos por
+  el gate. Tres selectores Localidad resuelven input auxiliar+combobox; un test
+  busca enlace viejo «Volver a atención presencial» donde producto aprobado dice
+  «Volver a perfil asistido»; un menú múltiple abierto intercepta submit; axe
+  detecta Popup(dialog) y List(listbox) sin nombres en categorías asistidas.
+- **Cambios necesarios antes de código:** usar role=combobox en los tres tests
+  empresariales y categorías asistidas, cerrar selección múltiple con Escape,
+  alinear enlace de regreso y verificar href. Añadir nombres accesibles específicos
+  a Popup/List en los cuatro callers existentes (categorías, filtros, localidad,
+  campos de oferta), conservando el componente adaptado Base. No ocultar errores
+  axe, eliminar escenarios, forzar clicks ni cambiar flujos de negocio.
+- **Fuentes/revisión:** docs oficiales shadcn Base Combobox y Base UI consultados;
+  reutilizar props aria-label soportadas, sin reemplazar el primitivo/estilo/API.
+  Adaptador base-nova local revisado. Fuente: https://base-ui.com/react/components/combobox
+  y https://ui.shadcn.com/docs/components/base/combobox .
+- **Archivos/riesgos/contratos:** cuatro componentes de campos y seis specs E2E,
+  nueva regresión axe de popups abiertos, guía/tareas/estado. Sin datos, auth,
+  permisos, esquemas, dependencias o acciones nuevas. Riesgo de selección/foco y
+  nombres coincidentes; comprobar triggers por rol, Escape y navegaciones completas.
+- **Plan de verificación:** seis recorridos fallidos sobre fixture aislado, axe
+  abierto/cerrado por tipo de selector, componentes, tipos/lint/build y CI nuevo.
+  Preservar next-env.d.ts. Autorizado como corrección necesaria de PR80; análisis
+  focal sin cambio de requisitos de negocio o arquitectura. Verificación pendiente.
+- **Resultado:** los seis recorridos que fallaban fueron verificados en corridas
+  dirigidas, y tres nuevas pruebas axe de popup abierto pasan con Escape/foco
+  intactos. Primera corrida7/9 PASS expuso el bucle de EXTRA091; tras corregirlo,
+  dos pendientes y regresiones añadidas PASS en corrida final7/7. No se bajaron
+  umbrales, aumentaron timeouts ni usaron clicks forzados.1254 unitarias y
+  tipos/lint/build PASS; T223 implementado. Nuevo resultado remoto se consulta
+  en PR80. Docker se había detenido; se reinició en segundo plano para el entorno
+  ficticio, sin reset habitual ni operaciones alojadas.
+
 ## EXTRA-089 — Corregir desbordamiento administrativo del PR80
 
 - **Fecha/origen:**2026-10-27, Mateo informa fallo GitHub de PR80 y solicita

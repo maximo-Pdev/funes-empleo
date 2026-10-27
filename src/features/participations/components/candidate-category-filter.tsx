@@ -14,8 +14,8 @@ export function CandidateCategoryFilter({ options, initial }: {
     <Combobox multiple value={selected} onValueChange={setSelected}>
       <ComboboxTrigger aria-label="Categorías"><span className={selected.length ? "" : "text-muted-foreground"}>
         {selected.length ? `${selected.length} seleccionadas` : "Todas las categorías"}</span></ComboboxTrigger>
-      <ComboboxContent><ComboboxInput placeholder="Buscar categoría…" aria-label="Buscar categoría" />
-        <ComboboxList>{options.map(option => <ComboboxItem key={option.value} value={option.value}>{option.label}</ComboboxItem>)}</ComboboxList>
+      <ComboboxContent aria-label="Filtrar por categorías"><ComboboxInput placeholder="Buscar categoría…" aria-label="Buscar categoría" />
+        <ComboboxList aria-label="Categorías disponibles para filtrar">{options.map(option => <ComboboxItem key={option.value} value={option.value}>{option.label}</ComboboxItem>)}</ComboboxList>
         <ComboboxEmpty>Sin resultados</ComboboxEmpty>
       </ComboboxContent>
     </Combobox>

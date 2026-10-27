@@ -20,7 +20,7 @@ for (const role of ["candidate", "company"] as const) {
       await page.getByLabel("CUIT").fill(`30${suffix}7`);
       await page.getByLabel("Persona responsable").fill("Responsable ficticio");
       await page.getByLabel("Actividad", { exact: true }).fill("Servicios ficticios");
-      await page.getByLabel("Localidad", { exact: true }).click();
+      await page.getByRole("combobox", { name: "Localidad", exact: true }).click();
       await page.getByRole("option", { name: "Funes", exact: true }).click();
     }
     await page.getByLabel("Correo electrónico").fill(email);

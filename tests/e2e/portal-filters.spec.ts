@@ -90,7 +90,7 @@ for (const path of ["/admin/candidates", "/admin/atencion-presencial"]) {
     }
     await expect(form).toHaveAttribute("method", "get");
     await expect(form).toHaveAttribute("action", path);
-    await form.getByLabel("Búsqueda por palabra", { exact: true }).fill("Persona");
+    await form.getByLabel("Búsqueda por palabra", { exact: true }).fill("Persona ficticia");
     await form.getByLabel("Categorías", { exact: true }).click();
     await page.getByRole("option", { name: "Categoría ficticia A", exact: true }).click();
     await page.getByRole("option", { name: "Categoría ficticia B", exact: true }).click();
@@ -108,7 +108,7 @@ for (const path of ["/admin/candidates", "/admin/atencion-presencial"]) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} filtrado a ${width}px`).toBe(true);
     }
     await page.reload();
-    await expect(form.getByLabel("Búsqueda por palabra", { exact: true })).toHaveValue("Persona");
+    await expect(form.getByLabel("Búsqueda por palabra", { exact: true })).toHaveValue("Persona ficticia");
     await expect(form.getByLabel("Categorías", { exact: true })).toContainText("2 seleccionadas");
     await page.goBack();
     await expect(page).toHaveURL(new RegExp(`${path}\\?page=2$`));

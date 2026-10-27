@@ -1545,3 +1545,20 @@ filtros general/asistido),13 componentes y tipos/lint/build/diff PASS; hashes de
 fuente/build coinciden, next-env.d.ts ajeno intacto. T222 implementado. Publicación
 sin firma en PR80; CI posterior/revisión humana se verifican en los checks del PR.
 No se dan por aprobados por las pruebas locales. Sin reset o cambios alojados.
+## 2026-10-27 — EXTRA090/091: completar recorridos del PR80
+
+Run40573996246 supera accesibilidad y121 E2E; seis fallos: Localidad ambigua en
+3 pruebas, enlace presencial antiguo, popup múltiple cubriendo submit y axe en
+Popup/List sin nombre. Ajustados selectores por rol/enlace vigente/Escape y nombres
+aria de los cuatro callers, conservando primitivas/controles/validación. Tres nuevas
+regresiones prueban menús abiertos con axe y restauración de foco.
+
+La corrida dirigida7/9 descubre otro defecto: canonicalReferenceRoute normaliza
+espacios a '+' y referenceUrl a '%20' aun sin sustituir UUID; redirige en bucle al
+filtrar frases con categorías. Se omite reconstrucción si no cambia identificador;
+se conservan encoding, repetidos, orden, guards y conversión legada. RED4 nuevas;
+GREEN47 referencias/descargas. Final1254/100, tipos/lint/build/diff PASS. Siete E2E
+finales PASS tras siete anteriores; seis casos originales recuperados y menús
+abiertos/frases verificadas sin alterar umbrales/timeouts ni force clicks. T223/224
+implementados; nueva CI/revisión humana en PR80. next-env.d.ts ajeno preservado.
+Sin migración/hosted/reset; Docker reiniciado en segundo plano por motor detenido.

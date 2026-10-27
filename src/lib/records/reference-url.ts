@@ -31,6 +31,8 @@ export async function referenceUrl(href: string): Promise<string> {
     if (values.length === 0) continue;
     const converted = await Promise.all(values.map(value =>
       value && databaseIdentifierPattern.test(value) ? recordReference(kind, value) : value));
+    // Preserve equivalent query encoding when there is no UUID to replace.
+    if (converted.every((value, index) => value === values[index])) continue;
     let index = 0;
     const rebuilt: [string, string][] = Array.from(url.searchParams.entries()).map(([k, value]) =>
       k === key ? [k, converted[index++]!] : [k, value]);

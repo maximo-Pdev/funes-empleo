@@ -2,6 +2,12 @@
 
 ## Portal follow-ups — EXTRA085
 
+EXTRA090: name both popup and list of every combobox for its field (categories,
+locality and offer options), including open/closing states. Reuse the adapted
+Base primitives and their ARIA props. Multiple selection stays open until Escape
+or dismissal; tests should operate the visible combobox by role and close it
+before acting on controls it covers. Keep native auxiliary validation inputs.
+
 EXTRA089: the candidate-search locality wrapper is positioned relative so its
 visually hidden native FormData/validation input stays within the field under
 administrative full-width input rules. Preserve native validation and combobox

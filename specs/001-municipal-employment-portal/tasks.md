@@ -5,6 +5,14 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T224 EXTRA091: evitar redirección por espacios en filtros ya opacos,
+  preservar conversión UUID/orden/repetidos; RED/GREEN de idempotencia y frases,
+  búsquedas por ambos destinos, regresiones de permisos y checks de PR80.
+
+- [x] T223 EXTRA090: completar seis recorridos antes bloqueados, nombres aria
+  de popups/listas de los cuatro campos, selectores por rol y cierre Escape;
+  regresión axe de menús abiertos, verificaciones y publicación en mismo PR80.
+
 - [x] T222 EXTRA089: recuperar PR80 corrigiendo contenedor del input auxiliar
   de localidad, sin recorte global ni cambio de contrato; gate de accesibilidad
   por roles y filtros general/asistido360/1366, tipos/lint/tests/build; publicación

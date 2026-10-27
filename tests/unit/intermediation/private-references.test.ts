@@ -62,6 +62,26 @@ it.each(["csv", "pdf", "xlsx"])("canonicaliza el filtro de categoría del inform
     .toBe(`/api/admin/exports/operations.${extension}?from=2026-09-01&category=${category}`);
   expect(mocks.rpc).toHaveBeenCalledWith("get_record_references", { p_kind: "category", p_ids: [id] });
 });
+it.each(["Persona ficticia 001", "Villa Cañás", "Nombre + apellido"])("no redirige query ya opaco con texto %s", async term => {
+  const category = "rub-0123456789abcdef01234567";
+  const params = new URLSearchParams({ term, categoryId: category });
+  const href = `/admin/candidates?${params}`;
+  expect(await referenceUrl(href)).toBe(href);
+  await canonicalReferenceRoute("/admin/candidates", { term, categoryId: category });
+  expect(mocks.redirect).not.toHaveBeenCalled();
+  expect(mocks.rpc).not.toHaveBeenCalled();
+});
+it("convierte UUID una vez y conserva parámetros repetidos y espacios sin bucle", async () => {
+  const category = "rub-0123456789abcdef01234567";
+  mocks.rpc.mockResolvedValue({ data: { [id]: category }, error: null });
+  const href = `/admin/atencion-presencial?term=Mesa+presencial&categoryId=${id}&categoryId=${id}&locality=Villa+Ca%C3%B1%C3%A1s`;
+  const canonical = await referenceUrl(href);
+  expect(new URL(canonical, "http://fixture.invalid").searchParams.getAll("categoryId")).toEqual([category, category]);
+  expect(new URL(canonical, "http://fixture.invalid").searchParams.get("locality")).toBe("Villa Cañás");
+  expect(await referenceUrl(canonical)).toBe(canonical);
+  await canonicalReferenceRoute("/admin/atencion-presencial", { term: "Mesa presencial", categoryId: [category, category], locality: "Villa Cañás" });
+  expect(mocks.redirect).not.toHaveBeenCalled();
+});
 it.each([null, { account: { status: "suspended" } }])("no consulta referencias sin sesión activa: %j", async session => {
   mocks.session.mockResolvedValue(session);
   await expect(recordReferences("candidate", [id])).rejects.toMatchObject({ code: "AUTH_REQUIRED" });
