@@ -125,3 +125,10 @@ el diagnóstico sanitizado, se prepara una migración correctiva y, si correspon
 desde migraciones y seed ficticio. No editar una migración ya aplicada ni usar datos reales.
 Las rutas de CV impiden nuevas descargas al revocar; no pueden recuperar copias ya descargadas.
 OQ-001 (retención) permanece abierta; las 720 horas son solo límite de acceso.
+# EXTRA0942026-10-28 — contratación y disponibilidad
+
+transition_participation conserva firma/ACL/evidencia/locks. Hire/late_hire fija
+availability unavailable y status active→unavailable, con auditoría en la misma
+transacción; no escribe consentimiento ni modifica casos/permisos ajenos. Permiso
+propio active autorizado hasta720h desde confirmar; revoked nunca se restaura.
+Retiro manual conserva revocación global/cierre de casos abiertos. Sin backfill.

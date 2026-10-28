@@ -1,5 +1,51 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA094 — Ajuste autorizado2026-10-28 (precedencia sobre EXTRA035)
+
+Mateo confirma este cambio de alcance; no ratifica política municipal de datos reales.
+
+- R1: todos los enlaces de CV abren PDF autorizado en pestaña nueva; respuesta
+  inline, sin descarga forzada. Conservar autorización por solicitud, privacidad,
+  versiones y URL opaca; sin CV vigente o sin acceso siguen mensajes actuales.
+- R2: métricas prioriza seis tarjetas: candidatos activos, empresas activas,
+  ofertas publicadas, participaciones, derivaciones y contrataciones confirmadas.
+  Dos gráficos de barras muestran resultados y contrataciones por categoría con
+  valores textuales, español, móvil y sin depender solo del color. Todo detalle
+  restante queda bajo Ver detalle, plegado inicialmente. PDF/Excel/CSV conservan
+  datos completos y filtros; definiciones bajo Más información, sin cambiar cálculo.
+- R3: contratar normal o tardíamente cambia disponibilidad a unavailable y un
+  perfil active a unavailable, atómicamente con el resultado y auditoría de actor/
+  fecha/causa. Conserva consentimiento y todos sus eventos; no altera estados ni
+  resultados de otras participaciones o permisos de otras derivaciones. No aparece
+  en matching ni admite nuevas derivaciones mientras siga No disponible.
+- R4: consentimiento general aceptado no vuelve a solicitarse por contratación,
+  navegación o actualización. Mostrar estado aceptado en lugar de checkbox/botón.
+  Ausencia o retiro exige acción afirmativa vigente; no reaceptar automáticamente.
+  Retiro manual conserva revocación global y cierre de casos abiertos. Datos
+  anteriores no se reconsienten ni recuperan por migración o corrección de resultado.
+- R5: contratación normal conserva permiso previamente activo de la derivación
+  contratada hasta confirmación +720h, sujeto a demás guardas/revocaciones. Al
+  alcanzar el límite se deniega lectura aunque Cron aún no materialice revoked.
+  Contratación tardía no revive acceso revocado. Otras derivaciones conservan sus
+  reglas/vencimientos. Este cambio no autoriza empresa a explorar el padrón.
+
+### Clarifications2026-10-28
+
+- Consentimiento una vez: Mateo elige conservarlo y pasar a No disponible, en
+  reemplazo del retiro global por contratación de EXTRA035; retiro manual intacto.
+- Métricas: confirma resumen de seis, dos gráficos y detalle desplegable,
+  exportaciones completas; no eliminar indicadores históricos o del contrato.
+- Acceso tras contratar: confirma perfil/contactos/foto/CV30 días, sin restaurar
+  permisos revocados (la opción elegida conserva, no concede otro acceso).
+
+Aceptación: abrir CV desde cuatro contextos mantiene página origen y devuelve PDF
+inline solo a actor autorizado; seis tarjetas y dos gráficos reflejan exactamente
+los filtros, cero/null distinguibles y detalle accesible; hire/late_hire preservan
+último consentimiento y otros casos, auditan disponibilidad y rechazan referencia/
+versión/actor indebidos; error de auditoría revierte toda la transacción. No hay
+backfill ni aceptación/activación/restauración automática. Artefactos anteriores
+describen comportamiento histórico donde se contradigan con este incremento.
+
 ## EXTRA085 — Portal,2026-10-27
 
 - P1: EXTRA088: Home muestra hasta10 ofertas públicas vigentes, ordenadas por
@@ -914,10 +960,10 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   `no_company_response` como antecedente automático reemplazado, sin eliminarlo del historial.
 - Una participación finaliza como no seleccionada o cancelada; se revoca inmediatamente el acceso
   empresarial al perfil, los contactos y el CV. Una nueva contratación confirmada, normal o tardía,
-  retira el consentimiento global y revoca todos los accesos empresariales sin alterar las demás
-  participaciones. Solo los permisos históricos anteriores a EXTRA035 conservan el límite de
-  720 horas desde la confirmación administrativa, salvo revocación previa; al vencer no permiten
-  nuevas consultas o descargas. Ese límite histórico no es una política de retención aprobada:
+  cambia disponibilidad a No disponible y conserva consentimiento y demás participaciones/
+  permisos. El permiso propio todavía activo conserva acceso hasta720 horas desde la
+  confirmación administrativa, salvo revocación previa; al vencer no permite
+  nuevas consultas o descargas. Ese límite no es una política de retención aprobada:
   el plazo de conservación de los datos continúa pendiente en OQ-001.
 - Un CV tiene tipo o tamaño no admitido, está dañado o intenta contener contenido ejecutable; se
   rechaza con un mensaje claro sin sustituir el CV vigente.
@@ -1106,11 +1152,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   automáticamente y reemplazar el CV solo afecta derivaciones posteriores. La empresa NO DEBE ver
   su DNI, domicilio ni notas internas. El acceso DEBE revocarse inmediatamente si el resultado final
   es no selección, cancelación o falta de respuesta empresarial. Si un administrador confirma una
-  contratación (normal o tardía), DEBE retirarse el consentimiento global vigente
-  y revocarse todo acceso empresarial dependiente en la misma transacción, con
-  fecha, actor administrativo y causa, conservando aceptación previa e historial.
-  Las demás participaciones no cambian de estado ni resultado. La ventana de 30 días
-  exactos (720 horas) solo sigue para contrataciones históricas previas al cambio, sujeta al consentimiento vigente y a la ausencia de
+  contratación (normal o tardía), DEBE cambiarse la disponibilidad a No disponible
+  atómicamente con resultado/auditoría, conservando consentimiento e historial
+  (EXTRA094). Las demás participaciones y permisos no cambian por ese hecho.
+  La empresa contratante conserva únicamente un permiso todavía activo hasta30 días
+  exactos (720 horas) desde la confirmación, sujeto al consentimiento vigente y a la ausencia de
   suspensión o archivo de cuentas y registros relacionados. Al cumplirse el plazo DEBEN denegarse
   de inmediato nuevas consultas y descargas y quedar registrada la expiración; nunca se repone un
   permiso revocado. Este plazo solo limita el acceso empresarial y NO define la retención o purga
@@ -1128,8 +1174,8 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 - **FR-038**: Los resultados finales DEBEN distinguir contratación, no selección, retiro,
   cancelación y cierre por falta de respuesta empresarial. El retiro, la no selección, la
   cancelación y la falta de respuesta DEBEN revocar inmediatamente el acceso empresarial a los
-  datos derivados. La nueva contratación confirmada retira el consentimiento global
-  y revoca todos los permisos del candidato según FR-036, sin cerrar otros casos;
+  datos derivados. La contratación confirmada conserva el consentimiento global
+  y cambia disponibilidad a No disponible según FR-036, sin cerrar otros casos;
   una aceptación afirmativa posterior nunca revive permisos revocados. El candidato DEBE poder retirar cualquier
   participación propia todavía abierta, sea
   postulación o nominación administrativa. Un administrador solo DEBE registrar un retiro a pedido
@@ -1305,8 +1351,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   El retiro posterior de la postulación o del consentimiento general revoca inmediatamente ese
   acceso sin borrar el historial administrativo ni permitir su restauración automática. La no
   selección, cancelación o falta de respuesta también lo revocan. Una nueva contratación confirmada
-  retira el consentimiento global y revoca todos los permisos, sin cambiar otros casos; la ventana
-  de 720 horas de FR-036 solo corresponde a permisos históricos previos a EXTRA035.
+  conserva el consentimiento y cambia disponibilidad, sin alterar otros casos o
+  permisos ajenos. La ventana720h de FR-036 solo conserva un permiso propio activo,
+  nunca restaura uno revocado; EXTRA094 sustituye el retiro automático de EXTRA035.
   Ese límite de acceso no define cuánto tiempo se conservan perfil, CV o historial.
 - **Entrevista y resultado**: Información comunicada por la empresa o recabada por el personal; solo
   un administrador confirma el resultado comunicado por la empresa, con excepción del retiro

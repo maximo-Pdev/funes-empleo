@@ -77,7 +77,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   await expect(page.getByText("CV guardado.")).toBeVisible();
   await page.goto(detail);
   await expect(page.getByLabel("Archivo PDF")).toBeVisible();
-  const cvLink = page.getByRole("link", { name: "Descargar CV vigente" });
+  const cvLink = page.getByRole("link", { name: "Abrir CV vigente en otra pestaña" });
   await expect(cvLink).toHaveAttribute("href", /^\/api\/cv\/cv-[0-9a-f]{24}$/);
   const previousCv = await cvLink.getAttribute("href");
   await page.getByLabel("Archivo PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
@@ -89,8 +89,20 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   const download = await page.request.get((await cvLink.getAttribute("href"))!);
   expect(download.status()).toBe(200);
   expect(download.headers()["content-type"]).toBe("application/pdf");
-  expect(download.headers()["content-disposition"]).toBe('attachment; filename="cv.pdf"');
+  expect(download.headers()["content-disposition"]).toBe('inline; filename="cv.pdf"');
   expect(download.headers()["cache-control"]).toContain("no-store");
+  await expect(cvLink).toHaveAttribute("target", "_blank");
+  await expect(cvLink).toHaveAttribute("rel", "noopener noreferrer");
+  const originalPage = page.url();
+  const newTab = page.waitForEvent("popup");
+  await cvLink.click();
+  const pdfTab = await newTab;
+  // Headless shell has no native PDF viewer. The new browsing context plus the
+  // authenticated PDF/inline response above test the portal's contract without
+  // depending on browser PDF preferences or an extension-owned viewer URL.
+  expect(pdfTab).not.toBe(page);
+  expect(page.url()).toBe(originalPage);
+  await pdfTab.close();
   await nominateFromOpening(page, id, opening);
   await page.getByLabel("Acción", { exact: true }).selectOption("skip_to_preselected");
   await page.getByRole("textbox", { name: "Motivo interno" }).fill("Evaluación presencial ficticia realizada");
@@ -152,7 +164,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
     await expect(page.getByLabel("Archivo PDF")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Perfil candidato", exact: true })).toContainText("Cuenta Activa");
     await expect(page.getByRole("button", { name: "Suspender cuenta", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Descargar CV vigente" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Abrir CV vigente en otra pestaña" })).toBeVisible();
     await expect(page.getByText("Orientación ficticia de entrevista presencial")).toBeVisible();
     await page.goto(detail);
     await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);

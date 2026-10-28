@@ -1,5 +1,108 @@
 # Cambios extra necesarios
 
+## EXTRA-095 — Aplicación alojada puntual y publicación de EXTRA094
+
+- **Fecha/origen:** Mateo2026-10-28 solicita aplicar migración y luego PR.
+- **Evidencia previa:** conector MCP rechaza lectura por permisos; CLI vinculado
+  kyjycjojzhwggjuqjnki sí permite inspección. Dry-run --skip-vault falla por
+  versiones antiguas con identidad remota distinta; no ejecutar repair/revert ni
+  incluir migraciones adicionales. Cuerpo actual transition_participation coincide
+  exactamente con baseline probado (MD5 normalizado36d09bf9a34820d36f3939a2d8d02462),
+  SECURITY DEFINER/search_path vacío, ACL postgres/authenticated y RLS4 tablas.
+- **Cambio técnico propuesto antes de ejecución:** archivo temporal ignorado con
+  solo20261028104205 revisada; guard previo de cuerpo/historial, comprobación de
+  cuerpo nuevo b82a56556b9a30fd708732b1dd7c6383 y ACL, inserción de versión/nombre/
+  SQL exactos en schema_migrations en la misma transacción. Copia de definición
+  previa privada local para recuperación. Ninguna escritura en datos de negocio.
+- **Archivos/contratos:** migración existente sin cambios; envoltorio/recibos en
+  test-results ignorado, guía/estado/log/PR. No nuevo requisito funcional, grants,
+  infraestructura, secreto o despliegue manual de aplicación. T227–232 conservados.
+- **Riesgos/verificación:** evitar aplicación doble o sobre función concurrentemente
+  cambiada mediante guard explícito; rollback si hash/ACL/historial no coincide.
+  Verificar después cuerpo, firma/search_path/ACL/RLS, recuentos sin PII e historial;
+  comparar advisor de seguridad. No probar contrataciones escribiendo datos alojados;
+  evidencia crítica1315 SQL/33 E2E ya obtenida en entorno ficticio aislado.
+- **Autorización/estado:** solicitud explícita autoriza ejecución y commit/PR sin
+  firma/signoff/coautoría; next-env.d.ts ajeno excluido. Aplicación pendiente.
+- **Aplicado/verificado2026-10-28:** guard baseline, reemplazo y registro exacto
+  20261028104205/hiring_candidate_availability confirmados en una transacción.
+  MD5 cuerpo nuevo b82a56556b9a30fd708732b1dd7c6383 y SQL almacenado coinciden con
+  archivo revisado; ACL/search_path/SECURITY DEFINER/RLS preservados. Historial +1,
+  sin repair ni otras migraciones; recuentos de consentimiento/participación/
+  derivación sin cambios. Advisor60 WARN previos→60, cero nuevos/cero ERROR.
+  No se hicieron pruebas escribiendo datos de negocio alojados ni deploy manual.
+  Verificaciones locales previas vigentes, sin cambios posteriores de producto.
+  Pendiente publicar commit/PR y observar CI/revisión humana.
+
+## EXTRA-094 — CV en pestaña, métricas resumidas y disponibilidad al contratar
+
+- **Fecha/origen:** Mateo,2026-10-28, solicita los tres ajustes. PR80 mergeado
+  e864cfb confirmado antes de partir de main actualizado; rama
+  feat/cv-metrics-candidate-availability. next-env.d.ts ajeno preservado.
+- **Evidencia:** /api/cv envía attachment y tres vistas ofrecen descarga;
+  Dashboard muestra todos los conteos/desgloses/tiempos sin jerarquía; EXTRA035
+  retira consentimiento global al contratar, y perfil propio vuelve a mostrar
+  aceptación aunque ya esté aceptado (DB rechaza duplicados).
+- **Decisiones explícitas:** sustituir retiro automático por indisponibilidad;
+  conservar consentimiento, otras participaciones/permisos, y acceso de empresa
+  contratante hasta30 días. Una revocación previa nunca se reactiva. Seis tarjetas
+  (candidatos activos, empresas activas, ofertas publicadas, participaciones,
+  derivaciones, contrataciones); gráficos resultados/contrataciones por categoría;
+  detalle plegado y exportaciones completas. No aprobación legal para datos reales.
+- **Cambio necesario antes de código:** CV inline y enlaces nueva pestaña en todos
+  los roles manteniendo proxy autorizado; jerarquía/gráficos accesibles servidor;
+  reemplazar únicamente rama hired de transition_participation mediante migración
+  forward-only. Actualizar disponibilidad/status y auditar atómicamente con hire/
+  late_hire; sin modificar consentimiento ni otros casos. Solo aceptación pendiente/
+  retirada muestra formulario; aceptado se conserva, sin aceptación implícita.
+- **Contratos/archivos:** ruta CV y enlaces candidato/admin/empresa/preview;
+  dashboard/página métricas, perfil candidato, RPC transition_participation,
+  pruebas SQL/UI/servidor/E2E; spec/plan/modelo/estados/permisos/guía/recuperación.
+- **Riesgos:** ampliación autorizada de acceso poscontratación; exige frontera
+  exacta720h, cuenta/sesión/consentimiento/archivo vigentes y revocación terminal.
+  Historial previo permanece; sin backfill, restauración de permisos o consentimiento.
+  Abrir PDF depende de capacidad/preferencia del navegador; no se expone URL Storage.
+  Gráficos preservan cero/pendiente, filtros y no suman categorías solapadas.
+- **Verificación prevista:** SQL normal/tardía,720h/retiro manual/roles/rollback/
+  concurrencia/otros casos; enlaces/headers/denegaciones, aceptación única, gráficos
+  cero/null/móvil/teclado/axe; tipos/lint/unit/tooling/build y navegador ficticio
+  aislado. Sin migración alojada/despliegue/PR solicitados todavía.
+- **Estado:** requisitos y aclaraciones autorizados; diseño/gates e implementación
+  pendientes. Sin cambios de producto antes de registrar este alcance.
+- **Diseño/gate posterior:** spec/clarify→plan/modelo/contratos→checklist8/8→tareas
+  T227–232→análisis R1–R5: cobertura100%, cero críticos/altos. Constitución I–VI
+  preservada. Checklists históricos de revisión humana no se modifican ni se
+  declaran aprobados; pedido explícito autoriza este incremento independiente.
+- **Implementación verificada parcialmente:** migración20261028104205 aplicada
+  solo a funes-admin-cv-check; normal/tardía conservan consentimiento, disponibilidad
+  y ventana exacta720h/terminalidad.1315 SQL/25 archivos PASS;1257 unit/100 archivos,
+  tooling57, tipos/lint/build PASS. Advisor security local sin incidencias.
+- **Diagnósticos:** primera unidad focal tuvo4 expectativas antiguas y un error
+  de archivo temporal sandbox del runner; suite completa fuera de sandbox PASS.
+  Navegador detecta selector companies anterior, consentimiento form→region y
+  dependencia del visor PDF inexistente en headless shell. Se ajustan pruebas al
+  contrato real: popup creado, respuesta PDF inline autenticada y pestaña original
+  conservada; sin exigir URL de una extensión. Sin cambios de producto por esos
+  diagnósticos ni relajación de permisos/umbrales. Verificación de UI en curso.
+- **Resultado final:** treinta E2E pasan en la primera corrida; los tres recorridos
+  con expectativas de presentación anteriores se recuperan en la corrida final de
+  seis pruebas PASS (métricas/exportaciones, atención presencial y candidato).
+  Treinta y tres escenarios críticos afectados cubiertos, sin retries/omisiones;
+  no se declara corrida de toda la suite de navegador/CI ni benchmark alojado.
+ 1315 SQL y fixture500/50/100/1000 con500 PDF verificados. Resumen1440/390px
+  inspeccionado, axe0/teclado/plegado y exports completos PASS; nueva pestaña/
+  inline y origen conservado, consentimiento sin reaceptación, permisos/normal/
+  tardío/atomicidad/concurrencia bajo bloqueo candidato PASS. Tipos/lint finales
+  PASS; build/source sin cambios posteriores de producto, unit1257/tooling57 PASS.
+- **Revisión/convergencia:** R1–R5 implementados y trazados T227–232; cero brechas
+  nuevas del incremento. Revisión React: hooks estables, render condicional solo
+  del formulario, mensajes de éxito fuera de él, gráficos servidor sin paquetes
+  ni fetch cliente, foco/semántica/valores legibles. FR036/038/modelo/contratos y
+  reglas actuales alineados; decisiones anteriores quedan como histórico fechado.
+  Guía docs/operations/cv-metrics-availability.md. No cambios alojados/env/deps,
+  commit/PR/CI/revisión humana todavía. Rama anterior borrada local/remota después
+  de confirmar merge80; next-env.d.ts ajeno con hash original conservado.
+
 ## EXTRA-093 — Observar oferta activa en prueba de pausa del carrusel
 
 - **Origen/evidencia previa,2026-10-27 Funes:** Run40605431687/991365b pasa129 E2E

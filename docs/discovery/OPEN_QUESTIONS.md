@@ -17,6 +17,13 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ### OQ-020 — Retiro automático del consentimiento al contratar (2026-10-21)
 
+**Sustituida para el incremento EXTRA094,2026-10-28:** Mateo elige conservar el
+consentimiento y pasar disponibilidad a No disponible al confirmar contratación
+normal/tardía. Confirma acceso de empresa contratante por30 días solo si permiso
+sigue activo; nunca restaurar revocados. Otras participaciones y permisos intactos,
+retiro manual conserva efectos. Sin backfill ni aprobación legal para datos reales.
+Las decisiones siguientes se conservan como historial de alcance reemplazado.
+
 Actualización2026-10-25, EXTRA069: ante la imposibilidad de identificar a quién
 informar, Mateo confirma conservar el nombre también en toda derivación propia
 con acceso terminado (retiro/falta de respuesta/otro cierre), con empresa/cuenta

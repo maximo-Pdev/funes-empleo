@@ -31,7 +31,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
             <h3 className="text-lg font-semibold">Contactos vigentes</h3>
             {candidate.contacts.length ? <ul className="mt-2 list-disc pl-6">{candidate.contacts.map((contact, index) => <li key={`${contact.kind}-${index}`}><span className="font-medium">{contact.kind === "email" ? "Correo" : contact.kind === "phone" ? "Teléfono" : "Otro contacto"}:</span> {contact.value}</li>)}</ul> : <p>No hay contactos vigentes para mostrar.</p>}
           </div>
-          <Link href={`/api/cv/${candidate.cvDocumentId}`} className="inline-flex min-h-11 items-center rounded-md bg-blue-800 px-4 py-2 font-semibold text-white underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Descargar CV asociado a esta derivación</Link>
+          <Link href={`/api/cv/${candidate.cvDocumentId}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-md bg-blue-800 px-4 py-2 font-semibold text-white underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Abrir CV asociado a esta derivación en otra pestaña</Link>
           <p className="text-sm text-slate-700">El acceso puede revocarse en cualquier momento. Una copia ya descargada no puede retirarse técnicamente.</p>
           <div>
             <h3 className="text-lg font-semibold">Entrevistas registradas</h3>

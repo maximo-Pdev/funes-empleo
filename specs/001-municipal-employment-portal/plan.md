@@ -1,5 +1,40 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA094 — Diseño2026-10-28, precedencia sobre EXTRA035
+
+R1: proxy GET CV mantiene sesión/RPC/Storage RLS/no-store/nosniff/refs; cambiar
+solo Content-Disposition a inline y enlaces target=_blank/rel=noopener noreferrer.
+No signed URLs ni rutas nuevas. El visor/configuración del navegador decide soporte.
+
+R2: Dashboard sigue Server Component. Seis tarjetas seleccionadas por indicador
+exacto, no sumas de categorías. Gráficos de barras estáticos con valores/etiquetas
+HTML y barra decorativa, usando tokens municipales; cero/null/ausencia explícitos.
+Sin Recharts/isla cliente: registro oficial chart consultado exige nueva dependencia
+para interacción no solicitada, innecesaria para estas dos distribuciones estáticas.
+No crear imitación de ChartContainer; reutilizar layout/Card donde corresponda.
+Detalle anterior y definiciones en details/summary nativos; exportadores intactos.
+
+R3/R5: migración aditiva reemplaza cuerpo transition_participation conservando
+firma/grants/guard/evidencia/locks y demás ramas. Hire/late_hire: availability
+unavailable; status active→unavailable, otros status preservados; audit
+availability_changed con actor/causa hired y decisión privada. No tocar consents.
+Si derivación propia sigue active y demás condiciones siguen vigentes, fijar
+post_hire_access_until=now_at+720h; jamás activar revoked. Helpers/cron existentes
+ya deniegan en frontera y materializan expiración. Otras derivaciones intactas.
+Mantener bloqueo candidato antes de participación; rollback si falla auditoría.
+Sin backfill, schema/índices/proveedores nuevos. Historial hiring_workflow previo
+permanece legible. Recuperación forward-only, nunca reconsentir/restaurar permisos.
+
+R4: perfil presenta explicación/estado siempre; formulario afirmativo solo si
+último evento no accepted. DB ya impide dos aceptaciones consecutivas. Retiro
+manual y nuevo consentimiento explícito siguen existentes; no ampliar UI de retiro.
+Texto explica indisponibilidad,720h y conservación sin reponer permisos. Guardar
+disponibilidad available sigue su activación vigente; hire no reactiva perfil.
+
+Constitución I–VI: decisión humana explícita sustituye EXTRA035, no norma municipal;
+misma intermediación/RLS/stack/historia. Tipos/lint/unit/tooling/build/SQL y E2E
+críticos aislados, responsive/axe/teclado y matriz de referencias/autorización.
+
 EXTRA091: referenceUrl reconstruye query únicamente al cambiar un identificador;
 no normalizar '+'/%20 de referencias ya opacas. La canonización debe ser idempotente
 y no provocar redirección por representaciones equivalentes de espacios. Guards,
@@ -386,8 +421,8 @@ confirma los resultados finales. Las empresas nunca acceden al padrón general y
 laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
 Ese acceso se calcula en cada lectura: se revoca ante retiro de postulación o consentimiento, no
 selección, cancelación o falta de respuesta; una nueva contratación normal/tardía
-retira el consentimiento global y revoca todos los permisos atómicamente, sin
-alterar otros casos. Solo permisos históricos anteriores conservan el límite de720 horas. Esta
+cambia disponibilidad atómicamente y conserva consentimiento, sin
+alterar otros casos/permisos. El permiso propio active conserva720h desde confirmar. Esta
 ventana de consulta no decide la retención de registros pendiente en OQ-001.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
@@ -479,7 +514,7 @@ alojado sin solicitud posterior. Recuperar con migración correctiva, no reactiv
 autoarchivo o permisos automáticamente. Gates acotados conservan arquitectura y
 constitución; OQ-001/002 y revisión humana siguen pendientes.
 
-### EXTRA035 — retiro global por contratación, autorización2026-10-21
+### Histórico EXTRA035 — sustituido por EXTRA0942026-10-28
 
 Mantener RPC `transition_participation` y su firma/grants: `hire` y `late_hire`
 comparten la rama de resultado. Bloqueo candidato FOR UPDATE antes de participación/

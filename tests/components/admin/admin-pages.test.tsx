@@ -128,7 +128,7 @@ it("muestra ausencia de CV sin carga, descarga o nominación desde perfil", asyn
  expect(screen.getByText("El candidato no tiene un CV vigente.")).toBeTruthy();
  expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
  expect(screen.queryByRole("button", { name: "Cargar CV" })).toBeNull();
- expect(screen.queryByRole("link", { name: "Descargar CV vigente" })).toBeNull();
+ expect(screen.queryByRole("link", { name: "Abrir CV vigente en otra pestaña" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Nominar a una oferta" })).toBeNull();
  expect(screen.queryByRole("button", { name: "Crear nominación" })).toBeNull();
  expect(mocks.nominations).not.toHaveBeenCalled();
@@ -137,7 +137,7 @@ it("muestra metadatos y descarga del CV vigente por referencia, sin formulario",
  mocks.candidate.mockResolvedValue({ candidate, currentCv: { id, original_name_safe: "cv-ficticio.pdf", byte_size: 2048 }, referralEligible: true, participations: [], notes: [], audit: [] });
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(screen.getByText("cv-ficticio.pdf")).toBeTruthy();
- expect(screen.getByRole("link", { name: "Descargar CV vigente" }).getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", id)}`);
+ expect(screen.getByRole("link", { name: "Abrir CV vigente en otra pestaña" }).getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", id)}`);
  expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
 });
 it.each([
@@ -278,7 +278,7 @@ it.each(["active", "suspended", "pending_verification", "archived"])("el asistid
  render(await Candidate(props));
  expect(within(screen.getByRole("main")).getAllByRole("button").map(element => element.textContent)).toEqual(controls);
  expect(within(screen.getByRole("main")).getAllByRole("heading").map(element => element.textContent).sort()).toEqual([...headings].sort());
- expect(screen.getByRole("link", { name: "Descargar CV vigente" })).toBeTruthy();
+ expect(screen.getByRole("link", { name: "Abrir CV vigente en otra pestaña" })).toBeTruthy();
  expect(mocks.assisted).not.toHaveBeenCalled();
 });
 

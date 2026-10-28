@@ -259,12 +259,9 @@ El consentimiento vigente es el último evento aceptado no seguido por retiro. S
 nuevas derivaciones y tratamientos que dependan de él, cierra como `withdrawn` con motivo
 `consent_withdrawn` todas las participaciones aún no finales y revoca en la misma transacción el
 acceso de todas las derivaciones vigentes, sin borrar historia legítima ni alterar resultados ya
-finales. Excepción EXTRA035: el retiro global automático por contratación normal/
-tardía revoca todos los permisos, pero conserva estados de otros casos y resultados.
-Se registra por el admin confirmante como hiring_workflow, copiando política/hash
-del aceptado anterior, con fecha posterior y motivo hired en auditoría enlazada
-a una decisión privada de la participación. Perfil consent_withdrawn salvo archivado;
-versión actualizada. Sin backfill de contrataciones históricas. Una aceptación
+finales. EXTRA094: contratar no escribe ningún consentimiento; cambia disponibilidad
+atómicamente. Los retiros hiring_workflow de EXTRA035 se conservan como historial
+legado, sin backfill ni reaceptación. Una aceptación
 posterior no reactiva automáticamente participaciones ni derivaciones.
 
 ### `cv_documents`
@@ -434,7 +431,7 @@ Todo contenido es interno. Puede haber varias instancias y el historial no se so
 | `access_status` | `active` permite la proyección empresarial solo si también se cumple el plazo poscontratación; `revoked` la deniega de forma persistente; `expired_by_policy` queda reservado a OQ-001. |
 | `consent_event_id`, `cv_document_id` | Evidencia vigente al derivar. |
 | `feedback_due_at` | Exactamente 30 días desde `referred_at`. |
-| `post_hire_access_until` | Solo histórico: antes de EXTRA035 se fijaba a confirmación administrativa +720 horas si el permiso seguía activo. Nuevas contrataciones no lo fijan ni lo reinician; revocan los permisos por retiro global. |
+| `post_hire_access_until` | Confirmación administrativa +720 horas solo si el permiso propio sigue active y autorizado (EXTRA094). Nunca restaura revoked; límite estricto aun antes de Cron. |
 | `access_changed_at` | Fecha del último cambio de autorización. |
 | `access_changed_actor_type` | `account` o `system`; coherente con el evento que cambió el acceso. |
 | `access_changed_by_account_id` | Cuenta responsable; nula únicamente para actor `system`. |
@@ -677,9 +674,9 @@ no_company_response -> hired | not_selected | cancelled (admin, respuesta tardí
   acceso a la empresa.
 - `hired`, `not_selected`, `withdrawn`, `cancelled` y `no_company_response` son finales para la vista
   del candidato. El override de respuesta tardía conserva el evento anterior.
-- Confirmar `hired` normal/tardío retira el consentimiento global y revoca todos los permisos
-  activos del candidato en la misma transacción, conservando los demás casos. Para permisos
-  históricos anteriores a EXTRA035, la autorización deniega nuevas lecturas desde
+- Confirmar `hired` normal/tardío cambia disponibilidad a unavailable y conserva consentimiento
+  y demás casos/permisos. Solo el permiso propio todavía activo recibe ventana720h.
+  La autorización deniega nuevas lecturas desde
   `post_hire_access_until` aunque la materialización del estado ocurra después; el vencimiento
   pasa el permiso a `revoked` y conserva historia.
   `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo cambian a `revoked` dentro de la
@@ -715,3 +712,13 @@ no_company_response -> hired | not_selected | cancelled (admin, respuesta tardí
 - Secret/system: solo funciones acotadas, nunca navegador.
 
 La matriz completa está en [contracts/authorization-matrix.md](./contracts/authorization-matrix.md).
+# Override EXTRA094,2026-10-28
+
+Para confirmaciones posteriores a esta migración, reemplaza retiro automático
+EXTRA035: candidate_consents no cambia; candidate_profiles.availability pasa a
+unavailable y status active a unavailable, conservando otros estados y vigencia.
+Auditoría availability_changed con admin/fecha/motivo hired. No nuevos campos.
+referrals.post_hire_access_until fija confirmación+720h solo en permiso propio
+previamente active y autorizado; revoked sigue terminal. Otras derivaciones y
+participaciones no cambian. Historial previo permanece sin backfill/reconsentir.
+Se conserva source hiring_workflow únicamente como historial legado.

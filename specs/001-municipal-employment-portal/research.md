@@ -568,3 +568,23 @@ y evitar calentamiento reduce variaciones no atribuibles al producto.
 entornos variables, hacer que cada persona pruebe roles ajenos, usar una sola ejecución por tarea,
 medir solo a los desarrolladores, reemplazar usuarios por E2E o usar únicamente axe fueron
 descartadas porque reducen comparabilidad o no validan usabilidad real y accesibilidad completa.
+# Investigación EXTRA094 —2026-10-28
+
+- MDN Content-Disposition: inline permite visor; attachment fuerza descarga.
+  target=_blank debe existir en todos los enlaces, manteniendo ruta autenticada.
+  https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Disposition
+- shadcn Base Chart/registro base-nova consultados: requieren Recharts3.8.0 y
+  cliente; para barras estáticas se elige HTML servidor con texto y tokens,
+  sin dependencia ni reemplazo de controles compartidos.
+  https://ui.shadcn.com/docs/components/base/chart
+- Supabase changelog oficial consultado: TLS CBC/upgrade Postgres son cambios
+  ambientales ajenos a este reemplazo de función; no se alteran SDK/config/roles.
+  Guías oficiales security y función existentes mantienen search_path vacío,
+  sesión/actor activo/locks. No DML directo de cliente o service_role nuevo.
+- private.can_read_candidate y company_cv_info ya validan ventana720h estricta,
+  consentimiento/cuentas/archivo. Restaurar solo asignación de fecha en rama
+  contratada active, sin volver a habilitar ningún permiso revocado.
+- change_candidate_consent ya rechaza aceptaciones consecutivas; no necesita
+  modificar RPC/grants para ocultar el formulario una vez aceptado.
+- Supabase/Postgres: bloqueo candidato existente serializa consentimiento/nominación
+  con contratar; no añadir trigger o segundo request que rompa atomicidad.

@@ -103,30 +103,34 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
         <AttachmentContent><AttachmentTitle title={cv.original_name_safe}>{cv.original_name_safe}</AttachmentTitle>
           <AttachmentDescription>CV vigente · PDF · {new Intl.NumberFormat("es-AR").format(cv.byte_size)} bytes</AttachmentDescription>
         </AttachmentContent>
-        <AttachmentActions><a className={styles.download} href={`/api/cv/${cvReference}`}>Descargar mi CV</a></AttachmentActions>
+        <AttachmentActions><a className={styles.download} href={`/api/cv/${cvReference}`} target="_blank" rel="noopener noreferrer">Abrir mi CV en otra pestaña</a></AttachmentActions>
       </Attachment> : <Empty className={styles.empty}><EmptyHeader><EmptyMedia variant="icon"><FileText aria-hidden="true" /></EmptyMedia>
         <EmptyTitle>Todavía no hay un CV vigente.</EmptyTitle><EmptyDescription>Cargá un PDF válido para completar este requisito del perfil.</EmptyDescription>
       </EmptyHeader></Empty>}
       {cvMessage && <p role={cvMessage === "ok" ? "status" : "alert"}>{cvMessage === "ok" ? "CV guardado." : cvMessage === "conflict" ? "El perfil cambió. Recargá antes de reemplazar el CV." : "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente."}</p>}
       <CvUploadForm candidateId={profile.id} version={profile.version} returnTo={cvReturnTo} />
     </section>
-    <Form action={consentAction} result={consentState} className={styles.section} aria-busy={changingConsent}>
+    <section className={styles.section} aria-label="Consentimiento de prueba">
       <h2 className="text-xl font-semibold">Consentimiento de prueba</h2>
       <p>Al aceptar, autorizás a la Oficina de Empleo a registrar y usar tus datos para acompañar tu búsqueda laboral y gestionar futuras derivaciones. Es un consentimiento general, no una aceptación por cada oferta.</p>
-      <p>Si la Oficina confirma una contratación en una de tus participaciones, tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas que dependan de él. No se cambian tus otras participaciones ni sus resultados y se conserva el historial.</p>
+      <p>Si la Oficina confirma una contratación, tu disponibilidad cambia a «No disponible» y no se realizan nuevas derivaciones mientras sigas en ese estado. Tu consentimiento se conserva: no tenés que aceptarlo de nuevo por cada oferta ni por una contratación. Tus otras participaciones y su historial no cambian.</p>
       <details className={styles.group}>
         <summary className={styles.policySummary}>Más información</summary>
         <div className="mt-3 space-y-3">
           <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
           <p>Las empresas a las que la Oficina ya te haya derivado podrán seguir viendo únicamente tu nombre para identificar esas derivaciones e informar sus resultados, incluso cuando termine el permiso. Esto no les devuelve acceso a tu perfil, contactos, foto ni CV.</p>
-          <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
+          <p>La empresa que te contrata conserva el acceso autorizado durante 30 días desde que la Oficina confirma la contratación, siempre que el permiso siga vigente. Los permisos de otras derivaciones mantienen sus condiciones. Una contratación tardía o una corrección no devuelve accesos revocados.</p>
+          <p>Si retiraste el consentimiento, para otorgarlo de nuevo tenés que aceptarlo expresamente desde este formulario. Esa aceptación no reabre participaciones ni devuelve accesos revocados.</p>
         </div>
       </details>
       <p>Estado actual: {consent?.status === "accepted" ? "aceptado" : consent?.status === "withdrawn" ? "retirado" : "pendiente"}.</p>
+      <ActionMessage state={consentState} />
+      {consent?.status === "accepted" ? <p role="status">Ya aceptaste el consentimiento. No necesitás volver a aceptarlo mientras siga vigente.</p> : <Form action={consentAction} result={consentState} className="grid gap-3" aria-busy={changingConsent}>
       <input type="hidden" name="version" value={profile.version} />
       <input type="hidden" name="status" value="accepted" />
       <Field className={styles.choice}><input type="checkbox" name="confirmed" required />Confirmo esta decisión y entiendo sus efectos.</Field>
-      <ActionMessage state={consentState} /><Button type="submit" disabled={changingConsent}>Guardar consentimiento</Button>
-    </Form>
+      <Button type="submit" disabled={changingConsent}>Guardar consentimiento</Button>
+      </Form>}
+    </section>
   </div>;
 }
