@@ -33,6 +33,11 @@
   No se hicieron pruebas escribiendo datos de negocio alojados ni deploy manual.
   Verificaciones locales previas vigentes, sin cambios posteriores de producto.
   Pendiente publicar commit/PR y observar CI/revisión humana.
+- **Publicación solicitada:** implementación77c41b5 sin firma/signoff/coautoría,
+  [PR81](https://github.com/maximo-Pdev/funes-empleo/pull/81) abierto hacia main,
+  sin borrador y adjunto a la conversación. Incluye EXTRA094/095 y migración ya
+  aplicada. next-env.d.ts y recibos privados ignorados excluidos. CI/revisión/merge
+  pendientes; no se afirma despliegue de interfaz por haber aplicado la función.
 
 ## EXTRA-094 — CV en pestaña, métricas resumidas y disponibilidad al contratar
 

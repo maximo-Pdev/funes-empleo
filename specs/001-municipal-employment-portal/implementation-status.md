@@ -1621,3 +1621,8 @@ recuentos de negocio intactos; historial +1. Advisor60 WARN previos sin nuevos,
 cero ERROR. No contratación real/backfill/deploy manual ni restauración de permisos.
 Publicación de commit/PR y sus checks pendientes en este punto; pruebas locales
 de EXTRA094 siguen válidas, no hubo nuevos cambios de producto.
+
+Publicación posterior autorizada: implementación77c41b5 sin firma/signoff/coautoría
+y PR81 abierto hacia main, sin borrador, adjunto a la conversación. Evidencia de
+migración alojada en EXTRA095; CI/revisión/merge aún pendientes. next-env.d.ts
+ajeno y test-results/credenciales excluidos. No despliegue manual de UI.
