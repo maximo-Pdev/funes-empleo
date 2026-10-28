@@ -40,6 +40,11 @@
   anónimos nuevos. [Detalle del aviso](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable).
   Recibos y definiciones previas guardados localmente en test-results ignorado.
   Pendiente publicar commit/PR y CI/revisión humana; no afirmar merge o deploy UI.
+- **Publicación solicitada:** implementación8c0ef6f sin firma/signoff/coautoría y
+  [PR82](https://github.com/maximo-Pdev/funes-empleo/pull/82) abierto hacia main,
+  sin borrador, adjunto a la conversación. Migración alojada verificada antes del
+  PR. next-env.d.ts ajeno y recibos privados excluidos. Checks/revisión/merge aún
+  pendientes; el despliegue UI depende del flujo habitual del proyecto.
 
 ## EXTRA-096 — CV específico de postulación y entrada PDF/JPG/PNG
 

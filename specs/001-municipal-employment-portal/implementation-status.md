@@ -39,6 +39,10 @@ Advisor60→63 WARN solo por los tres RPC autenticados previstos,0 ERROR; ningun
 exposición nueva a anon ni cambios en datos alojados. Ofertas/filtros públicos
 conservan formato. Publicación del PR y sus checks pendientes; no afirmar deploy UI.
 
+Publicado después: implementación8c0ef6f sin firma/signoff/coautoría y PR82 abierto
+hacia main, sin borrador, adjunto a la conversación. Migración compartida aplicada
+antes de publicar; next-env.d.ts preservado/excluido. CI/revisión/merge pendientes.
+
 **Estado vigente: ver EXTRA096 arriba y las actualizaciones históricas al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
