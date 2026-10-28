@@ -22,7 +22,7 @@ for (const role of ["candidate", "company", "admin"] as const) {
         await expect(page.locator("h1").first()).toBeVisible();
         await expect(page.getByRole("heading", { name: "Ocurrió un problema", exact: true })).toHaveCount(0);
         expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} debe respetar el ancho ${viewport.width}`).toBe(true);
         await page.keyboard.press("Tab");
         expect(await page.evaluate(() => document.activeElement !== document.body)).toBe(true);
       }

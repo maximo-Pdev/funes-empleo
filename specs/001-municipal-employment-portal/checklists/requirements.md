@@ -1,5 +1,10 @@
 # Specification Quality Checklist: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA085: calidad revisada en incremento P1–P4 antes de implementar: objetivos,
+límites, formatos/scroll confirmados, autorización/CSV compatibilidad, controles
+cliente necesarios, datos/refs/estados y verificación definidos. No resuelve
+OQ005 ni aprobación municipal. No cambia marcas de aceptación humana histórica.
+
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-19
 **Feature**: [spec.md](../spec.md)

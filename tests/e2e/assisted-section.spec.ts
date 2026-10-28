@@ -39,15 +39,18 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
     await page.getByLabel("Localidad laboral", { exact: true }).fill("Funes");
     await page.getByLabel("Habilidades y experiencia", { exact: true }).fill("Experiencia presencial ficticia");
-    await page.getByLabel("Categorías laborales").click();
+    await page.getByRole("combobox", { name: "Categorías laborales", exact: true }).click();
     await page.getByRole("option", { name: number === 1 ? "Categoría ficticia A" : "Categoría ficticia B" }).click();
+    await page.keyboard.press("Escape");
     const acceptance = page.getByLabel(/Confirmo que la persona leyó y aceptó/);
     await expect(acceptance).not.toBeChecked();
     await acceptance.check();
     await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
     await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
     if (number === 1) firstReference = new URL(page.url()).pathname.split("/").pop()!;
-    await page.getByRole("link", { name: "Volver a atención presencial", exact: true }).click();
+    const back = page.getByRole("link", { name: "Volver a perfil asistido", exact: true });
+    await expect(back).toHaveAttribute("href", "/admin/atencion-presencial");
+    await back.click();
   }
   await page.goto(`/admin/atencion-presencial?term=${encodeURIComponent(name)}&pageSize=1`);
   const results = page.getByRole("region", { name: "Perfiles de atención presencial" });
@@ -59,6 +62,7 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await expect(results.getByRole("link", { name: `${name} 2`, exact: true })).toBeVisible();
   await page.getByLabel("Categorías", { exact: true }).click();
   await page.getByRole("option", { name: "Categoría ficticia A" }).click();
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page).toHaveURL(/categoryId=rub-[0-9a-f]{24}/);
   await expect(results.getByRole("heading", { name: "Perfiles: 1", exact: true })).toBeVisible();

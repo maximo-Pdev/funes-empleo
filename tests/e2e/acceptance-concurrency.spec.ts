@@ -26,9 +26,16 @@ test("SC-008A: cuatro admins locales, barrera común, cuatro mutaciones y audito
   const measured = spawnSync(process.execPath, ["tests/quality/demo-performance.mjs", "concurrent-admins", resetId, "dpl_localAcceptance"], {
     env: { ...process.env, APP_ENV: "local" }, encoding: "utf8", timeout: measurementTimeout, maxBuffer: 1024 * 1024,
   });
-  expect(measured.status, "Las cuatro acciones deben confirmar éxito visible en hasta cinco segundos cada una").toBe(0);
-  const receipt = JSON.parse(measured.stdout) as { dataset: string; acceptanceBenchmark: boolean; pass: boolean;
+  expect((measured.error as NodeJS.ErrnoException | undefined)?.code ?? null, "La medición debe finalizar dentro de su presupuesto").toBeNull();
+  let parsed: unknown;
+  try { parsed = JSON.parse(measured.stdout); }
+  catch { throw new Error("La medición local no devolvió un recibo JSON válido."); }
+  const receipt = parsed as { dataset: string; acceptanceBenchmark: boolean; pass: boolean;
     concurrentResults: { admin: number; milliseconds: number; startOffset: number; pass: boolean }[] };
+  const safeTimings = Array.isArray(receipt?.concurrentResults) ? receipt.concurrentResults
+    .filter(r => Number.isInteger(r.admin) && r.admin >= 1 && r.admin <= 4 && Number.isFinite(r.milliseconds))
+    .map(r => `admin ${r.admin}: ${r.pass === true ? "PASS" : "FAIL"} ${Math.round(r.milliseconds)}ms`).join("; ") : "sin tiempos válidos";
+  expect(measured.status, `Las cuatro acciones deben confirmar éxito visible en hasta cinco segundos cada una (${safeTimings})`).toBe(0);
   expect(receipt.dataset).toBe("acceptance");
   expect(receipt.acceptanceBenchmark).toBe(true);
   expect(receipt.pass).toBe(true);

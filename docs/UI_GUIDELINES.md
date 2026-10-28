@@ -1,5 +1,37 @@
 # Municipal visual reference
 
+## Portal follow-ups — EXTRA085
+
+EXTRA090: name both popup and list of every combobox for its field (categories,
+locality and offer options), including open/closing states. Reuse the adapted
+Base primitives and their ARIA props. Multiple selection stays open until Escape
+or dismissal; tests should operate the visible combobox by role and close it
+before acting on controls it covers. Keep native auxiliary validation inputs.
+
+EXTRA089: the candidate-search locality wrapper is positioned relative so its
+visually hidden native FormData/validation input stays within the field under
+administrative full-width input rules. Preserve native validation and combobox
+focus; do not hide page overflow or relax viewport/accessibility checks.
+
+EXTRA088: Home shows the ten newest eligible offers by publication date. Keep the
+3D/mobile carousel with circular neighbors and previous/next navigation: last and
+penultimate left of first, first and second right of last. Mobile uses Embla loop
+with its fallback for insufficient slides. Candidate preview dialogs lock background
+scrolling while keeping internal scrolling, Escape and focus restoration.
+
+EXTRA087 supersedes EXTRA086: advance every three seconds on desktop and mobile,
+then return to the first offer. Keep only previous/next buttons (circular EXTRA088);
+remove Pausar/Reanudar. Mouse hover and focus pause only while interacting;
+leaving resumes automatically. Reduced-motion disables autoplay and hidden tabs
+do not advance. Use pointer-type-aware hover to avoid permanent touch hover.
+
+Search forms are composed on the server with native GET names and opaque category
+references. Keep shared validation and combobox interaction as narrow client
+islands. Candidate locality is optional; matching order applies with an explicit
+“Aplicar orden” submit and resets pagination. Metrics offers separate filtered PDF
+and Excel downloads using existing institutional colors and local PDF fonts.
+See `docs/implementation/portal-filters-audit.md` for the surface inventory.
+
 ## PR 78 validation and matching corrections — EXTRA-084
 
 Company Localidad remains a required catalog combobox. Its validation participates
@@ -20,7 +52,7 @@ Replace the former role-guide cards with “El portal en números”: Postulante
 registrados, Empresas registradas and Ofertas vigentes. Use three balanced cards
 on desktop and a single column below 768px, the existing institutional tokens,
 Sora numbers, Be Vietnam labels and decorative Lucide icons. Counts come from
-`public_portal_counts`, never constants or the twelve-card carousel limit.
+`public_portal_counts`, never constants or the ten-card carousel limit (EXTRA088).
 Count nonarchived profiles, including assisted/imported, incomplete and suspended
 registrations; count offers through the same public eligibility view as the catalog.
 Render genuine zero as zero; render unavailable totals as an em dash with an

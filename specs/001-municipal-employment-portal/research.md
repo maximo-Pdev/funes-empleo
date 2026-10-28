@@ -1,5 +1,47 @@
 # Investigación técnica: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA088: distancia circular centrada preserva el coverflow3D y vecinos sin
+duplicar tarjetas; módulo en flechas cruza ambos extremos. Home pide10 antes
+de renderizar, conservando orden published_at/ID DESC de RPC. Embla8.6.0 soporta
+loop:true y fallback cuando no puede llenar viewport; ver fuente oficial
+https://github.com/davidjerleke/embla-carousel/blob/v8.6.0/packages/embla-carousel/src/components/EmblaCarousel.ts
+y Options.ts. Sin nueva dependencia, datos/SQL ni alteración de filtros públicos.
+
+EXTRA087 sustituye la decisión de control de EXTRA086: pedido explícito de Mateo
+de avanzar3s y retirar Pausar/Reanudar. Intervalo/aplicación Embla sin cambios
+arquitectónicos; se elimina pausa manual y toda pausa permanente dependiente de
+ese botón. Hover/foco temporales se restablecen al salir, conservando preferencias
+de movimiento y visibilidad. No nuevo componente/dependencia/contrato de datos.
+
+EXTRA086: no se necesita plugin adicional de autoplay: el estado desktop y API
+Embla existentes permiten avance5s/reinicio con intervalo y cleanup React. Button
+adaptado controla pausa; distinguir puntero mouse/touch evita hover persistente.
+Conservar intención del control de rotación desde pointerdown hasta click, porque
+el foco puede pausar entre ambos; teclado usa estado actualizado. Reduced-motion
+pausa por defecto. Patrón oficial consultado:
+https://www.w3.org/WAI/ARIA/apg/patterns/carousel/ . Sin contrato SQL/API nuevo.
+
+## EXTRA085 — Investigación 2026-10-27
+
+Lectura delegada fase0: portal_filter_audit confirma todas las consultas servidor;
+solo formulario candidato y selector matching construyen navegación cliente.
+Decisión GET/composición servidor + islas necesarias, sin quitar combobox PR78.
+metrics_export_research verifica write-excel-file4.1.1 (tipos propios/fflate,
+API toBuffer) y PDFKit0.20.2 (TTF/paginación/MIT), @types/pdfkit0.17.6 con API
+estable. Preferidos sobre ExcelJS más amplio y pdf-lib con layout manual.
+Instalación/audit/build deben confirmar compatibilidad; no asumirla del research.
+Verificación posterior: instalación/build Node24 PASS, PDF/XLSX descargados desde
+producción local y leídos independientemente; tracing de fuentes comprobado.
+Audit actual y baseline coinciden en siete avisos previos, sin avisos nuevos.
+Fuentes: https://github.com/catamphetamine/write-excel-file ;
+https://pdfkit.org/docs/text.html ;
+https://github.com/foliojs/pdfkit/blob/v0.20.2/CHANGELOG.md ;
+https://nextjs.org/docs/app/api-reference/config/next-config-js/serverExternalPackages ;
+https://nextjs.org/docs/app/api-reference/config/next-config-js/output ;
+https://nextjs.org/docs/app/getting-started/server-and-client-components .
+Fuentes oficiales Button/Combobox/NativeSelect base-nova y changelog Supabase
+consultados; sin cambios SQL/API requeridos. Reciente significa published_at.
+
 **Fecha**: 2026-09-19  
 **Alcance**: decisiones necesarias para completar el plan técnico; no modifica requisitos de producto.
 

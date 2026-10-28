@@ -1,5 +1,381 @@
 # Cambios extra necesarios
 
+## EXTRA-093 — Observar oferta activa en prueba de pausa del carrusel
+
+- **Origen/evidencia previa,2026-10-27 Funes:** Run40605431687/991365b pasa129 E2E
+  y falla solo pausa móvil: espera translate3d -229.96px y recibe -230px. Son0.04px
+  de asentamiento de la misma transición, sin cambio de oferta. El fallo impide
+  ejecutar el control concurrente posterior, ya verificado localmente en EXTRA092.
+- **Cambio mínimo antes de código:** medir en móvil el índice de la tarjeta cuya
+  parte superior está más cerca del viewport del carrusel. Verificar que ese índice
+  no cambia durante hover y sí cambia tras salir; desktop mantiene distancia entera
+  de la tarjeta. Controla la oferta visible y tolera física subpíxel de Embla sin
+  redondeo arbitrario, ocultar bugs de navegación o modificar producto.
+- **Archivos/riesgos/contratos:** solo portal-filters.spec.ts y trazabilidad. Sin
+  cambios de app, duración3s, preferencias, contratos o infraestructura. Riesgo de
+  selector geométrico incorrecto: repetir desktop/móvil y comprobar auto/pausa/
+  reanudación con igual umbral de tiempo, sin retries ni rebajar aserciones de
+  oferta. Sin nuevo requisito de negocio/arquitectura; autorizado por recuperación
+  de CI del mismo PR80. Verificación prevista: repetición focal, tipos/lint/CI.
+- **Resultado:** seis E2E PASS (tres repeticiones por ancho1440/390), sin retries;
+  autoavance/pausa/reanudación y límites originales preservados. Tipos/lint/diff
+  PASS. Solo prueba/documentación; build de producto ya verificado sin cambios.
+  T226 implementado; publicación sin firma en PR80, CI/revisión humana pendientes.
+
+## EXTRA-092 — Recuperar observación de éxito en SC-008A
+
+- **Origen/evidencia previa,2026-10-27:** Run40601364799/efbf768 pasa130 E2E y
+  falla solo aceptación concurrente; database y Vercel PASS. demo-performance.mjs
+  busca «Estado: Publicada» y «Resultado o estado vigente: Preseleccionada/Persona
+  contratada». La UI aprobada renderiza esas etiquetas como texto + Badge sin ':',
+  confirmado en página administrativa de oferta y ParticipationTimeline. El wrapper
+  comprueba exit status antes de leer recibo, ocultando cuál de cuatro acciones falla.
+- **Cambio mínimo propuesto:** observar badge Publicada dentro de región Oferta y
+  empresa, y badge de estado dentro del status «Resultado o estado vigente» para
+  preselección/contratación. Contacto conserva su texto único. No cambiar acciones,
+  reloj/barrier, cuatro cuentas,5s, fixture frío ni comprobaciones SQL de integridad.
+  Adaptar test de inventario español que aún obliga la cadena antigua. Mostrar
+  solo admin/PASS-FAIL/milisegundos numéricos del recibo en error, nunca stdout/
+  stderr crudos, claves o datos de formularios.
+- **Archivos/contratos/riesgos:** helper de medición, aceptación E2E, inventario
+  tooling, tareas/estado. Solo sonda de prueba acorde a UI; sin cambio funcional,
+  presupuesto de latencia, SQL/RLS, dependencias o configuración. Riesgo de aceptar
+  historial en lugar de estado actual: scope estricto de región/status y Badge.
+- **Verificación prevista:** reset único en Supabase ficticio propio aislado,
+  prueba real de cuatro acciones/actores/auditorías sin omisiones; tooling,
+  tipos/lint y nuevo CI completo. Preservar entorno habitual y next-env.d.ts.
+  Autorizado por recuperación de PR80; sin decisión de negocio/arquitectura nueva.
+  Implementación y verificación pendientes.
+- **Resultado:** sondas de texto exacto dentro de región/status vigentes, sin
+  depender de ':' ni atributos del Badge no declarados. Primera verificación
+  local detectó una suposición incorrecta de data-slot: SQL confirmó las cuatro
+  mutaciones efectivas, solo fallaba observarlas. Corregida la sonda y repetido
+  reset frío propio: SC-008A PASS, cuatro resultados <=5000ms, barrera común,
+  actores1–4 y todas las versiones/auditorías SQL verdaderas. No se alteraron
+  presupuesto, fixture, acciones o condiciones para pasar.
+- **Verificado:**2 inventarios,57 tooling, tipos/lint/diff PASS; app sin cambios
+  respecto a efbf768 que ya pasó130 E2E. Control frío local final PASS (2.9min,
+  preparación fuera del reloj de acciones). Se hicieron dos resets únicamente del
+  proyecto ficticio funes-admin-cv-check por la corrección intermedia de sonda;
+  entorno habitual intacto. Recibo de fallo ahora expone solo números/admin/
+  PASS-FAIL permitidos, nunca salida cruda. T225 implementado; publicación sin
+  firma en PR80, nueva CI/revisión humana pendientes; escenarios alojados del
+  helper no ejecutados ni ampliados.
+
+## EXTRA-091 — Evitar redirecciones de filtros con espacios y referencias opacas
+
+- **Origen/evidencia previa,2026-10-27:** recuperación autorizada PR80. Al liberar
+  los menús de EXTRA090, dos recorridos quedan en «Cargando gestión municipal» y
+  repiten la misma URL con term='Persona ficticia 001' o nombre presencial +
+  categoryId opaco. canonicalReferenceRoute construye espacios como '+', mientras
+  referenceUrl reconstruye todos los parámetros como '%20' aun sin convertir un
+  UUID. Cada petición vuelve a redirigir por comparación de cadenas equivalente.
+- **Cambio mínimo propuesto:** en referenceUrl omitir reconstrucción del query
+  cuando los valores del campo no cambiaron tras conversión. Solo reescribir cuando
+  se sustituye realmente UUID por referencia. Mantener orden/repeticiones/encoding
+  original de URLs ya opacas. No tocar filtros, validación, guards ni resolución.
+- **Contratos/archivos:** helper reference-url.ts, regresiones unitarias de
+  idempotencia/espacios/+ y referencia legada, recorridos de búsqueda con espacios,
+  artefacto de referencias/plan/tareas/estado. Sin SQL/auth/estados/dependencias.
+- **Riesgos/verificación:** canonicalización de campos múltiples y referencias
+  repetidas, legados y datos codificados. Probar RED del bucle y GREEN sin redirect
+  espurio/ni RPC extra; conservar tests privados/autorización/UUID, ejecutar dos
+  búsquedas completas y seis flujos previos, tipos/lint/build y CI. No aumentar
+  timeouts ni ocultar estados de carga para sortear el fallo.
+- **Estado:** requisito técnico necesario de filtros GET/referencias aprobados,
+  autorizado por recuperación PR80; análisis focal sin cambio arquitectónico o de
+  negocio. Implementación/verificación pendientes. next-env.d.ts ajeno preservado.
+- **Resultado:** cuatro regresiones RED antes del guard;47 pruebas de referencias/
+  descargas GREEN. Suite final1254/100 y cobertura configurada env/schema100%
+  PASS, tipos/lint/build/diff PASS. Siete E2E finales PASS sin retries: alta/listado/
+  filtrado presencial, búsqueda general con frase, dos filtros GET con espacios y
+  tres menús abiertos/axe/foco. El diagnóstico confirmó bucle, no demora: se
+  corrigió sin aumentar timeouts ni modificar condiciones de resultados.
+  Fuente compilada coincide con workspace; T224 implementado. Publicación en
+  PR80 sin firma/coautoría; CI posterior se verifica en checks, revisión humana
+  pendiente. Sin cambios de datos alojados o migraciones.
+
+## EXTRA-090 — Completar recuperación de recorridos del PR80
+
+- **Origen/evidencia,2026-10-27:** continuación de Mateo «seguí». Run40573996246
+  pasa database, accesibilidad completa y121 E2E; seis fallos antes ocultos por
+  el gate. Tres selectores Localidad resuelven input auxiliar+combobox; un test
+  busca enlace viejo «Volver a atención presencial» donde producto aprobado dice
+  «Volver a perfil asistido»; un menú múltiple abierto intercepta submit; axe
+  detecta Popup(dialog) y List(listbox) sin nombres en categorías asistidas.
+- **Cambios necesarios antes de código:** usar role=combobox en los tres tests
+  empresariales y categorías asistidas, cerrar selección múltiple con Escape,
+  alinear enlace de regreso y verificar href. Añadir nombres accesibles específicos
+  a Popup/List en los cuatro callers existentes (categorías, filtros, localidad,
+  campos de oferta), conservando el componente adaptado Base. No ocultar errores
+  axe, eliminar escenarios, forzar clicks ni cambiar flujos de negocio.
+- **Fuentes/revisión:** docs oficiales shadcn Base Combobox y Base UI consultados;
+  reutilizar props aria-label soportadas, sin reemplazar el primitivo/estilo/API.
+  Adaptador base-nova local revisado. Fuente: https://base-ui.com/react/components/combobox
+  y https://ui.shadcn.com/docs/components/base/combobox .
+- **Archivos/riesgos/contratos:** cuatro componentes de campos y seis specs E2E,
+  nueva regresión axe de popups abiertos, guía/tareas/estado. Sin datos, auth,
+  permisos, esquemas, dependencias o acciones nuevas. Riesgo de selección/foco y
+  nombres coincidentes; comprobar triggers por rol, Escape y navegaciones completas.
+- **Plan de verificación:** seis recorridos fallidos sobre fixture aislado, axe
+  abierto/cerrado por tipo de selector, componentes, tipos/lint/build y CI nuevo.
+  Preservar next-env.d.ts. Autorizado como corrección necesaria de PR80; análisis
+  focal sin cambio de requisitos de negocio o arquitectura. Verificación pendiente.
+- **Resultado:** los seis recorridos que fallaban fueron verificados en corridas
+  dirigidas, y tres nuevas pruebas axe de popup abierto pasan con Escape/foco
+  intactos. Primera corrida7/9 PASS expuso el bucle de EXTRA091; tras corregirlo,
+  dos pendientes y regresiones añadidas PASS en corrida final7/7. No se bajaron
+  umbrales, aumentaron timeouts ni usaron clicks forzados.1254 unitarias y
+  tipos/lint/build PASS; T223 implementado. Nuevo resultado remoto se consulta
+  en PR80. Docker se había detenido; se reinició en segundo plano para el entorno
+  ficticio, sin reset habitual ni operaciones alojadas.
+
+## EXTRA-089 — Corregir desbordamiento administrativo del PR80
+
+- **Fecha/origen:**2026-10-27, Mateo informa fallo GitHub de PR80 y solicita
+  corregirlo. Run40571403004/head1dd0dc0: database PASS; application pasa tipos,
+  lint, tooling,1250 pruebas y build, falla accesibilidad admin360/1366 al exigir
+  ausencia de scroll horizontal. Los demás roles pasan;98 recorridos dependientes
+  no se ejecutan tras el gate fallido, no se consideran verificados.
+- **Evidencia antes de código:** Chromium sobre copia ficticia reproduce
+  /admin/candidates:360→scrollWidth412 y1366→2188. Input sr-only name=locality
+  absoluto toma ancho del viewport (CSS administrativo width100%) sin contenedor
+  posicionado; su origenx52/822 lo excede. Las otras páginas medidas no desbordan.
+  El nombre nativo agregado en EXTRA085 expone este transporte auxiliar.
+- **Cambio propuesto/necesidad:** posicionar únicamente el contenedor de localidad
+  de CandidateSearchForm con relative. Mantiene nombre/valor, validación nativa,
+  combobox, GET/referencias y CSS compartido. No esconder overflow de body ni
+  relajar pruebas. Mejorar diagnóstico de ruta en gate y comprobar360/1366 en
+  buscadores general/asistido antes/después de filtros.
+- **Archivos/contratos/riesgos:** candidate-search-form.tsx, E2E accesibilidad/
+  portal-filters y documentación/estado. Sin datos, contratos API, SQL, permisos,
+  dependencias o configuración. Riesgo de posicionamiento/foco del combobox;
+  verificar controles/popup/selección/teclado y búsqueda con localidad opcional.
+- **Verificación prevista:** reproducción RED y GREEN de ancho real, gate completo
+  por roles y filtros de ambos destinos, tipos/lint/tests/build; publicar corrección
+  sin firma en mismo PR80 y comprobar CI. Preservar next-env.d.ts ajeno.
+- **Estado:** autorizado por pedido explícito y requisito técnico derivado de
+  EXTRA085/constitución IV. Análisis focal sin cambio arquitectónico. Implementación,
+  verificación y CI pendientes; revisión humana no acreditada.
+- **Implementado/verificado localmente:** una clase relative en el contenedor,
+  sin modificar CSS global/controles ni contratos. Dos regresiones nuevas fallan
+  antes del fix (general sin filtrar y asistidos filtrados) y pasan después. Ocho
+  E2E PASS sin omisiones/retries: seis de accesibilidad por roles360/1366 y dos de
+  filtros GET/general/asistido con categorías múltiples y navegación. Umbrales,
+  axe y foco conservados.13 componentes, tipos/lint/build/diff PASS. Hash del
+  componente igual a copia compilada y next-env.d.ts ajeno intacto. No reset/SQL.
+  T222 implementado; corrección se publica en mismo PR80 sin firma ni coautoría.
+  CI posterior y revisión humana se consultan en los checks del PR; no se declaran
+  aprobados por la verificación local. Logs ficticios en test-results ignorado.
+
+### Publicación de EXTRA085–088 solicitada — 2026-10-27
+
+Mateo solicita commit y PR de la rama feat/portal-offers-metrics-filters. Main
+remoto sigue en b900485, sin divergencia de base. Revisión final del alcance
+completo:1250 pruebas/100 archivos y cobertura configurada env/schema100% PASS;
+tipos/lint/build,57 tooling, pgTAP1314 y recorridos focales anteriores documentados
+arriba. Se publican47 archivos de producto/documentación/pruebas; next-env.d.ts
+preexistente queda fuera y conserva su hash. Sin migración, configuración alojada
+o deploy manual. Commit sin firma/coautoría; PR/CI y revisión humana pendientes.
+- Publicado: commit de implementación `5936d2514fc55f397f98c445117d8a6b8618f1a4`
+  sin firma ni trailers de coautoría; PR abierto y listo para revisión:
+  https://github.com/maximo-Pdev/funes-empleo/pull/80 . CI y revisión humana
+  permanecen pendientes; no se afirma aprobación ni merge.
+
+## EXTRA-088 — Carrusel circular con diez ofertas recientes
+
+- **Fecha/origen:**2026-10-27, Mateo solicita última/penúltima a la izquierda de
+  la primera y primera/segunda a la derecha de la última, con las últimas10 ofertas.
+  Sustituye límites/navegación de P1/EXTRA085–087, conservando avance3s sin botón
+  de pausa y toda la funcionalidad restante de la rama.
+- **Evidencia/cambio antes de código:** Home consulta12; coverflow resta índices
+  y flechas se detienen. Pedir10 en servidor (publicación DESC/ID DESC existente),
+  distancia circular centrada para vecinos y flechas con módulo. Embla móvil
+  loop:true usando su API existente; fallback de biblioteca si faltan slides
+  para llenar viewport, sin inventar ni duplicar ofertas. Fuente oficial v8.6.0:
+  https://github.com/davidjerleke/embla-carousel/blob/v8.6.0/packages/embla-carousel/src/components/EmblaCarousel.ts
+  y Options.ts: loop nativo/fallback verificados. No nueva dependencia.
+- **Alcance/contratos:** página/carrusel Home y sus pruebas; spec/plan/research/
+  tareas/quickstart/guía/inventario/estado. Solo límite de preview, no catálogo
+  general, conteos públicos, elegibilidad ni SQL. Conservar links, foco/hover,
+  reduced-motion/pestaña oculta/cleanup, vacío/error y0/1 ofertas.
+- **Riesgos/verificación:** vecinos y sentido del giro, cruce9→0 y0→9, cantidades
+  pequeñas, flechas móviles y DTO/límite10. Pruebas temporizador/geometría/servidor,
+  navegador1440/390 con extremos y captura, tipos/lint/build/diff-check.
+- **Estado:** autorizado por pedido explícito; análisis focal consistente con
+  reglas públicas, sin cambio arquitectónico/SQL ni gates municipales nuevos.
+  Implementación/verificación/revisión pendientes. Preservar next-env.d.ts ajeno.
+- **Resultado implementado:** Home pide10 ofertas en servidor; coverflow tiene
+  vecinos/flechas circulares y móvil usa loop nativo. Mantiene3s, sin botón extra,
+  filtros públicos y conteos completos. Contrato de conteos solo ajusta referencia
+  documental al nuevo límite, sin cambiar RPC/ACL/datos.
+- **Verificación:**31 pruebas Home/carrusel/contadores PASS, incluidos0/1 y2–5/10,
+  vecinos de extremos, flechas y temporizador. Tipos/lint/build/diff-check PASS;
+  cuatro recorridos browser finales cubiertos y PASS en producción local aislada:
+  orden/límite10, extremos desktop/móvil, auto3s/hover y reduced-motion/flechas.
+  Una expectativa de visibilidad móvil falló porque parte del carrusel quedaba
+  fuera de pantalla; se colocó todo el viewport en pantalla, manteniendo ratio0.9
+  y verificando última/primera. Repetición PASS sin cambio de producto. Recorrido
+  geométrico usa reduced-motion para capturas deterministas; auto3s se prueba
+  por separado. Capturas primera/última revisadas; hashes de Home/carrusel
+  coinciden con build. next-env.d.ts ajeno conserva su hash previo.
+- **Estado final:** T221 completo, artefactos actuales consistentes; logs/capturas
+  ficticios ignorados. Sin migración/reset/dependencias/cambios alojados ni
+  commit/PR/CI; revisión humana pendiente. Entorno aislado cerrado con backup.
+
+## EXTRA-087 — Carrusel automático cada3s sin botón de pausa
+
+- **Fecha/origen:**2026-10-27, Mateo pide quitar Pausar/Reanudar y avanzar cada3s.
+  Sustituye la presentación/temporización de EXTRA086; misma rama y preservación
+  de todos los cambios anteriores/next-env.d.ts ajeno.
+- **Cambio antes de código:** retirar Button/iconos/ref/estado de pausa manual;
+  intervalo3000ms desktop/Embla móvil, reinicio al principio y flechas existentes.
+  Hover/foco solo pausan mientras la persona interactúa; al salir vuelve solo.
+  Conservar reduced-motion, pestaña oculta y cleanup, sin pausa táctil permanente
+  que ya no tendría control para reanudar. Sin dependencias ni contratos de datos.
+- **Archivos/riesgos:** HomeOffersCarousel, pruebas, spec/plan/tasks/guía/estado.
+  Riesgo de dejar bloqueado el avance al quitar su control: comprobar foco/blur,
+  hover/salida, mobile/tacto,3000ms/reinicio,0/1 ofertas y desmontaje. Tipos/lint/
+  build y pruebas pertinentes. Sin SQL, permisos, migración o publicación.
+- **Estado:** autorizado explícitamente; análisis focal compatible con P1 y sin
+  cambio arquitectónico. Implementación/verificación/revisión pendientes.
+- **Resultado:** implementado sin controles de pausa;3000ms en desktop/móvil,
+  reinicio/flechas, hover/foco temporales y preferencias/cleanup conservados.
+  Seis pruebas focales, tipos, lint, build y diff-check PASS. Cuatro E2E PASS
+  sin retries en compilación de producción local: orden,1440/390px con avance/
+  retorno automático tras hover, reduced-motion y flechas. Verificada ausencia
+  de Pausar/Reanudar en ambos tamaños. Hash de fuente coincide con copia
+  compilada; next-env.d.ts ajeno preservado. Sin reset ni cambios alojados.
+  Artefactos/guía/inventario alineados, T220 completo; revisión humana/CI/PR
+  pendientes. Entorno de prueba aislado detenido conservando datos.
+
+## EXTRA-086 — Avance automático del carrusel
+
+- **Fecha/origen:** 2026-10-27, Mateo pide que el carrusel cambie de oferta además
+  de los botones. Continuación autorizada de EXTRA085 en la misma rama; conservar
+  todos los cambios existentes y next-env.d.ts ajeno.
+- **Evidencia/cambio propuesto antes de código:** HomeOffersCarousel solo avanza
+  con controles. Agregar temporizador de5s para desktop y API Embla móvil,
+  retornando a la primera tras la última; orden servidor y botones acotados
+  permanecen. Sin dependencias nuevas, consultas, contratos de datos o migración.
+- **Adición necesaria/accesibilidad:** botón compartido Pausar/Reanudar primero
+  en orden de foco; pausa temporal al hover y persistente al foco/interacción
+  táctil. Preferencia reduced-motion pausa por defecto y admite inicio explícito;
+  pestaña oculta no avanza; cleanup cancela temporizador/listeners. Evidencia:
+  https://www.w3.org/WAI/ARIA/apg/patterns/carousel/ y Button oficial base-nova
+  consultados, conservar tokens/control adaptado.
+- **Archivos/contratos:** home-offers-carousel.tsx, pruebas de componente/browser,
+  spec/plan/tasks/guía UI/inventario/estado. Solo presentación; sin cambios de API,
+  permisos ni criterios de ofertas. Ampliación P1 sustituye parada automática al
+  extremo por reinicio; navegación manual sigue acotada.
+- **Riesgos/verificación:** movimiento durante lectura/foco, timers residuales,
+  reinicio móvil y0/1 ofertas. Probar tiempo/pausa/reanudación/preferencias/
+  pestaña oculta/desmontaje y navegador móvil/escritorio; tipos/lint/build y suite.
+- **Estado:** autorizado por pedido explícito; análisis focal sin contradicciones
+  de negocio/arquitectura, detalles accesibles derivados de constitución IV.
+  Implementación y verificación pendientes; revisión humana pendiente.
+- **Implementado/verificado:** intervalo5s con cleanup para desktop/Embla móvil,
+  reinicio al principio, botones manuales conservados, Button municipal de pausa,
+  foco/tacto/puntero mouse/reduced-motion/visibilidad. Ocho pruebas focales PASS;
+  suite completa1247/100 PASS antes del último ajuste de puntero táctil, ocho
+  focales finales lo verifican. Tipos/lint/build PASS en Node24.22.0. Cinco
+  recorridos browser finales cubiertos: orden, auto/hover/pausa/reanudación1440 y
+  390, reduced-motion e interacción táctil; todos PASS, capturas revisadas.
+  Código compilado y fuente tienen el mismo hash; next-env.d.ts ajeno conserva
+  su hash previo. No hubo reset, migración, dependencia ni publicación.
+- **Incidencias:** primera prueba browser falló por variable pública con nombre
+  incorrecto solo en la copia aislada; recompilada con el nombre vigente del
+  contrato, sin editar configuración del usuario. Prueba reduced-motion encontró
+  solo diferencia de espacios de style SSR; corregida para leer propiedad CSS,
+  repetición PASS sin cambiar producto. Logs/capturas ignorados en test-results.
+  Warning de lockfiles de copia y Canvas jsdom ya conocidos. Análisis final P1
+  consistente con plan/tarea/guía; sin pendientes funcionales focales detectados.
+  Revisión humana/CI/commit/PR siguen pendientes; T219 completo.
+
+## EXTRA-085 — Ofertas recientes, métricas PDF/XLSX y filtros servidor
+
+- **Fecha/origen:**2026-10-27, Mateo solicita cuatro mejoras. PR77 mergeado
+  confirmado; base main b900485 incluye PR78/tablas/combobox/canvas1280. Rama
+  feat/portal-offers-metrics-filters; next-env.d.ts preexistente preservado.
+- **Decisiones:** Mateo confirma PDF y Excel .xlsx, y bloquear solo scroll del
+  fondo del popup Ver perfil y nominar, conservando scroll interno. Consultas
+  y criterios de negocio, permisos, fuentes/diseño de PR78 permanecen vigentes.
+- **Evidencia:** Home ya pide12 ofertas ordenadas por publicación DESC/ID antes
+  de limitar; el coverflow circular mezcla la última junto a la primera. Mantener
+  orden servidor y limitar navegación reciente→antigua sin envolver, con diseño3D
+  y carrusel móvil vigentes. No nuevo timestamp o ranking.
+- **Adiciones necesarias antes de código:** descargas reales de servidor con
+  write-excel-file4.1.1 y PDFKit0.20.2 (MIT), tipos PDFKit0.17.6 y parser XLSX de
+  prueba. Versiones exactas/lockfile/audit/Node24; API actual writeExcelFile(...).
+  toBuffer(). PDFKit externo y tracing de TTF Be Vietnam solo para ruta PDF en
+  next.config. Evitar formatos binarios artesanales, ExcelJS más amplio y
+  pdf-lib con paginación manual. No datos/fuentes remotos durante generación.
+- **Contratos:** nuevas rutas operations.pdf/.xlsx reutilizan guard, filtros
+  estrictos/referencias opacas, getMetrics(true), auditoría y datos de CSV. CSV
+  permanece compatible; pantalla ofrece los dos nuevos formatos. Cabeceras
+  private/no-store/nosniff/attachment. Etiquetas españolas, cero numérico,
+  precisión y pendientes null, sin UUID/PII nuevos. XLSX texto String explícito
+  sin fórmulas/links/macros; PDF fuente embebida y texto largo paginado.
+- **Filtros:** auditoría de lectura confirma consultas ya servidor en público,
+  candidatos/asistidos, matching, ofertas, empresas, casos y métricas. Convertir
+  composición CandidateSearchForm a servidor GET, nombres nativos y categoryId
+  repetible opaco; islas cliente de combobox, LocalityCombobox required=false.
+  Matching compone orden GET en servidor y pasa ReactNode al cliente tabla/modal;
+  omitir página al enviar. Conservar Form/Field cliente para validación/foco,
+  defaults, selección múltiple OR y alcance asistido. No cambiar otros criterios.
+- **Popup:** CSS dirigido al dialog de preview abierto bloquea overflow raíz;
+  cierre/desmontaje restaura sin listeners residuales. Conservar scroll interior,
+  foco/Escape/bloqueo en nominación y posición del fondo.
+- **Archivos:** Home/carrusel, métricas etiquetas/generadores/handler/rutas/página,
+  reference-url, next.config/package/lock; filtros candidato/categorías/matching,
+  CSS/dialog, inventario y pruebas/artefactos. Sin SQL/variables/secretos nuevos.
+- **Riesgos/verificación:** dependencias/fuentes, Unicode/PDF largo, fórmulas,
+  caché/roles/auditoría, orden global, GET/refs/multiselección, móvil/foco/scroll.
+  Unitarias, lectura independiente/visual de archivos ficticios, tipos/lint/build
+  y navegador. No reset habitual/alojado, migraciones ni publicación autorizados.
+- **Gates:** incremento feature001; spec/clarificaciones→research/plan/modelo/
+  contratos/quickstart→checklist/tareas→análisis antes de implementar. Research
+  delegado de solo lectura según fase0 speckit-plan, no edición por agentes.
+  Constitución I–VI sin excepciones; autorización AGENTS para detalles necesarios.
+  Implementación/verificación/revisión pendientes al registrar esta entrada.
+- **Resultado implementado:** carrusel acotado reciente→antigua; PDF/XLSX reales
+  en servidor y CSV compatible; filtros GET compuestos en servidor con islas de
+  combobox/validación; bloqueo de fondo y scroll interior del popup. Archivos
+  reales: Home/carousel, globals.css, metrics/{labels,report-data,pdf-export,
+  xlsx-export,download-route,components/dashboard}, dos rutas exports, página de
+  métricas, reference-url, next.config, package/lock y componentes de candidatos/
+  matching. Inventario y operación en docs/implementation/portal-filters-audit.md;
+  UI_GUIDELINES y artefactos feature001 alineados. Sin SQL/env/remoto.
+- **Verificado, 2026-10-27:** Node24.22.0/npm11.19.1; tipos, lint sin warnings,
+  build producción y diff-check PASS. Suite1242/100 archivos, tooling57;67
+  focales finales PASS. Cobertura100% solo del módulo env/schema configurado,
+  no de todo el producto. pgTAP1314/25 archivos PASS en Supabase aislado
+  funes-admin-cv-check (API54341/DB54342), fixture500/50/100/1000 y500CV ficticios.
+  Diez recorridos Chromium PASS sin retries; repetición de popup con escritorio/
+  desmontaje PASS. PDF/XLSX/CSV audit+3 y permisos anónimo/empresa; matching,
+  nominación, orden global, paginación, GET múltiple/atrás/adelante, Home1440/390
+  y scroll móvil360/escritorio. Axe sin violaciones en superficies comprobadas.
+  XLSX parser independiente/XML sin fórmulas/macros/links/UUID; PDF14p leído
+  con pypdf y renderizado: acentos, títulos largos, encabezado por página y última
+  fila presentes. Tracing contiene ambas fuentes TTF. Hashes21 archivos runtime/
+  configuración/dependencias coinciden con la copia compilada. next-env.d.ts
+  ajeno conserva SHA256 B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+- **Incidencias y límites:** primera ejecución Chromium no encontró caché del
+  navegador del sandbox; luego no alcanzó servidor en otro contexto. Se ejecutaron
+  servidor/browser en el mismo contexto local y pasaron. Una corrida Vitest perdió
+  archivo temporal; repetición sin cambios de pruebas y suite completa PASS.
+  Tipos detectó dos índices opcionales en test nuevo; aserciones tras longitud
+  comprobada corregidas, tipos final PASS. Logs/capturas/binarios ficticios en
+  test-results ignorado; no son artefactos de producto. Warning de lockfiles
+  de la copia de verificación no afecta build. Audit actual=baseline7 avisos
+  (Next crítico; Zod/Undici/Vite altos; Vitest/coverage/mocker moderados), ninguno
+  nuevo por estas dependencias. npm temporal carece comando audit; se comparó con
+  CLI npm11.19.0 del sistema, solo lectura. No se actualizó stack fuera de alcance.
+- **Convergencia focal:** P1–P4 cubiertos por T214–218, sin trabajo funcional
+  pendiente detectado. Revisión React/server-only/guards/estado/teclado sin
+  defectos abiertos en este alcance. Gates municipales históricos y aceptación
+  global no se cierran. Sin commit/PR/CI/deploy; revisión humana pendiente.
+
 ## EXTRA-084 — Restore PR 78 browser checks and required locality validation
 
 - **Date/authorization:** 2026-10-26; Maxi requested: «Falló el PR en github. Arreglalo para que salga en verde».

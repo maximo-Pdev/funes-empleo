@@ -55,6 +55,30 @@ export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
   const [active, setActive] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!query) return;
+    const update = () => setReducedMotion(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (offers.length < 2 || reducedMotion || focused || hovered || (vertical && !api)) return;
+    const timer = window.setInterval(() => {
+      if (document.hidden) return;
+      if (vertical && api) {
+        if (api.canScrollNext()) api.scrollNext();
+        else api.scrollTo(0);
+      } else setActive(value => (value + 1) % offers.length);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [api, focused, hovered, offers.length, reducedMotion, vertical]);
 
   useEffect(() => {
     const query = window.matchMedia?.("(max-width: 767px)");
@@ -86,14 +110,14 @@ export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
     </CarouselItem>
   ));
 
-  if (vertical) {
-    return (
+  const count = offers.length;
+  const content = vertical ? (
       <div className={styles.carouselVertical}>
         <Carousel
           key="vertical"
           orientation="vertical"
           setApi={setApi}
-          opts={{ align: "start", containScroll: "trimSnaps", slidesToScroll: 1 }}
+          opts={{ align: "start", containScroll: "trimSnaps", slidesToScroll: 1, loop: true }}
           className={styles.offersCarousel}
         >
           <CarouselContent className={styles.carouselContentVertical}>{slides}</CarouselContent>
@@ -107,20 +131,15 @@ export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
           </button>
         </div>
       </div>
-    );
-  }
-
-  const count = offers.length;
-  const half = Math.floor(count / 2);
-
-  return (
+    ) : (
     <div className={styles.carouselHorizontal}>
-      <button type="button" onClick={() => setActive(value => (value - 1 + count) % count)} aria-label="Anterior" className={styles.carouselButton}>
+      <button type="button" onClick={() => setActive(value => (value + count - 1) % count)} disabled={count < 2} aria-label="Anterior" className={styles.carouselButton}>
         <ChevronLeft aria-hidden="true" />
       </button>
       <div className={styles.coverflow}>
         {offers.map((offer, index) => {
-          const distance = (((active - index + half) % count) + count) % count - half;
+          const half = Math.floor(count / 2);
+          const distance = (active - index + count + half) % count - half;
           const hidden = Math.abs(distance) > 2;
           return (
             <div
@@ -136,9 +155,17 @@ export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
           );
         })}
       </div>
-      <button type="button" onClick={() => setActive(value => (value + 1) % count)} aria-label="Siguiente" className={styles.carouselButton}>
+      <button type="button" onClick={() => setActive(value => (value + 1) % count)} disabled={count < 2} aria-label="Siguiente" className={styles.carouselButton}>
         <ChevronRight aria-hidden="true" />
       </button>
     </div>
   );
+
+  return <section aria-label="Carrusel de ofertas recientes" aria-live="off"
+    onPointerEnter={event => { if (event.pointerType === "mouse") setHovered(true); }}
+    onPointerLeave={() => setHovered(false)}
+    onFocusCapture={() => setFocused(true)}
+    onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
+    {content}
+  </section>;
 }

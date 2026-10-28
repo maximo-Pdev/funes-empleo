@@ -13,7 +13,7 @@ import HomePage from "@/app/(public)/page";
 
 beforeEach(() => {
   counts.mockReset().mockResolvedValue({ candidates: 1234, companies: 17, offers: 27 });
-  offers.mockReset().mockResolvedValue({ items: [], total: 27, page: 1, pageSize: 12 });
+  offers.mockReset().mockResolvedValue({ items: [], total: 27, page: 1, pageSize: 10 });
 });
 
 it("replaces only the role guide with actual public counts, independent of the carousel", async () => {
@@ -24,7 +24,7 @@ it("replaces only the role guide with actual public counts, independent of the c
     expect(within(within(metrics).getByText(label).parentElement!).getByText(value)).toBeTruthy();
   }
   expect(counts).toHaveBeenCalledOnce();
-  expect(offers).toHaveBeenCalledWith({ page: 1, pageSize: 12 });
+  expect(offers).toHaveBeenCalledWith({ page: 1, pageSize: 10 });
   expect(screen.queryByText("Cada perfil entra por el camino correcto")).toBeNull();
   for (const heading of ["Simple para usar, cuidadoso con los datos.", "Lo que más nos preguntan", "¿Listo para dar el siguiente paso?"]) {
     expect(screen.getByRole("heading", { name: heading })).toBeTruthy();

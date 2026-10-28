@@ -26,8 +26,9 @@ async function fillProfile(page: Page, name: string, dni: string) {
   await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
   await page.getByLabel("Localidad laboral").fill("Funes");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
-  await page.getByLabel("Categorías laborales").click();
+  await page.getByRole("combobox", { name: "Categorías laborales", exact: true }).click();
   await page.getByRole("option", { name: "Categoría ficticia A" }).click();
+  await page.keyboard.press("Escape");
   await page.getByLabel(/Confirmo que la persona leyó y aceptó/).check();
 }
 test("atención sin PDF, derivación protegida, consentimiento y vinculación presencial con historial", async ({ page, browser, request }) => {
@@ -48,7 +49,7 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${id}' and status='accepted' and source='assisted'`)).toBe("1");
   await page.getByLabel("Localidad laboral").fill("Funes");
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en atención municipal");
-  await page.getByLabel("Categorías laborales").click();
+  await page.getByRole("combobox", { name: "Categorías laborales", exact: true }).click();
   await expect(page.getByRole("option", { name: "Categoría ficticia A", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("group", { name: "Intereses laborales" })).toHaveCount(0);
   await page.getByRole("option", { name: "Categoría ficticia B", exact: true }).click();

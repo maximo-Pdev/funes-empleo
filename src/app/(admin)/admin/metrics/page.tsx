@@ -45,7 +45,10 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
     {result && <>
       <p className="mb-4">Foto al {new Date(result.as_of).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}.</p>
-      <RecordAnchor href={`/api/admin/exports/operations.csv?${metricsQuery(result.filters)}`} className="mb-6 inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar CSV filtrado</RecordAnchor>
+      <div className="mb-6 flex flex-wrap gap-3">
+        <RecordAnchor href={`/api/admin/exports/operations.pdf?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar PDF filtrado</RecordAnchor>
+        <RecordAnchor href={`/api/admin/exports/operations.xlsx?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar Excel filtrado</RecordAnchor>
+      </div>
       <Dashboard rows={result.rows} />
     </>}
   </AdminShell>;

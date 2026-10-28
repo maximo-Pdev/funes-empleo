@@ -55,7 +55,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Persona responsable").fill("Responsable ficticio");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Actividad").fill("Servicios ficticios");
-  await page.getByLabel("Localidad", { exact: true }).click();
+  await page.getByRole("combobox", { name: "Localidad", exact: true }).click();
   await page.getByRole("option", { name: "Funes", exact: true }).click();
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);

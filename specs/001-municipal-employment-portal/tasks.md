@@ -5,6 +5,47 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T226 EXTRA093: prueba de pausa del carrusel compara oferta activa en móvil,
+  conservando tiempos y aserciones; repetición desktop/móvil, tipos/lint y CI80.
+
+- [x] T225 EXTRA092: sonda concurrente observa badges actuales y emite solo
+  diagnóstico numérico seguro, conservando cuatro actores/barrera/5s/auditorías;
+  aceptación fría real y checks de PR80, sin alterar condiciones del benchmark.
+
+- [x] T224 EXTRA091: evitar redirección por espacios en filtros ya opacos,
+  preservar conversión UUID/orden/repetidos; RED/GREEN de idempotencia y frases,
+  búsquedas por ambos destinos, regresiones de permisos y checks de PR80.
+
+- [x] T223 EXTRA090: completar seis recorridos antes bloqueados, nombres aria
+  de popups/listas de los cuatro campos, selectores por rol y cierre Escape;
+  regresión axe de menús abiertos, verificaciones y publicación en mismo PR80.
+
+- [x] T222 EXTRA089: recuperar PR80 corrigiendo contenedor del input auxiliar
+  de localidad, sin recorte global ni cambio de contrato; gate de accesibilidad
+  por roles y filtros general/asistido360/1366, tipos/lint/tests/build; publicación
+  y estado CI se registran en EXTRA089/PR80, sin confundirlos con aceptación humana.
+
+- [x] T221 EXTRA088: Home últimas10 públicas, coverflow/controles circulares y
+  Embla loop; vecinos de extremos,0/1/N y3s verificados, documentación/tipos/lint/
+  build/navegador coherentes. Sin cambiar catálogo/conteos ni persistencia.
+
+- [x] T220 EXTRA087: quitar Pausar/Reanudar y avanzar cada3s, conservar flechas,
+  reinicio, hover/foco temporales, reduced-motion/pestaña oculta/cleanup; verificar
+  desktop/móvil y documentación consistente, sin cambios de datos.
+
+- [x] T219 EXTRA086: avance automático5s escritorio/móvil con pausa accesible,
+  foco/hover/tacto/reduced-motion/pestaña oculta, reinicio/cleanup y botones
+  manuales conservados; pruebas de estados/tiempo, navegador y gates de calidad.
+
+## EXTRA085 — Portal y descargas,2026-10-27
+
+- [x] T213 Revisar contexto/constitución, aclarar formatos/scroll con Mateo y registrar P1–P4, research, plan/modelo/contratos/quickstart/calidad; análisis focalizado antes de código, sin regenerar MVP ni alterar gates humanos.
+- [x] T214 [P1] Verificar orden servidor published_at y adaptar Home/coverflow a navegación reciente→antigua sin extremos mezclados; conservar3D/móvil, casos0/1/N y evidencia.
+- [x] T215 [P2] Instalar dependencias exactas revisadas; generadores PDF/XLSX, etiquetas compartidas, handler/rutas/headers/referencias y enlaces métricas. Conservar CSV/guard/auditoría/filtros; font tracing/runtime Node, pruebas de datos/binarios/roles/archivos extensos.
+- [x] T216 [P4] Registrar inventario de filtros, mover CandidateSearchForm y orden matching a composición servidor GET con islas de controles, refs opacas/defaults/asistidos/OR/localidad opcional; actualizar pruebas/navegación nativa.
+- [x] T217 [P3] Bloquear scroll de fondo solo mientras preview dialog esté abierto, conservar interior/foco/posición/cierre/Escape/nominar y restauración por desmontaje; pruebas móvil/escritorio.
+- [x] T218 Verificar P1–P4 y empaquetado desde build, tipos/lint/pruebas pertinentes/navegador, lectura independiente/visual PDF/XLSX, riesgos/dependencias y cobertura final de artefactos. Sin deploy/PR/migración/remoto no solicitados; depende T214–217.
+
 ## Oferta administrativa y matching ordenado — EXTRA073
 
 - [x] T212 Mantener cinco eventos iniciales de moderación y revelar cinco con Mostrar más solo cuando queden otros. Conservar foco/orden/auditoría y reutilizar el componente empresa/admin; expectativas de componentes/E2E alineadas.59 pruebas pertinentes PASS, bordes0/1/5/12, navegador8 escenarios0/5/6/12×1440/390 con teclado/foco/axe0 PASS; tipos/lint/build limpio/diff PASS. Ampliación visual posterior de EXTRA073, sin backend ni migración; revisión/publicación pendientes.

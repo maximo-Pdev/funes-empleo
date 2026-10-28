@@ -1,5 +1,10 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA085: sin entidades o persistencia nuevas. PDF/XLSX derivan de los mismos
+MetricsFilters/MetricRow/as_of de CSV, null/0 y referencias opacas. No almacenar
+archivos/contenido en logs o auditoría; el evento actual acredita solicitud
+autorizada, no recepción completa. Home usa published_at, filtros usan GET/URL.
+
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 

@@ -55,6 +55,7 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect((await new AxeBuilder({ page }).include('[aria-labelledby="opening-matches"]').analyze()).violations).toEqual([]);
   const evaluate = section.getByRole("button", { name: /^Ver perfil de / }).first();
+  await evaluate.scrollIntoViewIfNeeded();
   await evaluate.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("button", { name: "Nominar a esta oferta", exact: true })).toBeVisible();
@@ -70,10 +71,33 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   expect((await cvResponse.body()).subarray(0, 5).toString()).toBe("%PDF-");
   expect((await new AxeBuilder({ page }).include("dialog[open]").analyze()).violations).toEqual([]);
   expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await expect(page.locator("html")).toHaveCSS("overflow", "hidden");
+  const backgroundY = await page.evaluate(() => scrollY);
+  await page.mouse.move(5, 5);
+  await page.mouse.wheel(0, 600);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(backgroundY);
+  expect(await dialog.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+  await dialog.evaluate(element => { element.scrollTop = 0; });
+  const bounds = (await dialog.boundingBox())!;
+  await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  await page.mouse.wheel(0, 500);
+  await expect.poll(() => dialog.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => scrollY)).toBe(backgroundY);
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(evaluate).toBeFocused();
+  await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
   expect(runLocalMaintenanceSql("select jsonb_build_object('participations',(select count(*) from public.participations),'referrals',(select count(*) from public.referrals))")).toBe(before);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await evaluate.click();
+  await expect(dialog).toBeVisible();
+  await expect(page.locator("html")).toHaveCSS("overflow", "hidden");
+  const desktopBackgroundY = await page.evaluate(() => scrollY);
+  await page.mouse.move(5, 5);
+  await page.mouse.wheel(0, 600);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(desktopBackgroundY);
+  await page.goto("/admin/candidates");
+  await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
 });
 
 test("matching inválido y vacío se explican sin ampliar resultados", async ({ page }) => {
@@ -105,6 +129,7 @@ test("ordena globalmente por actualización, conserva orden al paginar y reinici
   const names = section.getByRole("table").locator("tbody tr td:first-child");
   await expect(names).toHaveText(expected("desc"));
   await selector.selectOption("updated_asc");
+  await section.getByRole("button", { name: "Aplicar orden", exact: true }).click();
   await expect(page).toHaveURL(/\?matchOrder=updated_asc#opening-matches$/);
   await expect(names).toHaveText(expected("asc"));
   await section.getByRole("link", { name: "Siguiente", exact: true }).click();
@@ -114,6 +139,7 @@ test("ordena globalmente por actualización, conserva orden al paginar y reinici
   await expect(selector).toHaveValue("updated_asc");
   await selector.focus();
   await page.keyboard.press("ArrowUp");
+  await section.getByRole("button", { name: "Aplicar orden", exact: true }).click();
   await expect(page).toHaveURL(/\?matchOrder=updated_desc#opening-matches$/);
   await expect(names).toHaveText(expected("desc"));
   const details = page.getByRole("region", { name: "Oferta y empresa" });

@@ -47,9 +47,9 @@ export function LocalityCombobox({ defaultValue, value: controlledValue, onChang
           aria-invalid={Boolean(error)} aria-describedby={description}>
           <ComboboxValue placeholder={<span className="text-muted-foreground">{placeholder}</span>} />
         </ComboboxTrigger>
-        <ComboboxContent>
+        <ComboboxContent aria-label="Seleccionar localidad">
           <ComboboxInput placeholder="Buscar localidad…" aria-label="Buscar localidad" />
-          <ComboboxList>
+          <ComboboxList aria-label="Localidades disponibles">
             {LOCALITIES.map(locality => (
               <ComboboxItem key={locality} value={locality}>{locality}</ComboboxItem>
             ))}
