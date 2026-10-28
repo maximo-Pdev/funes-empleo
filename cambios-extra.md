@@ -1,5 +1,127 @@
 # Cambios extra necesarios
 
+## EXTRA-097 — Aplicar y publicar CV por postulación
+
+- **Fecha/origen:** Mateo,2026-10-28, solicita migración y después PR de EXTRA096.
+- **Evidencia:** rama feat/application-specific-cv-and-images; next-env.d.ts ajeno
+  preservado. MCP rechaza acceso; CLI vinculado kyjycjojzhwggjuqjnki funciona.
+  Las siete funciones vigentes coinciden exactamente con el baseline probado;
+  índice cv_current previo, RLS cinco tablas y42 migraciones confirmados. La nueva
+  versión no está aplicada. Advisor60 WARN existentes,0 ERROR.
+- **Cambio técnico propuesto antes de ejecución:** aplicar exclusivamente el SQL
+  revisado20261028210445 con guards de cuerpos/índice/columnas/historial y registro
+  de versión/nombre/SQL exacto en una transacción. Evitar db push global por la
+  discrepancia histórica de versiones ya documentada; no repair/reset ni migraciones
+  ajenas. Guardar definiciones previas en recibo local ignorado para recuperación.
+- **Archivos/contratos:** migración existente sin cambios de producto; recibos y
+  envoltorio en test-results ignorado, log/guía/estado y PR. Mantener firmas/grants
+  anteriores, nuevas firmas/ACL previstas y bucket PDF privado.
+- **Riesgos/verificación:** rechazar si cambia baseline o se aplica otra vez;
+  lock_timeout/statement_timeout acotados y rollback ante cualquier guard fallido.
+  Verificar cuerpos de13 funciones, FK/índices/triggers, RLS/ACL, historial exacto,
+  recuentos sin cambios y advisor antes/después. No escribir casos de negocio alojados.
+- **Autorización/estado:** pedido explícito autoriza aplicar y commit/PR sin firma,
+  signoff o coautoría, excluyendo next-env.d.ts y recibos privados. Evidencia local
+  EXTRA096 vigente:1292 unit,57 tooling,1363 SQL únicas,32 E2E, tipos/lint/build.
+  Aplicación/publicación pendientes; no inferir revisión, CI, merge o despliegue UI.
+- **Aplicada/verificada2026-10-28:** exclusivamente20261028210445 registrada en
+  kyjycjojzhwggjuqjnki. SQL normalizado MD5 874964da8450b6c5257c7d4c0726432e,
+  SHA256 5d49c4c2a4efb4590575974c2ec53d149cbb97be6d0fdbeecefb9a58c59a77c1.
+  Los13 cuerpos/search_path/SECURITY DEFINER, ACL previas y nuevas, índices/FK/
+  triggers/RLS e historial exacto confirmados en una transacción; recuentos de
+  documentos, casos, derivaciones, consentimientos y auditoría intactos. Lecturas
+  públicas de ofertas/filtros devuelven object tras aplicar. Sin repair/backfill,
+  otras migraciones o pruebas que escriban datos alojados.
+- **Advisors:**60→63 WARN,0 ERROR. Los tres nuevos avisos0029 corresponden solo a
+  los RPC autenticados previstos (reserve_application_cv/apply_to_opening_with_cv/
+  my_candidate_participations_with_cv); guardan sesión/rol/titularidad y anon no
+  tiene EXECUTE. Los tres helpers nuevos privados carecen de EXECUTE para clientes.
+  Es exposición autenticada intencional según el contrato y pruebas, no permisos
+  anónimos nuevos. [Detalle del aviso](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable).
+  Recibos y definiciones previas guardados localmente en test-results ignorado.
+  Pendiente publicar commit/PR y CI/revisión humana; no afirmar merge o deploy UI.
+
+## EXTRA-096 — CV específico de postulación y entrada PDF/JPG/PNG
+
+- **Fecha/origen:** Mateo2026-10-28 solicita CV por oferta y formatos de imagen;
+  confirma opción CV general o específico, sin reemplazar general, máximo5 MiB.
+  Corrige después: WebP no. Quedan PDF/JPG/JPEG/PNG; no video/GIF/SVG/WebP.
+- **Evidencia previa:** un solo cv_documents valid por candidato; apply_to_opening
+  no recibe documento y la derivación toma el CV general vigente en ese momento.
+  Endpoint/parser/bucket actuales solo PDF. Hay consumidores de status valid en
+  activación/matching/perfil que deben distinguir alcance para evitar mezclar CV.
+- **Cambio técnico necesario antes de código:** aceptar entradas controladas y
+  normalizar imágenes estáticas a PDF con sharp/PDFKit ya instalados; validar firma,
+  MIME/extensión, integridad,5 MiB de entrada/salida y16MP para decodificación
+  acotada. Sin metadatos EXIF, animación o contenido activo. Conservar PDF protegido,
+  bucket/rutas/visor/privilegios y versiones anteriores. Trazar fuentes del runtime.
+- **Modelo propuesto:** cv_documents.opening_id opcional, NULL solo general;
+  participations.application_cv_document_id opcional, FK de documento/titular y
+  coherencia de oferta en comandos/constraint. Índice único valid general; CV
+  específicos históricos permanecen separados por caso. Aplicación fija CV elegido en alta, incluso al
+  usar general; cambiar general después no lo cambia. Casos previos y nominaciones
+  sin selección conservan comportamiento legado, sin backfill/borrado.
+- **Atomicidad:** reserva PDF pendiente ligada al candidato/oferta, upload privado,
+  RPC aplica/valida documento y crea participación/auditoría en una transacción.
+  Helper privado común preserva create_participation/apply_to_opening antiguos;
+  nuevo RPC específico evita sobrecargas ambiguas. Fallo deja reserva no compartible,
+  no CV válido ni participación parcial. No locks durante transferencia binaria.
+- **Frontera HTTP necesaria:** al pasar el envío binario a Route Handler, conservar
+  protección de origen de Server Actions: comparar Origin con Host real sin confiar
+  en forwarded headers, rechazar cross-site y acotar lectura multipart a5 MiB+64KiB
+  antes de parsear. Reutilizar el patrón aprobado de la ruta de foto, sin tocarla.
+- **Prueba preexistente:** la suite completa expuso una carrera en candidate-history:
+  el error aparece antes de terminar useTransition y el reintento se busca mientras
+  aún dice Cargando; clearAllMocks deja respuestas once si aborta el caso. Ajustar
+  espera de botón habilitado y reset del mock entre casos, sin cambiar producto.
+- **Orden E2E necesario:** Playwright agrupa por opciones de worker, no garantiza
+  orden alfabético de archivos. Evidencia: z-application-cv corrió antes de
+  intermediation y sus cuatro ofertas alteraron el conteo fijo80. Crear proyecto
+  application-cv dependiente de chromium y anterior al reset de concurrencia;
+  excluirlo del grupo general. No debilitar conteos ni omitir recorridos. Afecta
+  playwright.config.ts y gate T238; verificar dependencias y recorrido completo.
+- **Diagnóstico de verificación:** pgTAP026 crea un trigger temporal de fallo de
+  auditoría; ejecutarlo simultáneamente al navegador produjo un deadlock en una
+  suspensión ficticia. No es evidencia de defecto del flujo productivo. Repetir
+  por fases: SQL completo, restauración del fixture ya verificado y luego E2E,
+  sin pgTAP concurrente ni cambios de backend para encubrir el harness.
+- **Archivos/contratos afectados:** nuevas migración/RPC/índices/FK y tipos, guards
+  de CV general en activación/matching/preview/commit, servicios perfil/búsqueda,
+  POST de postulación, normalizador/formularios globales, detalle municipal y
+  participaciones propias, API CV existente, Spec Kit/guía/pruebas SQL/UI/E2E.
+- **Riesgos:** selección ajena/cruce de oferta, doble alta, perfil actualizado en
+  paralelo, reemplazo que afecte otros casos, imagen malformada/expansión/animación,
+  resultado convertido excesivo y respuesta perdida. Revalidar estado/consentimiento/
+  cuenta/frescura/CV general y versiones en DB; permisos revocados no reaparecen.
+  No cambia consentimiento, contratación, criterios de matching, retención o stack.
+- **Verificación prevista:** unit de PDF y conversión real/rechazos/5 MiB/dimensiones,
+  rutas y formularios con retención; SQL roles/coherencia/legacy/snapshot/referral/
+  auditoría/rollback/versión/concurrencia; navegador candidato→admin→empresa, CV
+  general intacto/otras ofertas, imágenes/asistidos, móvil/teclado/axe; tipos/lint/
+  tooling/build y trazado. Datos ficticios aislados. Sin hosted/reset compartido,
+  commit/PR/deploy hasta solicitud posterior.
+- **Estado/autorización:** alcance funcional confirmado y corrección WebP incorporada;
+  detalles derivados necesarios autorizados por AGENTS y pedido. Gates de requisitos/
+  diseño/calidad/análisis cumplidos antes de código: C1–C6 cubiertos,7/7 calidad,
+  seis principios de constitución preservados, sin decisiones funcionales abiertas.
+  Implementación y verificación completas. Rama feat/application-specific-cv-and-images
+  desde main bef7ddf; PR81 mergeado, rama anterior retirada local/remota y
+  next-env.d.ts ajeno preservado.
+- **Implementado:** migración20261028210445, política/normalizador compartidos,
+  POST protegido y servicio/formulario opcional, lectores generales con scope NULL,
+  CV elegido propio/municipal, tipos generados solo del delta conservando anotaciones
+  previas. Guía docs/operations/application-cv.md y artefactos sincronizados.
+- **Verificado hasta ahora:**1292 unit/componentes/104 archivos,57 tooling, tipos,
+  lint y build de producción PASS; fuente TTF trazada en ambas rutas. Suite SQL26
+  archivos1361 PASS y ampliación02648/48 PASS (1363 comprobaciones únicas). Lint DB
+  public/private sin errores. Recorrido nuevo y concurrencia real PASS; último
+  lote E2E32/32 en3,8min sin omisiones/reintentos PASS, SQL y navegador por fases.
+  Móvil390/1440px, teclado y axe0; referencias y visor PDF inline verificados.
+  Colección del proyecto real132 casos y dependencias confirmadas. Convergencia
+  C1–C6 y decisiones del plan sin brechas nuevas; no anexar tareas vacías.
+  Sin migración alojada, commit/PR/CI o revisión
+  humana de implementación; no declarar aprobados gates históricos del MVP.
+
 ## EXTRA-095 — Aplicación alojada puntual y publicación de EXTRA094
 
 - **Fecha/origen:** Mateo2026-10-28 solicita aplicar migración y luego PR.

@@ -1,5 +1,41 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA096 — CV por postulación y formatos de entrada2026-10-28
+
+Mateo confirma CV general o específico sin reemplazar general,5 MiB; corrige
+WebP no. Este incremento sustituye la restricción de entrada exclusivamente PDF,
+no las reglas de privacidad, activación, consentimiento o contratación.
+
+- C1: cargas de CV propio/asistido/postulación aceptan PDF, JPG/JPEG y PNG hasta
+  5 MiB por archivo. Rechazar WebP, video, SVG, GIF/animación, formato falso,
+  vacío/dañado o excesivo. Imágenes convertidas a PDF para visor protegido; entrada
+  y documento final respetan límite. Un rechazo no reemplaza ningún CV vigente.
+- C2: candidato apto elige CV general actual o carga opcional de uno específico
+  al postular. Se fija un documento para esa postulación, sin reemplazar general
+  ni afectar otras ofertas; el CV elegido no se cambia después de enviar.
+- C3: Oficina ve ese CV en el caso y comparte exactamente ese documento al derivar.
+  Reemplazar general después no cambia selección anterior. Nominaciones y casos
+  legados sin selección conservan CV vigente al derivar; sin backfill de historia.
+- C4: titular/administración ven documento; empresa únicamente tras derivación
+  propia con permiso vigente. Archivo/retirada/suspensión/vencimiento conservan
+  efectos, sin restaurar permisos. No acceder a CV específicos de otras ofertas.
+- C5: upload fallido o estado/versión inválidos no crean participación ni documento
+  válido asociado parcialmente. Alta/documento/auditoría transaccionales. No cambiar
+  obligatoriedad del CV general para activar/postular, duplicados o matching.
+- C6: interfaz española aclara opción y formatos/límite; conservar selección y
+  demás datos al rechazar, mensaje de resultado incierto ante red fallida; nueva
+  pestaña/URL opaca/scroll/foco/accesibilidad y pantalla móvil preservados.
+
+Clarificaciones: opción y5 MiB confirmados por Mateo; WebP excluido por corrección
+posterior expresa. Un archivo por carga; sin edición posterior de CV de un caso,
+constructor de CV, importación de archivos, retención nueva o despliegue automático.
+
+Aceptación: aplicar a dos ofertas con documentos distintos conserva general y
+ambos archivos; cambiar general mantiene selecciones; empresa recibe solo el CV
+del caso derivado y pierde acceso ante revocación. Probar PDF/JPG/PNG reales y
+rechazos/WebP/animación/5 MiB, errores de Storage/DB/auditoría, roles, versiones,
+legado y capacidad de consultar documento propio sin filtrar etapas internas.
+
 ## EXTRA094 — Ajuste autorizado2026-10-28 (precedencia sobre EXTRA035)
 
 Mateo confirma este cambio de alcance; no ratifica política municipal de datos reales.
@@ -1045,6 +1081,8 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   de intereses laborales; sus selecciones históricas se conservan según EXTRA057.
 - **FR-013**: Un candidato o administrador autorizado DEBE poder incorporar y reemplazar un CV en el
   formato aprobado, sujeto a validación de tipo, tamaño e integridad antes de aceptarlo.
+  EXTRA096 admite PDF/JPG/JPEG/PNG hasta5 MiB y normaliza imágenes estáticas a PDF
+  protegido; WebP excluido. Un CV por oferta no sustituye el general.
 - **FR-014**: El sistema DEBE detectar coincidencias potenciales por DNI y correo y bloquear el alta
   de un perfil nuevo hasta una resolución administrativa. Si la coincidencia corresponde a un perfil
   asistido que la persona desea reclamar, puede existir una cuenta candidata con correo verificado,
@@ -1135,6 +1173,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
 
 - **FR-030**: Un candidato autenticado con el perfil y CV exigidos DEBE poder postularse a múltiples
   ofertas publicadas, con un seguimiento independiente por oferta.
+  Puede usar el CV general o cargar uno específico; la selección se fija al crear
+  la participación y se conserva aunque reemplace el general. Los casos anteriores
+  y nominaciones sin selección usan el CV general vigente al derivar.
 - **FR-031**: Un administrador DEBE poder asociar y derivar a un candidato activo con una
   oportunidad aunque no exista una postulación previa, siempre que su consentimiento general
   continúe vigente; no se requiere una confirmación específica de interés para cada oferta.
@@ -1502,7 +1543,7 @@ pueden cerrarse ni implementarse definitivamente hasta que responda el responsab
 | OQ-005 | Formatos oficiales de reportes | Limitar el MVP a métricas internas y CSV genérico | Oficina de Empleo | Informes oficiales adicionales; no bloquea métricas/CSV del demo | Ejemplo de formato y aprobación escrita rastreable |
 | OQ-006 | Hosting productivo y responsables operativos | No definir producción; la demostración no resuelve operación municipal | Beex / Municipalidad | Configuración y despliegue productivo | Plan operativo escrito con hosting, responsables, región, backups, incidentes y SMTP |
 | OQ-010 | Catálogo final de categorías y ocupaciones | Modelo versionable y multiselección; fixtures ficticios sin declararlos oficiales | Oficina de Empleo | Seed final y aceptación del catálogo municipal | Archivo canónico versionado y aprobación escrita rastreable |
-| OQ-017 | Tamaño y formatos de archivo aceptados | PDF y máximo técnico de 5 MiB solo para demo | Plan técnico / Municipalidad | Uso de CV reales y aceptación municipal de límites de archivo | Ratificación escrita rastreable de formatos y tamaño |
+| OQ-017 | Tamaño y formatos de archivo aceptados | EXTRA096: PDF/JPG/JPEG/PNG, máximo5 MiB y normalización a PDF para demo | Plan técnico / Municipalidad | Uso de CV reales y aceptación municipal de límites de archivo | Ratificación escrita rastreable de formatos y tamaño |
 | OQ-018 | Mapeo completo del Excel histórico | No inferir columnas; bloquear importador definitivo | Oficina de Empleo | Implementación/aceptación definitiva del importador histórico | Muestra anonimizada, mapeo versionado y aprobación escrita rastreable |
 
 La evidencia escrita puede ser un PR, issue, acta, correo o mensaje incorporado al repositorio; no

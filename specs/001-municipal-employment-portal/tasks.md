@@ -5,6 +5,30 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA096 — CV por postulación
+
+- [x] T233 Alinear C1–C6/clarificación WebP excluido, plan/modelo/contratos/calidad
+  e investigación; análisis de cobertura/constitución antes de código; EXTRA096.
+- [x] T234 [C1] Política/normalización PDF/JPG/PNG en src/lib/files y endpoints de
+  carga, límite5 MiB/16MP, rechazo estricto y trazado producción; tests reales.
+- [x] T235 [C2–C5] Migración de scopes/FK/índice/guards, helper privado compartido,
+  RPC reserva/aplicación/proyección propia y referral seleccionado; generar tipos
+  Supabase locales; pruebas roles/atomicidad/legado/versiones/otros documentos.
+- [x] T236 [C1,C2,C5,C6] POST src/app/api/candidate/applications/route.ts y formulario
+  opcional con mismos controles/errores/retención; preservar general y acciones
+  legadas; tests de rutas/servicios/formularios y red incierta.
+- [x] T237 [C3,C4,C6] Perfil/búsqueda general filtran scope y participación propia/
+  detalle administrativo abren CV seleccionado opaco; permisos empresariales y
+  nueva pestaña conservados. Pruebas de datos/vistas/negativas.
+- [x] T238 Verificar tipos/lint/tooling/unit/build/SQL y navegador candidato→Oficina
+  →empresa, perfil/asistido/imágenes/selecciones/versiones/móvil/axe; recuperación,
+  estado y convergencia acotada.1292 unit/componentes,57 tooling,1363 SQL únicas,
+  32 E2E sin omisiones/reintentos, tipos/lint/build/DB-lint/trazado/axe PASS.
+  Sin hosted/commit/PR/deploy no solicitados; convergencia C1–C6 sin brechas nuevas.
+
+Dependencias: T233→T234/T235, ambas→T236/T237→T238. Trabajo secuencial en esta
+sesión; pruebas de normalizador y DB pueden ejecutarse independientemente.
+
 ## EXTRA094 — CV, métricas y disponibilidad2026-10-28
 
 - [x] T227 Registrar R1–R5/decisiones, plan/modelo/contratos y calidad; analizar

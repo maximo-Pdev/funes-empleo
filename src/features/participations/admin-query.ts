@@ -42,7 +42,7 @@ export async function getAdminParticipation(participationId: string) {
   const client = await adminClient();
   const [participation, audit, preinterviews, contacts, notes, referral] = await Promise.all([
     client.from("participations")
-      .select("id,status,origin,version,created_at,feedback_due_at,final_outcome_at,candidate_profiles!participations_candidate_id_fkey(id,display_name),job_openings!participations_opening_id_fkey(id,title,status)")
+      .select("id,status,origin,version,created_at,feedback_due_at,final_outcome_at,application_cv_document_id,application_cv:cv_documents!participation_cv_owner_fk(id,original_name_safe,status,archived_at),candidate_profiles!participations_candidate_id_fkey(id,display_name),job_openings!participations_opening_id_fkey(id,title,status)")
       .eq("id", participationId).is("archived_at", null).maybeSingle(),
     client.rpc("admin_workflow_timeline", { p_entity_type: "participations", p_entity_id: participationId }),
     client.from("preinterviews")

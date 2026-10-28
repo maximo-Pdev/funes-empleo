@@ -9,12 +9,12 @@ beforeEach(() => { vi.clearAllMocks(); });
 it("retiene el archivo ante un rechazo del servidor y explica cómo corregirlo", async () => {
   const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ status: "invalid" }), { status: 422 }));
   const view = render(<CvUploadForm candidateId="ficticio" version={2} />);
-  const input = screen.getByLabelText("Elegir PDF") as HTMLInputElement;
+  const input = screen.getByLabelText("Elegir CV") as HTMLInputElement;
   const file = new File(["PDF ficticio"], "ficticio.pdf", { type: "application/pdf" });
   fireEvent.change(input, { target: { files: [file] } });
   fireEvent.submit(view.container.querySelector("form")!);
   await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
-  expect((await screen.findByRole("alert")).textContent).toContain("El PDF fue rechazado");
+  expect((await screen.findByRole("alert")).textContent).toContain("El archivo de CV fue rechazado");
   expect(input.files?.[0]).toBe(file);
   expect(input.getAttribute("aria-invalid")).toBe("true");
   expect(mocks.refresh).not.toHaveBeenCalled();
@@ -24,7 +24,7 @@ it("retiene el archivo ante un rechazo del servidor y explica cómo corregirlo",
 it("muestra un mensaje seguro y conserva la selección si falla la red", async () => {
   vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("private details"));
   const view = render(<CvUploadForm candidateId="ficticio" version={2} />);
-  const input = screen.getByLabelText("Elegir PDF") as HTMLInputElement;
+  const input = screen.getByLabelText("Elegir CV") as HTMLInputElement;
   const file = new File(["PDF ficticio"], "ficticio.pdf", { type: "application/pdf" });
   fireEvent.change(input, { target: { files: [file] } });
   fireEvent.submit(view.container.querySelector("form")!);
@@ -37,7 +37,7 @@ it("solo anuncia el éxito al recibir la versión nueva del perfil, antes de otr
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ status: "ok" }), { status: 200 }));
   const view = render(<CvUploadForm candidateId="ficticio" version={2} />);
   const file = new File(["PDF ficticio"], "ficticio.pdf", { type: "application/pdf" });
-  fireEvent.change(screen.getByLabelText("Elegir PDF"), { target: { files: [file] } });
+  fireEvent.change(screen.getByLabelText("Elegir CV"), { target: { files: [file] } });
   fireEvent.submit(view.container.querySelector("form")!);
   await screen.findByText("CV guardado; actualizando el perfil…");
   expect(screen.queryByText("CV guardado.", { exact: true })).toBeNull();

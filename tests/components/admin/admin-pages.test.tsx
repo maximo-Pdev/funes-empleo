@@ -126,7 +126,7 @@ it("conserva menú y regreso al apartado para un perfil asistido vinculado", asy
 it("muestra ausencia de CV sin carga, descarga o nominación desde perfil", async () => {
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(screen.getByText("El candidato no tiene un CV vigente.")).toBeTruthy();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
  expect(screen.queryByRole("button", { name: "Cargar CV" })).toBeNull();
  expect(screen.queryByRole("link", { name: "Abrir CV vigente en otra pestaña" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Nominar a una oferta" })).toBeNull();
@@ -138,7 +138,7 @@ it("muestra metadatos y descarga del CV vigente por referencia, sin formulario",
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(screen.getByText("cv-ficticio.pdf")).toBeTruthy();
  expect(screen.getByRole("link", { name: "Abrir CV vigente en otra pestaña" }).getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", id)}`);
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
 });
 it.each([
  { status: "active", origin: "self_service" },
@@ -172,7 +172,7 @@ it("protege el detalle antes de consultar candidato o CV", async () => {
 });
 it("no ofrece carga de CV ni mantenimiento para un perfil archivado", async () => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, status: "archived", account_id: null }, referralEligible: false, participations: [], notes: [], audit: [] });
- render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) })); expect(screen.queryByLabelText("Archivo PDF")).toBeNull(); expect(mocks.nominations).not.toHaveBeenCalled();
+ render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) })); expect(screen.queryByLabelText("Archivo de CV")).toBeNull(); expect(mocks.nominations).not.toHaveBeenCalled();
 });
 it("muestra candidatos después de la información e historial de oferta y fuera del grid", async () => {
  render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
@@ -221,7 +221,7 @@ it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mante
  expect(profileDetails.nextElementSibling).toBe(cvDetails);
  expect(cvDetails.nextElementSibling).toBe(screen.getByRole("heading", { name: "Nota interna de la Oficina" }).closest("form"));
  expect(screen.getByLabelText("DNI exhibido")).toHaveProperty("type", "password"); expect(screen.getByRole("button", { name: "Vincular conservando historial" })).toHaveProperty("disabled", true);
- expect(screen.getByLabelText("Archivo PDF").getAttribute("accept")).toBe(".pdf,application/pdf");
+ expect(screen.getByLabelText("Archivo de CV").getAttribute("accept")).toBe(".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png");
  expect(screen.getByRole("button", { name: "Cargar CV" })).toBeTruthy();
  expect(screen.getAllByRole("heading", { name: "Notas internas" })).toHaveLength(1);
  expect(screen.getAllByRole("heading", { name: "Historial de cuenta y perfil" })).toHaveLength(1);
@@ -240,7 +240,7 @@ it.each([
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
  expect(screen.getByRole("heading", { name: "Historial de cuenta y perfil" })).toBeTruthy();
 });
 it("oculta controles si el workspace ya informa una cuenta vinculada", async () => {
@@ -250,7 +250,7 @@ it("oculta controles si el workspace ya informa una cuenta vinculada", async () 
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).toHaveBeenCalledWith(id);
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
 });
 it("retira formularios al refrescar tras vincular sin dejar nodos de edición anteriores", async () => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", account_id: null, accounts: null }, currentCv: null, referralEligible: false, participations: [], notes: [], audit: [] });
@@ -260,7 +260,7 @@ it("retira formularios al refrescar tras vincular sin dejar nodos de edición an
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", version: 2 }, currentCv: null, referralEligible: true, participations: [], notes: [], audit: [] });
  view.rerender(await Candidate(props));
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
  expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
  expect(screen.getAllByRole("heading", { name: "Nota interna de la Oficina" })).toHaveLength(1);

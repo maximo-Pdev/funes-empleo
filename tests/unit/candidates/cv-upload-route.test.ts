@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
 vi.mock("@/lib/env/client", () => ({ getClientEnvironment: () => ({ NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3000" }) }));
 vi.mock("@/lib/files/pdf-validation", () => ({ validatePdf: vi.fn() }));

@@ -35,7 +35,7 @@ export async function getCandidateWorkspace() {
     session.client.from("candidate_consents").select("id,status,policy_version,recorded_at")
       .eq("candidate_id", profileId).order("recorded_at", { ascending: false }).order("id", { ascending: false }).limit(1),
     session.client.from("cv_documents").select("id,original_name_safe,byte_size,created_at")
-      .eq("candidate_id", profileId).eq("status", "valid").is("archived_at", null).maybeSingle(),
+      .eq("candidate_id", profileId).eq("status", "valid").is("opening_id", null).is("archived_at", null).maybeSingle(),
   ]);
   if ([profile, privateData, contacts, categories, allCategories, consents, cvs].some((item) => item.error) || !profile.data || !privateData.data) {
     throw new AppError("INTERNAL_ERROR");

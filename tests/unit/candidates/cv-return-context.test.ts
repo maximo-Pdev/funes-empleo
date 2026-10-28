@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { fixtureReference } from "../../fixtures/record-references";
 import { beforeEach, expect, it, vi } from "vitest";
+vi.mock("server-only", () => ({}));
 const mocks = vi.hoisted(() => ({ session: vi.fn(), upload: vi.fn(), rpc: vi.fn(), profile: vi.fn() }));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: mocks.session }));
 vi.mock("@/lib/env/client", () => ({ getClientEnvironment: () => ({ NEXT_PUBLIC_APP_URL: "https://portal.example.test" }) }));

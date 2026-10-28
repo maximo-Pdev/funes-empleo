@@ -1,5 +1,51 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA096 — Diseño2026-10-28: CV por caso e imágenes de entrada
+
+C1: módulo compartido de política PDF/JPG/JPEG/PNG,5 MiB. normalizeCv servidor
+reutiliza validatePdf o valida extensión+MIME+firma JPEG/PNG, sharp failOn warning,
+16MP, una página y sin APNG; rotación EXIF y recodificación JPEG sin metadatos.
+PDFKit ya instalado produce PDF de una página con imagen íntegra ajustada sin
+recortar; validar resultado5 MiB y PDF. Sin WebP/SVG/GIF/video ni paquetes nuevos.
+Trazado de fuente local para ambas rutas de archivos, runtime Node y tamaño
+controlado antes de arrayBuffer. Archivo convertido mantiene nombre seguro.pdf.
+
+C2/C3: cv_documents.opening_id nullable FK, NULL=general. Índice cv_current solo
+para general; ningún backfill. participation.application_cv_document_id nullable
+FK titular/documento, scope inmutable y constraint de oferta coherente. General
+se reemplaza sin afectar específicos. Funciones de activación, perfil, matching y
+preview filtran opening_id NULL; caso propio conserva archivo elegido al enviar.
+Referir usa selección valid/superseded si existe; legado/admin sin selección usa
+general valid. Cambio de general conserva archivo y autorización histórica.
+
+C4/C5: reserve_application_cv valida actor candidato, versión, aptitud, oferta,
+duplicados y metadatos PDF; inserta rejected/upload_pending con scope de oferta.
+Almacenamiento privado existente, sin URLs firmadas ni service-role nuevo.
+Helper privado común create_participation_with_cv conserva reglas y locks previos,
+valida Storage/metadata de reserva propia, fija CV y alta/auditoría atómicamente.
+create_participation y apply_to_opening conservan firmas como wrappers; nuevo
+apply_to_opening_with_cv recibe documento opcional. No CV válido parcial al fallar;
+reservas rejected sin acceso permanecen como en flujo actual, sin purga inventada.
+No locks durante transferencia. RLS/permiso de empresa siguen derivación exacta.
+
+C6: POST /api/candidate/applications recibe formulario con archivo opcional y
+validación/error españoles, sin depender de límite de Server Actions para binario.
+CandidateApplyForm reutiliza Form/FileInput/Button: no adjuntar usa general,
+adjuntar no lo reemplaza; preserva archivo ante error y advierte estado incierto
+ante red. Ruta/sesión revalida en servidor y DB. Enlaces de CV de caso municipal y
+postulaciones propias usan referencias opacas/nueva pestaña. Nuevo RPC propio
+my_candidate_participations_with_cv amplía proyección legada sin etapas internas,
+mantiene RPC anterior compatible; convierte referencias en servidor.
+
+Constitución I–VI: solicitud explícita coordina scope, intermediación/historial y
+stack intactos. Mismo5 MiB y bucketPDF, recuperación forward-only sin borrar
+documentos/elecciones previas. Preparar SQL/contratos/tipos y analizar antes de
+código; pruebas SQL, UI/rutas/conversión, navegador ficticio, tipos/lint/build.
+
+El proyecto Playwright application-cv depende de chromium y precede al reset de
+acceptance-concurrency. Sus ofertas ficticias no deben alterar las comprobaciones
+de conteo fijo del fixture base; no confiar en nombres de archivo para ordenarlo.
+
 ## EXTRA094 — Diseño2026-10-28, precedencia sobre EXTRA035
 
 R1: proxy GET CV mantiene sesión/RPC/Storage RLS/no-store/nosniff/refs; cambiar
@@ -835,16 +881,18 @@ del compañero pendiente.
 ### CV y archivos
 
 - Un único bucket privado `candidate-cvs`; claves opacas con UUID, nunca nombres, DNI o email.
-- Para la demostración se acepta únicamente PDF de hasta 5 MiB. Se validan extensión, MIME declarado,
-  firma `%PDF-`, tamaño y lectura básica antes de reemplazar el CV vigente. Un rechazo no lo sustituye.
+- EXTRA096: entradas PDF/JPG/JPEG/PNG de hasta5 MiB; imágenes estáticas hasta16MP,
+  convertidas a PDF de hasta5 MiB sin metadatos ni recortes. WebP excluido. Se validan
+  extensión, MIME, firma, integridad y tamaño; un rechazo no sustituye el CV vigente.
 - El acceso al CV pasa por un Route Handler autenticado que vuelve a comprobar propietario, rol y
   autorización vigente en cada solicitud, transmite el archivo con `Cache-Control: private,
   no-store` y no entrega URLs reutilizables. Esto permite revocar inmediatamente nuevos accesos desde
   el portal; una copia ya descargada queda fuera del control técnico del sistema y debe quedar
   cubierta por el aviso y la política pendiente de OQ-001.
-- Los metadatos y versiones quedan en PostgreSQL; reemplazar archiva la versión anterior. No hay
+- Los metadatos y versiones quedan en PostgreSQL; reemplazar marca superseded la versión anterior. No hay
   eliminación automática hasta que exista una política de retención aprobada. Cada derivación
-  guarda `cv_document_id`; un reemplazo solo afecta derivaciones futuras.
+  guarda `cv_document_id`; las nuevas postulaciones fijan su elección desde el alta.
+  Casos legados/nominaciones sin elección usan el general vigente al derivar.
 - El límite de 5 MiB resuelve la configuración técnica de la demostración, pero OQ-017 continúa
   requiriendo ratificación municipal antes de tratar documentos reales.
 
@@ -1108,7 +1156,7 @@ microservicios ni un backend separado para el MVP.
 | OQ-005 | Oficina de Empleo | Métricas internas y CSV genérico | Informes oficiales adicionales | Ejemplo de formato y aprobación escrita |
 | OQ-006 | Beex / Municipalidad | Solo local, preview y demo ficticia | Configuración/despliegue productivo | Plan escrito de operador, hosting, región, backups, incidentes y SMTP |
 | OQ-010 | Oficina de Empleo | Modelo versionable/multiselección y fixtures ficticios | Seed final y aceptación del catálogo | Catálogo canónico versionado y aprobación escrita |
-| OQ-017 | Plan técnico / Municipalidad | PDF y máximo técnico de 5 MiB solo para demo | CV reales y aceptación municipal del límite | Ratificación escrita de formatos y tamaño |
+| OQ-017 | Plan técnico / Municipalidad | EXTRA096: PDF/JPG/JPEG/PNG, máximo5 MiB y normalización a PDF para demo | CV reales y aceptación municipal del límite | Ratificación escrita de formatos y tamaño |
 | OQ-018 | Oficina de Empleo | Flujo/contrato versionado, sin inferencia | Importador histórico definitivo y su aceptación | Muestra anonimizada, mapeo versionado y aprobación escrita |
 
 Un PR, issue, acta, correo o mensaje incorporado al repositorio sirve como evidencia si identifica

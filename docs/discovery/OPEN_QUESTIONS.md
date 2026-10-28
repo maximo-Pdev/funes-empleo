@@ -2,6 +2,12 @@
 
 These questions must not be silently answered by implementation. Defaults listed here are temporary assumptions for discussion, not stakeholder approval.
 
+2026-10-28, EXTRA096: Mateo confirma CV general o por postulación, PDF/JPG/JPEG/PNG
+y máximo5 MiB; excluye expresamente WebP. Sustituye el supuesto de entrada solo
+PDF de OQ-017 para el alcance demo, normalizando imágenes a PDF privado. No acredita
+aprobación jurídica ni cierre de OQ-017 para datos reales; responsables originales
+y posiciones históricas debajo se conservan como trazabilidad.
+
 ## Must be resolved before the first production release
 
 | ID | Question | Current safe position | Decision owner |

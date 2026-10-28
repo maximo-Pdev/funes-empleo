@@ -700,6 +700,7 @@ export type Database = {
           created_at: string
           id: string
           mime_type: string
+          opening_id: string | null
           original_name_safe: string
           sha256: string
           status: Database["public"]["Enums"]["cv_status"]
@@ -718,6 +719,7 @@ export type Database = {
           created_at?: string
           id?: string
           mime_type: string
+          opening_id?: string | null
           original_name_safe: string
           sha256: string
           status: Database["public"]["Enums"]["cv_status"]
@@ -736,6 +738,7 @@ export type Database = {
           created_at?: string
           id?: string
           mime_type?: string
+          opening_id?: string | null
           original_name_safe?: string
           sha256?: string
           status?: Database["public"]["Enums"]["cv_status"]
@@ -759,6 +762,13 @@ export type Database = {
             columns: ["candidate_id"]
             isOneToOne: false
             referencedRelation: "candidate_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cv_documents_opening_id_fkey"
+            columns: ["opening_id"]
+            isOneToOne: false
+            referencedRelation: "job_openings"
             referencedColumns: ["id"]
           },
           {
@@ -1290,6 +1300,7 @@ export type Database = {
       }
       participations: {
         Row: {
+          application_cv_document_id: string | null
           archived_at: string | null
           archived_by: string | null
           candidate_id: string
@@ -1307,6 +1318,7 @@ export type Database = {
           withdrawal_reason: string | null
         }
         Insert: {
+          application_cv_document_id?: string | null
           archived_at?: string | null
           archived_by?: string | null
           candidate_id: string
@@ -1324,6 +1336,7 @@ export type Database = {
           withdrawal_reason?: string | null
         }
         Update: {
+          application_cv_document_id?: string | null
           archived_at?: string | null
           archived_by?: string | null
           candidate_id?: string
@@ -1341,6 +1354,13 @@ export type Database = {
           withdrawal_reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "participation_cv_owner_fk"
+            columns: ["application_cv_document_id", "candidate_id"]
+            isOneToOne: false
+            referencedRelation: "cv_documents"
+            referencedColumns: ["id", "candidate_id"]
+          },
           {
             foreignKeyName: "participations_archived_by_fkey"
             columns: ["archived_by"]
@@ -1590,6 +1610,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      my_candidate_participations_with_cv: {
+        Args: never
+        Returns: {
+          created_at: string
+          cv_document_id: string | null
+          cv_name: string | null
+          display_status: string
+          id: string
+          opening_id: string
+          opening_title: string
+          version: number
+        }[]
+      }
+      apply_to_opening_with_cv: {
+        Args: { p_candidate_version: number; p_cv?: string | null; p_opening: string }
+        Returns: string
+      }
+      reserve_application_cv: {
+        Args: {
+          p_candidate_version: number
+          p_cv: string
+          p_name: string
+          p_opening: string
+          p_path: string
+          p_sha256: string
+          p_size: number
+        }
+        Returns: undefined
+      }
       authorize_candidate_photo_mutation: { Args: { p_candidate: string; p_expected_version: number }; Returns: string }
       candidate_photo_cleanup: { Args: { p_actor: string; p_auth_user: string; p_session: string; p_candidate: string }; Returns: { id: string; storage_path: string }[] }
       candidate_photo_cleanup_pending: { Args: { p_candidate: string }; Returns: boolean }

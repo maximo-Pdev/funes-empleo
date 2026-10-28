@@ -34,7 +34,7 @@ export async function withdrawParticipation(input: unknown) {
 }
 export async function listMyParticipations() {
   const session = await candidateSession();
-  const result = await session.client.rpc("my_candidate_participations");
+  const result = await session.client.rpc("my_candidate_participations_with_cv");
   if (result.error) throw new AppError("INTERNAL_ERROR");
   return result.data ?? [];
 }
