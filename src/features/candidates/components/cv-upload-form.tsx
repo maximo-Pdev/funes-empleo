@@ -4,14 +4,15 @@ import { useRouter } from "next/navigation";
 import { Form } from "@/components/forms/form";
 import { FileInput } from "@/components/forms/file-input";
 import { Button } from "@/components/ui/button";
+import { CV_ACCEPT, CV_FILE_ERROR, CV_FORMAT_HINT, CV_REJECTION_MESSAGE, MAX_CV_BYTES } from "@/lib/files/cv-policy";
 
 const messages = {
-  invalid: "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente.",
+  invalid: `${CV_REJECTION_MESSAGE} El CV anterior sigue vigente.`,
   conflict: "El perfil cambió. Abrí el perfil en otra pestaña para revisar los cambios antes de reintentar.",
   denied: "No tenés permiso o la sesión venció. Iniciá sesión nuevamente antes de reintentar.",
 };
 
-export function CvUploadForm({ candidateId, version, returnTo, label = "Elegir PDF", buttonLabel = "Cargar o reemplazar CV" }: {
+export function CvUploadForm({ candidateId, version, returnTo, label = "Elegir CV", buttonLabel = "Cargar o reemplazar CV" }: {
   candidateId: string; version: number; returnTo?: string; label?: string; buttonLabel?: string;
 }) {
   const router = useRouter();
@@ -40,8 +41,8 @@ export function CvUploadForm({ candidateId, version, returnTo, label = "Elegir P
       } finally { setBusy(false); }
     }}>
     <input type="hidden" name="candidateId" value={candidateId} /><input type="hidden" name="version" value={version} />{returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-    <FileInput label={label} hint="PDF válido de hasta 5 MiB." error={error} name="cv" accept=".pdf,application/pdf" required
-      data-max-bytes={5 * 1024 * 1024} data-file-error="Elegí un PDF no vacío de hasta 5 MiB." />
+    <FileInput label={label} hint={CV_FORMAT_HINT} error={error} name="cv" accept={CV_ACCEPT} required
+      data-max-bytes={MAX_CV_BYTES} data-file-error={CV_FILE_ERROR} />
     {saved && <p role="status">CV guardado.</p>}
     {refreshing && <p role="status">CV guardado; actualizando el perfil…</p>}
     <Button type="submit" disabled={busy || refreshing}>{busy || refreshing ? "Cargando CV…" : buttonLabel}</Button>

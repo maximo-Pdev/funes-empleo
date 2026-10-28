@@ -56,7 +56,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         {editable && <div className="space-y-3 border-t border-border pt-3">
           <h3 className="font-semibold">Cargar o reemplazar CV</h3>
           <p>La carga conserva las versiones anteriores usadas en derivaciones.</p>
-          <CvUploadForm candidateId={candidateId} version={editable.profile.version} label="Archivo PDF" buttonLabel="Cargar CV" />
+          <CvUploadForm candidateId={candidateId} version={editable.profile.version} label="Archivo de CV" buttonLabel="Cargar CV" />
         </div>}
       </section>;
 

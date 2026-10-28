@@ -1,5 +1,15 @@
 # Municipal visual reference
 
+## EXTRA096 — CV por postulación
+
+CV acepta PDF/JPG/JPEG/PNG hasta5 MiB; excluir WebP/video y animaciones. Explicar
+que imágenes se preparan como PDF; no cambiar visor o estilos de formularios.
+En Postularme, archivo opcional: sin archivo usa CV general actual; con archivo
+usa CV específico sin reemplazar general. Selección fija después de enviar.
+Errores conservan archivo/datos; éxito deshabilita nuevo envío hasta refresh.
+Caso municipal y postulaciones propias enlazan CV elegido, referencia opaca y
+nueva pestaña. Reutilizar Form/FileInput/Button y foco de feedback.
+
 ## EXTRA094 —2026-10-28
 
 CV: Abrir CV, nueva pestaña y rel noopener noreferrer; conservar estilos/primitivas.

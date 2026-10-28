@@ -722,3 +722,14 @@ referrals.post_hire_access_until fija confirmación+720h solo en permiso propio
 previamente active y autorizado; revoked sigue terminal. Otras derivaciones y
 participaciones no cambian. Historial previo permanece sin backfill/reconsentir.
 Se conserva source hiring_workflow únicamente como historial legado.
+## EXTRA096 — Extensión de documentos por postulación
+
+cv_documents.opening_id nullable FK a oferta: NULL solo CV general, no NULL reserva/
+documento específico de esa oferta. cv_current único valid no archivado solo para
+general. Específicos no se reemplazan al editar general y scope no puede cambiar.
+participations.application_cv_document_id nullable FK compuesta documento/titular,
+constraint de scope igual a oferta o general. Se fija en inserción propia incluso
+al usar general actual. Documento valid/superseded, no rechazado/archivado al compartir.
+Casos existentes/admin nomination sin selección siguen NULL, sin backfill. Bytes
+inmutables/versionados y permisos exactos de referral.cv_document_id preservados.
+Entrada JPG/PNG se normaliza a PDF, por lo que mime_type/path/bucket siguen PDF.

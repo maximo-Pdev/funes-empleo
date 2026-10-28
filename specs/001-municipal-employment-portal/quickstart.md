@@ -1,5 +1,15 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA096 — CV por postulación
+
+Ver `docs/operations/application-cv.md`. Aplicar20261028210445 antes de UI.
+Probar PDF/JPG/JPEG/PNG hasta5 MiB; excluir WebP/animación/formatos falsos. Desde
+postulación usar CV general o específico, sin reemplazar general/otra oferta.
+Reemplazar general después y comprobar la selección inicial desde postulaciones,
+caso municipal y empresa derivada; empresa ajena/revocada sin archivo. Carga propia
+y presencial con imágenes, error conserva archivo, móvil/teclado/axe y nueva pestaña.
+Ejecutar pgTAP026 y regresiones de activación/matching/derivación/contratación.
+
 EXTRA087 sustituye EXTRA086: comprobar avance cada3s en1440px y390px, vuelta al
 principio y solo flechas circulares (EXTRA088), sin Pausar/Reanudar. Hover/foco pausan temporalmente y
 reanuda solo al salir; reduced-motion/pestaña oculta sin avance, cleanup al

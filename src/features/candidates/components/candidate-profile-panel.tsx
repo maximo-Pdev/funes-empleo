@@ -107,7 +107,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
       </Attachment> : <Empty className={styles.empty}><EmptyHeader><EmptyMedia variant="icon"><FileText aria-hidden="true" /></EmptyMedia>
         <EmptyTitle>Todavía no hay un CV vigente.</EmptyTitle><EmptyDescription>Cargá un PDF válido para completar este requisito del perfil.</EmptyDescription>
       </EmptyHeader></Empty>}
-      {cvMessage && <p role={cvMessage === "ok" ? "status" : "alert"}>{cvMessage === "ok" ? "CV guardado." : cvMessage === "conflict" ? "El perfil cambió. Recargá antes de reemplazar el CV." : "El PDF fue rechazado. Revisá formato, estructura y tamaño (máximo 5 MiB). El CV anterior sigue vigente."}</p>}
+      {cvMessage && <p role={cvMessage === "ok" ? "status" : "alert"}>{cvMessage === "ok" ? "CV guardado." : cvMessage === "conflict" ? "El perfil cambió. Recargá antes de reemplazar el CV." : "El archivo de CV fue rechazado. Usá PDF, JPG/JPEG o PNG de hasta 5 MiB. El CV anterior sigue vigente."}</p>}
       <CvUploadForm candidateId={profile.id} version={profile.version} returnTo={cvReturnTo} />
     </section>
     <section className={styles.section} aria-label="Consentimiento de prueba">

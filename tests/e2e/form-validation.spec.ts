@@ -97,12 +97,12 @@ test("PDF rechazado: no navega, conserva el archivo elegido y el CV vigente", as
   await page.goto("/dashboard?section=perfil");
   await expect(page.locator("[data-form-field]").filter({ has: page.getByLabel("Habilidades y experiencia") })).toHaveCSS("grid-column-end", "-1");
   const currentCv = await page.getByRole("link", { name: "Abrir mi CV en otra pestaña" }).getAttribute("href");
-  const input = page.getByLabel("Elegir PDF");
+  const input = page.getByLabel("Elegir CV");
   await input.setInputFiles({ name: "rechazado-ficticio.pdf", mimeType: "application/pdf", buffer: Buffer.from("PDF ficticio dañado") });
   const response = page.waitForResponse(result => result.url().endsWith("/api/candidate/cv") && result.request().method() === "POST");
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
   expect((await response).status()).toBe(422);
-  await expect(page.getByText(/El PDF fue rechazado/)).toBeVisible();
+  await expect(page.getByText(/El archivo de CV fue rechazado/)).toBeVisible();
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
   expect(await input.evaluate(element => (element as HTMLInputElement).files?.[0]?.name)).toBe("rechazado-ficticio.pdf");
   await expect(input).toHaveAttribute("aria-invalid", "true");

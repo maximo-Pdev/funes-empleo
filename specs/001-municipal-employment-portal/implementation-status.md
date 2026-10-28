@@ -1,6 +1,60 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-25 al final.** Los apartados previos son
+## EXTRA098 — Corrección CI del PR82
+
+CI40777824782/1d510dd: application pasó tipos/lint/tooling/unit/build/SQL y falló
+por inventario HTTP obsoleto tras mover postulación a Route Handler. El export
+applyToOfferAction ya no tiene endpoint compilado; se mantiene en inventario con
+exclusión explícita que exige0 y se prueba POST /api/candidate/applications real.
+RED1/GREEN8 HTTP y264 pruebas directas, tipos/lint PASS. Rol/suspensión/candidato
+ajeno rechazados sin crear CV/casos/auditoría ni exponer PII. Sin cambios de producto,
+schema o permisos. Database falló antes de tests por54322 ocupado; observar el
+siguiente runner antes de cambiar configuración. Nueva CI/revisión pendientes.
+
+## EXTRA096 — CV por postulación,2026-10-28
+
+Rama feat/application-specific-cv-and-images desde main bef7ddf (PR81 mergeado).
+PR/rama anterior retirados tras comprobar el merge; next-env.d.ts ajeno preservado.
+Pedido posterior: aplicar migración y publicar PR; evidencia de ejecución EXTRA097.
+
+C1–C6 implementados: PDF/JPG/JPEG/PNG hasta5 MiB, sin WebP; normalización privada
+a PDF, opción general/específico al postular y documento fijo por caso. General,
+otros casos, historia y permisos empresariales conservados. Casos legados y
+nominaciones sin selección siguen tomando general al derivar. Alcance y recovery
+en docs/operations/application-cv.md; esquema y RPC aditivos20261028210445.
+
+Spec→clarify→plan→checklist7/7→tasks→analyze revisados por etapa antes de código;
+cobertura C1–C6 completa, sin críticos/altos ni decisiones funcionales pendientes.
+No equivale a aprobación jurídica ni revisión humana de implementación.
+
+Verificados1292 unit/componentes/104 archivos,57 tooling, tipos y lint, build de
+producción y trazado TTF en ambas rutas. En base ficticia aislada:26 archivos SQL
+1361 PASS y026 ampliado48/48 (1363 pruebas únicas), lint public/private0 errores.
+Recorrido específico con imágenes/perfil/presencial/empresa/revocación y carrera
+de dos envíos PASS. Verificación final E2E ordenada32/32 en3,8min sin omisiones ni
+reintentos PASS; móvil390/1440px, teclado y axe0. Colección del proyecto real y
+dependencias verificadas (132 casos hasta application-cv). Convergencia del delta:
+6 criterios,6 principios y decisiones del plan satisfechos;0 brechas nuevas, sin
+anexar tareas vacías ni cerrar pendientes históricos. T233–T238 completas.
+
+Diagnóstico: los proyectos E2E se agrupan por worker; se añadió dependencia
+application-cv después de chromium para no contaminar conteos originales. Un
+pgTAP de fallo inyectado simultáneo al navegador causó un deadlock de pruebas;
+verificación final por fases, sin tocar backend de suspensión. Capturas ficticias,
+recibos y logs en test-results ignorado. OQ/gates históricos siguen abiertos.
+
+EXTRA097:20261028210445 aplicada y registrada en Supabase compartido por solicitud
+posterior de Mateo. Hash SQL almacenado874964da8450b6c5257c7d4c0726432e y13 cuerpos
+coinciden; ACL/RLS/FK/índices/triggers verificados, historial +1 y recuentos intactos.
+Advisor60→63 WARN solo por los tres RPC autenticados previstos,0 ERROR; ninguna
+exposición nueva a anon ni cambios en datos alojados. Ofertas/filtros públicos
+conservan formato. Publicación del PR y sus checks pendientes; no afirmar deploy UI.
+
+Publicado después: implementación8c0ef6f sin firma/signoff/coautoría y PR82 abierto
+hacia main, sin borrador, adjunto a la conversación. Migración compartida aplicada
+antes de publicar; next-env.d.ts preservado/excluido. CI/revisión/merge pendientes.
+
+**Estado vigente: ver EXTRA096 arriba y las actualizaciones históricas al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).

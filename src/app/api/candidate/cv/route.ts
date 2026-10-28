@@ -2,7 +2,8 @@ import { referenceUrl } from "@/lib/records/reference-url";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { readAccountSession } from "@/lib/auth/session";
-import { validatePdf } from "@/lib/files/pdf-validation";
+import { normalizeCv } from "@/lib/files/cv-normalization";
+import { MAX_CV_BYTES } from "@/lib/files/cv-policy";
 import { getClientEnvironment } from "@/lib/env/client";
 import { databaseUuidSchema } from "@/validation/common";
 
@@ -50,8 +51,8 @@ export async function POST(request: Request) {
   }
   if (profile.data.version !== version.data) return result("conflict", destination);
   // Bound the read before allocating a second copy of an oversized upload.
-  if (file.size > 5 * 1024 * 1024 || file.size < 1) return result("invalid", destination);
-  const pdf = validatePdf(file.name, file.type, new Uint8Array(await file.arrayBuffer()));
+  if (file.size > MAX_CV_BYTES || file.size < 1) return result("invalid", destination);
+  const pdf = await normalizeCv(file.name, file.type, new Uint8Array(await file.arrayBuffer()));
   if (!pdf) return result("invalid", destination);
   const cvId = crypto.randomUUID();
   const path = `${candidateId}/${cvId}.pdf`;

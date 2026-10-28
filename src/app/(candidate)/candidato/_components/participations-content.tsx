@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RecordAnchor } from "@/components/ui/record-link";
 import { ArrowRight, CalendarDays, ClipboardList } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
 import styles from "../_components/candidate-forms.module.css";
@@ -17,6 +18,7 @@ export async function renderCandidateParticipationsContent({ offersHref = "/dash
           <h2 className="break-words text-xl font-bold leading-7 text-primary-900">{item.opening_title ?? "Oferta"}</h2>
           <p className="mt-4 text-sm"><span className="sr-only">Estado: </span><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></p>
           <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {new Date(item.created_at).toLocaleDateString("es-AR")}</p>
+          {item.cv_document_id && <p className="mt-4"><RecordAnchor href={`/api/cv/${item.cv_document_id}`} target="_blank" rel="noopener noreferrer" className="text-primary underline">Abrir CV de esta postulación: {item.cv_name}</RecordAnchor></p>}
           {item.display_status === "received" && <div className={`${styles.forms} mt-5 border-t border-border pt-3`}><CandidateWithdrawForm participationId={item.id} version={item.version} /></div>}
         </Card>
       </li>)}</ul>}

@@ -2,7 +2,7 @@ import { recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { contactChannelLabels, feedbackOutcomeLabels, displayLabel, referralAccessLabels } from "@/domain/presentation/labels";
 import { feedbackReviewTones, referralAccessTones, statusTone } from "@/domain/presentation/status-tone";
-import { RecordLink as Link } from "@/components/ui/record-link";
+import { RecordLink as Link, RecordAnchor } from "@/components/ui/record-link";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { Badge, EmptyState, FeedbackMessage } from "@/components/ui";
 import { getAdminParticipation } from "@/features/participations/admin-query";
@@ -64,6 +64,9 @@ export default async function AdminParticipationDetailPage({ params }: {
           <p>Candidato: <Link href={`/admin/candidates/${participation.candidate_profiles.id}`} className="text-blue-800 underline">{participation.candidate_profiles.display_name}</Link></p>
           <p>Oferta: <Link href={`/admin/openings/${participation.job_openings.id}`} className="text-blue-800 underline">{participation.job_openings.title ?? "Oferta sin título"}</Link></p>
           <p>Origen: {participation.origin === "admin_nomination" ? "Nominación administrativa" : "Postulación"}</p>
+          {participation.application_cv && !participation.application_cv.archived_at && ["valid", "superseded"].includes(participation.application_cv.status)
+            ? <p><RecordAnchor href={`/api/cv/${participation.application_cv.id}`} target="_blank" rel="noopener noreferrer" className="text-primary underline">Abrir CV de esta postulación: {participation.application_cv.original_name_safe}</RecordAnchor></p>
+            : <p>{participation.application_cv_document_id ? "El CV seleccionado ya no está disponible." : "Sin CV seleccionado al ingresar: se usará el vigente al derivar."}</p>}
           <p>Ingresó: {localDate(participation.created_at)}</p>
           <p>Respuesta esperada: {participation.feedback_due_at ? localDate(participation.feedback_due_at) : "Aún no derivada"}</p>
           {referral && <p className="flex flex-wrap items-center gap-2">Acceso empresarial <Badge variant="status" tone={statusTone(referralAccessTones, referral.access_status)}>{displayLabel(referralAccessLabels, referral.access_status)}</Badge>{referral.access_status === "active" ? <span className="text-sm text-muted-foreground">bajo condiciones vigentes</span> : null}</p>}

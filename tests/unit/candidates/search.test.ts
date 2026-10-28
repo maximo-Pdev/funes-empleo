@@ -21,7 +21,7 @@ describe("búsqueda administrativa de candidatos", () => {
       account_id: "account-1", status: "active", availability: "available", archived_at: null,
       refresh_due_at: "2027-01-01T00:00:00Z", accounts: { status: "active" },
       candidate_consents: [{ id: "consent-1", status: "accepted", recorded_at: "2026-09-20T00:00:00Z" }],
-      cv_documents: [{ status: "valid", archived_at: null }],
+      cv_documents: [{ status: "valid", archived_at: null, opening_id: null }],
     };
     expect(candidateIsReferralEligible(base, current)).toBe(true);
     expect(candidateIsReferralEligible({ ...base, candidate_consents: [
@@ -30,6 +30,7 @@ describe("búsqueda administrativa de candidatos", () => {
     expect(candidateIsReferralEligible({ ...base, accounts: { status: "suspended" } }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, refresh_due_at: "2026-09-23T11:59:59Z" }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, cv_documents: [] }, current)).toBe(false);
+    expect(candidateIsReferralEligible({ ...base, cv_documents: [{ status: "valid", archived_at: null, opening_id: "other-offer" }] }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, availability: null }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, availability: "unavailable" }, current)).toBe(false);
     expect(candidateIsReferralEligible({ ...base, account_id: null, accounts: null }, current)).toBe(true);
@@ -53,7 +54,7 @@ describe("búsqueda administrativa de candidatos", () => {
       { id: "c", display_name: "C", candidate_consents: [{ id: "1", status: "accepted", recorded_at: "2026-09-20T00:00:00Z" }] },
     ].map((row) => ({ ...row, account_id: null, accounts: null, locality: "Funes", skills_experience_summary: null,
       availability: "available", status: "active", refresh_due_at: "2027-01-01T00:00:00Z",
-      archived_at: null, version: 1, candidate_categories: [], cv_documents: [{ status: "valid", archived_at: null }] }));
+      archived_at: null, version: 1, candidate_categories: [], cv_documents: [{ status: "valid", archived_at: null, opening_id: null }] }));
     const query = { is: vi.fn(), order: vi.fn(), range: vi.fn(), eq: vi.fn(), gt: vi.fn(),
       then: (resolve: (value: unknown) => unknown) => resolve({ data: rows, error: null }) };
     for (const method of ["is", "order", "range", "eq", "gt"] as const) query[method].mockReturnValue(query);

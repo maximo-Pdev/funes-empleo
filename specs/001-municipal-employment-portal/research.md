@@ -588,3 +588,21 @@ descartadas porque reducen comparabilidad o no validan usabilidad real y accesib
   modificar RPC/grants para ocultar el formulario una vez aceptado.
 - Supabase/Postgres: bloqueo candidato existente serializa consentimiento/nominación
   con contratar; no añadir trigger o segundo request que rompa atomicidad.
+## Investigación EXTRA096 —2026-10-28
+
+Sharp constructor documenta limitInputPixels/failOn/pages; PDFKit images acepta
+buffer JPEG con fit sin recortar. Reutilizar paquetes fijados ya presentes y TTF
+local en runtime; no decoder SVG o formato WebP por corrección humana.
+https://sharp.pixelplumbing.com/api-constructor/
+https://pdfkit.org/docs/images.html
+
+Supabase funciones: mantener search_path vacío, guard de actor y grants explícitos;
+helper compartido privado evita duplicar criterios de participación y sobrecarga
+ambigua en PostgREST. Upload pendiente antes de alta transaccional como flujo CV
+existente. Modificar solo alcance de CV en selectores generales evita múltiples
+filas/matching duplicado. Wrappers permiten compatibilidad de consumidores.
+https://supabase.com/docs/guides/database/functions
+
+shadcn Base Button/registro y componentes existentes se consultan antes de UI;
+reutilizar FileInput/Form/Button adaptados, sin nueva librería ni controles locales.
+https://ui.shadcn.com/docs/components/base/button

@@ -402,7 +402,7 @@ test("cambiar CV y contactos conserva la instantánea derivada", async ({ browse
     await candidate.getByRole("button", { name: "Guardar teléfono" }).click();
     await expect(candidate.getByText("Contacto actualizado.")).toBeVisible();
     await candidate.reload();
-    await candidate.getByLabel("Elegir PDF").setInputFiles("tests/fixtures/cv-fictitious.pdf");
+    await candidate.getByLabel("Elegir CV").setInputFiles("tests/fixtures/cv-fictitious.pdf");
     await candidate.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
     await expect(candidate).toHaveURL(/\/dashboard\?section=perfil$/);
     await expect(candidate.getByText("CV guardado.", { exact: true })).toBeVisible();

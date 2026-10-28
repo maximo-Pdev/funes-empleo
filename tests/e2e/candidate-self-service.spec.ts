@@ -86,7 +86,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.reload();
   await expect(page.getByText("Ya aceptaste el consentimiento.", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "Guardar consentimiento" })).toHaveCount(0);
-  await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
+  await page.getByLabel("Elegir CV").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   let releaseRefresh!: () => void;
   const refreshGate = new Promise<void>(resolve => { releaseRefresh = resolve; });
   const profileRoute = (url: URL) => url.pathname === "/dashboard" && url.searchParams.get("section") === "perfil";
@@ -174,14 +174,14 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.reload();
   await expect(phone).toHaveValue("");
   const originalCv = await page.getByRole("link", { name: "Abrir mi CV en otra pestaña" }).getAttribute("href");
-  await page.getByLabel("Elegir PDF").setInputFiles({
+  await page.getByLabel("Elegir CV").setInputFiles({
     name: "rechazado.pdf", mimeType: "application/pdf", buffer: Buffer.from("PDF ficticio dañado"),
   });
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page.getByText("El PDF fue rechazado.", { exact: false })).toBeVisible();
+  await expect(page.getByText("El archivo de CV fue rechazado.", { exact: false })).toBeVisible();
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
   await expect(page.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).toHaveAttribute("href", originalCv!);
-  await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
+  await page.getByLabel("Elegir CV").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
   await expect(page.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).not.toHaveAttribute("href", originalCv!);
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);

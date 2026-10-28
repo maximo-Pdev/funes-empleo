@@ -1,5 +1,10 @@
 # Contratos del MVP
 
+EXTRA096: [application-cv.md](./application-cv.md) define carga opcional por
+postulación, entradas PDF/JPG/JPEG/PNG hasta5 MiB sin WebP, normalización PDF y
+reserva/alta/auditoría atómicas. Wrappers anteriores compatibles; CV general y
+selección por caso separados. [Guía y recuperación](../../../docs/operations/application-cv.md).
+
 EXTRA069,2026-10-25: company_referral_summaries(uuid) añade candidate_name a las
 referencias propias autorizadas y company_referral(uuid) conserva candidateName
 aun revocado el permiso completo. Cuenta/empresa activas, oferta/caso/derivación
