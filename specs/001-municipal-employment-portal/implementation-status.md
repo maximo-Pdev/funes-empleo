@@ -1583,3 +1583,46 @@ La prueba observa ahora el índice de la oferta visible en lugar de una cadena
 transform fraccionaria; mantiene3s, hover3200ms y polling5s. Seis repeticiones
 1440/390 PASS sin retries, tipos/lint/diff PASS. Sin cambio de producto/build/SQL;
 T226 implementado, nueva CI y revisión de PR80 pendientes al publicar.
+# 2026-10-28 — EXTRA094: CV, métricas y disponibilidad
+
+Rama feat/cv-metrics-candidate-availability desde main e864cfb tras merge80
+confirmado; rama anterior retirada local/remota, next-env.d.ts ajeno intacto.
+Spec/clarificaciones/plan/modelo/contratos/calidad/tareas/análisis previos; cobertura
+R1–R5 sin críticos/altos, decisiones explícitas de Mateo, no aprobación legal.
+
+CV proxy inline y cuatro enlaces nueva pestaña, guardas/versiones/refs intactas.
+Métricas seis indicadores y dos gráficos HTML servidor, detalle/definiciones
+plegados y exports completos. Consentimiento vigente no vuelve a solicitarse.
+Migración20261028104205 cambia disponibilidad atómicamente en normal/tardía,
+conserva consentimiento/otros casos y fija720h solo permiso propio todavía active.
+Revocado/tardío no recupera datos; retiro manual sigue global, sin backfill.
+
+1257 unit/100 archivos, tooling57, tipos/lint/build/diff PASS.1315 SQL/25 archivos
+PASS, normal/tardía/720h/roles/retirada/rollback/otros casos/legado. Advisor security
+local sin incidencias. Treinta E2E iniciales PASS y tres reparados entre seis finales
+PASS,33 escenarios afectados cubiertos sin retries/omisiones. Diagnósticos de
+selectores viejos y visor PDF headless en EXTRA094; sin cambios de producto para
+ocultarlos.1440/390px visual/axe0/teclado, exports reales y popup/origen PASS.
+Convergencia acotada5/5 sin brechas nuevas, T227–232 implementados.
+
+Solo base ficticia propia funes-admin-cv-check fue reiniciada;500 PDF de prueba,
+puertos3001/54341/54342. Entorno habitual preservado. Migración alojada, publicación,
+commit/PR/CI y revisión humana pendientes; no se declaran suite E2E completa,
+SC008A fría de cuatro administradores ni tareas históricas del MVP cerradas.
+
+## 2026-10-28 — EXTRA095: aplicación alojada solicitada
+
+Mateo solicita migración y PR. MCP carece de permisos para el proyecto; CLI
+vinculado sí permite acceso. Dry-run --skip-vault detecta versiones antiguas
+remotas distintas. Se verifica baseline exacto y aplica solo20261028104205 con
+registro de versión/nombre/SQL en la misma transacción, sin repair ni pendientes
+ajenas. Hash cuerpo/archivo almacenado coinciden, firma/ACL/RLS/search_path y
+recuentos de negocio intactos; historial +1. Advisor60 WARN previos sin nuevos,
+cero ERROR. No contratación real/backfill/deploy manual ni restauración de permisos.
+Publicación de commit/PR y sus checks pendientes en este punto; pruebas locales
+de EXTRA094 siguen válidas, no hubo nuevos cambios de producto.
+
+Publicación posterior autorizada: implementación77c41b5 sin firma/signoff/coautoría
+y PR81 abierto hacia main, sin borrador, adjunto a la conversación. Evidencia de
+migración alojada en EXTRA095; CI/revisión/merge aún pendientes. next-env.d.ts
+ajeno y test-results/credenciales excluidos. No despliegue manual de UI.

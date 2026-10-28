@@ -1,5 +1,15 @@
 # Municipal visual reference
 
+## EXTRA094 —2026-10-28
+
+CV: Abrir CV, nueva pestaña y rel noopener noreferrer; conservar estilos/primitivas.
+Métricas: seis tarjetas principales, dos distribuciones de barras con etiquetas/
+valores textuales y tokens, sin depender del color; datos restantes en Ver detalle
+cerrado. Definiciones en Más información, guardas y descargas completas intactas.
+Consentimiento aceptado muestra estado, sin checkbox/botón de aceptación. Texto
+explica conservación al contratar y No disponible, acceso720h de empresa contratante
+y que permisos revocados no regresan. Datos de prueba siguen sin aprobación legal.
+
 ## Portal follow-ups — EXTRA085
 
 EXTRA090: name both popup and list of every combobox for its field (categories,

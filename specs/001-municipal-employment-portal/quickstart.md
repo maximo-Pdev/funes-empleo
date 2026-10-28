@@ -478,3 +478,12 @@ El `.env.example` futuro documentará nombres sin secretos:
 
 No se incorpora una variable SMTP productiva ni secretos de cron mientras sus decisiones sigan
 pendientes o el trabajo se ejecute dentro de Supabase Cron.
+# Verificación focal EXTRA094
+
+En Supabase ficticio aislado aplicar nueva migración y ejecutar suite pgTAP.
+Contratación normal/tardía conserva eventos de consentimiento, marca No disponible,
+audita actor/fecha/causa y mantiene otros casos. Permiso normal sigue hasta720h,
+tardío revocado permanece; retirar manualmente conserva cierres/revocación.
+Abrir CV desde perfil propio/admin/empresa/preview conserva pestaña origen y usa
+PDF inline sin URL Storage. Métricas seis tarjetas/dos gráficos/detalle cerrado,
+exports completos y mismos filtros; probar cero/null y390/1440px/teclado/axe.

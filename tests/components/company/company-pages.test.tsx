@@ -155,14 +155,14 @@ it("identifica la persona en lista y encabezado al informar tras revocar, sin pe
  expect(screen.getByRole("button", { name: "Enviar informe" })).toBeTruthy();
  expect(screen.queryByRole("heading", { name: "Perfil laboral derivado" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Contactos vigentes" })).toBeNull();
- expect(screen.queryByRole("link", { name: /Descargar CV/ })).toBeNull();
+ expect(screen.queryByRole("link", { name: /Abrir CV/ })).toBeNull();
  expect(within(screen.getByRole("region", { name: "Derivación de Persona derivada ficticia" })).getByRole("status").textContent).toContain("nombre");
 });
 it("mantiene fallback seguro si un detalle histórico no contiene nombre", async () => {
  mocks.references.mockResolvedValue([{ referral_id: id, opening_title: offer.title, referred_at: referral.referredAt }]);
  mocks.referral.mockResolvedValue({ ...referral, candidate: undefined }); render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({ referral: id }) }));
  expect(mocks.referral).toHaveBeenCalledWith(id, id); expect(screen.getByRole("button", { name: "Enviar informe" })).toBeTruthy();
- expect(screen.queryByRole("link", { name: /Descargar CV/ })).toBeNull(); expect(screen.queryByRole("button", { name: "Registrar entrevista" })).toBeNull();
+ expect(screen.queryByRole("link", { name: /Abrir CV/ })).toBeNull(); expect(screen.queryByRole("button", { name: "Registrar entrevista" })).toBeNull();
  expect(screen.queryByText("Persona Ficticia")).toBeNull(); expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
 });
 it("la contratación propia conserva solo nombre y no ofrece CV/contactos/entrevista/informe", async () => {
@@ -170,7 +170,7 @@ it("la contratación propia conserva solo nombre y no ofrece CV/contactos/entrev
  render(await CompanyOpeningReferrals({ openingId: id }));
  expect(screen.getByRole("heading", { name: "Derivación de Persona contratada ficticia" })).toBeTruthy();
  expect(screen.getByText("Contratado", { exact: true })).toBeTruthy();
- expect(screen.queryByRole("link", { name: /Descargar CV/ })).toBeNull();
+ expect(screen.queryByRole("link", { name: /Abrir CV/ })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Contactos vigentes" })).toBeNull();
  expect(screen.queryByRole("button", { name: "Enviar informe" })).toBeNull();
  expect(screen.queryByRole("button", { name: "Registrar entrevista" })).toBeNull();

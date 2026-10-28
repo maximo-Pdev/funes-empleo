@@ -85,150 +85,116 @@ select throws_ok($$select public.transition_participation(private.fixture_id('hc
 select ok(not has_function_privilege('anon','public.transition_participation(uuid,integer,text,text,uuid,uuid,uuid)','EXECUTE'),'El anónimo no puede invocar la transición');
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee240000-0000-4000-8000-000000000001')::text,true);
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),2,'hire','Contratación ficticia')$$,
- 'P0001','CONFLICT_STALE_DATA','Versión obsoleta no contrata ni retira');
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire')$$,
- 'P0001','INVALID_INPUT','Contratación exige evidencia o motivo');
-select lives_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire','Contratación ficticia')$$,
- 'Contratación normal retira consentimiento y permisos en el mismo comando');
-select is((select status::text from public.participations where id=private.fixture_id('hc-part',1)),'hired','Solo el caso contratado cambia a hired');
-select is((select status::text from public.candidate_profiles where id=private.fixture_id('hc-profile',1)),'consent_withdrawn','Perfil deja de ser apto para derivar');
-select is((select version from public.candidate_profiles where id=private.fixture_id('hc-profile',1)),2,'El cambio invalida la versión anterior del perfil');
-select is((select status::text from public.candidate_consents where candidate_id=private.fixture_id('hc-profile',1) order by recorded_at desc,id desc limit 1),
- 'withdrawn','El último consentimiento global queda retirado');
-select is((select count(*) from public.candidate_consents where candidate_id=private.fixture_id('hc-profile',1)),2::bigint,'Se agrega un retiro sin borrar la aceptación');
-select ok(not private.current_consent(private.fixture_id('hc-profile',1)),'La autorización de consentimiento ya deniega nuevas derivaciones');
-select is((select count(*) from public.referrals where candidate_id=private.fixture_id('hc-profile',1) and access_status='active'),0::bigint,'Revoca también el permiso de la otra empresa');
-select ok((select post_hire_access_until is null from public.referrals where id=private.fixture_id('hc-referral',1)),'No crea una nueva ventana720h');
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',3),1,'refer','Otra derivación ficticia')$$,
- 'P0001','INVALID_TRANSITION','Un caso preservado no puede derivarse mientras el consentimiento esté retirado');
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire','Reintento ficticio')$$,
- 'P0001','CONFLICT_STALE_DATA','Reintento no duplica retiro ni resultado');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),2,'hire','Contratación ficticia')$$,'P0001','CONFLICT_STALE_DATA','Versión obsoleta no contrata');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire')$$,'P0001','INVALID_INPUT','Contratación exige evidencia o motivo');
+select lives_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire','Contratación ficticia')$$,'Contratación normal conserva consentimiento y cambia disponibilidad');
+select is((select status::text from public.participations where id=private.fixture_id('hc-part',1)),'hired','Resultado hired');
+select is((select status::text from public.candidate_profiles where id=private.fixture_id('hc-profile',1)),'unavailable','Perfil No disponible');
+select is((select availability from public.candidate_profiles where id=private.fixture_id('hc-profile',1)),'unavailable','Disponibilidad No disponible');
+select is((select version from public.candidate_profiles where id=private.fixture_id('hc-profile',1)),2,'Versión del perfil invalidada');
+select ok(private.current_consent(private.fixture_id('hc-profile',1)),'Consentimiento sigue vigente');
+select is((select count(*) from public.candidate_consents where candidate_id=private.fixture_id('hc-profile',1)),1::bigint,'No se registra otra aceptación ni retiro');
+select is((select count(*) from public.referrals where candidate_id=private.fixture_id('hc-profile',1) and access_status='active'),3::bigint,'Otros permisos intactos');
+select ok((select r.post_hire_access_until=p.final_outcome_at+interval '720 hours' from public.referrals r join public.participations p on p.id=r.participation_id where r.id=private.fixture_id('hc-referral',1)),'Ventana exactamente720h desde confirmación');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',3),1,'refer','Otra derivación ficticia')$$,'P0001','INVALID_TRANSITION','No disponible impide nuevas derivaciones');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',1),1,'hire','Reintento ficticio')$$,'P0001','CONFLICT_STALE_DATA','Reintento no duplica resultado o ventana');
 reset role;
-select ok(not exists(select 1 from original_consents original join public.candidate_consents current using(id)
- where to_jsonb(original)<>to_jsonb(current)),'El consentimiento anterior permanece inalterado');
-select ok(exists(select 1 from public.candidate_consents withdrawal join original_consents original using(candidate_id)
- where withdrawal.source='hiring_workflow' and withdrawal.status='withdrawn' and withdrawal.policy_version=original.policy_version
- and withdrawal.policy_hash=original.policy_hash and withdrawal.recorded_at>original.recorded_at
- and withdrawal.recorded_by=private.fixture_id('admin',1)),'Retiro conserva política/hash, admin y fecha posterior');
-select ok(exists(select 1 from public.audit_events event join private.workflow_decisions decision
- on decision.id=(event.metadata_safe->>'decision_id')::uuid
- where event.entity_id=private.fixture_id('hc-profile',1) and event.action='consent_withdrawn' and event.reason_code='hired'
- and event.actor_account_id=private.fixture_id('admin',1) and event.actor_type='account' and event.occurred_at is not null
- and decision.entity_id=private.fixture_id('hc-part',1) and decision.command='hiring_consent_withdrawal'),
- 'Auditoría vincula actor, fecha y causa privada a la contratación');
-select is((select count(*) from public.audit_events where action='referral_revoked' and reason_code='consent_withdrawn'
- and entity_id in (private.fixture_id('hc-referral',1),private.fixture_id('hc-referral',2),private.fixture_id('hc-referral',9))),3::bigint,'Cada permiso revocado conserva su evento');
-select ok(not exists(select 1 from unchanged_parts original join public.participations current using(id)
- where to_jsonb(original)<>to_jsonb(current)),'Otros casos abiertos, finales y de otras personas conservan todos sus campos');
-select is((select count(*) from public.candidate_consents where candidate_id=private.fixture_id('hc-profile',1)),2::bigint,'Reintento conserva exactamente dos eventos');
-
+select ok(not exists(select 1 from original_consents o join public.candidate_consents c using(id) where to_jsonb(o)<>to_jsonb(c)),'Consentimiento original inalterado');
+select ok(not exists(select 1 from public.candidate_consents where source='hiring_workflow' and candidate_id=private.fixture_id('hc-profile',1)),'Sin retiro automático');
+select ok(exists(select 1 from public.audit_events e join private.workflow_decisions d on d.id=(e.metadata_safe->>'decision_id')::uuid where e.entity_id=private.fixture_id('hc-profile',1) and e.action='availability_changed' and e.reason_code='hired' and e.actor_account_id=private.fixture_id('admin',1) and e.actor_type='account' and e.occurred_at is not null and d.entity_id=private.fixture_id('hc-part',1) and d.command='hiring_availability'),'Actor fecha y causa de disponibilidad auditados');
+select is((select count(*) from public.audit_events where action='referral_revoked' and entity_id in (private.fixture_id('hc-referral',1),private.fixture_id('hc-referral',2),private.fixture_id('hc-referral',9))),0::bigint,'No revoca otras derivaciones');
+select ok(not exists(select 1 from unchanged_parts o join public.participations c using(id) where to_jsonb(o)<>to_jsonb(c)),'Todos los campos de otros casos preservados');
 set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',1)::text,'session_id','ee240000-0000-4000-8000-000000000002')::text,true);
-select ok(not(public.company_referral(private.fixture_id('hc-referral',1)) ? 'candidate'),'Empresa contratante pierde perfil y contactos');
-select is(public.company_referral(private.fixture_id('hc-referral',1))->'hiredCandidate',
- jsonb_build_object('displayName','Persona ficticia contratación 1','outcome','hired'),'Contratación normal conserva solo nombre y resultado confirmado');
-select is((select count(*) from jsonb_object_keys(public.company_referral(private.fixture_id('hc-referral',1)))),6::bigint,'Respuesta revocada tiene cuatro metadatos, candidateName y nombre/resultado mínimos');
+select ok(public.company_referral(private.fixture_id('hc-referral',1)) ? 'candidate','Empresa contratante conserva perfil durante ventana');
+select ok(private.can_read_cv(private.fixture_id('hc-cv',1)),'Empresa contratante conserva CV');
 reset role;
+savepoint expiry;
+update public.referrals set post_hire_access_until=clock_timestamp() where id in (private.fixture_id('hc-referral',1),private.fixture_id('hc-referral',9));
+set local role authenticated;
+select ok(not(public.company_referral(private.fixture_id('hc-referral',1)) ? 'candidate'),'Frontera720h deniega sin esperar Cron');
+select ok(not private.can_read_cv(private.fixture_id('hc-cv',1)),'CV denegado al vencer todas las derivaciones propias');
+reset role;
+rollback to savepoint expiry;
 update public.company_profiles set status='suspended' where account_id=private.fixture_id('company',1);
 set local role authenticated;
-select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Empresa suspendida tampoco consulta nombre contratado');
+select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Empresa suspendida no consulta');
 reset role;
 update public.company_profiles set status='active' where account_id=private.fixture_id('company',1);
-update public.accounts set status='suspended',suspended_at=clock_timestamp(),suspended_by=private.fixture_id('admin',1),
- suspended_reason='Suspensión ficticia' where id=private.fixture_id('company',1);
+update public.accounts set status='suspended',suspended_at=clock_timestamp(),suspended_by=private.fixture_id('admin',1),suspended_reason='Suspensión ficticia' where id=private.fixture_id('company',1);
 set local role authenticated;
-select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Cuenta inactiva no consulta nombre contratado');
+select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Cuenta suspendida no consulta');
 reset role;
 update public.accounts set status='active',suspended_at=null,suspended_by=null,suspended_reason=null where id=private.fixture_id('company',1);
 set local role authenticated;
-select ok(not private.can_read_cv(private.fixture_id('hc-cv',1)),'Empresa contratante pierde CV');
 select set_config('request.jwt.claim.sub',private.fixture_id('company',2)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',2)::text,'session_id','ee240000-0000-4000-8000-000000000003')::text,true);
-select ok(not(public.company_referral(private.fixture_id('hc-referral',2)) ? 'candidate'),'La otra empresa tampoco recupera datos');
-select ok(not(public.company_referral(private.fixture_id('hc-referral',2)) ? 'hiredCandidate'),'Caso no contratado no se presenta como contratación tras retiro global');
-select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Empresa ajena no puede leer el nombre contratado');
-select ok(not private.can_read_cv(private.fixture_id('hc-cv',1)),'La otra empresa pierde CV');
+select ok(public.company_referral(private.fixture_id('hc-referral',2)) ? 'candidate','Otra empresa conserva perfil de su derivación');
+select ok(private.can_read_cv(private.fixture_id('hc-cv',1)),'Otra empresa conserva su CV autorizado');
+select throws_ok($$select public.company_referral(private.fixture_id('hc-referral',1))$$,'P0001','NOT_FOUND','Empresa ajena no lee otra derivación');
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee240000-0000-4000-8000-000000000001')::text,true);
-select lives_ok($$select public.record_contact(private.fixture_id('hc-part',5),1,'phone','inbound',clock_timestamp()-interval '1 minute','Respuesta tardía ficticia')$$,'Se registra evidencia tardía');
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',5),2,'late_hire','Respuesta ficticia')$$,
- 'P0001','INVALID_INPUT','Contratación tardía sin evidencia no retira consentimiento');
+select lives_ok($$select public.record_contact(private.fixture_id('hc-part',5),1,'phone','inbound',clock_timestamp()-interval '1 minute','Respuesta tardía ficticia')$$,'Evidencia tardía');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',5),2,'late_hire','Respuesta ficticia')$$,'P0001','INVALID_INPUT','Tardía exige evidencia');
 reset role;
 select set_config('hc.before_late',pg_temp.hiring_snapshot()::text,true);
 select set_config('hc.fail_action','outcome_corrected',true);
 set local role authenticated;
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',5),2,'late_hire','Respuesta ficticia',null,null,
- (select id from public.contact_events where participation_id=private.fixture_id('hc-part',5) limit 1))$$,
- 'P0001','HIRING_AUDIT_FAILURE','Fallo al auditar corrección tardía revierte todos sus efectos');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',5),2,'late_hire','Respuesta ficticia',null,null,(select id from public.contact_events where participation_id=private.fixture_id('hc-part',5) limit 1))$$,'P0001','HIRING_AUDIT_FAILURE','Fallo de auditoría tardía aborta todo');
 reset role;
-select is(pg_temp.hiring_snapshot(),current_setting('hc.before_late')::jsonb,'Corrección tardía también es atómica');
+select is(pg_temp.hiring_snapshot(),current_setting('hc.before_late')::jsonb,'Rollback tardío íntegro');
 select set_config('hc.fail_action','',true);
 set local role authenticated;
-select lives_ok($$select public.transition_participation(private.fixture_id('hc-part',5),2,'late_hire','Respuesta ficticia',null,null,
- (select id from public.contact_events where participation_id=private.fixture_id('hc-part',5) limit 1))$$,'Contratación tardía ejecuta el mismo retiro global');
-select is((select status::text from public.participations where id=private.fixture_id('hc-part',5)),'hired','Corrección tardía conserva resultado hired');
-select ok(not private.current_consent(private.fixture_id('hc-profile',2)),'Corrección tardía también retira consentimiento');
-select is((select access_status::text from public.referrals where id=private.fixture_id('hc-referral',6)),'revoked','Corrección tardía revoca otro permiso vigente');
-select is((select access_status::text from public.referrals where id=private.fixture_id('hc-referral',5)),'revoked','Nunca revive el permiso tardío ya revocado');
-select is((select status::text from public.participations where id=private.fixture_id('hc-part',6)),'referred','El otro caso sigue derivado, no se cierra');
+select lives_ok($$select public.transition_participation(private.fixture_id('hc-part',5),2,'late_hire','Respuesta ficticia',null,null,(select id from public.contact_events where participation_id=private.fixture_id('hc-part',5) limit 1))$$,'Tardía cambia disponibilidad');
+select ok(private.current_consent(private.fixture_id('hc-profile',2)),'Tardía conserva consentimiento');
+select is((select availability from public.candidate_profiles where id=private.fixture_id('hc-profile',2)),'unavailable','Tardía No disponible');
+select is((select access_status::text from public.referrals where id=private.fixture_id('hc-referral',6)),'active','Tardía conserva otro permiso');
+select is((select access_status::text from public.referrals where id=private.fixture_id('hc-referral',5)),'revoked','Tardía no revive revoked');
+select ok((select post_hire_access_until is null from public.referrals where id=private.fixture_id('hc-referral',5)),'Tardía revocada no recibe ventana');
+select is((select status::text from public.participations where id=private.fixture_id('hc-part',6)),'referred','Otro caso sigue abierto');
 select set_config('request.jwt.claim.sub',private.fixture_id('company',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('company',1)::text,'session_id','ee240000-0000-4000-8000-000000000002')::text,true);
-select is(public.company_referral(private.fixture_id('hc-referral',5))->'hiredCandidate',
- jsonb_build_object('displayName','Persona ficticia contratación 2','outcome','hired'),'Contratación tardía conserva la misma proyección mínima');
-select ok(not(public.company_referral(private.fixture_id('hc-referral',5)) ? 'candidate'),'El nombre tardío no restaura el perfil');
-select ok(not private.can_read_cv(private.fixture_id('hc-cv',2)),'El nombre tardío no restaura acceso al CV');
+select is(public.company_referral(private.fixture_id('hc-referral',5))->'hiredCandidate',jsonb_build_object('displayName','Persona ficticia contratación 2','outcome','hired'),'Tardía solo nombre y resultado');
+select ok(not(public.company_referral(private.fixture_id('hc-referral',5)) ? 'candidate'),'Tardía no restaura perfil');
+select ok(not private.can_read_cv(private.fixture_id('hc-cv',2)),'Tardía no restaura CV');
+reset role;
+select ok(not exists(select 1 from unchanged_parts o join public.participations c using(id) where to_jsonb(o)<>to_jsonb(c)),'Otros casos e historial preservados después de ambas contrataciones');
 select set_config('request.jwt.claim.sub',private.fixture_id('admin',1)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('admin',1)::text,'session_id','ee240000-0000-4000-8000-000000000001')::text,true);
-reset role;
-select ok(not exists(select 1 from unchanged_parts original join public.participations current using(id)
- where to_jsonb(original)<>to_jsonb(current)),'La contratación tardía también conserva todos los campos de otros casos y contrataciones previas');
-set local role authenticated;
-select is((select count(*) from public.audit_events where entity_id=private.fixture_id('hc-part',5)
- and action in ('no_company_response','outcome_corrected')),2::bigint,'Se conservan cierre anterior y corrección tardía');
-reset role;
-
 select set_config('hc.before',pg_temp.hiring_snapshot()::text,true);
-select set_config('hc.fail_action','consent_withdrawn',true);
+select set_config('hc.fail_action','availability_changed',true);
 set local role authenticated;
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación ficticia')$$,
- 'P0001','HIRING_AUDIT_FAILURE','Fallo de auditoría aborta contratación, retiro y permisos');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación ficticia')$$,'P0001','HIRING_AUDIT_FAILURE','Fallo disponibilidad aborta contratación');
 reset role;
-select is(pg_temp.hiring_snapshot(),current_setting('hc.before')::jsonb,'Rollback íntegro: perfil, resultado, permisos, consentimientos, decisiones y eventos');
-select set_config('hc.fail_action','referral_revoked',true);
-set local role authenticated;
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación ficticia')$$,
- 'P0001','HIRING_AUDIT_FAILURE','Fallo al auditar revocación revierte el retiro ya insertado');
-reset role;
-select is(pg_temp.hiring_snapshot(),current_setting('hc.before')::jsonb,'Rollback cuando falla la revocación');
+select is(pg_temp.hiring_snapshot(),current_setting('hc.before')::jsonb,'Rollback disponibilidad y resultado');
 select set_config('hc.fail_action','outcome_confirmed',true);
 set local role authenticated;
-select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación ficticia')$$,
- 'P0001','HIRING_AUDIT_FAILURE','Fallo en evento final revierte también los dos permisos ya revocados');
+select throws_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación ficticia')$$,'P0001','HIRING_AUDIT_FAILURE','Fallo final revierte disponibilidad y ventana');
 reset role;
-select is(pg_temp.hiring_snapshot(),current_setting('hc.before')::jsonb,'Rollback tras ejecutar todos los efectos');
+select is(pg_temp.hiring_snapshot(),current_setting('hc.before')::jsonb,'Rollback tras todos los efectos');
 select set_config('hc.fail_action','',true);
 set local role authenticated;
-select lives_ok($$select public.assisted_candidate_command(private.fixture_id('hc-profile',1),2,'accept_consent',
- 'demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'Una nueva aceptación usa el flujo afirmativo asistido existente');
-select ok(private.current_consent(private.fixture_id('hc-profile',1)),'La aceptación explícita queda vigente');
-select is((select status::text from public.candidate_profiles where id=private.fixture_id('hc-profile',1)),'draft','Aceptar no reactiva el perfil automáticamente');
-select is((select count(*) from public.referrals where candidate_id=private.fixture_id('hc-profile',1) and access_status='active'),0::bigint,'Reaceptar no restaura ninguno de los permisos');
+select throws_ok($$select public.assisted_candidate_command(private.fixture_id('hc-profile',1),2,'accept_consent','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'P0001','INVALID_TRANSITION','No se acepta de nuevo mientras sigue vigente');
+select lives_ok($$select public.assisted_candidate_command(private.fixture_id('hc-profile',1),2,'withdraw_consent','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'Retiro manual explícito sigue disponible');
+select ok(not private.current_consent(private.fixture_id('hc-profile',1)),'Retiro manual invalida consentimiento');
+select is((select status::text from public.participations where id=private.fixture_id('hc-part',3)),'withdrawn','Retiro manual cierra caso abierto');
+select is((select status::text from public.participations where id=private.fixture_id('hc-part',1)),'hired','Retiro manual conserva resultado final');
+select is((select count(*) from public.referrals where candidate_id=private.fixture_id('hc-profile',1) and access_status='active'),0::bigint,'Retiro manual revoca todos sus permisos');
+select lives_ok($$select public.assisted_candidate_command(private.fixture_id('hc-profile',1),3,'accept_consent','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'Solo acción afirmativa vuelve a consentir');
+select is((select count(*) from public.referrals where candidate_id=private.fixture_id('hc-profile',1) and access_status='active'),0::bigint,'Reaceptación no restaura permisos');
 reset role;
 insert into public.candidate_consents(candidate_id,policy_version,policy_hash,status,recorded_by,source,recorded_at)
 select private.fixture_id('hc-profile',3),version,policy_hash,'withdrawn',private.fixture_id('admin',1),'assisted',clock_timestamp()
 from private.consent_policies where version='demo-not-approved';
 set local role authenticated;
-select lives_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación ficticia')$$,'Puede confirmar un resultado con consentimiento ya retirado');
-select is((select count(*) from public.candidate_consents where candidate_id=private.fixture_id('hc-profile',3)),2::bigint,'No duplica un retiro ya vigente');
-select is((select count(*) from public.referrals where candidate_id=private.fixture_id('hc-profile',3) and access_status='active'),0::bigint,'Revoca permisos activos aunque el consentimiento ya estuviera retirado');
+select lives_ok($$select public.transition_participation(private.fixture_id('hc-part',7),1,'hire','Contratación histórica ficticia')$$,'Resultado puede confirmarse con consentimiento ya retirado');
+select ok(not private.current_consent(private.fixture_id('hc-profile',3)),'Contratar no reacepta un retiro anterior');
+select is((select count(*) from public.candidate_consents where candidate_id=private.fixture_id('hc-profile',3)),2::bigint,'Historial de retiro previo permanece exacto');
+select ok((select post_hire_access_until is null from public.referrals where id=private.fixture_id('hc-referral',7)),'Consentimiento retirado no obtiene ventana');
 reset role;
-select throws_ok($$update public.candidate_consents set status='accepted' where source='hiring_workflow'$$,
- 'P0001','APPEND_ONLY','No se reescribe un consentimiento retirado');
-select ok(not has_table_privilege('authenticated','public.candidate_consents','INSERT,UPDATE,DELETE'),'Clientes no pueden fingir nueva aceptación o retiro');
-select throws_ok($$insert into public.candidate_consents(candidate_id,policy_version,policy_hash,status,recorded_by,source)
- select candidate_id,policy_version,policy_hash,'accepted',recorded_by,'hiring_workflow' from original_consents limit 1$$,
- '23514',null,'La fuente automática no puede registrar aceptación');
+select throws_ok($$update public.candidate_consents set status='withdrawn' where id=private.fixture_id('hc-consent',1)$$,'P0001','APPEND_ONLY','Historial no se reescribe');
+select ok(not has_table_privilege('authenticated','public.candidate_consents','INSERT,UPDATE,DELETE'),'Cliente no escribe consentimiento directo');
+select throws_ok($$insert into public.candidate_consents(candidate_id,policy_version,policy_hash,status,recorded_by,source) select candidate_id,policy_version,policy_hash,'accepted',recorded_by,'hiring_workflow' from original_consents limit 1$$,'23514',null,'Origen automático legado nunca acepta');
 select * from finish();
 rollback;

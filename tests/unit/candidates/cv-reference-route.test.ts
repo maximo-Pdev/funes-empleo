@@ -27,7 +27,7 @@ it("referencia descarga por streaming y reautoriza UUID tanto en RPC como Storag
   expect(response.headers.get("cache-control")).toBe("private, no-store, max-age=0");
   expect(response.headers.get("x-content-type-options")).toBe("nosniff");
   expect(response.headers.get("vary")).toBe("Cookie");
-  expect(response.headers.get("content-disposition")).toBe('attachment; filename="cv.pdf"');
+  expect(response.headers.get("content-disposition")).toBe('inline; filename="cv.pdf"');
   expect(response.headers.get("location")).toBeNull();
 });
 it("enlace UUID anterior autorizado redirige a código, sin emitir Storage ni descargar", async () => {

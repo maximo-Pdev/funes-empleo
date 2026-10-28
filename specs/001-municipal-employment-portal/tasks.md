@@ -5,6 +5,26 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA094 — CV, métricas y disponibilidad2026-10-28
+
+- [x] T227 Registrar R1–R5/decisiones, plan/modelo/contratos y calidad; analizar
+  cobertura y constitución antes de código; EXTRA094 en cambios-extra.md.
+- [x] T228 [R1] Cambiar src/app/api/cv/[cvId]/route.ts a inline y enlaces CV
+  propios/admin/empresa/preview a nueva pestaña; pruebas headers/roles/refs/UI.
+- [x] T229 [R2] Resumir src/features/metrics/components/dashboard.tsx a seis
+  indicadores y dos gráficos servidor; detalle/definiciones plegados, valores
+  accesibles/filtros/cero/null; PDF/Excel/CSV completos, pruebas y visual móvil.
+- [x] T230 [R3,R5] Migración forward-only transition_participation: disponibilidad
+  atómica/audit, consentimiento preservado,720h solo permiso active propio,
+  revocación terminal/otros casos intactos. Supabase tests y recuperación.
+- [x] T231 [R4] Perfil candidato oculta reaceptación vigente y explica reglas
+  nuevas; tests presentación/flujo y retirar expectativas obsoletas acotadas.
+- [x] T232 Verificar tipos/lint/unit/tooling/build/SQL/E2E/axe, convergencia R1–R5,
+  estado y riesgos; docs/operations/cv-metrics-availability.md. No hosted/deploy.
+
+Dependencias: T227→T228/T229/T230; T230→T231; todas→T232. Implementar
+secuencialmente en esta sesión; las historias UI pueden verificarse por separado.
+
 - [x] T226 EXTRA093: prueba de pausa del carrusel compara oferta activa en móvil,
   conservando tiempos y aserciones; repetición desktop/móvil, tipos/lint y CI80.
 

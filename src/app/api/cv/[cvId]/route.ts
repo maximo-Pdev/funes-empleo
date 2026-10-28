@@ -41,7 +41,7 @@ export async function GET(_request: Request, context: { params: Promise<{ cvId: 
     headers: {
       ...headers,
       "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="cv.pdf"',
+      "Content-Disposition": 'inline; filename="cv.pdf"',
       "Content-Length": String(download.data.size),
     },
   });

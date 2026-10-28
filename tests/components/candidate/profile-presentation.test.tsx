@@ -67,7 +67,11 @@ describe("presentación de consentimiento y activación", () => {
     let cvRegion = screen.getByRole("region", { name: "CV PDF" });
     expect(cvRegion.querySelector('[data-slot="attachment"]')).not.toBeNull();
     expect(cvRegion.querySelector('[data-slot="attachment-title"]')?.textContent).toBe("cv-ficticio.pdf");
-    expect(within(cvRegion).getByRole("link", { name: "Descargar mi CV" }).getAttribute("href")).toBe("/api/cv/CV-FICTICIA-0001");
+    const cvLink = within(cvRegion).getByRole("link", { name: "Abrir mi CV en otra pestaña" });
+    expect(cvLink.getAttribute("href")).toBe("/api/cv/CV-FICTICIA-0001");
+    expect(cvLink.getAttribute("target")).toBe("_blank");
+    expect(cvLink.getAttribute("rel")).toBe("noopener noreferrer");
+    expect(cvLink.hasAttribute("download")).toBe(false);
     expect(within(cvRegion).queryByRole("button", { name: /eliminar/i })).toBeNull();
     rerender(<CandidateProfilePanel {...props} cv={null} />);
     cvRegion = screen.getByRole("region", { name: "CV PDF" });
@@ -100,7 +104,7 @@ describe("presentación de consentimiento y activación", () => {
     expect(screen.queryByRole("heading", { name: "Contacto adicional" })).toBeNull();
     expect(container.querySelector("form form")).toBeNull();
     const cv = screen.getByRole("region", { name: "CV PDF" });
-    const consent = screen.getByRole("heading", { name: "Consentimiento de prueba" }).closest("form")!;
+    const consent = screen.getByRole("region", { name: "Consentimiento de prueba" });
     expect(cv.compareDocumentPosition(consent) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
@@ -150,25 +154,32 @@ describe("presentación de consentimiento y activación", () => {
 
   it("resume el consentimiento, agrupa Más información y conserva la aceptación explícita sin apartado de política", () => {
     render(<CandidateProfilePanel {...props} />);
-    const consent = screen.getByRole("heading", { name: "Consentimiento de prueba" }).closest("form")!;
+    const consent = screen.getByRole("region", { name: "Consentimiento de prueba" });
     expect(within(consent).getByText(/autorizás a la Oficina de Empleo/).closest("details")).toBeNull();
     expect(within(consent).getByText(/solo puede ver tu perfil laboral, tus contactos vigentes y el CV/)).toBeTruthy();
     expect(within(consent).getByText(/No puede ver tu DNI, domicilio ni notas internas/)).toBeTruthy();
-    const hiring = within(consent).getByText(/Si la Oficina confirma una contratación en/);
-    expect(hiring.textContent).toMatch(/consentimiento vigente se retira automáticamente/);
-    expect(hiring.textContent).toMatch(/todas las empresas/);
+    const hiring = within(consent).getByText(/Si la Oficina confirma una contratación,/);
+    expect(hiring.textContent).toContain("Tu consentimiento se conserva");
+    expect(hiring.textContent).toContain("No disponible");
     expect(hiring.closest("details")).toBeNull();
-    expect(within(consent).getByText(/otras participaciones ni sus resultados/)).toBeTruthy();
-    expect(within(consent).getByText(/volver a aceptarlo expresamente/)).toBeTruthy();
+    expect(within(consent).getByText(/Tus otras participaciones y su historial no cambian/)).toBeTruthy();
+    expect(within(consent).getByText(/tenés que aceptarlo expresamente/)).toBeTruthy();
     const more = within(consent).getByText("Más información", { exact: true }).closest("details")!;
     expect(more).toHaveProperty("open", false);
-    expect(more.querySelectorAll("p")).toHaveLength(3);
+    expect(more.querySelectorAll("p")).toHaveLength(4);
     expect(within(more).getByText(/Una empresa solo puede ver/)).toBeTruthy();
     expect(within(more).getByText(/seguir viendo únicamente tu nombre/)).toBeTruthy();
-    expect(within(more).getByText(/Corregir un resultado no restablece/)).toBeTruthy();
+    expect(within(more).getByText(/durante 30 días/)).toBeTruthy();
     expect(within(consent).queryByText(props.policy.policy_text, { exact: false })).toBeNull();
     expect(within(consent).queryByText("Ver política de consentimiento")).toBeNull();
-    expect(within(consent).getByRole("checkbox")).toHaveProperty("required", true);
+    expect(within(consent).queryByRole("checkbox")).toBeNull();
+    expect(within(consent).queryByRole("button", { name: "Guardar consentimiento" })).toBeNull();
     expect(within(consent).queryByRole("combobox")).toBeNull();
+  });
+  it.each([null, { ...props.consent!, status: "withdrawn" }])("exige aceptación afirmativa cuando no está vigente: %j", consent => {
+    render(<CandidateProfilePanel {...props} consent={consent} />);
+    const section = screen.getByRole("region", { name: "Consentimiento de prueba" });
+    expect(within(section).getByRole("checkbox")).toHaveProperty("required", true);
+    expect(within(section).getByRole("button", { name: "Guardar consentimiento" })).toBeTruthy();
   });
 });

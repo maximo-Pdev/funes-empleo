@@ -79,11 +79,13 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.reload();
   await expect(page.getByLabel("Categoría ficticia A")).toBeChecked();
   await expect(page.getByLabel("Categoría ficticia B")).toBeChecked();
-  await expect(page.getByText(/tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas/)).toBeVisible();
+  await expect(page.getByText(/Tu consentimiento se conserva: no tenés que aceptarlo de nuevo/)).toBeVisible();
   await page.getByLabel("Confirmo esta decisión y entiendo sus efectos.", { exact: true }).check();
   await page.getByRole("button", { name: "Guardar consentimiento" }).click();
   await expect(page.getByText("Consentimiento registrado.", { exact: false })).toBeVisible();
   await page.reload();
+  await expect(page.getByText("Ya aceptaste el consentimiento.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Guardar consentimiento" })).toHaveCount(0);
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   let releaseRefresh!: () => void;
   const refreshGate = new Promise<void>(resolve => { releaseRefresh = resolve; });
@@ -125,7 +127,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.setViewportSize({ width: 1920, height: 1080 });
   const detailsCard = page.getByRole("region", { name: "Datos laborales y personales" });
   const cvCard = page.getByRole("region", { name: "CV PDF" });
-  const consentCard = page.locator("form").filter({ has: page.getByRole("heading", { name: "Consentimiento de prueba" }) });
+  const consentCard = page.getByRole("region", { name: "Consentimiento de prueba" });
   // La grilla de dos columnas vive dentro de la sección de datos, no en la sección misma.
   const detailsGrid = page.locator("[data-profile-details]");
   expect(await detailsGrid.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(" ").length)).toBe(2);
@@ -136,7 +138,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(detailsCard.getByLabel("Teléfono (opcional)")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Contacto adicional" })).toHaveCount(0);
   await expect(consentCard.getByText(/Al aceptar, autorizás/)).toBeVisible();
-  await expect(consentCard.getByText(/Si la Oficina confirma una contratación en/)).toBeVisible();
+  await expect(consentCard.getByText(/Si la Oficina confirma una contratación,/)).toBeVisible();
   await expect(consentCard.getByText("Ver política de consentimiento", { exact: true })).toHaveCount(0);
   const informationText = consentCard.getByText(/Una empresa solo puede ver tu perfil laboral/);
   await expect(informationText).toBeHidden();
@@ -145,7 +147,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.keyboard.press("Enter");
   await expect(informationText).toBeVisible();
   await expect(consentCard.getByText(/seguir viendo únicamente tu nombre/)).toBeVisible();
-  await expect(consentCard.getByText(/Corregir un resultado no restablece/)).toBeVisible();
+  await expect(consentCard.getByText(/durante 30 días/)).toBeVisible();
   
   await page.keyboard.press("Enter");
   await expect(informationText).toBeHidden();
@@ -171,17 +173,17 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(detailsCard.getByText("Contacto actualizado.", { exact: true })).toBeVisible();
   await page.reload();
   await expect(phone).toHaveValue("");
-  const originalCv = await page.getByRole("link", { name: "Descargar mi CV" }).getAttribute("href");
+  const originalCv = await page.getByRole("link", { name: "Abrir mi CV en otra pestaña" }).getAttribute("href");
   await page.getByLabel("Elegir PDF").setInputFiles({
     name: "rechazado.pdf", mimeType: "application/pdf", buffer: Buffer.from("PDF ficticio dañado"),
   });
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
   await expect(page.getByText("El PDF fue rechazado.", { exact: false })).toBeVisible();
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
-  await expect(page.getByRole("link", { name: "Descargar mi CV" })).toHaveAttribute("href", originalCv!);
+  await expect(page.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).toHaveAttribute("href", originalCv!);
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", originalCv!);
+  await expect(page.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).not.toHaveAttribute("href", originalCv!);
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
 
   await page.goto("/dashboard?section=ofertas");

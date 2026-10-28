@@ -31,9 +31,19 @@ test("administración: métricas filtradas, PDF, Excel y CSV compatible en menos
   const started = Date.now();
   await page.getByRole("button", { name: "Aplicar filtros" }).click();
   await expect(page.getByTestId("metric-active_candidates").locator("dd")).toHaveText("200");
-  await expect(page.getByTestId("metric-companies").locator("dd")).toHaveText("50");
+  await expect(page.getByTestId("metric-companies_active").locator("dd")).toHaveText("50");
   await expect(page.getByTestId("metric-applications").locator("dd")).toHaveText("500");
   await expect(page.getByTestId("metric-hired").locator("dd")).toHaveText("25");
+  await expect(page.getByRole("figure", { name: "Resultados de las participaciones" })).toBeVisible();
+  await expect(page.getByRole("figure", { name: "Contrataciones por categoría" })).toBeVisible();
+  await expect(page.getByText("Ver detalle", { exact: true }).locator("..")).not.toHaveAttribute("open");
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: `test-results/metrics-summary-${width}.png`, fullPage: true });
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByText("Ver detalle", { exact: true }).click();
   await expect(page.getByTestId(`duration-first_hire_days-${fixtureId("opening",22)}`)).toContainText("10 días");
   await expect(page.getByTestId(`duration-coverage_days-${fixtureId("opening",22)}`)).toContainText("Pendiente");
   const excelLink = page.getByRole("link", { name: "Descargar Excel filtrado" });

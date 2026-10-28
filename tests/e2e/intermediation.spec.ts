@@ -113,7 +113,7 @@ test("CV privado: solo permisos vigentes permiten descargar y la última revocac
     await company.goto(referralPage);
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado" })).toBeVisible();
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 005", exact: true })).toBeVisible();
-    await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" }))
+    await expect(company.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" }))
       .toHaveAttribute("href", cvUrl);
     await expect(company.locator("body")).not.toContainText(/DNI|domicilio|nota interna/i);
     const foreignPage = await otherCompany.context().request.get(referralPage);
@@ -142,7 +142,7 @@ test("CV privado: solo permisos vigentes permiten descargar y la última revocac
     await expect(company.getByText("El acceso al perfil de esta persona finalizó.", { exact: false })).toBeVisible();
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 005", exact: true })).toBeVisible();
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
-    await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
+    await expect(company.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" })).toHaveCount(0);
   } finally {
     await Promise.all([candidateContext.close(), companyContext.close(), otherCompanyContext.close(), adminContext.close()]);
   }
@@ -394,7 +394,7 @@ test("cambiar CV y contactos conserva la instantánea derivada", async ({ browse
     const referralPage = `/empresa/ofertas/${fixtureId("opening", 2)}?referral=${fixtureId("referral", 15)}#derivaciones`;
     await company.goto(referralPage);
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 015", exact: true })).toBeVisible();
-    const snapshotCv = await company.getByRole("link", { name: "Descargar CV asociado a esta derivación" }).getAttribute("href");
+    const snapshotCv = await company.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" }).getAttribute("href");
     expect(snapshotCv).toBe(`/api/cv/${persistedReference("cv", fixtureId("cv", 15))}`);
 
     await candidate.goto("/dashboard?section=perfil");
@@ -406,11 +406,11 @@ test("cambiar CV y contactos conserva la instantánea derivada", async ({ browse
     await candidate.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
     await expect(candidate).toHaveURL(/\/dashboard\?section=perfil$/);
     await expect(candidate.getByText("CV guardado.", { exact: true })).toBeVisible();
-    await expect(candidate.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", snapshotCv!);
+    await expect(candidate.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).not.toHaveAttribute("href", snapshotCv!);
     await company.reload();
     await expect(company.getByText("3415550015")).toBeVisible();
     await expect(company.getByText("candidate15@example.invalid")).toBeVisible();
-    await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveAttribute("href", snapshotCv!);
+    await expect(company.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" })).toHaveAttribute("href", snapshotCv!);
     await expect(company.locator("body")).not.toContainText(/DNI|domicilio|nota interna/i);
   } finally { await Promise.all([candidateContext.close(), companyContext.close()]); }
 });
@@ -519,7 +519,7 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(hiredCompany.getByRole("heading", { name: "Derivación de Persona ficticia 021", exact: true })).toBeVisible();
     await expect(hiredCompany.getByRole("heading", { name: "Perfil laboral derivado" })).toHaveCount(0);
     await expect(hiredCompany.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
-    await expect(hiredCompany.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
+    await expect(hiredCompany.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" })).toHaveCount(0);
     await admin.goto(`/admin/participations/${overdueParticipation}`);
     await expect(currentStatus).toContainText("Sin respuesta empresarial");
     await company.getByLabel("Resultado informado").selectOption("hired");
@@ -535,7 +535,7 @@ test("el mantenimiento local cierra una oferta, vence permisos y permite corregi
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 210", exact: true })).toBeVisible();
     await expect(company.getByRole("heading", { name: "Perfil laboral derivado" })).toHaveCount(0);
     await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
-    await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
+    await expect(company.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" })).toHaveCount(0);
     expect([403, 404]).toContain((await company.request.get(`/api/cv/${fixtureId("cv", 210)}`)).status());
   } finally {
     await Promise.all([companyContext.close(), hiredCompanyContext.close(), adminContext.close(), offerCompanyContext.close()]);
