@@ -1,5 +1,16 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA098 — Corrección CI del PR82
+
+CI40777824782/1d510dd: application pasó tipos/lint/tooling/unit/build/SQL y falló
+por inventario HTTP obsoleto tras mover postulación a Route Handler. El export
+applyToOfferAction ya no tiene endpoint compilado; se mantiene en inventario con
+exclusión explícita que exige0 y se prueba POST /api/candidate/applications real.
+RED1/GREEN8 HTTP y264 pruebas directas, tipos/lint PASS. Rol/suspensión/candidato
+ajeno rechazados sin crear CV/casos/auditoría ni exponer PII. Sin cambios de producto,
+schema o permisos. Database falló antes de tests por54322 ocupado; observar el
+siguiente runner antes de cambiar configuración. Nueva CI/revisión pendientes.
+
 ## EXTRA096 — CV por postulación,2026-10-28
 
 Rama feat/application-specific-cv-and-images desde main bef7ddf (PR81 mergeado).

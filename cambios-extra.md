@@ -1,5 +1,36 @@
 # Cambios extra necesarios
 
+## EXTRA-098 — Corregir inventario HTTP del PR82
+
+- **Fecha/origen:** Mateo,2026-10-28, informa fallo de GitHub en PR82. CI40777824782
+  sobre1d510dd: application pasa tipos/lint/tooling/unit/build/SQL, falla el gate
+  action-http porque applyToOfferAction ya no está en el manifiesto compilado.
+  EXTRA096 reemplazó ese envío por POST /api/candidate/applications; el export
+  legado permanece probado directamente, pero Next elimina su endpoint sin uso.
+- **Cambio propuesto antes de editar:** añadir únicamente ese nombre a la exclusión
+  explícita del inventario (seguir exigiendo cero endpoints compilados), documentar
+  el reemplazo y probar el POST real para anónimo/candidato/empresa/admin, activos
+  y suspendidos, sin escrituras ni PII. No permitir omisiones automáticas de otras
+  acciones ni cambiar autorización, código de producto o migraciones.
+- **Segundo fallo independiente:** database no ejecutó pruebas: Docker no pudo
+  publicar54322 porque estaba ocupado en el runner. Volver a observar con el push
+  correctivo; no modificar configuración por un fallo aislado sin evidencia nueva.
+- **Archivos/contratos:** tests/e2e/action-http.spec.ts, tasks/estado/log del delta;
+  contrato HTTP y reglas de servidor/DB actuales intactos. Origen C4/C5/C6,T238.
+- **Riesgos/verificación:** no debilitar el inventario ni esconder fallos reales;
+  RED del manifiesto actual, GREEN de siete fronteras HTTP más inventario y POST,
+  conteos de CV/casos/auditoría intactos, tipos/lint/pruebas relevantes. Publicar
+  commit sin firma en el mismo PR y confirmar ambos checks; preservar next-env.d.ts.
+- **Autorización/estado:** corrección solicitada y derivada necesaria bajo AGENTS.
+  Implementación/verificación pendientes. No reaplicar migración alojada ni desplegar
+  manualmente; CI/revisión humana no se declaran aprobadas sin evidencia.
+- **Corrección local verificada:** RED1/1 reproduce applyToOfferAction ausente;
+  GREEN8/8 HTTP reales, siete combinaciones rol/suspensión, validación de candidato
+  ajeno y conteos CV/casos/auditoría intactos. Cache-Control verifica private y
+  no-store aun con las directivas adicionales del proxy; JSON sin PII.264 pruebas
+  directas de guardas/endpoint, tipos/lint/diff PASS. Build/producto/migración sin
+  cambios: se usa el build que falla el gate anterior. Pendiente observar nueva CI.
+
 ## EXTRA-097 — Aplicar y publicar CV por postulación
 
 - **Fecha/origen:** Mateo,2026-10-28, solicita migración y después PR de EXTRA096.

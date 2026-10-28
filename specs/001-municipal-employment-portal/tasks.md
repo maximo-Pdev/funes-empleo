@@ -7,6 +7,10 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 ## EXTRA096 — CV por postulación
 
+- [ ] T239 Corregir gate HTTP del PR82/EXTRA098: inventario explícito del export
+  legado no compilado y POST real por rol/suspensión, sin escrituras o PII; RED/GREEN,
+  tipos/lint y checks application/database del mismo PR. Sin cambios de negocio/SQL.
+
 - [x] T233 Alinear C1–C6/clarificación WebP excluido, plan/modelo/contratos/calidad
   e investigación; análisis de cobertura/constitución antes de código; EXTRA096.
 - [x] T234 [C1] Política/normalización PDF/JPG/PNG en src/lib/files y endpoints de
