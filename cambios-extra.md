@@ -1,5 +1,27 @@
 # Cambios extra necesarios
 
+## EXTRA-093 — Observar oferta activa en prueba de pausa del carrusel
+
+- **Origen/evidencia previa,2026-10-27 Funes:** Run40605431687/991365b pasa129 E2E
+  y falla solo pausa móvil: espera translate3d -229.96px y recibe -230px. Son0.04px
+  de asentamiento de la misma transición, sin cambio de oferta. El fallo impide
+  ejecutar el control concurrente posterior, ya verificado localmente en EXTRA092.
+- **Cambio mínimo antes de código:** medir en móvil el índice de la tarjeta cuya
+  parte superior está más cerca del viewport del carrusel. Verificar que ese índice
+  no cambia durante hover y sí cambia tras salir; desktop mantiene distancia entera
+  de la tarjeta. Controla la oferta visible y tolera física subpíxel de Embla sin
+  redondeo arbitrario, ocultar bugs de navegación o modificar producto.
+- **Archivos/riesgos/contratos:** solo portal-filters.spec.ts y trazabilidad. Sin
+  cambios de app, duración3s, preferencias, contratos o infraestructura. Riesgo de
+  selector geométrico incorrecto: repetir desktop/móvil y comprobar auto/pausa/
+  reanudación con igual umbral de tiempo, sin retries ni rebajar aserciones de
+  oferta. Sin nuevo requisito de negocio/arquitectura; autorizado por recuperación
+  de CI del mismo PR80. Verificación prevista: repetición focal, tipos/lint/CI.
+- **Resultado:** seis E2E PASS (tres repeticiones por ancho1440/390), sin retries;
+  autoavance/pausa/reanudación y límites originales preservados. Tipos/lint/diff
+  PASS. Solo prueba/documentación; build de producto ya verificado sin cambios.
+  T226 implementado; publicación sin firma en PR80, CI/revisión humana pendientes.
+
 ## EXTRA-092 — Recuperar observación de éxito en SC-008A
 
 - **Origen/evidencia previa,2026-10-27:** Run40601364799/efbf768 pasa130 E2E y

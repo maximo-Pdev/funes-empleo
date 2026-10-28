@@ -47,8 +47,17 @@ for (const width of [1440, 390]) {
     await expect(carousel.getByRole("button")).toHaveCount(2);
     await expect(carousel.getByRole("button", { name: /pausar|reanudar/i })).toHaveCount(0);
     const position = () => width > 767
-      ? carousel.locator('[data-slot="coverflow-card"]').first().evaluate(element => (element as HTMLElement).style.getPropertyValue("--r"))
-      : carousel.locator('[data-slot="carousel-content"] > div').evaluate(element => (element as HTMLElement).style.transform);
+      ? carousel.locator('[data-slot="coverflow-card"]').first().evaluate(element => Number((element as HTMLElement).style.getPropertyValue("--r")))
+      : carousel.locator('[data-slot="carousel-content"]').evaluate(viewport => {
+        const top = viewport.getBoundingClientRect().top;
+        let closest = -1;
+        let distance = Infinity;
+        viewport.querySelectorAll('[data-slot="carousel-item"]').forEach((slide, index) => {
+          const gap = Math.abs(slide.getBoundingClientRect().top - top);
+          if (gap < distance) { closest = index; distance = gap; }
+        });
+        return closest;
+      });
     await expect(carousel.getByRole("button", { name: "Siguiente", exact: true })).toBeEnabled();
     const initial = await position();
     await page.mouse.move(0, 0);

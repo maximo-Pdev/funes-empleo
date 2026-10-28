@@ -1575,3 +1575,11 @@ Diagnóstico seguro del recibo agregado, sin stdout/stderr crudos.2 inventarios,
 57 tooling, tipos/lint/diff PASS; sin código de producto nuevo ni presupuesto
 relajado. T225 implementado, corrección en PR80 sin firma; nueva CI/revisión
 humana pendientes. Otros escenarios alojados de rendimiento no ejecutados.
+
+## 2026-10-27 — EXTRA093: pausa del carrusel estable ante física subpíxel
+
+Run40605431687 pasa129 E2E y falla solo por asentamiento móvil de0.04px.
+La prueba observa ahora el índice de la oferta visible en lugar de una cadena
+transform fraccionaria; mantiene3s, hover3200ms y polling5s. Seis repeticiones
+1440/390 PASS sin retries, tipos/lint/diff PASS. Sin cambio de producto/build/SQL;
+T226 implementado, nueva CI y revisión de PR80 pendientes al publicar.

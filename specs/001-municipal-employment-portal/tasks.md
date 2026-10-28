@@ -5,6 +5,9 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T226 EXTRA093: prueba de pausa del carrusel compara oferta activa en móvil,
+  conservando tiempos y aserciones; repetición desktop/móvil, tipos/lint y CI80.
+
 - [x] T225 EXTRA092: sonda concurrente observa badges actuales y emite solo
   diagnóstico numérico seguro, conservando cuatro actores/barrera/5s/auditorías;
   aceptación fría real y checks de PR80, sin alterar condiciones del benchmark.
