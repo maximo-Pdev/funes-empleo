@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import { assertLocalTargets } from "../fixtures/credentials.mjs";
-import { loginFixture } from "./fixtures/quality";
+import { loginFixture, selectLaborCategories } from "./fixtures/quality";
 import { expectUnavailablePublicOffer } from "./fixtures/public-offer";
 import { runLocalMaintenanceSql } from "./local-maintenance";
 
@@ -55,10 +55,11 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Persona responsable").fill("Responsable ficticio");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Actividad").fill("Servicios ficticios");
-  await page.getByLabel("Localidad", { exact: true }).click();
+  await page.getByRole("combobox", { name: "Localidad", exact: true }).click();
   await page.getByRole("option", { name: "Funes", exact: true }).click();
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
+  await page.locator('input[name="termsAccepted"]').check();
   await page.locator("form").getByRole("button", { name: "Crear cuenta de empresa", exact: true }).click();
   await expect(page.getByText(/recibirás un enlace/)).toBeVisible();
 
@@ -75,7 +76,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   const link = (mail.Text ?? mail.HTML ?? "").match(/https?:\/\/[^\s"<>]+/)?.[0]?.replaceAll("&amp;", "&");
   expect(link).toBeTruthy();
   await page.goto(link!);
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/empresa$/);
   await page.goto("/empresa/perfil");
   await expect(page.getByRole("heading", { name: "Perfil de empresa" })).toBeVisible();
   await expect(page.getByText("Estado:")).toContainText("Activo");
@@ -93,8 +94,7 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.getByLabel("Tipo de contratación", { exact: true }).click();
   await page.getByRole("option", { name: "A plazo fijo", exact: true }).click();
   await page.getByLabel("Fecha de cierre").fill("2026-12-31");
-  await page.getByLabel("Categoría ficticia A").check();
-  await page.getByLabel("Categoría ficticia B").check();
+  await selectLaborCategories(page, ["Categoría ficticia A", "Categoría ficticia B"], "Categorías");
   await page.getByRole("button", { name: "Guardar borrador" }).click();
   await expect(page).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
   const openingReference = new URL(page.url()).pathname.split("/").at(-1)!;

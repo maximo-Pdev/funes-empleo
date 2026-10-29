@@ -88,9 +88,9 @@ for (const role of ["candidato", "empresa"] as const) {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto(`/?registro=${role}`);
     await page.getByRole("button", { name: role === "candidato" ? "Crear cuenta candidata" : "Crear cuenta de empresa" }).click();
-    const count = role === "candidato" ? 5 : 8;
+    const count = role === "candidato" ? 6 : 9;
     await expect(page.getByText(`Revisá los ${count} campos indicados.`)).toBeVisible();
-    await expect(page.locator("[data-field-error]")).toHaveCount(0);
+    await expect(page.locator("[data-field-error]")).toHaveText("Confirmá esta opción para continuar.");
     const markers = page.locator("[data-required-marker]");
     await expect(markers).toHaveCount(count);
     for (const marker of await markers.all()) {

@@ -20,12 +20,15 @@ for (const role of ["candidate", "company"] as const) {
       await page.getByLabel("CUIT").fill(`30${suffix}7`);
       await page.getByLabel("Persona responsable").fill("Responsable ficticio");
       await page.getByLabel("Actividad", { exact: true }).fill("Servicios ficticios");
-      await page.getByLabel("Localidad", { exact: true }).click();
+      await page.getByRole("combobox", { name: "Localidad", exact: true }).click();
       await page.getByRole("option", { name: "Funes", exact: true }).click();
     }
     await page.getByLabel("Correo electrónico").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill(password);
     await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
+    const terms = page.locator('input[name="termsAccepted"]');
+    await expect(terms).not.toBeChecked();
+    await terms.check();
     await page.getByRole("button", { name: role === "candidate" ? "Crear cuenta candidata" : "Crear cuenta de empresa" }).click();
     await expect(page.getByText(/recibirás un enlace/)).toBeVisible();
 
@@ -50,12 +53,12 @@ for (const role of ["candidate", "company"] as const) {
     await page.goto("/account");
     await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
     await page.goto(link!);
-    await expect(page).toHaveURL("http://127.0.0.1:3000/account");
+    await expect(page).toHaveURL(`http://127.0.0.1:3000/${role === "candidate" ? "dashboard" : "empresa"}`);
     if (role === "candidate") {
       await expect(page.getByRole("heading", { name: "Panel de usuario", exact: true })).toBeVisible();
       await expect(page.getByRole("navigation", { name: "Secciones de mi cuenta" })).toBeVisible();
     } else {
-      await expect(page.getByText("Acceso individual activo. Rol: Empresa.", { exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Panel de empresa", exact: true })).toBeVisible();
     }
     await page.goto(role === "candidate" ? "/dashboard?section=perfil" : "/empresa/perfil");
     await expect(page.getByRole("heading", { name: role === "candidate" ? "Mi perfil" : "Perfil de empresa", exact: true })).toBeVisible();

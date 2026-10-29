@@ -4,6 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { join } from "node:path";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { selectLaborCategories } from "./fixtures/quality";
 
 // One-time local verification links must stay out of traces and screenshots.
 test.use({ trace: "off", screenshot: "off" });
@@ -21,7 +22,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL({ candidate: /\/dashboard$/, admin: /\/account$/ }[role]);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, admin: /\/admin$/ }[role]);
 }
 
 test("registro, dos postulaciones independientes, retiro, suspensión y archivo restaurable", async ({ page, browser, request }) => {
@@ -44,6 +45,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByLabel("Confirmar contraseña", { exact: true }).fill(password);
+  await page.locator('input[name="termsAccepted"]').check();
   await page.locator("form").getByRole("button", { name: "Crear cuenta candidata", exact: true }).click();
   await expect(page.getByText(/recibirás un enlace/)).toBeVisible();
 
@@ -61,7 +63,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   const link = (message.Text ?? message.HTML ?? "").match(/https?:\/\/[^\s"<>]+/)?.[0]?.replaceAll("&amp;", "&");
   expect(link).toBeTruthy();
   await page.goto(link!);
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/dashboard?section=perfil");
   await expect(page.getByRole("heading", { name: "Mi perfil" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -69,21 +71,24 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   const activation = page.getByRole("region", { name: "Activación del perfil" });
   await expect(activation.getByText("Antes de activar tu perfil", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Activar perfil" })).toHaveCount(0);
-  await page.getByLabel("Localidad laboral").fill("Funes");
+  await page.getByRole("combobox", { name: "Localidad laboral", exact: true }).click();
+  await page.getByRole("option", { name: "Funes", exact: true }).click();
   await page.getByLabel("Habilidades y experiencia").fill("Experiencia ficticia en tareas administrativas");
-  await page.getByLabel("Categoría ficticia A").check();
-  await page.getByLabel("Categoría ficticia B").check();
+  await selectLaborCategories(page, ["Categoría ficticia A", "Categoría ficticia B"]);
   await expect(page.getByRole("group", { name: "Intereses laborales" })).toHaveCount(0);
   await page.getByRole("button", { name: "Guardar correcciones" }).click();
   await expect(page.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
   await page.reload();
-  await expect(page.getByLabel("Categoría ficticia A")).toBeChecked();
-  await expect(page.getByLabel("Categoría ficticia B")).toBeChecked();
+  const categories = page.getByRole("list", { name: "Categorías seleccionadas" });
+  await expect(categories.getByText("Categoría ficticia A", { exact: true })).toBeVisible();
+  await expect(categories.getByText("Categoría ficticia B", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Privacidad", exact: true })).toHaveCount(0);
+  await page.goto("/dashboard?section=cuenta");
   await expect(page.getByText(/tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas/)).toBeVisible();
   await page.getByLabel("Confirmo esta decisión y entiendo sus efectos.", { exact: true }).check();
   await page.getByRole("button", { name: "Guardar consentimiento" }).click();
   await expect(page.getByText("Consentimiento registrado.", { exact: false })).toBeVisible();
-  await page.reload();
+  await page.goto("/dashboard?section=perfil");
   await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   let releaseRefresh!: () => void;
   const refreshGate = new Promise<void>(resolve => { releaseRefresh = resolve; });
@@ -124,17 +129,21 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.screenshot({ path: "test-results/profile-presentation-mobile.png" });
   await page.setViewportSize({ width: 1920, height: 1080 });
   const detailsCard = page.getByRole("region", { name: "Datos laborales y personales" });
+  const contactCard = page.getByRole("region", { name: "Contacto", exact: true });
   const cvCard = page.getByRole("region", { name: "CV PDF" });
-  const consentCard = page.locator("form").filter({ has: page.getByRole("heading", { name: "Consentimiento de prueba" }) });
   // La grilla de dos columnas vive dentro de la sección de datos, no en la sección misma.
   const detailsGrid = page.locator("[data-profile-details]");
   expect(await detailsGrid.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(" ").length)).toBe(2);
-  await expect(consentCard).toBeVisible();
+  await expect(page.getByRole("region", { name: "Privacidad", exact: true })).toHaveCount(0);
   const cvBounds = await cvCard.boundingBox();
-  const consentBounds = await consentCard.boundingBox();
-  expect(consentBounds!.y).toBeGreaterThanOrEqual(cvBounds!.y + cvBounds!.height);
-  await expect(detailsCard.getByLabel("Teléfono (opcional)")).toBeVisible();
+  const contactBounds = await contactCard.boundingBox();
+  expect(cvBounds!.y).toBeGreaterThanOrEqual(contactBounds!.y + contactBounds!.height);
+  await expect(contactCard.getByLabel("Teléfono (opcional)")).toBeVisible();
+  await expect(detailsCard.getByLabel("Teléfono (opcional)")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Contacto adicional" })).toHaveCount(0);
+  await page.goto("/dashboard?section=cuenta");
+  const consentCard = page.getByRole("region", { name: "Privacidad", exact: true });
+  await expect(consentCard).toBeVisible();
   await expect(consentCard.getByText(/Al aceptar, autorizás/)).toBeVisible();
   await expect(consentCard.getByText(/Si la Oficina confirma una contratación en/)).toBeVisible();
   await expect(consentCard.getByText("Ver política de consentimiento", { exact: true })).toHaveCount(0);
@@ -149,26 +158,30 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   
   await page.keyboard.press("Enter");
   await expect(informationText).toBeHidden();
+  await page.goto("/dashboard?section=perfil");
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: "test-results/profile-presentation-desktop.png", fullPage: true });
   const summary = page.getByLabel("Habilidades y experiencia");
   const storedSummary = await summary.inputValue();
-  await summary.fill("Corrección ficticia todavía sin guardar");
-  const phone = detailsCard.getByLabel("Teléfono (opcional)");
+  await summary.click();
+  await summary.press("ControlOrMeta+A");
+  await page.keyboard.insertText("Corrección ficticia todavía sin guardar");
+  await expect(summary).toHaveValue("Corrección ficticia todavía sin guardar");
+  const phone = contactCard.getByLabel("Teléfono (opcional)");
   await phone.fill("inválido");
-  await detailsCard.getByRole("button", { name: "Guardar teléfono" }).click();
+  await contactCard.getByRole("button", { name: "Guardar teléfono" }).click();
   await expect(phone).toHaveAttribute("aria-invalid", "true");
   await expect(summary).toHaveValue("Corrección ficticia todavía sin guardar");
   await phone.fill("3415550100");
-  await detailsCard.getByRole("button", { name: "Guardar teléfono" }).click();
-  await expect(detailsCard.getByText("Contacto actualizado.", { exact: true })).toBeVisible();
+  await contactCard.getByRole("button", { name: "Guardar teléfono" }).click();
+  await expect(contactCard.getByText("Contacto actualizado.", { exact: true })).toBeVisible();
   await expect(summary).toHaveValue("Corrección ficticia todavía sin guardar");
   await page.reload();
   await expect(phone).toHaveValue("3415550100");
   await expect(summary).toHaveValue(storedSummary);
   await phone.fill("");
-  await detailsCard.getByRole("button", { name: "Guardar teléfono" }).click();
-  await expect(detailsCard.getByText("Contacto actualizado.", { exact: true })).toBeVisible();
+  await contactCard.getByRole("button", { name: "Guardar teléfono" }).click();
+  await expect(contactCard.getByText("Contacto actualizado.", { exact: true })).toBeVisible();
   await page.reload();
   await expect(phone).toHaveValue("");
   const originalCv = await page.getByRole("link", { name: "Descargar mi CV" }).getAttribute("href");
