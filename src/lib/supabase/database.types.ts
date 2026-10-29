@@ -9,6 +9,15 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      account_notifications: {
+        Row: { created_at: string; id: string; kind: string; read_at: string | null; recipient_account_id: string; reference: string; resource_id: string; source_event_id: string }
+        Insert: { created_at: string; id?: string; kind: string; read_at?: string | null; recipient_account_id: string; reference?: string; resource_id: string; source_event_id: string }
+        Update: { created_at?: string; id?: string; kind?: string; read_at?: string | null; recipient_account_id?: string; reference?: string; resource_id?: string; source_event_id?: string }
+        Relationships: [
+          { foreignKeyName: "account_notifications_recipient_account_id_fkey"; columns: ["recipient_account_id"]; isOneToOne: false; referencedRelation: "accounts"; referencedColumns: ["id"] },
+          { foreignKeyName: "account_notifications_source_event_id_fkey"; columns: ["source_event_id"]; isOneToOne: false; referencedRelation: "audit_events"; referencedColumns: ["id"] },
+        ]
+      }
       candidate_photos: {
         Row: { id: string; candidate_id: string; storage_path: string; byte_size: number; sha256: string; state: string; uploaded_by: string; created_at: string; deleted_at: string | null }
         Insert: { id: string; candidate_id: string; storage_path: string; byte_size: number; sha256: string; state: string; uploaded_by: string; created_at?: string; deleted_at?: string | null }
@@ -1610,6 +1619,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      list_my_notifications: { Args: { p_page?: number; p_page_size?: number }; Returns: Json }
+      open_my_notification: { Args: { p_reference: string }; Returns: Json }
+      my_candidate_preinterview_agenda: { Args: never; Returns: Json }
       my_candidate_participations_with_cv: {
         Args: never
         Returns: {

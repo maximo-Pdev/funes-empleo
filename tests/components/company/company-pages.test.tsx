@@ -52,7 +52,7 @@ it.each([
  expect(within(sidebar).getByTitle("login@example.invalid")).toBeTruthy();
  expect(within(sidebar).queryByText("empresa@example.invalid")).toBeNull();
  const nav = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/empresa", "/empresa/perfil", "/empresa/ofertas", "/account"]);
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/empresa", "/empresa/perfil", "/empresa/ofertas", "/account", "/empresa/notificaciones"]);
  expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
  expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();

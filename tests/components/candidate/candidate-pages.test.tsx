@@ -7,6 +7,7 @@ vi.mock("@/features/candidates/photo-service", () => ({ getCandidatePhoto: vi.fn
 vi.mock("@/features/candidates/consent-service", () => ({ getDemoConsentPolicy: mocks.policy }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: mocks.offers, getPublicOffer: mocks.selected }));
 vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: mocks.participations }));
+vi.mock("@/features/notifications/service", () => ({ candidatePreinterviewAgenda: vi.fn().mockResolvedValue([]), listNotifications: vi.fn() }));
 vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn() }));
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: vi.fn(), withdrawParticipationAction: vi.fn() }));
@@ -81,7 +82,7 @@ it("renders the requested profile inside its canvas with sidebar identity and na
  render(await AccountPage({ searchParams: Promise.resolve({ section: "perfil" }) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta", "Notificaciones"]);
  expect(within(navigation).getByRole("link", { name: "Perfil" }).getAttribute("aria-current")).toBe("page");
  expect(within(sidebar).getByText("Persona Ficticia")).toBeTruthy();
  expect(within(sidebar).getByText("persona@example.test")).toBeTruthy();
@@ -122,7 +123,7 @@ it("opens the user dashboard by default with participation metrics and states", 
  render(await AccountPage({ searchParams: Promise.resolve({}) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta", "Notificaciones"]);
  expect(within(navigation).getByRole("link", { name: "Panel de usuario" }).getAttribute("aria-current")).toBe("page");
  expect(screen.getByRole("heading", { level: 1, name: "Panel de usuario" })).toBeTruthy();
  expect(screen.getByRole("heading", { name: "Postulaciones en curso" })).toBeTruthy();

@@ -1,5 +1,63 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA101 — Corrección de aserciones E2E del PR83
+
+CI40799278979/c1eb7e4: database/Vercel PASS; application pasa1346 unit, tipos/lint/
+tooling/build/SQL y128 E2E, falla dos prohibiciones anteriores a la agenda aprobada
+N3 y bloquea seis recorridos dependientes. Pruebas ajustadas a fecha/canal propios,
+manteniendo negativos concretos de notas/resumen/recomendación/estados internos
+y ausencia de agenda ajena. RED2/GREEN5 sin omisiones/reintentos y tipos/lint/diff
+PASS. Producto, migración alojada y CI intactos. Nueva ejecución del mismo PR83
+en seguimiento; no se declara aprobada antes de recibir los checks.
+
+## EXTRA100 — Migración de avisos aplicada por solicitud posterior
+
+2026-10-28:20261028235316/portal_notifications aplicada y registrada en el proyecto
+vinculado kyjycjojzhwggjuqjnki. Transacción guardada y postcheck independiente:
+seis funciones/search_path/ACL, RLS/política, cinco índices/FK/trigger, SQL exacto
+en historial y smoke público PASS. Datos/definiciones previas conservados, sin
+backfill ni casos de prueba alojados. Tres WARN0029 por RPC autenticados previstos
+en contrato, sin EXECUTE anónimo ni grants directos nuevos. Recibos ignorados en
+test-results; EXTRA100 en cambios-extra.md. No commit/PR/deploy de interfaz aún.
+
+Publicación posterior solicitada: commit8de1c5b sin firma y PR83 abierto hacia
+main desde feat/portal-notifications, adjunto al chat. Cambio local next-env.d.ts
+preservado fuera del commit. Checks/revisión/merge pendientes; no despliegue manual.
+
+## EXTRA099 — Avisos privados,2026-10-28
+
+Rama feat/portal-notifications desde7064e3c (PR82 mergeado, CI anterior completa
+en a454c4e/run40780133223). Rama anterior retirada después de confirmar merge;
+next-env.d.ts ajeno conserva SHA256B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+
+Spec/clarify/plan/modelo/contrato/calidad/tasks/analyze revisados por etapas;
+dos respuestas de Mateo resuelven agenda mínima y exclusión de aviso empresarial.
+El código actual conserva InterviewForm, contrario al supuesto de la pregunta;
+se deja intacto. Dos pendientes históricas del checklist de ofertas conservados
+con autorización expresa de Mateo para continuar en este incremento.
+
+Implementados: fanout auditado atómico, tabla/RLS propia y tres RPC; servicio,
+GET/POST privados, referencias opacas, campana5 y listas20 por rol, anclas de
+participación y agenda propia solo fecha/canal. Eventos normales/tardíos y
+destinatarios de la matriz N1–N6; sin backfill, correo o cambios de estados/permisos.
+
+Verificación en entorno aislado funes-admin-cv-check,54341/54342 y3001:
+1346 unit/componentes y57 tooling PASS; suite SQL1416 PASS y SQL focal ampliado
+57/57 PASS. Tipos/build/lint PASS, DB lint public/private sin errores. Lint general
+incluía falsos positivos de helpers pgTAP transitorios en extensions; producto sin
+errores. E2E/axe/visual final y convergencia documentados debajo. Sin hosted/commit/PR.
+
+Actualización final:26 E2E PASS sin omisiones/reintentos, incluidos registro
+empresarial verificado con cuatro avisos, moderación, permisos HTTP, lectura
+independiente, nominación→agenda→derivación→informe→confirmación, teclado/Escape/
+retorno de foco y axe390/1440. Visual de campana/lista revisada con datos ficticios;
+contraste corregido solo en módulo de filas. Convergencia N1–N6 sin brechas nuevas.
+Servicios aislados detenidos con respaldo; entorno habitual preservado.
+
+EXTRA098 cerrado técnicamente: application/database/Vercel PASS en a454c4e,
+run40780133223; PR82 mergeado7064e3c. El seguimiento pendiente de CI que figura
+en la entrada histórica siguiente se conserva como evidencia de aquella etapa.
+
 ## EXTRA098 — Corrección CI del PR82
 
 CI40777824782/1d510dd: application pasó tipos/lint/tooling/unit/build/SQL y falló

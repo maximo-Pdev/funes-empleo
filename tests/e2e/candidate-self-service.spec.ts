@@ -199,7 +199,13 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByRole("heading", { name: "Mis postulaciones" })).toBeVisible();
   await expect(page.locator("li").filter({ hasText: titles[0] })).toContainText("Recibida por la Oficina");
   await expect(page.locator("li").filter({ hasText: titles[1] })).toContainText("Recibida por la Oficina");
-  await expect(page.locator("body")).not.toContainText(/preseleccionad|preentrevista|nota interna/i);
+  // EXTRA099 permits the agenda of a recorded preinterview, never internal
+  // evaluations. These two self applications have no appointment of their own.
+  await expect(page.getByRole("main")).not.toContainText(/preseleccionad|nota interna|resumen interno|recomendación/i);
+  for (const title of titles.slice(0, 2)) {
+    const participation = page.locator("li").filter({ has: page.getByRole("heading", { name: title, exact: true }) });
+    await expect(participation.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toHaveCount(0);
+  }
   const first = page.locator("li").filter({ hasText: titles[0] });
   await first.getByLabel("Confirmo que quiero retirar esta participación.").check();
   await first.getByRole("button", { name: "Retirar participación" }).click();
