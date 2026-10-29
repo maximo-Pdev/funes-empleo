@@ -10,6 +10,10 @@ backfill ni casos de prueba alojados. Tres WARN0029 por RPC autenticados previst
 en contrato, sin EXECUTE anónimo ni grants directos nuevos. Recibos ignorados en
 test-results; EXTRA100 en cambios-extra.md. No commit/PR/deploy de interfaz aún.
 
+Publicación posterior solicitada: commit8de1c5b sin firma y PR83 abierto hacia
+main desde feat/portal-notifications, adjunto al chat. Cambio local next-env.d.ts
+preservado fuera del commit. Checks/revisión/merge pendientes; no despliegue manual.
+
 ## EXTRA099 — Avisos privados,2026-10-28
 
 Rama feat/portal-notifications desde7064e3c (PR82 mergeado, CI anterior completa

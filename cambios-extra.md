@@ -37,6 +37,11 @@
   No aparecieron otras advertencias nuevas. [Detalle del aviso](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable).
   Recibos/definiciones previas guardados solo en test-results ignorado. Migración
   alojada verificada; publicar interfaz por PR y revisión/CI continúan pendientes.
+- **Publicación solicitada posteriormente:** implementación8de1c5b, sin firma,
+  signoff ni coautoría; rama feat/portal-notifications publicada y
+  [PR83](https://github.com/maximo-Pdev/funes-empleo/pull/83) abierto hacia main,
+  listo para revisión y adjunto a esta conversación. next-env.d.ts ajeno y recibos
+  ignorados excluidos. Migración ya aplicada; CI/revisión/merge aún pendientes.
 
 ## EXTRA-099 — Notificaciones del portal por perfil
 
