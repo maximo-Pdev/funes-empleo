@@ -62,7 +62,7 @@ export function AssistedProfileForm({ categories, candidateId, version, initial,
       <option value="available">Disponible</option>{candidateId && <option value="unavailable">No disponible</option>}</select></Field>
     <fieldset className="grid gap-2 rounded border p-3"><legend>{labels.categories}</legend>
       {categories.length === 0 && <p>No hay categorías vigentes disponibles.</p>}
-      <CategoryMultiSelect categories={categories} defaultSelected={initial?.categories ?? []} /></fieldset>
+      <CategoryMultiSelect categories={categories} defaultSelected={initial?.categories ?? []} required={!candidateId} /></fieldset>
     {!candidateId && <fieldset className="grid gap-2 rounded border p-3"><legend className="font-semibold">Términos y condiciones</legend>
       <p>La persona acepta los términos y condiciones de la Oficina de Empleo para el uso de sus datos laborales y su comunicación a empresas solo después de una derivación municipal. La aceptación se registra una sola vez, al dar el alta, y no puede retirarse.</p>
       {creationPolicy ? <details><summary>Ver el texto de la versión {creationPolicy.version}</summary><p>{creationPolicy.policy_text}</p></details>

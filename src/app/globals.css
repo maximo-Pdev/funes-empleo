@@ -180,6 +180,15 @@ h1, h2, h3, h4, h5, h6 {
   caret-color: var(--color-brand-primary);
 }
 
+/* Native validation proxies must retain screen-reader-only geometry. */
+:root form input.sr-only {
+  width: 1px;
+  min-height: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+}
+
 :root :is(form textarea, textarea.municipal-control) {
   min-height: 85px;
   resize: vertical;

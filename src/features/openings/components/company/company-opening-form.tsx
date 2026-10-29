@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { saveCompanyOpeningAction, submitCompanyOpeningAction } from "../../company-actions";
 import type { CompanyOffer } from "../../company-service";
 import { Button, Combobox, ComboboxContent, ComboboxItem, ComboboxList, ComboboxTrigger } from "@/components/ui";
+import { CategoryMultiSelect } from "@/features/candidates/components/category-multi-select";
 import { FieldHelp } from "@/components/forms/field-help";
 import { OPENING_MODALITY_OPTIONS, OPENING_CONTRACT_OPTIONS, type OpeningOption } from "@/domain/catalogs/opening-options";
 import { canEditCompanyOpening, canCancelCompanyOpening } from "../../company-opening-policy";
@@ -86,7 +87,7 @@ export function CompanyOpeningForm({ opening, categories }: { opening: CompanyOf
       <Field className="grid gap-1">Fecha de cierre<input className={field} name="closingDate" required={publishedEditing} type="date" defaultValue={opening?.closingDate ?? ""} /></Field>
       <Field className="grid gap-1">Salario (opcional)<input className={field} name="salary" defaultValue={opening?.salary ?? ""} maxLength={500} /></Field>
       <Field className="grid gap-1">Beneficios (opcional)<textarea className={field} name="benefits" defaultValue={opening?.benefits ?? ""} maxLength={2000} /></Field>
-      <fieldset className="rounded border p-3"><legend className="font-semibold">Categorías</legend><div className="grid gap-2 sm:grid-cols-2">{categories.map((category) => <Field key={category.id} className="flex gap-2"><input type="checkbox" name="categories" value={category.id} defaultChecked={opening?.categories.some((selected) => selected.id === category.id)} />{category.name}</Field>)}</div></fieldset>
+      <fieldset className="rounded border p-3"><legend className="font-semibold">Categorías</legend><CategoryMultiSelect categories={categories} label="Categorías" required={publishedEditing} defaultSelected={opening?.categories.map(category => category.id) ?? []} /></fieldset>
       <Button type="submit" busy={saving}>{publishedEditing ? "Guardar cambios y enviar a revisión" : "Guardar borrador"}</Button>
     </Form>}
     {opening && editable && !editing && !publishedEditing && <Form action={submitAction} result={submitted} className="grid gap-3 rounded border bg-white p-5" aria-busy={submitting}>
