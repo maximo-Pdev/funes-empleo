@@ -1,3 +1,4 @@
+import { formatFunesDate } from "@/lib/time/presentation";
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, ClipboardList, CircleCheck, CircleSlash, FileText, ShieldCheck, UserRound } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
@@ -11,7 +12,7 @@ import styles from "./account.module.css";
 const closedStatuses = ["hired", "not_selected", "withdrawn", "cancelled", "no_company_response"];
 
 function receivedOn(value: string) {
-  return new Date(value).toLocaleDateString("es-AR");
+  return formatFunesDate(value);
 }
 
 export async function renderCandidateDashboardContent({ workspace, profileHref, participationsHref, offersHref }: {

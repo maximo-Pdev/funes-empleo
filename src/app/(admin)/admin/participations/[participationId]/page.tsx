@@ -1,3 +1,4 @@
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { contactChannelLabels, feedbackOutcomeLabels, displayLabel, referralAccessLabels } from "@/domain/presentation/labels";
@@ -19,7 +20,7 @@ import { requireActiveAccount } from "@/lib/auth/guards";
 export const dynamic = "force-dynamic";
 
 function localDate(value: string) {
-  return new Date(value).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" });
+  return formatFunesDateTime(value);
 }
 
 export default async function AdminParticipationDetailPage({ params }: {

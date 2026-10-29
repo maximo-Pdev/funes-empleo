@@ -1,5 +1,8 @@
 # EXTRA085: informes y filtros
 
+EXTRA102: fechas de contexto visibles en PDF/XLSX DD/MM/YYYY, as_of con hora
+Funes. Entradas ISO y CSV técnico conservan contrato; no cambia valores métricos.
+
 GET /api/admin/exports/operations.pdf y operations.xlsx reciben exactamente
 from,to,category opcional como CSV. Duplicados/desconocidos/fechas inválidos se
 rechazan; categoría UUID heredada redirige307 a referencia opaca tras guard.

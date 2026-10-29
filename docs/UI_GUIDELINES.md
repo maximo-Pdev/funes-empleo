@@ -1,5 +1,18 @@
 # Municipal visual reference
 
+## EXTRA102 — Fechas y estados de retiro
+
+EXTRA105 sustituye104: Mateo pide conservar exactamente selector de contacto
+municipal original. Usar datetime-local, calendario/edición nativos y lang es-AR;
+no entrada libre/hint nuevo. El orden lo decide la región del navegador; lang no
+lo garantiza. Mantener label, requerido rojo, foco, datos y payload ISO.
+
+Fechas visibles DD/MM/YYYY con ceros y año4; instantes en zona Funes, con la hora
+ya prevista en cada vista. Calendarios conservan su día. Usar helpers compartidos
+de presentación; entradas nativas y valores ISO internos se conservan. Retirada y
+Cancelada de participaciones usan tone red, sin quitar texto o foco accesible.
+
+
 ## EXTRA099 — Notificaciones privadas
 
 Campana en DashboardShell/HomeNavbar privado; inicio público sin consultas de

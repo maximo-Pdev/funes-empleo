@@ -1,3 +1,4 @@
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { referenceFilters } from "@/lib/records/page-references";
 import { recordReferences } from "@/lib/records/references";
 import { RecordAnchor } from "@/components/ui/record-link";
@@ -23,7 +24,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
     categories = await metricsCategories();
     if (parsed.success) result = await getMetrics(parsed.data);
   } catch (e) {
-    error = e instanceof MetricsHistoryUnavailable ? `No hay evidencia histórica suficiente para ese período. ${e.message ? `El historial fiable comienza el ${new Date(e.message).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}; elegí fechas desde el día siguiente.` : "Elegí un período posterior al inicio del historial."} No se sustituyen datos históricos por valores actuales.` : publicErrorFrom(e).message;
+    error = e instanceof MetricsHistoryUnavailable ? `No hay evidencia histórica suficiente para ese período. ${e.message ? `El historial fiable comienza el ${formatFunesDateTime(e.message)}; elegí fechas desde el día siguiente.` : "Elegí un período posterior al inicio del historial."} No se sustituyen datos históricos por valores actuales.` : publicErrorFrom(e).message;
   }
   const categoryReferences = await recordReferences("category", categories.map(category => category.id));
   return <AdminShell email={user?.email} active="/admin/metrics" title="Métricas operativas" description="Información interna de la Oficina de Empleo. No es un informe oficial municipal o provincial."
@@ -44,7 +45,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
     </details>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
     {result && <>
-      <p className="mb-4">Foto al {new Date(result.as_of).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}.</p>
+      <p className="mb-4">Foto al {formatFunesDateTime(result.as_of)}.</p>
       <div className="mb-6 flex flex-wrap gap-3">
         <RecordAnchor href={`/api/admin/exports/operations.pdf?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar PDF filtrado</RecordAnchor>
         <RecordAnchor href={`/api/admin/exports/operations.xlsx?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar Excel filtrado</RecordAnchor>

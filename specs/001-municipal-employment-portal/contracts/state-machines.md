@@ -46,6 +46,16 @@ cualquier escritura o auditoría revierte el agregado completo.
 
 ## Cuenta
 
+### EXTRA102 — Nuevo intento de postulación propia
+
+withdrawn sigue siendo terminal. apply_to_opening y apply_to_opening_with_cv pueden
+crear otra participación received si todos los casos no archivados previos para
+el par son withdrawn y se cumplen las precondiciones actuales. reserve_application_cv
+usa la misma condición. No reabre fila, no recupera permiso, no cambia CV anterior;
+auditoría/avisos y alta/promoción de CV son atómicos. Los demás finales bloquean
+un nuevo intento. Nominación/matching municipales mantienen exclusión histórica.
+
+
 | Comando | Actor | Desde | Hacia | Motivo | Precondiciones y efecto |
 | --- | --- | --- | --- | --- | --- |
 | Aprovisionar administrador | Operador autorizado del entorno | inexistente | `pending_verification` | No | Fuera del registro público, identidad individual confirmada y acción auditada; en producción el operador permanece bloqueado por OQ-006. |

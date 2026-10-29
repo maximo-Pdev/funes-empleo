@@ -1,3 +1,4 @@
+import { formatFunesDate, formatFunesDateTime } from "@/lib/time/presentation";
 import Link from "next/link";
 import { RecordAnchor } from "@/components/ui/record-link";
 import { ArrowRight, CalendarDays, ClipboardList } from "lucide-react";
@@ -21,12 +22,12 @@ export async function renderCandidateParticipationsContent({ offersHref = "/dash
         <Card className="h-full p-6"><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-primary"><ClipboardList className="h-5 w-5" aria-hidden="true" /></div>
           <h2 className="break-words text-xl font-bold leading-7 text-primary-900">{item.opening_title ?? "Oferta"}</h2>
           <p className="mt-4 text-sm"><span className="sr-only">Estado: </span><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></p>
-          <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {new Date(item.created_at).toLocaleDateString("es-AR")}</p>
+          <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {formatFunesDate(item.created_at)}</p>
           {agenda.filter(entry => entry.reference === references[item.id]).map((entry, index) => <div key={`${entry.reference}-${index}`} className="mt-4 rounded-lg border border-border bg-secondary p-3 text-sm">
             <h3 className="font-semibold">Preentrevista de la Oficina de Empleo</h3>
             <p>Canal: {preinterviewChannelLabels[entry.channel]}</p>
-            {entry.scheduledAt && <p>Programada: {new Date(entry.scheduledAt).toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" })}</p>}
-            {entry.heldAt && <p>Realizada: {new Date(entry.heldAt).toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" })}</p>}
+            {entry.scheduledAt && <p>Programada: {formatFunesDateTime(entry.scheduledAt)}</p>}
+            {entry.heldAt && <p>Realizada: {formatFunesDateTime(entry.heldAt)}</p>}
           </div>)}
           {item.cv_document_id && <p className="mt-4"><RecordAnchor href={`/api/cv/${item.cv_document_id}`} target="_blank" rel="noopener noreferrer" className="text-primary underline">Abrir CV de esta postulación: {item.cv_name}</RecordAnchor></p>}
           {item.display_status === "received" && <div className={`${styles.forms} mt-5 border-t border-border pt-3`}><CandidateWithdrawForm participationId={item.id} version={item.version} /></div>}
