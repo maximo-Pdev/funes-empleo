@@ -68,8 +68,67 @@ beforeEach(() => {
  mocks.imports.mockResolvedValue([{ id, created_at: date, status: "blocked", total_rows: 1 }]); mocks.preview.mockResolvedValue(preview);
  mocks.metricCategories.mockResolvedValue(categories); mocks.metrics.mockResolvedValue({ filters: metricFilters, as_of: date, rows });
 });
+it("puts case identity before actionable guidance and preserves evidence destinations", async () => {
+ render(await Participation({ params: Promise.resolve({ participationId: id }) }));
+ const identity = screen.getByRole("heading", { name: "Caso", level: 2 });
+ const guide = screen.getByRole("region", { name: "Próximo paso" });
+ expect(identity.compareDocumentPosition(guide) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(within(guide).getByRole("link", { name: "Ir a la acción disponible" }).getAttribute("href")).toBe("#case-actions");
+ expect(document.querySelector("#case-actions")?.getAttribute("tabindex")).toBe("-1");
+ expect(document.querySelector("#contact-record")).toBeTruthy();
+ expect(screen.getByRole("list", { name: "Etapas del caso" })).toBeTruthy();
+});
+it("prioritizes confirmation of a pending company response with unique anchors", async () => {
+ mocks.participation.mockResolvedValue({ participation: { ...participation, status: "awaiting_feedback" }, audit: [], preinterviews: [], contacts: [], notes: [], referral: null, feedback: [{ id, reported_outcome: "not_selected", reported_at: date, review_status: "pending_admin", message: "Motivo ficticio" }] });
+ render(await Participation({ params: Promise.resolve({ participationId: id }) }));
+ expect(screen.getByRole("link", { name: "Ir a la acción disponible" }).getAttribute("href")).toBe("#feedback-review");
+ const ids = Array.from(document.querySelectorAll("[id]")).map(node => node.id);
+ expect(new Set(ids).size).toBe(ids.length);
+ const review = document.querySelector("#feedback-review")!;
+ expect(review.compareDocumentPosition(document.querySelector("#case-actions")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+it("surfaces existing closing dates in administrative offer summaries", async () => {
+ render(await Openings({ searchParams: Promise.resolve({}) }));
+ expect(screen.getByRole("region", { name: "Listado de ofertas" }).textContent).toContain("Cierre: 30/11/2026");
+});
+it("provides real moderation and matching destinations without replacing the approved grid", async () => {
+ render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
+ const guide = screen.getByRole("region", { name: "Próximo paso de la oferta" });
+ expect(within(guide).getByRole("link", { name: "Revisar decisión municipal" }).getAttribute("href")).toBe("#opening-moderation");
+ expect(document.querySelector("#opening-moderation")).toBeTruthy();
+ expect(document.querySelector("#candidate-matches")).toBeTruthy();
+});
+it.each(["active", "archived"])("retains opaque course history navigation for %s candidates", async status => {
+ mocks.candidate.mockResolvedValue({ candidate: { ...candidate, status }, currentCv: null, referralEligible: false, participations: [], notes: [], audit: [] });
+ render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
+ expect(screen.getByRole("link", { name: "Cursos y derivaciones" }).getAttribute("href")).toBe(`/admin/courses?candidate=${fixtureReference("candidate", id)}`);
+});
 it("rechaza acceso antes de consultar el padrón", async () => {
  mocks.guard.mockRejectedValue(new Error("FORBIDDEN")); await expect(Candidates({ searchParams: Promise.resolve({}) })).rejects.toThrow("FORBIDDEN"); expect(mocks.search).not.toHaveBeenCalled();
+});
+it("starts the admin navigation with an operational overview", async () => {
+ render(await Metrics({ searchParams: Promise.resolve({}) }));
+ const navigation = screen.getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
+ const first = within(navigation).getAllByRole("link")[0]!;
+ expect(first.getAttribute("href")).toBe("/admin");
+ expect(first.textContent).toContain("Panel de administración");
+});
+it("shows hierarchical breadcrumbs on an administrative detail", async () => {
+ render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
+ const breadcrumbs = screen.getByRole("navigation", { name: "Ruta de navegación" });
+ expect(within(breadcrumbs).getByRole("link", { name: "Panel de administración" }).getAttribute("href")).toBe("/admin");
+ expect(within(breadcrumbs).getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/admin/openings");
+ expect(breadcrumbs.querySelector('[aria-current="page"]')?.textContent).toBe(screen.getByRole("heading", { level: 1 }).textContent);
+});
+it("loads actual metrics for the guarded daily overview", async () => {
+ const { default: Overview } = await import("@/app/(admin)/admin/page");
+ render(await Overview());
+ expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
+ expect(mocks.metrics).toHaveBeenCalledWith(expect.objectContaining({ from: expect.any(String), to: expect.any(String) }));
+ const filters = mocks.metrics.mock.calls[0]![0];
+ expect(filters.from).toBe(filters.to);
+ expect(screen.getByRole("heading", { level: 1, name: "Panel de administración" })).toBeDefined();
+ expect(screen.getByTestId("metric-active_candidates").textContent).toContain("24");
 });
 it("conserva los filtros de candidatos al paginar", async () => {
  render(await Candidates({ searchParams: Promise.resolve({ locality: "Funes" }) })); expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
@@ -307,7 +366,7 @@ it.each([
  expect(within(sidebar).getByText("Administración")).toBeTruthy();
  expect(within(sidebar).getByTitle("admin@example.invalid")).toBeTruthy();
  const nav = within(sidebar).getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
- expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/metrics", "/account"]);
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin", "/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/courses", "/admin/metrics", "/account"]);
  expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
  expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();

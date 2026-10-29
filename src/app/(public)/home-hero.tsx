@@ -9,7 +9,8 @@ import { HomeRibbons } from "./home-ribbons";
 import styles from "./home.module.css";
 
 export function HomeHero({ authenticated, panelHref, panelLabel, initialView = "login", accessState = null }: { authenticated: boolean; panelHref?: string; panelLabel?: string; initialView?: HomeAccessView; accessState?: AccessState | null }) {
-  const [view, setView] = useState<HomeAccessView>(initialView);
+  const [selectedView, setView] = useState<HomeAccessView>(initialView);
+  const view = authenticated ? "login" : selectedView;
   const copy = view === "login" ? null : registrationContent[view];
 
   return (

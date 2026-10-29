@@ -27,9 +27,11 @@ import * as company from "@/features/companies/company-actions";
 import * as companyAdmin from "@/features/companies/admin-actions";
 import * as accounts from "@/features/accounts/actions";
 import * as feedback from "@/features/referrals/feedback-actions";
+import * as administratorInvitation from "@/features/accounts/admin-invitation-actions";
+import * as training from "@/features/training/actions";
 const actions = { ...candidateAdmin, ...candidateHistory, ...assisted, ...claim, ...duplicate, ...candidateProfile,
   ...consent, ...participation, ...evaluation, ...nomination, ...matching, ...openingAdmin, ...openingCompany,
-  ...company, ...companyAdmin, ...accounts, ...feedback };
+  ...company, ...companyAdmin, ...accounts, ...feedback, ...administratorInvitation, ...training };
 
 const id = "00000000-0000-4000-8000-000000000001";
 const profile = { name: "Persona ficticia", dni: "99000001", locality: "Funes", summary: "",
@@ -76,6 +78,9 @@ add("accounts/actions", "active", "passwordAction", { password: "Fictitious-Test
 add("referrals/feedback-actions", "company", "submitFeedbackAction", { reportedOutcome: "hired" }, true);
 add("referrals/feedback-actions", "company", "submitInterviewAction", { status: "scheduled", scheduledAt: "2026-09-27T10:00" }, true);
 add("referrals/feedback-actions", "admin", "confirmOutcomeAction", { outcome: "hired" }, true);
+add("accounts/admin-invitation-actions", "admin", "administratorInvitationAction", { email: "invitation@example.invalid" }, true);
+add("training/actions", "admin", "saveCourseLinkAction", { title: "Curso ficticio", url: "https://example.invalid/curso", published: "true" }, true);
+add("training/actions", "admin", "createCourseReferralAction", { candidateReference: "candidato-ficticio", courseId: id }, true);
 
 const publicActions = ["accounts/actions:loginAction", "accounts/actions:recoveryAction",
   "accounts/actions:verificationAction", "accounts/actions:registerAccountAction", "accounts/actions:logoutAction",

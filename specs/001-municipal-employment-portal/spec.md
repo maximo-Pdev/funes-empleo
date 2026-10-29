@@ -75,8 +75,11 @@ El hero conserva el contenido restante y el fondo animado.
 
 Con sesión activa verificada, el modo Iniciar sesión muestra “Ya tenés la sesión
 iniciada” sin otro formulario de login. El servidor impide otro inicio de sesión
-antes de autenticar credenciales nuevas; ambos autorregistros siguen disponibles
-con sus reglas de confirmación existentes. Los campos vacíos de estos formularios
+antes de autenticar credenciales nuevas. La solicitud de Máximo del 2026-10-27
+reemplaza la disponibilidad anterior de autorregistro con sesión: Home oculta
+el registro y sus accesos cuando hay una sesión activa verificada, incluso ante
+selectores de URL o eventos de registro. Sin sesión, ambos autorregistros mantienen
+sus reglas de confirmación existentes. Los campos vacíos de estos formularios
 de portada mantienen las líneas rojas y el resumen “Revisá los x campos indicados.”,
 sin repetir “Completá este campo.”. Se conservan errores útiles de formato,
 confirmación y servidor, validaciones y semántica accesible. Trazabilidad EXTRA-052.
@@ -935,7 +938,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   confirmación explícita e historial; NO DEBE suspenderse a sí mismo ni dejar cero administradores
   activos. Las cuentas administrativas NO DEBEN archivarse en el MVP; cualquier baja permanente
   queda pendiente de un procedimiento municipal posterior. No existe autorregistro ni elevación
-  pública al rol administrador.
+  pública al rol administrador. Actualización autorizada por Máximo el 2026-10-27:
+  desde Cuenta, un administrador activo puede invitar otras cuentas individuales,
+  con correo válido y confirmación explícita de permisos completos. Las cuatro
+  cuentas iniciales no constituyen un máximo. La invitación conserva su reserva,
+  atribución e ingreso individual con definición de contraseña; los errores de envío
+  no se presentan como éxito ni se expone el cliente privilegiado al navegador.
 - **FR-004**: Cada acción y registro privado DEBE ser accesible únicamente para los roles y
   propietarios autorizados, incluso cuando alguien intente acceder fuera de la navegación normal.
 - **FR-005**: Los administradores DEBEN poder suspender y reactivar cuentas de candidatos y empresas
@@ -1112,7 +1120,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   participaciones abiertas conforme a FR-025; cada vía conserva el historial.
 - **FR-039**: La empresa DEBE poder comunicar el resultado de una entrevista, pero solo un
   administrador DEBE poder confirmar el resultado final según esa comunicación; el retiro efectuado
-  por el candidato es una excepción explícita. Si la empresa informa `process_cancelled` para un
+  por el candidato es una excepción explícita. Si informa `not_selected`, DEBE indicar un motivo
+  no vacío, según el PDF confirmado por Máximo
+  (EXTRA-086). El informe queda pendiente de confirmación municipal; el detalle sigue siendo
+  opcional para los demás resultados. No se completan motivos de informes históricos.
+  Si la empresa informa `process_cancelled` para un
   candidato, la Oficina PUEDE cerrar solo esa participación como cancelada, sin cancelar la oferta.
   Después de revocado el acceso a los datos del candidato, una empresa activa solo DEBE conservar
   para ese feedback tardío el identificador de su derivación, el identificador y título de su propia
@@ -1132,9 +1144,15 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   sin reactivar el permiso empresarial revocado.
 - **FR-041**: Un candidato no seleccionado DEBE poder continuar activo y participar en otras
   búsquedas.
-- **FR-042 (Should)**: El personal DEBERÍA poder registrar una nota interna de texto libre sobre
-  capacitaciones u orientaciones vinculadas con un candidato, sin catálogo, inscripciones ni
-  recomendaciones automáticas.
+- **FR-042 (Must, actualización autorizada 2026-10-27)**: El personal DEBE poder
+  publicar enlaces informativos a cursos y registrar una derivación de un postulante
+  a un curso, con fecha, cuenta responsable e historial independiente de las
+  postulaciones y derivaciones laborales. Los enlaces publicados se pueden consultar
+  públicamente; los antecedentes individuales quedan restringidos a administración.
+  Las notas libres de orientación existentes se conservan como complemento, no como
+  sustituto del registro estructurado. No se incluyen inscripciones, gestión académica
+  ni recomendaciones automáticas de cursos. Máximo confirmó el requisito del PDF
+  `Beex_Funes_Tech_Lab_Proyecto_Final.pdf`; sustituye el alcance anterior de nota libre.
 
 #### Historial, contactos y privacidad
 

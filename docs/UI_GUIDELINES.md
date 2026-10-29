@@ -1,5 +1,22 @@
 # Municipal visual reference
 
+## Final portal improvements — EXTRA-086 (in progress)
+
+The administrator overview lives at `/admin` and is the first sidebar destination
+and successful administrator login destination. `/account` remains Cuenta;
+`/admin/metrics` keeps period/category filters and CSV. Both overview and metrics
+reuse actual `getMetrics` rows: horizontal bars replace count cards, and a donut
+shows mutually exclusive opening states, never overlapping category counts.
+Preserve text equivalents, unavailable/zero/pending distinctions and municipal
+tokens. The overview uses today's Argentine date for both bounds and labels
+snapshot counts separately from today's activity; it does not invent a trend.
+
+The latest request supersedes authenticated Home registration availability:
+verified active sessions keep their role panel access, not registration tabs,
+role selection or closing registration shortcuts. Anonymous registration and
+independent form drafts remain unchanged. See `odd/tasks/final-portal-improvements.md`
+for active scope, pending checks and the separate legal/operational consent rules.
+
 ## PR 78 validation and matching corrections — EXTRA-084
 
 Company Localidad remains a required catalog combobox. Its validation participates
@@ -296,6 +313,15 @@ Password visibility toggles remain separate non-submit controls with at least
 44×44px targets. Existing destructive actions stay red; the auth danger wrapper
 uses `--form-submit-background` / `--form-submit-hover` to preserve that meaning.
 Do not remove confirmation, hints, `required`, autocomplete, errors or ARIA links.
+
+Native validation proxies using `input.sr-only` keep 1px width/height/min-height,
+zero padding and zero border through the shared `:root form input.sr-only` rule.
+The visible-input sizing rules (including administrator workspace styles) must not
+expand these absolutely positioned proxies. Keep native `required`, FormData and
+focus redirection to the visible combobox intact; never fix their overflow with
+page clipping or by disabling validation. Visible controls retain their normal
+touch targets. Verify candidate Perfil and admin Atención presencial at both
+360px and 1366px against a fresh production build (EXTRA-086).
 
 The homepage's compact layout uses 6px between labels and their controls,
 16px between field groups, and 12px panel padding. Reuse `--form-label-gap`,

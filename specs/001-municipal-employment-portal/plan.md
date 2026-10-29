@@ -1,5 +1,32 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## Final portal improvements — EXTRA-086 (implementation in progress)
+
+Authorized scope and exact user corrections: `odd/tasks/final-portal-improvements.md`.
+Reuse existing request-bound Supabase services, role guards, opaque record references
+and municipal components. The administrator overview at `/admin` uses real metrics
+for today and shares the chart renderer with the filtered metrics page; `/account`
+retains account management. Candidate offer suggestions union recent public search
+matches by the selected active category codes, deduplicate and exclude applied offers;
+they do not call administrative matching or grant any referral access.
+
+Course links and referrals use additive migration `20261027233000_course_referrals.sql`.
+`municipal_courses` exposes published title/URL metadata, while `course_referrals`
+is administrator-only append-only history with course title/URL snapshots and actor/time.
+Ordinary sessions read through RLS. Session-bound SECURITY DEFINER commands with
+empty search_path perform writes and audit them. No job participation, CV requirement,
+company access or enrollment is created by a course referral. HTTPS links are validated
+lexically, never fetched server-side; staff verify their official provenance. Recovery
+preserves records and revokes new commands rather than deleting populated tables.
+New course/terms database behavior still requires isolated SQL verification; a mock RPC
+pass is not database proof. Registration terms remain an unapproved demonstration
+draft, separate from operational consent and existing privacy gates.
+
+The shared sidebar receives the candidate's existing private photo, loaded once per
+account render and reused by Perfil. Optional read failure must not block other forms.
+Visibility toggles for passwords and masked identifiers share the same adapted Button;
+each input retains its own visibility, value, validation and accessible label.
+
 ## Authorized public metrics design — EXTRA-079
 
 Use a no-argument SQL `public_portal_counts()` RPC with SECURITY DEFINER and

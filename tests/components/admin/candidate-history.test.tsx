@@ -7,7 +7,7 @@ import type { CandidateHistoryEvent } from "@/features/candidates/candidate-hist
 const date="2026-10-24T12:00:00Z", id="0a000000-0000-4000-8000-000000000001";
 const initial:CandidateHistoryEvent[] = Array.from({ length:5 },(_,index)=>({ id:`event-${index}`,action:"profile_activated",occurred_at:date }));
 const cursor={ occurredAt:date,id };
-beforeEach(()=>vi.clearAllMocks());
+beforeEach(()=>{ mocks.load.mockReset(); });
 it("muestra cinco entradas con evento y fecha, sin datos técnicos ni transiciones",()=>{
   render(<CandidateHistory candidateId={id} initialEvents={initial} initialCursor={cursor} />);
   const region=screen.getByRole("region",{ name:"Historial de cuenta y perfil" });
@@ -35,6 +35,7 @@ it("mantiene datos y cursor tras error, permite reintento y no duplica entradas"
   render(<CandidateHistory candidateId={id} initialEvents={initial} initialCursor={cursor} />);
   fireEvent.click(screen.getByRole("button",{ name:"Ver más" }));
   await screen.findByRole("alert"); expect(screen.getAllByRole("listitem")).toHaveLength(5);
+  await waitFor(()=>expect(screen.getByRole("button",{ name:"Ver más" })).toHaveProperty("disabled",false));
   fireEvent.click(screen.getByRole("button",{ name:"Ver más" }));
   await screen.findByText("Perfil vinculado");
   expect(screen.getAllByRole("listitem")).toHaveLength(6); expect(mocks.load.mock.calls[1]![0].cursor).toEqual(cursor);

@@ -5,12 +5,14 @@ vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/candidates/profile-service", () => ({ getCandidateWorkspace: mocks.workspace }));
 vi.mock("@/features/candidates/photo-service", () => ({ getCandidatePhoto: vi.fn().mockResolvedValue(null), getPhotoCleanupPending: vi.fn().mockResolvedValue(false) }));
 vi.mock("@/features/candidates/consent-service", () => ({ getDemoConsentPolicy: mocks.policy }));
+vi.mock("@/features/training/components/course-links", () => ({ CourseLinks: vi.fn(async () => <p>Cursos públicos ficticios</p>) }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: mocks.offers, getPublicOffer: mocks.selected }));
 vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: mocks.participations }));
 vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn() }));
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: vi.fn(), withdrawParticipationAction: vi.fn() }));
 vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn(), accountStatusAction: vi.fn() }));
+vi.mock("@/features/accounts/admin-invitation-actions", () => ({ administratorInvitationAction: vi.fn() }));
 vi.mock("@/features/accounts/navigation", () => ({ getPanelHref: () => "/dashboard" }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }), usePathname: () => "/account" }));
 import { getCandidatePhoto, getPhotoCleanupPending } from "@/features/candidates/photo-service";
@@ -76,12 +78,32 @@ it.each([
  if (heading) expect(canvas?.contains(screen.getByRole("heading", { level: 1, name: heading }))).toBe(true);
  expect(canvas?.textContent).toContain("La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.");
 });
+it("suggests public offers matching the candidate categories on the dashboard", async () => {
+ accountSession();
+ render(await DashboardPage({ searchParams: Promise.resolve({}) }));
+ const suggestions = screen.getByRole("region", { name: "Ofertas según tus rubros" });
+ expect(within(suggestions).getByRole("link", { name: offer.title }).getAttribute("href")).toContain("section=ofertas&oferta=");
+ expect(mocks.offers).toHaveBeenCalledWith({ rubro: "ADMIN", page: 1, pageSize: 30 });
+});
+it("loads the persisted photo for sidebar identity outside the profile section", async () => {
+ accountSession();
+ vi.mocked(getCandidatePhoto).mockResolvedValueOnce({ id: "photo-fixture" });
+ render(await DashboardPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
+ expect(getCandidatePhoto).toHaveBeenCalledExactlyOnceWith(offer.id);
+ const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
+ expect(sidebar.querySelector('[data-slot="sidebar-photo"]')).toBeTruthy();
+});
+it("separates optional contact details from the personal and work form", async () => {
+ render(await ProfilePage({ searchParams: Promise.resolve({}) }));
+ expect(within(screen.getByRole("region", { name: "Contacto" })).getByRole("button", { name: "Guardar teléfono" })).toBeDefined();
+ expect(within(screen.getByRole("region", { name: "Datos laborales y personales" })).queryByRole("button", { name: "Guardar teléfono" })).toBeNull();
+});
 it("renders the requested profile inside its canvas with sidebar identity and navigation intact", async () => {
  accountSession();
  render(await AccountPage({ searchParams: Promise.resolve({ section: "perfil" }) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta"]);
  expect(within(navigation).getByRole("link", { name: "Perfil" }).getAttribute("aria-current")).toBe("page");
  expect(within(sidebar).getByText("Persona Ficticia")).toBeTruthy();
  expect(within(sidebar).getByText("persona@example.test")).toBeTruthy();
@@ -91,7 +113,7 @@ it("renders the requested profile inside its canvas with sidebar identity and na
  expect(screen.getByRole("main").childElementCount).toBe(1);
  expect(screen.getByRole("main").querySelector('[data-slot="profile-canvas"]')?.contains(screen.getByLabelText("Nombre y apellido"))).toBe(true);
  expect(screen.getByRole("main").getAttribute("aria-label")).toBe("Perfil");
- expect(mocks.policy).toHaveBeenCalledOnce();
+ expect(mocks.policy).not.toHaveBeenCalled();
  expect(screen.queryByRole("button", { name: /Archivar/ })).toBeNull();
  expect(screen.getAllByRole("main")).toHaveLength(1);
  expect(screen.getByRole("main").id).toBe("contenido");
@@ -107,7 +129,7 @@ it.each(["photo", "cleanup"])("keeps profile usable when the %s query fails befo
  expect(screen.getByLabelText("Nombre y apellido")).toHaveProperty("value", "Persona Ficticia");
  expect(screen.getByRole("button", { name: "Guardar teléfono" })).toHaveProperty("disabled", false);
  expect(screen.getByRole("heading", { name: "CV PDF" })).toBeTruthy();
- expect(screen.getByRole("heading", { name: "Consentimiento de prueba" })).toBeTruthy();
+ expect(screen.queryByRole("heading", { name: "Consentimiento de prueba" })).toBeNull();
  expect(screen.getByRole("button", { name: "Subir foto" })).toHaveProperty("disabled", true);
  expect(screen.getByRole("button", { name: "Eliminar foto" })).toHaveProperty("disabled", true);
  expect(screen.getByText("La foto de perfil no está disponible en este momento. Podés completar el resto de tus datos.")).toBeTruthy();
@@ -122,7 +144,7 @@ it("opens the user dashboard by default with participation metrics and states", 
  render(await AccountPage({ searchParams: Promise.resolve({}) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta"]);
  expect(within(navigation).getByRole("link", { name: "Panel de usuario" }).getAttribute("aria-current")).toBe("page");
  expect(screen.getByRole("heading", { level: 1, name: "Panel de usuario" })).toBeTruthy();
  expect(screen.getByRole("heading", { name: "Postulaciones en curso" })).toBeTruthy();
@@ -154,9 +176,47 @@ it.each([
  fireEvent.submit(logout.closest("form")!);
  expect(logoutAction).toHaveBeenCalledOnce();
  expect(mocks.workspace).toHaveBeenCalledOnce();
- expect(mocks.policy).not.toHaveBeenCalled();
+ expect(mocks.policy).toHaveBeenCalledOnce();
+ expect(within(main).getByRole("region", { name: "Privacidad" })).toBeTruthy();
  expect(mocks.offers).not.toHaveBeenCalled();
  expect(mocks.participations).not.toHaveBeenCalled();
+});
+it("muestra cursos públicos dentro de la sección Cursos", async () => {
+ accountSession();
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "cursos" }) }));
+ expect(screen.getByRole("heading", { level: 1, name: "Cursos" })).toBeTruthy();
+ expect(screen.getByText("Cursos públicos ficticios")).toBeTruthy();
+ expect(mocks.policy).not.toHaveBeenCalled();
+});
+it.each([null, "withdrawn"])("permite otorgar permiso explícito en Cuenta para estado %s", async status => {
+ accountSession();
+ const state = workspace("consent_withdrawn");
+ mocks.workspace.mockResolvedValue({ ...state, consent: status ? { ...state.consent, status } : null });
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
+ const privacy = screen.getByRole("region", { name: "Privacidad" });
+ const form = within(privacy).getByRole("button", { name: "Guardar consentimiento" }).closest("form")!;
+ expect(new FormData(form).get("status")).toBe("accepted");
+ expect(new FormData(form).get("version")).toBe("1");
+ expect(within(form).getByRole("checkbox")).toHaveProperty("checked", false);
+ expect(within(form).getByRole("checkbox")).toHaveProperty("required", true);
+ expect(within(privacy).getByText(/no sustituye los términos/)).toBeTruthy();
+});
+it.each(["perfil", "ofertas", "dashboard"])("enlaza al permiso pendiente desde %s hacia Cuenta", async section => {
+ accountSession();
+ mocks.workspace.mockResolvedValue({ ...workspace("draft"), consent: null });
+ render(await AccountPage({ searchParams: Promise.resolve({ section }) }));
+ expect(screen.getByRole("link", { name: "Gestionar privacidad en Cuenta" }).getAttribute("href")).toBe("/account?section=cuenta");
+});
+it("permite retirar un permiso vigente sin enviar accepted hacia accepted", async () => {
+ accountSession();
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
+ const privacy = screen.getByRole("region", { name: "Privacidad" });
+ expect(within(privacy).getByText("Permiso actual: vigente.")).toBeTruthy();
+ expect(within(privacy).queryByRole("button", { name: "Guardar consentimiento" })).toBeNull();
+ const form = within(privacy).getByRole("button", { name: "Retirar consentimiento" }).closest("form")!;
+ expect(new FormData(form).get("status")).toBe("withdrawn");
+ expect(within(form).getByRole("checkbox")).toHaveProperty("required", true);
+ expect(within(privacy).getByText(/participaciones abiertas se cerrarán/)).toBeTruthy();
 });
 it("hides the closed participation section until a final state exists", async () => {
  accountSession();

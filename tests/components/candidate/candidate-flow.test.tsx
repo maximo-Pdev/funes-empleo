@@ -27,7 +27,7 @@ const categoryB = "0a000000-0000-4000-8000-000000000002";
 describe("autogestión candidata", () => {
   it("normaliza el DNI y exige los campos mínimos del autorregistro", () => {
     expect(candidateRegistrationSchema.parse({ name: " Persona Ficticia ", dni: "90.000.001",
-      email: "test@example.invalid", password: "Fictitious-123", confirmation: "Fictitious-123" }).dni).toBe("90000001");
+      email: "test@example.invalid", password: "Fictitious-123", confirmation: "Fictitious-123", termsAccepted: true, termsVersion: "demo-terms-draft-1" }).dni).toBe("90000001");
     expect(candidateRegistrationSchema.safeParse({ name: "A", dni: "abc", email: "invalid", password: "1" }).success).toBe(false);
     render(<CandidateRegistrationForm />);
     expect(screen.getByLabelText("Nombre y apellido")).toBeTruthy();
@@ -65,8 +65,10 @@ describe("autogestión candidata", () => {
     expect(dni).toHaveProperty("type", "password");
     expect(new FormData(form).get("dni")).toBe("90000002");
     expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Categoría A")).toHaveProperty("checked", true);
-    expect(screen.getByLabelText("Categoría B")).toHaveProperty("checked", true);
+    const tags = screen.getByRole("list", { name: "Categorías seleccionadas" });
+    expect(tags.textContent).toContain("Categoría A");
+    expect(tags.textContent).toContain("Categoría B");
+    expect(new FormData(form).getAll("categories")).toEqual([categoryA, categoryB]);
     expect(screen.queryByText(/no es texto municipal aprobado/i)).toBeNull();
     expect(screen.queryByRole("button", { name: "Activar perfil" })).toBeNull();
     expect(screen.queryByRole("button", { name: /archivar|eliminar perfil/i })).toBeNull();
