@@ -1,12 +1,15 @@
 import { expect, it, vi } from "vitest";
 import { fireEvent } from "@testing-library/react";
-const mocks = vi.hoisted(() => ({ apply: vi.fn(), refresh: vi.fn(), offers: vi.fn(), selected: vi.fn(), participations: vi.fn() }));
+const mocks = vi.hoisted(() => ({ refresh: vi.fn(), offers: vi.fn(), selected: vi.fn(), participations: vi.fn() }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: mocks.offers, getPublicOffer: mocks.selected }));
 vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: mocks.participations }));
+vi.mock("@/features/notifications/service", () => ({ candidatePreinterviewAgenda: vi.fn(async () => []) }));
+vi.mock("@/lib/records/references", async () => (await import("../../fixtures/record-references")).referenceMocks);
+vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures/record-references")).recordLinkMocks);
 import { renderCandidateOffersContent } from "@/app/(candidate)/candidato/_components/offers-content";
 import { renderCandidateParticipationsContent } from "@/app/(candidate)/candidato/_components/participations-content";
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: mocks.refresh }) }));
-vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: mocks.apply, withdrawParticipationAction: vi.fn() }));
+vi.mock("@/features/participations/candidate-actions", () => ({ withdrawParticipationAction: vi.fn() }));
 import { CandidateApplyForm } from "@/features/participations/components/candidate-status";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import { WorkflowSteps } from "@/components/ui/workflow-steps";
@@ -40,15 +43,21 @@ it.each(["/account?section=postulaciones&oferta=auxiliar", "/dashboard?section=p
   expect(screen.getByRole("link", { name: "Ver mis postulaciones" }).getAttribute("href")).toBe(href);
 });
 it("continues after successful submission without losing version, refresh or duplicate protection", async () => {
-  mocks.apply.mockResolvedValue({ message: "Postulación recibida", success: true });
-  render(<CandidateApplyForm openingId="offer" candidateVersion={3} disabled={false} participationsHref="/account?section=postulaciones" />);
-  fireEvent.click(screen.getByRole("button", { name: "Postularme" }));
-  expect(await screen.findByRole("link", { name: "Ver mis postulaciones" })).toBeTruthy();
-  const data = mocks.apply.mock.calls[0]![1] as FormData;
-  expect(data.get("candidateVersion")).toBe("3");
-  expect(data.get("openingId")).toBe("offer");
-  await waitFor(() => expect(mocks.refresh).toHaveBeenCalled());
-  expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true);
+  const request = vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: true, json: async () => ({ success: true }) } as Response);
+  try {
+    render(<CandidateApplyForm openingId="offer" candidateVersion={3} disabled={false} participationsHref="/account?section=postulaciones" />);
+    fireEvent.submit(screen.getByRole("button", { name: "Postularme" }).closest("form")!);
+    expect(await screen.findByRole("link", { name: "Ver mis postulaciones" })).toBeTruthy();
+    expect(request).toHaveBeenCalledOnce();
+    const [url, options] = request.mock.calls[0]!;
+    expect(url).toBe("/api/candidate/applications");
+    expect(options?.method).toBe("POST");
+    const data = options?.body as FormData;
+    expect(data.get("candidateVersion")).toBe("3");
+    expect(data.get("openingId")).toBe("offer");
+    await waitFor(() => expect(mocks.refresh).toHaveBeenCalled());
+    expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true);
+  } finally { request.mockRestore(); }
 });
 
 it("exposes ordered stages with textual status and one current step", () => {

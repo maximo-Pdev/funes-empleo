@@ -1,0 +1,13 @@
+/* The shared legacy submit rule has higher specificity than utility variants.
+   Notification rows are navigation actions and retain their surface treatment. */
+:root form.itemForm[method="post"] button[type="submit"][data-slot="button"] {
+  padding: 12px;
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  font-size: 14px;
+  text-align: left;
+}
+
+:root form.itemForm[method="post"] button[type="submit"][data-slot="button"]:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}

@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { companyNavigation } from "@/features/companies/navigation";
-import { BriefcaseBusiness, Building2, LayoutDashboard, Settings } from "lucide-react";
+import { Bell, BriefcaseBusiness, Building2, LayoutDashboard, Settings } from "lucide-react";
 import { DashboardShell } from "@/components/ui/dashboard-shell";
 import styles from "@/app/(auth)/account/account.module.css";
 
-const navigationIcons = [LayoutDashboard, Building2, BriefcaseBusiness, Settings];
+const navigationIcons = [LayoutDashboard, Building2, BriefcaseBusiness, Settings, Bell];
 const links = companyNavigation.map((link, index) => ({ ...link, icon: navigationIcons[index] ?? Building2 }));
 
 export function CompanyShell({ title, description, active, name, email, children }: {

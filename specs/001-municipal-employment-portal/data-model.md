@@ -2,6 +2,9 @@
 
 ## Course links and independent referrals — EXTRA-086
 
+Here EXTRA-086 means “Mejoras finales del portal y recorridos del PDF de Beex”,
+not the main carousel entry; title-qualified identities are mapped in EXTRA102.
+
 Add `municipal_courses` (UUID, title, HTTPS URL, publication flag, creation actor/time)
 and `course_referrals` (UUID, existing candidate/course references, immutable course
 title/URL snapshot, referral actor/time). Foreign keys restrict deletion; referral
@@ -12,6 +15,31 @@ or record referrals through session-bound commands. The course referral has no j
 opening or participation foreign key and creates no company access. SQL migration
 `20261027233000_course_referrals.sql` is the executable schema; no existing data is reset
 or transformed. Historical training-guidance notes remain unchanged.
+
+## Notification, agenda and derived export additions
+
+Registration terms use separate append-only `private.registration_terms_receipts`
+for account/role/version/time under `20261028013000_registration_terms.sql`.
+No legal receipt populates `candidate_consents`, activates referral permission or
+backfills existing accounts. Operational controls live in Cuenta > Privacidad,
+with explicit manual withdrawal and no repeated accepted-to-accepted submission.
+Chart-first reporting adds no persisted metric entities: overview and metrics use
+the same real rows, labels, snapshot/event definitions and CSV/PDF/XLSX exports.
+
+EXTRA099: account_notifications agrega id UUID interno, reference aviso-24hex
+UNIQUE, recipient_account_id→accounts y source_event_id→audit_events RESTRICT,
+kind cerrado, resource_id interno, created_at y read_at nullable. UNIQUE(recipient,
+source,kind), índice cronológico por destinatario e índice parcial unread. Sin
+PII, cuerpo libre, URL, snapshots, estado de lectura compartido o backfill. Solo
+RPC dueño con sesión activa puede marcar lectura; fuente/identidad inmutables.
+RLS destinatario activo, sin acceso general por ser administrador. Proyección de
+agenda derivada de preinterviews: solo fechas/canal para titular del caso vigente.
+
+EXTRA085: sin entidades o persistencia nuevas. PDF/XLSX derivan de los mismos
+MetricsFilters/MetricRow/as_of de CSV, null/0 y referencias opacas. No almacenar
+archivos/contenido en logs o auditoría; el evento actual acredita solicitud
+autorizada, no recepción completa. Home usa published_at, filtros usan GET/URL.
+
 
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
@@ -261,18 +289,15 @@ Registro append-only del consentimiento general.
 | `status` | `accepted` o `withdrawn`. |
 | `recorded_by` | Cuenta candidata o admin responsable de atención asistida. |
 | `recorded_at` | Fecha efectiva, default clock_timestamp(); no fecha de inicio de transacción. |
-| `source` | `self_service`, `assisted` o `hiring_workflow` (solo withdrawn). |
+| `source` | `self_service`, `assisted` o `hiring_workflow` (solo withdrawn histórico de EXTRA035; sin nuevos retiros por contratación desde EXTRA094). |
 
 El consentimiento vigente es el último evento aceptado no seguido por retiro. Su retiro bloquea
 nuevas derivaciones y tratamientos que dependan de él, cierra como `withdrawn` con motivo
 `consent_withdrawn` todas las participaciones aún no finales y revoca en la misma transacción el
 acceso de todas las derivaciones vigentes, sin borrar historia legítima ni alterar resultados ya
-finales. Excepción EXTRA035: el retiro global automático por contratación normal/
-tardía revoca todos los permisos, pero conserva estados de otros casos y resultados.
-Se registra por el admin confirmante como hiring_workflow, copiando política/hash
-del aceptado anterior, con fecha posterior y motivo hired en auditoría enlazada
-a una decisión privada de la participación. Perfil consent_withdrawn salvo archivado;
-versión actualizada. Sin backfill de contrataciones históricas. Una aceptación
+finales. EXTRA094: contratar no escribe ningún consentimiento; cambia disponibilidad
+atómicamente. Los retiros hiring_workflow de EXTRA035 se conservan como historial
+legado, sin backfill ni reaceptación. Una aceptación
 posterior no reactiva automáticamente participaciones ni derivaciones.
 
 ### `cv_documents`
@@ -289,8 +314,10 @@ posterior no reactiva automáticamente participaciones ni derivaciones.
 | `validation_result` | Código controlado; nunca contenido del archivo. |
 | `uploaded_by`, `created_at`, `superseded_at` | Trazabilidad. |
 
-Solo un CV `valid` vigente por candidato. La empresa solo lo descarga si existe derivación autorizada
-a una oferta propia. Reemplazar no borra la versión anterior.
+Solo un CV general `valid` vigente por candidato (`opening_id IS NULL`); EXTRA096
+permite documentos específicos independientes por oferta. La empresa solo consulta
+el documento exacto de una derivación autorizada a una oferta propia. Reemplazar
+el general no borra versiones ni cambia selecciones previas de postulaciones.
 
 ### `job_categories` y `candidate_categories`
 
@@ -442,7 +469,7 @@ Todo contenido es interno. Puede haber varias instancias y el historial no se so
 | `access_status` | `active` permite la proyección empresarial solo si también se cumple el plazo poscontratación; `revoked` la deniega de forma persistente; `expired_by_policy` queda reservado a OQ-001. |
 | `consent_event_id`, `cv_document_id` | Evidencia vigente al derivar. |
 | `feedback_due_at` | Exactamente 30 días desde `referred_at`. |
-| `post_hire_access_until` | Solo histórico: antes de EXTRA035 se fijaba a confirmación administrativa +720 horas si el permiso seguía activo. Nuevas contrataciones no lo fijan ni lo reinician; revocan los permisos por retiro global. |
+| `post_hire_access_until` | Confirmación administrativa +720 horas solo si el permiso propio sigue active y autorizado (EXTRA094). Nunca restaura revoked; límite estricto aun antes de Cron. |
 | `access_changed_at` | Fecha del último cambio de autorización. |
 | `access_changed_actor_type` | `account` o `system`; coherente con el evento que cambió el acceso. |
 | `access_changed_by_account_id` | Cuenta responsable; nula únicamente para actor `system`. |
@@ -457,9 +484,12 @@ se deniega desde el instante exacto `post_hire_access_until`, aun si la tarea pr
 materializó `revoked` y el evento de auditoría; esa tarea registra actor `system`, plazo y ejecución
 sin copiar datos personales. El límite de acceso de 720 horas no elimina ni purga datos. Retiro de postulación o
 consentimiento, no selección, cancelación, falta de respuesta, suspensión o archivo cambian el acceso
-a `revoked` de forma atómica y auditada. Desde EXTRA035, confirmar `hired` normal o tardío retira
-el consentimiento global y revoca todos los permisos activos sin alterar otras participaciones.
-No conserva ni vuelve a activar permisos. Reactivar una cuenta, restaurar un registro o aceptar nuevamente
+a `revoked` de forma atómica y auditada. Históricamente EXTRA035 retiraba
+consentimiento y revocaba permisos al contratar; EXTRA094 sustituye ese efecto:
+confirmar `hired` normal o tardío conserva consentimiento, cambia disponibilidad a
+unavailable y no altera otros casos/permisos. Solo el permiso propio previamente
+active y autorizado conserva acceso hasta confirmación+720h; revoked nunca revive.
+Reactivar una cuenta, restaurar un registro o aceptar nuevamente
 el consentimiento tampoco repone acceso automáticamente. El
 valor `expired_by_policy` queda reservado y no se usa hasta resolver OQ-001; la evidencia histórica
 permanece disponible solo para administración. `unavailable` y `needs_update` afectan nuevas
@@ -685,9 +715,9 @@ no_company_response -> hired | not_selected | cancelled (admin, respuesta tardí
   acceso a la empresa.
 - `hired`, `not_selected`, `withdrawn`, `cancelled` y `no_company_response` son finales para la vista
   del candidato. El override de respuesta tardía conserva el evento anterior.
-- Confirmar `hired` normal/tardío retira el consentimiento global y revoca todos los permisos
-  activos del candidato en la misma transacción, conservando los demás casos. Para permisos
-  históricos anteriores a EXTRA035, la autorización deniega nuevas lecturas desde
+- Confirmar `hired` normal/tardío cambia disponibilidad a unavailable y conserva consentimiento
+  y demás casos/permisos. Solo el permiso propio todavía activo recibe ventana720h.
+  La autorización deniega nuevas lecturas desde
   `post_hire_access_until` aunque la materialización del estado ocurra después; el vencimiento
   pasa el permiso a `revoked` y conserva historia.
   `not_selected`, `withdrawn`, `cancelled` y `no_company_response` lo cambian a `revoked` dentro de la
@@ -723,3 +753,24 @@ no_company_response -> hired | not_selected | cancelled (admin, respuesta tardí
 - Secret/system: solo funciones acotadas, nunca navegador.
 
 La matriz completa está en [contracts/authorization-matrix.md](./contracts/authorization-matrix.md).
+# Override EXTRA094,2026-10-28
+
+Para confirmaciones posteriores a esta migración, reemplaza retiro automático
+EXTRA035: candidate_consents no cambia; candidate_profiles.availability pasa a
+unavailable y status active a unavailable, conservando otros estados y vigencia.
+Auditoría availability_changed con admin/fecha/motivo hired. No nuevos campos.
+referrals.post_hire_access_until fija confirmación+720h solo en permiso propio
+previamente active y autorizado; revoked sigue terminal. Otras derivaciones y
+participaciones no cambian. Historial previo permanece sin backfill/reconsentir.
+Se conserva source hiring_workflow únicamente como historial legado.
+## EXTRA096 — Extensión de documentos por postulación
+
+cv_documents.opening_id nullable FK a oferta: NULL solo CV general, no NULL reserva/
+documento específico de esa oferta. cv_current único valid no archivado solo para
+general. Específicos no se reemplazan al editar general y scope no puede cambiar.
+participations.application_cv_document_id nullable FK compuesta documento/titular,
+constraint de scope igual a oferta o general. Se fija en inserción propia incluso
+al usar general actual. Documento valid/superseded, no rechazado/archivado al compartir.
+Casos existentes/admin nomination sin selección siguen NULL, sin backfill. Bytes
+inmutables/versionados y permisos exactos de referral.cv_document_id preservados.
+Entrada JPG/PNG se normaliza a PDF, por lo que mime_type/path/bucket siguen PDF.

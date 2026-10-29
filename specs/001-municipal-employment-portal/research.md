@@ -1,5 +1,67 @@
 # Investigación técnica: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Investigación por etapas
+
+Lectura de notification_events (fase0, sin ediciones) confirma ocho familias de
+auditoría existentes: participation_created según origin; preinterview_recorded;
+referral_created; outcome_confirmed/corrected; opening_submitted; opening_approved/
+rejected; feedback_recorded según reported_outcome; company profile_created tras
+bootstrap verificado. Referral audita antes del cambio de estado; usar relaciones.
+Duplicados secundarios de etapas y company_interviews quedan fuera. Helper
+require_workflow_actor valida sesión viva y cuenta activa; current_account_id
+permite RLS propia. can_reference_record requiere además guardas de archivo.
+
+Decisión: trigger transaccional sobre evidencia existente, en vez de llamadas
+desde cada UI/acción o servicio externo. UNIQUE por fuente/destinatario/tipo evita
+doble entrega; sin payload personal almacenado. Polling visible30s y carga al foco
+es suficiente sin infraestructura Realtime/publication/WebSocket adicional.
+Fuentes oficiales consultadas: https://supabase.com/docs/guides/database/postgres/triggers
+y https://ui.shadcn.com/docs/components/base/popover ; reutilizar registro base-nova
+adaptado en src/components/ui/popover.tsx, sin sobrescribir componentes locales.
+Las decisiones de agenda/entrevista provienen de respuestas expresas de Mateo.
+
+EXTRA088: distancia circular centrada preserva el coverflow3D y vecinos sin
+duplicar tarjetas; módulo en flechas cruza ambos extremos. Home pide10 antes
+de renderizar, conservando orden published_at/ID DESC de RPC. Embla8.6.0 soporta
+loop:true y fallback cuando no puede llenar viewport; ver fuente oficial
+https://github.com/davidjerleke/embla-carousel/blob/v8.6.0/packages/embla-carousel/src/components/EmblaCarousel.ts
+y Options.ts. Sin nueva dependencia, datos/SQL ni alteración de filtros públicos.
+
+EXTRA087 sustituye la decisión de control de EXTRA086: pedido explícito de Mateo
+de avanzar3s y retirar Pausar/Reanudar. Intervalo/aplicación Embla sin cambios
+arquitectónicos; se elimina pausa manual y toda pausa permanente dependiente de
+ese botón. Hover/foco temporales se restablecen al salir, conservando preferencias
+de movimiento y visibilidad. No nuevo componente/dependencia/contrato de datos.
+
+EXTRA086: no se necesita plugin adicional de autoplay: el estado desktop y API
+Embla existentes permiten avance5s/reinicio con intervalo y cleanup React. Button
+adaptado controla pausa; distinguir puntero mouse/touch evita hover persistente.
+Conservar intención del control de rotación desde pointerdown hasta click, porque
+el foco puede pausar entre ambos; teclado usa estado actualizado. Reduced-motion
+pausa por defecto. Patrón oficial consultado:
+https://www.w3.org/WAI/ARIA/apg/patterns/carousel/ . Sin contrato SQL/API nuevo.
+
+## EXTRA085 — Investigación 2026-10-27
+
+Lectura delegada fase0: portal_filter_audit confirma todas las consultas servidor;
+solo formulario candidato y selector matching construyen navegación cliente.
+Decisión GET/composición servidor + islas necesarias, sin quitar combobox PR78.
+metrics_export_research verifica write-excel-file4.1.1 (tipos propios/fflate,
+API toBuffer) y PDFKit0.20.2 (TTF/paginación/MIT), @types/pdfkit0.17.6 con API
+estable. Preferidos sobre ExcelJS más amplio y pdf-lib con layout manual.
+Instalación/audit/build deben confirmar compatibilidad; no asumirla del research.
+Verificación posterior: instalación/build Node24 PASS, PDF/XLSX descargados desde
+producción local y leídos independientemente; tracing de fuentes comprobado.
+Audit actual y baseline coinciden en siete avisos previos, sin avisos nuevos.
+Fuentes: https://github.com/catamphetamine/write-excel-file ;
+https://pdfkit.org/docs/text.html ;
+https://github.com/foliojs/pdfkit/blob/v0.20.2/CHANGELOG.md ;
+https://nextjs.org/docs/app/api-reference/config/next-config-js/serverExternalPackages ;
+https://nextjs.org/docs/app/api-reference/config/next-config-js/output ;
+https://nextjs.org/docs/app/getting-started/server-and-client-components .
+Fuentes oficiales Button/Combobox/NativeSelect base-nova y changelog Supabase
+consultados; sin cambios SQL/API requeridos. Reciente significa published_at.
+
 **Fecha**: 2026-09-19  
 **Alcance**: decisiones necesarias para completar el plan técnico; no modifica requisitos de producto.
 
@@ -526,3 +588,41 @@ y evitar calentamiento reduce variaciones no atribuibles al producto.
 entornos variables, hacer que cada persona pruebe roles ajenos, usar una sola ejecución por tarea,
 medir solo a los desarrolladores, reemplazar usuarios por E2E o usar únicamente axe fueron
 descartadas porque reducen comparabilidad o no validan usabilidad real y accesibilidad completa.
+# Investigación EXTRA094 —2026-10-28
+
+- MDN Content-Disposition: inline permite visor; attachment fuerza descarga.
+  target=_blank debe existir en todos los enlaces, manteniendo ruta autenticada.
+  https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Disposition
+- shadcn Base Chart/registro base-nova consultados: requieren Recharts3.8.0 y
+  cliente; para barras estáticas se elige HTML servidor con texto y tokens,
+  sin dependencia ni reemplazo de controles compartidos.
+  https://ui.shadcn.com/docs/components/base/chart
+- Supabase changelog oficial consultado: TLS CBC/upgrade Postgres son cambios
+  ambientales ajenos a este reemplazo de función; no se alteran SDK/config/roles.
+  Guías oficiales security y función existentes mantienen search_path vacío,
+  sesión/actor activo/locks. No DML directo de cliente o service_role nuevo.
+- private.can_read_candidate y company_cv_info ya validan ventana720h estricta,
+  consentimiento/cuentas/archivo. Restaurar solo asignación de fecha en rama
+  contratada active, sin volver a habilitar ningún permiso revocado.
+- change_candidate_consent ya rechaza aceptaciones consecutivas; no necesita
+  modificar RPC/grants para ocultar el formulario una vez aceptado.
+- Supabase/Postgres: bloqueo candidato existente serializa consentimiento/nominación
+  con contratar; no añadir trigger o segundo request que rompa atomicidad.
+## Investigación EXTRA096 —2026-10-28
+
+Sharp constructor documenta limitInputPixels/failOn/pages; PDFKit images acepta
+buffer JPEG con fit sin recortar. Reutilizar paquetes fijados ya presentes y TTF
+local en runtime; no decoder SVG o formato WebP por corrección humana.
+https://sharp.pixelplumbing.com/api-constructor/
+https://pdfkit.org/docs/images.html
+
+Supabase funciones: mantener search_path vacío, guard de actor y grants explícitos;
+helper compartido privado evita duplicar criterios de participación y sobrecarga
+ambigua en PostgREST. Upload pendiente antes de alta transaccional como flujo CV
+existente. Modificar solo alcance de CV en selectores generales evita múltiples
+filas/matching duplicado. Wrappers permiten compatibilidad de consumidores.
+https://supabase.com/docs/guides/database/functions
+
+shadcn Base Button/registro y componentes existentes se consultan antes de UI;
+reutilizar FileInput/Form/Button adaptados, sin nueva librería ni controles locales.
+https://ui.shadcn.com/docs/components/base/button

@@ -35,17 +35,21 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
         <option value="">Todas las categorías</option>{categories.map((c) => <option key={c.id} value={categoryReferences[c.id]}>{c.name} ({c.code}, v{c.version})</option>)}
       </select></Field><button className="rounded bg-blue-800 px-4 py-2 text-white" type="submit">Aplicar filtros</button>
     </Form>
-    <section aria-labelledby="definitions" className="mb-6 space-y-2 rounded border border-blue-300 bg-blue-50 p-4">
-      <h2 id="definitions" className="font-semibold">Cómo se calculan</h2>
+    <details className="mb-6 space-y-2 rounded border border-border bg-card p-4">
+      <summary className="cursor-pointer font-semibold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">Más información sobre las métricas</summary>
       <p>Candidato activo: perfil activo, disponible, con consentimiento vigente y confirmado durante los últimos seis meses; no exige CV.</p>
       <p>Candidatos, empresas y ofertas: foto al cierre del período. Hoy se muestra la foto hasta el momento de consulta, sin predecir el futuro. Fechas en Argentina.</p>
       <p>Participaciones, preentrevistas registradas, derivaciones y resultados: eventos dentro del período. Las empresas no se filtran por categoría.</p>
       <p>Primera contratación y cobertura total: días desde la publicación hasta la confirmación administrativa de la primera persona y de todas las vacantes, respectivamente. Incluye ofertas publicadas en el período aunque contraten después. La cobertura incompleta queda pendiente.</p>
-    </section>
+    </details>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
     {result && <>
       <p className="mb-4">Foto al {new Date(result.as_of).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}.</p>
-      <RecordAnchor href={`/api/admin/exports/operations.csv?${metricsQuery(result.filters)}`} className="mb-6 inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar CSV filtrado</RecordAnchor>
+      <div className="mb-6 flex flex-wrap gap-3">
+        <RecordAnchor href={`/api/admin/exports/operations.csv?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar CSV filtrado</RecordAnchor>
+        <RecordAnchor href={`/api/admin/exports/operations.pdf?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar PDF filtrado</RecordAnchor>
+        <RecordAnchor href={`/api/admin/exports/operations.xlsx?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar Excel filtrado</RecordAnchor>
+      </div>
       <Dashboard rows={result.rows} />
     </>}
   </AdminShell>;

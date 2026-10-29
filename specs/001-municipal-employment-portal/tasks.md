@@ -5,6 +5,130 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Notificaciones del portal
+
+- [x] T246 [EXTRA101,N3] Corregir dos aserciones E2E obsoletas de PR83: agenda
+  propia solo fecha/canal, sin agenda ajena/etapas/resumen/recomendación. RED2/2,
+  GREEN5/5, tipos/lint/diff PASS, retiros y revocación conservados. Sin cambios de
+  producto/SQL/CI; publicación en el mismo PR83 y nuevos checks en seguimiento.
+
+- [x] T245 [EXTRA100] Por pedido posterior de Mateo, aplicar exclusivamente
+  20261028235316 al Supabase vinculado, registrar SQL exacto y verificar seis
+  funciones/ACL/RLS/política/FK/índices/trigger, datos previos, no backfill y smoke
+  público. Transacción/postcheck PASS; advisors0029 autenticados documentados.
+  Sin publicar interfaz/PR ni omitir revisión/CI posteriores.
+
+- [x] T240 [N1–N6] Especificar/clarificar, investigar eventos, plan/modelo/contrato,
+  revisar calidad y cobertura constitucional antes del código; EXTRA099.
+- [x] T241 [N1,N2,N3,N5] Migración aditiva de tabla/RLS/fanout auditado/RPCs propios,
+  agenda mínima, índices/privilegios/tipos y recuperación; SQL de cada evento,
+  destinatario/suspensión/ajeno/archivo/idempotencia/rollback/normal y tardío.
+- [x] T242 [N1,N4] Servicio/contrato validado y GET/POST same-origin/no-store;
+  rutas opacas construidas por rol, read-on-open idempotente, tests negativos.
+- [x] T243 [N3,N4,N6] Campana privada/contador/Popover y listado20 por rol,
+  cinco recientes/errores/cargando/vacío, agenda propia y anclas de destino;
+  tests UI/teclado/móvil/foco/privacidad sin cambios a entrevistas empresariales.
+- [x] T244 [N1–N6] Tipos/lint/unit/tooling/build/SQL y E2E real por rol,
+  auditoría/rollback/lectura independiente/enlaces/axe; docs de uso y recuperación,
+  evidencia/convergencia sin aceptación humana ni aplicación alojada implícitas.
+  1346 unit/componentes,57 tooling, suite SQL1416 y57 focales ampliadas,26 E2E
+  sin omisiones/reintentos, axe390/1440/foco, tipos/lint/build/DB-lint/diff PASS.
+  Reutilización final del catálogo:77 focales y tipos/lint/build PASS. Recuperación
+  documentada, entorno aislado detenido con respaldo, next-env ajeno preservado.
+
+Dependencias T240→T241→T242→T243→T244. Gate histórico2 pendientes de checklist
+ofertas: Mateo autoriza continuar y dejarlas pendientes; no marcar aceptación.
+
+## EXTRA096 — CV por postulación
+
+- [x] T239 Corregir gate HTTP del PR82/EXTRA098: inventario explícito del export
+  legado no compilado y POST real por rol/suspensión, sin escrituras o PII; RED/GREEN,
+  tipos/lint y checks application/database del mismo PR. Sin cambios de negocio/SQL.
+  a454c4e/run40780133223 application/database/Vercel PASS; PR82 mergeado7064e3c.
+
+- [x] T233 Alinear C1–C6/clarificación WebP excluido, plan/modelo/contratos/calidad
+  e investigación; análisis de cobertura/constitución antes de código; EXTRA096.
+- [x] T234 [C1] Política/normalización PDF/JPG/PNG en src/lib/files y endpoints de
+  carga, límite5 MiB/16MP, rechazo estricto y trazado producción; tests reales.
+- [x] T235 [C2–C5] Migración de scopes/FK/índice/guards, helper privado compartido,
+  RPC reserva/aplicación/proyección propia y referral seleccionado; generar tipos
+  Supabase locales; pruebas roles/atomicidad/legado/versiones/otros documentos.
+- [x] T236 [C1,C2,C5,C6] POST src/app/api/candidate/applications/route.ts y formulario
+  opcional con mismos controles/errores/retención; preservar general y acciones
+  legadas; tests de rutas/servicios/formularios y red incierta.
+- [x] T237 [C3,C4,C6] Perfil/búsqueda general filtran scope y participación propia/
+  detalle administrativo abren CV seleccionado opaco; permisos empresariales y
+  nueva pestaña conservados. Pruebas de datos/vistas/negativas.
+- [x] T238 Verificar tipos/lint/tooling/unit/build/SQL y navegador candidato→Oficina
+  →empresa, perfil/asistido/imágenes/selecciones/versiones/móvil/axe; recuperación,
+  estado y convergencia acotada.1292 unit/componentes,57 tooling,1363 SQL únicas,
+  32 E2E sin omisiones/reintentos, tipos/lint/build/DB-lint/trazado/axe PASS.
+  Sin hosted/commit/PR/deploy no solicitados; convergencia C1–C6 sin brechas nuevas.
+
+Dependencias: T233→T234/T235, ambas→T236/T237→T238. Trabajo secuencial en esta
+sesión; pruebas de normalizador y DB pueden ejecutarse independientemente.
+
+## EXTRA094 — CV, métricas y disponibilidad2026-10-28
+
+- [x] T227 Registrar R1–R5/decisiones, plan/modelo/contratos y calidad; analizar
+  cobertura y constitución antes de código; EXTRA094 en cambios-extra.md.
+- [x] T228 [R1] Cambiar src/app/api/cv/[cvId]/route.ts a inline y enlaces CV
+  propios/admin/empresa/preview a nueva pestaña; pruebas headers/roles/refs/UI.
+- [x] T229 [R2] Resumir src/features/metrics/components/dashboard.tsx a seis
+  indicadores y dos gráficos servidor; detalle/definiciones plegados, valores
+  accesibles/filtros/cero/null; PDF/Excel/CSV completos, pruebas y visual móvil.
+- [x] T230 [R3,R5] Migración forward-only transition_participation: disponibilidad
+  atómica/audit, consentimiento preservado,720h solo permiso active propio,
+  revocación terminal/otros casos intactos. Supabase tests y recuperación.
+- [x] T231 [R4] Perfil candidato oculta reaceptación vigente y explica reglas
+  nuevas; tests presentación/flujo y retirar expectativas obsoletas acotadas.
+- [x] T232 Verificar tipos/lint/unit/tooling/build/SQL/E2E/axe, convergencia R1–R5,
+  estado y riesgos; docs/operations/cv-metrics-availability.md. No hosted/deploy.
+
+Dependencias: T227→T228/T229/T230; T230→T231; todas→T232. Implementar
+secuencialmente en esta sesión; las historias UI pueden verificarse por separado.
+
+- [x] T226 EXTRA093: prueba de pausa del carrusel compara oferta activa en móvil,
+  conservando tiempos y aserciones; repetición desktop/móvil, tipos/lint y CI80.
+
+- [x] T225 EXTRA092: sonda concurrente observa badges actuales y emite solo
+  diagnóstico numérico seguro, conservando cuatro actores/barrera/5s/auditorías;
+  aceptación fría real y checks de PR80, sin alterar condiciones del benchmark.
+
+- [x] T224 EXTRA091: evitar redirección por espacios en filtros ya opacos,
+  preservar conversión UUID/orden/repetidos; RED/GREEN de idempotencia y frases,
+  búsquedas por ambos destinos, regresiones de permisos y checks de PR80.
+
+- [x] T223 EXTRA090: completar seis recorridos antes bloqueados, nombres aria
+  de popups/listas de los cuatro campos, selectores por rol y cierre Escape;
+  regresión axe de menús abiertos, verificaciones y publicación en mismo PR80.
+
+- [x] T222 EXTRA089: recuperar PR80 corrigiendo contenedor del input auxiliar
+  de localidad, sin recorte global ni cambio de contrato; gate de accesibilidad
+  por roles y filtros general/asistido360/1366, tipos/lint/tests/build; publicación
+  y estado CI se registran en EXTRA089/PR80, sin confundirlos con aceptación humana.
+
+- [x] T221 EXTRA088: Home últimas10 públicas, coverflow/controles circulares y
+  Embla loop; vecinos de extremos,0/1/N y3s verificados, documentación/tipos/lint/
+  build/navegador coherentes. Sin cambiar catálogo/conteos ni persistencia.
+
+- [x] T220 EXTRA087: quitar Pausar/Reanudar y avanzar cada3s, conservar flechas,
+  reinicio, hover/foco temporales, reduced-motion/pestaña oculta/cleanup; verificar
+  desktop/móvil y documentación consistente, sin cambios de datos.
+
+- [x] T219 EXTRA086: avance automático5s escritorio/móvil con pausa accesible,
+  foco/hover/tacto/reduced-motion/pestaña oculta, reinicio/cleanup y botones
+  manuales conservados; pruebas de estados/tiempo, navegador y gates de calidad.
+
+## EXTRA085 — Portal y descargas,2026-10-27
+
+- [x] T213 Revisar contexto/constitución, aclarar formatos/scroll con Mateo y registrar P1–P4, research, plan/modelo/contratos/quickstart/calidad; análisis focalizado antes de código, sin regenerar MVP ni alterar gates humanos.
+- [x] T214 [P1] Verificar orden servidor published_at y adaptar Home/coverflow a navegación reciente→antigua sin extremos mezclados; conservar3D/móvil, casos0/1/N y evidencia.
+- [x] T215 [P2] Instalar dependencias exactas revisadas; generadores PDF/XLSX, etiquetas compartidas, handler/rutas/headers/referencias y enlaces métricas. Conservar CSV/guard/auditoría/filtros; font tracing/runtime Node, pruebas de datos/binarios/roles/archivos extensos.
+- [x] T216 [P4] Registrar inventario de filtros, mover CandidateSearchForm y orden matching a composición servidor GET con islas de controles, refs opacas/defaults/asistidos/OR/localidad opcional; actualizar pruebas/navegación nativa.
+- [x] T217 [P3] Bloquear scroll de fondo solo mientras preview dialog esté abierto, conservar interior/foco/posición/cierre/Escape/nominar y restauración por desmontaje; pruebas móvil/escritorio.
+- [x] T218 Verificar P1–P4 y empaquetado desde build, tipos/lint/pruebas pertinentes/navegador, lectura independiente/visual PDF/XLSX, riesgos/dependencias y cobertura final de artefactos. Sin deploy/PR/migración/remoto no solicitados; depende T214–217.
+
 ## Oferta administrativa y matching ordenado — EXTRA073
 
 - [x] T212 Mantener cinco eventos iniciales de moderación y revelar cinco con Mostrar más solo cuando queden otros. Conservar foco/orden/auditoría y reutilizar el componente empresa/admin; expectativas de componentes/E2E alineadas.59 pruebas pertinentes PASS, bordes0/1/5/12, navegador8 escenarios0/5/6/12×1440/390 con teclado/foco/axe0 PASS; tipos/lint/build limpio/diff PASS. Ampliación visual posterior de EXTRA073, sin backend ni migración; revisión/publicación pendientes.

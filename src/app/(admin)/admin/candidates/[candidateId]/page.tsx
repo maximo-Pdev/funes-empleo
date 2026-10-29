@@ -52,13 +52,13 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         {currentCv ? <>
           <p>CV vigente: <strong>{currentCv.original_name_safe}</strong></p>
           <p className="text-sm text-muted-foreground">PDF · {new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(currentCv.byte_size / 1024)} KB</p>
-          <RecordAnchor href={`/api/cv/${currentCv.id}`} className="inline-flex min-h-11 items-center text-primary underline underline-offset-4">Descargar CV vigente</RecordAnchor>
+          <RecordAnchor href={`/api/cv/${currentCv.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-primary underline underline-offset-4">Abrir CV vigente en otra pestaña</RecordAnchor>
         </> : <p>El candidato no tiene un CV vigente.</p>}
         {cv && <p role={cv === "ok" ? "status" : "alert"}>{cv === "ok" ? "CV guardado." : cv === "conflict" ? "El perfil cambió. Recargá antes de cargarlo." : "El PDF fue rechazado; el CV vigente no cambió."}</p>}
         {editable && <div className="space-y-3 border-t border-border pt-3">
           <h3 className="font-semibold">Cargar o reemplazar CV</h3>
           <p>La carga conserva las versiones anteriores usadas en derivaciones.</p>
-          <CvUploadForm candidateId={candidateId} version={editable.profile.version} label="Archivo PDF" buttonLabel="Cargar CV" />
+          <CvUploadForm candidateId={candidateId} version={editable.profile.version} label="Archivo de CV" buttonLabel="Cargar CV" />
         </div>}
       </section>;
 

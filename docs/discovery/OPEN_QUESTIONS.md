@@ -2,6 +2,12 @@
 
 These questions must not be silently answered by implementation. Defaults listed here are temporary assumptions for discussion, not stakeholder approval.
 
+2026-10-28, EXTRA096: Mateo confirma CV general o por postulación, PDF/JPG/JPEG/PNG
+y máximo5 MiB; excluye expresamente WebP. Sustituye el supuesto de entrada solo
+PDF de OQ-017 para el alcance demo, normalizando imágenes a PDF privado. No acredita
+aprobación jurídica ni cierre de OQ-017 para datos reales; responsables originales
+y posiciones históricas debajo se conservan como trazabilidad.
+
 ## Must be resolved before the first production release
 
 | ID | Question | Current safe position | Decision owner |
@@ -15,7 +21,41 @@ These questions must not be silently answered by implementation. Defaults listed
 
 ## Must be resolved during specification and clarification
 
+### Integration authority — EXTRA102 / S18, 2026-10-29
+
+Preserve the superseded decisions below as evidence, not current executable rules.
+EXTRA094 governs hiring: unavailable with consent retained, 720-hour hiring-company
+access only if its own referral remains active and authorized, no revival of revoked
+permissions and no change to other cases. Manual withdrawal remains explicit and
+global in Cuenta > Privacidad; accepted consent is not requested repeatedly. Legal
+terms at registration remain separate and unapproved for real data. S2/L36 replaces
+the six-summary-card hierarchy with visible shared bar/donut reporting on overview
+and metrics, retaining all indicators, filters and CSV/PDF/XLSX exports. None of this
+closes municipal/legal questions or establishes integrated functional acceptance.
+
+### OQ-021 — Alcance de agenda visible y entrevista empresarial (EXTRA099)
+
+Mateo solicita notificaciones por rol, incluida nominación/preentrevista/derivación
+y resultados del candidato. Esto modifica puntualmente la visibilidad anterior de
+FR-053 para avisar esos hechos, sin abrir notas ni evaluación interna. Resuelta
+por Mateo,2026-10-28: omitir por ahora el aviso de entrevista empresarial; el candidato consulta fecha y canal de preentrevistas cuando estén
+registrados. No exponer resumen, recomendación o notas. No acredita aprobación
+jurídica de datos reales. Responsable: desarrollador solicitante (Mateo).
+
+Evidencia posterior de código: company-referral-panel.tsx sí conserva InterviewForm.
+La pregunta lo describía como retirado; ambas versiones quedan documentadas.
+Este incremento omite el aviso y preserva el formulario existente. No interpretar
+la respuesta como autorización de quitar/recrear ese flujo. Responsable si se
+solicita cambiarlo: desarrollador solicitante.
+
 ### OQ-020 — Retiro automático del consentimiento al contratar (2026-10-21)
+
+**Sustituida para el incremento EXTRA094,2026-10-28:** Mateo elige conservar el
+consentimiento y pasar disponibilidad a No disponible al confirmar contratación
+normal/tardía. Confirma acceso de empresa contratante por30 días solo si permiso
+sigue activo; nunca restaurar revocados. Otras participaciones y permisos intactos,
+retiro manual conserva efectos. Sin backfill ni aprobación legal para datos reales.
+Las decisiones siguientes se conservan como historial de alcance reemplazado.
 
 Actualización2026-10-25, EXTRA069: ante la imposibilidad de identificar a quién
 informar, Mateo confirma conservar el nombre también en toda derivación propia

@@ -8,6 +8,7 @@ vi.mock("@/features/candidates/consent-service", () => ({ getDemoConsentPolicy: 
 vi.mock("@/features/training/components/course-links", () => ({ CourseLinks: vi.fn(async () => <p>Cursos públicos ficticios</p>) }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: mocks.offers, getPublicOffer: mocks.selected }));
 vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: mocks.participations }));
+vi.mock("@/features/notifications/service", () => ({ candidatePreinterviewAgenda: vi.fn().mockResolvedValue([]), listNotifications: vi.fn() }));
 vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.fn(), savePhoneAction: vi.fn(), activateProfileAction: vi.fn() }));
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: vi.fn(), withdrawParticipationAction: vi.fn() }));
@@ -16,6 +17,8 @@ vi.mock("@/features/accounts/admin-invitation-actions", () => ({ administratorIn
 vi.mock("@/features/accounts/navigation", () => ({ getPanelHref: () => "/dashboard" }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }), usePathname: () => "/account" }));
 import { getCandidatePhoto, getPhotoCleanupPending } from "@/features/candidates/photo-service";
+import { candidatePreinterviewAgenda } from "@/features/notifications/service";
+import { fixtureReference } from "../../fixtures/record-references";
 import DashboardPage from "@/app/(auth)/dashboard/page";
 const OffersPage = async ({ searchParams }: { searchParams: Promise<{ oferta?: string; page?: string }> }) => {
  accountSession();
@@ -103,7 +106,7 @@ it("renders the requested profile inside its canvas with sidebar identity and na
  render(await AccountPage({ searchParams: Promise.resolve({ section: "perfil" }) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta", "Notificaciones"]);
  expect(within(navigation).getByRole("link", { name: "Perfil" }).getAttribute("aria-current")).toBe("page");
  expect(within(sidebar).getByText("Persona Ficticia")).toBeTruthy();
  expect(within(sidebar).getByText("persona@example.test")).toBeTruthy();
@@ -144,7 +147,7 @@ it("opens the user dashboard by default with participation metrics and states", 
  render(await AccountPage({ searchParams: Promise.resolve({}) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta", "Notificaciones"]);
  expect(within(navigation).getByRole("link", { name: "Panel de usuario" }).getAttribute("aria-current")).toBe("page");
  expect(screen.getByRole("heading", { level: 1, name: "Panel de usuario" })).toBeTruthy();
  expect(screen.getByRole("heading", { name: "Postulaciones en curso" })).toBeTruthy();
@@ -212,6 +215,8 @@ it("permite retirar un permiso vigente sin enviar accepted hacia accepted", asyn
  render(await AccountPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
  const privacy = screen.getByRole("region", { name: "Privacidad" });
  expect(within(privacy).getByText("Permiso actual: vigente.")).toBeTruthy();
+ expect(within(privacy).getByText(/Ya aceptaste el consentimiento/)).toBeTruthy();
+ expect(within(privacy).getByText(/Tu consentimiento se conserva/)).toBeTruthy();
  expect(within(privacy).queryByRole("button", { name: "Guardar consentimiento" })).toBeNull();
  const form = within(privacy).getByRole("button", { name: "Retirar consentimiento" }).closest("form")!;
  expect(new FormData(form).get("status")).toBe("withdrawn");
@@ -257,6 +262,37 @@ it("embeds offers with account-local profile and pagination destinations", async
  expect(next.searchParams.get("page")).toBe("2");
  expect(next.searchParams.get("oferta")).toBe(offer.id);
  expect(mocks.workspace).toHaveBeenCalledOnce();
+});
+it.each([false, true])("keeps general CV presentation and panel-aware continuation for selected=%s", async selected => {
+ accountSession();
+ const query = { section: "ofertas", ...(selected ? { oferta: offer.slug } : {}) };
+ const view = render(await AccountPage({ searchParams: Promise.resolve(query) }));
+ expect(screen.getByText(/se usará tu CV del perfil: cv-ficticio.pdf/)).toBeTruthy();
+ expect(screen.getByLabelText("CV específico para esta oferta (opcional)")).toBeTruthy();
+ expect(screen.queryByRole("link", { name: "Ver mis postulaciones" })).toBeNull();
+ view.unmount();
+ mocks.participations.mockResolvedValue([{ opening_id: offer.id }]);
+ render(await AccountPage({ searchParams: Promise.resolve(query) }));
+ expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true);
+ expect(screen.getByRole("link", { name: "Ver mis postulaciones" }).getAttribute("href")).toBe(`/account?section=postulaciones&oferta=${offer.slug}`);
+});
+it("keeps the approved agenda and own case CV beside role-safe workflow steps", async () => {
+ accountSession();
+ const reference = fixtureReference("participation", offer.id);
+ mocks.participations.mockResolvedValue([{ id: offer.id, opening_title: offer.title, display_status: "received", version: 2, created_at: "2026-10-07", cv_document_id: offer.id, cv_name: "cv-del-caso.pdf", summary: "Resumen interno ficticio", recommendation: "Recomendación interna ficticia" }]);
+ vi.mocked(candidatePreinterviewAgenda).mockResolvedValueOnce([{ reference, channel: "phone", scheduledAt: "2026-11-02T12:00:00Z", heldAt: null }]);
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "postulaciones" }) }));
+ const item = screen.getByRole("heading", { name: offer.title }).closest("li")!;
+ expect(item.id).toBe(reference);
+ expect(within(item).getByText("Preentrevista de la Oficina de Empleo")).toBeTruthy();
+ expect(within(item).getByText(/Canal:/)).toBeTruthy();
+ expect(within(item).getByText(/Programada:/)).toBeTruthy();
+ const cv = within(item).getByRole("link", { name: "Abrir CV de esta postulación: cv-del-caso.pdf" });
+ expect(cv.getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", offer.id)}`);
+ expect(cv.getAttribute("target")).toBe("_blank");
+ expect(cv.getAttribute("rel")).toBe("noopener noreferrer");
+ expect(within(item).getByRole("list", { name: "Etapas de la postulación" })).toBeTruthy();
+ expect(item.textContent).not.toMatch(/Resumen interno ficticio|Recomendación interna ficticia|Preseleccionada|Derivada a empresa/);
 });
 it("embeds participations and preserves withdrawal confirmation", async () => {
  accountSession();

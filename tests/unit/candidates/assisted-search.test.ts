@@ -15,7 +15,7 @@ const rows = [
   availability: "available", refresh_due_at: "2027-10-01", archived_at: row.status === "archived" ? "2026-10-01" : null,
   locality: "Funes", skills_experience_summary: null, version: 1, candidate_categories: [],
   candidate_consents: [{ id: "consent", status: "accepted", recorded_at: "2026-10-01" }],
-  cv_documents: [{ status: "valid", archived_at: null }], ...row }));
+  cv_documents: [{ status: "valid", archived_at: null, opening_id: null }], ...row }));
 const filters = new Map<string, unknown>();
 const query = { eq: vi.fn(), is: vi.fn(), gt: vi.fn(), order: vi.fn(), range: vi.fn(),
   then: (resolve: (value: unknown) => unknown) => resolve({ data: rows.filter(row =>

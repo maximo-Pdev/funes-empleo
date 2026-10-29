@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { candidateRegistrationSchema } from "@/validation/candidate-registration";
 import { candidateProfileSchema } from "@/validation/candidate-profile";
@@ -86,6 +86,27 @@ describe("autogestión candidata", () => {
     expect(screen.getByLabelText(/Confirmo que quiero retirar/)).toHaveProperty("required", true);
     render(<CandidateApplyForm openingId={categoryB} candidateVersion={2} disabled={true} />);
     expect(screen.getByRole("button", { name: "Postularme" })).toHaveProperty("disabled", true);
+  });
+
+  it("continúa al panel correcto tras una postulación multipart sin permitir duplicados", async () => {
+    const request = vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: true, json: async () => ({ success: true }) } as Response);
+    try {
+      render(<CandidateApplyForm openingId={categoryB} candidateVersion={2} disabled={false} generalCvName="cv-general-ficticio.pdf" participationsHref="/account?section=postulaciones&oferta=oferta-ficticia" />);
+      expect(screen.getByText(/cv-general-ficticio.pdf/)).toBeTruthy();
+      const button = screen.getByRole("button", { name: "Postularme" });
+      const form = button.closest("form")!;
+      fireEvent.submit(form);
+      await waitFor(() => expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true));
+      expect(request).toHaveBeenCalledOnce();
+      const [url, options] = request.mock.calls[0]!;
+      expect(url).toBe("/api/candidate/applications");
+      expect(options?.method).toBe("POST");
+      const payload = options?.body as FormData;
+      expect(payload.get("openingId")).toBe(categoryB);
+      expect(payload.get("candidateVersion")).toBe("2");
+      expect(screen.getByRole("link", { name: "Ver mis postulaciones" }).getAttribute("href")).toBe("/account?section=postulaciones&oferta=oferta-ficticia");
+      expect(screen.queryByLabelText("CV específico para esta oferta (opcional)")).toBeNull();
+    } finally { request.mockRestore(); }
   });
 
   it("rechaza un PDF dañado o con acción ejecutable sin sustituir un CV vigente", () => {

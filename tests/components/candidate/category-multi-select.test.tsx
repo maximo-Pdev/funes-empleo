@@ -39,6 +39,9 @@ it("nombra el diálogo y la lista de categorías y los opera con el teclado", as
 
   const form = container.querySelector("form")!;
   await waitFor(() => expect(new FormData(form).getAll("categories")).toEqual([categories[0]!.id]));
+  expect(screen.getByRole("listbox", { name: "Categorías laborales: opciones" })).toBeTruthy();
+  fireEvent.keyDown(input, { key: "Escape" });
+  await waitFor(() => expect(document.activeElement).toBe(trigger));
   fireEvent.click(screen.getByRole("button", { name: "Guardar" }));
   expect(submit).toHaveBeenCalledOnce();
 });
@@ -77,4 +80,7 @@ it("mantiene el desplegable abierto para elegir más de una categoría", async (
   fireEvent.click(await screen.findByRole("option", { name: "Categoría ficticia A" }));
   fireEvent.click(screen.getByRole("option", { name: "Categoría ficticia B" }));
   expect(screen.getByRole("combobox", { name: "Categorías laborales" }).textContent).toContain("2 seleccionadas");
+  expect(screen.getByRole("listbox", { name: "Categorías laborales: opciones" })).toBeTruthy();
+  fireEvent.keyDown(screen.getByRole("combobox", { name: "Buscar categoría" }), { key: "Escape" });
+  await waitFor(() => expect(screen.queryByRole("listbox", { name: "Categorías laborales: opciones" })).toBeNull());
 });

@@ -129,6 +129,11 @@ it("loads actual metrics for the guarded daily overview", async () => {
  expect(filters.from).toBe(filters.to);
  expect(screen.getByRole("heading", { level: 1, name: "Panel de administración" })).toBeDefined();
  expect(screen.getByTestId("metric-active_candidates").textContent).toContain("24");
+ expect(screen.getByTestId("metric-active_candidates").querySelector("[data-metric-bar]")).toBeTruthy();
+ expect(screen.getByRole("figure", { name: "Ofertas por estado" })).toBeTruthy();
+ expect(document.querySelector("[data-metrics-chart-first] details")).toBeNull();
+ expect(screen.queryByText("Indicadores principales")).toBeNull();
+ expect(screen.queryByText("Ver detalle")).toBeNull();
 });
 it("conserva los filtros de candidatos al paginar", async () => {
  render(await Candidates({ searchParams: Promise.resolve({ locality: "Funes" }) })); expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
@@ -185,9 +190,9 @@ it("conserva menú y regreso al apartado para un perfil asistido vinculado", asy
 it("muestra ausencia de CV sin carga, descarga o nominación desde perfil", async () => {
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(screen.getByText("El candidato no tiene un CV vigente.")).toBeTruthy();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
  expect(screen.queryByRole("button", { name: "Cargar CV" })).toBeNull();
- expect(screen.queryByRole("link", { name: "Descargar CV vigente" })).toBeNull();
+ expect(screen.queryByRole("link", { name: "Abrir CV vigente en otra pestaña" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Nominar a una oferta" })).toBeNull();
  expect(screen.queryByRole("button", { name: "Crear nominación" })).toBeNull();
  expect(mocks.nominations).not.toHaveBeenCalled();
@@ -196,8 +201,8 @@ it("muestra metadatos y descarga del CV vigente por referencia, sin formulario",
  mocks.candidate.mockResolvedValue({ candidate, currentCv: { id, original_name_safe: "cv-ficticio.pdf", byte_size: 2048 }, referralEligible: true, participations: [], notes: [], audit: [] });
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(screen.getByText("cv-ficticio.pdf")).toBeTruthy();
- expect(screen.getByRole("link", { name: "Descargar CV vigente" }).getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", id)}`);
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.getByRole("link", { name: "Abrir CV vigente en otra pestaña" }).getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", id)}`);
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
 });
 it.each([
  { status: "active", origin: "self_service" },
@@ -231,7 +236,7 @@ it("protege el detalle antes de consultar candidato o CV", async () => {
 });
 it("no ofrece carga de CV ni mantenimiento para un perfil archivado", async () => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, status: "archived", account_id: null }, referralEligible: false, participations: [], notes: [], audit: [] });
- render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) })); expect(screen.queryByLabelText("Archivo PDF")).toBeNull(); expect(mocks.nominations).not.toHaveBeenCalled();
+ render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) })); expect(screen.queryByLabelText("Archivo de CV")).toBeNull(); expect(mocks.nominations).not.toHaveBeenCalled();
 });
 it("muestra candidatos después de la información e historial de oferta y fuera del grid", async () => {
  render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
@@ -264,8 +269,21 @@ it("conserva los IDs de filtro al paginar participaciones", async () => {
 it("conserva la confirmación obligatoria en las decisiones de empresa", async () => {
  render(await Company({ params: Promise.resolve({ companyId: id }) })); expect(screen.getAllByRole("checkbox")).toHaveLength(2); for (const checkbox of screen.getAllByRole("checkbox")) expect(checkbox).toHaveProperty("required", true);
 });
+it("renders the same chart-first metrics on the filtered reporting page", async () => {
+ render(await Metrics({ searchParams: Promise.resolve(metricFilters) }));
+ expect(screen.getByTestId("metric-active_candidates").querySelector("[data-metric-bar]")).toBeTruthy();
+ expect(screen.getByRole("figure", { name: "Ofertas por estado" })).toBeTruthy();
+ expect(document.querySelector("[data-metrics-chart-first] details")).toBeNull();
+ expect(screen.queryByText("Indicadores principales")).toBeNull();
+ expect(screen.queryByText("Ver detalle")).toBeNull();
+});
 it("exporta los filtros consultados y conserva cobertura pendiente", async () => {
- render(await Metrics({ searchParams: Promise.resolve(metricFilters) })); expect(screen.getByRole("link", { name: "Descargar CSV filtrado" }).getAttribute("href")).toContain("from=2026-10-01&to=2026-10-19"); expect(screen.getByText("Pendiente de cubrir todas las vacantes")).toBeTruthy();
+ render(await Metrics({ searchParams: Promise.resolve(metricFilters) }));
+ for (const [format, label] of [["csv", "CSV"], ["pdf", "PDF"], ["xlsx", "Excel"]]) {
+  const href = screen.getByRole("link", { name: `Descargar ${label} filtrado` }).getAttribute("href")!;
+  expect(href).toContain(`/api/admin/exports/operations.${format}?from=2026-10-01&to=2026-10-19`);
+ }
+ expect(screen.getByText("Pendiente de cubrir todas las vacantes")).toBeTruthy();
 });
 it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mantenimiento presencial %s, consentimiento, CV y vinculación sin duplicar notas", async status => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", account_id: null, accounts: null, archived_at: null, status }, currentCv: null, referralEligible: false, participations: [], notes: [], audit: [] });
@@ -280,7 +298,7 @@ it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mante
  expect(profileDetails.nextElementSibling).toBe(cvDetails);
  expect(cvDetails.nextElementSibling).toBe(screen.getByRole("heading", { name: "Nota interna de la Oficina" }).closest("form"));
  expect(screen.getByLabelText("DNI exhibido")).toHaveProperty("type", "password"); expect(screen.getByRole("button", { name: "Vincular conservando historial" })).toHaveProperty("disabled", true);
- expect(screen.getByLabelText("Archivo PDF").getAttribute("accept")).toBe(".pdf,application/pdf");
+ expect(screen.getByLabelText("Archivo de CV").getAttribute("accept")).toBe(".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png");
  expect(screen.getByRole("button", { name: "Cargar CV" })).toBeTruthy();
  expect(screen.getAllByRole("heading", { name: "Notas internas" })).toHaveLength(1);
  expect(screen.getAllByRole("heading", { name: "Historial de cuenta y perfil" })).toHaveLength(1);
@@ -299,7 +317,7 @@ it.each([
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
  expect(screen.getByRole("heading", { name: "Historial de cuenta y perfil" })).toBeTruthy();
 });
 it("oculta controles si el workspace ya informa una cuenta vinculada", async () => {
@@ -309,7 +327,7 @@ it("oculta controles si el workspace ya informa una cuenta vinculada", async () 
  render(await Candidate({ params: Promise.resolve({ candidateId: id }), searchParams: Promise.resolve({}) }));
  expect(mocks.assisted).toHaveBeenCalledWith(id);
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
 });
 it("retira formularios al refrescar tras vincular sin dejar nodos de edición anteriores", async () => {
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", account_id: null, accounts: null }, currentCv: null, referralEligible: false, participations: [], notes: [], audit: [] });
@@ -319,7 +337,7 @@ it("retira formularios al refrescar tras vincular sin dejar nodos de edición an
  mocks.candidate.mockResolvedValue({ candidate: { ...candidate, origin: "assisted", version: 2 }, currentCv: null, referralEligible: true, participations: [], notes: [], audit: [] });
  view.rerender(await Candidate(props));
  expect(screen.queryByRole("heading", { name: "Mantener perfil" })).toBeNull();
- expect(screen.queryByLabelText("Archivo PDF")).toBeNull();
+ expect(screen.queryByLabelText("Archivo de CV")).toBeNull();
  expect(screen.queryByRole("heading", { name: "Activación" })).toBeNull();
  expect(screen.queryByRole("heading", { name: "Vincular cuenta presencialmente" })).toBeNull();
  expect(screen.getAllByRole("heading", { name: "Nota interna de la Oficina" })).toHaveLength(1);
@@ -337,7 +355,7 @@ it.each(["active", "suspended", "pending_verification", "archived"])("el asistid
  render(await Candidate(props));
  expect(within(screen.getByRole("main")).getAllByRole("button").map(element => element.textContent)).toEqual(controls);
  expect(within(screen.getByRole("main")).getAllByRole("heading").map(element => element.textContent).sort()).toEqual([...headings].sort());
- expect(screen.getByRole("link", { name: "Descargar CV vigente" })).toBeTruthy();
+ expect(screen.getByRole("link", { name: "Abrir CV vigente en otra pestaña" })).toBeTruthy();
  expect(mocks.assisted).not.toHaveBeenCalled();
 });
 
@@ -366,7 +384,7 @@ it.each([
  expect(within(sidebar).getByText("Administración")).toBeTruthy();
  expect(within(sidebar).getByTitle("admin@example.invalid")).toBeTruthy();
  const nav = within(sidebar).getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
- expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin", "/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/courses", "/admin/metrics", "/account"]);
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin", "/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/courses", "/admin/metrics", "/admin/notificaciones", "/account"]);
  expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
  expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();

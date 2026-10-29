@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 async function getPreviewOffers(): Promise<PublicOffer[]> {
   try {
-    return (await listPublicOffers({ page: 1, pageSize: 12 })).items;
+    return (await listPublicOffers({ page: 1, pageSize: 10 })).items;
   } catch {
     return [];
   }
@@ -58,12 +58,12 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
             <div className={styles.offersHeader}>
               <div>
                 <h2 id="ofertas-titulo" className={styles.offersTitle}>Ofertas disponibles</h2>
-                <p className={styles.offersSubtitle}>Explorá una selección de las búsquedas vigentes aprobadas por la Oficina de Empleo.</p>
+                <p className={styles.offersSubtitle}>Las búsquedas vigentes más recientes, publicadas por la Oficina de Empleo.</p>
               </div>
               <Link href="/ofertas" className={styles.offersAllLink}>Ver todas las ofertas<ArrowRight size={16} aria-hidden="true" /></Link>
             </div>
             {offers.length > 0 ? (
-              <HomeOffersCarousel offers={offers} />
+              <HomeOffersCarousel key={offers[0]?.id} offers={offers} />
             ) : (
               <div className={styles.offersEmpty}>
                 <p>No hay ofertas vigentes para mostrar en este momento.</p>

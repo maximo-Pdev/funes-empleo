@@ -16,7 +16,7 @@ async function signIn(page: Page, identity: string, role: "admin" | "company") {
 }
 
 for (const late of [false, true]) {
-  test(`contratación tardía=${late}: retiro global atómico, bloqueo por candidato y otros casos intactos`, async ({ browser }) => {
+  test(`contratación tardía=${late}: disponibilidad atómica, consentimiento y otros casos intactos`, async ({ browser }) => {
     const candidateId = randomUUID();
     const consentId = randomUUID();
     const cvId = randomUUID();
@@ -92,28 +92,34 @@ for (const late of [false, true]) {
       blocker.stdin.end("rollback;\n");
       expect(await blockerDone).toBe(0);
       await expect(admin.getByRole("status").filter({ hasText: "Resultado o estado vigente" })).toContainText("Persona contratada");
-      expect(runLocalMaintenanceSql(`select private.current_consent('${candidateId}');`)).toBe("f");
-      expect(runLocalMaintenanceSql(`select count(*) from public.referrals where candidate_id='${candidateId}' and access_status='active';`)).toBe("0");
+      expect(runLocalMaintenanceSql(`select private.current_consent('${candidateId}');`)).toBe("t");
+      expect(runLocalMaintenanceSql(`select availability from public.candidate_profiles where id='${candidateId}';`)).toBe("unavailable");
+      expect(runLocalMaintenanceSql(`select count(*) from public.candidate_consents where candidate_id='${candidateId}';`)).toBe("1");
+      expect(runLocalMaintenanceSql(`select count(*) from public.referrals where candidate_id='${candidateId}' and access_status='active';`)).toBe(late ? "1" : "2");
       expect(runLocalMaintenanceSql(`select to_jsonb(part)::text from public.participations part where id='${otherParticipationId}';`)).toBe(otherCaseBefore);
       await company.reload();
       await expect(company.getByText(name, { exact: true })).toBeVisible();
       await expect(company.getByRole("heading", { name: `Derivación de ${name}`, exact: true })).toBeVisible();
-      await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
-      await expect(company.getByRole("heading", { name: "Contactos vigentes", exact: true })).toHaveCount(0);
-      await expect(company.getByRole("link", { name: "Descargar CV asociado a esta derivación" })).toHaveCount(0);
-      expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
+      await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toBeVisible();
+      await expect(company.getByRole("link", { name: "Abrir CV asociado a esta derivación en otra pestaña" })).toHaveAttribute("target", "_blank");
       await companyContext.clearCookies();
       await signIn(company, "company1", "company");
       await company.goto(`/empresa/ofertas/${openingId}#derivaciones`);
       // El detalle canoniza la referencia privada; el fragmento no sobrevive al redirect de servidor.
       await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
       await expect(company.getByRole("heading", { name: `Derivación de ${name}`, exact: true })).toBeVisible();
-      await expect(company.getByText("Contratado", { exact: true })).toBeVisible();
-      await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
-      await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
-      await expect(company.getByRole("link", { name: /Descargar CV/ })).toHaveCount(0);
+      if (late) {
+        await expect(company.getByText("Contratado", { exact: true })).toBeVisible();
+        await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
+        await expect(company.getByRole("heading", { name: "Contactos vigentes" })).toHaveCount(0);
+        await expect(company.getByRole("link", { name: /Abrir CV/ })).toHaveCount(0);
+        expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
+      } else {
+        await expect(company.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toBeVisible();
+        await expect(company.getByRole("link", { name: /Abrir CV/ })).toHaveAttribute("target", "_blank");
+        expect(runLocalMaintenanceSql(`select (post_hire_access_until > now())::text from public.referrals where participation_id='${participationId}';`)).toBe("true");
+      }
       await expect(company.getByRole("button", { name: "Enviar informe" })).toHaveCount(0);
-      expect([403, 404]).toContain((await company.request.get(`/api/cv/${cvId}`)).status());
     } finally {
       if (!blocker.stdin.writableEnded) blocker.stdin.end("rollback;\n");
       await blockerDone;

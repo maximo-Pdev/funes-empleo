@@ -27,7 +27,7 @@ The server-only service uses the ordinary Supabase request client, validates the
 exact shape and returns a generic internal error on provider/schema failure. Home
 renders real zeros when successful. On failure it renders an unavailable notice and
 em dashes, independently of session access and offer-preview loading. Home remains
-dynamic; counts are not hardcoded or derived from the twelve-item preview limit.
+dynamic; counts are not hardcoded or derived from the ten-item preview limit (EXTRA088).
 
 ## Recovery and rollout
 

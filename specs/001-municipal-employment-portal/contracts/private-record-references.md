@@ -1,5 +1,10 @@
 # A04 — Referencias privadas sin UUID visibles
 
+EXTRA091: canonicalización idempotente. Reescribir query solo al sustituir realmente
+un UUID; si ya contiene referencias opacas, conservar encoding, orden y parámetros
+repetidos. Espacios equivalentes '+'/%20 no deben provocar una redirección nueva.
+No modifica validación ni autorización de la página/handler receptor.
+
 Solicitud de Mateo,2026-10-23. Revisión técnica acotada; no acredita aceptación
 municipal ni altera permisos. UUID sigue siendo PK/FK y contrato de comandos.
 

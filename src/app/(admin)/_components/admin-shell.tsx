@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, BarChart3, BriefcaseBusiness, Building2, GraduationCap, Settings, ShieldCheck, Users } from "lucide-react";
+import { ArrowLeft, BarChart3, Bell, BriefcaseBusiness, Building2, GraduationCap, Settings, ShieldCheck, Users } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 import { DashboardShell } from "@/components/ui/dashboard-shell";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -15,6 +15,7 @@ const navigation = [
   { href: "/admin/participations", label: "Participaciones", icon: ShieldCheck },
   { href: "/admin/courses", label: "Cursos", icon: GraduationCap },
   { href: "/admin/metrics", label: "Métricas", icon: BarChart3 },
+  { href: "/admin/notificaciones", label: "Notificaciones", icon: Bell },
   { href: "/account", label: "Cuenta", icon: Settings },
 ];
 

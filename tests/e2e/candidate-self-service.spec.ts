@@ -84,12 +84,15 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(categories.getByText("Categoría ficticia B", { exact: true })).toBeVisible();
   await expect(page.getByRole("region", { name: "Privacidad", exact: true })).toHaveCount(0);
   await page.goto("/dashboard?section=cuenta");
-  await expect(page.getByText(/tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas/)).toBeVisible();
+  await expect(page.getByText(/Tu consentimiento se conserva: no tenés que aceptarlo de nuevo/)).toBeVisible();
   await page.getByLabel("Confirmo esta decisión y entiendo sus efectos.", { exact: true }).check();
   await page.getByRole("button", { name: "Guardar consentimiento" }).click();
   await expect(page.getByText("Consentimiento registrado.", { exact: false })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Ya aceptaste el consentimiento.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Guardar consentimiento" })).toHaveCount(0);
   await page.goto("/dashboard?section=perfil");
-  await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
+  await page.getByLabel("Elegir CV").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   let releaseRefresh!: () => void;
   const refreshGate = new Promise<void>(resolve => { releaseRefresh = resolve; });
   const profileRoute = (url: URL) => url.pathname === "/dashboard" && url.searchParams.get("section") === "perfil";
@@ -145,7 +148,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   const consentCard = page.getByRole("region", { name: "Privacidad", exact: true });
   await expect(consentCard).toBeVisible();
   await expect(consentCard.getByText(/Al aceptar, autorizás/)).toBeVisible();
-  await expect(consentCard.getByText(/Si la Oficina confirma una contratación en/)).toBeVisible();
+  await expect(consentCard.getByText(/Si la Oficina confirma una contratación,/)).toBeVisible();
   await expect(consentCard.getByText("Ver política de consentimiento", { exact: true })).toHaveCount(0);
   const informationText = consentCard.getByText(/Una empresa solo puede ver tu perfil laboral/);
   await expect(informationText).toBeHidden();
@@ -154,7 +157,7 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await page.keyboard.press("Enter");
   await expect(informationText).toBeVisible();
   await expect(consentCard.getByText(/seguir viendo únicamente tu nombre/)).toBeVisible();
-  await expect(consentCard.getByText(/Corregir un resultado no restablece/)).toBeVisible();
+  await expect(consentCard.getByText(/durante 30 días/)).toBeVisible();
   
   await page.keyboard.press("Enter");
   await expect(informationText).toBeHidden();
@@ -184,17 +187,17 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(contactCard.getByText("Contacto actualizado.", { exact: true })).toBeVisible();
   await page.reload();
   await expect(phone).toHaveValue("");
-  const originalCv = await page.getByRole("link", { name: "Descargar mi CV" }).getAttribute("href");
-  await page.getByLabel("Elegir PDF").setInputFiles({
+  const originalCv = await page.getByRole("link", { name: "Abrir mi CV en otra pestaña" }).getAttribute("href");
+  await page.getByLabel("Elegir CV").setInputFiles({
     name: "rechazado.pdf", mimeType: "application/pdf", buffer: Buffer.from("PDF ficticio dañado"),
   });
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page.getByText("El PDF fue rechazado.", { exact: false })).toBeVisible();
+  await expect(page.getByText("El archivo de CV fue rechazado.", { exact: false })).toBeVisible();
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
-  await expect(page.getByRole("link", { name: "Descargar mi CV" })).toHaveAttribute("href", originalCv!);
-  await page.getByLabel("Elegir PDF").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
+  await expect(page.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).toHaveAttribute("href", originalCv!);
+  await page.getByLabel("Elegir CV").setInputFiles(join(process.cwd(), "tests/fixtures/cv-fictitious.pdf"));
   await page.getByRole("button", { name: "Cargar o reemplazar CV" }).click();
-  await expect(page.getByRole("link", { name: "Descargar mi CV" })).not.toHaveAttribute("href", originalCv!);
+  await expect(page.getByRole("link", { name: "Abrir mi CV en otra pestaña" })).not.toHaveAttribute("href", originalCv!);
   await expect(page).toHaveURL(/\/dashboard\?section=perfil$/);
 
   await page.goto("/dashboard?section=ofertas");
@@ -210,7 +213,13 @@ test("registro, dos postulaciones independientes, retiro, suspensión y archivo 
   await expect(page.getByRole("heading", { name: "Mis postulaciones" })).toBeVisible();
   await expect(page.locator("li").filter({ hasText: titles[0] })).toContainText("Recibida por la Oficina");
   await expect(page.locator("li").filter({ hasText: titles[1] })).toContainText("Recibida por la Oficina");
-  await expect(page.locator("body")).not.toContainText(/preseleccionad|preentrevista|nota interna/i);
+  // EXTRA099 permits the agenda of a recorded preinterview, never internal
+  // evaluations. These two self applications have no appointment of their own.
+  await expect(page.getByRole("main")).not.toContainText(/preseleccionad|nota interna|resumen interno|recomendación/i);
+  for (const title of titles.slice(0, 2)) {
+    const participation = page.locator("li").filter({ has: page.getByRole("heading", { name: title, exact: true }) });
+    await expect(participation.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toHaveCount(0);
+  }
   const first = page.locator("li").filter({ hasText: titles[0] });
   await first.getByLabel("Confirmo que quiero retirar esta participación.").check();
   await first.getByRole("button", { name: "Retirar participación" }).click();

@@ -44,14 +44,16 @@ describe("intermediación administrativa", () => {
   });
 
   it("filtra candidatos por palabra y disponibilidad con controles etiquetados", () => {
-    const search = vi.fn();
-    render(<CandidateSearchForm categories={[{ id: "cat-1", name: "Categoría ficticia" }]} onSearch={search} />);
+    render(<CandidateSearchForm categories={[]} />);
     fireEvent.change(screen.getByLabelText("Búsqueda por palabra"), { target: { value: "Persona ficticia" } });
     fireEvent.change(screen.getByLabelText("Disponibilidad"), { target: { value: "available" } });
-    fireEvent.click(screen.getByRole("button", { name: "Buscar candidatos" }));
-    expect(search).toHaveBeenCalledWith(expect.objectContaining({
-      term: "Persona ficticia", categoryId: [], availability: "available",
-    }));
+    const form = screen.getByRole("search") as HTMLFormElement;
+    const data = new FormData(form);
+    expect(form.method).toBe("get");
+    expect(data.get("term")).toBe("Persona ficticia");
+    expect(data.getAll("categoryId")).toEqual([]);
+    expect(data.get("availability")).toBe("available");
+    expect(form.querySelector('[name="locality"]')).toHaveProperty("required", false);
   });
 
   it("no permite omitir una etapa sin motivo ni convierte la derivación en un salto implícito", () => {

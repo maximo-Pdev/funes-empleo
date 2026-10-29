@@ -12,7 +12,7 @@ import { candidateHistoryActions, candidateHistoryPageSize, type CandidateHistor
 const candidateIdSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
 type ConsentSnapshot = { id: string; status: "accepted" | "withdrawn"; recorded_at: string };
-type CvSnapshot = { status: string; archived_at: string | null };
+type CvSnapshot = { status: string; archived_at: string | null; opening_id: string | null };
 type CategorySnapshot = { category_id: string; job_categories: { code: string; name: string; active: boolean } | null };
 
 export interface CandidateSearchRow {
@@ -53,7 +53,7 @@ now: Date): boolean {
   return referralEligibility({ status: row.status, available: row.availability === "available", archived: Boolean(row.archived_at),
     fresh: Boolean(row.refresh_due_at && new Date(row.refresh_due_at).getTime() > now.getTime()),
     accountActive: !row.account_id || row.accounts?.status === "active", currentConsent: latestConsent?.status === "accepted",
-    validCv: row.cv_documents.some((document) => document.status === "valid" && !document.archived_at) }) === null;
+    validCv: row.cv_documents.some((document) => document.opening_id === null && document.status === "valid" && !document.archived_at) }) === null;
 }
 
 export function paginateCandidates<T>(items: readonly T[], page: number, pageSize: number) {
@@ -75,7 +75,7 @@ async function refreshDueProfiles(client: Awaited<ReturnType<typeof adminClient>
   if (result.error) throw new AppError("INTERNAL_ERROR");
 }
 
-const SEARCH_COLUMNS = "id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,archived_at,version,accounts!candidate_profiles_account_id_fkey(status),candidate_categories(category_id,job_categories(code,name,active)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)";
+const SEARCH_COLUMNS = "id,account_id,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,archived_at,version,accounts!candidate_profiles_account_id_fkey(status),candidate_categories(category_id,job_categories(code,name,active)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at,opening_id)";
 const BATCH_SIZE = 1000;
 
 // The bounded demonstration fixture fits in one request. Apply category and
@@ -148,7 +148,7 @@ export async function getAdminCandidate(candidateId: string) {
   await refreshDueProfiles(client, parsed.data);
   const [candidate, participations, notes, currentCv] = await Promise.all([
     client.from("candidate_profiles")
-      .select("id,account_id,origin,archived_at,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,version,accounts!candidate_profiles_account_id_fkey(id,status,version),candidate_categories(job_categories(code,name)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at)")
+      .select("id,account_id,origin,archived_at,display_name,locality,skills_experience_summary,availability,status,refresh_due_at,version,accounts!candidate_profiles_account_id_fkey(id,status,version),candidate_categories(job_categories(code,name)),candidate_consents(id,status,recorded_at),cv_documents(status,archived_at,opening_id)")
       .eq("id", parsed.data).maybeSingle(),
     client.from("participations")
       .select("id,status,origin,created_at,job_openings!participations_opening_id_fkey(id,title)")
@@ -158,7 +158,7 @@ export async function getAdminCandidate(candidateId: string) {
       .eq("candidate_id", parsed.data).is("archived_at", null)
       .is("participation_id", null).order("created_at", { ascending: false }).limit(50),
     client.from("cv_documents").select("id,original_name_safe,byte_size")
-      .eq("candidate_id", parsed.data).eq("status", "valid").is("archived_at", null).maybeSingle(),
+      .eq("candidate_id", parsed.data).is("opening_id", null).eq("status", "valid").is("archived_at", null).maybeSingle(),
   ]);
   if (candidate.error || participations.error || notes.error || currentCv.error) throw new AppError("INTERNAL_ERROR");
   if (!candidate.data) throw new AppError("NOT_FOUND");

@@ -26,6 +26,169 @@ The shared sidebar receives the candidate's existing private photo, loaded once 
 account render and reused by Perfil. Optional read failure must not block other forms.
 Visibility toggles for passwords and masked identifiers share the same adapted Button;
 each input retains its own visibility, value, validation and accessible label.
+## EXTRA099 — Diseño de avisos privados,2026-10-28
+
+N1/N5: account_notifications con recipient_account_id, source_event_id, kind,
+resource_id, referencia aleatoria aviso-24hex, created_at y read_at. FK RESTRICT,
+UNIQUE(destinatario,fuente,tipo), índice cronológico y parcial de pendientes. RLS
+solo cuenta activa con sesión viva; sin escrituras directas de aplicación. Trigger
+privado AFTER INSERT audit_events usa lista cerrada de hechos y relaciones reales;
+misma transacción, sin catch que silencie fallos ni reemplazar workflows existentes.
+Cada admin activo recibe su fila; perfiles sin cuenta no reciben avisos personales.
+No backfill, retención nueva, snapshot personal o permiso empresarial adicional.
+
+N2/N3: preinterview_recorded únicamente, no eventos secundarios de transición.
+Feedback empresarial notifica a admins como pendiente, consultando reported_outcome;
+resultados del candidato solo outcome_confirmed/corrected hired/not_selected.
+Referral se resuelve por relaciones sin exigir status referred, porque se audita
+antes de actualizar ese estado. Entrevista empresarial explícitamente excluida.
+Nuevo RPC propio expone agenda municipal: scheduled_at/held_at/channel y referencia
+del caso; no recommendation/summary_internal, nunca lectura directa de preinterviews.
+
+N4: RPC list_my_notifications y open_my_notification requieren require_workflow_actor,
+filtran destinatario y revalidan archivo/propiedad actuales. Devuelven referencias
+opacas y tipo de destino, no UUID ni URL arbitraria. Servicio servidor valida contrato
+y construye rutas por rol. Apertura POST same-origin, cuerpo acotado, lectura
+idempotente y 303 a destino; GET nunca marca leído. Recurso inaccesible se muestra
+sin asunto personal ni enlace activo. Respuestas privadas no-store/Vary Cookie.
+
+N6: campana cliente en DashboardShell/HomeNavbar privado; no consultas en inicio
+público. Popover oficial adaptado, cinco recientes, contador de pendientes, enlace
+a lista paginada de20. Refresco30s solo pestaña visible y al recuperar foco/abrir;
+AbortController/cleanup evita resultados de sesión desmontada. Lista completa
+Server Component por rol; sin proveedores ni dependencias nuevas. Participaciones
+propias con ancla opaca estable y fecha/canal cuando existan, incluyendo destino
+seleccionado aunque quede fuera del listado inicial. No publicar etapas internas.
+
+Constitución: intermediación, minimización, sesión/RLS y auditoría conservadas;
+excepción de visibilidad N3 explícita y acotada. Recuperación forward-only:
+deshabilitar fanout/ocultar campana, conservar filas y auditoría; no DROP destructivo.
+Pruebas SQL por evento/rol/propiedad/sesión/rollback/idempotencia; rutas/servicios/UI,
+HTTP real y navegador ficticio, teclado/móvil/axe, tipos/lint/tooling/unit/build.
+Gate histórico: company-offer-management conserva2 casillas pendientes. Mateo
+autoriza expresamente continuar con este incremento sin marcarlas como aprobadas.
+
+## EXTRA096 — Diseño2026-10-28: CV por caso e imágenes de entrada
+
+C1: módulo compartido de política PDF/JPG/JPEG/PNG,5 MiB. normalizeCv servidor
+reutiliza validatePdf o valida extensión+MIME+firma JPEG/PNG, sharp failOn warning,
+16MP, una página y sin APNG; rotación EXIF y recodificación JPEG sin metadatos.
+PDFKit ya instalado produce PDF de una página con imagen íntegra ajustada sin
+recortar; validar resultado5 MiB y PDF. Sin WebP/SVG/GIF/video ni paquetes nuevos.
+Trazado de fuente local para ambas rutas de archivos, runtime Node y tamaño
+controlado antes de arrayBuffer. Archivo convertido mantiene nombre seguro.pdf.
+
+C2/C3: cv_documents.opening_id nullable FK, NULL=general. Índice cv_current solo
+para general; ningún backfill. participation.application_cv_document_id nullable
+FK titular/documento, scope inmutable y constraint de oferta coherente. General
+se reemplaza sin afectar específicos. Funciones de activación, perfil, matching y
+preview filtran opening_id NULL; caso propio conserva archivo elegido al enviar.
+Referir usa selección valid/superseded si existe; legado/admin sin selección usa
+general valid. Cambio de general conserva archivo y autorización histórica.
+
+C4/C5: reserve_application_cv valida actor candidato, versión, aptitud, oferta,
+duplicados y metadatos PDF; inserta rejected/upload_pending con scope de oferta.
+Almacenamiento privado existente, sin URLs firmadas ni service-role nuevo.
+Helper privado común create_participation_with_cv conserva reglas y locks previos,
+valida Storage/metadata de reserva propia, fija CV y alta/auditoría atómicamente.
+create_participation y apply_to_opening conservan firmas como wrappers; nuevo
+apply_to_opening_with_cv recibe documento opcional. No CV válido parcial al fallar;
+reservas rejected sin acceso permanecen como en flujo actual, sin purga inventada.
+No locks durante transferencia. RLS/permiso de empresa siguen derivación exacta.
+
+C6: POST /api/candidate/applications recibe formulario con archivo opcional y
+validación/error españoles, sin depender de límite de Server Actions para binario.
+CandidateApplyForm reutiliza Form/FileInput/Button: no adjuntar usa general,
+adjuntar no lo reemplaza; preserva archivo ante error y advierte estado incierto
+ante red. Ruta/sesión revalida en servidor y DB. Enlaces de CV de caso municipal y
+postulaciones propias usan referencias opacas/nueva pestaña. Nuevo RPC propio
+my_candidate_participations_with_cv amplía proyección legada sin etapas internas,
+mantiene RPC anterior compatible; convierte referencias en servidor.
+
+Constitución I–VI: solicitud explícita coordina scope, intermediación/historial y
+stack intactos. Mismo5 MiB y bucketPDF, recuperación forward-only sin borrar
+documentos/elecciones previas. Preparar SQL/contratos/tipos y analizar antes de
+código; pruebas SQL, UI/rutas/conversión, navegador ficticio, tipos/lint/build.
+
+El proyecto Playwright application-cv depende de chromium y precede al reset de
+acceptance-concurrency. Sus ofertas ficticias no deben alterar las comprobaciones
+de conteo fijo del fixture base; no confiar en nombres de archivo para ordenarlo.
+
+## EXTRA094 — Diseño2026-10-28, precedencia sobre EXTRA035
+
+R1: proxy GET CV mantiene sesión/RPC/Storage RLS/no-store/nosniff/refs; cambiar
+solo Content-Disposition a inline y enlaces target=_blank/rel=noopener noreferrer.
+No signed URLs ni rutas nuevas. El visor/configuración del navegador decide soporte.
+
+R2: Dashboard sigue Server Component. S2/L36 y EXTRA102 sustituyen las seis tarjetas
+resumen por gráficos visibles de barras y dona; `/admin` y `/admin/metrics`
+comparten renderer. Indicadores exactos, no sumas de categorías; dona únicamente
+con estados de oferta mutuamente excluyentes. Valores/etiquetas HTML y gráficos
+decorativos usan tokens municipales; cero/null/ausencia explícitos.
+Sin Recharts/isla cliente: registro oficial chart consultado exige nueva dependencia
+para interacción no solicitada, innecesaria para estas distribuciones estáticas.
+No crear imitación de ChartContainer; reutilizar layout/Card donde corresponda.
+No ocultar el reemplazo gráfico bajo Ver detalle. Definiciones en details/summary
+nativos; filtros, indicadores completos y exportadores CSV/PDF/XLSX intactos.
+
+R3/R5: migración aditiva reemplaza cuerpo transition_participation conservando
+firma/grants/guard/evidencia/locks y demás ramas. Hire/late_hire: availability
+unavailable; status active→unavailable, otros status preservados; audit
+availability_changed con actor/causa hired y decisión privada. No tocar consents.
+Si derivación propia sigue active y demás condiciones siguen vigentes, fijar
+post_hire_access_until=now_at+720h; jamás activar revoked. Helpers/cron existentes
+ya deniegan en frontera y materializan expiración. Otras derivaciones intactas.
+Mantener bloqueo candidato antes de participación; rollback si falla auditoría.
+Sin backfill, schema/índices/proveedores nuevos. Historial hiring_workflow previo
+permanece legible. Recuperación forward-only, nunca reconsentir/restaurar permisos.
+
+R4: Cuenta > Privacidad presenta explicación/estado siempre; Perfil no duplica
+controles de consentimiento. Formulario afirmativo solo si
+último evento no accepted. DB ya impide dos aceptaciones consecutivas. Retiro
+manual explícito conserva sus controles existentes en Cuenta y sus efectos globales;
+nuevo consentimiento explícito no reabre casos ni permisos. Términos del registro
+persisten por separado, sin otorgar consentimiento operativo.
+Texto explica indisponibilidad,720h y conservación sin reponer permisos. Guardar
+disponibilidad available sigue su activación vigente; hire no reactiva perfil.
+
+Constitución I–VI: decisión humana explícita sustituye EXTRA035, no norma municipal;
+misma intermediación/RLS/stack/historia. Tipos/lint/unit/tooling/build/SQL y E2E
+críticos aislados, responsive/axe/teclado y matriz de referencias/autorización.
+
+EXTRA091: referenceUrl reconstruye query únicamente al cambiar un identificador;
+no normalizar '+'/%20 de referencias ya opacas. La canonización debe ser idempotente
+y no provocar redirección por representaciones equivalentes de espacios. Guards,
+resolución, validación y orden/repetición de parámetros se conservan.
+
+EXTRA087 sustituye EXTRA086: HomeOffersCarousel usa intervalo React de3s con
+cleanup y API Embla móvil. EXTRA088: Home pide10 ofertas, distancia circular
+centrada en coverflow y módulo en flechas; Embla loop:true con fallback nativo si
+hay pocas slides. Avance vuelve al índice0, sin discontinuidad de vecinos visibles.
+Sin Button de pausa/ref/pausa manual. Hover/foco temporales se restablecen al
+salir; reduced-motion y pestaña oculta detienen avance. Sin dependencias,
+consultas ni cambios de arquitectura.
+
+## EXTRA085 — Diseño 2026-10-27
+
+Constitución I–VI: preservar intermediación, permisos, historial y DTO; sin SQL/
+infra/variables nuevas. RPC público ya ordena globalmente; coverflow usa distancia
+modular centrada y flechas circulares (EXTRA088), sin alterar fuentes públicas.
+write-excel-file4.1.1 genera XLSX String/Number/null; PDFKit0.20.2 PDF con Be
+Vietnam TTF locales, texto/páginas. Solo servidor Node; externalizar PDFKit y
+trazar fuentes solo para ruta PDF; tipos0.17.6 con API estable. Generar en memoria
+el resultado autorizado actual; no introducir límite de filas silencioso.
+Handler compartido: guard→filtros/referencias→getMetrics(true)→serializar;
+duplicados/desconocidos inválidos, referencias opacas, no-store/nosniff/attachment.
+Centralizar etiquetas métricas fuera de JSX. Contexto/fechas/categoría/as_of,
+pendiente distinto de0; CSV permanece, interfaz ofrece ambos formatos nuevos.
+CandidateSearchForm servidor compone Form GET, campos nombrados sin handlers,
+LocalityCombobox autónomo required=false y categorías como isla cliente con
+categoryId opacos repetidos. Quitar onSearch solo de pruebas y router.push.
+Servidor de matching compone formulario GET de orden como ReactNode al cliente
+tabla/modal; mantiene preview/nominación/refresh. Otras composiciones ya servidor.
+html:has(dialog[data-candidate-preview][open]) bloquea fondo automáticamente;
+conservar overflow interior y comprobar posición/teclado/cierre/móvil.
+
 
 ## Authorized public metrics design — EXTRA-079
 
@@ -379,8 +542,8 @@ confirma los resultados finales. Las empresas nunca acceden al padrón general y
 laborales, todos los contactos vigentes y la versión del CV asociada a una derivación propia.
 Ese acceso se calcula en cada lectura: se revoca ante retiro de postulación o consentimiento, no
 selección, cancelación o falta de respuesta; una nueva contratación normal/tardía
-retira el consentimiento global y revoca todos los permisos atómicamente, sin
-alterar otros casos. Solo permisos históricos anteriores conservan el límite de720 horas. Esta
+cambia disponibilidad atómicamente y conserva consentimiento, sin
+alterar otros casos/permisos. El permiso propio active conserva720h desde confirmar. Esta
 ventana de consulta no decide la retención de registros pendiente en OQ-001.
 
 La solución se construirá como una aplicación Next.js con App Router, React, TypeScript y Tailwind
@@ -420,6 +583,11 @@ autorización/estados intactos; no traducir contenido personal o formatos técni
 
 ### EXTRA040 — presentación del perfil candidato, 2026-10-22
 
+Historical layout/copy below is retained for traceability. S12/S18 and EXTRA102
+move operational privacy to Cuenta, not Perfil; EXTRA094 supersedes hiring-related
+withdrawal copy with retained consent/unavailable and conditional 720-hour access.
+The existing explicit manual withdrawal remains reachable without repeat acceptance.
+
 Solo CandidateProfilePanel y CSS local: tarjeta inicial de estado/vigencia y
 activación. Derivar visibilidad de props guardadas que ya entrega workspace,
 según el predicado del RPC activate_candidate existente: estados recuperables,
@@ -442,6 +610,9 @@ flujo real de activación/consentimiento, móvil, teclado y axe. Tipos/lint/prue
 build. Modelo/contratos de estados y autorización permanecen intactos.
 
 ### EXTRA041 — composición de tarjetas del perfil, 2026-10-22
+
+The consent placement described below is historical, superseded by Cuenta > Privacidad
+in S12/S18. It does not require restoring consent controls to Perfil or obsolete copy.
 
 Una section de Datos laborales y personales contiene los formularios hermanos
 de datos y teléfono opcional, cada uno con su Action/version/resultado; sin
@@ -472,7 +643,7 @@ alojado sin solicitud posterior. Recuperar con migración correctiva, no reactiv
 autoarchivo o permisos automáticamente. Gates acotados conservan arquitectura y
 constitución; OQ-001/002 y revisión humana siguen pendientes.
 
-### EXTRA035 — retiro global por contratación, autorización2026-10-21
+### Histórico EXTRA035 — sustituido por EXTRA0942026-10-28
 
 Mantener RPC `transition_participation` y su firma/grants: `hire` y `late_hire`
 comparten la rama de resultado. Bloqueo candidato FOR UPDATE antes de participación/
@@ -793,16 +964,18 @@ del compañero pendiente.
 ### CV y archivos
 
 - Un único bucket privado `candidate-cvs`; claves opacas con UUID, nunca nombres, DNI o email.
-- Para la demostración se acepta únicamente PDF de hasta 5 MiB. Se validan extensión, MIME declarado,
-  firma `%PDF-`, tamaño y lectura básica antes de reemplazar el CV vigente. Un rechazo no lo sustituye.
+- EXTRA096: entradas PDF/JPG/JPEG/PNG de hasta5 MiB; imágenes estáticas hasta16MP,
+  convertidas a PDF de hasta5 MiB sin metadatos ni recortes. WebP excluido. Se validan
+  extensión, MIME, firma, integridad y tamaño; un rechazo no sustituye el CV vigente.
 - El acceso al CV pasa por un Route Handler autenticado que vuelve a comprobar propietario, rol y
   autorización vigente en cada solicitud, transmite el archivo con `Cache-Control: private,
   no-store` y no entrega URLs reutilizables. Esto permite revocar inmediatamente nuevos accesos desde
   el portal; una copia ya descargada queda fuera del control técnico del sistema y debe quedar
   cubierta por el aviso y la política pendiente de OQ-001.
-- Los metadatos y versiones quedan en PostgreSQL; reemplazar archiva la versión anterior. No hay
+- Los metadatos y versiones quedan en PostgreSQL; reemplazar marca superseded la versión anterior. No hay
   eliminación automática hasta que exista una política de retención aprobada. Cada derivación
-  guarda `cv_document_id`; un reemplazo solo afecta derivaciones futuras.
+  guarda `cv_document_id`; las nuevas postulaciones fijan su elección desde el alta.
+  Casos legados/nominaciones sin elección usan el general vigente al derivar.
 - El límite de 5 MiB resuelve la configuración técnica de la demostración, pero OQ-017 continúa
   requiriendo ratificación municipal antes de tratar documentos reales.
 
@@ -1066,7 +1239,7 @@ microservicios ni un backend separado para el MVP.
 | OQ-005 | Oficina de Empleo | Métricas internas y CSV genérico | Informes oficiales adicionales | Ejemplo de formato y aprobación escrita |
 | OQ-006 | Beex / Municipalidad | Solo local, preview y demo ficticia | Configuración/despliegue productivo | Plan escrito de operador, hosting, región, backups, incidentes y SMTP |
 | OQ-010 | Oficina de Empleo | Modelo versionable/multiselección y fixtures ficticios | Seed final y aceptación del catálogo | Catálogo canónico versionado y aprobación escrita |
-| OQ-017 | Plan técnico / Municipalidad | PDF y máximo técnico de 5 MiB solo para demo | CV reales y aceptación municipal del límite | Ratificación escrita de formatos y tamaño |
+| OQ-017 | Plan técnico / Municipalidad | EXTRA096: PDF/JPG/JPEG/PNG, máximo5 MiB y normalización a PDF para demo | CV reales y aceptación municipal del límite | Ratificación escrita de formatos y tamaño |
 | OQ-018 | Oficina de Empleo | Flujo/contrato versionado, sin inferencia | Importador histórico definitivo y su aceptación | Muestra anonimizada, mapeo versionado y aprobación escrita |
 
 Un PR, issue, acta, correo o mensaje incorporado al repositorio sirve como evidencia si identifica

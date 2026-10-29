@@ -22,16 +22,18 @@ export function CandidatePrivacyForm({ version, consent, policy }: {
     <h2 className="text-xl font-semibold">Privacidad</h2>
     <p>Este permiso operativo no sustituye los términos de uso del registro. Aceptar esos términos no habilita derivaciones ni modifica este permiso.</p>
     <p>Al aceptar, autorizás a la Oficina de Empleo a registrar y usar tus datos para acompañar tu búsqueda laboral y gestionar futuras derivaciones. Es un consentimiento general, no una aceptación por cada oferta.</p>
-    <p>Si la Oficina confirma una contratación en una de tus participaciones, tu consentimiento vigente se retira automáticamente y se revocan los accesos de todas las empresas que dependan de él. No se cambian tus otras participaciones ni sus resultados y se conserva el historial.</p>
+    <p>Si la Oficina confirma una contratación, tu disponibilidad cambia a «No disponible» y no se realizan nuevas derivaciones mientras sigas en ese estado. Tu consentimiento se conserva: no tenés que aceptarlo de nuevo por cada oferta ni por una contratación. Tus otras participaciones y su historial no cambian.</p>
     <details>
       <summary className="cursor-pointer font-semibold">Más información</summary>
       <div className="mt-3 space-y-3">
         <p>Una empresa solo puede ver tu perfil laboral, tus contactos vigentes y el CV asociado a su derivación cuando la Oficina de Empleo te deriva a una oferta de esa empresa y el permiso sigue vigente. No puede ver tu DNI, domicilio ni notas internas, ni consultar el padrón de candidatos.</p>
         <p>Las empresas a las que la Oficina ya te haya derivado podrán seguir viendo únicamente tu nombre para identificar esas derivaciones e informar sus resultados, incluso cuando termine el permiso. Esto no les devuelve acceso a tu perfil, contactos, foto ni CV.</p>
-        <p>Corregir un resultado no restablece el consentimiento. Para otorgarlo de nuevo tenés que volver a aceptarlo expresamente desde este formulario; eso no reabre participaciones ni devuelve accesos revocados.</p>
+        <p>La empresa que te contrata conserva el acceso autorizado durante 30 días desde que la Oficina confirma la contratación, siempre que el permiso siga vigente. Los permisos de otras derivaciones mantienen sus condiciones. Una contratación tardía o una corrección no devuelve accesos revocados.</p>
+        <p>Si retiraste el consentimiento, para otorgarlo de nuevo tenés que aceptarlo expresamente desde este formulario. Esa aceptación no reabre participaciones ni devuelve accesos revocados.</p>
       </div>
     </details>
     <p>Permiso actual: {accepted ? "vigente" : consent?.status === "withdrawn" ? "retirado" : "pendiente"}.</p>
+    {accepted && <p>Ya aceptaste el consentimiento. No necesitás volver a aceptarlo mientras siga vigente.</p>}
     <p className="text-sm">Política operativa: {policy.version}. Es una política de demostración pendiente de aprobación municipal.</p>
     <Form key={`${version}-${consent?.status ?? "pending"}`} action={action} result={state} className="grid gap-3" aria-busy={pending}>
       <input type="hidden" name="version" value={version} />

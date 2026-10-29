@@ -1,5 +1,50 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Notificaciones
+
+Ver docs/operations/portal-notifications.md. Aplicar20261028235316 antes de la UI.
+Desde candidato postular y comprobar que cada admin recibe su fila; abrir como
+admin1 no marca admin2. Nominación/preentrevista/derivación avisan al titular;
+fecha/canal visibles, notas/recomendaciones ocultas. Empresa recibe su derivación;
+informe contratado/no seleccionado avisa admins, confirmación normal/tardía avisa
+candidato. Envío/reenvío a revisión, publicación/rechazo y perfil empresarial
+completo generan destinatarios exactos. Recurso archivado/ajeno y cuenta suspendida
+no acceden; rollback no deja avisos/negocio parcial; reintento no duplica. Campana5,
+lista20, Ver más, teclado/foco,390/1440px y axe. Sin correo/backfill/entrevista
+empresarial nueva ni cambios de consentimiento/disponibilidad/permisos.
+
+## EXTRA096 — CV por postulación
+
+Ver `docs/operations/application-cv.md`. Aplicar20261028210445 antes de UI.
+Probar PDF/JPG/JPEG/PNG hasta5 MiB; excluir WebP/animación/formatos falsos. Desde
+postulación usar CV general o específico, sin reemplazar general/otra oferta.
+Reemplazar general después y comprobar la selección inicial desde postulaciones,
+caso municipal y empresa derivada; empresa ajena/revocada sin archivo. Carga propia
+y presencial con imágenes, error conserva archivo, móvil/teclado/axe y nueva pestaña.
+Ejecutar pgTAP026 y regresiones de activación/matching/derivación/contratación.
+
+EXTRA087 sustituye EXTRA086: comprobar avance cada3s en1440px y390px, vuelta al
+principio y solo flechas circulares (EXTRA088), sin Pausar/Reanudar. Hover/foco pausan temporalmente y
+reanuda solo al salir; reduced-motion/pestaña oculta sin avance, cleanup al
+desmontar y cero/una oferta sin timer. Sin reset ni migración.
+
+## EXTRA085 — Portal y archivos
+
+Con datos ficticios: verificar que Home arranque en la última publicación y
+avance circular con hasta10 ofertas y vecinos correctos en ambos extremos,
+con0/1/varias ofertas y móvil/escritorio.
+Descargar métricas filtradas como PDF/XLSX: período/categoría/foto,0/decimales/
+pendientes, títulos largos y acentos, referencias opacas y ningún dato privado
+adicional. Abrir con lector independiente y revisar páginas/hojas sin fórmulas.
+Denegar anónimo/candidato/empresa y filtros duplicados/desconocidos; conservar
+pruebas CSV. Verificar PDF desde build con fuente embebida/tracing.
+Auditar todas las superficies; candidatos/asistidos y orden matching deben
+enviar GET nativo con controles nombrados, categorías repetibles opacas y sin
+página anterior. Mantener defaults, multiselección OR y localidad opcional;
+back/forward/recarga y validación siguen al servidor. Abrir popup con fondo
+desplazado: wheel/touch no mueven fondo, interior sigue accesible; cierre/Escape/
+nominación/desmontaje restauran scroll/foco. Tipos/lint/pruebas/build y navegador.
+
 ## Incremento EXTRA073 — Oferta administrativa
 
 En fixture ficticio aislado con la nueva migración, abrir una oferta publicada
@@ -456,3 +501,12 @@ El `.env.example` futuro documentará nombres sin secretos:
 
 No se incorpora una variable SMTP productiva ni secretos de cron mientras sus decisiones sigan
 pendientes o el trabajo se ejecute dentro de Supabase Cron.
+# Verificación focal EXTRA094
+
+En Supabase ficticio aislado aplicar nueva migración y ejecutar suite pgTAP.
+Contratación normal/tardía conserva eventos de consentimiento, marca No disponible,
+audita actor/fecha/causa y mantiene otros casos. Permiso normal sigue hasta720h,
+tardío revocado permanece; retirar manualmente conserva cierres/revocación.
+Abrir CV desde perfil propio/admin/empresa/preview conserva pestaña origen y usa
+PDF inline sin URL Storage. Métricas seis tarjetas/dos gráficos/detalle cerrado,
+exports completos y mismos filtros; probar cero/null y390/1440px/teclado/axe.

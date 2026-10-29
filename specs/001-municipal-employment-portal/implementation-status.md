@@ -1,6 +1,118 @@
 # Estado de implementación — 2026-09-22
 
-**Estado vigente: ver actualizaciones hasta 2026-10-25 al final.** Los apartados previos son
+## EXTRA101 — Corrección de aserciones E2E del PR83
+
+CI40799278979/c1eb7e4: database/Vercel PASS; application pasa1346 unit, tipos/lint/
+tooling/build/SQL y128 E2E, falla dos prohibiciones anteriores a la agenda aprobada
+N3 y bloquea seis recorridos dependientes. Pruebas ajustadas a fecha/canal propios,
+manteniendo negativos concretos de notas/resumen/recomendación/estados internos
+y ausencia de agenda ajena. RED2/GREEN5 sin omisiones/reintentos y tipos/lint/diff
+PASS. Producto, migración alojada y CI intactos. Nueva ejecución del mismo PR83
+en seguimiento; no se declara aprobada antes de recibir los checks.
+
+## EXTRA100 — Migración de avisos aplicada por solicitud posterior
+
+2026-10-28:20261028235316/portal_notifications aplicada y registrada en el proyecto
+vinculado kyjycjojzhwggjuqjnki. Transacción guardada y postcheck independiente:
+seis funciones/search_path/ACL, RLS/política, cinco índices/FK/trigger, SQL exacto
+en historial y smoke público PASS. Datos/definiciones previas conservados, sin
+backfill ni casos de prueba alojados. Tres WARN0029 por RPC autenticados previstos
+en contrato, sin EXECUTE anónimo ni grants directos nuevos. Recibos ignorados en
+test-results; EXTRA100 en cambios-extra.md. No commit/PR/deploy de interfaz aún.
+
+Publicación posterior solicitada: commit8de1c5b sin firma y PR83 abierto hacia
+main desde feat/portal-notifications, adjunto al chat. Cambio local next-env.d.ts
+preservado fuera del commit. Checks/revisión/merge pendientes; no despliegue manual.
+
+## EXTRA099 — Avisos privados,2026-10-28
+
+Rama feat/portal-notifications desde7064e3c (PR82 mergeado, CI anterior completa
+en a454c4e/run40780133223). Rama anterior retirada después de confirmar merge;
+next-env.d.ts ajeno conserva SHA256B8B3A344484B959AF5E4E3FC1A1609DAC3CB9ECE0CDEB6C145BE29BC4C491000.
+
+Spec/clarify/plan/modelo/contrato/calidad/tasks/analyze revisados por etapas;
+dos respuestas de Mateo resuelven agenda mínima y exclusión de aviso empresarial.
+El código actual conserva InterviewForm, contrario al supuesto de la pregunta;
+se deja intacto. Dos pendientes históricas del checklist de ofertas conservados
+con autorización expresa de Mateo para continuar en este incremento.
+
+Implementados: fanout auditado atómico, tabla/RLS propia y tres RPC; servicio,
+GET/POST privados, referencias opacas, campana5 y listas20 por rol, anclas de
+participación y agenda propia solo fecha/canal. Eventos normales/tardíos y
+destinatarios de la matriz N1–N6; sin backfill, correo o cambios de estados/permisos.
+
+Verificación en entorno aislado funes-admin-cv-check,54341/54342 y3001:
+1346 unit/componentes y57 tooling PASS; suite SQL1416 PASS y SQL focal ampliado
+57/57 PASS. Tipos/build/lint PASS, DB lint public/private sin errores. Lint general
+incluía falsos positivos de helpers pgTAP transitorios en extensions; producto sin
+errores. E2E/axe/visual final y convergencia documentados debajo. Sin hosted/commit/PR.
+
+Actualización final:26 E2E PASS sin omisiones/reintentos, incluidos registro
+empresarial verificado con cuatro avisos, moderación, permisos HTTP, lectura
+independiente, nominación→agenda→derivación→informe→confirmación, teclado/Escape/
+retorno de foco y axe390/1440. Visual de campana/lista revisada con datos ficticios;
+contraste corregido solo en módulo de filas. Convergencia N1–N6 sin brechas nuevas.
+Servicios aislados detenidos con respaldo; entorno habitual preservado.
+
+EXTRA098 cerrado técnicamente: application/database/Vercel PASS en a454c4e,
+run40780133223; PR82 mergeado7064e3c. El seguimiento pendiente de CI que figura
+en la entrada histórica siguiente se conserva como evidencia de aquella etapa.
+
+## EXTRA098 — Corrección CI del PR82
+
+CI40777824782/1d510dd: application pasó tipos/lint/tooling/unit/build/SQL y falló
+por inventario HTTP obsoleto tras mover postulación a Route Handler. El export
+applyToOfferAction ya no tiene endpoint compilado; se mantiene en inventario con
+exclusión explícita que exige0 y se prueba POST /api/candidate/applications real.
+RED1/GREEN8 HTTP y264 pruebas directas, tipos/lint PASS. Rol/suspensión/candidato
+ajeno rechazados sin crear CV/casos/auditoría ni exponer PII. Sin cambios de producto,
+schema o permisos. Database falló antes de tests por54322 ocupado; observar el
+siguiente runner antes de cambiar configuración. Nueva CI/revisión pendientes.
+
+## EXTRA096 — CV por postulación,2026-10-28
+
+Rama feat/application-specific-cv-and-images desde main bef7ddf (PR81 mergeado).
+PR/rama anterior retirados tras comprobar el merge; next-env.d.ts ajeno preservado.
+Pedido posterior: aplicar migración y publicar PR; evidencia de ejecución EXTRA097.
+
+C1–C6 implementados: PDF/JPG/JPEG/PNG hasta5 MiB, sin WebP; normalización privada
+a PDF, opción general/específico al postular y documento fijo por caso. General,
+otros casos, historia y permisos empresariales conservados. Casos legados y
+nominaciones sin selección siguen tomando general al derivar. Alcance y recovery
+en docs/operations/application-cv.md; esquema y RPC aditivos20261028210445.
+
+Spec→clarify→plan→checklist7/7→tasks→analyze revisados por etapa antes de código;
+cobertura C1–C6 completa, sin críticos/altos ni decisiones funcionales pendientes.
+No equivale a aprobación jurídica ni revisión humana de implementación.
+
+Verificados1292 unit/componentes/104 archivos,57 tooling, tipos y lint, build de
+producción y trazado TTF en ambas rutas. En base ficticia aislada:26 archivos SQL
+1361 PASS y026 ampliado48/48 (1363 pruebas únicas), lint public/private0 errores.
+Recorrido específico con imágenes/perfil/presencial/empresa/revocación y carrera
+de dos envíos PASS. Verificación final E2E ordenada32/32 en3,8min sin omisiones ni
+reintentos PASS; móvil390/1440px, teclado y axe0. Colección del proyecto real y
+dependencias verificadas (132 casos hasta application-cv). Convergencia del delta:
+6 criterios,6 principios y decisiones del plan satisfechos;0 brechas nuevas, sin
+anexar tareas vacías ni cerrar pendientes históricos. T233–T238 completas.
+
+Diagnóstico: los proyectos E2E se agrupan por worker; se añadió dependencia
+application-cv después de chromium para no contaminar conteos originales. Un
+pgTAP de fallo inyectado simultáneo al navegador causó un deadlock de pruebas;
+verificación final por fases, sin tocar backend de suspensión. Capturas ficticias,
+recibos y logs en test-results ignorado. OQ/gates históricos siguen abiertos.
+
+EXTRA097:20261028210445 aplicada y registrada en Supabase compartido por solicitud
+posterior de Mateo. Hash SQL almacenado874964da8450b6c5257c7d4c0726432e y13 cuerpos
+coinciden; ACL/RLS/FK/índices/triggers verificados, historial +1 y recuentos intactos.
+Advisor60→63 WARN solo por los tres RPC autenticados previstos,0 ERROR; ninguna
+exposición nueva a anon ni cambios en datos alojados. Ofertas/filtros públicos
+conservan formato. Publicación del PR y sus checks pendientes; no afirmar deploy UI.
+
+Publicado después: implementación8c0ef6f sin firma/signoff/coautoría y PR82 abierto
+hacia main, sin borrador, adjunto a la conversación. Migración compartida aplicada
+antes de publicar; next-env.d.ts preservado/excluido. CI/revisión/merge pendientes.
+
+**Estado vigente: ver EXTRA096 arriba y las actualizaciones históricas al final.** Los apartados previos son
 registros históricos de cada fase, no una descripción del producto actual.
 
 Rama: `feature/mvp-implementation`. Base de esta continuación: `836dc2b` (`docs: complete implement pt.1`).
@@ -1470,3 +1582,159 @@ Publicación solicitada por Mateo: commit00f06cc sin firma/signoff/coautoría y
 sin borrador, desde feat/admin-opening-workspace; adjunto a la conversación.
 Incluye EXTRA073/T208–212 y migración alojada ya aplicada. next-env.d.ts y todos
 los respaldos ignorados quedan fuera. CI/revisión/merge/despliegue pendientes.
+
+## 2026-10-27 — EXTRA085: ofertas recientes, archivos y filtros
+
+Implementado en `feat/portal-offers-metrics-filters` desde main b900485, sin
+commit/publicación. Home conserva orden servidor published_at DESC/ID DESC y
+carrusel 3D/móvil con extremos acotados. Métricas permite PDF y Excel reales,
+filtrados/autorizados/auditados, conservando CSV. Filtros compuestos en servidor
+GET con islas cliente para combobox/validación; matching aplica orden explícito.
+Popup bloquea fondo y conserva desplazamiento interior y restauración de foco.
+Sin migración ni variables nuevas. Inventario/operación:
+`docs/implementation/portal-filters-audit.md`; contrato
+`contracts/portal-reports-and-filters.md`.
+
+Tipos/lint/build/diff PASS;1242 pruebas/100 archivos y57 tooling;67 focales PASS.
+pgTAP1314/25 archivos y fixture aislado500 candidatos/50 empresas/100 ofertas/
+1000 participaciones/500 CV ficticios PASS. Diez E2E y repetición final del popup
+PASS, sin retries; binarios PDF/XLSX, permisos y auditoría+3, GET opaco múltiple,
+orden/paginación/nominación, desktop/móvil, bloqueo/restauración comprobados.
+PDF14p leído/renderizado con encabezados/acentos/última fila; XLSX parser/XML sin
+contenido activo ni UUID. Ambas fuentes en tracing;21 hashes runtime coinciden
+con build. Cobertura100% se limita al env/schema configurado. next-env.d.ts
+preexistente conservado. Audit mantiene los siete avisos del main; no se agregan
+avisos por las librerías de informes. Incidencias de entorno y resultados reales
+en EXTRA085. T213–218 completos; P1–P4 cubiertos y sin pendientes funcionales
+focales detectados. Revisión humana/CI/aceptación global pendientes.
+## 2026-10-27 — EXTRA086: carrusel automático
+
+T219 implementado: avance5s en desktop y móvil, retorno al inicio, controles
+manuales conservados y Button Pausar/Reanudar accesible. Hover de mouse pausa;
+foco/tacto pausa hasta acción expresa; reduced-motion inicia pausado y pestaña
+oculta no avanza. Sin dependencia, datos ni migración nuevos. Ocho focales PASS;
+suite1247/100 anterior al último ajuste táctil PASS, cubierto luego por focales.
+Tipos/lint/build PASS. Cinco recorridos browser finales cubiertos y PASS tras
+corregir el entorno aislado y una expectativa de espacios SSR (EXTRA086).
+Capturas1440/390 revisadas, código compilado coincide por hash. Trabajo existente
+y next-env.d.ts ajeno preservados. Sin commit/PR/CI/deploy; revisión humana pendiente.
+## 2026-10-27 — EXTRA087: tres segundos sin botón adicional
+
+T220 sustituye presentación/temporización de EXTRA086 por petición expresa:
+carrusel automático3000ms con solo flechas. Quita Button/iconos/ref/pausa manual;
+hover/foco son temporales y se reanuda solo al salir. Conserva reduced-motion,
+visibilidad, reinicio y cleanup. Seis focales, tipos/lint/build/diff PASS; cuatro
+E2E desktop/móvil sin retries PASS, ausencia de Pausar/Reanudar comprobada. Código
+compilado coincide por hash; next-env.d.ts ajeno preservado. Sin migración/reset/
+cambios alojados. Misma rama, sin commit/PR/CI; revisión humana pendiente.
+## 2026-10-27 — EXTRA088: diez ofertas y vecinos circulares
+
+T221 implementado: Home pide10 públicas, conserva orden publicación DESC/ID DESC;
+coverflow muestra última/penúltima a izquierda de primera y primera/segunda a
+derecha de última, con flechas modulares y Embla loop móvil. Mantiene auto3s y
+solo flechas, sin cambiar catálogo, conteos, elegibilidad ni SQL.31 focales PASS,
+tipos/lint/build/diff PASS; cuatro recorridos browser finales cubiertos y PASS,
+con vecinos/cruces de extremos1440/390, límite10, auto/hover y reduced-motion.
+Capturas primera/última revisadas y hashes de fuente/build coinciden. Incidencia
+solo de viewport de prueba documentada en EXTRA088. next-env.d.ts ajeno intacto.
+Sin reset/migración/dependencia/hosted/commit/PR/CI; revisión humana pendiente.
+## 2026-10-27 — Publicación del PR80
+
+Mateo solicita el PR. Base remota b900485 confirmada sin divergencia. Suite final
+1250/100 y cobertura env/schema100% PASS. Commit de implementación5936d25,
+sin firma/coautoría, publicado en feat/portal-offers-metrics-filters. PR abierto
+(no draft): https://github.com/maximo-Pdev/funes-empleo/pull/80 . Comprende
+EXTRA085–088; next-env.d.ts ajeno excluido y preservado. CI/revisión humana/merge
+pendientes. No se ejecutó despliegue manual ni cambios alojados de base de datos.
+## 2026-10-27 — EXTRA089: recuperar accesibilidad del PR80
+
+Run40571403004 falló solo application en accesibilidad administrativa360/1366;
+database/tipos/lint/tooling1250pruebas/build pasaron. Input auxiliar de localidad
+ocupaba100% del viewport por falta de contenedor posicionado. CandidateSearchForm
+ahora posiciona su wrapper relativo; sin clipping global ni cambio de validación,
+GET, controles, permisos o datos. RED2/2 y GREEN8 E2E (seis roles/tamaños y dos
+filtros general/asistido),13 componentes y tipos/lint/build/diff PASS; hashes de
+fuente/build coinciden, next-env.d.ts ajeno intacto. T222 implementado. Publicación
+sin firma en PR80; CI posterior/revisión humana se verifican en los checks del PR.
+No se dan por aprobados por las pruebas locales. Sin reset o cambios alojados.
+## 2026-10-27 — EXTRA090/091: completar recorridos del PR80
+
+Run40573996246 supera accesibilidad y121 E2E; seis fallos: Localidad ambigua en
+3 pruebas, enlace presencial antiguo, popup múltiple cubriendo submit y axe en
+Popup/List sin nombre. Ajustados selectores por rol/enlace vigente/Escape y nombres
+aria de los cuatro callers, conservando primitivas/controles/validación. Tres nuevas
+regresiones prueban menús abiertos con axe y restauración de foco.
+
+La corrida dirigida7/9 descubre otro defecto: canonicalReferenceRoute normaliza
+espacios a '+' y referenceUrl a '%20' aun sin sustituir UUID; redirige en bucle al
+filtrar frases con categorías. Se omite reconstrucción si no cambia identificador;
+se conservan encoding, repetidos, orden, guards y conversión legada. RED4 nuevas;
+GREEN47 referencias/descargas. Final1254/100, tipos/lint/build/diff PASS. Siete E2E
+finales PASS tras siete anteriores; seis casos originales recuperados y menús
+abiertos/frases verificadas sin alterar umbrales/timeouts ni force clicks. T223/224
+implementados; nueva CI/revisión humana en PR80. next-env.d.ts ajeno preservado.
+Sin migración/hosted/reset; Docker reiniciado en segundo plano por motor detenido.
+## 2026-10-27 — EXTRA092: observación concurrente de estados vigentes
+
+Run40601364799 pasa130 E2E, database/Vercel; falla solo SC-008A por textos antiguos
+con ':'. Sonda ahora usa texto exacto dentro de región Oferta y empresa/status
+Resultado o estado vigente, conservando todos los límites y comprobaciones.
+Primer ensayo local usó erróneamente data-slot ausente; SQL confirmó las cuatro
+mutaciones y se corrigió para observar texto real. Segundo control frío aislado
+PASS: cuatro actores, barrera común, cuatro acciones <=5s y auditorías/versiones
+íntegras. Dos resets solo del proyecto ficticio propio; entorno habitual intacto.
+Diagnóstico seguro del recibo agregado, sin stdout/stderr crudos.2 inventarios,
+57 tooling, tipos/lint/diff PASS; sin código de producto nuevo ni presupuesto
+relajado. T225 implementado, corrección en PR80 sin firma; nueva CI/revisión
+humana pendientes. Otros escenarios alojados de rendimiento no ejecutados.
+
+## 2026-10-27 — EXTRA093: pausa del carrusel estable ante física subpíxel
+
+Run40605431687 pasa129 E2E y falla solo por asentamiento móvil de0.04px.
+La prueba observa ahora el índice de la oferta visible en lugar de una cadena
+transform fraccionaria; mantiene3s, hover3200ms y polling5s. Seis repeticiones
+1440/390 PASS sin retries, tipos/lint/diff PASS. Sin cambio de producto/build/SQL;
+T226 implementado, nueva CI y revisión de PR80 pendientes al publicar.
+# 2026-10-28 — EXTRA094: CV, métricas y disponibilidad
+
+Rama feat/cv-metrics-candidate-availability desde main e864cfb tras merge80
+confirmado; rama anterior retirada local/remota, next-env.d.ts ajeno intacto.
+Spec/clarificaciones/plan/modelo/contratos/calidad/tareas/análisis previos; cobertura
+R1–R5 sin críticos/altos, decisiones explícitas de Mateo, no aprobación legal.
+
+CV proxy inline y cuatro enlaces nueva pestaña, guardas/versiones/refs intactas.
+Métricas seis indicadores y dos gráficos HTML servidor, detalle/definiciones
+plegados y exports completos. Consentimiento vigente no vuelve a solicitarse.
+Migración20261028104205 cambia disponibilidad atómicamente en normal/tardía,
+conserva consentimiento/otros casos y fija720h solo permiso propio todavía active.
+Revocado/tardío no recupera datos; retiro manual sigue global, sin backfill.
+
+1257 unit/100 archivos, tooling57, tipos/lint/build/diff PASS.1315 SQL/25 archivos
+PASS, normal/tardía/720h/roles/retirada/rollback/otros casos/legado. Advisor security
+local sin incidencias. Treinta E2E iniciales PASS y tres reparados entre seis finales
+PASS,33 escenarios afectados cubiertos sin retries/omisiones. Diagnósticos de
+selectores viejos y visor PDF headless en EXTRA094; sin cambios de producto para
+ocultarlos.1440/390px visual/axe0/teclado, exports reales y popup/origen PASS.
+Convergencia acotada5/5 sin brechas nuevas, T227–232 implementados.
+
+Solo base ficticia propia funes-admin-cv-check fue reiniciada;500 PDF de prueba,
+puertos3001/54341/54342. Entorno habitual preservado. Migración alojada, publicación,
+commit/PR/CI y revisión humana pendientes; no se declaran suite E2E completa,
+SC008A fría de cuatro administradores ni tareas históricas del MVP cerradas.
+
+## 2026-10-28 — EXTRA095: aplicación alojada solicitada
+
+Mateo solicita migración y PR. MCP carece de permisos para el proyecto; CLI
+vinculado sí permite acceso. Dry-run --skip-vault detecta versiones antiguas
+remotas distintas. Se verifica baseline exacto y aplica solo20261028104205 con
+registro de versión/nombre/SQL en la misma transacción, sin repair ni pendientes
+ajenas. Hash cuerpo/archivo almacenado coinciden, firma/ACL/RLS/search_path y
+recuentos de negocio intactos; historial +1. Advisor60 WARN previos sin nuevos,
+cero ERROR. No contratación real/backfill/deploy manual ni restauración de permisos.
+Publicación de commit/PR y sus checks pendientes en este punto; pruebas locales
+de EXTRA094 siguen válidas, no hubo nuevos cambios de producto.
+
+Publicación posterior autorizada: implementación77c41b5 sin firma/signoff/coautoría
+y PR81 abierto hacia main, sin borrador, adjunto a la conversación. Evidencia de
+migración alojada en EXTRA095; CI/revisión/merge aún pendientes. next-env.d.ts
+ajeno y test-results/credenciales excluidos. No despliegue manual de UI.

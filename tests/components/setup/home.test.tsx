@@ -83,13 +83,13 @@ it("renders the offers preview below the opening viewport", async () => {
   expect(information.id).toBe("ofertas-disponibles");
   expect(information.getAttribute("tabindex")).toBe("-1");
   expect(within(information).getByRole("heading", { name: "Ofertas disponibles" })).toBeTruthy();
-  expect(within(information).getByText("Explorá una selección de las búsquedas vigentes aprobadas por la Oficina de Empleo.")).toBeTruthy();
+  expect(within(information).getByText("Las búsquedas vigentes más recientes, publicadas por la Oficina de Empleo.")).toBeTruthy();
   expect(within(information).getByRole("link", { name: "Ver todas las ofertas" }).getAttribute("href")).toBe("/ofertas");
 });
 
 it("lists fetched offers as preview cards in the carousel", async () => {
   listPublicOffers.mockResolvedValue({
-    total: 3, page: 1, pageSize: 12,
+    total: 3, page: 1, pageSize: 10,
     items: [
       { id: "1", slug: "operario", company_name: "Metalúrgica Funes", title: "Operario de planta", tasks: "", requirements: "", vacancies: 2, location: "Funes", modality: "onsite", schedule: "Lun a Vie", contract_type: "fixed_term", closing_date: "2026-12-31", salary: null, benefits: null, categories: [{ id: "c1", name: "Producción" }] },
       { id: "2", slug: "admin", company_name: "Comercio SA", title: "Administrativo", tasks: "", requirements: "", vacancies: 1, location: "Funes", modality: "onsite", schedule: "", contract_type: "permanent", closing_date: "2026-11-30", salary: null, benefits: null, categories: [] },
@@ -99,6 +99,7 @@ it("lists fetched offers as preview cards in the carousel", async () => {
   render(await HomePage());
   const information = screen.getByRole("region", { name: "Ofertas disponibles" });
   expect(within(information).getByRole("link", { name: "Operario de planta" }).getAttribute("href")).toBe("/ofertas/operario");
+  expect(listPublicOffers).toHaveBeenCalledWith({ page: 1, pageSize: 10 });
   expect(within(information).getByText("Metalúrgica Funes")).toBeTruthy();
   expect(within(information).getAllByText(/Presencial/)).toHaveLength(3);
   expect(within(information).getByText(/2 vacantes/)).toBeTruthy();

@@ -4,7 +4,7 @@
 
 The administrator overview lives at `/admin` and is the first sidebar destination
 and successful administrator login destination. `/account` remains Cuenta;
-`/admin/metrics` keeps period/category filters and CSV. Both overview and metrics
+`/admin/metrics` keeps period/category filters and CSV/PDF/XLSX. Both overview and metrics
 reuse actual `getMetrics` rows: horizontal bars replace count cards, and a donut
 shows mutually exclusive opening states, never overlapping category counts.
 Preserve text equivalents, unavailable/zero/pending distinctions and municipal
@@ -16,6 +16,78 @@ verified active sessions keep their role panel access, not registration tabs,
 role selection or closing registration shortcuts. Anonymous registration and
 independent form drafts remain unchanged. See `odd/tasks/final-portal-improvements.md`
 for active scope, pending checks and the separate legal/operational consent rules.
+## EXTRA099 — Notificaciones privadas
+
+Campana en DashboardShell/HomeNavbar privado; inicio público sin consultas de
+avisos. Reutilizar Button/Popover Base adaptados, cinco recientes y lista propia20
+por página. Pendientes por cuenta, Sin leer accesible, fecha/hora local, errores
+distintos de vacío, contador99+ con valor completo en etiqueta. Foco restaurado
+al cerrar, teclado/Escape y scroll interno del Popover;390px sin overflow.
+Filas usan Form/POST y tokens de superficie/texto con CSS de módulo acotado para
+evitar el fondo de submit global; mantener foco y contraste de fechas/pendientes.
+Cada aviso navega al destino propio opaco. Preentrevista del candidato solo fechas
+y canal, sin evaluaciones. Archivo muestra recurso no disponible, sin asunto viejo.
+
+## EXTRA096 — CV por postulación
+
+CV acepta PDF/JPG/JPEG/PNG hasta5 MiB; excluir WebP/video y animaciones. Explicar
+que imágenes se preparan como PDF; no cambiar visor o estilos de formularios.
+En Postularme, archivo opcional: sin archivo usa CV general actual; con archivo
+usa CV específico sin reemplazar general. Selección fija después de enviar.
+Errores conservan archivo/datos; éxito deshabilita nuevo envío hasta refresh.
+Caso municipal y postulaciones propias enlazan CV elegido, referencia opaca y
+nueva pestaña. Reutilizar Form/FileInput/Button y foco de feedback.
+
+## EXTRA094 —2026-10-28
+
+CV: Abrir CV, nueva pestaña y rel noopener noreferrer; conservar estilos/primitivas.
+Métricas: gráficos de barras y dona visibles en el paneo de `/admin` y en métricas,
+con el mismo renderer, etiquetas/valores textuales y tokens, sin depender del color.
+Sin las seis tarjetas resumen ni esconder su reemplazo en Ver detalle. La dona usa
+solo estados de oferta mutuamente excluyentes; categorías superpuestas no forman
+una distribución. Definiciones en Más información, guardas, filtros y descargas
+completas CSV/PDF/XLSX intactas. Revisión S2/L36 de EXTRA102 sustituye solo la
+jerarquía visual anterior de EXTRA094, no los indicadores o sus cálculos.
+Consentimiento aceptado muestra estado, sin checkbox/botón de aceptación. Texto
+explica conservación al contratar y No disponible, acceso720h de empresa contratante
+y que permisos revocados no regresan. Privacidad operativa vive en Cuenta, no en
+Perfil; retiro manual explícito sigue disponible y conserva sus efectos globales.
+Solo ausencia/retiro requiere nueva aceptación afirmativa. Los términos legales
+del registro son independientes y no conceden permiso de derivación. Datos de
+prueba siguen sin aprobación legal.
+
+## Portal follow-ups — EXTRA085
+
+EXTRA090: name both popup and list of every combobox for its field (categories,
+locality and offer options), including open/closing states. Reuse the adapted
+Base primitives and their ARIA props. Multiple selection stays open until Escape
+or dismissal; tests should operate the visible combobox by role and close it
+before acting on controls it covers. Keep native auxiliary validation inputs.
+
+EXTRA089: the candidate-search locality wrapper is positioned relative so its
+visually hidden native FormData/validation input stays within the field under
+administrative full-width input rules. Preserve native validation and combobox
+focus; do not hide page overflow or relax viewport/accessibility checks.
+
+EXTRA088: Home shows the ten newest eligible offers by publication date. Keep the
+3D/mobile carousel with circular neighbors and previous/next navigation: last and
+penultimate left of first, first and second right of last. Mobile uses Embla loop
+with its fallback for insufficient slides. Candidate preview dialogs lock background
+scrolling while keeping internal scrolling, Escape and focus restoration.
+
+EXTRA087 supersedes EXTRA086: advance every three seconds on desktop and mobile,
+then return to the first offer. Keep only previous/next buttons (circular EXTRA088);
+remove Pausar/Reanudar. Mouse hover and focus pause only while interacting;
+leaving resumes automatically. Reduced-motion disables autoplay and hidden tabs
+do not advance. Use pointer-type-aware hover to avoid permanent touch hover.
+
+Search forms are composed on the server with native GET names and opaque category
+references. Keep shared validation and combobox interaction as narrow client
+islands. Candidate locality is optional; matching order applies with an explicit
+“Aplicar orden” submit and resets pagination. Metrics offers separate filtered PDF
+and Excel downloads using existing institutional colors and local PDF fonts.
+See `docs/implementation/portal-filters-audit.md` for the surface inventory.
+
 
 ## PR 78 validation and matching corrections — EXTRA-084
 
@@ -47,7 +119,7 @@ Replace the former role-guide cards with “El portal en números”: Postulante
 registrados, Empresas registradas and Ofertas vigentes. Use three balanced cards
 on desktop and a single column below 768px, the existing institutional tokens,
 Sora numbers, Be Vietnam labels and decorative Lucide icons. Counts come from
-`public_portal_counts`, never constants or the twelve-card carousel limit.
+`public_portal_counts`, never constants or the ten-card carousel limit (EXTRA088).
 Count nonarchived profiles, including assisted/imported, incomplete and suspended
 registrations; count offers through the same public eligibility view as the catalog.
 Render genuine zero as zero; render unavailable totals as an em dash with an
@@ -85,6 +157,10 @@ El enlace destacado usa data-slot=link-button para conservar el texto blanco
 de sus variantes frente al override de enlaces del panel, también en hover.
 Historial de moderación conserva cinco eventos iniciales y revela cinco por
 Mostrar más; ocultar ese botón si no quedan otros. Mantener foco y anuncio.
+
+Historical EXTRA072 presentation below is superseded by S12/S18/EXTRA102: privacy
+controls belong to Cuenta, and hiring copy follows EXTRA094. Do not restore the
+Perfil consent block, automatic withdrawal on hire or repeated acceptance.
 
 EXTRA072: Consentimiento de prueba del perfil propio muestra dos párrafos
 visibles y cuatro dentro de Más información, cerrado inicialmente. Usar el texto

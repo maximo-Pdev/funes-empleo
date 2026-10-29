@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./home.module.css";
+import { NotificationCenter } from "@/features/notifications/components/notification-center";
 
 function subscribeToVisibility(onChange: () => void) {
   const mobile = window.matchMedia?.("(max-width: 767px)");
@@ -30,7 +31,7 @@ function hasScrolled() {
 
 type PanelAccess = { href: string; label: string };
 
-export function HomeNavbar({ alwaysVisible = false, panel = null }: { alwaysVisible?: boolean; panel?: PanelAccess | null } = {}) {
+export function HomeNavbar({ alwaysVisible = false, panel = null, notifications = false }: { alwaysVisible?: boolean; panel?: PanelAccess | null; notifications?: boolean } = {}) {
   const pathname = usePathname();
   const homeCurrent = pathname === "/" ? "page" : undefined;
   const offersCurrent = pathname === "/ofertas" || pathname?.startsWith("/ofertas/") ? "page" : undefined;
@@ -92,6 +93,7 @@ export function HomeNavbar({ alwaysVisible = false, panel = null }: { alwaysVisi
         <div className={styles.navbarLinks}>
           {alwaysVisible ? <Link href="/" aria-current={homeCurrent}>Inicio</Link> : <a href="#contenido" aria-current={homeCurrent}>Inicio</a>}
           <Link href="/ofertas" aria-current={offersCurrent}>Ofertas</Link>
+          {notifications && <NotificationCenter />}
           {panel ? <Link href={panel.href} className={styles.navbarPanel} aria-current={panelCurrent}>Mi cuenta</Link>
             : !alwaysVisible && <a href="#contenido" className={styles.navbarPanel}>Ingresar</a>}
         </div>

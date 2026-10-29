@@ -31,7 +31,7 @@ for (const [number, state] of [[3, "revocado"], [8, "vigente"], [1, "contratado"
     if (state === "revocado") {
       await expect(section.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toHaveCount(0);
       await expect(section.getByRole("heading", { name: "Contactos vigentes", exact: true })).toHaveCount(0);
-      await expect(section.getByRole("link", { name: /Descargar CV/ })).toHaveCount(0);
+      await expect(section.getByRole("link", { name: /Abrir CV/ })).toHaveCount(0);
       await expect(section).toContainText("Se conserva únicamente su nombre");
       expect((await page.request.get(`/api/cv/${persistedReference("cv", id("cv", number))}`)).status()).toBe(404);
       for (const width of [1440, 390]) {
@@ -47,7 +47,7 @@ for (const [number, state] of [[3, "revocado"], [8, "vigente"], [1, "contratado"
       await expect(section.getByRole("button", { name: "Enviar informe" })).toHaveCount(0);
     } else {
       await expect(section.getByRole("heading", { name: "Perfil laboral derivado", exact: true })).toBeVisible();
-      await expect(section.getByRole("link", { name: /Descargar CV/ })).toBeVisible();
+      await expect(section.getByRole("link", { name: /Abrir CV/ })).toBeVisible();
     }
   });
 }

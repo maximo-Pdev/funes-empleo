@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
+import { MAX_CV_BYTES } from "./cv-policy";
 
-const MAX_BYTES = 5 * 1024 * 1024;
 const MIN_BYTES = 1;
 const forbiddenActions = /\/(?:JavaScript|JS|Launch|EmbeddedFile|OpenAction|AA)\b/i;
 
@@ -8,7 +8,7 @@ export type ValidatedPdf = { bytes: Uint8Array<ArrayBuffer>; safeName: string; s
 
 export function validatePdf(name: string, declaredMime: string, bytes: Uint8Array): ValidatedPdf | null {
   if (!/\.pdf$/i.test(name) || declaredMime !== "application/pdf" ||
-    bytes.byteLength < MIN_BYTES || bytes.byteLength > MAX_BYTES) return null;
+    bytes.byteLength < MIN_BYTES || bytes.byteLength > MAX_CV_BYTES) return null;
   const text = Buffer.from(bytes).toString("latin1");
   if (!/^%PDF-1\.[0-7]\r?\n/.test(text) || forbiddenActions.test(text)) return null;
   const eof = text.lastIndexOf("%%EOF");

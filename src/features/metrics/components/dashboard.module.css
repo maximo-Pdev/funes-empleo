@@ -1,19 +1,21 @@
-.overview { display: grid; gap: 2rem; }
+.overview { display: grid; gap: 2rem; min-width: 0; }
+.overview > * { min-width: 0; }
 .counts { display: grid; gap: 1rem; }
 .count { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .35rem 1rem; padding-block: .5rem; border-bottom: 1px solid var(--color-border); }
-.count dt { color: var(--color-foreground-secondary); }
+.count dt { color: var(--color-foreground-secondary); overflow-wrap: anywhere; }
 .count dd { margin: 0; font-family: var(--font-heading); font-weight: 600; font-variant-numeric: tabular-nums; }
 .track { grid-column: 1 / -1; height: .5rem; overflow: hidden; background: var(--color-secondary); border-radius: .25rem; }
 .bar { height: 100%; background: var(--color-brand-primary); border-radius: inherit; }
 .distribution { margin: 0; padding: 1.5rem; background: var(--color-secondary); }
 .distribution figcaption { margin-bottom: 1.25rem; font-weight: 600; }
-.distributionBody { display: flex; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
-.donut { width: 11rem; aspect-ratio: 1; flex-shrink: 0; border-radius: 50%; position: relative; }
+
+.donut { width: min(11rem, 100%); aspect-ratio: 1; flex-shrink: 0; border-radius: 50%; position: relative; }
 .donut::after { content: ""; position: absolute; inset: 25%; border-radius: 50%; background: var(--color-secondary); }
-.legend { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; }
+.legend { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: .6rem; }
 .legend li { display: flex; align-items: center; gap: .5rem; }
 .swatch { width: .75rem; height: .75rem; flex-shrink: 0; border: 1px solid currentColor; }
 .categories { display: grid; gap: 1rem; list-style: none; padding: 0; }
-.category { padding-block: .75rem; border-bottom: 1px solid var(--color-border); }
+.category { overflow-wrap: anywhere; padding-block: .75rem; border-bottom: 1px solid var(--color-border); }
+.category .track { margin-top: .5rem; }
 @media (min-width: 1100px) { .overview { grid-template-columns: minmax(0, 1fr) minmax(16rem, .85fr); align-items: start; } }
 @media (forced-colors: active) { .bar { background: Highlight; } .donut { display: none; } }

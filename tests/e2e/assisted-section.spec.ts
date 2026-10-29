@@ -46,7 +46,9 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByRole("button", { name: "Comprobar duplicados y guardar" }).click();
     await expect(page).toHaveURL(/\/admin\/candidates\/can-[0-9a-f]{24}$/);
     if (number === 1) firstReference = new URL(page.url()).pathname.split("/").pop()!;
-    await page.getByRole("link", { name: "Volver a perfil asistido", exact: true }).click();
+    const back = page.getByRole("link", { name: "Volver a perfil asistido", exact: true });
+    await expect(back).toHaveAttribute("href", "/admin/atencion-presencial");
+    await back.click();
   }
   await page.goto(`/admin/atencion-presencial?term=${encodeURIComponent(name)}&pageSize=1`);
   const results = page.getByRole("region", { name: "Perfiles de atención presencial" });
@@ -58,6 +60,7 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
   await expect(results.getByRole("link", { name: `${name} 2`, exact: true })).toBeVisible();
   await page.getByLabel("Categorías", { exact: true }).click();
   await page.getByRole("option", { name: "Categoría ficticia A" }).click();
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Buscar candidatos" }).click();
   await expect(page).toHaveURL(/categoryId=rub-[0-9a-f]{24}/);
   await expect(results.getByRole("heading", { name: "Perfiles: 1", exact: true })).toBeVisible();

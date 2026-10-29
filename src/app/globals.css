@@ -143,6 +143,12 @@ html {
   scroll-behavior: smooth;
 }
 
+/* The native candidate preview owns scrolling while its modal is open. */
+html:has(dialog[data-candidate-preview][open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--color-page);

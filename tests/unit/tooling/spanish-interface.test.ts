@@ -38,7 +38,8 @@ it("no renderiza códigos crudos ni vocabulario inglés en vistas o mensajes", (
 it("la medición reutiliza etiquetas españolas y el select de disponibilidad sin cambiar sus valores", () => {
   const benchmark = readFileSync("tests/quality/demo-performance.mjs", "utf8");
   expect(benchmark).toMatch(/getByRole\("region",\{name:"Oferta y empresa",exact:true\}\)\.getByText\("Publicada",\{exact:true\}\)/);
-  expect(benchmark).toContain('hasText:`Resultado o estado vigente ${n===1?"Preseleccionada":"Persona contratada"}`');
+  expect(benchmark).toContain('filter({hasText:"Resultado o estado vigente"}).getByText(n===1?"Preseleccionada":"Persona contratada",{exact:true})');
+  expect(benchmark).not.toContain("Resultado o estado vigente:");
   expect(benchmark).toMatch(/getByLabel\("Disponibilidad",\s*\{exact:true\}\)\.selectOption\("available"\)/);
   expect(benchmark).not.toMatch(/Estado: (?:published|pending_review|draft)/);
 });

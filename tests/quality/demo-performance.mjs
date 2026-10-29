@@ -84,7 +84,7 @@ try {
         await p.getByRole("button",{name:n===0?"Guardar decisión":n===2?"Guardar contacto":"Registrar acción",exact:true}).click();
         if(n===0) await expect(p.getByRole("region",{name:"Oferta y empresa",exact:true}).getByText("Publicada",{exact:true})).toBeVisible();
         else if(n===2) await expect(p.getByText(`Contacto ficticio concurrente ${resetId}`,{exact:true})).toBeVisible();
-        else await expect(p.getByRole("status").filter({hasText:`Resultado o estado vigente ${n===1?"Preseleccionada":"Persona contratada"}`})).toBeVisible();
+        else await expect(p.getByRole("status").filter({hasText:"Resultado o estado vigente"}).getByText(n===1?"Preseleccionada":"Persona contratada",{exact:true})).toBeVisible();
         const duration=performance.now()-start;
         return {action:names[n],admin:n+1,startOffset:start-barrier,milliseconds:duration,limit:5000,pass:duration<=5000};
       } catch { return {action:names[n],admin:n+1,startOffset:start-barrier,milliseconds:performance.now()-start,limit:5000,pass:false,error:"UI_SUCCESS_NOT_OBSERVED"}; }
