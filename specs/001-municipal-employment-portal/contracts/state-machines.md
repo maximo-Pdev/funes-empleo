@@ -163,6 +163,15 @@ Las 720 horas corresponden solo a permisos históricos anteriores a EXTRA035, no
 purga de perfil, CV e historial. Las nuevas confirmaciones normales o tardías a `hired` retiran el
 consentimiento global y no fijan una nueva ventana de acceso.
 
+El informe empresarial `not_selected` requiere un motivo no vacío, tanto en el formulario como
+en la validación de aplicación y en `submit_company_feedback(uuid,text,text)` (EXTRA-086).
+Los demás informes conservan el detalle opcional. Un rechazo por motivo omitido, vacío o de
+solo espacios no agrega feedback ni auditoría ni cambia la participación. Un informe válido
+conserva su motivo, queda pendiente de revisión municipal y no confirma el resultado final.
+No se inventan motivos para registros anteriores. La migración aditiva conserva firma, grants,
+control de titularidad y bloqueo de participación; recuperar la versión previa requiere una
+sustitución revisada de la función, nunca borrar informes ni auditoría.
+
 ## Permiso de derivación
 
 | Comando | Actor | Desde | Hacia | Motivo/código | Precondiciones y efecto |

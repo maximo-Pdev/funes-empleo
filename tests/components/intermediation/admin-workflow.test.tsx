@@ -2,6 +2,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 const router = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
+import { OpeningCandidateMatchesList } from "@/features/participations/components/opening-candidate-matches-list";
+import { openingPreview } from "../../fixtures/opening-preview";
+const nomination = vi.hoisted(() => ({ preview: vi.fn(), create: vi.fn() }));
+vi.mock("@/features/candidates/matching-actions", () => ({ openingCandidatePreviewAction: nomination.preview }));
+vi.mock("@/features/participations/nomination-actions", () => ({ createAdminNominationAction: nomination.create }));
 import { ModerationForm } from "@/features/openings/components/moderation-form";
 import { CandidateSearchForm } from "@/features/participations/components/candidate-search-form";
 import { ParticipationActionForm } from "@/features/participations/components/participation-action-form";
@@ -10,6 +15,19 @@ import { ParticipationTimeline } from "@/features/participations/components/part
 import { FeedbackReviewPanel } from "@/features/participations/components/feedback-review-panel";
 
 describe("intermediación administrativa", () => {
+  it("continues nomination to the actual case through an opaque action reference", async () => {
+    nomination.preview.mockResolvedValue({ code: "OK", profile: { ...openingPreview, cvReference: "cv-111111111111111111111111" } });
+    nomination.create.mockResolvedValue({ code: "OK", participationId: openingPreview.id, participationReference: "cas-111111111111111111111111" });
+    Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true, value: function(this: HTMLDialogElement) { this.setAttribute("open", ""); } });
+    Object.defineProperty(HTMLDialogElement.prototype, "close", { configurable: true, value: function(this: HTMLDialogElement) { this.removeAttribute("open"); } });
+    render(<OpeningCandidateMatchesList openingId={openingPreview.id} openingReference="ofe-111111111111111111111111" matches={{ available: true, total: 1, page: 1, pageSize: 12, items: [{ id: openingPreview.id, displayName: "Persona ficticia", locality: "Funes", participationId: null, matchedCategories: [] }] }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ver perfil de Persona ficticia" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Nominar a esta oferta" }));
+    const next = await screen.findByRole("link", { name: "Continuar evaluación y derivación" });
+    expect(next.getAttribute("href")).toBe("/admin/participations/cas-111111111111111111111111");
+    expect(next.getAttribute("href")).not.toContain(openingPreview.id);
+    expect(screen.getByRole("status").textContent).toContain("todavía no recibe");
+  });
   it("exige una explicación empresarial para corrección y separa el motivo interno", () => {
     const submit = vi.fn();
     render(<ModerationForm openingId="offer-1" version={2} status="pending_review" onSubmit={submit} />);

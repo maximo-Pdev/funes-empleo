@@ -1,12 +1,13 @@
 "use client";
 import { Form } from "@/components/forms/form";
+import Link from "next/link";
 import { Field } from "@/components/forms/field";
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { applyToOfferAction, withdrawParticipationAction } from "../candidate-actions";
 
-export function CandidateApplyForm({ openingId, candidateVersion, disabled, alreadyApplied = false }: {
-  openingId: string; candidateVersion: number; disabled: boolean; alreadyApplied?: boolean;
+export function CandidateApplyForm({ openingId, candidateVersion, disabled, alreadyApplied = false, participationsHref = "/dashboard?section=postulaciones" }: {
+  openingId: string; candidateVersion: number; disabled: boolean; alreadyApplied?: boolean; participationsHref?: string;
 }) {
   const router = useRouter();
   const [state, action, pending] = useActionState(applyToOfferAction, { message: "", success: false });
@@ -15,7 +16,8 @@ export function CandidateApplyForm({ openingId, candidateVersion, disabled, alre
   return <Form action={action} result={state} className="mt-3 grid gap-2" aria-busy={pending}>
     <input type="hidden" name="openingId" value={openingId} /><input type="hidden" name="candidateVersion" value={candidateVersion} />
     <p ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{state.message}</p>
-    <button disabled={disabled || pending || alreadyApplied} className="rounded bg-blue-800 p-2 text-white disabled:opacity-50">{alreadyApplied ? "Participación registrada" : "Postularme"}</button>
+    <button disabled={disabled || pending || alreadyApplied || state.success} className="rounded bg-blue-800 p-2 text-white disabled:opacity-50">{alreadyApplied || state.success ? "Participación registrada" : "Postularme"}</button>
+    {(alreadyApplied || state.success) && <Link href={participationsHref} className="inline-flex min-h-11 items-center text-primary underline underline-offset-4">Ver mis postulaciones</Link>}
   </Form>;
 }
 

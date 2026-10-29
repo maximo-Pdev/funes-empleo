@@ -8,6 +8,8 @@ export const companyFeedbackInput = z.object({
   referralId: id,
   reportedOutcome: z.enum(["hired", "not_selected", "candidate_withdrew", "process_cancelled", "other"]),
   message: shortMessage.optional(),
+}).refine(value => value.reportedOutcome !== "not_selected" || Boolean(value.message), {
+  message: "Indicá el motivo de no selección.", path: ["message"],
 });
 
 export const companyInterviewInput = z.object({

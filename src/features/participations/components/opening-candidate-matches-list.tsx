@@ -25,6 +25,7 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [continuation, setContinuation] = useState<string | null>(null);
   const [removed, setRemoved] = useState<Set<string>>(() => new Set());
   const [pending, startTransition] = useTransition();
   const visible = matches.items.filter(candidate => !removed.has(candidate.id) && !candidate.participationId);
@@ -82,6 +83,7 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
           router.refresh();
           return;
         }
+        setContinuation(result.participationReference ? `/admin/participations/${result.participationReference}` : null);
         setRemoved(previous => new Set(previous).add(selected.id));
         setNotice("Candidato nominado a esta oferta. La empresa todavía no recibe su perfil.");
         closeDialog();
@@ -102,6 +104,7 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
         }} />
     </div>
     {notice && <p role="status" className="rounded border border-green-300 bg-green-50 p-3 text-green-950">{notice}</p>}
+    {continuation && <Link href={continuation} className="inline-flex min-h-11 items-center text-primary underline">Continuar evaluación y derivación</Link>}
     {!matches.available ? <EmptyState title="Coincidencias no disponibles" description="La oferta debe estar publicada o pausada, vigente y pertenecer a una empresa activa." /> : <>
       <p aria-live="polite">Coincidencias: {total}</p>
       {!visible.length ? <EmptyState title="Sin candidatos en esta página" description="No hay perfiles aptos sin participación previa. Revisá los rubros o volvé a la primera página." /> :

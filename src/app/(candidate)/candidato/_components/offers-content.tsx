@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin, ShieldCheck, CircleAlert } from "lucide-react";
 import { Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import styles from "../_components/candidate-forms.module.css";
@@ -12,7 +13,9 @@ function OfferSummary({ offer }: { offer: PublicOffer }) {
   return <div className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
     <p className="font-semibold text-foreground">{offer.company_name}</p>
     <p className="flex items-start gap-2"><MapPin className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{offer.location}</p>
-    <p className="flex items-start gap-2"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {offer.closing_date}</p>
+    <p className="flex items-start gap-2"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {formatPublicClosingDate(offer.closing_date)}</p>
+    <p>Modalidad: {publicModalityLabel(offer.modality)} · Vacantes: {offer.vacancies}</p>
+    <p>Rubros: {offer.categories.map(category => category.name).join(", ") || "Sin rubros informados"}</p>
   </div>;
 }
 export async function renderCandidateOffersContent({ workspace, page, oferta, profileHref = "/dashboard?section=perfil", offersHref = "/dashboard?section=ofertas" }: {
@@ -25,6 +28,14 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
     const params = new URLSearchParams(query);
     params.set("page", String(number));
     if (oferta) params.set("oferta", oferta);
+    return `${path}?${params}`;
+  };
+  const participationsHref = (slug: string) => {
+    const [path, query] = offersHref.split("?");
+    const params = new URLSearchParams(query);
+    params.set("section", "postulaciones");
+    params.delete("page");
+    params.set("oferta", slug);
     return `${path}?${params}`;
   };
   const joinedOfferIds = new Set(participations.map((item) => item.opening_id));
@@ -45,7 +56,7 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
       <h2 className="break-words text-xl font-bold text-primary-900">Oferta elegida: {selectedOffer.title}</h2>
       <OfferSummary offer={selectedOffer} />
       {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-5 max-w-md`}><CandidateApplyForm openingId={selectedOffer.id} candidateVersion={workspace.profile.version}
-        disabled={!enabled} alreadyApplied={joinedOfferIds.has(selectedOffer.id)} /></div>}
+        disabled={!enabled} participationsHref={participationsHref(selectedOffer.slug)} alreadyApplied={joinedOfferIds.has(selectedOffer.id)} /></div>}
     </section>}
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-primary-900">Ofertas vigentes</h2><p className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700"><ShieldCheck className="h-4 w-4" aria-hidden="true" />Revisadas por la Oficina</p></div>
     {offers.items.length === 0 ? <Card className="p-8 text-center sm:p-12"><BriefcaseBusiness className="mx-auto h-10 w-10 text-primary" aria-hidden="true" /><h3 className="mt-4 text-xl font-bold text-primary-900">No hay ofertas vigentes en esta página.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Podés volver a consultar más adelante y mantener tu perfil actualizado.</p><Link href={profileHref} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-primary hover:bg-secondary">Ir a mi perfil<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card> :
@@ -53,7 +64,7 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
         <Card className="flex h-full flex-col p-6"><h3 className="break-words text-xl font-bold leading-7"><Link href={`/ofertas/${offer.slug}`} className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary">{offer.title}</Link></h3>
           <OfferSummary offer={offer} />
           {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-auto pt-5`}><CandidateApplyForm openingId={offer.id} candidateVersion={workspace.profile.version}
-            disabled={!enabled} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
+            disabled={!enabled} participationsHref={participationsHref(offer.slug)} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
         </Card>
       </li>)}</ul>}
     <Pagination aria-label="Páginas de ofertas" className="mt-6">
