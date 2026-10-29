@@ -82,6 +82,27 @@ it("no cambia slugs públicos, URL externas, hashes ni tokens de Auth", async ()
   }
   expect(mocks.rpc).not.toHaveBeenCalled();
 });
+it.each([
+  ["/admin/candidates", "categoryId", "rub-0123456789abcdef01234567"],
+  ["/admin/atencion-presencial", "categoryId", "rub-0123456789abcdef01234567"],
+  ["/admin/participations", "openingId", "ofe-0123456789abcdef01234567"],
+  ["/admin/metrics", "category", "rub-0123456789abcdef01234567"],
+  ["/api/admin/exports/operations.csv", "category", "rub-0123456789abcdef01234567"],
+  ["/empresa/ofertas/ofe-0123456789abcdef01234567", "referral", "der-0123456789abcdef01234567"],
+])("keeps spaced canonical queries idempotent with repeated references on %s", async (path, key, code) => {
+  const href = `${path}?term=Persona+ficticia+001&${key}=${code}&${key}=${code}&page=2`;
+  expect(await referenceUrl(href)).toBe(href);
+  await canonicalReferenceRoute(path, { term: "Persona ficticia 001", [key]: [code, code], page: "2" });
+  expect(mocks.redirect).not.toHaveBeenCalled();
+  expect(mocks.rpc).not.toHaveBeenCalled();
+});
+it("distinguishes spaces from literal plus and keeps encoded filter values and anchors", async () => {
+  const category = "rub-0123456789abcdef01234567";
+  mocks.rpc.mockResolvedValue({ data: { [id]: category }, error: null });
+  const result = await referenceUrl(`/admin/candidates?term=Persona+%2B+rubro+%26+lugar&categoryId=${id}&page=2#resultados`);
+  expect(result).toBe(`/admin/candidates?term=Persona+%2B+rubro+%26+lugar&categoryId=${category}&page=2#resultados`);
+  expect(await referenceUrl(result)).toBe(result);
+});
 it("canonicaliza la oferta y el selector de derivación en la página empresarial integrada", async () => {
   mocks.rpc.mockImplementation(async (_name, args) => ({ data: {
     [id]: args.p_kind === "opening" ? "ofe-0123456789abcdef01234567" : "der-0123456789abcdef01234567",

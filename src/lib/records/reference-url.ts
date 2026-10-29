@@ -34,7 +34,7 @@ export async function referenceUrl(href: string): Promise<string> {
     let index = 0;
     const rebuilt: [string, string][] = Array.from(url.searchParams.entries()).map(([k, value]) =>
       k === key ? [k, converted[index++]!] : [k, value]);
-    url.search = `?${rebuilt.map(([k, value]) => `${encodeURIComponent(k)}=${encodeURIComponent(value)}`).join("&")}`;
+    url.search = new URLSearchParams(rebuilt).toString();
   }
   return url.pathname + url.search + url.hash;
 }
