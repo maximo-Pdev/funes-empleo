@@ -25,6 +25,10 @@
   alojada; next-env ajeno conserva SHA256 B8B3A344…491000. Sin migración, commit,
   PR/publicación ni revisión humana implícitos. T258 completo; no quedan brechas
   del alcance reducido ni cambios en gates históricos pendientes.
+- **Publicación solicitada:** commit sin firma 361f7eb; PR86 abierto hacia main:
+  https://github.com/maximo-Pdev/funes-empleo/pull/86. Incluye solo el ajuste de
+  ofertas, sus pruebas y trazabilidad. Sin merge, aceptación humana o CI aprobado
+  implícitos; next-env ajeno excluido.
 
 ## EXTRA-107 — Retirar también la tarjeta de sesión iniciada del inicio
 
