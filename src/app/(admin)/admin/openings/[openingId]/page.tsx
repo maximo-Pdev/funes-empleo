@@ -1,5 +1,6 @@
 import { WorkflowSteps } from "@/components/ui/workflow-steps";
 import { companyOpeningWorkflow } from "@/domain/presentation/workflow-steps";
+import { formatCalendarDate } from "@/lib/time/presentation";
 import { recordReference, recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { DEFAULT_OPENING_MATCH_ORDER } from "@/domain/catalogs/opening-match-order";
@@ -49,7 +50,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         <h2 id="opening-details" className="text-xl font-semibold">Oferta y empresa</h2>
         <p>Empresa: <strong>{opening.company_profiles?.legal_name ?? "Sin nombre"}</strong></p>
         <p className="flex flex-wrap items-center gap-2">Estado <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
-        <p>Fecha de cierre: {opening.closing_date ?? "Sin definir"}</p>
+        <p>Fecha de cierre: {opening.closing_date ? formatCalendarDate(opening.closing_date) : "Sin definir"}</p>
         <p>Vacantes: {opening.vacancies ?? "Sin definir"}</p>
         <p>Localidad: {opening.location ?? "Sin definir"}</p>
         <p>Modalidad: {publicModalityLabel(opening.modality ?? "Sin definir")}</p>

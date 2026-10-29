@@ -417,8 +417,11 @@ usa actor `system` y código controlado, no un motivo humano.
 
 ### `participations`
 
-Unifica postulación propia y asociación administrativa; existe como máximo una participación no
-archivada por candidato/oferta.
+Unifica postulación propia y asociación administrativa. EXTRA102: existe como
+máximo una participación no archivada cuyo estado no sea withdrawn por
+candidato/oferta. Pueden coexistir varios retirados históricos. Solo una nueva
+postulación propia puede ignorarlos; nominación administrativa conserva bloqueo
+por cualquier caso no archivado. Cada intento conserva ID/CV/eventos/permisos.
 
 | Campo | Regla |
 | --- | --- |

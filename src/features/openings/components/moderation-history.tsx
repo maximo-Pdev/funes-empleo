@@ -1,4 +1,5 @@
 "use client";
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { useEffect, useRef, useState } from "react";
 import { Button, EmptyState } from "@/components/ui";
 import { displayLabel, moderationDecisionLabels, openingStatusLabels } from "@/domain/presentation/labels";
@@ -21,7 +22,7 @@ export function ModerationHistory({ events }: { events: ModerationHistoryEvent[]
       <ol ref={list} className="space-y-3">{events.slice(0, visible).map(event => <li key={event.id} tabIndex={-1}
         className="rounded-lg border border-border bg-surface p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
         <p className="font-semibold">{displayLabel(moderationDecisionLabels, event.decision, "Decisión registrada")}: {event.previousStatus ? displayLabel(openingStatusLabels, event.previousStatus) : "Inicio"} → {displayLabel(openingStatusLabels, event.newStatus)}</p>
-        <p className="text-sm text-muted-foreground"><time dateTime={event.at}>{new Date(event.at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires", hour12: false })}</time>{event.actorLabel ? ` · ${event.actorLabel}` : ""}</p>
+        <p className="text-sm text-muted-foreground"><time dateTime={event.at}>{formatFunesDateTime(event.at)}</time>{event.actorLabel ? ` · ${event.actorLabel}` : ""}</p>
         {event.message && <p className="mt-2">Mensaje de la Oficina: {event.message}</p>}
         {event.internalReason && <p className="mt-2">Motivo interno: {event.internalReason}</p>}
       </li>)}</ol>}

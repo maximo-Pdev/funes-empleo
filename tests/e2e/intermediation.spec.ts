@@ -226,10 +226,14 @@ test("la Oficina registra contacto y nota interna sin mostrarlos a la empresa", 
   await page.goto(`/admin/participations/${fixtureId("participation", 7)}`);
   await page.getByLabel("Canal", { exact: true }).selectOption("phone");
   await page.getByLabel("Dirección").selectOption("inbound");
-  await page.getByLabel("Fecha y hora (Funes)").fill("2026-09-20T12:00");
+  const contactDate = page.getByLabel("Fecha y hora (Funes)");
+  await expect(contactDate).toHaveAttribute("type", "datetime-local");
+  await contactDate.fill("2026-09-20T12:00");
   await page.getByRole("textbox", { name: "Resumen interno" }).fill("Contacto municipal ficticio sobre seguimiento.");
   await page.getByRole("button", { name: "Guardar contacto" }).click();
   await expect(page.getByText("Contacto municipal ficticio sobre seguimiento.")).toBeVisible();
+  const contact = page.getByRole("listitem").filter({ hasText: "Contacto municipal ficticio sobre seguimiento." });
+  await expect(contact).toContainText("20/09/2026, 12:00:00");
 
   await page.goto(`/admin/candidates/${fixtureId("profile", 7)}`);
   await page.getByLabel("Tipo").selectOption("record_training_guidance");
@@ -325,7 +329,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     // municipal evaluation or the actual internal participation stage.
     await expect(nominated.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toBeVisible();
     await expect(nominated).toContainText("Canal: Teléfono");
-    await expect(nominated.getByText(/^Realizada:/)).toContainText("24/9/2026");
+    await expect(nominated.getByText(/^Realizada:/)).toContainText("24/09/2026");
     await expect(nominated).not.toContainText(/Preseleccionada|Derivada|Resumen interno|Recomendación/);
     await expect(nominated).not.toContainText("Preentrevista municipal ficticia.");
     await nominated.getByLabel("Confirmo que quiero retirar esta participación.").check();

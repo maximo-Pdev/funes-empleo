@@ -1,3 +1,4 @@
+import { formatCalendarDate, formatFunesDate } from "@/lib/time/presentation";
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, ClipboardList, CircleCheck, CircleSlash, FileText, ShieldCheck, UserRound } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
@@ -12,7 +13,7 @@ import { listSuggestedOffers } from "@/features/openings/recommendations-service
 const closedStatuses = ["hired", "not_selected", "withdrawn", "cancelled", "no_company_response"];
 
 function receivedOn(value: string) {
-  return new Date(value).toLocaleDateString("es-AR");
+  return formatFunesDate(value);
 }
 
 export async function renderCandidateDashboardContent({ workspace, profileHref, participationsHref, offersHref }: {
@@ -82,7 +83,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
             : <ul className={styles.dashboardList}>{suggestions.map(offer => <li key={offer.id}><article className={styles.dashboardItem}>
               <h3 className={styles.itemTitle}><Link href={selectedOfferHref(offer.slug)} className={styles.sectionLink}>{offer.title}</Link></h3>
               <p className={styles.itemMeta}>{offer.company_name} · {offer.location}</p>
-              <p className={styles.itemMeta}>Cierre: {offer.closing_date}</p>
+              <p className={styles.itemMeta}>Cierre: {formatCalendarDate(offer.closing_date)}</p>
               <p className="text-sm text-muted-foreground">Rubros: {offer.categories.map(category => category.name).join(", ")}</p>
             </article></li>)}</ul>}
     </section>

@@ -39,6 +39,9 @@ describe("catálogo de tonos por estado", () => {
     expect(participationStatusTones.awaiting_feedback).toBe("amber");
     expect(participationStatusTones.hired).toBe("green");
     expect(participationStatusTones.not_selected).toBe("neutral");
+    expect(participationStatusTones.withdrawn).toBe("red");
+    expect(participationStatusTones.cancelled).toBe("red");
+    expect(openingStatusTones.cancelled).toBe("neutral");
     expect(accountStatusTones.pending_verification).toBe("amber");
     expect(consentStatusTones.withdrawn).toBe("red");
     expect(cvStatusTones.valid).toBe("green");

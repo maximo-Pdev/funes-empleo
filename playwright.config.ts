@@ -20,9 +20,9 @@ export default defineConfig({
     // The acceptance metrics require the pristine fixture before mutating journeys.
     { name: "metrics-fixture", testMatch: /admin-metrics\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
     { name: "quality-boundaries", testMatch: /(accessibility|authorization-boundaries|action-http|pagination)\.spec\.ts/, dependencies: ["metrics-fixture"], fullyParallel: false, use: { ...devices["Desktop Chrome"] } },
-    { name: "chromium", testIgnore: /(admin-metrics|accessibility|authorization-boundaries|action-http|pagination|acceptance-concurrency|z-application-cv|z-notifications)\.spec\.ts/, dependencies: ["quality-boundaries"], use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium", testIgnore: /(admin-metrics|accessibility|authorization-boundaries|action-http|pagination|acceptance-concurrency|z-application-cv|z-application-retry|z-notifications)\.spec\.ts/, dependencies: ["quality-boundaries"], use: { ...devices["Desktop Chrome"] } },
     // These journeys add published offers; run after baseline exact-count checks.
-    { name: "application-cv", testMatch: /z-(application-cv|notifications)\.spec\.ts/, dependencies: ["chromium"], fullyParallel: false, use: { ...devices["Desktop Chrome"] } },
+    { name: "application-cv", testMatch: /z-(application-cv|application-retry|notifications)\.spec\.ts/, dependencies: ["chromium"], fullyParallel: false, use: { ...devices["Desktop Chrome"] } },
     // Last: this case performs its own cold acceptance reset, then verifies all
     // four independent mutations/audits. It never measures the hosted small demo.
     { name: "acceptance-concurrency", testMatch: /acceptance-concurrency\.spec\.ts/, dependencies: ["application-cv"], fullyParallel: false, use: { ...devices["Desktop Chrome"] } },

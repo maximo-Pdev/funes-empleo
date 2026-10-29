@@ -42,7 +42,7 @@ export function ContactRecordForm({ participationId, version, onSubmit }: {
         { value: "whatsapp", label: "WhatsApp" }, { value: "in_person", label: "Presencial" }]} />
     <SelectField id="contact-direction" label="Dirección" required value={direction} onChange={(event) => setDirection(event.target.value)}
       options={[{ value: "inbound", label: "Recibido" }, { value: "outbound", label: "Realizado" }]} />
-    <TextField id="contact-date" label="Fecha y hora (Funes)" type="datetime-local"
+    <TextField id="contact-date" label="Fecha y hora (Funes)" type="datetime-local" lang="es-AR"
       value={occurredAtLocal} onChange={(event) => setOccurredAtLocal(event.target.value)} required />
     <TextField id="contact-summary" label="Resumen interno" value={summary}
       onChange={(event) => setSummary(event.target.value)} maxLength={5000} required />

@@ -1,5 +1,65 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA105 — Selector nativo restituido,29/10/2026
+
+Publicado con102/103 en commit sin firma2d4da71,
+[PR85](https://github.com/maximo-Pdev/funes-empleo/pull/85). Rama
+feat/dates-and-application-retry→main adad96c; next-env ajeno excluido.
+Checks/revisión humana pendientes; migración102 ya aplicada según103. No merge.
+
+Mateo corrige104 y elige expresamente conservar selector original después de
+explicar su dependencia de la región del navegador. ContactRecordForm vuelve a
+datetime-local con calendario/edición y estado ISO anteriores, lang es-AR sin
+afirmar orden fijo en Chromium. Eliminados helper/entrada/hint de104 y sus pruebas
+específicas; pruebas de contrato/validación/retención conservadas, fills E2E ISO.
+No cambios de servidor/BD ni nueva migración.1358 unit/componentes/110 archivos,
+57 tooling, tipos/lint/build/diff PASS; navegador ficticio verifica contrato nativo,
+requerido/foco/resumen retenido/guardado/hora Funes/overflow390 y captura revisada.
+Captura del Chromium probado con navegadoren-US/lang es-AR muestra20/09/2026 12:00
+y calendario nativo; no se afirma garantía universal por lang. Mateo optó por
+conservar selector original. Convergencia de la corrección sin brechas.
+EXTRA104 se conserva debajo como evidencia histórica, sustituida por esta decisión.
+
+## EXTRA104 — Fecha de entrada en contacto municipal,29/10/2026
+
+TextField/Form existentes muestran DD/MM/AAAA HH:mm,24h con hint/ejemplo y validan
+calendario mediante conversor Funes ya vigente. Payload ISO local/UTC servidor,
+permisos y BD intactos; sin otra migración. Fecha/resumen conservados ante error,
+error inline rojo/foco y formato independiente del navegador. RED3/GREEN20 focales,
+1375 unit/componentes/111 archivos,57 tooling, tipos/lint/build/diff PASS; cinco
+E2E distintos de contacto/retiro/contratación normal/tardía PASS sin retries o
+omisiones finales. Preparación auxiliar inicial apuntaba contenedor equivocado;
+corregida solo en copia ignorada y repetida2/2 PASS. Axe0/overflow0 móvil390,
+revisión visual de formulario1440/390 con navegadoren-US y captura de error PASS.
+Convergencia sin brechas nuevas; next-env preservado. Publicación/PR pendientes.
+
+## EXTRA102 — Fechas y reintentos propios,2026-10-29
+
+Actualización EXTRA103 por pedido posterior de Mateo:20261029180304 aplicada y
+registrada alojada29/10/2026, misma fuente SQL probada localmente. Índice válido,
+dos cuerpos/ACL/configuración, otras111 funciones, datos/historial previo y smoke
+público verificados; advisors66→66, cero nuevas alertas/ERROR. Sin cuentas/casos
+de prueba alojados. La publicación de interfaz y PR siguen pendientes.
+
+Rama feat/dates-and-application-retry desde main adad96c, rama previa eliminada
+tras confirmar PR83 mergeado. Fechas mostradas numéricas DD/MM/YYYY por calendario
+o instante Funes, PDF/Excel incluidos; ISO/CSV técnico/inputs intactos. Retirada y
+Cancelada rojas. Nuevo caso propio después de retirados, mismo control de aptitud,
+CV, versión y oferta; índice parcial y guardas atómicas conservan historia/permisos
+revocados, bloquean otros finales y no amplían nominación/matching municipal.
+EXTRA102/guía dates-application-retry registra evidencia, migración y recuperación.
+En el cierre inicial se había aplicado solo al fixture propio aislado; posterior
+aplicación alojada documentada arriba. PR pendiente.
+1355 unit/componentes/109 archivos,57 tooling, tipos/lint/build/diff PASS; suite
+1454 SQL/28 archivos y luego075 ampliado40 PASS; lintSQL y advisor local ERROR0.
+22 E2E distintos verificados, incluidos nuevo caso/CV y doble envío, privacidad,
+contratación normal/tardía y notificaciones. Conteo inicial80 se conserva y pasa
+con fixture limpio; runner auxiliar mezclado falló83/80, sin modificar aserción.
+Grupo oficial tardío7/7 PASS sin retries/omisiones tras clasificar retry allí.
+Convergencia del incremento sin brechas nuevas, no cierra gates históricos ni
+revisión humana. next-env ajeno preservado; entorno habitual sin resets/cambios.
+
+
 ## EXTRA101 — Corrección de aserciones E2E del PR83
 
 CI40799278979/c1eb7e4: database/Vercel PASS; application pasa1346 unit, tipos/lint/

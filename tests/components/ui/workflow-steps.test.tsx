@@ -18,7 +18,7 @@ it.each(["/account", "/dashboard"])("shows public offer summaries and keeps cont
   const offer = { id: "offer", slug: "auxiliar-ficticio", title: "Auxiliar", company_name: "Empresa Ficticia", location: "Funes", closing_date: "2026-11-30", vacancies: 2, modality: "on_site", categories: [{ name: "Administración" }] };
   mocks.offers.mockResolvedValue({ items: [offer], page: 1, pageSize: 10, total: 1 });
   mocks.selected.mockResolvedValue(offer);
-  mocks.participations.mockResolvedValue([{ opening_id: "offer" }]);
+  mocks.participations.mockResolvedValue([{ id: "attempt-fictitious", opening_id: "offer", display_status: "received" }]);
   const workspace = { bootstrap: "ready", profile: { status: "active", availability: "available", version: 3 }, cv: {}, consent: { status: "accepted" } } as Parameters<typeof renderCandidateOffersContent>[0]["workspace"];
   render(await renderCandidateOffersContent({ workspace, oferta: offer.slug, offersHref: `${base}?section=ofertas` }));
   const selected = screen.getByRole("region", { name: "Oferta elegida" });

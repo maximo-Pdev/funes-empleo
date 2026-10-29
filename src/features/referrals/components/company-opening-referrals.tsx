@@ -1,3 +1,4 @@
+import { formatFunesDate } from "@/lib/time/presentation";
 import { routeIdentifier } from "@/lib/records/references";
 import { RecordLink as Link, RecordLabel } from "@/components/ui/record-link";
 import { notFound } from "next/navigation";
@@ -30,7 +31,7 @@ export async function CompanyOpeningReferrals({ openingId, requestedReference }:
             <Link href={`/empresa/ofertas/${openingId}?referral=${item.referral_id}#derivaciones`} aria-current={selectedId === item.referral_id ? "page" : undefined}
               className="block min-h-11 break-words rounded-lg border border-border p-3 text-primary-700 hover:bg-secondary aria-[current=page]:border-primary aria-[current=page]:bg-secondary">
               <span className="block font-medium">{item.candidate_name ?? "Candidato de esta derivación"}</span>
-              <span className="block text-sm">{new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeZone: "America/Buenos_Aires" }).format(new Date(item.referred_at))}</span>
+              <span className="block text-sm">{formatFunesDate(item.referred_at)}</span>
               <span className="block break-all text-xs"><RecordLabel kind="referral" id={item.referral_id} /></span>
             </Link>
           </li>)}</ul>

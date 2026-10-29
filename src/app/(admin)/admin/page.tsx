@@ -6,6 +6,7 @@ import { publicErrorFrom } from "@/lib/errors/public-error";
 import { Dashboard } from "@/features/metrics/components/dashboard";
 import { getMetrics, MetricsHistoryUnavailable } from "@/features/metrics/service";
 import { localToday } from "@/validation/metrics";
+import { formatFunesDateTime } from "@/lib/time/presentation";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function AdminOverviewPage() {
     </nav>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}
     {result && <>
-      <p className="mb-5 text-sm text-muted-foreground">Actualizado al {new Date(result.as_of).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}. Los desgloses por categoría pueden superponerse.</p>
+      <p className="mb-5 text-sm text-muted-foreground">Actualizado al {formatFunesDateTime(result.as_of)}. Los desgloses por categoría pueden superponerse.</p>
       <Dashboard rows={result.rows} />
     </>}
   </AdminShell>;

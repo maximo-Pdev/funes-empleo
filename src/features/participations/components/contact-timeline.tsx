@@ -1,8 +1,9 @@
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { contactChannelLabels, displayLabel } from "@/domain/presentation/labels";
 import type { ContactItem } from "../contact-service";
 import { orderContacts } from "../contact-order";
 
-const date = (v: string) => new Date(v).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" });
+const date = (v: string) => formatFunesDateTime(v);
 export function ContactTimeline({ contacts }: { contacts: readonly ContactItem[] }) {
   return <section aria-labelledby="contact-timeline-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
     <h2 id="contact-timeline-title" className="text-xl font-semibold">Historial de contactos</h2>

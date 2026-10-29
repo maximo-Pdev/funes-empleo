@@ -1,5 +1,38 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA102 — Fechas y nueva postulación,2026-10-29
+
+Corrección EXTRA105 solicitada29/10 sustituye104: conservar exactamente el selector
+original de Registrar contacto municipal, datetime-local con calendario y edición
+nativos. Mateo elige conservarlo tras conocer que el orden visible depende de la
+región del navegador. No entrada libre ni calendario de aplicación. Mantener
+validación/foco/retención, occurredAtLocal ISO y conversión Funes/servidor actuales;
+declarar idioma español sin garantizar que fuerce orden en todos los navegadores.
+
+Pedido explícito de Mateo; reemplaza la prohibición de segundo caso únicamente
+para postulación propia cuando todos los casos anteriores no archivados están
+retirados. No modifica las reglas de nominación/matching administrativos.
+
+- **R1:** Fechas mostradas en portal, PDF y Excel: DD/MM/YYYY con año de cuatro
+  dígitos; conservar hora donde ya existe, con zona America/Buenos_Aires. Una
+  fecha calendario mantiene su día. Datos ISO y CSV técnico se conservan. Los
+  selectores actuales se conservan, incluido el contacto municipal según EXTRA105.
+- **R2:** Titular puede enviar una nueva postulación tras retirar una anterior,
+  si oferta/perfil/consentimiento/disponibilidad/CV siguen habilitados. Crear
+  otro caso recibido, con selección de CV independiente y auditoría/avisos normales.
+  Conservar el anterior retirado, documentos, eventos y accesos revocados. No
+  reactivar permisos ni reabrir casos; no permitir duplicados concurrentes o si
+  existe cualquier caso no archivado en otro estado, incluidos finales.
+- **R3:** Participaciones Retirada y Cancelada usan indicador rojo con texto
+  español existente; los demás estados y dominios conservan su presentación.
+
+Aceptación: postular→retirar→postular genera dos casos; segundo envío duplicado
+rechazado; nuevo retiro permite otro intento; fallo de auditoría revierte alta y
+promoción de CV. Caso referido retirado mantiene permiso revocado. Otros casos y
+resultados no se alteran. Fecha de calendario/instante/padding/hora y todos los
+roles/descargas se verifican. El retiro municipal a pedido no amplía nominaciones.
+
+
 ## EXTRA099 — Avisos navegables por perfil,2026-10-28
 
 Pedido explícito de Mateo. Avisos privados dentro del portal, con pendientes/leídos
@@ -1179,6 +1212,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   de forma recuperable mientras no exista una política de retención aprobada. Si la postulación retirada ya tenía una
   derivación, el sistema DEBE revocar inmediatamente el acceso empresarial al perfil, los contactos
   y el CV, conservar el historial administrativo y NO DEBE restaurar ese acceso automáticamente.
+  EXTRA102: el titular PUEDE crear otra postulación propia cuando todos los casos
+  no archivados previos para esa oferta estén retirados y siga cumpliendo FR-030;
+  es un caso nuevo y nunca restaura la participación o el permiso anterior.
 - **FR-017 (Should)**: El sistema DEBERÍA permitir vincular un perfil asistido con la cuenta personal
   del mismo candidato exclusivamente mediante atención presencial. Un administrador DEBE comprobar
   el DNI exhibido sin conservar copia y exigir que la cuenta personal tenga correo verificado antes

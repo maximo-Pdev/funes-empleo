@@ -1,4 +1,5 @@
 "use client";
+import { formatFunesDate } from "@/lib/time/presentation";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { useActionState, useEffect, useRef } from "react";
@@ -65,7 +66,7 @@ export function CandidateProfilePanel({ profile, dni, address, phone, categories
     <CandidatePhotoForm candidateId={profile.id} version={profile.version} photo={photo} name={profile.display_name} cleanupPending={photoCleanupPending} unavailable={photoUnavailable} />
     <section className={styles.section} aria-label="Activación del perfil">
       <p role="status" className={styles.status}>
-        Estado del perfil <Badge variant="status" tone={tone} data-profile-status data-tone={tone}>{displayLabel(candidateProfileStatusLabels, profile.status, "En revisión")}</Badge>. Vigencia: {profile.refresh_due_at ? new Date(profile.refresh_due_at).toLocaleDateString("es-AR") : "pendiente"}.</p>
+        Estado del perfil <Badge variant="status" tone={tone} data-profile-status data-tone={tone}>{displayLabel(candidateProfileStatusLabels, profile.status, "En revisión")}</Badge>. Vigencia: {profile.refresh_due_at ? formatFunesDate(profile.refresh_due_at) : "pendiente"}.</p>
       {canActivate && <Form action={activateAction} result={activation} className="grid gap-3" aria-busy={activating}>
         <h2 className="text-xl font-semibold">Activar perfil</h2><p>Tu perfil cumple los requisitos guardados. Activá tu perfil para postularte y ser considerado por la Oficina de Empleo.</p>
         <input type="hidden" name="version" value={profile.version} /><ActionMessage state={activation} />

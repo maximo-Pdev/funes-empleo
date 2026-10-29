@@ -32,7 +32,7 @@ export const openingStatusTones = {
 export const participationStatusTones = {
   received: "neutral", under_review: "blue", preinterview: "blue", preselected: "blue",
   referred: "violet", company_interview: "violet", awaiting_feedback: "amber", hired: "green",
-  not_selected: "neutral", withdrawn: "neutral", cancelled: "neutral", no_company_response: "neutral",
+  not_selected: "neutral", withdrawn: "red", cancelled: "red", no_company_response: "neutral",
 } satisfies Record<ParticipationStatus, StatusTone>;
 
 export const referralAccessTones = {

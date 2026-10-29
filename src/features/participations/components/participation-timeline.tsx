@@ -1,3 +1,4 @@
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { Badge, FeedbackMessage } from "@/components/ui";
 import type { ParticipationStatus } from "@/domain/states";
 import { participationStatusLabels, displayLabel, auditActionLabel, reasonLabel } from "@/domain/presentation/labels";
@@ -28,7 +29,7 @@ export function ParticipationTimeline({ currentStatus, events }: {
     {events.length === 0 ? <p>No hay eventos registrados todavía.</p> : <ol className="space-y-3 border-l-2 border-slate-300 pl-5">
       {events.map((event) => <li key={event.id} className="rounded-md border border-slate-200 bg-white p-3">
         <p className="font-medium">{displayLabel(participationStatusLabels, event.newStatus, auditActionLabel(event.action))}</p>
-        <p className="text-sm text-slate-700">{new Date(event.occurredAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })} · {event.actorLabel}</p>
+        <p className="text-sm text-slate-700">{formatFunesDateTime(event.occurredAt)} · {event.actorLabel}</p>
         {event.reasonCode && <p className="mt-1 text-sm">Motivo: {reasonLabel(event.reasonCode)}</p>}
         {event.reason && <p className="mt-1 text-sm">Motivo interno: {event.reason}</p>}
       </li>)}

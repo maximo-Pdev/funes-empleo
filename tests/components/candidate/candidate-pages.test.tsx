@@ -86,7 +86,16 @@ it("suggests public offers matching the candidate categories on the dashboard", 
  render(await DashboardPage({ searchParams: Promise.resolve({}) }));
  const suggestions = screen.getByRole("region", { name: "Ofertas según tus rubros" });
  expect(within(suggestions).getByRole("link", { name: offer.title }).getAttribute("href")).toContain("section=ofertas&oferta=");
+ expect(within(suggestions).getByText("Cierre: 30/11/2026")).toBeTruthy();
  expect(mocks.offers).toHaveBeenCalledWith({ rubro: "ADMIN", page: 1, pageSize: 30 });
+});
+it("keeps previously withdrawn offers out of dashboard recommendations", async () => {
+ accountSession();
+ mocks.participations.mockResolvedValue([{ id: "withdrawn-fixture", opening_id: offer.id, opening_title: offer.title, display_status: "withdrawn", version: 2, created_at: "2026-10-07" }]);
+ render(await DashboardPage({ searchParams: Promise.resolve({}) }));
+ const suggestions = screen.getByRole("region", { name: "Ofertas según tus rubros" });
+ expect(within(suggestions).queryByRole("link", { name: offer.title })).toBeNull();
+ expect(within(suggestions).getByText(/No hay sugerencias nuevas/)).toBeTruthy();
 });
 it("loads the persisted photo for sidebar identity outside the profile section", async () => {
  accountSession();

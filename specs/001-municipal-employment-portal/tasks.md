@@ -5,6 +5,59 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA102 — Fechas y reintentos
+
+- [x] T254 [EXTRA105,R1] Por corrección expresa, restaurar selector nativo de
+  contacto con calendario, retirar entrada/helper de104 y alinear pruebas/artefactos.
+  Conservar validación, ISO/Funes y datos ante errores; lang es-AR sin promesa de
+  orden fijo. Mateo confirma conservar selector original; no cambiar su navegador.
+  Tipos/lint/unit/tooling/build y verificación del contrato nativo requeridos.
+  1358 unit/componentes,57 tooling, tipos/lint/build/diff PASS; navegador ficticio
+  prueba requerido/foco/retención/guardado/hora Funes/overflow390. Captura20/09/2026
+  con calendario nativo en Chromium/lang es-AR, sin garantía universal. Sin SQL/hosted.
+
+- [x] T252 [EXTRA104,R1] Adaptar solo entrada de contacto municipal a
+  DD/MM/AAAA HH:mm,24h con mismo TextField/Form y payload ISO/Funes. Helper puro,
+  errores inline/foco/retención, RED/GREEN de calendario/horas/envío/error remoto;
+  docs/contrato alineados antes del cambio de código.
+  Implementación histórica sustituida porT254 a pedido de Mateo; ya no se usa
+  entrada libre, helper ni validación adicional de104.
+- [x] T253 [EXTRA104,R1] Actualizar cuatro entradas E2E al formato visible y
+  verificar contacto/privacidad, navegador en-US/móvil/teclado, tipos/lint/unit/
+  tooling/build. Sin migración/reset habitual ni cambios ajenos.
+  RED3/GREEN20 focales;1375 unit/componentes,57 tooling, tipos/lint/build/diff PASS.
+  Cinco E2E distintos PASS, axe0/móvil/privacidad y prueba visualen-US1440/390;
+  fallo inicial de contenedor auxiliar corregido solo en copia ignorada. Sin SQL.
+
+- [x] T251 [EXTRA103,R2] Por pedido posterior de Mateo, aplicar exclusivamente
+  20261029180304 al Supabase vinculado y registrar SQL exacto transaccionalmente.
+  Pre/postcheck de índice/dos cuerpos/ACL/113 funciones/historial/contadores,
+  smoke público y advisors66→66 sin alertas nuevas/ERROR PASS. Sin pruebas con
+  datos alojados, cambios ajenos, publicación de UI o PR implícitos.
+
+- [x] T247 [R1–R3] Revisar contexto, especificar/clarificar, investigar y planear
+  incremento con modelo/contrato/guía; calidad y cobertura constitucional analizadas
+  antes de código. EXTRA102, gate histórico2 autorizado pendiente, sin aprobarlo.
+- [x] T248 [R2] Migración compatible de índice/guardas y nueva elegibilidad UI;
+  preservar caso/CV/auditoría/permisos previos y nominación. SQL, concurrencia,
+  general/específico y rollback; supabase/tests y candidate offers/CandidateApplyForm.
+- [x] T249 [R1,R3] Centralizar fechas visibles calendario/Funes/PDF/XLSX y rojo de
+  Retirada/Cancelada en status-tone; mantener ISO/inputs/CSV y restantes estados.
+  Pruebas unit/componentes por rol y bordes de calendario/zona.
+- [x] T250 [R1–R3] Verificar tipos/lint/unit/tooling/SQL/build/E2E aislados, documentar
+  recuperación/operación/evidencia y convergencia. Sin aplicar alojado o publicar
+  PR implícitamente. Preservar next-env y servicios/cambios ajenos.
+  1355 unit/componentes,57 tooling, tipos/lint/build/diff PASS; suite1454 SQL y
+  ampliación075 de40 PASS, lintSQL/advisor ERROR0.22 E2E distintos verificados:
+  17/18 iniciales, conteo fallido por orden auxiliar83/80 repetido con fixture
+  limpio PASS y grupo oficial tardío7/7 sin reintentos/omisiones. Colección retry
+  en application-cv confirmada, privacidad/contratación/avisos/axe390/1440 intactos.
+  Guía de recuperación forward-only y artefactos alineados; alojado/PR pendientes.
+
+Dependencias T247→T248/T249→T250. T248/T249 son independientes por historia;
+ejecución de mutaciones/verificaciones DB y navegador secuencial en entorno propio.
+
+
 ## EXTRA099 — Notificaciones del portal
 
 - [x] T246 [EXTRA101,N3] Corregir dos aserciones E2E obsoletas de PR83: agenda

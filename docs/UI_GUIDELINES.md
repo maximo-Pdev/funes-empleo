@@ -16,6 +16,24 @@ verified active sessions keep their role panel access, not registration tabs,
 role selection or closing registration shortcuts. Anonymous registration and
 independent form drafts remain unchanged. See `odd/tasks/final-portal-improvements.md`
 for active scope, pending checks and the separate legal/operational consent rules.
+## EXTRA102 — Fechas y estados de retiro
+
+EXTRA105 sustituye104: Mateo pide conservar exactamente selector de contacto
+municipal original. Usar datetime-local, calendario/edición nativos y lang es-AR;
+no entrada libre/hint nuevo. El orden lo decide la región del navegador; lang no
+lo garantiza. Mantener label, requerido rojo, foco, datos y payload ISO.
+
+Fechas visibles DD/MM/YYYY con ceros y año4; instantes en zona Funes, con la hora
+ya prevista en cada vista. Calendarios conservan su día. Usar helpers compartidos
+de presentación; entradas nativas y valores ISO internos se conservan. Retirada y
+Cancelada de participaciones usan tone red, sin quitar texto o foco accesible.
+
+
+### PR85 integration clarification — EXTRA-106
+
+The dates section above belongs to `EXTRA-102 — Fechas uniformes y nueva postulación tras retiro`; the separate local `EXTRA-102 — Documentation integration for final portal improvements` retains its chart-first history. Both administrator pages keep the same visible bar/donut renderer, never six summary cards or charts hidden behind a detail action. Preserve centralized metric labels, real counts, native GET filters with selected-name tags and keep-open multiselect, and all three visible filtered export actions: CSV, PDF and XLSX. Shared date formatting applies to displayed timestamps and report context, not ISO transport or calendar-day semantics. The separate public Home aggregate cards are unaffected.
+
+EXTRA-105 is the current contact-input decision: native `datetime-local`, `lang="es-AR"`, ISO state and the existing Funes conversion; browser/system regional settings still determine its visible order. EXTRA-104 is retained history, not authorization to restore free text. Only withdrawn self-application history permits a fresh attempt; other blocking states remain blocking. New attempts retain their own fixed CV and history without restoring old access. Existing role-safe workflow guidance, notifications, course links/referral history, private photos and separation of legal terms from operational consent remain intact. This documentation union is static integration, not new browser, SQL, review or acceptance evidence.
 ## EXTRA099 — Notificaciones privadas
 
 Campana en DashboardShell/HomeNavbar privado; inicio público sin consultas de

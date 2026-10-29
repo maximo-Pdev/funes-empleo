@@ -22,6 +22,10 @@ it("genera Excel legible con números reales, pendientes y texto sin fórmulas n
   const bytes = await metricsXlsx(report);
   const sheets = await readExcelFile(bytes);
   expect(sheets.map(sheet => sheet.sheet)).toEqual(["Contexto", "Métricas"]);
+  const context = sheets.find(sheet => sheet.sheet === "Contexto")!.data;
+  expect(context).toContainEqual(["Desde", "01/10/2026"]);
+  expect(context).toContainEqual(["Hasta", "20/10/2026"]);
+  expect(context).toContainEqual(["Foto de consulta", "20/10/2026, 15:00:00"]);
   const rows = sheets.find(sheet => sheet.sheet === "Métricas")!.data;
   expect(rows[1]![1]).toBe(0);
   expect(rows[2]![1]).toBeNull();

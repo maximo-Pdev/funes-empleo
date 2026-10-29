@@ -1,3 +1,4 @@
+import { formatFunesDate, formatFunesDateTime } from "@/lib/time/presentation";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { RecordLink as Link, RecordAnchor } from "@/components/ui/record-link";
 import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel } from "@/domain/presentation/labels";
@@ -43,7 +44,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         <p>Derivación: <strong>{referralEligible ? "Puede evaluarse" : "No disponible actualmente"}</strong></p>
         <p>Localidad: {candidate.locality ?? "Sin informar"}</p>
         <p className="flex flex-wrap items-center gap-2">Disponibilidad <Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></p>
-        <p>Vigencia hasta: {candidate.refresh_due_at ?? "Sin definir"}</p>
+        <p>Vigencia hasta: {candidate.refresh_due_at ? formatFunesDate(candidate.refresh_due_at) : "Sin definir"}</p>
         <p>Habilidades: {candidate.skills_experience_summary ?? "Sin informar"}</p>
         <p>Categorías: {candidate.candidate_categories.map((item) => item.job_categories?.name).filter(Boolean).join(", ") || "Sin categorías"}</p>
       </section>;
@@ -77,7 +78,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         <h2 id="candidate-notes" className="text-lg font-semibold">Notas internas</h2>
         {notes.length === 0 ? <EmptyState title="Sin notas" description="Todavía no hay notas para este perfil." /> :
           <ul className="space-y-3">{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
-            <p><strong>{item.note_kind === "training_guidance" ? "Orientación y capacitación" : "Nota sobre postulante"}</strong> · {new Date(item.created_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" })}</p>
+            <p><strong>{item.note_kind === "training_guidance" ? "Orientación y capacitación" : "Nota sobre postulante"}</strong> · {formatFunesDateTime(item.created_at)}</p>
             <p className="whitespace-pre-wrap">{item.body}</p>
           </li>)}</ul>}
       </section>
