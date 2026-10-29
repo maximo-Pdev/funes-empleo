@@ -1,5 +1,12 @@
 # Municipal visual reference
 
+## EXTRA106/108 — Acceso desde ofertas públicas
+
+En /ofertas, la tarjeta lateral ofrece el panel del rol si existe una sesión
+activa verificada; en ese caso no muestra «Crear cuenta» ni «Iniciá sesión».
+El visitante conserva esos enlaces. Reutilizar controles y tokens existentes.
+Mateo descartó los cambios de inicio/login; su diseño y comportamiento se conservan.
+
 ## EXTRA102 — Fechas y estados de retiro
 
 EXTRA105 sustituye104: Mateo pide conservar exactamente selector de contacto

@@ -1,5 +1,13 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA106/108 — Presentación de acceso en /ofertas
+
+Reutilizar getSiteAccess por request para header y tarjeta lateral en una sola
+lectura de sesión. Si panel existe, ofrecer su href/label por rol; si no,
+conservar registro/login existentes. Sin cambiar servicios de autenticación,
+proxy, autorización, DB, caché global, dependencias ni componentes base.
+Inicio/login y sus pruebas restaurados por pedido explícito de Mateo.
+
 ## EXTRA102 — Diseño de presentación y reintento propio
 
 EXTRA105 sustituye104 por decisión expresa: restaurar TextField datetime-local

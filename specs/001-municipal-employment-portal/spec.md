@@ -1,5 +1,13 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA106/108 — CTA de ofertas públicas, 29/10/2026
+
+Mateo conserva únicamente el ajuste de /ofertas y descarta los cambios de inicio/
+login. Con sesión activa verificada de candidato, empresa o administración,
+la tarjeta lateral de ofertas muestra acceso al panel correspondiente, sin
+«Crear cuenta» ni «Iniciá sesión». Sin sesión conserva esos enlaces y sus destinos.
+No cambia el inicio, registro, recuperación, autorización ni las reglas de sesión.
+
 ## EXTRA102 — Fechas y nueva postulación,2026-10-29
 
 Corrección EXTRA105 solicitada29/10 sustituye104: conservar exactamente el selector

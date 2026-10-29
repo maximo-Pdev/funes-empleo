@@ -1,5 +1,9 @@
 # Contrato de autorización y visibilidad
 
+EXTRA106/108: /ofertas adapta únicamente su CTA al rol activo verificado con
+getSiteAccess servidor por request. No modifica permisos ni autorregistro; ocultar
+enlaces no es un control de seguridad. Home/login conservan el comportamiento previo.
+
 EXTRA099,2026-10-28: cada cuenta activa con sesión viva consulta/abre únicamente
 sus avisos, también para los cuatro admins. No hay bandeja común ni parámetros
 de destinatario. RLS propia, sin escritura directa; RPC de apertura actualiza
