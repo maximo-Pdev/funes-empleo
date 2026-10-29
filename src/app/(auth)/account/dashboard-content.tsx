@@ -7,6 +7,7 @@ import { listMyParticipations } from "@/features/participations/candidate-servic
 import { candidateStatusLabels } from "@/features/participations/candidate-status-labels";
 import { candidateProfileStatusTones, participationStatusTones, statusTone, type StatusTone } from "@/domain/presentation/status-tone";
 import styles from "./account.module.css";
+import { listSuggestedOffers } from "@/features/openings/recommendations-service";
 
 const closedStatuses = ["hired", "not_selected", "withdrawn", "cancelled", "no_company_response"];
 
@@ -24,6 +25,19 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
   const open = items.filter((item) => !closedStatuses.includes(item.display_status));
   const closed = items.filter((item) => closedStatuses.includes(item.display_status));
   const profile = workspace.profile;
+  const selectedIds = new Set(workspace.categories?.map(item => item.category_id) ?? []);
+  const selectedCategories = workspace.allCategories?.filter(item => selectedIds.has(item.id)) ?? [];
+  let suggestions: Awaited<ReturnType<typeof listSuggestedOffers>> = [];
+  let suggestionsUnavailable = false;
+  try {
+    suggestions = await listSuggestedOffers(selectedCategories.map(item => item.code), items.map(item => item.opening_id));
+  } catch { suggestionsUnavailable = true; }
+  const selectedOfferHref = (slug: string) => {
+    const [path, query] = offersHref.split("?");
+    const params = new URLSearchParams(query);
+    params.set("oferta", slug);
+    return `${path}?${params}`;
+  };
   const checks: Array<{ label: string; value: string; tone: StatusTone; done: boolean }> = [
     { label: "Perfil", value: profile ? candidateProfileStatusLabels[profile.status] ?? "Registrado" : "Sin perfil", tone: statusTone(candidateProfileStatusTones, profile?.status), done: profile?.status === "active" },
     { label: "Disponibilidad", value: profile?.availability === "available" ? "Disponible" : "No disponible", tone: profile?.availability === "available" ? "green" : "amber", done: profile?.availability === "available" },
@@ -56,6 +70,21 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
         </ul>
         <p className={styles.summaryNote}><ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />La Oficina de Empleo revisa los perfiles antes de derivarlos a una empresa.</p>
       </Card>
+    </section>
+
+    <section aria-labelledby="dashboard-sugerencias" className={styles.dashboardSection}>
+      <div className={styles.sectionHead}><h2 id="dashboard-sugerencias" className={styles.sectionTitle}>Ofertas según tus rubros</h2>
+        <Link href={offersHref} className={styles.sectionLink}>Ver todas las ofertas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></div>
+      <p className="mb-4 text-sm leading-6 text-muted-foreground">Una selección de ofertas vigentes que coinciden con al menos uno de tus rubros. No implica preselección ni garantiza una contratación.</p>
+      {suggestionsUnavailable ? <p role="status">No pudimos cargar las sugerencias. Podés consultar todas las ofertas.</p>
+        : selectedCategories.length === 0 ? <p>Seleccioná tus rubros en <Link href={profileHref} className={styles.sectionLink}>Mi perfil</Link> para recibir sugerencias.</p>
+          : suggestions.length === 0 ? <p>No hay sugerencias nuevas entre las ofertas recientes de tus rubros. Podés explorar el catálogo completo.</p>
+            : <ul className={styles.dashboardList}>{suggestions.map(offer => <li key={offer.id}><article className={styles.dashboardItem}>
+              <h3 className={styles.itemTitle}><Link href={selectedOfferHref(offer.slug)} className={styles.sectionLink}>{offer.title}</Link></h3>
+              <p className={styles.itemMeta}>{offer.company_name} · {offer.location}</p>
+              <p className={styles.itemMeta}>Cierre: {offer.closing_date}</p>
+              <p className="text-sm text-muted-foreground">Rubros: {offer.categories.map(category => category.name).join(", ")}</p>
+            </article></li>)}</ul>}
     </section>
 
     <section aria-labelledby="dashboard-curso" className={styles.dashboardSection}>
