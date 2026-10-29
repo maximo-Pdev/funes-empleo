@@ -1,5 +1,204 @@
 # Cambios extra necesarios
 
+## EXTRA-105 — Restituir selector de contacto municipal
+
+- **Fecha/origen:** Mateo,29/10/2026: el control anterior estaba bien; pidió
+  únicamente que apareciera día/mes/año. Rechaza la entrada de texto de EXTRA104.
+- **Evidencia/limitación:** datetime-local conserva calendario y edición nativos;
+  la documentación MDN indica que el formato mostrado depende de la región del
+  sistema/navegador, sin API para imponer locale. lang no constituye garantía.
+- **Cambio previo autorizado:** retirar solamente la sustitución104, restaurar
+  datetime-local/estado ISO y edición/calendario anteriores, declarar idioma es-AR
+  sin afirmar que fuerza el orden en Chromium. Retirar helper y pruebas creados
+  solo para texto; adaptar pruebas del contacto al contrato nativo, manteniendo
+  cobertura de envío/foco/retención. Mantener el resto de102/103 y next-env ajeno.
+- **Archivos/contratos:** contact-record-form, tests/components/admin/contact-date,
+  fills E2E de contacto y eliminación del helper funes-input/test propio de104.
+  Docs/UI/spec/plan/task registran corrección; servidor/BD/permisos inalterados.
+- **Decisión expresa de Mateo:** «Conservar el selector original». Mantener el
+  calendario nativo, sin selector de aplicación ni entrada libre. El orden visible
+  depende de la región del navegador; no cambiar la configuración personal sin
+  pedido. No usar overlays/CSS frágil ni afirmar que lang garantiza día/mes/año.
+- **Riesgos/verificación:** preservar valores, validación compartida, foco, calendario,
+  hora Funes y payload ISO. Tipos/lint/unit/tooling/build y contacto ficticio en
+  navegador; sin otra migración ni edición de la configuración personal del usuario.
+- **Estado:** corrección solicitada, restaurada y verificada. No amplía
+  permisos, lógica de negocio o arquitectura ni publica código/PR.
+- **Resultado:** control nativo restituido; solo lang es-AR difiere de la versión
+  anterior a104. Helper/pruebas de parsing libre retirados, fills ISO restaurados.
+  1358 unit/componentes/110 archivos,57 tooling, tipos/lint/build/diff PASS. Navegador
+  en-US confirma datetime-local, foco en requerido, resumen retenido, guardado y
+  hora Funes correctos y sin overflow390; captura revisada muestra20/09/2026 12:00
+  con icono nativo y día seleccionado. lang es-AR funciona en el Chromium probado;
+  no se generaliza como garantía para todo navegador/sistema. La opción expresa
+  fue conservar exactamente selector original. Convergencia
+  sin brechas respecto de esa corrección; no migración/cambio alojado. next-env
+  ajeno conserva SHA256B8B3A344…491000.
+- **Seguimiento de publicación,29/10:** después de informar que su navegador aún
+  mostraba mes/día/año, Mateo indica «ya esta» y solicita crear el PR. Se conserva
+  selector nativo y limitación regional documentada; no implica una garantía de
+  formato universal ni aceptación municipal. Base remota main adad96c actualizada
+  y sin cambios; publicar únicamente archivos propios, excluyendo next-env ajeno.
+  Verificaciones finales ya PASS; CI/revisión del PR pendientes de publicación.
+- **Publicación:** commit sin firma2d4da71 y
+  [PR85](https://github.com/maximo-Pdev/funes-empleo/pull/85),29/10/2026,
+  feat/dates-and-application-retry→main adad96c. Incluye102/103 y corrección final105;
+  control nativo, prueba de contacto, fechas y reintentos. next-env ajeno excluido.
+  CI y revisión humana en seguimiento; no se acredita aceptación ni merge.
+
+
+## EXTRA-104 — Entrada municipal de fecha en día/mes/año
+
+- **Fecha/origen:** Mateo,29/10/2026, muestra «Registrar contacto municipal» con
+  datetime-local nativo mm/dd/yyyy y pide el mismo formato día/mes/año allí.
+- **Evidencia/alcance:** EXTRA102 uniformó presentación conservando selectores;
+  ahora se autoriza explícitamente esta entrada. lang no garantiza el formato del
+  control nativo del navegador. ContactRecordForm usa estado local ISO y servidor
+  convierte occurredAtLocal a UTC mediante funesLocalToIso.
+- **Cambio mínimo previo a implementar:** reutilizar TextField/Form y entrada
+  visible DD/MM/AAAA HH:mm (24h), ejemplo e instrucción clara; adaptador puro
+  valida y convierte al mismo YYYY-MM-DDTHH:mm antes del submit. Validación nativa
+  customValidity integrada con error/borde/foco/retención compartidos; no aceptar
+  meses/días inexistentes, formato ambiguo o horas inválidas. Reutilizar conversor
+  Funes existente para validar calendario; no duplicar reglas de zona/servidor.
+- **Archivos/contratos:** contact-record-form, helper de entrada local, pruebas
+  unit/componentes y cuatro fills E2E en intermediation/hiring-consent. Artefactos
+  y guía/UI afectados; payload/servidor/autorización/BD iguales. Consultadas docs y
+  fuente oficial Input Base Nova; sin sobreescribir controles compartidos.
+- **Riesgos/verificación:** confusión día/mes, bisiestos, horas, envío sin cambio,
+  error remoto y conservación de resumen/fecha. RED/GREEN de entrada/payload/errores,
+  navegador en-US, foco/teclado/axe móvil, contacto real ficticio y privacidad de
+  empresa. Tipos/lint/pruebas/build requeridos; no otra migración o cambio alojado.
+- **Estado:** solicitado/autorizado y coordinado; implementado con TextField/Form
+  actuales y helper puro. Mismo gate histórico de dos casillas pendiente sin aprobar; sin
+  cambio nuevo de arquitectura o regla de negocio que requiera repetir sus gates.
+- **Evidencia:** RED3 de componente contra datetime-local; GREEN20 focales y
+  suite1375 unit/componentes/111 archivos,57 tooling, tipos aislados/lint/build/diff
+  PASS. Tres E2E intermediation de contacto/nominación/tardío PASS, con formato,
+  error inline rojo/foco, retención de resumen, guardado y hora histórica correcta,
+  privacidad empresarial, axe0 y sin overflow390px; captura visual revisada.
+  Dos E2E de contratación fallaron inicialmente en preparación del bloqueo porque
+  la copia auxiliar seguía apuntando al nombre del contenedor habitual. Se corrigió
+  solo la copia ignorada al contenedor aislado, sin cambiar prueba original,
+  producto, aserciones o tiempos. Nueva ejecución focal2/2 PASS sin retries o
+  omisiones; cinco recorridos distintos verificados. Prueba visual adicional
+  en-US confirma placeholder español, fecha inválida roja, foco, resumen retenido
+  y cero overflow390; capturas del formulario1440/390 revisadas. Convergencia
+  del alcance104 sin brechas nuevas. SQL/servidor/consentimiento/permisos intactos,
+  sin otra migración. next-env ajeno conserva hashB8B3A344…491000.
+
+
+## EXTRA-103 — Aplicar migración de reintentos al proyecto vinculado
+
+- **Fecha/origen:** Mateo,2026-10-29: «hace la migracion», sobre EXTRA102 ya
+  implementado/probado. Alcance exclusivo20261029180304_candidate_application_retry.
+- **Evidencia/plan previo:** conector MCP rechaza acceso; CLI vinculada funcionó
+  en EXTRA100. Verificar ref del proyecto/URL pública, historial, índice y cuerpos
+  vigentes antes de ejecutar; rechazar divergencias o aplicación previa inesperada.
+  Historial remoto heredado impide un push indiscriminado: aplicar solo SQL exacto
+  con controles y registrar esa versión en la misma transacción, como EXTRA100.
+- **Cambio/justificación:** sustituir único parcial y dos guardas conforme a102;
+  conserva firmas/ACL, datos de negocio/auditoría/CV/permisos y otras funciones.
+  Guardar evidencia técnica agregada, sin perfiles reales, tokens ni nuevas cuentas
+  o postulaciones de prueba alojadas. No modificar migraciones anteriores.
+- **Archivos/contratos:** migración102 sin cambios; scripts/evidencia ignorados en
+  test-results, guía de operación, implementation-status y tareaT251. No nueva
+  regla, dependencia, UI o cambio de alcance que requiera otro gate de arquitectura.
+- **Riesgos/verificación:** lock breve del índice (lock_timeout5s, statement_timeout
+  60s), concurrencia/deriva del esquema. Validar hashes/ACL/índice/check de historial
+  antes de commit y lectura independiente después; controles completos de102 ya
+  PASS. Auditoría/contadores y funciones ajenas intactos bajo el lock, advisors
+  antes/después y smoke público solo lectura. Fallo revierte todo; recuperación
+  forward-only documentada, nunca borrar/archivar casos para restituir índice viejo.
+- **Estado:** aplicada y registrada20261029180304 el29/10/2026 por CLI vinculada,
+  en una transacción con pre/postcondiciones y SQL exacto. SHA256
+  589633fb6df1d52d75660beabab1a5e58c44018dfb7c31853f1cf3ab90876dc5.
+  No publica interfaz ni constituye commit, PR o revisión humana.
+- **Resultado:** preflight confirma funciones anteriores idénticas a102, índice
+  antiguo vigente y versión todavía ausente; sin pares bloqueantes duplicados.
+  Commit comprueba índice único válido con excepción withdrawn, dos cuerpos nuevos,
+  firmas/ACL/configuración y otras111 funciones intactas; mismos contadores de
+  negocio/CV/consentimientos/permisos/auditoría/avisos antes/después. Historial previo
+  intacto y nueva versión con hash exacto. Postcheck independiente PASS; búsqueda
+  y filtros públicos devuelven objetos válidos. Advisors seguridad66→66 avisos,
+  cero nuevos y cero ERROR. Sin cuentas, CV ni postulaciones de prueba alojadas.
+- **Evidencia local ignorada:** extra103-preflight/before/apply/postcheck/manifest,
+  advisors-before/after y verification.json en test-results. Fallo de parsing
+  inicial de advisors (CLI ahora devuelve array) corregido en script auxiliar;
+  no requirió cambio o repetición de migración. next-env ajeno preservado.
+
+
+## EXTRA-102 — Fechas uniformes y nueva postulación tras retiro
+
+- **Fecha/origen:** Mateo,2026-10-29: fechas día/mes/año; volver a postularse
+  después de cancelar la propia postulación; estado retirado/cancelado rojo.
+- **Evidencia previa:** offers-content bloquea toda oferta con historial; índice
+  participation_once y create_participation_with_cv/reserve_application_cv
+  impiden cualquier segundo caso no archivado, incluido uno retirado. Fechas de
+  cierre públicas ya son DD/MM/YYYY; otras vistas usan ISO, fechas sin ceros o
+  año corto. status-tone asigna neutral a withdrawn/cancelled.
+- **Cambio necesario, registrado antes de implementar:** nuevo caso propio tras
+  retiros anteriores; índice único excluye withdrawn y las dos guardas SQL se
+  alinean para self_application. Nominación y matching municipales conservan su
+  exclusión previa. UI distingue historial retirado de caso que bloquea enviar.
+  Centralizar presentación DD/MM/YYYY y hora local existente; no transformar
+  fechas calendario en instantes. PDF/Excel visibles usan el mismo formato;
+  transporte, CSV técnico y selectores nativos conservan ISO. Rojo en catálogo
+  de participaciones, sin cambiar estados o colores de otros dominios.
+- **Justificación/contratos:** imprescindible modificar restricción persistente,
+  reserva de CV y creación atómica para no depender de ocultar botones. Nuevo
+  intento conserva UUID propio y CV fijo; no reabre el retirado ni su permiso.
+  Modelo/spec/plan/contrato de estados y guías se actualizan por etapas.
+- **Archivos previstos:** migración nueva, supabase/tests, offers-content,
+  src/lib/time, vistas por rol/report-data, status-tone y pruebas UI/unit/E2E.
+  Sin nueva dependencia, RPC público, columna, permiso o eliminación de datos.
+- **Riesgos/verificación:** duplicados concurrentes, CV específico tras retiro,
+  auditoría/avisos y rollback; todos los otros resultados finales bloquean;
+  actor ajeno, aptitud/vigencia y permisos revocados intactos. Probar calendario,
+  medianoche Funes/UTC, padding/año4 y errores de fecha. Tipos/lint/unit/tooling/
+  SQL/E2E/build en fixture aislado, preservando next-env y servicios habituales.
+- **Recuperación:** forward-only; conservar intentos retirados y nuevos. Para
+  suspender reintentos restaurar guardas previas, sin reconstruir índice antiguo
+  sobre pares repetidos ni archivar/borrar historia para hacerlo caber.
+- **Estado:** alcance solicitado y coordinación autorizados por Mateo; incremento
+  implementado en feat/dates-and-application-retry desde main adad96c (PR83
+  mergeado). Mateo permite continuar con2 casillas históricas de ofertas pendientes
+  sin marcarlas aprobadas. No implica aplicación alojada, PR o revisión.
+- **Prerrequisito de verificación descubierto antes de editar configuración:**
+  z-application-retry crea ofertas publicadas. playwright.config.ts excluye
+  z-application-cv/notificaciones del grupo chromium con conteos iniciales, pero
+  todavía no reconoce este archivo nuevo. Incluir retry en ese mismo grupo
+  posterior application-cv es necesario para no contaminar los conteos, sin
+  relajar aserciones, reintentos ni dependencias. La ejecución auxiliar mezclada
+  produjo83 frente a80 tras avisos; repetir conteo con fixture limpio y probar
+  colección oficial de retry. Archivos: playwright.config.ts, plan/tasks y tests.
+- **Archivos reales:** migración20261029180304 (índice y dos guardas), pruebaSQL075,
+  offers-content con key por intento y estado público; helper time/presentation y
+  wrapper público reutilizados en18 vistas/contexto de informes; catálogo de tonos.
+  Pruebas de calendario/instantes/estados/UI/Excel/notificaciones y dos E2E nuevos;
+  expectativa histórica24/09 corregida por padding. Documentación/contratos alineados.
+- **Verificación hasta el momento:** RED de tono neutral y módulo de fecha ausente;
+  GREEN1355 unit/componentes/109 archivos,57 tooling, tipos aislados/lint/build PASS.
+  Suite completa1454 SQL/28 archivos y luego archivo ampliado40 focales PASS;
+  incluye reserva/alta/retiros repetidos/CV/rollback/avisos/roles, revocación antigua,
+  otros finales, matching/nominación sin cambios, vencimiento y versión. Al ampliar
+  pruebas, la mutación de disponibilidad/estado incrementó versión del fixture:
+  se corrigió preparación usando versión actual, sin cambiar controles de producto.
+  LintSQL public/private y advisors locales ERROR0. Cuatro E2E CV/reintentos PASS,
+  incluidos concurrencia y axe390/1440 sin overflow. Regresiones finales:17/18
+  iniciales; el conteo80 falló por83 ofertas tras notificaciones en runner auxiliar.
+  Conteo estricto repetido con fixture limpio PASS, después grupo oficial tardío
+  completo7/7 PASS sin retries/omisiones.22 E2E distintos verificados en total;
+  se conserva expectativa80. Clasificación oficial de retry comprobada por --list,
+  lint focal y tipos con nuevas pruebas PASS. Convergencia R1–R3: sin brechas nuevas;
+  gates históricos/aceptación humana permanecen pendientes. next-env ajeno conserva
+  SHA256B8B3A344…491000; sin aplicación alojada, commit o PR en este pedido.
+- **Cierre local:** servidor3001 detenido y Supabase funes-admin-cv-check detenido
+  con backup; no reset del proyecto habitual. Durante navegación/cierre Next emitió
+  diagnósticos «The destination stream closed early» sin fallo de los recorridos
+  y respuestas comprobados; no se cambió código de streaming fuera de alcance.
+
+
 ## EXTRA-101 — Alinear pruebas de privacidad con agenda autorizada
 
 - **Fecha/origen:** Mateo,2026-10-28, informa fallo de GitHub en PR83.

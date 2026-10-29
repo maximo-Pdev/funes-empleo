@@ -1,3 +1,4 @@
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { Form } from "@/components/forms/form";
 import { Button } from "@/components/ui/button";
 import { notificationLabels, type Notification } from "../contracts";
@@ -15,7 +16,7 @@ export function NotificationItems({ items }: { items: readonly Notification[] })
         </span>
         {item.available && item.subject && <span className="break-words font-normal">{item.subject}</span>}
         {!item.available && <span className="font-normal text-muted-foreground">El recurso ya no está disponible.</span>}
-        <time dateTime={item.createdAt} className="text-xs font-normal text-muted-foreground">{new Date(item.createdAt).toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", dateStyle: "short", timeStyle: "short" })}</time>
+        <time dateTime={item.createdAt} className="text-xs font-normal text-muted-foreground">{formatFunesDateTime(item.createdAt, { seconds: false })}</time>
       </Button>
     </Form>
   </li>)}</ul>;

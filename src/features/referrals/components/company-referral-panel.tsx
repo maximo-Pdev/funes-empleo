@@ -1,3 +1,4 @@
+import { formatFunesDateTime } from "@/lib/time/presentation";
 import { availabilityLabel, interviewStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { availabilityTones, interviewStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { RecordLink as Link, RecordLabel } from "@/components/ui/record-link";
@@ -13,7 +14,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
       <h2 id="detalle-derivacion" className="break-words text-xl font-semibold">{candidateName ? `Derivación de ${candidateName}` : <>Derivación <RecordLabel kind="referral" id={referral.referralId} /></>}</h2>
       {candidateName && <p className="mt-2 break-all text-xs text-slate-700">Referencia: <RecordLabel kind="referral" id={referral.referralId} /></p>}
       <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? "Oferta sin título"}</p>
-      <p className="text-sm text-slate-700">Fecha de derivación: {new Intl.DateTimeFormat("es-AR", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Buenos_Aires" }).format(new Date(referral.referredAt))}</p>
+      <p className="text-sm text-slate-700">Fecha de derivación: {formatFunesDateTime(referral.referredAt, { seconds: false })}</p>
       {referral.hiredCandidate && <p className="mt-4 font-semibold">Contratado</p>}
       {candidate ? (
         <div className="mt-6 space-y-5">
@@ -35,7 +36,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
           <p className="text-sm text-slate-700">El acceso puede revocarse en cualquier momento. Una copia ya descargada no puede retirarse técnicamente.</p>
           <div>
             <h3 className="text-lg font-semibold">Entrevistas registradas</h3>
-            {referral.interviews?.length ? <ul className="mt-2 grid gap-2">{referral.interviews.map((interview) => <li key={interview.id} className="flex flex-wrap items-center gap-2"><Badge variant="status" tone={statusTone(interviewStatusTones, interview.status)}>{displayLabel(interviewStatusLabels, interview.status)}</Badge>{interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires" }) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
+            {referral.interviews?.length ? <ul className="mt-2 grid gap-2">{referral.interviews.map((interview) => <li key={interview.id} className="flex flex-wrap items-center gap-2"><Badge variant="status" tone={statusTone(interviewStatusTones, interview.status)}>{displayLabel(interviewStatusLabels, interview.status)}</Badge>{interview.scheduledAt ? formatFunesDateTime(interview.scheduledAt) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
           </div>
           {referral.participationVersion && <InterviewForm openingId={openingId} referralId={referral.referralId} version={referral.participationVersion} />}
         </div>

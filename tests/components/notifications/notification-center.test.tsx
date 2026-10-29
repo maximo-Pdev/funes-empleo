@@ -11,6 +11,7 @@ afterEach(()=>vi.unstubAllGlobals());
 it("muestra pendientes, abre popover accesible y formularioPOST sin UUID",async()=>{
  const view=render(<NotificationCenter/>);const trigger=await screen.findByRole("button",{name:"Notificaciones: 1 sin leer"});
  fireEvent.click(trigger);expect(await screen.findByText("Oferta ficticia")).toBeTruthy();
+ expect(screen.getByText("28/10/2026, 07:00")).toBeTruthy();
  const notice=screen.getByRole("button",{name:/La Oficina te incorporó/});const form=notice.closest("form")!;
  expect(form.getAttribute("method")).toBe("post");expect(form.getAttribute("action")).toBe("/api/notifications/open");expect(form.querySelector("input")?.value).toBe(item.reference);
  expect(screen.getByRole("link",{name:"Ver todas las notificaciones"}).getAttribute("href")).toBe(data.listHref);

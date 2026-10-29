@@ -1,10 +1,15 @@
 # EXTRA096 — Documentos de postulación
 
+EXTRA102: reserva y alta propias ignoran únicamente casos withdrawn anteriores.
+Nuevo caso/selección/evento, sin reabrir el retirado o recuperar accesos. Los otros
+estados no archivados bloquean; nominación conserva la condición anterior.
+
 - Entradas CV: PDF/JPG/JPEG/PNG,5 MiB, una imagen estática de hasta16MP; WebP no.
   Servidor devuelve PDF validado5 MiB. Mismo proxy privado inline/nueva pestaña.
 - reserve_application_cv(p_opening,p_candidate_version,p_cv,p_path,p_name,p_size,
   p_sha256): candidato activo dueño, aptitud vigente, oferta pública y sin caso
-  no archivado; reserva rejected/upload_pending scope oferta. No cambia general.
+  no archivado distinto de withdrawn; reserva rejected/upload_pending scope oferta.
+  No cambia general ni elecciones históricas.
 - apply_to_opening_with_cv(p_opening,p_candidate_version,p_cv default NULL): UUID
   de participación. NULL usa general actual; UUID exige reserva propia del mismo
   destino y objeto Storage. Validación/documento/alta/auditoría atómicas; revalida

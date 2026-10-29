@@ -1,5 +1,24 @@
 # Investigación técnica: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA102 — Fase0,2026-10-29
+
+Decisión: nuevo caso tras retiro, no reabrir fila ni archivar historia. Agente de
+investigación retry_research confirmó índice y dos guardas como bloqueos, lectores
+por ID y matching municipal independiente. Índice parcial mantiene una sola fila
+no retirada aun bajo concurrencia; lock de candidato ya serializa creación.
+Alternativas descartadas: reutilizar fila perdería trazabilidad/CV, quitar índice
+permitiría duplicados, liberar todos los finales ampliaría requisito.
+Fuente primaria: https://www.postgresql.org/docs/current/indexes-partial.html .
+Changelog oficial Supabase consultado2026-10-29: TLS/cifrados y minor upgrade
+extensiones no cambian esta DDL B-tree/PLpgSQL; funciones/privilegios se conservan.
+
+date_display_research inventarió18 archivos y descargas. Wrapper público ya valida
+calendario; reutilizar validación central y formato numérico explícito para
+instantes. No usar dateStyle short (año2) ni host timezone; CSV conserva contrato
+ISO. No dependencia/calendario nuevo. Pregunta opcional de inputs sin respuesta:
+solo fechas mostradas como alcance mínimo comunicado; conversión nativa intacta.
+
+
 ## EXTRA099 — Investigación por etapas
 
 Lectura de notification_events (fase0, sin ediciones) confirma ocho familias de

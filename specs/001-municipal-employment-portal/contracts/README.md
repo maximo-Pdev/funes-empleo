@@ -1,5 +1,13 @@
 # Contratos del MVP
 
+EXTRA105 sustituye104: ContactRecordForm conserva datetime-local nativo; payload
+record_contact.occurredAtLocal YYYY-MM-DDTHH:mm y validación Funes/UTC del servidor.
+El orden visual depende de la región del navegador. No cambia RPC/BD/permisos.
+
+EXTRA102: nueva postulación propia tras retiros genera otro caso; excepciones y
+conservación de permisos/historia en state-machines.md y application-cv.md.
+Fechas visibles numéricas en informes, valores ISO de entrada y CSV intactos.
+
 EXTRA096: [application-cv.md](./application-cv.md) define carga opcional por
 postulación, entradas PDF/JPG/JPEG/PNG hasta5 MiB sin WebP, normalización PDF y
 reserva/alta/auditoría atómicas. Wrappers anteriores compatibles; CV general y

@@ -1,4 +1,5 @@
 "use client";
+import { formatFunesDateTime } from "@/lib/time/presentation";
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button, EmptyState, FeedbackMessage } from "@/components/ui";
@@ -42,7 +43,7 @@ export function CandidateHistory({ candidateId, initialEvents, initialCursor }: 
       <ol ref={list} className="space-y-3">{events.map(event => <li key={event.id} tabIndex={-1}
         className="space-y-1 border-t border-border pt-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
         <p className="font-semibold">{auditActionLabel(event.action)}</p>
-        <time dateTime={event.occurred_at} className="text-sm text-muted-foreground">{new Date(event.occurred_at).toLocaleString("es-AR", { timeZone: "America/Buenos_Aires", hour12: false })}</time>
+        <time dateTime={event.occurred_at} className="text-sm text-muted-foreground">{formatFunesDateTime(event.occurred_at)}</time>
       </li>)}</ol>}
     <p role="status" aria-live="polite" className="sr-only">{pending ? "Cargando eventos anteriores…" : announcement}</p>
     {error && <FeedbackMessage tone="error">{error}</FeedbackMessage>}

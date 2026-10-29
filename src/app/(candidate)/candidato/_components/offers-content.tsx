@@ -1,3 +1,4 @@
+import { formatCalendarDate } from "@/lib/time/presentation";
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin, ShieldCheck, CircleAlert } from "lucide-react";
 import { Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
@@ -12,7 +13,7 @@ function OfferSummary({ offer }: { offer: PublicOffer }) {
   return <div className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
     <p className="font-semibold text-foreground">{offer.company_name}</p>
     <p className="flex items-start gap-2"><MapPin className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{offer.location}</p>
-    <p className="flex items-start gap-2"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {offer.closing_date}</p>
+    <p className="flex items-start gap-2"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {formatCalendarDate(offer.closing_date)}</p>
   </div>;
 }
 export async function renderCandidateOffersContent({ workspace, page, oferta, profileHref = "/dashboard?section=perfil", offersHref = "/dashboard?section=ofertas" }: {
@@ -27,7 +28,9 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
     if (oferta) params.set("oferta", oferta);
     return `${path}?${params}`;
   };
-  const joinedOfferIds = new Set(participations.map((item) => item.opening_id));
+  const joinedOfferIds = new Set(participations.filter(item => item.display_status !== "withdrawn").map(item => item.opening_id));
+  // Each attempt has a fresh form, without the previous submission's success state.
+  const attemptKey = (openingId: string) => `${openingId}:${participations.filter(item => item.opening_id === openingId).map(item => `${item.id}:${item.display_status}`).sort().join(",")}`;
   let selectedOffer: Awaited<ReturnType<typeof getPublicOffer>> | null = null;
   if (oferta) {
     try { selectedOffer = await getPublicOffer(oferta); }
@@ -44,7 +47,7 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
       <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-primary-700"><BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />Tu oferta seleccionada</p>
       <h2 className="break-words text-xl font-bold text-primary-900">Oferta elegida: {selectedOffer.title}</h2>
       <OfferSummary offer={selectedOffer} />
-      {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-5 max-w-md`}><CandidateApplyForm openingId={selectedOffer.id} candidateVersion={workspace.profile.version}
+      {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-5 max-w-md`}><CandidateApplyForm key={attemptKey(selectedOffer.id)} openingId={selectedOffer.id} candidateVersion={workspace.profile.version}
         generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} alreadyApplied={joinedOfferIds.has(selectedOffer.id)} /></div>}
     </section>}
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-primary-900">Ofertas vigentes</h2><p className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700"><ShieldCheck className="h-4 w-4" aria-hidden="true" />Revisadas por la Oficina</p></div>
@@ -52,7 +55,7 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
       <ul className="grid gap-5 md:grid-cols-2">{offers.items.filter((offer) => offer.id !== selectedOffer?.id).map((offer) => <li key={offer.id} className="min-w-0">
         <Card className="flex h-full flex-col p-6"><h3 className="break-words text-xl font-bold leading-7"><Link href={`/ofertas/${offer.slug}`} className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary">{offer.title}</Link></h3>
           <OfferSummary offer={offer} />
-          {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-auto pt-5`}><CandidateApplyForm openingId={offer.id} candidateVersion={workspace.profile.version}
+          {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-auto pt-5`}><CandidateApplyForm key={attemptKey(offer.id)} openingId={offer.id} candidateVersion={workspace.profile.version}
             generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
         </Card>
       </li>)}</ul>}

@@ -1,4 +1,5 @@
 "use client";
+import { formatFunesDate } from "@/lib/time/presentation";
 
 import Link from "next/link";
 import { useRef, useState, useTransition, type ReactNode } from "react";
@@ -142,7 +143,7 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
         <dl className="grid gap-3 sm:grid-cols-2">
           <div><dt className="font-semibold">Localidad</dt><dd>{profile.locality ?? "Sin informar"}</dd></div>
           <div><dt className="font-semibold">Disponibilidad</dt><dd>Disponible</dd></div>
-          <div><dt className="font-semibold">Vigencia del perfil</dt><dd>{new Date(profile.refreshDueAt).toLocaleDateString("es-AR", { timeZone: "America/Buenos_Aires" })}</dd></div>
+          <div><dt className="font-semibold">Vigencia del perfil</dt><dd>{formatFunesDate(profile.refreshDueAt)}</dd></div>
           <div><dt className="font-semibold">Rubros coincidentes</dt><dd>{profile.matchedCategories.map(category => category.name).join(", ")}</dd></div>
         </dl>
         <div><h3 className="font-semibold">Categorías laborales</h3><p>{profile.categories.map(category => category.name).join(", ")}</p></div>

@@ -1,5 +1,41 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA102 — Diseño de presentación y reintento propio
+
+EXTRA105 sustituye104 por decisión expresa: restaurar TextField datetime-local
+del contacto, calendario nativo y estado ISO directo. lang es-AR es declarativo,
+sin prometer control de región del navegador. Eliminar helper/validación/entrada
+libre añadidos104; E2E de contacto vuelven a enviar ISO nativo. Conservar pruebas
+de selector/payload/requerido/foco/retención; servidor y BD intactos, sin calendario,
+paquete, endpoint/SQL o arquitectura nueva.
+
+R1: módulo puro src/lib/time/presentation.ts, Intl con campos numéricos explícitos
+y zona Funes para instantes. Calendario validado sin Date.parse y wrapper público
+compatible; reutilizar en vistas/historias/notificaciones y contexto PDF/XLSX.
+ISO en inputs/CSV/RPC intacto; sin paquetes o controles nuevos.
+
+R2: migración transaccional nueva, no editar aplicadas. Sustituir participation_once
+por único parcial candidato/oferta no archivado y status<>withdrawn. Reemplazar
+solo guardas de duplicados en create_participation_with_cv y reserve_application_cv:
+postulación propia ignora retirados; admin_nomination y matching conservan bloqueo
+histórico. Mismas firmas/grants/search_path, locks y validaciones de aptitud/CV.
+Nuevo ID/evento/selección; no UPDATE del retirado ni de sus permisos. UI usa estado
+público para habilitar envío y key derivada del historial por oferta para limpiar
+éxito local entre intentos. Sin nuevo campo, migración de datos o backfill.
+
+R3: catálogo central participationStatusTones: withdrawn/cancelled red; etiquetas
+y otros estados intactos. Constitución I–VI satisfecha: intermediación, privacidad,
+historial, accesibilidad, stack y pruebas conservados. Investigación read-only de
+retry_research/date_display_research confirma lectores por ID, métricas por caso
+y todos los displays afectados. Calidad/clarificación por etapas antes de código;
+gate histórico de ofertas2 pendiente, excepción expresa de Mateo para este cambio.
+Recuperación forward-only conserva múltiples retirados; restaurar guardas para
+deshabilitar reintentos, nunca reconstruir índice antiguo sin compatibilidad.
+Pruebas z-application-retry crean ofertas; incluirlas en grupo application-cv
+posterior a chromium y excluirlas de chromium, conservando conteos iniciales y
+dependencias de CI. No cambiar aserciones, retries ni workers existentes.
+
+
 ## EXTRA099 — Diseño de avisos privados,2026-10-28
 
 N1/N5: account_notifications con recipient_account_id, source_event_id, kind,

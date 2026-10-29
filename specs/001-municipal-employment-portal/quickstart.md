@@ -1,5 +1,17 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA102 — Fechas/reintentos/rojo
+
+Aplicar migración de reintentos antes de usar la UI nueva. Candidato apto:
+postular, retirar, volver a oferta y enviar con CV general/específico. Debe crear
+caso recibido nuevo y conservar retirado/CV/auditoría/permisos previos. Nuevo
+duplicado bloqueado, otros finales bloqueados, nominación histórica sin cambios.
+Comparar fechas públicas/por rol/notificaciones/historias/PDF/Excel DD/MM/YYYY,
+fecha calendario sin corrimiento, instantes a Funes y año4. Retirada/Cancelada
+rojas con texto. Tipos/lint/unit/tooling/build/SQL y navegador aislado requeridos;
+sin reset de entorno habitual ni aplicación alojada implícita.
+
+
 ## EXTRA099 — Notificaciones
 
 Ver docs/operations/portal-notifications.md. Aplicar20261028235316 antes de la UI.

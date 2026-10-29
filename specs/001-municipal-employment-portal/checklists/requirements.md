@@ -48,6 +48,23 @@ OQ005 ni aprobación municipal. No cambia marcas de aceptación humana históric
   Mateo resuelven las dos dudas del alcance. No quedan marcadores nuevos de
   aclaración ni se modifican checkboxes de checklists de revisión humana.
 
+- EXTRA102: calidad revisada por etapas: R1 calendario/instante/año4/ISO nativo,
+  R2 nuevo caso tras retiro sin reapertura ni ampliación de finales/nominación,
+  R3 catálogo rojo y criterios verificables explícitos. Solicitud autoriza scope;
+  excepción de dos casillas históricas confirmada por Mateo2026-10-29. No quedan
+  decisiones bloqueantes nuevas; alcance opcional de escritura de fechas pendiente,
+  presentación mínima comunicada. No se acredita revisión humana de otros cambios.
+
+- EXTRA104: ampliación explícita de entrada municipal; formato visible, calendario,
+  hora24, errores/foco y retención definidos con mismo payload ISO/UTC. Sin reglas
+  nuevas de contacto/privacidad, arquitectura o migración; no modifica checkboxes
+  de revisión humana ni el gate histórico autorizado pendiente.
+
+- EXTRA105: corrección expresa de Mateo sustituye104: selector nativo con calendario,
+  sin entrada libre ni garantía artificial de locale. Payload/validación/permisos
+  intactos; limitación regional explicada y elección respondida. Sin nuevo gate
+  de arquitectura o modificación de checkboxes de revisión humana.
+
 - Validation iteration 1 passed all specification-quality criteria.
 - Open stakeholder decisions are preserved explicitly under `Open Questions and Validation
   Dependencies`; their documented safe positions are constraints, not approved answers.

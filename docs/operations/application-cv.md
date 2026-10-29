@@ -1,5 +1,10 @@
 # CV general y CV por postulación
 
+EXTRA102: después de retirar una participación, el titular puede iniciar otra en
+la misma oferta si sigue habilitada. La nueva elección de CV pertenece al nuevo
+caso; no reemplaza ni reabre el retirado o su permiso. Ver dates-application-retry.md
+para migración, límites y recuperación.
+
 EXTRA096,2026-10-28. Se admiten PDF, JPG/JPEG y PNG de hasta5 MiB por archivo.
 WebP, GIF, SVG, video e imágenes animadas no se admiten. Las imágenes deben tener
 hasta16 megapíxeles: el servidor las orienta, elimina metadatos y convierte a PDF,
