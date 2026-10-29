@@ -40,6 +40,11 @@
   formato universal ni aceptación municipal. Base remota main adad96c actualizada
   y sin cambios; publicar únicamente archivos propios, excluyendo next-env ajeno.
   Verificaciones finales ya PASS; CI/revisión del PR pendientes de publicación.
+- **Publicación:** commit sin firma2d4da71 y
+  [PR85](https://github.com/maximo-Pdev/funes-empleo/pull/85),29/10/2026,
+  feat/dates-and-application-retry→main adad96c. Incluye102/103 y corrección final105;
+  control nativo, prueba de contacto, fechas y reintentos. next-env ajeno excluido.
+  CI y revisión humana en seguimiento; no se acredita aceptación ni merge.
 
 
 ## EXTRA-104 — Entrada municipal de fecha en día/mes/año

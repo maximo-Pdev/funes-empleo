@@ -2,6 +2,11 @@
 
 ## EXTRA105 — Selector nativo restituido,29/10/2026
 
+Publicado con102/103 en commit sin firma2d4da71,
+[PR85](https://github.com/maximo-Pdev/funes-empleo/pull/85). Rama
+feat/dates-and-application-retry→main adad96c; next-env ajeno excluido.
+Checks/revisión humana pendientes; migración102 ya aplicada según103. No merge.
+
 Mateo corrige104 y elige expresamente conservar selector original después de
 explicar su dependencia de la región del navegador. ContactRecordForm vuelve a
 datetime-local con calendario/edición y estado ISO anteriores, lang es-AR sin
