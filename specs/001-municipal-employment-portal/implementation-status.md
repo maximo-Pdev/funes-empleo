@@ -1,5 +1,15 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA101 — Corrección de aserciones E2E del PR83
+
+CI40799278979/c1eb7e4: database/Vercel PASS; application pasa1346 unit, tipos/lint/
+tooling/build/SQL y128 E2E, falla dos prohibiciones anteriores a la agenda aprobada
+N3 y bloquea seis recorridos dependientes. Pruebas ajustadas a fecha/canal propios,
+manteniendo negativos concretos de notas/resumen/recomendación/estados internos
+y ausencia de agenda ajena. RED2/GREEN5 sin omisiones/reintentos y tipos/lint/diff
+PASS. Producto, migración alojada y CI intactos. Nueva ejecución del mismo PR83
+en seguimiento; no se declara aprobada antes de recibir los checks.
+
 ## EXTRA100 — Migración de avisos aplicada por solicitud posterior
 
 2026-10-28:20261028235316/portal_notifications aplicada y registrada en el proyecto

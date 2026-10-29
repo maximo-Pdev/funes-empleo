@@ -7,6 +7,11 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 ## EXTRA099 — Notificaciones del portal
 
+- [x] T246 [EXTRA101,N3] Corregir dos aserciones E2E obsoletas de PR83: agenda
+  propia solo fecha/canal, sin agenda ajena/etapas/resumen/recomendación. RED2/2,
+  GREEN5/5, tipos/lint/diff PASS, retiros y revocación conservados. Sin cambios de
+  producto/SQL/CI; publicación en el mismo PR83 y nuevos checks en seguimiento.
+
 - [x] T245 [EXTRA100] Por pedido posterior de Mateo, aplicar exclusivamente
   20261028235316 al Supabase vinculado, registrar SQL exacto y verificar seis
   funciones/ACL/RLS/política/FK/índices/trigger, datos previos, no backfill y smoke

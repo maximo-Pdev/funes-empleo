@@ -1,5 +1,38 @@
 # Cambios extra necesarios
 
+## EXTRA-101 — Alinear pruebas de privacidad con agenda autorizada
+
+- **Fecha/origen:** Mateo,2026-10-28, informa fallo de GitHub en PR83.
+  CI40799278979/c1eb7e4: database/Vercel PASS; application pasa tipos/lint/tooling/
+  1346 unit/build/SQL y128 E2E, falla dos aserciones de privacidad anteriores a
+  EXTRA099. candidate-self-service prohíbe «preentrevista» en todo body, incluida
+  la descripción; intermediation prohíbe la agenda real del caso nominado.
+- **Requisito de origen:** N3 y respuesta expresa de Mateo: titular puede ver
+  fecha/canal de preentrevista; resumen, recomendación y evaluaciones privados.
+  Las pruebas contradicen la excepción acotada aprobada, no evidencian una fuga
+  de notas. Seis recorridos dependientes quedaron sin ejecutar en ese runner.
+- **Cambio mínimo propuesto antes de editar:** actualizar solo ambos E2E:
+  postulaciones propias sin registro no muestran agenda; caso municipal con
+  preentrevista muestra canal/fecha y conserva estado público Recibida, sin
+  preselección/etapas internas/resumen/recomendaciones. Mantener retiros, pruebas
+  de otras participaciones y revocación. No ocultar agenda aprobada, omitir pruebas,
+  debilitar privacidad ni cambiar producto, SQL, CI o tiempos de espera.
+- **Archivos/contratos/riesgos:** tests/e2e/candidate-self-service.spec.ts,
+  tests/e2e/intermediation.spec.ts y evidencia/tasks. Contrato N3 vigente intacto.
+  Riesgo: reemplazar prohibición demasiado amplia por una prueba permisiva;
+  exigir positivos de agenda y negativos concretos del resumen privado.
+- **Verificación prevista:** RED de ambos recorridos, GREEN con cambio acotado,
+  tipos/lint y flujo de avisos relevante; publicar commit sin firma en el PR83 y
+  comprobar nueva CI. Base alojada intacta; datos exclusivamente ficticios en
+  entorno local aislado. next-env.d.ts ajeno conservado. Implementación pendiente.
+- **Corrección verificada:** RED2/2 reproduce exactamente ambos errores de CI;
+  GREEN5/5 completa registro/dos postulaciones/retiro/suspensión/archivo, nominación/
+  preentrevista/preselección/derivación/retiros y los tres recorridos de avisos.
+  Fecha/canal permitidos y resumen/recomendación/estados internos ocultos; no se
+  omitieron aserciones de otras participaciones ni revocación. Tipos/lint/diff PASS.
+  Solo dos archivos E2E y documentación; build de producto/migración/permisos sin
+  cambios. Corrección publicada en el mismo PR83, sin firma; nueva CI en seguimiento.
+
 ## EXTRA-100 — Aplicación alojada de notificaciones
 
 - **Fecha/origen:** Mateo,2026-10-28: «aplica la migracion», después de la

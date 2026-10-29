@@ -318,8 +318,14 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
 
     await candidate.goto("/dashboard?section=postulaciones");
     const nominated = candidate.locator("li").filter({ has: candidate.getByRole("heading", { name: "Oferta ficticia 002" }) });
-    await expect(nominated).toContainText("Recibida");
-    await expect(nominated).not.toContainText(/Preentrevista|Preseleccionada|Derivada/);
+    await expect(nominated.getByText("Recibida por la Oficina", { exact: true })).toBeVisible();
+    // The approved agenda exception reveals only dates/channel, not the
+    // municipal evaluation or the actual internal participation stage.
+    await expect(nominated.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toBeVisible();
+    await expect(nominated).toContainText("Canal: Teléfono");
+    await expect(nominated.getByText(/^Realizada:/)).toContainText("24/9/2026");
+    await expect(nominated).not.toContainText(/Preseleccionada|Derivada|Resumen interno|Recomendación/);
+    await expect(nominated).not.toContainText("Preentrevista municipal ficticia.");
     await nominated.getByLabel("Confirmo que quiero retirar esta participación.").check();
     await nominated.getByRole("button", { name: "Retirar participación" }).click();
     await expect(nominated).toContainText("Retirada");
