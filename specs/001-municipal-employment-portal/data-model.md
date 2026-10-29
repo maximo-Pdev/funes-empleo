@@ -1,5 +1,18 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+## Course links and independent referrals — EXTRA-086
+
+Add `municipal_courses` (UUID, title, HTTPS URL, publication flag, creation actor/time)
+and `course_referrals` (UUID, existing candidate/course references, immutable course
+title/URL snapshot, referral actor/time). Foreign keys restrict deletion; referral
+history is append-only even for privileged SQL. Index candidate/time/ID for stable
+history pagination. Public reads expose published link metadata only, never staff
+attribution or candidate history. Only active administrators can create/maintain links
+or record referrals through session-bound commands. The course referral has no job
+opening or participation foreign key and creates no company access. SQL migration
+`20261027233000_course_referrals.sql` is the executable schema; no existing data is reset
+or transformed. Historical training-guidance notes remain unchanged.
+
 **Fecha**: 2026-09-19  
 **Fuente**: [spec.md](./spec.md), [plan.md](./plan.md) y [research.md](./research.md).
 

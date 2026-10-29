@@ -75,6 +75,22 @@ de contrataciones anteriores ni reaceptación implícita por corregir un resulta
 
 ## Resolved by the MVP clarifications of 2026-09-19
 
+### Actualización de OQ-019 y referencia de entrega — 2026-10-27, EXTRA-086
+
+Máximo entrega `Beex_Funes_Tech_Lab_Proyecto_Final.pdf` y confirma «Si, lo del PDF
+es lo que se pide». Para esta entrega se requieren curso, postulante, derivación e
+historial independiente de las postulaciones; el alcance anterior de nota libre
+queda superado, sin borrar las notas existentes. No se incluye una plataforma
+educativa ni inscripción automática. FR-042 y el plan reflejan este cambio.
+
+El PDF contiene dos formulaciones sobre preentrevista: su tabla de mínimos dice
+que es opcional y permite derivar directamente; el paso 4 del flujo dice que se
+realiza antes de decidir la derivación. Ante la pregunta explícita sobre mantener
+la preentrevista opcional y permitir derivación directa, Máximo responde afirmativamente.
+Se mantiene ese flujo para la implementación; ambas frases se conservan como evidencia
+de la discrepancia del documento. Esto no acredita una nueva aprobación municipal
+ni cambia los controles de derivación o privacidad.
+
 ### A08 — actualización acotada de OQ-010, 2026-10-19
 
 Mateo confirmó aprobación municipal para los quince rubros amplios de
