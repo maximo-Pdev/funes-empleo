@@ -79,6 +79,8 @@ test("empresa registra, corrige, somete y archiva una oferta bajo decisión muni
   await page.goto("/empresa/perfil");
   await expect(page.getByRole("heading", { name: "Perfil de empresa" })).toBeVisible();
   await expect(page.getByText("Estado:")).toContainText("Activo");
+  expect(runLocalMaintenanceSql(`select count(*) from public.account_notifications n join public.company_profiles c on c.id=n.resource_id
+    where n.kind='admin_company_registered' and c.legal_name='${name}'`)).toBe("4");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
   await page.goto("/empresa/ofertas/nueva");

@@ -1,5 +1,25 @@
 # Investigación técnica: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Investigación por etapas
+
+Lectura de notification_events (fase0, sin ediciones) confirma ocho familias de
+auditoría existentes: participation_created según origin; preinterview_recorded;
+referral_created; outcome_confirmed/corrected; opening_submitted; opening_approved/
+rejected; feedback_recorded según reported_outcome; company profile_created tras
+bootstrap verificado. Referral audita antes del cambio de estado; usar relaciones.
+Duplicados secundarios de etapas y company_interviews quedan fuera. Helper
+require_workflow_actor valida sesión viva y cuenta activa; current_account_id
+permite RLS propia. can_reference_record requiere además guardas de archivo.
+
+Decisión: trigger transaccional sobre evidencia existente, en vez de llamadas
+desde cada UI/acción o servicio externo. UNIQUE por fuente/destinatario/tipo evita
+doble entrega; sin payload personal almacenado. Polling visible30s y carga al foco
+es suficiente sin infraestructura Realtime/publication/WebSocket adicional.
+Fuentes oficiales consultadas: https://supabase.com/docs/guides/database/postgres/triggers
+y https://ui.shadcn.com/docs/components/base/popover ; reutilizar registro base-nova
+adaptado en src/components/ui/popover.tsx, sin sobrescribir componentes locales.
+Las decisiones de agenda/entrevista provienen de respuestas expresas de Mateo.
+
 EXTRA088: distancia circular centrada preserva el coverflow3D y vecinos sin
 duplicar tarjetas; módulo en flechas cruza ambos extremos. Home pide10 antes
 de renderizar, conservando orden published_at/ID DESC de RPC. Embla8.6.0 soporta

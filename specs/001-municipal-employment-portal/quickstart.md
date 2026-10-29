@@ -1,5 +1,18 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Notificaciones
+
+Ver docs/operations/portal-notifications.md. Aplicar20261028235316 antes de la UI.
+Desde candidato postular y comprobar que cada admin recibe su fila; abrir como
+admin1 no marca admin2. Nominación/preentrevista/derivación avisan al titular;
+fecha/canal visibles, notas/recomendaciones ocultas. Empresa recibe su derivación;
+informe contratado/no seleccionado avisa admins, confirmación normal/tardía avisa
+candidato. Envío/reenvío a revisión, publicación/rechazo y perfil empresarial
+completo generan destinatarios exactos. Recurso archivado/ajeno y cuenta suspendida
+no acceden; rollback no deja avisos/negocio parcial; reintento no duplica. Campana5,
+lista20, Ver más, teclado/foco,390/1440px y axe. Sin correo/backfill/entrevista
+empresarial nueva ni cambios de consentimiento/disponibilidad/permisos.
+
 ## EXTRA096 — CV por postulación
 
 Ver `docs/operations/application-cv.md`. Aplicar20261028210445 antes de UI.

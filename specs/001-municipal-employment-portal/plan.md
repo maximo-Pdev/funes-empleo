@@ -1,5 +1,47 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Diseño de avisos privados,2026-10-28
+
+N1/N5: account_notifications con recipient_account_id, source_event_id, kind,
+resource_id, referencia aleatoria aviso-24hex, created_at y read_at. FK RESTRICT,
+UNIQUE(destinatario,fuente,tipo), índice cronológico y parcial de pendientes. RLS
+solo cuenta activa con sesión viva; sin escrituras directas de aplicación. Trigger
+privado AFTER INSERT audit_events usa lista cerrada de hechos y relaciones reales;
+misma transacción, sin catch que silencie fallos ni reemplazar workflows existentes.
+Cada admin activo recibe su fila; perfiles sin cuenta no reciben avisos personales.
+No backfill, retención nueva, snapshot personal o permiso empresarial adicional.
+
+N2/N3: preinterview_recorded únicamente, no eventos secundarios de transición.
+Feedback empresarial notifica a admins como pendiente, consultando reported_outcome;
+resultados del candidato solo outcome_confirmed/corrected hired/not_selected.
+Referral se resuelve por relaciones sin exigir status referred, porque se audita
+antes de actualizar ese estado. Entrevista empresarial explícitamente excluida.
+Nuevo RPC propio expone agenda municipal: scheduled_at/held_at/channel y referencia
+del caso; no recommendation/summary_internal, nunca lectura directa de preinterviews.
+
+N4: RPC list_my_notifications y open_my_notification requieren require_workflow_actor,
+filtran destinatario y revalidan archivo/propiedad actuales. Devuelven referencias
+opacas y tipo de destino, no UUID ni URL arbitraria. Servicio servidor valida contrato
+y construye rutas por rol. Apertura POST same-origin, cuerpo acotado, lectura
+idempotente y 303 a destino; GET nunca marca leído. Recurso inaccesible se muestra
+sin asunto personal ni enlace activo. Respuestas privadas no-store/Vary Cookie.
+
+N6: campana cliente en DashboardShell/HomeNavbar privado; no consultas en inicio
+público. Popover oficial adaptado, cinco recientes, contador de pendientes, enlace
+a lista paginada de20. Refresco30s solo pestaña visible y al recuperar foco/abrir;
+AbortController/cleanup evita resultados de sesión desmontada. Lista completa
+Server Component por rol; sin proveedores ni dependencias nuevas. Participaciones
+propias con ancla opaca estable y fecha/canal cuando existan, incluyendo destino
+seleccionado aunque quede fuera del listado inicial. No publicar etapas internas.
+
+Constitución: intermediación, minimización, sesión/RLS y auditoría conservadas;
+excepción de visibilidad N3 explícita y acotada. Recuperación forward-only:
+deshabilitar fanout/ocultar campana, conservar filas y auditoría; no DROP destructivo.
+Pruebas SQL por evento/rol/propiedad/sesión/rollback/idempotencia; rutas/servicios/UI,
+HTTP real y navegador ficticio, teclado/móvil/axe, tipos/lint/tooling/unit/build.
+Gate histórico: company-offer-management conserva2 casillas pendientes. Mateo
+autoriza expresamente continuar con este incremento sin marcarlas como aprobadas.
+
 ## EXTRA096 — Diseño2026-10-28: CV por caso e imágenes de entrada
 
 C1: módulo compartido de política PDF/JPG/JPEG/PNG,5 MiB. normalizeCv servidor

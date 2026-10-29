@@ -36,6 +36,12 @@ OQ005 ni aprobación municipal. No cambia marcas de aceptación humana históric
 
 ## Notes
 
+- EXTRA099: revisión de calidad por etapas: destinatarios, hechos, confirmación
+  municipal, agenda mínima, exclusión de entrevista empresarial, lectura por cuenta,
+  enlaces privados, ausencia de backfill y criterios de atomicidad definidos. Las
+  dos clarificaciones fueron respondidas por Mateo. No cambia marcas de revisión
+  humana; autorización expresa para continuar con2 pendientes históricas de ofertas.
+
 - Incremento EXTRA073: revisión de calidad de requisitos integrada en feature001.
   Scope/R1–R5, última actualización, orden global/empates, página inicial,
   compatibilidad/roles/errores y móvil/teclado están definidos; las respuestas de

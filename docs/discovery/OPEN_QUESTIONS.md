@@ -21,6 +21,21 @@ y posiciones históricas debajo se conservan como trazabilidad.
 
 ## Must be resolved during specification and clarification
 
+### OQ-021 — Alcance de agenda visible y entrevista empresarial (EXTRA099)
+
+Mateo solicita notificaciones por rol, incluida nominación/preentrevista/derivación
+y resultados del candidato. Esto modifica puntualmente la visibilidad anterior de
+FR-053 para avisar esos hechos, sin abrir notas ni evaluación interna. Resuelta
+por Mateo,2026-10-28: omitir por ahora el aviso de entrevista empresarial; el candidato consulta fecha y canal de preentrevistas cuando estén
+registrados. No exponer resumen, recomendación o notas. No acredita aprobación
+jurídica de datos reales. Responsable: desarrollador solicitante (Mateo).
+
+Evidencia posterior de código: company-referral-panel.tsx sí conserva InterviewForm.
+La pregunta lo describía como retirado; ambas versiones quedan documentadas.
+Este incremento omite el aviso y preserva el formulario existente. No interpretar
+la respuesta como autorización de quitar/recrear ese flujo. Responsable si se
+solicita cambiarlo: desarrollador solicitante.
+
 ### OQ-020 — Retiro automático del consentimiento al contratar (2026-10-21)
 
 **Sustituida para el incremento EXTRA094,2026-10-28:** Mateo elige conservar el

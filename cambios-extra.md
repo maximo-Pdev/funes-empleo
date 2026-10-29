@@ -1,5 +1,110 @@
 # Cambios extra necesarios
 
+## EXTRA-100 — Aplicación alojada de notificaciones
+
+- **Fecha/origen:** Mateo,2026-10-28: «aplica la migracion», después de la
+  verificación de EXTRA099. Autoriza aplicar20261028235316_portal_notifications
+  al proyecto Supabase vinculado kyjycjojzhwggjuqjnki; sin publicar interfaz/PR.
+- **Evidencia previa:** rama feat/portal-notifications y cambios existentes
+  preservados. CLI confirma CV20261028210445 aplicado; tabla de avisos e historial
+  de la nueva versión ausentes. Definiciones actuales y conteos sin datos personales
+  guardados en test-results ignorado. Plugin sin permiso, CLI vinculada disponible.
+- **Cambio propuesto antes de ejecutar:** aplicar exclusivamente el SQL revisado
+  en una transacción con timeouts, guardas de ausencia/compatibilidad, verificación
+  de seis cuerpos/search_path/ACL, RLS/política/índices/FK/trigger y registro exacto
+  de versión/nombre/SQL en historial. Conservar funciones previas y conteos de negocio;
+  sin backfill, reparaciones masivas, resets, cargas reales ni pruebas mutantes alojadas.
+- **Archivos/contratos/riesgos:** migración de EXTRA099, guía operativa, estado/tasks
+  y este log. Riesgos de destino equivocado, aplicación parcial o permisos incorrectos:
+  verificar proyecto explícito, rollback ante discrepancias y postcheck independiente
+  de estructura/historial/ACL/smoke público. Recuperación forward-only documentada;
+  no eliminar auditoría ni avisos. Revisión de advisors antes/después.
+- **Estado:** aplicación y comprobación pendientes; autorización expresa, no
+  aceptación legal ni revisión humana del incremento. No commit/PR/deploy implícitos.
+- **Ejecución completada:**20261028235316/portal_notifications aplicado por CLI
+  vinculada en transacción con verificación antes de COMMIT; historial conserva
+  SQL exacto normalizado y MD5ff727318748fe1fb425526d68be049f4,
+  SHA256da661e9392f4edfe1389d380ca20260b43f85148f49eaa63e623a5938027daff.
+  Postcheck independiente confirma seis cuerpos/search_path/ACL, RLS/política,
+  cinco índices, trigger habilitado y FKs RESTRICT. Funciones previas intactas,
+  recuentos de cuentas/perfiles/ofertas/casos/derivaciones/consentimientos/CV/
+  auditoría conservados, cero avisos por backfill y smoke público JSON correcto.
+  No se escribieron postulaciones u otros casos de prueba en el proyecto compartido.
+- **Advisors:** tres WARN nuevos0029 por los RPC autenticados list_my_notifications,
+  open_my_notification y my_candidate_preinterview_agenda. Exposición autenticada
+  intencional del contrato: sesión viva/cuenta activa/propiedad revalidadas en DB;
+  anon/service_role sin EXECUTE, helpers privados y tabla sin grants directos.
+  No aparecieron otras advertencias nuevas. [Detalle del aviso](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable).
+  Recibos/definiciones previas guardados solo en test-results ignorado. Migración
+  alojada verificada; publicar interfaz por PR y revisión/CI continúan pendientes.
+
+## EXTRA-099 — Notificaciones del portal por perfil
+
+- **Fecha/origen:** Mateo,2026-10-28, solicita avisos navegables para candidatos,
+  empresas y administradores con la matriz de eventos incorporada en spec.md.
+  PR82 mergeado7064e3c; application/database/Vercel PASS en a454c4e, run40780133223.
+  Rama anterior retirada local/remota; feat/portal-notifications parte de main
+  actualizado. next-env.d.ts ajeno preservado con su huella anterior.
+- **Evidencia:** no hay notificaciones persistidas. Los comandos registran auditoría
+  transaccional para altas, moderación, participaciones, preentrevistas, derivaciones,
+  entrevistas y feedback. Los cuatro administradores tienen cuentas independientes.
+  FR-053 y la matriz actual ocultan etapas/datos internos al candidato. El pedido
+  nuevo autoriza avisos de nominación/preentrevista/derivación, sin notas ni razones
+  internas. La pregunta inicial consideraba retirado el formulario empresarial;
+  revisión del código actual encuentra InterviewForm en company-referral-panel.tsx.
+  Se conserva sin cambios y se registra esta diferencia con el contexto previo.
+  Mateo confirma omitir ese aviso y permitir únicamente fecha
+  y canal de preentrevista al candidato; resumen y recomendación siguen privados.
+- **Propuesta técnica derivada previa al código:** persistir avisos por destinatario
+  dentro de la transacción de negocio, con vínculo al evento fuente e idempotencia;
+  lectura individual por cuenta y RLS/sesión vigente. Enlaces construidos en servidor
+  a destinos autorizados/referencias opacas; nunca rutas arbitrarias recibidas del
+  cliente ni snapshots de DNI/CUIT/contactos/CV/notas. Integrar campana/contador y
+  lista accesible usando el chrome y componentes adaptados existentes. Avisos en
+  el portal, sin correo, push externo ni nuevo proveedor. No generar avisos históricos.
+- **Archivos/contratos previstos:** nueva migración/tabla/RPC/tipos y pruebas SQL,
+  servicios/acciones/catálogo UI de notificaciones, chrome compartido y vistas de
+  destino por rol; spec/plan/modelo/contratos/tasks/UI/guía. No cambiar entrevistas
+  empresariales. Agenda municipal mínima autorizada en la participación propia.
+- **Riesgos/verificación prevista:** fuga entre destinatarios, estados leídos globales,
+  duplicados, avisos huérfanos si falla auditoría, información revocada/archivada,
+  navegación que eluda permisos, filtración de preselección/notas o resultados aún
+  no confirmados. SQL de roles/propiedad/suspensión/atomicidad/idempotencia y eventos;
+  UI de contador/lista/error/vacío/lectura/enlace/móvil/teclado/axe; tipos/lint/unit/
+  build y E2E con actores ficticios. Recuperación aditiva sin borrar auditoría.
+- **Autorización/estado:** alcance de avisos solicitado y coordinación según AGENTS.
+  Especificación y clarificaciones resueltas. Diseño: AFTER INSERT de auditoría
+  con lista cerrada; avisos sin snapshots personales, UNIQUE por fuente/tipo/cuenta;
+  RPCs de lista/apertura con sesión viva y recurso vigente, RLS solo destinatario;
+  referencia aviso-aleatoria, lectura por POST y destino construido en servidor.
+  Campana privada con refresco mientras la pestaña es visible, lista paginada;
+  participación propia anclada y agenda mínima. Sin backfill ni migración alojada
+  automática. Gates de diseño y verificación se registran antes de implementar.
+  Mateo autoriza continuar pese a2 casillas históricas pendientes del checklist de
+  ofertas; quedan intactas. Necesidad de pruebas derivada N5/N6: los E2E de avisos
+  crean ofertas ficticias, por eso se ejecutan en la fase posterior a los conteos
+  base, junto al recorrido CV específico y antes del reset de concurrencia. Ajustar
+  solo la selección de proyectos Playwright, sin omitir pruebas ni cambiar CI gates.
+  Evidencia de navegador: globals.css aplica fondo oscuro a todo submit y deja
+  fechas grises con contraste1.73 en avisos. Antes de corregir: CSS de módulo
+  acotado a sus filas, tokens municipales de superficie/texto y foco existente;
+  sin alterar estilos globales. Verificar axe, móvil y teclado nuevamente.
+- **Implementado/verificado:** migración20261028235316 y SQL074, tipos cotejados
+  con generación local, src/features/notifications, dos Route Handlers, dos páginas
+  de avisos, chrome/nav por rol y agenda/ancla propias; artefactos/guía operativa/UI.
+  Sin nuevas dependencias/configuración.1346 unit/componentes,57 tooling PASS;
+  SQL completo1416 y focal ampliado57 PASS; tipos/lint/build/diff y DB lint
+  public/private PASS.26 E2E sin omisiones/reintentos, registro real ficticio,
+  permisos HTTP, flujos por rol/agenda/resultado/lectura, axe390/1440/foco PASS.
+  Revisión React: datos servidor mínimos, islas cliente acotadas, cleanup/abort de
+  polling, sin caché privada global; catálogos de canales/etiquetas reutilizados.
+  Contraste de fechas corregido solo en CSS del componente, sin estilos globales.
+  Convergencia N1–N6 sin brechas de implementación nuevas; recuperación documentada.
+  Pendientes posteriores: aplicación alojada, publicación/PR/CI y revisión humana.
+  No solicitados en este turno; sin aceptación legal implícita o cambio en gates
+  históricos. Entorno aislado detenido con backup, entorno habitual y next-env ajeno
+  preservados. Sin commits ni PR todavía.
+
 ## EXTRA-098 — Corregir inventario HTTP del PR82
 
 - **Fecha/origen:** Mateo,2026-10-28, informa fallo de GitHub en PR82. CI40777824782
@@ -30,6 +135,10 @@
   no-store aun con las directivas adicionales del proxy; JSON sin PII.264 pruebas
   directas de guardas/endpoint, tipos/lint/diff PASS. Build/producto/migración sin
   cambios: se usa el build que falla el gate anterior. Pendiente observar nueva CI.
+- **CI/merge confirmados posteriormente:** a454c4e, run40780133223, application y
+  database SUCCESS; Vercel SUCCESS. El conflicto54322 no se repitió, sin cambiar CI.
+  PR82 mergeado7064e3c antes de comenzar EXTRA099. Corrección completada; no equivale
+  a aceptación final del MVP o cierre de OQ/gates históricos.
 
 ## EXTRA-097 — Aplicar y publicar CV por postulación
 

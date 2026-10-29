@@ -1,5 +1,14 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA099: account_notifications agrega id UUID interno, reference aviso-24hex
+UNIQUE, recipient_account_id→accounts y source_event_id→audit_events RESTRICT,
+kind cerrado, resource_id interno, created_at y read_at nullable. UNIQUE(recipient,
+source,kind), índice cronológico por destinatario e índice parcial unread. Sin
+PII, cuerpo libre, URL, snapshots, estado de lectura compartido o backfill. Solo
+RPC dueño con sesión activa puede marcar lectura; fuente/identidad inmutables.
+RLS destinatario activo, sin acceso general por ser administrador. Proyección de
+agenda derivada de preinterviews: solo fechas/canal para titular del caso vigente.
+
 EXTRA085: sin entidades o persistencia nuevas. PDF/XLSX derivan de los mismos
 MetricsFilters/MetricRow/as_of de CSV, null/0 y referencias opacas. No almacenar
 archivos/contenido en logs o auditoría; el evento actual acredita solicitud

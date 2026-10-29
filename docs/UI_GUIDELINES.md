@@ -1,5 +1,17 @@
 # Municipal visual reference
 
+## EXTRA099 — Notificaciones privadas
+
+Campana en DashboardShell/HomeNavbar privado; inicio público sin consultas de
+avisos. Reutilizar Button/Popover Base adaptados, cinco recientes y lista propia20
+por página. Pendientes por cuenta, Sin leer accesible, fecha/hora local, errores
+distintos de vacío, contador99+ con valor completo en etiqueta. Foco restaurado
+al cerrar, teclado/Escape y scroll interno del Popover;390px sin overflow.
+Filas usan Form/POST y tokens de superficie/texto con CSS de módulo acotado para
+evitar el fondo de submit global; mantener foco y contraste de fechas/pendientes.
+Cada aviso navega al destino propio opaco. Preentrevista del candidato solo fechas
+y canal, sin evaluaciones. Archivo muestra recurso no disponible, sin asunto viejo.
+
 ## EXTRA096 — CV por postulación
 
 CV acepta PDF/JPG/JPEG/PNG hasta5 MiB; excluir WebP/video y animaciones. Explicar

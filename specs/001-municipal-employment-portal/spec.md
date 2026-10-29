@@ -1,5 +1,56 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Avisos navegables por perfil,2026-10-28
+
+Pedido explícito de Mateo. Avisos privados dentro del portal, con pendientes/leídos
+por cuenta y enlaces al recurso indicado. No introduce correo ni mensajería externa.
+
+### Matriz solicitada
+
+| Destinatario | Hecho que genera el aviso | Destino esperado |
+| --- | --- | --- |
+| Candidato titular | La Oficina lo nomina/incorpora a una oferta | Su participación en esa oferta |
+| Candidato titular | Administración registra una preentrevista real | Su participación y aviso de preentrevista |
+| Candidato titular | La Oficina confirma una derivación a la empresa | Su participación |
+| Candidato titular | La Oficina confirma contratación o no selección, normal o tardía | Su participación y resultado vigente |
+| Empresa titular | La Oficina deriva a un candidato a una oferta propia | Oferta y derivación propia |
+| Empresa titular | La Oficina aprueba/publica o rechaza su oferta enviada a revisión | Oferta propia y moderación visible |
+| Cada administrador | Una oferta se envía o vuelve a revisión | Oferta y decisión municipal |
+| Cada administrador | Un candidato se postula a una oferta | Participación administrativa |
+| Cada administrador | Una empresa informa contratación o no selección | Participación y respuesta pendiente de revisión |
+| Cada administrador | Se completa el registro del perfil empresarial | Perfil administrativo de esa empresa |
+
+N1: cada aviso pertenece a una cuenta; leerlo no lo marca leído para otros
+administradores. No mezclar cuentas ni permitir lectura/escritura ajena por ID.
+N2: candidato recibe resultados únicamente tras confirmación municipal. Informes
+de empresa pendientes notifican a administración, sin adelantar un resultado final.
+N3: el aviso de nominación/preentrevista/derivación amplía puntualmente FR-053 por
+pedido expreso. No publica preselección, recomendaciones, notas, motivos internos,
+DNI, CUIT, contactos o CV ni habilita a empresas a navegar el padrón.
+N4: pulsar un aviso lleva al caso/oferta/perfil correspondiente, con autorización
+vigente y URL opaca. Un aviso no revive permisos revocados ni evita suspensión.
+Recurso ya inaccesible debe tener respuesta clara sin revelar información ajena.
+N5: avisos de hechos futuros confirmados, sin backfill de auditoría. Un error o
+rollback del negocio no deja avisos falsos; reintentos no duplican el mismo hecho.
+N6: contador de pendientes, listado cronológico, lectura al abrir y acceso a más
+avisos; español, teclado/móvil, vacío/cargando/error claros. Fallo de carga no debe
+presentarse como cero notificaciones. Perfiles asistidos sin cuenta no reciben
+avisos personales hasta tener una cuenta; no convertirlos en mensajes externos.
+
+### Clarificaciones resueltas por Mateo,2026-10-28
+
+- Se omite por ahora el aviso de entrevista empresarial; no cambiar su formulario.
+  La pregunta inicial lo describía como retirado, pero company-referral-panel.tsx
+  actual sí renderiza InterviewForm. Se conserva esa implementación sin cambios;
+  la respuesta autoriza omitir el aviso, no retirar el flujo existente.
+- El candidato puede consultar fecha programada/realizada y canal de una
+  preentrevista registrada. Resumen, recomendación y evaluaciones siguen privados.
+
+Aceptación: un hecho genera solo los destinatarios de la
+matriz; cuatro admins leen independientemente; enlaces llevan al recurso correcto;
+usuarios ajenos/suspendidos no reciben contenido; rollback/reintento no produce
+avisos falsos/duplicados; modificación de disponibilidad y consentimiento no cambia.
+
 ## EXTRA096 — CV por postulación y formatos de entrada2026-10-28
 
 Mateo confirma CV general o específico sin reemplazar general,5 MiB; corrige

@@ -5,11 +5,41 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA099 — Notificaciones del portal
+
+- [x] T245 [EXTRA100] Por pedido posterior de Mateo, aplicar exclusivamente
+  20261028235316 al Supabase vinculado, registrar SQL exacto y verificar seis
+  funciones/ACL/RLS/política/FK/índices/trigger, datos previos, no backfill y smoke
+  público. Transacción/postcheck PASS; advisors0029 autenticados documentados.
+  Sin publicar interfaz/PR ni omitir revisión/CI posteriores.
+
+- [x] T240 [N1–N6] Especificar/clarificar, investigar eventos, plan/modelo/contrato,
+  revisar calidad y cobertura constitucional antes del código; EXTRA099.
+- [x] T241 [N1,N2,N3,N5] Migración aditiva de tabla/RLS/fanout auditado/RPCs propios,
+  agenda mínima, índices/privilegios/tipos y recuperación; SQL de cada evento,
+  destinatario/suspensión/ajeno/archivo/idempotencia/rollback/normal y tardío.
+- [x] T242 [N1,N4] Servicio/contrato validado y GET/POST same-origin/no-store;
+  rutas opacas construidas por rol, read-on-open idempotente, tests negativos.
+- [x] T243 [N3,N4,N6] Campana privada/contador/Popover y listado20 por rol,
+  cinco recientes/errores/cargando/vacío, agenda propia y anclas de destino;
+  tests UI/teclado/móvil/foco/privacidad sin cambios a entrevistas empresariales.
+- [x] T244 [N1–N6] Tipos/lint/unit/tooling/build/SQL y E2E real por rol,
+  auditoría/rollback/lectura independiente/enlaces/axe; docs de uso y recuperación,
+  evidencia/convergencia sin aceptación humana ni aplicación alojada implícitas.
+  1346 unit/componentes,57 tooling, suite SQL1416 y57 focales ampliadas,26 E2E
+  sin omisiones/reintentos, axe390/1440/foco, tipos/lint/build/DB-lint/diff PASS.
+  Reutilización final del catálogo:77 focales y tipos/lint/build PASS. Recuperación
+  documentada, entorno aislado detenido con respaldo, next-env ajeno preservado.
+
+Dependencias T240→T241→T242→T243→T244. Gate histórico2 pendientes de checklist
+ofertas: Mateo autoriza continuar y dejarlas pendientes; no marcar aceptación.
+
 ## EXTRA096 — CV por postulación
 
-- [ ] T239 Corregir gate HTTP del PR82/EXTRA098: inventario explícito del export
+- [x] T239 Corregir gate HTTP del PR82/EXTRA098: inventario explícito del export
   legado no compilado y POST real por rol/suspensión, sin escrituras o PII; RED/GREEN,
   tipos/lint y checks application/database del mismo PR. Sin cambios de negocio/SQL.
+  a454c4e/run40780133223 application/database/Vercel PASS; PR82 mergeado7064e3c.
 
 - [x] T233 Alinear C1–C6/clarificación WebP excluido, plan/modelo/contratos/calidad
   e investigación; análisis de cobertura/constitución antes de código; EXTRA096.

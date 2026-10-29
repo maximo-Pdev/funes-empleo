@@ -24,7 +24,7 @@ export function DashboardShell({ panel, links, name, email, mainLabel, navigatio
   children: ReactNode;
 }) {
   return <div className={styles.page}>
-    <HomeNavbar alwaysVisible panel={panel} />
+    <HomeNavbar alwaysVisible panel={panel} notifications />
     <div className={styles.workspace}>
       <DashboardSidebar label={panel.label} navigation={
           <nav aria-label={navigationLabel} className={styles.navigation}>

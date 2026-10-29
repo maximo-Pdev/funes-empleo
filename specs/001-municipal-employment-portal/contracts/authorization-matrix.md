@@ -1,5 +1,16 @@
 # Contrato de autorización y visibilidad
 
+EXTRA099,2026-10-28: cada cuenta activa con sesión viva consulta/abre únicamente
+sus avisos, también para los cuatro admins. No hay bandeja común ni parámetros
+de destinatario. RLS propia, sin escritura directa; RPC de apertura actualiza
+solo read_at propio. Destinos revalidados al abrir y en la página final.
+Excepción acotada a FR053: titular conoce nominación/preentrevista/derivación por
+aviso; agenda municipal propia expone scheduled_at/held_at/channel únicamente.
+No publica resumen, recomendación, motivos, notas, documentos de identidad o
+perfiles ajenos; feedback empresarial no confirmado solo avisa a administración.
+Sin cambios de consentimiento, disponibilidad ni permisos de empresas. Contrato
+detallado: notifications.md. Sin backfill ni aviso de entrevista empresarial.
+
 EXTRA069,2026-10-25: excepción ampliada a toda derivación propia. Cuenta/empresa
 activas y oferta/caso/derivación no archivados reciben solo candidateName actual
 en company_referral y candidate_name en company_referral_summaries. No exige
