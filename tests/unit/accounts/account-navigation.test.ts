@@ -36,7 +36,7 @@ it("devuelve acceso público seguro cuando no se puede verificar la identidad", 
 it.each([
   ["candidate", "/dashboard?section=perfil", "/dashboard", "Panel de usuario"],
   ["company", "/empresa/perfil", "/empresa", "Panel de empresa"],
-  ["admin", "/account", "/account", "Panel de administración"],
+  ["admin", "/account", "/admin", "Panel de administración"],
 ] as const)("expone el panel de %s solo con sesión activa", async (role, accountHref, panelHref, panelLabel) => {
   mocks.readSession.mockResolvedValue({ account: { role, status: "active", id: "private-id" } });
   expect(await getSiteAccess()).toEqual({

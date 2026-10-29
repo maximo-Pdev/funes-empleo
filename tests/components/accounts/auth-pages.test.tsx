@@ -13,6 +13,7 @@ vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/companies/service", () => ({ getCompanyWorkspace: vi.fn().mockResolvedValue({ profile: { legalName: "Empresa Ficticia" } }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/account", useRouter: () => ({ refresh: vi.fn() }) }));
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: mocks.logout, accountStatusAction: vi.fn() }));
+vi.mock("@/features/accounts/admin-invitation-actions", () => ({ administratorInvitationAction: vi.fn() }));
 import Recovery from "@/app/(auth)/recover/page";
 import Expired from "@/app/(auth)/verification-expired/page";
 import Logout from "@/app/(auth)/logout/page";
@@ -71,7 +72,7 @@ it("no ofrece archivo a administración y mantiene la exclusión del propio admi
  expect(screen.getByRole("main").querySelector('[data-slot="admin-canvas"]')).toBeTruthy();
  const navigation = within(sidebar).getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
  expect(within(navigation).getByRole("link", { name: "Cuenta" }).getAttribute("aria-current")).toBe("page");
- expect(within(navigation).getAllByRole("link")).toHaveLength(7);
+ expect(within(navigation).getAllByRole("link")).toHaveLength(9);
  expect(within(navigation).getByRole("link", { name: "Perfil asistido" }).getAttribute("href")).toBe("/admin/atencion-presencial");
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
  expect(mocks.neq).toHaveBeenCalledWith("id", "cuenta-ficticia");

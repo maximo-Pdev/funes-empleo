@@ -46,7 +46,7 @@ try {
   await page.getByLabel("Correo electrónico").fill(credentials.admin1.email);
   await page.getByLabel("Contraseña",{exact:true}).fill(credentials.admin1.password);
   await page.getByRole("button",{name:"Ingresar",exact:true}).click();
-  await page.waitForURL("**/account");
+  await page.waitForURL("**/admin");
   if (scenario === "concurrent-admins") {
     const pages=[page];
     for (let n=2;n<=4;n++) {
@@ -57,7 +57,7 @@ try {
       await p.getByLabel("Correo electrónico").fill(credentials[`admin${n}`].email);
       await p.getByLabel("Contraseña",{exact:true}).fill(credentials[`admin${n}`].password);
       await p.getByRole("button",{name:"Ingresar",exact:true}).click();
-      await p.waitForURL("**/account"); pages.push(p);
+      await p.waitForURL("**/admin"); pages.push(p);
     }
     const fixture=manifest.concurrentAdmins;
     await pages[0].goto(`/admin/openings/${id("opening",fixture.openingNumber)}`);
@@ -82,9 +82,9 @@ try {
       const start=performance.now();
       try {
         await p.getByRole("button",{name:n===0?"Guardar decisión":n===2?"Guardar contacto":"Registrar acción",exact:true}).click();
-        if(n===0) await expect(p.getByText("Estado: Publicada",{exact:true})).toBeVisible();
+        if(n===0) await expect(p.getByRole("region",{name:"Oferta y empresa",exact:true}).getByText("Publicada",{exact:true})).toBeVisible();
         else if(n===2) await expect(p.getByText(`Contacto ficticio concurrente ${resetId}`,{exact:true})).toBeVisible();
-        else await expect(p.getByRole("status").filter({hasText:`Resultado o estado vigente: ${n===1?"Preseleccionada":"Persona contratada"}`})).toBeVisible();
+        else await expect(p.getByRole("status").filter({hasText:`Resultado o estado vigente ${n===1?"Preseleccionada":"Persona contratada"}`})).toBeVisible();
         const duration=performance.now()-start;
         return {action:names[n],admin:n+1,startOffset:start-barrier,milliseconds:duration,limit:5000,pass:duration<=5000};
       } catch { return {action:names[n],admin:n+1,startOffset:start-barrier,milliseconds:performance.now()-start,limit:5000,pass:false,error:"UI_SUCCESS_NOT_OBSERVED"}; }

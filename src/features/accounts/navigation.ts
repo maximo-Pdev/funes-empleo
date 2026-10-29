@@ -10,7 +10,7 @@ const accountAccess: Record<UserRole, { href: string; label: string }> = {
 const panelAccess: Record<UserRole, string> = {
   candidate: "/dashboard",
   company: "/empresa",
-  admin: "/account",
+  admin: "/admin",
 };
 const panelLabels: Record<UserRole, string> = {
   candidate: "Panel de usuario",

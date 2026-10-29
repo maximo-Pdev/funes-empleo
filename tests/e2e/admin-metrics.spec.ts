@@ -21,7 +21,7 @@ test("administración: fixture exacto, filtros, tiempos y CSV en menos de 30 seg
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/admin$/);
   await page.goto("/admin/metrics?from=invalido");
   await expect(page.getByRole("heading", { name: "Métricas operativas" })).toBeVisible();
   await page.getByLabel("Desde", { exact: true }).fill("2026-09-01");
@@ -94,7 +94,7 @@ test("seguimiento: canales cronológicos y plantillas sin envío", async ({ page
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/admin$/);
   await page.goto(`/admin/participations/${fixtureId("participation",1)}`);
   const timeline = page.getByRole("region", { name: "Historial de contactos" });
   await expect(timeline.locator("li")).toHaveCount(4);
