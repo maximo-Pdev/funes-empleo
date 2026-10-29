@@ -7,6 +7,7 @@ import { registerCompanyAction } from "../company-actions";
 import { PasswordField } from "@/features/accounts/components/password-field";
 import { companyPhoneField, cuitField } from "@/components/forms/identifier-fields";
 import { LocalityCombobox } from "./locality-combobox";
+import { TermsAcceptanceField } from "@/features/accounts/components/terms-acceptance-field";
 
 export function CompanyRegistrationForm({ submitLabel = "Crear cuenta de empresa", homepageLayout = false, onSent, defaultValues }: { submitLabel?: string; homepageLayout?: boolean; onSent?: (result: { email: string; message: string }) => void; defaultValues?: Record<string, string> } = {}) {
   const [state, action, pending] = useActionState(registerCompanyAction, { message: "", success: false });
@@ -43,6 +44,7 @@ export function CompanyRegistrationForm({ submitLabel = "Crear cuenta de empresa
     <PasswordField name="password" label="Contraseña" autoComplete="new-password" help="Entre 6 y 128 caracteres. No compartas tu contraseña." defaultValue={defaultValues?.password} />
     <PasswordField name="confirmation" label="Confirmar contraseña" autoComplete="new-password" defaultValue={defaultValues?.confirmation} />
     <p className="text-sm">Verificá tu correo antes de ingresar. Cada oferta requiere revisión de la Oficina antes de publicarse.</p>
+    <TermsAcceptanceField />
     <p ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{homepageLayout && state.success && state.message && <Info size={16} aria-hidden="true" />}{state.message}</p>
     <button type="submit" disabled={pending} className="rounded bg-blue-800 p-3 font-semibold text-white disabled:opacity-60">{submitLabel}</button>
   </Form>;

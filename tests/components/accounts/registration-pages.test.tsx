@@ -5,14 +5,14 @@ vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: 
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn() }));
 import { HomeHero } from "@/app/(public)/home-hero";
 
-it.each([["candidate", "Postulante", "Tu próximo paso laboral empieza acá.", 5], ["company", "Empresa", "Encontrá talento para tu empresa.", 10]] as const)("conserva los campos de %s en el acceso de Home", (role, label, heading, fields) => {
+it.each([["candidate", "Postulante", "Tu próximo paso laboral empieza acá.", 7], ["company", "Empresa", "Encontrá talento para tu empresa.", 10]] as const)("conserva los campos de %s en el acceso de Home", (role, label, heading, fields) => {
   const view = render(<HomeHero authenticated={false} initialView={role} />);
   expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   expect(screen.getByRole("heading", { name: heading })).toBeTruthy();
   const panel = screen.getByRole("region", { name: "Acceso al portal" });
   const form = panel.querySelector("form")!;
   const inputNames = [...form.querySelectorAll("input")].map(input => input.getAttribute("name")).filter((name): name is string => name !== null);
-  if (role === "company") expect(inputNames).toEqual(["legalName", "responsibleName", "email", "cuit", "activity", "locality", "phone", "password", "confirmation"]);
+  if (role === "company") expect(inputNames).toEqual(["legalName", "responsibleName", "email", "cuit", "activity", "locality", "phone", "password", "confirmation", "termsVersion", "termsAccepted"]);
   else expect(inputNames).toHaveLength(fields);
   expect(view.container.querySelectorAll("#acceso")).toHaveLength(1);
   expect(screen.getByRole("radio", { name: label })).toHaveProperty("checked", true);

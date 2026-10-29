@@ -11,7 +11,8 @@ export async function registerAccount(input: unknown) {
   const client = await createServerSupabaseClient();
   const { email, password, role } = parsed.data;
   const result = await client.auth.signUp({ email, password, options: {
-    emailRedirectTo: getClientEnvironment().NEXT_PUBLIC_APP_URL + "/auth/callback", data: { role },
+    emailRedirectTo: getClientEnvironment().NEXT_PUBLIC_APP_URL + "/auth/callback", data: { role,
+      registration_terms_accepted: parsed.data.termsAccepted, registration_terms_version: parsed.data.termsVersion },
   } });
   // Never return user, identities, tokens, duplicate-account errors or existence.
   return !result.error;
@@ -71,7 +72,7 @@ export async function changeAccountStatus(input: unknown) {
   if (result.error) return { code: result.error.message === "CONFLICT_STALE_DATA" ? "CONFLICT_STALE_DATA" as const : "DENIED" as const };
   return { code: "OK" as const, version: result.data };
 }
-// Operator service, intentionally not exported as a public Server Action or ordinary panel operation.
+// Server-only service: recheck the verified active administrator before privileged provisioning.
 export async function provisionAdministrator(input: unknown) {
   const parsed = emailInput.safeParse(input);
   const session = await readAccountSession();
