@@ -6,6 +6,7 @@ set local timezone = 'America/Buenos_Aires';
 select no_plan();
 select is(current_date,(current_timestamp at time zone 'America/Buenos_Aires')::date,
  'La fecha de la fixture coincide con el día de negocio argentino');
+select set_config('retry.today',(clock_timestamp() at time zone 'America/Buenos_Aires')::date::text,true);
 grant execute on function private.fixture_id(text,integer) to authenticated;
 insert into auth.sessions(id,user_id) values
  ('ee750000-0000-4000-8000-000000000001',private.fixture_id('candidate',200)),
@@ -16,7 +17,7 @@ insert into public.job_openings
 select (jsonb_populate_record(null::public.job_openings,to_jsonb(t)||jsonb_build_object(
  'id',private.fixture_id('retry-offer',n),'slug',null,'title','Oferta reintento ficticia '||n,
  'company_id',(select id from public.company_profiles where account_id=private.fixture_id('company',1)),
- 'status','published','closing_date',current_date+20,'version',1,'archived_at',null))).*
+ 'status','published','closing_date',current_setting('retry.today')::date+20,'version',1,'archived_at',null))).*
 from public.job_openings t cross join generate_series(1,8) n where t.id=private.fixture_id('opening',1);
 insert into public.opening_categories(opening_id,category_id)
 select private.fixture_id('retry-offer',1),category_id from public.candidate_categories where candidate_id=private.fixture_id('profile',200);
@@ -58,11 +59,11 @@ select throws_ok($$select public.create_participation(private.fixture_id('profil
 select pg_temp.retry_actor('candidate',200,'000000000001');
 select throws_ok($$select public.apply_to_opening(private.fixture_id('retry-offer',1),99)$$,'P0001','CONFLICT_STALE_DATA','Reintento mantiene control de versión');
 reset role;
-update public.job_openings set closing_date=current_date-1 where id=private.fixture_id('retry-offer',1);
+update public.job_openings set closing_date=current_setting('retry.today')::date-1 where id=private.fixture_id('retry-offer',1);
 set local role authenticated;
 select throws_ok($$select pg_temp.retry_apply(1)$$,'P0001','INVALID_TRANSITION','Oferta vencida no admite reintento');
 reset role;
-update public.job_openings set closing_date=current_date+20,status='paused' where id=private.fixture_id('retry-offer',1);
+update public.job_openings set closing_date=current_setting('retry.today')::date+20,status='paused' where id=private.fixture_id('retry-offer',1);
 set local role authenticated;
 select throws_ok($$select pg_temp.retry_apply(1)$$,'P0001','INVALID_TRANSITION','Oferta no publicada no admite reintento');
 reset role;

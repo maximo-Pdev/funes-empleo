@@ -15,6 +15,7 @@ import { ParticipationTimeline } from "@/features/participations/components/part
 import { FeedbackReviewPanel } from "@/features/participations/components/feedback-review-panel";
 
 describe("intermediación administrativa", () => {
+
   it("continues nomination to the actual case through an opaque action reference", async () => {
     nomination.preview.mockResolvedValue({ code: "OK", profile: { ...openingPreview, cvReference: "cv-111111111111111111111111" } });
     nomination.create.mockResolvedValue({ code: "OK", participationId: openingPreview.id, participationReference: "cas-111111111111111111111111" });
@@ -28,6 +29,20 @@ describe("intermediación administrativa", () => {
     expect(next.getAttribute("href")).not.toContain(openingPreview.id);
     expect(screen.getByRole("status").textContent).toContain("todavía no recibe");
   });
+
+  it("ofrece solo aprobar, rechazar o solicitar correcciones al revisar", () => {
+    render(<ModerationForm openingId="offer-review" version={1} status="pending_review" onSubmit={vi.fn()} />);
+    const decisions = screen.getAllByRole("option").filter(item => (item as HTMLOptionElement).value);
+    expect(decisions.map(item => item.textContent)).toEqual(["Aprobar", "Rechazar", "Solicitar correcciones"]);
+  });
+
+  it("conserva las acciones de seguimiento de una oferta publicada", () => {
+    render(<ModerationForm openingId="offer-live" version={1} status="published" onSubmit={vi.fn()} />);
+    expect(screen.getAllByRole("option").filter(item => (item as HTMLOptionElement).value).map(item => item.textContent))
+      .toEqual(["Pausar", "Cerrar", "Suspender", "Cancelar"]);
+  });
+
+
   it("exige una explicación empresarial para corrección y separa el motivo interno", () => {
     const submit = vi.fn();
     render(<ModerationForm openingId="offer-1" version={2} status="pending_review" onSubmit={submit} />);

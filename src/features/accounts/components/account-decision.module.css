@@ -1,0 +1,6 @@
+.reactivation {
+  --form-submit-background: var(--color-primary);
+  --form-submit-hover: var(--color-primary-700);
+  border-color: var(--color-primary-100);
+  background: var(--color-primary-50);
+}

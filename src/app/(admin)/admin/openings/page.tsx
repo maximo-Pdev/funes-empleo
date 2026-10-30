@@ -24,6 +24,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
   const urlForPage = (target: number) => `/admin/openings?${new URLSearchParams({
     ...(status?.success ? { status: status.data } : {}), page: String(target),
   })}`;
+  const outOfRange = result !== null && result.total > 0 && result.page > result.pageCount;
 
   return <AdminShell email={user?.email} active="/admin/openings" title="Ofertas para la Oficina" description="Moderación y seguimiento de ofertas con historial de decisiones."
     navigation={[{ href: "/admin/candidates", label: "Candidatos" }, { href: "/admin/participations", label: "Participaciones" }, { href: "/account", label: "Cuenta" }]}>
@@ -37,13 +38,13 @@ export default async function AdminOpeningsPage({ searchParams }: {
     {invalid && <div className="mt-5"><FeedbackMessage tone="error">Revisá el estado o la página solicitada.</FeedbackMessage></div>}
     {result && <section className="mt-8 space-y-4" aria-label="Listado de ofertas">
       <h2 className="text-xl font-semibold">Ofertas: {result.total}</h2>
-      {result.items.length === 0 ? <EmptyState title="Sin ofertas" description="No hay ofertas con estos filtros." /> :
+      {outOfRange ? <div className="space-y-3"><EmptyState title="Página sin ofertas" description="La página solicitada está fuera del listado actual." /><Link href={urlForPage(1)} className="font-semibold underline">Volver a la primera página</Link></div> : result.items.length === 0 ? <EmptyState title="Sin ofertas" description="No hay ofertas con estos filtros." /> :
         <ul className="space-y-3">{result.items.map((opening) => <li key={opening.id} className="rounded-lg border border-slate-300 bg-white p-4">
           <Link href={`/admin/openings/${opening.id}`} className="font-semibold text-blue-800 underline">{opening.title ?? "Oferta sin título"}</Link>
           <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
           <p className="mt-2 text-sm text-muted-foreground">Cierre: {opening.closing_date ? formatPublicClosingDate(opening.closing_date) : "Sin definir"}</p>
         </li>)}</ul>}
-      {result.pageCount > 1 && <Pagination aria-label="Páginas de ofertas">
+      {!outOfRange && result.pageCount > 1 && <Pagination aria-label="Páginas de ofertas">
         <PaginationContent>
           {result.page > 1 && <PaginationItem><PaginationPrevious href={urlForPage(result.page - 1)} /></PaginationItem>}
           <PaginationItem><span className="px-3 text-sm">Página {result.page} de {result.pageCount}</span></PaginationItem>

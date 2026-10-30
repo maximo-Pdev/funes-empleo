@@ -1,5 +1,15 @@
 # Guía de validación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA109 — Administración
+
+Ver `docs/operations/admin-offer-management.md`. Sin migración nueva. Como admin,
+revisar las tres decisiones de una oferta pendiente, abrir la ficha empresarial,
+recorrer ofertas de diez en diez (incluidas las posteriores a50) y recuperar una
+página fuera de rango. En historial, cinco eventos y Mostrar más con teclado.
+Comprobar contacto municipal sin plantillas y reactivaciones verdes manteniendo
+confirmación y motivo. Verificar límites de roles, último administrador y dos
+transacciones concurrentes únicamente sobre la instancia ficticia propia.
+
 ## EXTRA102 — Fechas/reintentos/rojo
 
 Aplicar migración de reintentos antes de usar la UI nueva. Candidato apto:

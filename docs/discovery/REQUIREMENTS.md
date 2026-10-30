@@ -61,7 +61,7 @@ Priority meanings:
 ## Communication and audit
 
 - **FR-050 — Must:** Staff can record phone, email, WhatsApp, and in-person contact events.
-- **FR-051 — Should:** The interface provides message templates or safe links without requiring direct WhatsApp API integration.
+- **FR-051 — Withdrawn by Mateo, EXTRA109, 2026-10-29:** Remove staff message templates; retain contact recording and history without an automatic messaging integration. Approved spec FR-057 records this change.
 - **FR-052 — Must:** Important administrative changes retain actor, timestamp, previous state, and new state where applicable.
 - **FR-053 — Must:** Internal notes are invisible to candidates and companies.
 

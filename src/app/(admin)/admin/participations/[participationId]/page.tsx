@@ -15,7 +15,6 @@ import { FeedbackReviewPanel } from "@/features/participations/components/feedba
 import { ParticipationTimeline } from "@/features/participations/components/participation-timeline";
 import { getContactTimeline } from "@/features/participations/contact-service";
 import { ContactTimeline } from "@/features/participations/components/contact-timeline";
-import { ContactTools } from "@/features/participations/components/contact-tools";
 import { adminParticipationAction, confirmFeedbackAction, recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
 
@@ -97,7 +96,6 @@ export default async function AdminParticipationDetailPage({ params }: {
       </div>
       <div className="space-y-6">
         <ContactTimeline contacts={contactHistory} />
-        <ContactTools />
         <section aria-labelledby="preinterviews-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
           <h2 id="preinterviews-title" className="text-xl font-semibold">Preentrevistas</h2>
           {preinterviews.length === 0 ? <EmptyState title="Sin preentrevistas" description="Todavía no se registró una preentrevista." /> :

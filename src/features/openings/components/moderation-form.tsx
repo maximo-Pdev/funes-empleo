@@ -16,13 +16,13 @@ export type ModerationPayload = {
 };
 
 const decisionLabels: Record<AdminOpeningDecision, string> = {
-  approved: "Aprobar y publicar", changes_requested: "Solicitar correcciones", rejected: "Rechazar",
+  approved: "Aprobar", changes_requested: "Solicitar correcciones", rejected: "Rechazar",
   paused: "Pausar", resumed: "Reanudar", closed: "Cerrar", suspended: "Suspender",
   restored_to_draft: "Devolver a borrador", cancelled: "Cancelar",
 };
 const visibleChoices: Partial<Record<OpeningStatus, readonly AdminOpeningDecision[]>> = {
   draft: ["suspended", "cancelled"],
-  pending_review: ["approved", "changes_requested", "rejected", "suspended", "cancelled"],
+  pending_review: ["approved", "rejected", "changes_requested"],
   changes_requested: ["suspended", "cancelled"],
   published: ["paused", "closed", "suspended", "cancelled"],
   paused: ["resumed", "closed", "suspended", "cancelled"],
