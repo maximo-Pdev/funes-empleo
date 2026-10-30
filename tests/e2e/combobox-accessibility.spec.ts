@@ -19,20 +19,20 @@ async function checkPopup(page: Page, triggerName: string, popupName: string, li
 
 test("registro empresarial: selector de localidad abierto tiene nombres y foco accesibles", async ({ page }) => {
   await page.goto("/?registro=empresa");
-  await checkPopup(page, "Localidad", "Seleccionar localidad", "Localidades disponibles");
+  await checkPopup(page, "Localidad", "Elegir localidad", "Localidad: opciones");
 });
 
 test("administración: categorías y localidad abiertas conservan accesibilidad", async ({ page }) => {
   await loginFixture(page, "admin");
   await page.goto("/admin/candidates");
-  await checkPopup(page, "Categorías", "Filtrar por categorías", "Categorías disponibles para filtrar");
-  await checkPopup(page, "Localidad", "Seleccionar localidad", "Localidades disponibles");
+  await checkPopup(page, "Categorías", "Elegir categorías", "Categorías: opciones");
+  await checkPopup(page, "Localidad", "Elegir localidad", "Localidad: opciones");
   await page.goto("/admin/atencion-presencial");
-  await checkPopup(page, "Categorías laborales", "Seleccionar categorías laborales", "Categorías laborales disponibles");
+  await checkPopup(page, "Categorías laborales", "Elegir categorías laborales", "Categorías laborales: opciones");
 });
 
 test("empresa: modalidades abiertas tienen nombres y foco accesibles", async ({ page }) => {
   await loginFixture(page, "company");
   await page.goto("/empresa/ofertas/nueva");
-  await checkPopup(page, "Modalidad", "Opciones de modalidad", "Valores de modalidad");
+  await checkPopup(page, "Modalidad", "Opciones de modalidad", "Modalidad: opciones");
 });
