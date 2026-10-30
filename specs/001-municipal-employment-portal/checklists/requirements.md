@@ -1,5 +1,11 @@
 # Specification Quality Checklist: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA109: revisión acotada antes de código: siete criterios AD1–AD7 verificables,
+estados/permisos vigentes y retirada explícita de FR057; paginación empresarial
+sin truncado y controles de último admin conservados. Datos privados solo admin,
+empty/error/rango/teclado/móvil y prueba concurrente identificados. Sin decisión
+municipal abierta resuelta, arquitectura nueva ni casillas humanas completadas.
+
 EXTRA106/108: alcance limitado por Mateo a CTA de /ofertas, con tres roles activos
 y visitante definidos. Inicio/login descartados; sin cambios de negocio,
 autorización o arquitectura ni cierre de casillas históricas de revisión humana.

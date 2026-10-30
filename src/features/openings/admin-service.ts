@@ -32,6 +32,15 @@ export async function listAdminOpenings(input: unknown) {
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (status) query = query.eq("status", status);
   const result = await query;
+  if (result.error?.code === "PGRST103") {
+    let countQuery = client.from("job_openings").select("id", { count: "exact", head: true })
+      .is("archived_at", null).neq("status", "draft");
+    if (status) countQuery = countQuery.eq("status", status);
+    const count = await countQuery;
+    if (count.error) throw new AppError("INTERNAL_ERROR");
+    const total = count.count ?? 0;
+    return { items: [], total, page, pageSize, pageCount: Math.ceil(total / pageSize) };
+  }
   if (result.error) throw new AppError("INTERNAL_ERROR");
   const total = result.count ?? 0;
   return { items: result.data ?? [], total, page, pageSize, pageCount: Math.ceil(total / pageSize) };

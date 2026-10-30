@@ -1,5 +1,26 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA109/110/111 — Gestión administrativa,29/10/2026
+
+Rama feat/admin-offer-management desde main9cf0741, PR86 mergeado y rama anterior
+eliminada local/remota. Cambio ajeno next-env preservado con su hash original.
+Tres decisiones de revisión, enlace y ficha empresarial autorizada, ofertas de10
+por página sin límite50, recuperación PGRST103, historial5/Mostrar más reutilizado,
+plantillas retiradas y reactivaciones verdes. Protección existente del último
+administrador comprobada también con dos conexiones reales; sin reglas nuevas.
+
+1387 unit/componentes/112 archivos,60 tooling,1463 SQL/28 archivos, concurrencia,
+E2E de contactos, tipos/lint/build/diff PASS. Navegador ficticio: tres decisiones
+guardadas, páginas posteriores a50, recuperación, historial/foco, tres variantes
+de reactivación/validación y dos roles denegados; diez vistas1440/390px con axe0 y
+sin overflow. Solo entorno propio aislado; no base habitual ni Supabase alojado.
+EXTRA110 corrige día Funes del fixture SQL en frontera UTC; EXTRA111 corrige token
+ámbar de4.24 a5.67:1 tras fallo axe real. Sin migración, secretos o dependencias.
+
+T259–T267 completadas; contraste AD1–AD7 contra código/pruebas sin brechas nuevas.
+Guía de operación y recuperación: docs/operations/admin-offer-management.md.
+No commit/PR/CI/revisión humana/despliegue implícitos; gates históricos intactos.
+
 ## EXTRA106/108 — Acceso de ofertas por sesión, 29/10/2026
 
 Rama fix/public-authenticated-access desde main e8ba52c. Mateo descarta todos los

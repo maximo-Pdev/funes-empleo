@@ -43,7 +43,7 @@ const id = "0a000000-0000-4000-8000-000000000001";
 const date = "2026-10-19T12:00:00Z";
 const categories = [{ id, name: "Administración", code: "DEMO-A", version: 1 }];
 const candidate = { id, display_name: "Persona Ficticia", status: "active", version: 1, account_id: id, accounts: { status: "active", version: 1 }, locality: "Funes", availability: "Disponible", refresh_due_at: "2027-04-19", skills_experience_summary: "Experiencia ficticia en tareas administrativas y atención al público.", candidate_categories: [{ job_categories: categories[0] }] };
-const opening = { id, title: "Auxiliar administrativo", status: "pending_review", version: 1, company_profiles: { legal_name: "Empresa Ficticia" }, closing_date: "2026-11-30", vacancies: 2, location: "Funes", modality: "Presencial", schedule: "Jornada completa", contract_type: "Permanente", tasks: "Atención al público y organización de documentación.", requirements: "Experiencia administrativa y manejo de herramientas informáticas." };
+const opening = { id, title: "Auxiliar administrativo", status: "pending_review", version: 1, company_profiles: { id, legal_name: "Empresa Ficticia" }, closing_date: "2026-11-30", vacancies: 2, location: "Funes", modality: "Presencial", schedule: "Jornada completa", contract_type: "Permanente", tasks: "Atención al público y organización de documentación.", requirements: "Experiencia administrativa y manejo de herramientas informáticas." };
 const participation = { id, status: "received", version: 1, candidate_profiles: { id, display_name: candidate.display_name }, job_openings: { id, title: opening.title }, origin: "candidate_application", created_at: date, feedback_due_at: null };
 const company = { id, account_id: id, legal_name: "Empresa Ficticia", status: "active", version: 1, archived_at: null };
 const profileData = { name: candidate.display_name, dni: "90000001", email: "persona@example.invalid", phone: "", locality: "Funes", summary: candidate.skills_experience_summary, detail: "Jornada completa", address: "", availability: "available", categories: [id] };
@@ -57,8 +57,8 @@ const rows = [
 const preview = { id, status: "blocked", version: 1, total: 1, valid: 0, invalid: 1, duplicates: 0, rows: [{ id, number: 1, name: candidate.display_name, dni: "90000001", email: "persona@example.invalid", phone: "", locality: "Funes", categories: ["DEMO-A"], availability: "available", summary: "Experiencia ficticia", errors: ["UNKNOWN_CATEGORY"], matches: [], fields: [], decision: null }], hash: "ficticio", mapping: "demo-v1", retryOf: null, failure: null };
 beforeEach(() => {
  vi.clearAllMocks(); mocks.guard.mockResolvedValue({ user: { email: "admin@example.invalid" }, client: { from: mocks.from } });
- mocks.from.mockImplementation(() => { const query = { select: () => query, order: () => query, eq: () => query, neq: () => query, range: mocks.range, maybeSingle: mocks.company, single: mocks.account, limit: mocks.companyOffers }; return query; });
- mocks.range.mockResolvedValue({ data: [company], count: 11, error: null }); mocks.company.mockResolvedValue({ data: company, error: null }); mocks.account.mockResolvedValue({ data: { id, status: "active", version: 1 }, error: null }); mocks.companyOffers.mockResolvedValue({ data: [opening], error: null });
+ mocks.from.mockImplementation((table: string) => { const query = { select: () => query, order: () => query, eq: () => query, neq: () => query, range: table === "job_openings" ? mocks.companyOffers : mocks.range, maybeSingle: mocks.company, single: mocks.account, limit: mocks.companyOffers, then: (resolve: (result: unknown) => unknown) => Promise.resolve({ data: null, count: 11, error: null }).then(resolve) }; return query; });
+ mocks.range.mockResolvedValue({ data: [company], count: 11, error: null }); mocks.company.mockResolvedValue({ data: company, error: null }); mocks.account.mockResolvedValue({ data: { id, status: "active", version: 1 }, error: null }); mocks.companyOffers.mockResolvedValue({ data: [opening], count: 11, error: null });
  mocks.categories.mockResolvedValue(categories); mocks.search.mockResolvedValue({ total: 11, page: 1, pageCount: 2, items: [{ id, displayName: candidate.display_name, locality: "Funes", availability: "Disponible", categories, referralEligible: true }] });
  mocks.assistedSearch.mockResolvedValue({ total: 11, page: 1, pageCount: 2, items: [{ id, displayName: candidate.display_name, locality: "Funes", status: "draft", availability: null, categories, referralEligible: false }] });
  mocks.candidate.mockResolvedValue({ candidate, currentCv: null, referralEligible: true, participations: [participation], notes: [], audit: [] }); mocks.nominations.mockResolvedValue([opening]);
@@ -70,6 +70,82 @@ beforeEach(() => {
 });
 it("rechaza acceso antes de consultar el padrón", async () => {
  mocks.guard.mockRejectedValue(new Error("FORBIDDEN")); await expect(Candidates({ searchParams: Promise.resolve({}) })).rejects.toThrow("FORBIDDEN"); expect(mocks.search).not.toHaveBeenCalled();
+});
+it("enlaza desde la oferta al perfil de empresa con referencia opaca", async () => {
+ render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
+ expect(screen.getByRole("link", { name: "Ver perfil de la empresa" }).getAttribute("href"))
+   .toBe(`/admin/empresas/${fixtureReference("company", id)}`);
+});
+it("muestra los datos registrados de empresa solo después de exigir admin", async () => {
+ mocks.company.mockResolvedValue({ data: { ...company, cuit_display: "20-90000001-3", responsible_name: "Responsable Ficticio", email: "contacto@example.invalid", phone: "3410000000", activity: "Actividad ficticia", locality: "Funes" }, error: null });
+ render(await Company({ params: Promise.resolve({ companyId: id }) }));
+ expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
+ const profile = screen.getByRole("region", { name: "Perfil de la empresa" });
+ for (const value of ["20-90000001-3", "Responsable Ficticio", "contacto@example.invalid", "3410000000", "Actividad ficticia", "Funes"]) expect(within(profile).getByText(value)).toBeTruthy();
+ expect(within(profile).queryByRole("textbox")).toBeNull();
+});
+it("explica datos empresariales ausentes sin inventarlos", async () => {
+ render(await Company({ params: Promise.resolve({ companyId: id }) }));
+ expect(within(screen.getByRole("region", { name: "Perfil de la empresa" })).getAllByText("Sin informar")).toHaveLength(6);
+});
+it("pagina las ofertas de la empresa más allá del anterior límite de cincuenta", async () => {
+ mocks.companyOffers.mockResolvedValue({ data: [opening], count: 55, error: null });
+ render(await Company({ params: Promise.resolve({ companyId: id }), searchParams: Promise.resolve({ page: "6" }) }));
+ expect(mocks.companyOffers).toHaveBeenCalledWith(50, 59);
+ expect(screen.getByText("Página 6 de 6")).toBeTruthy();
+ expect(screen.queryByRole("link", { name: "Siguiente" })).toBeNull();
+ expect(screen.getByRole("link", { name: "Anterior" }).getAttribute("href"))
+   .toBe(`/admin/empresas/${fixtureReference("company", id)}?page=5`);
+});
+it.each(["0", "1.5", "1001", ["1", "2"]])("no consulta ofertas empresariales con página inválida %j", async page => {
+ render(await Company({ params: Promise.resolve({ companyId: id }), searchParams: Promise.resolve({ page }) }));
+ expect(mocks.companyOffers).not.toHaveBeenCalled();
+ expect(within(screen.getByRole("region", { name: "Ofertas de la empresa" })).getByRole("alert").textContent).toContain("Revisá la página");
+});
+it("recupera una página empresarial fuera de rango sin enlaces a páginas inexistentes", async () => {
+ mocks.companyOffers.mockResolvedValue({ data: [], count: 11, error: null });
+ render(await Company({ params: Promise.resolve({ companyId: id }), searchParams: Promise.resolve({ page: "9" }) }));
+ expect(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href"))
+   .toBe(`/admin/empresas/${fixtureReference("company", id)}?page=1`);
+ expect(screen.queryByRole("link", { name: "Anterior" })).toBeNull();
+});
+it("recupera la respuesta real PGRST103 sin confundirla con empresa inexistente", async () => {
+ mocks.companyOffers.mockResolvedValue({ data: null, count: null, error: { code: "PGRST103", message: "Range" } });
+ render(await Company({ params: Promise.resolve({ companyId: id }), searchParams: Promise.resolve({ page: "99" }) }));
+ expect(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href")).toBe(`/admin/empresas/${fixtureReference("company", id)}?page=1`);
+ expect(screen.getByRole("region", { name: "Perfil de la empresa" })).toBeTruthy();
+});
+it("mantiene filtro y páginas en el listado administrativo general", async () => {
+ mocks.openings.mockResolvedValue({ items: [opening], total: 25, page: 2, pageCount: 3 });
+ render(await Openings({ searchParams: Promise.resolve({ status: "published", page: "2" }) }));
+ expect(mocks.openings).toHaveBeenCalledWith({ status: "published", page: 2, pageSize: 10 });
+ for (const [label, page] of [["Anterior", "1"], ["Siguiente", "3"]]) {
+   const url = new URL(screen.getByRole("link", { name: label }).getAttribute("href")!, "http://fixture.invalid");
+   expect(url.searchParams.get("status")).toBe("published"); expect(url.searchParams.get("page")).toBe(page);
+ }
+});
+it("recupera una página vacía de ofertas conservando el filtro", async () => {
+ mocks.openings.mockResolvedValue({ items: [], total: 25, page: 99, pageCount: 3 });
+ render(await Openings({ searchParams: Promise.resolve({ status: "published", page: "99" }) }));
+ const url = new URL(screen.getByRole("link", { name: "Volver a la primera página" }).getAttribute("href")!, "http://fixture.invalid");
+ expect(url.searchParams.get("page")).toBe("1"); expect(url.searchParams.get("status")).toBe("published");
+ expect(screen.queryByRole("link", { name: "Anterior" })).toBeNull();
+});
+it("limita el historial de moderación administrativo a cinco y permite seguir leyendo", async () => {
+ mocks.opening.mockResolvedValue({ opening, events: Array.from({ length: 6 }, (_, index) => ({ id: `ficticio-${index}`, decision: "submitted", previous_status: "draft", new_status: "pending_review", created_at: date, actor_type: "system", actor_account_id: null })) });
+ render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) }));
+ const history = screen.getByRole("region", { name: "Historial de moderación" });
+ expect(within(history).getAllByRole("listitem")).toHaveLength(5);
+ fireEvent.click(within(history).getByRole("button", { name: "Mostrar más" }));
+ expect(within(history).getAllByRole("listitem")).toHaveLength(6);
+ expect(within(history).queryByRole("button", { name: "Mostrar más" })).toBeNull();
+});
+it("conserva contactos y notas sin la tarjeta de plantillas", async () => {
+ render(await Participation({ params: Promise.resolve({ participationId: id }) }));
+ expect(screen.queryByRole("heading", { name: "Plantillas para el personal" })).toBeNull();
+ expect(screen.queryByLabelText("Tipo de mensaje")).toBeNull();
+ expect(screen.getByRole("region", { name: "Historial de contactos" })).toBeTruthy();
+ expect(screen.getByRole("heading", { name: "Registrar contacto municipal" })).toBeTruthy();
 });
 it("conserva los filtros de candidatos al paginar", async () => {
  render(await Candidates({ searchParams: Promise.resolve({ locality: "Funes" }) })); expect(mocks.guard).toHaveBeenCalledWith(["admin"]);
@@ -190,6 +266,7 @@ it("muestra candidatos después de la información e historial de oferta y fuera
  expect(matches.closest(".grid")).toBeNull();
 });
 it("conserva validación y confirmación al suspender una oferta", async () => {
+ mocks.opening.mockResolvedValue({ opening: { ...opening, status: "published" }, events: [] });
  render(await Opening({ params: Promise.resolve({ openingId: id }), searchParams: Promise.resolve({}) })); fireEvent.change(screen.getByLabelText("Decisión"), { target: { value: "suspended" } });
  fireEvent.change(screen.getByRole("textbox", { name: /Motivo interno/ }), { target: { value: "Motivo ficticio" } }); fireEvent.click(screen.getByRole("button", { name: "Guardar decisión" }));
  expect(screen.getByRole("checkbox").getAttribute("aria-invalid")).toBe("true");

@@ -1,5 +1,51 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA109 — Ajustes administrativos con contratos existentes
+
+AD1: ModerationForm pending_review reduce opciones a approved/rejected/
+changes_requested con las mismas acciones, mensajes/motivos y versiones. Otros
+estados conservan ciclo de vida. AD2: RecordLink a company_profiles.id desde
+oferta; ficha servidor exige admin antes de leer los siete campos ya autorizados
+de company_profiles. Sin nueva proyección pública ni RPC propio empresarial.
+
+AD6: ficha empresarial reemplaza limit50 por select con count exact, filtro por
+empresa y exclusión de borradores, orden created_at DESC/id ASC y range de10.
+Validar page simple entero1..1000 antes de consultar ofertas; navegación utiliza
+referencia opaca y page. Listado general conserva su consulta paginada/filtros.
+Ambas superficies ofrecen regreso a primera página para resultados fuera de rango.
+
+PostgREST responde PGRST103/416 cuando el offset excede las filas. AD6 recupera
+solo ese código mediante count/head con los mismos filtros y RLS; retorna items
+vacíos + total para el enlace de regreso. No oculta otros errores ni consulta
+datos completos sin límite. Prueba de API real además de mocks del SDK.
+
+AD3: reutilizar ModerationHistory sin otro historial local; probar5/6/12 eventos,
+foco, anuncio y reinicio de instancia por oferta/versión. AD4: reutilizar RPC
+change_account_status y su implementación privada: sesión viva, admin activo,
+versiones/motivo/confirmación, advisory lock70620260919, relectura de actor/target,
+prohibición de autosuspensión y archivo admin. Verificación pgTAP y dos conexiones
+reales de suspensión cruzada; nunca mutar datos alojados ni cambiar grants/RLS.
+
+AD5: retirar ContactTools, message-templates y prueba aislada del generador;
+ajustar E2E para conservar y comprobar contactos sin esa UI. AD7: reutilizar
+Button Base adaptado con variante primaria para reactivate y danger para
+suspend/archive. CSS de módulo acotado establece variables existentes de submit
+verde; sin nuevas reglas globales. Quitar envoltura danger solo al reactivar
+pares admin. Confirmación/feedback/datos y funciones servidor intactos.
+
+Constitución I–VI: intermediación, autorización/RLS, auditoría y cuentas separadas
+intactas; controles accesibles y mensajes españoles, sin dependencias/modelo/
+arquitectura nueva. No migración salvo evidencia de defecto de seguridad. Calidad:
+pruebas relevantes SQL/unit/UI/HTTP/navegador local, tipos/lint/tooling/build,
+colores computados, móvil/teclado y recuperación de páginas. Recuperación: revertir
+UI en una corrección futura, conservando todos los datos y eventos.
+
+Prerrequisitos demostrados durante QA: EXTRA110 adapta solo el fixture SQL de
+reintentos al día de Funes, sin modificar funciones o aserciones. EXTRA111 oscurece
+únicamente el token compartido status-amber para resolver contraste detectado por
+axe (4.24→5.67:1); no agrega reglas o paletas locales. Evidencia y recuperación en
+`docs/operations/admin-offer-management.md`; no se requiere migración.
+
 ## EXTRA106/108 — Presentación de acceso en /ofertas
 
 Reutilizar getSiteAccess por request para header y tarjeta lateral en una sola

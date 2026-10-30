@@ -1,5 +1,43 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA109 — Gestión administrativa, 29/10/2026
+
+Pedido autorizado de Mateo, dentro de la intermediación y permisos existentes.
+Historia prioritaria: la Oficina revisa una oferta, consulta a su empresa y opera
+sus cuentas sin perder historial ni dejar el sistema sin administradores.
+
+- **AD1:** Para una oferta pendiente de revisión, «Decisión» ofrece exactamente
+  Aprobar, Rechazar y Solicitar correcciones. Aprobar conserva su publicación;
+  rechazo/correcciones conservan mensajes/motivos requeridos. Las acciones de
+  ciclo de vida disponibles en otros estados mantienen las reglas actuales.
+- **AD2:** Desde el detalle de oferta hay un enlace al perfil administrativo de
+  su empresa. Ese perfil muestra razón social, CUIT, responsable, email, teléfono,
+  actividad y localidad registrados, o «Sin informar»; solo administrador activo,
+  sin dar permisos nuevos a otros roles o editar el perfil en nombre de la empresa.
+- **AD3:** El historial muestra cinco eventos más recientes inicialmente y cinco
+  adicionales por «Mostrar más». El botón desaparece al agotarse; conserva foco,
+  anuncio, fecha, actor y detalle municipal. No se elimina auditoría.
+- **AD4:** No se permite autosuspender ni archivar administradores. Ninguna
+  operación autorizada del portal puede dejar cero administradores activos,
+  incluso con decisiones concurrentes. Rechazos no producen cambios ni auditoría
+  de éxito. Se conservan las cuentas individuales y el flujo de recuperación.
+- **AD5:** Retirar «Plantillas para el personal» y su generador de mensajes.
+  Mantener registro e historial de contactos, notas y preentrevistas. FR057 queda
+  fuera del alcance vigente por pedido explícito, sin envío automático nuevo.
+- **AD6:** Ofertas administrativas generales y de la ficha empresarial se
+  consultan en páginas de diez, con conteo y orden estable en servidor. Conservar
+  filtros, excluir borradores según reglas actuales y no truncar a cincuenta.
+  Parámetros inválidos no amplían consultas; página fuera de rango ofrece regreso
+  a la primera página conservando filtros y empresa.
+- **AD7:** Reactivar empresa/cuenta candidata usa botón verde; suspensión y
+  archivo conservan rojo. Motivo, confirmación, validación, feedback, versiones
+  y efectos existentes siguen intactos. No se recuperan accesos revocados.
+
+Clarificaciones resueltas por evidencia: AD1 corresponde a la revisión pendiente;
+AD3/AD4 y paginación general ya están implementados y requieren verificación, no
+otra regla. AD6 incluye la lista de ofertas dentro de empresa actualmente sin
+páginas. Sin cambio de modelo o arquitectura ni migración prevista.
+
 ## EXTRA106/108 — CTA de ofertas públicas, 29/10/2026
 
 Mateo conserva únicamente el ajuste de /ofertas y descarta los cambios de inicio/
@@ -1394,9 +1432,9 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   participaciones ni permisos revocados.
 - **FR-056**: Los errores y rechazos DEBEN comunicarse en español de forma accionable sin revelar
   credenciales, datos personales, notas internas ni detalles operativos sensibles.
-- **FR-057 (Should)**: La interfaz DEBERÍA ofrecer plantillas de mensaje o enlaces seguros para
-  facilitar contactos iniciados por el personal, sin enviar mensajes mediante una integración
-  directa.
+- **FR-057 (retirado por EXTRA109, Mateo, 29/10/2026)**: Se quitan las plantillas
+  de mensajes para el personal; se conserva el registro de contactos de FR-051.
+  No se agrega envío automático ni se elimina el historial existente.
 
 #### Importación y reportes
 
