@@ -324,7 +324,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
 
     await candidate.goto("/dashboard?section=postulaciones");
     const nominated = candidate.locator("li").filter({ has: candidate.getByRole("heading", { name: "Oferta ficticia 002" }) });
-    await expect(nominated.getByText("Recibida por la Oficina", { exact: true })).toBeVisible();
+    await expect(nominated.locator("p").filter({ hasText: /^Estado:/ }).getByText("Recibida por la Oficina", { exact: true })).toBeVisible();
     // The approved agenda exception reveals only dates/channel, not the
     // municipal evaluation or the actual internal participation stage.
     await expect(nominated.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toBeVisible();
