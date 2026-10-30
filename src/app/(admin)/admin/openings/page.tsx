@@ -1,3 +1,4 @@
+import { formatPublicClosingDate } from "@/features/openings/public-offer-display";
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 import { RecordLink as Link } from "@/components/ui/record-link";
@@ -41,6 +42,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
         <ul className="space-y-3">{result.items.map((opening) => <li key={opening.id} className="rounded-lg border border-slate-300 bg-white p-4">
           <Link href={`/admin/openings/${opening.id}`} className="font-semibold text-blue-800 underline">{opening.title ?? "Oferta sin título"}</Link>
           <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700">{opening.company_profiles?.legal_name ?? "Empresa sin nombre"} <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
+          <p className="mt-2 text-sm text-muted-foreground">Cierre: {opening.closing_date ? formatPublicClosingDate(opening.closing_date) : "Sin definir"}</p>
         </li>)}</ul>}
       {!outOfRange && result.pageCount > 1 && <Pagination aria-label="Páginas de ofertas">
         <PaginationContent>

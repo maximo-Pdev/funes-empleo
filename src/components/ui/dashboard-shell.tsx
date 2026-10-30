@@ -12,11 +12,12 @@ import styles from "@/app/(auth)/account/account.module.css";
 export type DashboardLink = { href: string; label: string; icon: LucideIcon; current: boolean };
 
 /** Shared account chrome; role-specific data and content stay with the caller. */
-export function DashboardShell({ panel, links, name, email, mainLabel, navigationLabel = "Secciones de mi cuenta", canvasSlot, children }: {
+export function DashboardShell({ panel, links, name, email, avatar, mainLabel, navigationLabel = "Secciones de mi cuenta", canvasSlot, children }: {
   panel: { href: string; label: string };
   links: readonly DashboardLink[];
   name: string;
   email?: string;
+  avatar?: ReactNode;
   mainLabel?: string;
   /** Accessible name of the section navigation; role-specific callers supply their own. */
   navigationLabel?: string;
@@ -42,7 +43,7 @@ export function DashboardShell({ panel, links, name, email, mainLabel, navigatio
           </Form>
       } identity={
           <div className={styles.identity}>
-            <span role="img" aria-label="Foto de perfil de ejemplo" className={styles.avatar}><UserRound className="h-6 w-6" aria-hidden="true" /></span>
+            {avatar ?? <span role="img" aria-label="Foto de perfil de ejemplo" className={styles.avatar}><UserRound className="h-6 w-6" aria-hidden="true" /></span>}
             <div className={styles.identityText}><p className={styles.name}>{name}</p><SidebarEmail email={email || "Correo no disponible"} /></div>
           </div>
       } />

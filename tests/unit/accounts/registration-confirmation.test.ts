@@ -19,13 +19,14 @@ import { companyRegistrationSchema } from "@/validation/company";
 
 const password = "Fictitious-Registration-Only!";
 const email = "registro@example.invalid";
+const acceptedTerms = { termsAccepted: true, termsVersion: "demo-terms-draft-1" };
 const cases = [
   { name: "cuenta", schema: registrationInput, service: registerAccount, action: registerAccountAction,
-    values: { role: "candidate", email, password } },
+    values: { ...acceptedTerms, role: "candidate", email, password } },
   { name: "candidato", schema: candidateRegistrationSchema, service: registerCandidate, action: registerCandidateAction,
-    values: { name: "Persona ficticia", dni: "99000001", email, password } },
+    values: { ...acceptedTerms, name: "Persona ficticia", dni: "99000001", email, password } },
   { name: "empresa", schema: companyRegistrationSchema, service: registerCompany, action: registerCompanyAction,
-    values: { legalName: "Empresa ficticia", cuit: "30999999997", responsibleName: "Responsable ficticio",
+    values: { ...acceptedTerms, legalName: "Empresa ficticia", cuit: "30999999997", responsibleName: "Responsable ficticio",
       email, phone: "", activity: "Servicios", locality: "Funes", password } },
 ];
 
@@ -33,6 +34,7 @@ function form(values: object) {
   const result = new FormData();
   for (const [name, value] of Object.entries(values)) {
     if (typeof value === "string") result.set(name, value);
+    else if (value === true) result.set(name, "on");
   }
   return result;
 }

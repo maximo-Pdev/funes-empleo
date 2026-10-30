@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { cuitSchema, emailContactSchema, phoneContactSchema } from "./common";
 import { passwordConfirmationSchema } from "./password";
+import { registrationTermsSchema } from "@/features/accounts/legal-terms";
 
 const companyFields = z.object({
   legalName: z.string().trim().min(2).max(200),
@@ -16,7 +17,7 @@ const companyFields = z.object({
   if (value.phone && !phoneContactSchema.safeParse(value.phone).success) context.addIssue({ code: "custom", path: ["phone"], message: "Ingresá un teléfono válido." });
 });
 
-export const companyRegistrationSchema = companyFields.and(passwordConfirmationSchema);
+export const companyRegistrationSchema = companyFields.and(passwordConfirmationSchema).and(registrationTermsSchema);
 export const companyProfileSchema = companyFields.safeExtend({
   version: z.coerce.number().int().positive(),
 });

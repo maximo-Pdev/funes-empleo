@@ -1,7 +1,13 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
-import RootLayout from "@/app/layout";
+import RootLayout, { metadata } from "@/app/layout";
+
+it("uses the supplied white emblem as the site favicon", () => {
+  expect(metadata.icons).toEqual({
+    icon: { url: "/brand/funes-favicon-white.png?v=white-emblem-1", type: "image/png", sizes: "256x256" },
+  });
+});
 
 it("no agrega el enlace global oculto ni otro enlace antes del contenido", () => {
   const markup = renderToStaticMarkup(<RootLayout><main id="contenido"><h1>Perfil</h1></main></RootLayout>);

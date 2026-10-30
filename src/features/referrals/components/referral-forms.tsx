@@ -2,7 +2,7 @@
 import { Form } from "@/components/forms/form";
 import { Field } from "@/components/forms/field";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   submitFeedbackAction,
@@ -14,13 +14,14 @@ const initialReferralActionState: ReferralActionState = { status: "idle", messag
 
 export function FeedbackForm({ openingId, referralId }: { openingId: string; referralId: string }) {
   const [state, action, pending] = useActionState(submitFeedbackAction, initialReferralActionState);
+  const [outcome, setOutcome] = useState("");
   return (
     <Form action={action} result={state} className="rounded-md border border-slate-300 p-4">
       <h3 className="text-lg font-semibold">Informar resultado a la Oficina</h3>
       <p className="mt-1 text-sm text-slate-700">Tu informe queda pendiente. Solo la Oficina confirma el resultado final; informar una respuesta no restaura el acceso a datos revocados.</p>
       <input type="hidden" name="openingId" value={openingId} />
       <input type="hidden" name="referralId" value={referralId} />
-      <Field className="mt-4 block font-medium" label={<>Resultado informado</>}><select id="resultado-empresa" name="reportedOutcome" required className="mt-1 min-h-11 w-full rounded-md border border-slate-500 bg-white px-3 py-2 text-slate-950 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700">
+      <Field className="mt-4 block font-medium" label={<>Resultado informado</>}><select id="resultado-empresa" name="reportedOutcome" required onChange={event => setOutcome(event.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-slate-500 bg-white px-3 py-2 text-slate-950 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700">
         <option value="">Seleccioná un resultado</option>
         <option value="hired">Contratación informada</option>
         <option value="not_selected">No seleccionado</option>
@@ -28,7 +29,7 @@ export function FeedbackForm({ openingId, referralId }: { openingId: string; ref
         <option value="process_cancelled">Proceso cancelado para esta persona</option>
         <option value="other">Otra respuesta</option>
       </select></Field>
-      <Field className="mt-4 block font-medium" label={<>Detalle breve (opcional)</>}><textarea id="detalle-feedback" name="message" maxLength={2000} rows={3} className="mt-1 w-full rounded-md border border-slate-500 p-3 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700" /></Field>
+      <Field className="mt-4 block font-medium" label={outcome === "not_selected" ? "Motivo de no selección" : "Detalle breve (opcional)"}><textarea id="detalle-feedback" name="message" required={outcome === "not_selected"} maxLength={2000} rows={3} className="mt-1 w-full rounded-md border border-slate-500 p-3 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700" /></Field>
       <div className="mt-4"><Button type="submit" busy={pending} busyLabel="Enviando…">Enviar informe</Button></div>
       {state.status !== "idle" && <p role={state.status === "error" ? "alert" : "status"} className="mt-3" aria-live="polite">{state.message}</p>}
     </Form>

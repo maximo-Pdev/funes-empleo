@@ -9,6 +9,18 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      municipal_courses: {
+        Row: { id: string; title: string; url: string; published: boolean; created_at: string; created_by: string }
+        Insert: { id?: string; title: string; url: string; published: boolean; created_at?: string; created_by: string }
+        Update: { title?: string; url?: string; published?: boolean }
+        Relationships: []
+      }
+      course_referrals: {
+        Row: { id: string; candidate_id: string; course_id: string; course_title: string; course_url: string; referred_at: string; referred_by: string }
+        Insert: { id?: string; candidate_id: string; course_id: string; course_title: string; course_url: string; referred_at?: string; referred_by: string }
+        Update: { [_ in never]: never }
+        Relationships: []
+      }
       account_notifications: {
         Row: { created_at: string; id: string; kind: string; read_at: string | null; recipient_account_id: string; reference: string; resource_id: string; source_event_id: string }
         Insert: { created_at: string; id?: string; kind: string; read_at?: string | null; recipient_account_id: string; reference?: string; resource_id: string; source_event_id: string }
@@ -1619,6 +1631,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      save_municipal_course: { Args: { p_title: string; p_url: string; p_published: boolean; p_course?: string | null }; Returns: string }
+      create_course_referral: { Args: { p_candidate: string; p_course: string }; Returns: string }
       list_my_notifications: { Args: { p_page?: number; p_page_size?: number }; Returns: Json }
       open_my_notification: { Args: { p_reference: string }; Returns: Json }
       my_candidate_preinterview_agenda: { Args: never; Returns: Json }

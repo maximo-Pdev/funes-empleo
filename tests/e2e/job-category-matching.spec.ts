@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
 import { runLocalMaintenanceSql } from "./local-maintenance";
+import { selectLaborCategories } from "./fixtures/quality";
 
 test.use({ trace: "off", screenshot: "off" });
 test.beforeEach(() => assertLocalTargets());
@@ -12,7 +13,7 @@ async function signIn(page: Page, email: string, role: "candidate" | "admin" | "
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/admin$/ }[role]);
 }
 
 function openingId() {
@@ -199,11 +200,12 @@ test("empresa ve nuevos rubros seleccionables pero no el matching administrativo
   await expect(page).toHaveURL(/\/account$/);
   await expect(page.getByRole("heading", { name: "Candidatos con rubros coincidentes" })).toHaveCount(0);
   await page.goto("/empresa/ofertas/nueva");
+  await page.getByRole("combobox", { name: "Categorías", exact: true }).click();
   for (const name of ["Administración", "Comercio", "Tecnología", "Agro"]) {
-    await expect(page.getByRole("checkbox", { name, exact: true })).toBeVisible();
+    await expect(page.getByRole("option", { name, exact: true })).toBeVisible();
   }
-  await page.getByRole("checkbox", { name: "Comercio", exact: true }).check();
-  await page.getByRole("checkbox", { name: "Tecnología", exact: true }).check();
-  await expect(page.getByRole("checkbox", { name: "Comercio", exact: true })).toBeChecked();
-  await expect(page.getByRole("checkbox", { name: "Tecnología", exact: true })).toBeChecked();
+  await selectLaborCategories(page, ["Comercio", "Tecnología"], "Categorías");
+  await page.getByRole("combobox", { name: "Categorías", exact: true }).click();
+  await expect(page.getByRole("option", { name: "Comercio", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("option", { name: "Tecnología", exact: true })).toHaveAttribute("aria-selected", "true");
 });

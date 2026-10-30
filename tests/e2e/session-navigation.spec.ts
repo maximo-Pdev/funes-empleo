@@ -31,7 +31,7 @@ async function expireStoredSession(context: BrowserContext) {
 for (const account of [
   { role: "candidate", href: "/dashboard?section=perfil", label: "Mi perfil", panelHref: "/dashboard", panelLabel: "Ir al panel de usuario" },
   { role: "company", href: "/empresa/perfil", label: "Mi perfil", panelHref: "/empresa", panelLabel: "Ir al panel de empresa" },
-  { role: "admin", href: "/account", label: "Cuenta", panelHref: "/account", panelLabel: "Ir al panel de administración" },
+  { role: "admin", href: "/account", label: "Cuenta", panelHref: "/admin", panelLabel: "Ir al panel de administración" },
 ] as const) {
   for (const entry of ["public", "private"] as const) {
     test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page, browser }) => {

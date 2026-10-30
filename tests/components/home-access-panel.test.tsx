@@ -59,20 +59,16 @@ describe("Home access panel", () => {
     ["candidate", "Ir al panel de usuario"],
     ["company", "Ir al panel de empresa"],
     ["admin", "Ir al panel de administración"],
-  ])("replaces login for an active %s but keeps both registration forms usable", async (role, label) => {
+  ])("keeps verified panel access without registration controls for an active %s", async (role, label) => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role, status: "active" } } as never);
     const view = render(await HomePage());
     expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
     expect(view.container.querySelector("form")).toBeNull();
-    const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/account";
+    const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
     expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
-    fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
-    expect(screen.getByLabelText("DNI")).toBeTruthy();
-    expect(screen.queryByRole("link", { name: /^Ir al panel de / })).toBeNull();
-    expect(view.container.querySelector('button[type="submit"]')).not.toBeNull();
-    fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
-    expect(screen.getByLabelText("CUIT")).toBeTruthy();
-    expect(view.container.querySelector('button[type="submit"]')).not.toBeNull();
+    expect(screen.queryByRole("button", { name: "Registrarse" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
+    expect(screen.queryByRole("radio")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Iniciar sesión" }));
     expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
     expect(view.container.querySelector("form")).toBeNull();
@@ -86,8 +82,8 @@ describe("Home access panel", () => {
       if (mode === "company") fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
       fireEvent.submit(view.container.querySelector("form")!);
       expect(screen.queryByText("Completá este campo.")).toBeNull();
-      expect(view.container.querySelectorAll('[aria-invalid="true"]:not([aria-hidden="true"])')).toHaveLength(mode === "login" ? 2 : mode === "candidate" ? 5 : 8);
-      expect(screen.getByText(`Revisá los ${mode === "login" ? 2 : mode === "candidate" ? 5 : 8} campos indicados.`)).toBeTruthy();
+      expect(view.container.querySelectorAll('[aria-invalid="true"]:not([aria-hidden="true"])')).toHaveLength(mode === "login" ? 2 : mode === "candidate" ? 6 : 9);
+      expect(screen.getByText(`Revisá los ${mode === "login" ? 2 : mode === "candidate" ? 6 : 9} campos indicados.`)).toBeTruthy();
     }
   });
 
@@ -99,15 +95,15 @@ describe("Home access panel", () => {
     fireEvent.change(screen.getByLabelText("Correo electrónico"), { target: { value: "test@example.invalid" } });
     expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "Registrarse" }));
-    expect(view.container.querySelectorAll('[data-marker-state="muted"]')).toHaveLength(5);
+    expect(view.container.querySelectorAll('[data-marker-state="muted"]')).toHaveLength(6);
     // The login email arrives filled, so clear it to measure a fully empty registration.
     fireEvent.change(screen.getByLabelText("Correo electrónico"), { target: { value: "" } });
     fireEvent.submit(view.container.querySelector("form")!);
-    expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(5);
+    expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(6);
     fireEvent.click(screen.getByRole("radio", { name: "Empresa" }));
-    expect(view.container.querySelectorAll('[data-marker-state="muted"]')).toHaveLength(8);
+    expect(view.container.querySelectorAll('[data-marker-state="muted"]')).toHaveLength(9);
     fireEvent.submit(view.container.querySelector("form")!);
-    expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(8);
+    expect(view.container.querySelectorAll('[data-marker-state="missing"]')).toHaveLength(9);
     expect(screen.getByLabelText("Teléfono de contacto").closest("[data-form-field]")?.querySelector("[data-required-marker]")).toBeNull();
   });
   it("offers recovery below a separator after sign-in, outside the form and only in login mode", async () => {
@@ -161,7 +157,7 @@ describe("Home access panel", () => {
     expect(cuit.closest("[data-form-field]")?.parentElement?.contains(activity)).toBe(true);
     expect(cuit.closest("[data-form-field]")?.parentElement?.children).toHaveLength(2);
     expect([...phone.form!.querySelectorAll<HTMLInputElement>('input:not([type="hidden"]):not([aria-hidden="true"])')].map(input => input.name).filter(Boolean)).toEqual([
-      "legalName", "responsibleName", "email", "cuit", "activity", "phone", "password", "confirmation",
+      "legalName", "responsibleName", "email", "cuit", "activity", "phone", "password", "confirmation", "termsAccepted",
     ]);
     expect(phone.required).toBe(false);
     expect(activity.required).toBe(true);

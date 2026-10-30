@@ -20,6 +20,11 @@ it("invalida la navegación después de iniciar sesión correctamente", async ()
   expect(mocks.signOut).not.toHaveBeenCalled();
 });
 
+it.each([["candidate", "/dashboard"], ["company", "/empresa"], ["admin", "/admin"]])("opens the %s overview after login", async (role, href) => {
+  mocks.signIn.mockResolvedValue({ status: "active", role });
+  await expect(loginAction({ message: "", success: false }, new FormData())).rejects.toThrow(`Redirect ${href}`);
+});
+
 it("invalida la navegación al cerrar explícitamente solo la sesión local", async () => {
   await expect(logoutAction()).rejects.toThrow(/^Redirect \/$/);
   expect(mocks.signOut).toHaveBeenCalledExactlyOnceWith({ scope: "local" });

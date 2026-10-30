@@ -1,5 +1,6 @@
 "use client";
 import { Form } from "@/components/forms/form";
+import Link from "next/link";
 import { Field } from "@/components/forms/field";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,8 +9,8 @@ import { FileInput } from "@/components/forms/file-input";
 import { Button } from "@/components/ui/button";
 import { CV_ACCEPT, CV_FILE_ERROR, CV_FORMAT_HINT, MAX_CV_BYTES } from "@/lib/files/cv-policy";
 
-export function CandidateApplyForm({ openingId, candidateVersion, disabled, alreadyApplied = false, generalCvName }: {
-  openingId: string; candidateVersion: number; disabled: boolean; alreadyApplied?: boolean; generalCvName?: string;
+export function CandidateApplyForm({ openingId, candidateVersion, disabled, alreadyApplied = false, generalCvName, participationsHref = "/dashboard?section=postulaciones" }: {
+  openingId: string; candidateVersion: number; disabled: boolean; alreadyApplied?: boolean; participationsHref?: string; generalCvName?: string;
 }) {
   const router = useRouter();
   const [state, setState] = useState({ message: "", success: false });
@@ -47,6 +48,7 @@ export function CandidateApplyForm({ openingId, candidateVersion, disabled, alre
     </>}
     <p ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{state.message}</p>
     <Button type="submit" disabled={disabled || pending || alreadyApplied || state.success}>{alreadyApplied || state.success ? "Participación registrada" : pending ? "Enviando postulación…" : "Postularme"}</Button>
+    {(alreadyApplied || state.success) && <Link href={participationsHref} className="inline-flex min-h-11 items-center text-primary underline underline-offset-4">Ver mis postulaciones</Link>}
   </Form>;
 }
 

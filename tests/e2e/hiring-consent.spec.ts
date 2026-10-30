@@ -12,7 +12,7 @@ async function signIn(page: Page, identity: string, role: "admin" | "company") {
   await page.getByLabel("Correo electrónico").fill(`${identity}@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL({ company: /\/empresa$/, admin: /\/account$/ }[role]);
+  await expect(page).toHaveURL({ company: /\/empresa$/, admin: /\/admin$/ }[role]);
 }
 
 for (const late of [false, true]) {

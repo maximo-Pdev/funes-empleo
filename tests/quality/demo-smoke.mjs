@@ -36,7 +36,8 @@ try {
       await page.getByLabel("Correo electrónico").fill(credentials[`${role}1`].email);
       await page.getByLabel("Contraseña", { exact:true }).fill(credentials[`${role}1`].password);
       await page.getByRole("button",{ name:"Ingresar",exact:true }).click();
-      await page.waitForURL("**/account");
+      const panel = role === "admin" ? "/admin" : role === "candidate" ? "/dashboard" : "/empresa";
+      await page.waitForURL(`**${panel}`);
       const path = role === "admin" ? "/admin/candidates" : role === "candidate" ? "/dashboard?section=perfil" : "/empresa/perfil";
       await page.goto(path);
       await expect(page.getByRole("heading", { level:1 })).toBeVisible();

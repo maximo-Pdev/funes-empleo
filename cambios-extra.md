@@ -1,5 +1,132 @@
 # Cambios extra necesarios
 
+
+## PR86 documentation integration — current scope and historical evidence
+
+PR86 adds only session-aware public-offer presentation: `/ofertas` reads
+`getSiteAccess` once per request and reuses the verified `panel.href` and
+`panel.label` for its header and sidebar. An active candidate, company or
+administrator sees the correct panel link, not anonymous “Crear cuenta” or
+“Iniciá sesión” calls to action. With no verified active panel, preserve the
+anonymous registration and login links. URL parameters, client registration
+selection and guessed role paths are not authentication evidence. Hiding links
+is presentation, not authorization; keep server guards and database privacy.
+See `docs/operations/public-offers-authenticated-access.md` and
+`specs/001-municipal-employment-portal/contracts/authorization-matrix.md`.
+
+Mateo's EXTRA-108 rollback applies to PR86's own Home/login experiments only;
+it does not revert the feature branch's independently approved session-aware
+Home access panel, anonymous drafts, or chart-first administrative architecture.
+Both `/admin` and `/admin/metrics` retain visible shared bar/donut charts, not
+six summary cards or graphs hidden behind Ver detalle. Keep central labels,
+real values, text equivalents, native GET filters, selected-name tags, keep-open
+multiselect and visible CSV/PDF/XLSX exports. Public Home aggregate cards are
+separate and unchanged. Preserve course links/referral history, private photos,
+individual administrator invitation/password setup, private notifications,
+per-case immutable CVs, date presentation and withdrawn-only new attempts.
+Hiring retains operational consent, changes availability to unavailable and
+preserves only the already-authorized hiring-company access window of 720 hours;
+revoked access never revives. Legal registration receipts remain separate from
+operational privacy in Cuenta. Keep native `datetime-local`, ISO payloads and
+Funes conversion; browser locale display order is not guaranteed.
+
+The retained branch narratives below are historical evidence where superseded.
+In particular, incoming six-card/Perfil wording is explicitly archived inline,
+not a competing current design. Earlier statements that SQL or browser checks
+were pending describe their recorded phase, not a new failure: the task ledger
+contains subsequent isolated SQL, coverage and browser phase results. An
+interrupted local gate is not a pass, and prior CI success is not a fresh
+integrated acceptance run. This unit performs static documentation verification
+only; the parent owns executable gates, task-ledger updates and Git operations.
+No new legal/municipal approval, independent review, acceptance, hosted rollout,
+merge or deployment is established by this union.
+
+### Documentation reconciliation record
+
+- **Authorization / origin:** requested PR86 documentation conflict resolution; S18/T11 in `odd/tasks/final-portal-improvements.md`. Existing EXTRA-106 identities are retained, not renumbered.
+- **Problem / change:** independent appended histories collide; incoming current architecture predates approved charts and Cuenta privacy. Union both complete originals, archive superseded incoming wording inline, and bound PR86 to public-offer CTA presentation without reverting feature Home behavior.
+- **Affected files / recovery:** only `cambios-extra.md`, `docs/UI_GUIDELINES.md` and `specs/001-municipal-employment-portal/plan.md`. Recover by additive documentation correction; preserve runbook, contracts and original evidence. No source, tests, SQL, dependency, Git or remote changes by this unit.
+- **Static verification / status:** implemented documentation reconciliation. Exact ordered-line comparison retains all 5,747 local and 5,797 incoming ledger lines, all 908 local and 838 incoming UI lines, and all 1,313 local and 1,273 incoming plan lines; zero missing lines, including the complete EXTRA082 section. Conflict markers are absent from these three files. Original snapshot hashes and line mappings are retained in `C:/Users/maxim/AppData/Local/hermes/cache/scratch/pr86-doc-union/`. This is static preservation evidence only; integrated functional verification, review and task-ledger status remain parent-owned.
+
+### Historical identifier disambiguation — EXTRA-106 (PR86)
+
+| Historical ID | Title-qualified identity and scope |
+| --- | --- |
+| EXTRA-106 | `PR85 documentation union for chart-first dates and retries` — local documentation history |
+| EXTRA-106 / EXTRA106 | `Accesos públicos coherentes con sesión iniciada` — incoming PR86 history, reduced to `/ofertas` by `EXTRA-108 — Conservar solo el ajuste de ofertas` |
+
+Retain both original identifiers and all their evidence. Prior local references
+to EXTRA-106 denote the PR85 documentation union; incoming EXTRA106/107/108
+references denote the public-access experiment and its rollback history. Qualify
+ambiguous references by title; do not globally renumber either lineage. The local
+historical claim that 106 was unused describes its discovery snapshot only.
+No new EXTRA identifier is allocated for this documentation-only reconciliation.
+
+## EXTRA-106 — PR85 documentation union for chart-first dates and retries
+
+- **Date / authorization:** 2026-10-29. Requested resolution of the three PR85 documentation conflicts; approved S18/T11/L36–L38 in `odd/tasks/final-portal-improvements.md`. Recorded before semantic documentation edits. EXTRA-106 was unused in this ledger at discovery.
+- **Problem / evidence:** `pr85-map/report.md` identifies independent chart-first portal architecture and incoming date/retry/contact guidance in the same three documentation hunks. Both branches allocated EXTRA-102 to different changes. Historical EXTRA-104 free-text input is superseded by EXTRA-105, not a competing current requirement.
+- **Necessary change / justification:** union both complete histories and architecture sections, add title-qualified EXTRA-102 references without renumbering, and clarify that central date presentation and withdrawn-only self-reapplication coexist with the shared chart-first renderer, existing privacy rules and per-case CVs. Preserve EXTRA-103/104/105 as historical evidence; do not reintroduce six summary cards or free-text contact entry.
+- **Affected paths / contracts:** only `cambios-extra.md`, `docs/UI_GUIDELINES.md`, and `specs/001-municipal-employment-portal/plan.md`. Preserve native GET filters, labels, CSV/PDF/XLSX, notifications, courses, separate legal acceptance, private photos and the late retry test-project ordering. No source, tests, SQL, Git, database, installation, remote or configuration changes by this unit.
+- **Risks / recovery:** ambiguous IDs, lost historical paragraphs and overstating browser locale or acceptance evidence. Recover through a reviewed additive documentation correction, never deletion of history or blind renumbering. Native `datetime-local` with `lang="es-AR"` does not guarantee regional order across browsers/systems.
+- **Verification plan / status:** documentation union implemented. Static ordered-line readback against `pr85-map/01/local` and `pr85-map/01/main` retained all 5,529 local and all 5,670 incoming change-log lines verbatim in order, with zero missing lines, including the previously restored EXTRA082 verification paragraph. All three targets have zero conflict markers. Both complete local UI/plan originals are retained; incoming UI/plan retain the date/retry/contact sections while the earlier approved chart/privacy integration intentionally supersedes their obsolete current six-card/privacy wording. This is not a claim of byte-identical preservation of those architecture documents. Functional gates remain parent-owned; no new execution, independent review, legal/municipal approval, acceptance, migration rollout, merge or deployment is claimed.
+
+## EXTRA-102 — Documentation integration for final portal improvements
+
+- **Date / authorization:** 2026-10-29. Maxi requested «Resolvamos los conflictos» and confirmed «Prefiero reemplazarlos por los gráficos como te pedí inicialmente.» Scope: S18/T11/L36 in `odd/tasks/final-portal-improvements.md`; feature `63d32f2` / main `adad96c` are the supplied integration baselines.
+- **Problem / evidence:** both branches add independent approved histories; conflict hunks and auto-merged contracts retain incompatible six-card/chart-first presentation and obsolete automatic consent withdrawal on hiring. The extracted registration-terms implementation note still describes that superseded rule.
+- **Necessary change recorded before semantic documentation edits:** retain both histories without global renumbering; resolve the four documentation conflict blocks and align current spec, plan, UI, model, state-machine and terms implementation notes with visible shared bar/donut reporting, no six summary cards, and main's hiring/privacy rules. Keep notifications, application-specific CVs, limited candidate agenda, CSV/PDF/XLSX, courses, legal receipts, individual invitations and private photos. Preserve native GET filters, shared selected-name tags, keep-open multiselect and the ten-newest circular carousel without a pause button.
+- **Contract / paths:** `cambios-extra.md`, `docs/UI_GUIDELINES.md`, `specs/001-municipal-employment-portal/{spec,plan,data-model}.md`, `specs/001-municipal-employment-portal/contracts/state-machines.md`, `docs/discovery/OPEN_QUESTIONS.md`, `docs/operations/registration-terms-draft.md`. Parent owns the task ledger, Git and final functional verification; no source, tests, migrations, database, remote or installation operations by this documentation unit.
+- **Privacy / risks:** hiring makes availability unavailable while retaining consent; only an already-active authorized hiring-company referral may retain access for 720 hours (30 days); revoked access never revives and other cases remain intact. Legal acceptance at registration is separate from operational privacy in Cuenta. Preserve explicit manual withdrawal, conditional fresh acceptance after absence/withdrawal, and no repeat acceptance while accepted. Historical evidence is not current acceptance or municipal/legal approval. Risks: shared-contract contradictions, ambiguous historical IDs and mistaking static integration for functional proof.
+- **Verification / recovery:** read back allowed paths for remaining conflict markers and contradictory current wording; verify both complete conflict-side histories remain, except explicitly superseded current presentation wording. Parent performs functional gates after concurrent resolution. Recovery is a reviewed documentation correction, never deletion of history or restoration of obsolete privacy rules.
+- **Status:** documentation resolution implemented; static readback found zero conflict markers across the eight owned paths. Ordered-line comparison against both complete scratch originals (`pr84-map/01/local` and `01/main`) confirms both entire change-log histories are retained, including the EXTRA082 verification paragraph omitted by the initial textual merge. Current spec/plan/UI/model/state-machine/terms notes use the approved chart-first and hiring/privacy rules; superseded decisions remain explicitly historical. No integrated tests, build, independent review, acceptance, merge or deployment claimed; parent owns functional verification. Full current ledger recovery mirror saved and read back as Engram361 under project `funes-empleo`, topic `odd/final-portal-improvements/tasks`, with exact source locator; ledger itself was not edited.
+
+### Historical identifier disambiguation — 085 / 086
+
+| Historical ID | Title-qualified reference (preserve exact original identity) |
+| --- | --- |
+| EXTRA-085 | `/ofertas al diseño vigente y nombres accesibles de los combobox` — feature visual/accessibility history |
+| EXTRA-085 / EXTRA085 | `Ofertas recientes, métricas PDF/XLSX y filtros servidor` — main portal/export/filter history |
+| EXTRA-086 | `Mejoras finales del portal y recorridos del PDF de Beex` — feature S1–S17 history |
+| EXTRA-086 / EXTRA086 | `Avance automático del carrusel` — main carousel history, subsequently refined by EXTRA087/088 |
+
+References to colliding IDs must include the title or feature/main context above; do not globally replace historical IDs. EXTRA102 governs only this integration. Prior six-card and automatic-withdrawal descriptions remain historical where superseded by the approved rules above.
+
+### Historical identifier disambiguation — 102 (PR85 integration)
+
+| Historical ID | Title-qualified reference (preserve exact original identity) |
+| --- | --- |
+| EXTRA-102 / EXTRA102 | `Documentation integration for final portal improvements` — local chart-first documentation integration history |
+| EXTRA-102 / EXTRA102 | `Fechas uniformes y nueva postulación tras retiro` — incoming PR85 dates and withdrawn-only self-reapplication history |
+
+The preceding historical sentence “EXTRA102 governs only this integration” refers exclusively to `EXTRA-102 — Documentation integration for final portal improvements`, not to the incoming dates/retry entry. In the incoming EXTRA-103/104/105 histories, numeric 102 references denote `EXTRA-102 — Fechas uniformes y nueva postulación tras retiro`. Both identities remain unchanged; qualify current references by title. EXTRA-106 records the present union, not a renumbering of either history. EXTRA-105 supersedes the EXTRA-104 free-text contact experiment; its implementation and verification paragraphs remain historical evidence, not current input guidance.
+
+## EXTRA-086 — Mejoras finales del portal y recorridos del PDF de Beex
+
+- **Fecha y autorización:** 2026-10-27; Maxi solicita las diecisiete mejoras de `odd/tasks/final-portal-improvements.md` y confirma «Si, lo del PDF es lo que se pide» tras revisar la preentrevista opcional y las derivaciones a cursos.
+- **Origen y evidencia:** el mapa de `a5b867c` detecta registro de Home disponible con sesión, categorías inconsistentes, sidebar sin foto persistida, métricas sin gráficos y ausencia de gestión específica de derivaciones a cursos. El PDF entregado exige curso, postulante, derivación e historial independiente; una lista de enlaces no lo reemplaza.
+- **Cambio propuesto:** ejecutar los bloques trazados en el documento de tareas, preservando intermediación, controles de privacidad, validación, URLs opacas y datos existentes. Separar aceptación de términos del consentimiento operativo. Mantener preentrevista opcional y derivación directa según confirmación de Maxi; conservar la contradicción textual del PDF como evidencia.
+- **Archivos y contratos:** superficies de Home, formularios compartidos, paneles, métricas, cuentas y capacitación; pruebas, documentación y migraciones aditivas acotadas cuando correspondan. Las rutas exactas y resultados se registran por bloque en el documento de tareas. Sin nuevas dependencias por defecto.
+- **Riesgos y recuperación:** permisos/invitaciones, registros persistidos y contratos compartidos requieren verificación independiente. No migrar aceptaciones legales implícitas, eliminar historial, relajar consentimiento ni enviar invitaciones reales. Cambios de esquema con recuperación documentada. No ejecutar wrappers que resetean datos locales sin autorización específica.
+- **Verificación prevista:** RED/GREEN focalizado, regresiones, lint, typecheck, build, unitarias/tooling; pruebas SQL y recorridos reales en estado aislado autorizado. Navegador responsive y teclado para la presentación. No inferir aprobación legal o municipal de los términos de demostración.
+- **Estado actual:** implementado localmente en `feature/portal-flujos-final`, con verificación automatizada por fases registrada en `odd/tasks/final-portal-improvements.md` L33. Última suite amplia de navegador121aprobadas/1fallida; tras corregir el control desactualizado, SC-008A1aprobada con cuatro administradores bajo5000ms y auditorías íntegras, más ambas carreras SQL aprobadas. No se afirma una nueva corrida completa122/122. Cursos/historial, foto/sidebar e invitación real local hasta contraseña individual/ingreso nuevo ya pasaron; enlaces reutilizados/inválidos denegados. Aplicación de plantilla conservó exactamente73tablas y501objetos Storage por sus bytes. Últimas31pruebas focalizadas/4archivos, ESLint, TypeScript y57tooling aprobadas; evidencia anterior de1426unitarias,build y1383pgTAP/46migraciones se conserva separada. Aviso de contraseña actualizada ausente confirmado también en el commit base: advertencia preexistente, no regresión ni requisito añadido silenciosamente. Revisión visual humana, aprobación jurídica/municipal, plantilla Auth alojada y entrega Git siguen pendientes; no hubo commits, PR, publicación ni despliegue. Los cambios ajenos y los datos ficticios retenidos fueron preservados.
+- **Resultado de la corrección de invitaciones:** plantilla/configuración implementadas y aplicadas solo al proyecto local con respaldo predeterminado. El verificador independiente comprobó correo real en Mailpit, callback con hash de un solo uso, cookies de servidor, formulario de contraseña, persistencia, cierre de sesión, ingreso nuevo a `/admin`, auditorías y rechazo de reutilización/hash/tipo inválido. Ningún bearer token se procesó en cliente ni se relajó el callback; no se modificó configuración alojada. El reinicio mantuvo los501objetos y todas las tablas antes de la nueva cuenta ficticia de aceptación; esa cuenta y sus auditorías permanecen. Riesgos2,5 verificados en el alcance local, no aprobación de producción.
+- **Corrección necesaria de invitaciones, 2026-10-28, antes del cambio:** el recorrido real S5 confirma que el correo predeterminado de Auth verifica la cuenta pero entrega la sesión en un fragmento invisible al servidor. El callback recibe solo `next`, falla cerrado y no abre la contraseña individual. Se añadirá `supabase/templates/invite.html` y se habilitará exclusivamente `[auth.email.template.invite]` en `supabase/config.toml`, con origen canónico `.SiteURL`, `token_hash=.TokenHash`, tipo fijo `invite` y destino fijo de contraseña. Se conserva `verifyOtp`, eliminación de fragmentos, cookies de servidor, autorización y encabezados de privacidad; no se añade procesamiento cliente de bearer tokens. Fuentes: diagnóstico `scratch/s5-callback-diagnosis/verification-report.md` y documentación oficial de Supabase sobre plantillas/SSR. Verificación: regresión de configuración/enlace, callback existente, aplicación local no destructiva y nueva invitación real solo a Mailpit, contraseña propia e ingreso independiente; comprobación de enlace reutilizado/inválido. Riesgos: autenticación y configuración local; verificador independiente obligatorio. Aplicación mediante parada/arranque local con respaldo predeterminado, sin `--no-backup`, reset ni migraciones, verificando conservación de datos y objetos; cambios alojados requieren autorización aparte. Recuperación: revertir plantilla/configuración y reiniciar preservando datos; no reutilizar enlaces consumidos ni modificar las cuentas ficticias previas.
+- **Corrección necesaria de búsqueda, 2026-10-28, antes del cambio:** el recorrido E2E de filtros reproduce un bucle canónico al combinar texto con espacios y categoría opaca. `referenceUrl` serializa espacios como `%20` y `canonicalReferenceRoute` reconstruye `+`, por lo que la búsqueda nunca llega a resultados. Se unificará únicamente la serialización del query en `src/lib/records/reference-url.ts` con URLSearchParams, conservando valores, orden, claves repetidas, anclas, firmas y permisos de referencias. Siete regresiones RED observadas cubren las seis superficies compartidas y diferencian espacios de `+` literal. Riesgo: contrato compartido de enlaces; verificación independiente y recorrido real sin aumentar timeout. Recuperación: revertir la serialización, sin modificar registros ni migraciones. La comparación con HEAD es estática, no se atribuye como regresión introducida sin prueba equivalente.
+- **Corrección necesaria responsive, 2026-10-28, antes del cambio:** las cuatro regresiones E2E de Perfil/Atención presencial se reproducen por proxies nativos `.sr-only` afectados por los tamaños de inputs globales y administrativos. Anchos del documento:391/1681px para candidato y425/1723px para administración, frente a viewports360/1366px. Se restaurará únicamente su geometría1px en `src/app/globals.css`, sin clipping de página, sin tocar inputs visibles, required, FormData ni enfoque del combobox. La prueba existente `accessibility.spec.ts:25` y el diagnóstico real sirven como RED; se verificará con build fresco, las cuatro geometrías, pruebas de validación y E2E autorizado. Riesgo de fundamento compartido; revisión independiente requerida. Recuperación: revertir solo esa regla sin modificar datos.
+- **Adición necesaria, 2026-10-28:** el PDF confirmado exige motivo cuando la empresa informa que no contrata; la revisión encuentra `companyFeedbackInput` y `submit_company_feedback` aceptando `not_selected` sin detalle. Antes de modificar se registra la validación condicional compartida, campo requerido para ese resultado y migración aditiva `20261028023000_required_nonhire_reason.sql`, conservando firma, permisos, bloqueo, auditoría y respuestas restantes. Pruebas de esquema, formulario y pgTAP deben rechazar motivo omitido/vacío y conservar contratación sin detalle. No modifica retrospectivamente respuestas históricas. También se protege el autorregistro genérico legado con la misma aceptación de términos para no dejar un camino alternativo sin validar.
+
+## EXTRA-085 — /ofertas al diseño vigente y nombres accesibles de los combobox
+
+- **Fecha/autorización:** 2026-10-26; Maxi pidió «rediseñes `src/app/(public)/ofertas/page.tsx` y lo adaptes al diseño que venimos trabajando» y arreglar los seis hallazgos del tablero de pruebas.
+- **Origen/alcance:** S1 de `odd/tasks/portal-polish.md` quedó cerrado solo con el reemplazo del emblema del encabezado. El catálogo público conservaba el encabezado propio, el degradado y los `Card`/`Badge` anteriores al pulido del portal. Alcance: composición visual de esa página y accesibilidad de los desplegables; sin cambios de contrato, datos ni permisos.
+- **Problema/evidencia:** (1) el popup del combobox se renderiza con `role="dialog"` (cuando el input de búsqueda vive dentro) y la lista con `role="listbox"`, ambos sin nombre accesible; la regla axe `aria-input-field-name` cubre `listbox`, así que quedaban violaciones al abrir el desplegable. (2) En el filtro de categorías de la búsqueda administrativa el popup quedaba abierto tras elegir y tapaba el botón «Buscar candidatos». (3) El input oculto de transporte de `LocalityCombobox` repetía el nombre accesible "Localidad" del disparador visible, dejando dos controles con el mismo nombre. (4) `tests/e2e/assisted-section.spec.ts` todavía buscaba «Volver a atención presencial» cuando la navegación dice «Volver a perfil asistido» desde S11.
+- **Cambio:** encabezado de `/ofertas` con el `HomeNavbar` compartido (`alwaysVisible`) sobre banda primaria, eyebrow, titular Sora y nota de intermediación; formulario de búsqueda migrado a `TextField`/`SelectField`/`Button` con el tratamiento municipal de campos; tarjetas, estados vacíos, paginación y barra lateral con los tokens vigentes; el acceso de cuenta sigue dentro de `nav[aria-label="Accesos principales"]` y la barra lateral muestra el panel cuando hay sesión. Nombres accesibles únicos: diálogo «Elegir …», lista «…: opciones», y el transporte oculto de localidad pasa a llamarse «Valor del formulario». El filtro de categorías administrativo cierra el popup al elegir, devolviendo el foco al disparador.
+- **Archivos/contratos:** `src/app/(public)/ofertas/page.tsx`, `public-offer-search-form.tsx`, `locality-combobox.tsx`, `category-multi-select.tsx`, `candidate-search-form.tsx`, `company-opening-form.tsx`, `tests/e2e/assisted-section.spec.ts`, pruebas nuevas de componentes del combobox de categorías y del cierre del filtro.
+- **Riesgo/recuperación:** 3 (los selectores de búsqueda y registro comparten `LocalityCombobox`); se conservan etiquetas, validación nativa, marcador requerido, foco del primer error y `FormData`. Revertir el commit restituye la presentación y los nombres anteriores.
+- **Verificación:** lint, `next typegen` + `tsc`, suite unitaria y build de producción; comprobación del render público en navegador real (nombres accesibles, teclado, axe y geometría). El wrapper E2E no se usa como prueba visual porque reinicia la base de aceptación.
+- **Estado:** implementado; registrado durante la implementación. Revisión humana, PR y despliegue pendientes.
+
 ## EXTRA-111 — Contraste del estado ámbar en la vista administrativa
 
 - **Fecha/origen:** 29/10/2026, prerrequisito demostrado de accesibilidad al
@@ -129,6 +256,7 @@ Publicación posterior de EXTRA109/110/111 solicitada por Mateo: commit sin firm
 f3d460e y [PR87](https://github.com/maximo-Pdev/funes-empleo/pull/87) abierto hacia
 main desde feat/admin-offer-management. Verificación local anterior preservada;
 CI/revisión humana/merge/despliegue pendientes, next-env ajeno excluido.
+
 
 ## EXTRA-108 — Conservar solo el ajuste de ofertas
 
@@ -454,6 +582,7 @@ CI/revisión humana/merge/despliegue pendientes, next-env ajeno excluido.
   con backup; no reset del proyecto habitual. Durante navegación/cierre Next emitió
   diagnósticos «The destination stream closed early» sin fallo de los recorridos
   y respuestas comprobados; no se cambió código de streaming fuera de alcance.
+
 
 
 ## EXTRA-101 — Alinear pruebas de privacidad con agenda autorizada
@@ -1245,6 +1374,7 @@ o deploy manual. Commit sin firma/coautoría; PR/CI y revisión humana pendiente
   defectos abiertos en este alcance. Gates municipales históricos y aceptación
   global no se cierran. Sin commit/PR/CI/deploy; revisión humana pendiente.
 
+
 ## EXTRA-084 — Restore PR 78 browser checks and required locality validation
 
 - **Date/authorization:** 2026-10-26; Maxi requested: «Falló el PR en github. Arreglalo para que salga en verde».
@@ -1254,6 +1384,17 @@ o deploy manual. Commit sin firma/coautoría; PR/CI y revisión humana pendiente
 - **Affected surfaces:** company locality/registration components, focused component regressions and the reported E2E specifications. No migrations, Auth/provider changes or dependency updates.
 - **Risks/recovery:** locality is shared by company forms; test optional, controlled and default-value consumers. Revert the focused correction to recover the prior implementation. Preserve curated local accounts by using isolated GitHub acceptance runs instead of the local reset wrapper.
 - **Verification/status:** implemented. Required-locality RED reproduced; five new focused tests pass and independent scratch baseline comparison fails four of them. Integration found five old-test/inventory failures; corrected without scanner suppression, and 34 focused tests now pass. Initial lint/types/build and 57 tooling tests passed; post-correction full recheck and exact-head GitHub E2E/database results pending. Table authorization recovered from `odd/tasks/portal-polish.md` S27 and reconciled with the older spec/UI guide. Not human-reviewed or accepted.
+
+## EXTRA-083 — White municipal emblem favicon
+
+- **Follow-up, 2026-10-26:** Maxi reports the prior default icon remains in the tab at `http://localhost:3000/`. Exact live GET confirmed the new root icon metadata and byte-exact PNG with HTTP 200, so the server is not serving the old reference. Add an explicit revision query to the icon URL so the browser must request a distinct favicon resource on reload; keep white silhouette, transparency and other logos unchanged. Local proof does not establish that an already-open user tab has refreshed.
+- **Follow-up verification:** metadata regression observed RED without the query and 3/3 root-layout tests GREEN after adding `?v=white-emblem-1`; scoped ESLint and diff check passed. Actual `localhost:3000/` now emits exactly the revised icon URL and returns the matching PNG with HTTP 200. Passive metadata-only follow-up checked structurally and over live HTTP; full build/suite above belong to the preceding asset increment, not this URL revision. Refresh of the user's existing browser tab remains to be confirmed; no running server was restarted and no database changes occurred.
+- **Date/authorization:** 2026-10-26; Maxi requested: «El favicon podría ser este logo pero en blanco», with a supplied transparent green emblem PNG.
+- **Evidence/scope:** root metadata currently uses the navbar seal. Replace only the favicon with a white derivative of the supplied image; keep page logos, layout and metadata copy unchanged.
+- **Implementation:** preserve the original alpha channel and silhouette, recolor RGB to white and center without distortion on a transparent 256×256 canvas. Reference the new local PNG explicitly through root metadata.
+- **Risks/recovery:** passive public brand asset and favicon reference only; no runtime dependencies, authentication, data or routes changed. White on transparency has low contrast on light browser tabs, as inherent in the requested white treatment. Restore the previous metadata reference to revert.
+- **Verification:** metadata regression, decoded PNG color/alpha/dimensions, production build and actual HTTP icon/metadata readback. No account creation or database-resetting E2E wrapper.
+- **Status:** implemented and verified locally, not published or human-reviewed. A metadata regression failed against the former seal before implementation. PNG readback confirmed 256×256, all-white RGB, transparent padding and byte-exact original silhouette alpha; no image distortion. Node 24.22.0 and native child versions matched; lint, type generation, TypeScript, production build and 1217 tests/95 files passed (`--maxWorkers=2`). GET-only production readback verified the exact root icon link, HTTP 200/image/png and byte-exact served asset; owned server stopped. `git diff --check` passed. Existing Canvas/jsdom and external-lockfile warnings remain nonblocking. No E2E reset, accounts, database changes, commits or deployment. Unrelated untracked gradient archives preserved.
 
 ## EXTRA-082 — Independent Home access form drafts
 

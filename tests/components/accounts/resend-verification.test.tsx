@@ -26,6 +26,8 @@ async function advance(seconds: number) {
 
 function submitForm() {
   return act(async () => {
+    const terms = document.querySelector<HTMLInputElement>('form input[name="termsAccepted"]');
+    if (terms && !terms.checked) fireEvent.click(terms);
     fireEvent.click(document.querySelector<HTMLButtonElement>('form button[type="submit"]')!);
   });
 }

@@ -52,6 +52,12 @@ Revalidación por patrones dinámicos o referencia, no por ruta UUID obsoleta.
 Descarga CV conserva streaming,no-store,nosniff,Vary:Cookie y nombre cv.pdf;
 nunca entrega rutas Storage/signed URLs. No modificar tokens del proveedor Auth.
 
+La serialización de filtros usa URLSearchParams tanto al emitir enlaces como al
+comparar la ruta canónica. Debe ser idempotente para términos con espacios,
+conservar orden y claves repetidas, distinguir `+` literal de espacio y mantener
+el ancla. No alternar `%20` y `+` entre ambos pasos: produce redirecciones a la
+misma búsqueda. La codificación no modifica referencias ni permisos (EXTRA-086).
+
 ## Verificación y recuperación
 
 SQL: generación/backfill/inmutabilidad/colisiones/actores/suspensión/IDOR,

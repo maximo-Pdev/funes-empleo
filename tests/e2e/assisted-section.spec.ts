@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { loginFixture } from "./fixtures/quality";
+import { loginFixture, selectLaborCategories } from "./fixtures/quality";
 import { referenceIdentifier } from "./fixtures/record-reference";
 import { runLocalMaintenanceSql } from "./local-maintenance";
 import { assertLocalTargets } from "../fixtures/credentials.mjs";
@@ -39,9 +39,7 @@ test("menú, alta activa, filtros, paginación y detalle reutilizan perfiles sin
     await page.getByLabel("Teléfono", { exact: true }).fill("3410000000");
     await page.getByLabel("Localidad laboral", { exact: true }).fill("Funes");
     await page.getByLabel("Habilidades y experiencia", { exact: true }).fill("Experiencia presencial ficticia");
-    await page.getByRole("combobox", { name: "Categorías laborales", exact: true }).click();
-    await page.getByRole("option", { name: number === 1 ? "Categoría ficticia A" : "Categoría ficticia B" }).click();
-    await page.keyboard.press("Escape");
+    await selectLaborCategories(page, [number === 1 ? "Categoría ficticia A" : "Categoría ficticia B"]);
     const acceptance = page.getByLabel(/Confirmo que la persona leyó y aceptó/);
     await expect(acceptance).not.toBeChecked();
     await acceptance.check();

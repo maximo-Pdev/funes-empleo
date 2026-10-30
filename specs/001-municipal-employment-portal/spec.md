@@ -173,12 +173,14 @@ Mateo confirma este cambio de alcance; no ratifica política municipal de datos 
 - R1: todos los enlaces de CV abren PDF autorizado en pestaña nueva; respuesta
   inline, sin descarga forzada. Conservar autorización por solicitud, privacidad,
   versiones y URL opaca; sin CV vigente o sin acceso siguen mensajes actuales.
-- R2: métricas prioriza seis tarjetas: candidatos activos, empresas activas,
-  ofertas publicadas, participaciones, derivaciones y contrataciones confirmadas.
-  Dos gráficos de barras muestran resultados y contrataciones por categoría con
-  valores textuales, español, móvil y sin depender solo del color. Todo detalle
-  restante queda bajo Ver detalle, plegado inicialmente. PDF/Excel/CSV conservan
-  datos completos y filtros; definiciones bajo Más información, sin cambiar cálculo.
+- R2 (S2/L36, EXTRA102): métricas y paneo inicial de `/admin` comparten gráficos
+  visibles de barras y dona, sin las seis tarjetas resumen ni esconder el reemplazo
+  bajo Ver detalle. Conservar candidatos activos, empresas activas, ofertas publicadas,
+  participaciones, derivaciones, contrataciones confirmadas y todos los demás
+  indicadores. La dona usa estados de oferta mutuamente excluyentes, nunca categorías
+  superpuestas. Valores textuales, español, móvil y acceso sin depender solo del color.
+  PDF/Excel/CSV conservan datos completos y filtros; definiciones bajo Más información,
+  sin cambiar cálculo ni presentar una foto de estado como tendencia histórica.
 - R3: contratar normal o tardíamente cambia disponibilidad a unavailable y un
   perfil active a unavailable, atómicamente con el resultado y auditoría de actor/
   fecha/causa. Conserva consentimiento y todos sus eventos; no altera estados ni
@@ -189,6 +191,8 @@ Mateo confirma este cambio de alcance; no ratifica política municipal de datos 
   Ausencia o retiro exige acción afirmativa vigente; no reaceptar automáticamente.
   Retiro manual conserva revocación global y cierre de casos abiertos. Datos
   anteriores no se reconsienten ni recuperan por migración o corrección de resultado.
+  Los controles operativos viven en Cuenta > Privacidad, fuera de Perfil, con retiro
+  manual explícito; aceptación de términos en registro no concede ese consentimiento.
 - R5: contratación normal conserva permiso previamente activo de la derivación
   contratada hasta confirmación +720h, sujeto a demás guardas/revocaciones. Al
   alcanzar el límite se deniega lectura aunque Cron aún no materialice revoked.
@@ -199,14 +203,17 @@ Mateo confirma este cambio de alcance; no ratifica política municipal de datos 
 
 - Consentimiento una vez: Mateo elige conservarlo y pasar a No disponible, en
   reemplazo del retiro global por contratación de EXTRA035; retiro manual intacto.
-- Métricas: confirma resumen de seis, dos gráficos y detalle desplegable,
-  exportaciones completas; no eliminar indicadores históricos o del contrato.
+- Métricas (histórico, sustituido en presentación por S2/L36 de 2026-10-29):
+  confirma resumen de seis, dos gráficos y detalle desplegable, exportaciones
+  completas; no eliminar indicadores históricos o del contrato. La decisión posterior
+  de Maxi exige gráficos visibles en lugar de las tarjetas; cálculos/exports intactos.
 - Acceso tras contratar: confirma perfil/contactos/foto/CV30 días, sin restaurar
   permisos revocados (la opción elegida conserva, no concede otro acceso).
 
 Aceptación: abrir CV desde cuatro contextos mantiene página origen y devuelve PDF
-inline solo a actor autorizado; seis tarjetas y dos gráficos reflejan exactamente
-los filtros, cero/null distinguibles y detalle accesible; hire/late_hire preservan
+inline solo a actor autorizado; gráficos visibles en paneo y métricas reflejan
+exactamente los filtros, cero/null distinguibles y equivalentes textuales accesibles;
+sin seis tarjetas ni reemplazo gráfico oculto bajo Ver detalle; hire/late_hire preservan
 último consentimiento y otros casos, auditan disponibilidad y rechazan referencia/
 versión/actor indebidos; error de auditoría revierte toda la transacción. No hay
 backfill ni aceptación/activación/restauración automática. Artefactos anteriores
@@ -313,8 +320,11 @@ El hero conserva el contenido restante y el fondo animado.
 
 Con sesión activa verificada, el modo Iniciar sesión muestra “Ya tenés la sesión
 iniciada” sin otro formulario de login. El servidor impide otro inicio de sesión
-antes de autenticar credenciales nuevas; ambos autorregistros siguen disponibles
-con sus reglas de confirmación existentes. Los campos vacíos de estos formularios
+antes de autenticar credenciales nuevas. La solicitud de Máximo del 2026-10-27
+reemplaza la disponibilidad anterior de autorregistro con sesión: Home oculta
+el registro y sus accesos cuando hay una sesión activa verificada, incluso ante
+selectores de URL o eventos de registro. Sin sesión, ambos autorregistros mantienen
+sus reglas de confirmación existentes. Los campos vacíos de estos formularios
 de portada mantienen las líneas rojas y el resumen “Revisá los x campos indicados.”,
 sin repetir “Completá este campo.”. Se conservan errores útiles de formato,
 confirmación y servidor, validaciones y semántica accesible. Trazabilidad EXTRA-052.
@@ -415,6 +425,13 @@ una categoría, disponibilidad available, consentimiento accepted y CV válido.
 En caso contrario explica qué completar/guardar; archived u otro estado no
 ofrecen activación. Servidor y DB siguen revalidando sin cambios. No confundir
 estado active con elegibilidad para una derivación concreta.
+
+Historial de presentación EXTRA040/041/072: los párrafos siguientes conservan
+la disposición y copia anteriores, no el contrato vigente. Desde S12/S18 y EXTRA102,
+Cuenta > Privacidad reemplaza ese bloque de Perfil y aplica EXTRA094: conserva
+consentimiento al contratar, No disponible y permiso propio autorizado hasta30 días,
+sin revivir revocados. Aceptado muestra estado y retiro explícito, no otra aceptación;
+ausencia/retiro permite confirmación afirmativa. Términos legales viven en registro.
 
 Consentimiento explica el uso laboral por la Oficina y la entrega de perfil,
 contactos y CV únicamente tras derivación municipal a una empresa, sin DNI,
@@ -541,8 +558,10 @@ interna, pero sí para derivar. No hay alta interactiva incompleta o aceptación
 por defecto. Duplicados/rechazo no aceptan consentimiento; usar/actualizar un
 existente conserva su estado y consentimiento sin reactivarlos. Importación y
 mantenimiento conservan sus reglas. No se activa retroactivamente ningún perfil.
-Contratación normal/tardía mantiene EXTRA035: retiro global y consent_withdrawn,
-revocación empresarial y otros casos intactos; nunca reaceptación implícita.
+Contratación normal/tardía aplica EXTRA094: consentimiento conservado, disponibilidad
+unavailable y perfil active a unavailable, otros casos intactos. Permiso propio
+previamente activo/autorizado hasta720h; revocados nunca reviven ni hay reaceptación
+implícita. La regla EXTRA035 previa queda documentada en la clarificación histórica.
 
 ## Apartado de atención presencial, solicitud2026-10-23 (EXTRA055)
 
@@ -653,7 +672,11 @@ Esta decisión sustituye las aclaraciones históricas de autoarchivo y las parte
 correspondientes de FR-016/054; no resuelve políticas legales OQ-001/002 ni añade
 un flujo alternativo de solicitudes de eliminación.
 
-### Session 2026-10-21 — contratación y consentimiento (EXTRA035)
+### Session 2026-10-21 — contratación y consentimiento (EXTRA035, histórico)
+
+Superseded by EXTRA094 (2026-10-28): the following decision and its 720-hour
+restriction are preserved as history, not executable current policy. Hiring now
+retains consent and changes availability; manual withdrawal remains a separate action.
 
 - Q: ¿El retiro automático por contratación afecta solo una derivación o el consentimiento global? → A: Mateo confirma el global y todos sus accesos empresariales, descartando la alternativa de solo matching. La transacción administrativa normal o tardía registra el retiro append-only con actor/fecha/causa, revoca todos los permisos activos y conserva los estados y resultados de las demás participaciones. El retiro manual sigue cerrando casos abiertos. No hay aceptación automática por corregir resultados; cualquier aceptación posterior exige el flujo afirmativo vigente y no revive permisos. Aplica a nuevas confirmaciones tras migración, sin backfill de contrataciones previas.
 
@@ -1173,7 +1196,12 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   confirmación explícita e historial; NO DEBE suspenderse a sí mismo ni dejar cero administradores
   activos. Las cuentas administrativas NO DEBEN archivarse en el MVP; cualquier baja permanente
   queda pendiente de un procedimiento municipal posterior. No existe autorregistro ni elevación
-  pública al rol administrador.
+  pública al rol administrador. Actualización autorizada por Máximo el 2026-10-27:
+  desde Cuenta, un administrador activo puede invitar otras cuentas individuales,
+  con correo válido y confirmación explícita de permisos completos. Las cuatro
+  cuentas iniciales no constituyen un máximo. La invitación conserva su reserva,
+  atribución e ingreso individual con definición de contraseña; los errores de envío
+  no se presentan como éxito ni se expone el cliente privilegiado al navegador.
 - **FR-004**: Cada acción y registro privado DEBE ser accesible únicamente para los roles y
   propietarios autorizados, incluso cuando alguien intente acceder fuera de la navegación normal.
 - **FR-005**: Los administradores DEBEN poder suspender y reactivar cuentas de candidatos y empresas
@@ -1358,7 +1386,11 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   participaciones abiertas conforme a FR-025; cada vía conserva el historial.
 - **FR-039**: La empresa DEBE poder comunicar el resultado de una entrevista, pero solo un
   administrador DEBE poder confirmar el resultado final según esa comunicación; el retiro efectuado
-  por el candidato es una excepción explícita. Si la empresa informa `process_cancelled` para un
+  por el candidato es una excepción explícita. Si informa `not_selected`, DEBE indicar un motivo
+  no vacío, según el PDF confirmado por Máximo
+  (EXTRA-086). El informe queda pendiente de confirmación municipal; el detalle sigue siendo
+  opcional para los demás resultados. No se completan motivos de informes históricos.
+  Si la empresa informa `process_cancelled` para un
   candidato, la Oficina PUEDE cerrar solo esa participación como cancelada, sin cancelar la oferta.
   Después de revocado el acceso a los datos del candidato, una empresa activa solo DEBE conservar
   para ese feedback tardío el identificador de su derivación, el identificador y título de su propia
@@ -1378,9 +1410,15 @@ verificando los conteos, filtros y una exportación administrativa que no sea p�
   sin reactivar el permiso empresarial revocado.
 - **FR-041**: Un candidato no seleccionado DEBE poder continuar activo y participar en otras
   búsquedas.
-- **FR-042 (Should)**: El personal DEBERÍA poder registrar una nota interna de texto libre sobre
-  capacitaciones u orientaciones vinculadas con un candidato, sin catálogo, inscripciones ni
-  recomendaciones automáticas.
+- **FR-042 (Must, actualización autorizada 2026-10-27)**: El personal DEBE poder
+  publicar enlaces informativos a cursos y registrar una derivación de un postulante
+  a un curso, con fecha, cuenta responsable e historial independiente de las
+  postulaciones y derivaciones laborales. Los enlaces publicados se pueden consultar
+  públicamente; los antecedentes individuales quedan restringidos a administración.
+  Las notas libres de orientación existentes se conservan como complemento, no como
+  sustituto del registro estructurado. No se incluyen inscripciones, gestión académica
+  ni recomendaciones automáticas de cursos. Máximo confirmó el requisito del PDF
+  `Beex_Funes_Tech_Lab_Proyecto_Final.pdf`; sustituye el alcance anterior de nota libre.
 
 #### Historial, contactos y privacidad
 

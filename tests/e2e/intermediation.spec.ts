@@ -7,6 +7,7 @@ const fixture = { ...fixtures, ...fixtures.acceptance };
 import { runLocalMaintenanceSql } from "./local-maintenance";
 import { expectUnavailablePublicOffer } from "./fixtures/public-offer";
 import { assertLocalTargets, localFixturePassword } from "../fixtures/credentials.mjs";
+import { selectLaborCategories } from "./fixtures/quality";
 
 function openingSlug(id: string) {
   expect(id).toMatch(/^[0-9a-f-]{36}$/);
@@ -26,7 +27,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, role
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/admin$/ }[role]);
 }
 
 // The business-flow suite uses exclusively the reset local fictitious dataset.
@@ -191,6 +192,7 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
     await company.getByRole("button", { name: "Registrar entrevista" }).click();
     await expect(company.getByText("La entrevista quedó registrada.")).toBeVisible();
     await company.getByLabel("Resultado informado").selectOption("not_selected");
+    await company.getByLabel("Motivo de no selección", { exact: true }).fill("Otro perfil reúne la experiencia requerida.");
     await company.getByRole("button", { name: "Enviar informe" }).click();
     await expect(company.getByText("El resultado informado quedó pendiente de revisión municipal.")).toBeVisible();
     await admin.goto(`/admin/participations/${fixtureId("participation", 9)}`);
@@ -293,7 +295,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await signIn(company, "company2@example.invalid", "company");
 
     await candidate.goto("/account?section=perfil");
-    await candidate.getByLabel("Categoría ficticia A", { exact: true }).check();
+    await selectLaborCategories(candidate, ["Categoría ficticia A"]);
     await candidate.getByRole("button", { name: "Guardar correcciones" }).click();
     await expect(candidate.getByText("Perfil actualizado.", { exact: false })).toBeVisible();
     await admin.goto(`/admin/candidates/${fixtureId("profile", 1)}`);
@@ -322,7 +324,7 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
 
     await candidate.goto("/dashboard?section=postulaciones");
     const nominated = candidate.locator("li").filter({ has: candidate.getByRole("heading", { name: "Oferta ficticia 002" }) });
-    await expect(nominated.getByText("Recibida por la Oficina", { exact: true })).toBeVisible();
+    await expect(nominated.locator("p").filter({ hasText: /^Estado:/ }).getByText("Recibida por la Oficina", { exact: true })).toBeVisible();
     // The approved agenda exception reveals only dates/channel, not the
     // municipal evaluation or the actual internal participation stage.
     await expect(nominated.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toBeVisible();
@@ -575,7 +577,7 @@ test("rechazo, cierre y cancelación de ofertas conservan mensajes públicos y c
       await company.getByLabel("Tipo de contratación", { exact: true }).click();
       await company.getByRole("option", { name: "A plazo fijo", exact: true }).click();
       await company.getByLabel("Fecha de cierre").fill("2026-12-31");
-      await company.getByLabel("Categoría ficticia A").check();
+      await selectLaborCategories(company, ["Categoría ficticia A"], "Categorías");
       await company.getByRole("button", { name: "Guardar borrador" }).click();
       await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}$/);
       const id = referenceIdentifier("opening", new URL(company.url()).pathname.split("/").at(-1)!);

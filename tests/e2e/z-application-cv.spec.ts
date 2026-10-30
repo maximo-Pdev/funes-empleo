@@ -15,7 +15,7 @@ async function login(page: Page, email: string, role: "candidate" | "admin" | "c
   await page.goto("/"); await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL({ candidate: /\/dashboard$/, admin: /\/account$/, company: /\/empresa$/ }[role]);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, admin: /\/admin$/, company: /\/empresa$/ }[role]);
 }
 test("CV opcional por oferta, imágenes, general independiente y acceso exacto por derivación", async ({ page, browser }) => {
   test.setTimeout(120_000); assertLocalTargets();

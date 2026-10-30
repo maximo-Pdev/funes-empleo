@@ -1,5 +1,75 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+
+## PR86 documentation integration — current scope and historical evidence
+
+PR86 adds only session-aware public-offer presentation: `/ofertas` reads
+`getSiteAccess` once per request and reuses the verified `panel.href` and
+`panel.label` for its header and sidebar. An active candidate, company or
+administrator sees the correct panel link, not anonymous “Crear cuenta” or
+“Iniciá sesión” calls to action. With no verified active panel, preserve the
+anonymous registration and login links. URL parameters, client registration
+selection and guessed role paths are not authentication evidence. Hiding links
+is presentation, not authorization; keep server guards and database privacy.
+See `docs/operations/public-offers-authenticated-access.md` and
+`specs/001-municipal-employment-portal/contracts/authorization-matrix.md`.
+
+Mateo's EXTRA-108 rollback applies to PR86's own Home/login experiments only;
+it does not revert the feature branch's independently approved session-aware
+Home access panel, anonymous drafts, or chart-first administrative architecture.
+Both `/admin` and `/admin/metrics` retain visible shared bar/donut charts, not
+six summary cards or graphs hidden behind Ver detalle. Keep central labels,
+real values, text equivalents, native GET filters, selected-name tags, keep-open
+multiselect and visible CSV/PDF/XLSX exports. Public Home aggregate cards are
+separate and unchanged. Preserve course links/referral history, private photos,
+individual administrator invitation/password setup, private notifications,
+per-case immutable CVs, date presentation and withdrawn-only new attempts.
+Hiring retains operational consent, changes availability to unavailable and
+preserves only the already-authorized hiring-company access window of 720 hours;
+revoked access never revives. Legal registration receipts remain separate from
+operational privacy in Cuenta. Keep native `datetime-local`, ISO payloads and
+Funes conversion; browser locale display order is not guaranteed.
+
+The retained branch narratives below are historical evidence where superseded.
+In particular, incoming six-card/Perfil wording is explicitly archived inline,
+not a competing current design. Earlier statements that SQL or browser checks
+were pending describe their recorded phase, not a new failure: the task ledger
+contains subsequent isolated SQL, coverage and browser phase results. An
+interrupted local gate is not a pass, and prior CI success is not a fresh
+integrated acceptance run. This unit performs static documentation verification
+only; the parent owns executable gates, task-ledger updates and Git operations.
+No new legal/municipal approval, independent review, acceptance, hosted rollout,
+merge or deployment is established by this union.
+
+Historical EXTRA-106 references are title-qualified in `cambios-extra.md`; PR85 documentation union and PR86 public-access history are distinct entries.
+
+## Final portal improvements — EXTRA-086 (implementation in progress)
+
+Authorized scope and exact user corrections: `odd/tasks/final-portal-improvements.md`.
+Reuse existing request-bound Supabase services, role guards, opaque record references
+and municipal components. The administrator overview at `/admin` uses real metrics
+for today and shares the chart renderer with the filtered metrics page; `/account`
+retains account management. Candidate offer suggestions union recent public search
+matches by the selected active category codes, deduplicate and exclude applied offers;
+they do not call administrative matching or grant any referral access.
+
+Course links and referrals use additive migration `20261027233000_course_referrals.sql`.
+`municipal_courses` exposes published title/URL metadata, while `course_referrals`
+is administrator-only append-only history with course title/URL snapshots and actor/time.
+Ordinary sessions read through RLS. Session-bound SECURITY DEFINER commands with
+empty search_path perform writes and audit them. No job participation, CV requirement,
+company access or enrollment is created by a course referral. HTTPS links are validated
+lexically, never fetched server-side; staff verify their official provenance. Recovery
+preserves records and revokes new commands rather than deleting populated tables.
+New course/terms database behavior still requires isolated SQL verification; a mock RPC
+pass is not database proof. Registration terms remain an unapproved demonstration
+draft, separate from operational consent and existing privacy gates.
+
+The shared sidebar receives the candidate's existing private photo, loaded once per
+account render and reused by Perfil. Optional read failure must not block other forms.
+Visibility toggles for passwords and masked identifiers share the same adapted Button;
+each input retains its own visibility, value, validation and accessible label.
+
 ## EXTRA109 — Ajustes administrativos con contratos existentes
 
 AD1: ModerationForm pending_review reduce opciones a approved/rejected/
@@ -46,6 +116,7 @@ reintentos al día de Funes, sin modificar funciones o aserciones. EXTRA111 oscu
 axe (4.24→5.67:1); no agrega reglas o paletas locales. Evidencia y recuperación en
 `docs/operations/admin-offer-management.md`; no se requiere migración.
 
+
 ## EXTRA106/108 — Presentación de acceso en /ofertas
 
 Reutilizar getSiteAccess por request para header y tarjeta lateral en una sola
@@ -90,6 +161,13 @@ posterior a chromium y excluirlas de chromium, conservando conteos iniciales y
 dependencias de CI. No cambiar aserciones, retries ni workers existentes.
 
 
+### PR85 integration boundary — EXTRA-106
+
+R1/R2/R3 above belong to `EXTRA-102 — Fechas uniformes y nueva postulación tras retiro`, distinct from local `EXTRA-102 — Documentation integration for final portal improvements`. Apply central presentation helpers to administrator overview timestamps, candidate suggestion closing dates and report context without replacing the shared visible bar/donut metrics renderer, its central labels, real values, native GET filters or visible CSV/PDF/XLSX actions. Do not restore six summary cards or hide the charts behind a detail link. Preserve selected-name tags, keep-open multiselect, course history, notifications, private photo loading and separate legal/operational consent contracts.
+
+Retry is a new self-application after withdrawn attempts only, with a new identifier, immutable per-case CV, events and fresh eligibility/consent/version checks. Other final states still block; municipal nomination/matching and recommendation exclusion retain their existing rules. Both selected-offer and list form instances retain the history-derived attempt key and panel-aware continuation links. No withdrawn record is reopened and no revoked access is revived. Hiring still makes availability unavailable while retaining operational consent; only an already-active authorized hiring-company referral can retain the existing 720-hour window. The late `application-cv` retry project ordering preserves earlier exact counts, not weaker assertions.
+
+EXTRA-105 supersedes the EXTRA-104 free-text contact experiment: keep native `datetime-local`, declarative `lang="es-AR"`, existing ISO payload and Funes conversion without promising universal browser display order. The incoming EXTRA-103 hosted-migration account remains historical evidence, not a migration performed or reverified by this documentation unit. Parent-owned application, SQL and browser gates remain necessary for the integrated executable result; neither past branch verification nor this static union establishes new review, acceptance or municipal/legal approval.
 ## EXTRA099 — Diseño de avisos privados,2026-10-28
 
 N1/N5: account_notifications con recipient_account_id, source_event_id, kind,
@@ -184,6 +262,9 @@ R1: proxy GET CV mantiene sesión/RPC/Storage RLS/no-store/nosniff/refs; cambiar
 solo Content-Disposition a inline y enlaces target=_blank/rel=noopener noreferrer.
 No signed URLs ni rutas nuevas. El visor/configuración del navegador decide soporte.
 
+Historical incoming EXTRA094 metrics wording, superseded by the current integration scope above:
+
+```text
 R2: Dashboard sigue Server Component. Seis tarjetas seleccionadas por indicador
 exacto, no sumas de categorías. Gráficos de barras estáticos con valores/etiquetas
 HTML y barra decorativa, usando tokens municipales; cero/null/ausencia explícitos.
@@ -191,6 +272,20 @@ Sin Recharts/isla cliente: registro oficial chart consultado exige nueva depende
 para interacción no solicitada, innecesaria para estas dos distribuciones estáticas.
 No crear imitación de ChartContainer; reutilizar layout/Card donde corresponda.
 Detalle anterior y definiciones en details/summary nativos; exportadores intactos.
+```
+
+Current integrated metrics guidance:
+
+R2: Dashboard sigue Server Component. S2/L36 y EXTRA102 sustituyen las seis tarjetas
+resumen por gráficos visibles de barras y dona; `/admin` y `/admin/metrics`
+comparten renderer. Indicadores exactos, no sumas de categorías; dona únicamente
+con estados de oferta mutuamente excluyentes. Valores/etiquetas HTML y gráficos
+decorativos usan tokens municipales; cero/null/ausencia explícitos.
+Sin Recharts/isla cliente: registro oficial chart consultado exige nueva dependencia
+para interacción no solicitada, innecesaria para estas distribuciones estáticas.
+No crear imitación de ChartContainer; reutilizar layout/Card donde corresponda.
+No ocultar el reemplazo gráfico bajo Ver detalle. Definiciones en details/summary
+nativos; filtros, indicadores completos y exportadores CSV/PDF/XLSX intactos.
 
 R3/R5: migración aditiva reemplaza cuerpo transition_participation conservando
 firma/grants/guard/evidencia/locks y demás ramas. Hire/late_hire: availability
@@ -203,9 +298,24 @@ Mantener bloqueo candidato antes de participación; rollback si falla auditoría
 Sin backfill, schema/índices/proveedores nuevos. Historial hiring_workflow previo
 permanece legible. Recuperación forward-only, nunca reconsentir/restaurar permisos.
 
+Historical incoming EXTRA094 privacy wording, superseded by the current integration scope above:
+
+```text
 R4: perfil presenta explicación/estado siempre; formulario afirmativo solo si
 último evento no accepted. DB ya impide dos aceptaciones consecutivas. Retiro
 manual y nuevo consentimiento explícito siguen existentes; no ampliar UI de retiro.
+Texto explica indisponibilidad,720h y conservación sin reponer permisos. Guardar
+disponibilidad available sigue su activación vigente; hire no reactiva perfil.
+```
+
+Current integrated privacy guidance:
+
+R4: Cuenta > Privacidad presenta explicación/estado siempre; Perfil no duplica
+controles de consentimiento. Formulario afirmativo solo si
+último evento no accepted. DB ya impide dos aceptaciones consecutivas. Retiro
+manual explícito conserva sus controles existentes en Cuenta y sus efectos globales;
+nuevo consentimiento explícito no reabre casos ni permisos. Términos del registro
+persisten por separado, sin otorgar consentimiento operativo.
 Texto explica indisponibilidad,720h y conservación sin reponer permisos. Guardar
 disponibilidad available sigue su activación vigente; hire no reactiva perfil.
 
@@ -246,6 +356,7 @@ Servidor de matching compone formulario GET de orden como ReactNode al cliente
 tabla/modal; mantiene preview/nominación/refresh. Otras composiciones ya servidor.
 html:has(dialog[data-candidate-preview][open]) bloquea fondo automáticamente;
 conservar overflow interior y comprobar posición/teclado/cierre/móvil.
+
 
 ## Authorized public metrics design — EXTRA-079
 
@@ -640,6 +751,11 @@ autorización/estados intactos; no traducir contenido personal o formatos técni
 
 ### EXTRA040 — presentación del perfil candidato, 2026-10-22
 
+Historical layout/copy below is retained for traceability. S12/S18 and EXTRA102
+move operational privacy to Cuenta, not Perfil; EXTRA094 supersedes hiring-related
+withdrawal copy with retained consent/unavailable and conditional 720-hour access.
+The existing explicit manual withdrawal remains reachable without repeat acceptance.
+
 Solo CandidateProfilePanel y CSS local: tarjeta inicial de estado/vigencia y
 activación. Derivar visibilidad de props guardadas que ya entrega workspace,
 según el predicado del RPC activate_candidate existente: estados recuperables,
@@ -662,6 +778,9 @@ flujo real de activación/consentimiento, móvil, teclado y axe. Tipos/lint/prue
 build. Modelo/contratos de estados y autorización permanecen intactos.
 
 ### EXTRA041 — composición de tarjetas del perfil, 2026-10-22
+
+The consent placement described below is historical, superseded by Cuenta > Privacidad
+in S12/S18. It does not require restoring consent controls to Perfil or obsolete copy.
 
 Una section de Datos laborales y personales contiene los formularios hermanos
 de datos y teléfono opcional, cada uno con su Action/version/resultado; sin

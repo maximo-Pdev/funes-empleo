@@ -7,10 +7,11 @@ import type { AccountFormState } from "./form-state";
 import { getAccessHref } from "./access-notices";
 import type { UserRole } from "@/domain/catalogs";
 import { passwordConfirmationMessage, passwordConfirmationSchema } from "@/validation/password";
+import { registrationTermsMessage, registrationTermsSchema } from "./legal-terms";
 
 const genericRenewal = { message: "Si corresponde, recibirás un enlace en tu correo. Revisá también la carpeta de correo no deseado.", success: true };
 
-const panelHref: Record<UserRole, string> = { candidate: "/dashboard", company: "/empresa", admin: "/account" };
+const panelHref: Record<UserRole, string> = { candidate: "/dashboard", company: "/empresa", admin: "/admin" };
 
 export async function loginAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   let result: { status: "active" | "invalid" | "suspended" | "already-active"; role?: UserRole } = { status: "invalid" };
@@ -33,7 +34,9 @@ export async function verificationAction(_previous: AccountFormState, form: Form
 export async function registerAccountAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {
   const passwords = passwordConfirmationSchema.safeParse({ password: form.get("password"), confirmation: form.get("confirmation") });
   if (!passwords.success) return { message: passwordConfirmationMessage, success: false };
-  try { await registerAccount({ email: form.get("email"), ...passwords.data, role: form.get("role") }); } catch { /* same safe response */ }
+  const terms = registrationTermsSchema.safeParse({ termsAccepted: form.get("termsAccepted") === "on", termsVersion: form.get("termsVersion") });
+  if (!terms.success) return { message: registrationTermsMessage, success: false };
+  try { await registerAccount({ email: form.get("email"), ...passwords.data, ...terms.data, role: form.get("role") }); } catch { /* same safe response */ }
   return genericRenewal;
 }
 export async function passwordAction(_previous: AccountFormState, form: FormData): Promise<AccountFormState> {

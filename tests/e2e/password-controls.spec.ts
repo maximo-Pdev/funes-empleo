@@ -45,7 +45,9 @@ for (const registration of [
 
     await page.locator("form").evaluate(form => form.setAttribute("novalidate", ""));
     await page.getByRole("button", { name: registration.button, exact: true }).click();
-    await expect(page.locator("[data-field-error]")).toContainText("Las contraseñas deben coincidir");
+    await expect(page.locator("[data-form-field]").filter({ has: confirmation }).locator("[data-field-error]")).toContainText("Las contraseñas deben coincidir");
+    await expect(page.locator('input[name="termsAccepted"]')).not.toBeChecked();
+    await expect(page.getByText("Confirmá esta opción para continuar.", { exact: true })).toBeVisible();
     await expect(confirmation).toHaveAttribute("aria-invalid", "true");
     await expect(confirmation).toBeFocused();
     await expect(page).toHaveURL(registration.path);

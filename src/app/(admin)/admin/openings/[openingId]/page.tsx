@@ -1,3 +1,5 @@
+import { WorkflowSteps } from "@/components/ui/workflow-steps";
+import { companyOpeningWorkflow } from "@/domain/presentation/workflow-steps";
 import { formatCalendarDate } from "@/lib/time/presentation";
 import { recordReference, recordReferences } from "@/lib/records/references";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
@@ -35,6 +37,14 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
   return <AdminShell email={user?.email} active="/admin/openings" title={opening.title ?? "Oferta sin título"}
     description="Detalle e historial de decisiones visible solo para la Oficina de Empleo."
     navigation={[{ href: "/admin/openings", label: "Volver a ofertas" }, { href: "/admin/candidates", label: "Candidatos" }]}>
+    <section aria-label="Próximo paso de la oferta" className="mb-6 rounded-lg border border-border p-5">
+      <WorkflowSteps label="Etapas de la oferta" steps={companyOpeningWorkflow(opening.status).steps} />
+      <p>{opening.status === "pending_review" ? "Revisá la oferta y registrá la decisión municipal antes de su publicación." : "Consultá el estado y el historial. Para una oferta habilitada, revisá candidatos coincidentes o continuá las participaciones existentes; nominar no deriva el perfil."}</p>
+      <div className="flex flex-wrap gap-4">
+        <a href="#opening-moderation" className="inline-flex min-h-11 items-center text-primary underline">Revisar decisión municipal</a>
+        <a href="#candidate-matches" className="inline-flex min-h-11 items-center text-primary underline">Revisar candidatos coincidentes</a>
+      </div>
+    </section>
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
       <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
@@ -53,7 +63,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         <LinkButton href={`/admin/participations?openingId=${openingReference}`}>Ver participaciones de esta oferta</LinkButton>
       </section>
       </div>
-      <div className="space-y-6">
+      <div id="opening-moderation" tabIndex={-1} className="scroll-mt-24 space-y-6">
       <ModerationForm key={`${opening.status}-${opening.version}`} openingId={opening.id}
         version={opening.version} status={opening.status} onSubmit={moderateOpeningAction} />
       <ModerationHistory key={`${opening.id}:${opening.version}`} events={events.map(event => ({
@@ -63,9 +73,11 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
       }))} />
       </div>
     </div>
+    <div id="candidate-matches" tabIndex={-1} className="scroll-mt-24">
     <Suspense key={`${Array.isArray(matchOrder) ? matchOrder.join(",") : matchOrder ?? DEFAULT_OPENING_MATCH_ORDER}:${Array.isArray(matchPage) ? matchPage.join(",") : matchPage ?? "1"}`}
       fallback={<p role="status">Buscando candidatos con rubros coincidentes…</p>}>
       <OpeningCandidateMatches openingId={opening.id} page={matchPage} order={matchOrder} />
     </Suspense>
+    </div>
   </AdminShell>;
 }

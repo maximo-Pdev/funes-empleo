@@ -22,7 +22,7 @@ test("administración: métricas filtradas, PDF, Excel y CSV compatible en menos
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/admin$/);
   await page.goto("/admin/metrics?from=invalido");
   await expect(page.getByRole("heading", { name: "Métricas operativas" })).toBeVisible();
   await page.getByLabel("Desde", { exact: true }).fill("2026-09-01");
@@ -34,20 +34,23 @@ test("administración: métricas filtradas, PDF, Excel y CSV compatible en menos
   await expect(page.getByTestId("metric-companies_active").locator("dd")).toHaveText("50");
   await expect(page.getByTestId("metric-applications").locator("dd")).toHaveText("500");
   await expect(page.getByTestId("metric-hired").locator("dd")).toHaveText("25");
-  await expect(page.getByRole("figure", { name: "Resultados de las participaciones" })).toBeVisible();
-  await expect(page.getByRole("figure", { name: "Contrataciones por categoría" })).toBeVisible();
-  await expect(page.getByText("Ver detalle", { exact: true }).locator("..")).not.toHaveAttribute("open");
+  await expect(page.getByRole("figure", { name: "Ofertas por estado" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Conteos del período" }).locator("[data-metric-bar]").first()).toBeVisible();
+  await expect(page.getByRole("region", { name: "Distribución por categoría" })).toBeVisible();
+  await expect(page.getByText("Indicadores principales", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Ver detalle", { exact: true })).toHaveCount(0);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: `test-results/metrics-summary-${width}.png`, fullPage: true });
   }
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.getByText("Ver detalle", { exact: true }).click();
+  await expect(page.locator("[data-metrics-chart-first] details")).toHaveCount(0);
   await expect(page.getByTestId(`duration-first_hire_days-${fixtureId("opening",22)}`)).toContainText("10 días");
   await expect(page.getByTestId(`duration-coverage_days-${fixtureId("opening",22)}`)).toContainText("Pendiente");
-  const excelLink = page.getByRole("link", { name: "Descargar Excel filtrado" });
-  const csvPath = (await excelLink.getAttribute("href"))!.replace("operations.xlsx", "operations.csv");
+  const csvLink = page.getByRole("link", { name: "Descargar CSV filtrado", exact: true });
+  await expect(csvLink).toBeVisible();
+  const csvPath = (await csvLink.getAttribute("href"))!;
   const csvResponse = await page.request.get(csvPath);
   expect(csvResponse.status()).toBe(200);
   const csv = await csvResponse.text();
@@ -121,7 +124,7 @@ test("seguimiento: conserva canales cronológicos sin plantillas de mensajes", a
   await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
   await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/admin$/);
   await page.goto(`/admin/participations/${fixtureId("participation",1)}`);
   const timeline = page.getByRole("region", { name: "Historial de contactos" });
   await expect(timeline.locator("li")).toHaveCount(4);
