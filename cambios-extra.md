@@ -125,6 +125,11 @@
   streaming. next-env ajeno mantiene SHA256 original B8B3A344…C491000. Sin commit,
   PR, CI, revisión humana o despliegue de este incremento; pendientes ajenos intactos.
 
+Publicación posterior de EXTRA109/110/111 solicitada por Mateo: commit sin firma
+f3d460e y [PR87](https://github.com/maximo-Pdev/funes-empleo/pull/87) abierto hacia
+main desde feat/admin-offer-management. Verificación local anterior preservada;
+CI/revisión humana/merge/despliegue pendientes, next-env ajeno excluido.
+
 ## EXTRA-108 — Conservar solo el ajuste de ofertas
 
 - **Fecha/origen:** Mateo, 29/10/2026: «los cambios del login descartalos, lo de

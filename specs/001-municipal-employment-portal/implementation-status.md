@@ -21,6 +21,11 @@ T259–T267 completadas; contraste AD1–AD7 contra código/pruebas sin brechas 
 Guía de operación y recuperación: docs/operations/admin-offer-management.md.
 No commit/PR/CI/revisión humana/despliegue implícitos; gates históricos intactos.
 
+Publicación posterior solicitada por Mateo: commit sin firma f3d460e y
+[PR87](https://github.com/maximo-Pdev/funes-empleo/pull/87),
+feat/admin-offer-management → main9cf0741. CI y revisión humana pendientes;
+sin merge ni despliegue acreditados. next-env ajeno permanece excluido.
+
 ## EXTRA106/108 — Acceso de ofertas por sesión, 29/10/2026
 
 Rama fix/public-authenticated-access desde main e8ba52c. Mateo descarta todos los
