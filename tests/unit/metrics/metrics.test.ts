@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { metricsFilterSchema } from "@/validation/metrics";
 import { csvCell, metricsCsv } from "@/features/metrics/csv-export";
 import { orderContacts } from "@/features/participations/contact-order";
-import { messageTemplate } from "@/features/participations/message-templates";
 
 describe("métricas y seguimiento", () => {
   it("valida fechas reales y orden sin aceptar filtros ajenos", () => {
@@ -41,9 +40,5 @@ describe("métricas y seguimiento", () => {
     const values = [{ id: "b", occurred_at: "2026-09-20T00:00:00Z" }, { id: "a", occurred_at: "2026-09-19T00:00:00Z" }];
     expect(orderContacts(values).map((v) => v.id)).toEqual(["a", "b"]);
     expect(values[0]?.id).toBe("b");
-  });
-  it("plantillas sin datos personales ni envío automático", () => {
-    expect(messageTemplate("follow_up")).toContain("Oficina de Empleo");
-    expect(messageTemplate("appointment")).not.toMatch(/https:|mailto:|wa.me/);
   });
 });

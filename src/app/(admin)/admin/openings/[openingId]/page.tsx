@@ -15,6 +15,7 @@ import { ModerationForm } from "@/features/openings/components/moderation-form";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { OpeningCandidateMatches } from "@/features/participations/components/opening-candidate-matches";
 import { LinkButton } from "@/components/ui/link-button";
+import { RecordLink } from "@/components/ui/record-link";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,7 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
       <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="opening-details" className="text-xl font-semibold">Oferta y empresa</h2>
         <p>Empresa: <strong>{opening.company_profiles?.legal_name ?? "Sin nombre"}</strong></p>
+        {opening.company_profiles?.id && <RecordLink href={`/admin/empresas/${opening.company_profiles.id}`} className="font-semibold underline">Ver perfil de la empresa</RecordLink>}
         <p className="flex flex-wrap items-center gap-2">Estado <Badge variant="status" tone={statusTone(openingStatusTones, opening.status)}>{displayLabel(openingStatusLabels, opening.status)}</Badge></p>
         <p>Fecha de cierre: {opening.closing_date ? formatCalendarDate(opening.closing_date) : "Sin definir"}</p>
         <p>Vacantes: {opening.vacancies ?? "Sin definir"}</p>

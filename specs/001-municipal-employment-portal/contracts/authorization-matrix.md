@@ -1,5 +1,11 @@
 # Contrato de autorización y visibilidad
 
+EXTRA109: la ficha empresarial administrativa usa los datos ya autorizados al
+admin activo (razón social, CUIT, responsable, contactos, actividad, localidad).
+Enlace desde oferta y páginas de sus ofertas no amplían visibilidad a otros roles.
+Protección del último admin, decisiones por estado y auditoría conservan contratos
+existentes; plantillas retiradas sin alterar contactos. No nuevos grants/RLS/RPC.
+
 EXTRA106/108: /ofertas adapta únicamente su CTA al rol activo verificado con
 getSiteAccess servidor por request. No modifica permisos ni autorregistro; ocultar
 enlaces no es un control de seguridad. Home/login conservan el comportamiento previo.

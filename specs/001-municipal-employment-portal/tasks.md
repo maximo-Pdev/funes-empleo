@@ -5,6 +5,40 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA109 — Administración de ofertas y cuentas
+
+### Preparación y fundamento
+
+- [x] T259 Revisar AD1–AD7, contratos/constitución y diseño antes de código; registrar evidencia/alcance en `cambios-extra.md`, `spec.md`, `plan.md` y `checklists/requirements.md`; rama desde main actualizado y next-env ajeno preservado.
+- [x] T266 EXTRA110: corregir solo el día de Funes del fixture en `supabase/tests/075_application_retry.test.sql` tras evidencia de diferencia UTC/Funes; conservar todas las aserciones y repetir SQL completo en base aislada. Prerrequisito técnico de T265, sin cambio de producto.
+- [x] T267 EXTRA111: corregir solo contraste del token ámbar en `src/app/globals.css` tras fallo axe real y verificar seis pares semánticos en `tests/unit/presentation/status-contrast.test.ts`; conservar estados/semántica y repetir build/navegador. Prerrequisito de accesibilidad de T265, sin paletas locales.
+
+### US1 — Intermediación municipal (P1)
+
+- [x] T260 [US1] AD1/AD2/AD3/AD6: probar revisión de tres opciones y ciclo de vida restante en `tests/components/intermediation/admin-workflow.test.tsx`; ajustar `src/features/openings/components/moderation-form.tsx` y enlace empresarial opaco en `src/app/(admin)/admin/openings/[openingId]/page.tsx`; verificar historial5 y paginación/filtros/rango con recuperación en `src/app/(admin)/admin/openings/page.tsx`, `src/features/openings/admin-service.ts` y pruebas de listas/UI (incluido PGRST103).
+- [x] T262 [US1] AD7: probar y ajustar verde de reactivación, rojo destructivo y retención/confirmación en `src/features/companies/components/admin-company-decision.tsx`, `src/features/accounts/components/account-change-form.tsx`, `src/features/participations/components/safety-decision-form.tsx`; CSS acotado y envoltura danger de `src/app/(auth)/account/page.tsx`, sin cambiar funciones servidor.
+- [x] T264 [US1] AD4: verificar SQL existente de último admin, autosuspensión, archivo y auditoría sin escritura en `supabase/tests/001_foundation_rls.test.sql`; agregar prueba aislada de suspensión cruzada con bloqueo observado en `tests/quality/admin-account-concurrency.mjs`, sin alterar datos alojados o reglas de cuentas.
+
+### US3 — Gestión empresarial (P1)
+
+- [x] T261 [US3] AD2/AD6: ficha de solo lectura con guard admin y campos existentes/ausentes en `src/app/(admin)/admin/empresas/[companyId]/page.tsx`; reemplazar límite50 por conteo/orden/range10 y páginas con referencia opaca, entrada inválida sin consulta y recuperación fuera de rango. Probar en `tests/components/admin/admin-pages.test.tsx` y autorización SQL existente.
+
+### US6 — Seguimiento (P3)
+
+- [x] T263 [US6] AD5: retirar `src/features/participations/components/contact-tools.tsx`, `src/features/participations/message-templates.ts` y su uso en `src/app/(admin)/admin/participations/[participationId]/page.tsx`; ajustar `tests/unit/metrics/metrics.test.ts` y `tests/e2e/admin-metrics.spec.ts` conservando contactos/historial.
+
+### Calidad y cierre transversal
+
+- [x] T265 Verificar tipos/lint/pruebas relevantes/unit/tooling/SQL/build y navegador ficticio por AD1–AD7, móvil/teclado/axe/colores; registrar resultados y recuperación en `docs/operations/admin-offer-management.md`, `cambios-extra.md` y `implementation-status.md`; convergencia sin cerrar gates humanos ajenos.
+
+Dependencias: T259 → tareas de historias → T265. Orden de ejecución T260 → T261
+→ T262 → T263 → T264 → T265; conservar ledger histórico y revisión humana pendiente.
+Pruebas independientes: US1 decisiones/historial/permisos/colores; US3 perfil y
+páginas propias; US6 contactos sin plantillas. Los cambios separados por historia
+son revisables de forma independiente; se ejecutan secuencialmente por archivos
+compartidos. Alcance mínimo del incremento: completar las tres historias pedidas,
+sin nuevas entidades, migración, dependencias o publicación implícita.
+
 ## EXTRA106/108 — Mantener solo el acceso de ofertas por sesión
 
 - [x] T258 [A02/A03] Restaurar inicio/login, conservar CTA de /ofertas por rol

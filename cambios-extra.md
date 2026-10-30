@@ -1,5 +1,135 @@
 # Cambios extra necesarios
 
+## EXTRA-111 — Contraste del estado ámbar en la vista administrativa
+
+- **Fecha/origen:** 29/10/2026, prerrequisito demostrado de accesibilidad al
+  verificar AD2/AD6 de EXTRA109; amparado por autorización de adiciones técnicas
+  necesarias de AGENTS.md. Sin decisión funcional o municipal nueva.
+- **Evidencia previa:** axe rechaza cuatro etiquetas Pendiente de revisión en la
+  última página empresarial. Token existente #9a6b00 sobre #fcf3db da4.2399:1,
+  inferior a4.5:1 para texto pequeño; no se cambia el test ni se omite la regla.
+- **Cambio previsto antes de implementar:** oscurecer solo el token compartido
+  status-amber a #805900 (5.6718:1), manteniendo fondo, estado, mapeo, borde y punto.
+  Un único token evita excepciones por página o paletas paralelas. Afecta las
+  etiquetas ámbar de todos los roles; el significado y demás colores no cambian.
+- **Archivos/contratos:** globals.css, UI_GUIDELINES.md y prueba independiente de
+  contraste de los seis pares semánticos; tasks/evidencia. Sin componentes nuevos,
+  API, permisos, modelo, dependencias o migración. Cambio compartido mínimo dentro
+  de la verificación del alcance, sin asumir revisión humana del compañero.
+- **Riesgo/verificación:** matiz ámbar más oscuro en consumidores existentes;
+  conservar textos y tonos. Cálculo de contraste de tokens reales, unit/lint/build
+  y axe/navegador en escritorio/móvil. Fuente de umbral: W3C SC1.4.3,
+  https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html.
+- **Estado real:** implementado y verificado. Token en globals.css, guía UI,
+  plan/tasks y prueba nueva de seis pares semánticos PASS. Suite1387/112, tipos,
+  lint y build PASS; navegador final diez vistas1440/390px con axe0. No publicación
+  o aprobación humana implícitas; no modifica colores institucionales principales.
+
+## EXTRA-110 — Fecha de Funes en el fixture SQL de reintentos
+
+- **Fecha/origen:** 29/10/2026, requisito técnico necesario para ejecutar la
+  verificación SQL de EXTRA109 según AGENTS.md; autorización permanente de
+  prerrequisitos demostrables, no un cambio funcional adicional.
+- **Problema/evidencia:** tras restablecer solo el entorno propio,27 archivos SQL
+  pasan y075 falla en «Oferta vencida». Consulta local muestra current_date=
+  2026-10-30, Funes=2026-10-29; current_date-1 produce29, que todavía está vigente
+  para el contrato aprobado. El intento se crea y provoca fallos posteriores.
+- **Propuesta previa a código:** fijar el día del fixture desde clock_timestamp
+  at time zone America/Buenos_Aires y reutilizarlo para fechas de prueba futuras/
+  vencidas. Mantener todos los rechazos, versiones y aserciones existentes.
+- **Archivos/contratos:** solo `supabase/tests/075_application_retry.test.sql` y
+  evidencia/tasks; contrato de fechas Funes y funciones servidor/SQL de producto
+  intactos. Sin migración, configuración horaria global ni nuevos datos reales.
+- **Riesgo/verificación:** debe pasar entre00:00 y03:00 UTC cuando difieren los
+  días, sin debilitar la condición de vencimiento. Repetir pgTAP completo sobre
+  fixture aislado frío, incluido075; no tocar base habitual o alojada.
+- **Estado real:** implementado solo en075; todas las aserciones conservadas.
+  Suite SQL completa1463/28 PASS en base aislada fría, incluida frontera real
+  UTC/Funes. Ninguna función, migración o base alojada modificada. Guía operativa
+  y T266 actualizadas; revisión humana y publicación no acreditadas.
+
+## EXTRA-109 — Gestión administrativa de ofertas, empresas y cuentas
+
+- **Fecha/origen:** Mateo, 29/10/2026, solicita siete ajustes administrativos:
+  decisión aprobar/rechazar/correcciones, consultar empresa, historial inicial5,
+  protección de administradores, quitar plantillas, paginar ofertas y reactivar
+  en verde. Rama feat/admin-offer-management desde main9cf0741, PR86 mergeado;
+  rama anterior eliminada local/remota. next-env ajeno preservado.
+- **Evidencia previa:** ModerationForm ofrece cinco decisiones para pending_review;
+  la oferta muestra nombre empresarial sin enlace. La ficha administrativa solo
+  lee nombre/estado, y limita ofertas a50 sin páginas. ModerationHistory ya revela
+  cinco eventos; listado general ya pagina10. change_account_status exige admin
+  activo, impide autosuspensión/archivo admin y serializa con advisory lock antes
+  de revalidar actor/estado/conteo. No se encontró una vía de panel que eluda esto.
+  ContactTools muestra exactamente «Plantillas para el personal». Reactivaciones
+  usan estilos rojos/neutros y pueden heredar el rojo del contenedor de cuenta.
+- **Cambio propuesto antes de implementar:** limitar la decisión de revisión a
+  Aprobar/Rechazar/Solicitar correcciones, preservando las acciones de ciclo de vida
+  de otros estados y sus contratos. Enlazar a empresa con referencia opaca y mostrar
+  sus datos registrados solo tras guard admin existente. Paginar10 sus ofertas
+  con conteo/filtro/sort en servidor, sin borrar ni esconder resultados después
+  de50. Conservar/verificar paginación general e historial5, mejorar recuperación
+  de página vacía si corresponde. Retirar UI/módulo de plantillas sin alterar
+  contactos registrados. Usar Button municipal primario verde para reactivación,
+  mantener suspensión/archivo rojos, confirmación, motivo y auditoría.
+- **Justificación/contratos:** FR023/025/051/053/055 y matriz de autorización ya
+  admiten moderación, lectura de empresa y protección de último admin; FR057 se
+  retira por pedido expreso. Perfil empresarial incluye razón social, CUIT,
+  responsable, email/teléfono, actividad y localidad ya almacenados y autorizados
+  para la Oficina. No acceso público/candidato/otra empresa ni botón de DNI/CUIT
+  ajeno. No cambia estados, privacidad, límites de roles o reglas de reactivación.
+- **Archivos previstos:** moderation-form; detalle/lista administrativa de ofertas;
+  detalle empresarial; AdminCompanyDecision/AccountChangeForm/SafetyDecisionForm y
+  estilos de cuenta acotados si el rojo heredado lo requiere; detalle de caso y
+  contact-tools/message-templates; pruebas unit/UI/SQL/concurrencia/navegador;
+  spec/plan/tasks/UI y contrato de autorización/guía operativa afectados.
+- **Riesgos/verificación:** acceso a datos privados solo admin, referencias sin
+  UUID visibles, filtros/paginación antes de contar, mensajes/versión conservados,
+  botones destructivos todavía rojos, historial sin perder eventos, último admin
+  protegido también con dos transacciones reales. Probar SQL existente, auditoría
+  y rechazos sin escritura; pruebas UI por estado/cinco/seis/múltiples páginas,
+  tipos/lint/pruebas/build y navegador ficticio escritorio/móvil/teclado.
+- **Estado real:** implementado y verificado; pedido explícito autoriza y coordina
+  alcance. Spec/diseño/tasks y análisis acotado precedieron código; AD1–AD7 cubiertos,
+  sin hallazgos nuevos críticos/altos ni brechas finales. Sin migración: protección
+  del último admin ya existente, ampliada evidencia SQL/DELETE/concurrencia.
+  Se preservan pendientes históricos de revisión humana. Sin dependencias,
+  arquitectura nueva, datos reales, cambios alojados, commit o PR implícitos.
+- **Detalle técnico AD6 descubierto antes de corregirlo:** navegador real en
+  página999 falla con INTERNAL_ERROR; PostgREST devuelve PGRST103/416 para rango
+  fuera de filas, no una lista vacía como el mock inicial. Se requiere recuperar
+  únicamente ese código con un conteo head bajo idénticos filtros/RLS y devolver
+  lista vacía + total para el enlace previsto. Otros errores se siguen rechazando.
+  Afecta admin-service.ts, ficha empresarial y pruebas de ambos; no otro endpoint,
+  permiso, arquitectura ni migración. Verificar rango real, filtros y no ocultar
+  errores de autorización/conteo. Evidencia oficial: docs.postgrest.org/en/stable/
+  references/errors.html (PGRST103); respuesta observada local y código del SDK.
+- **Archivos finales/evidencia:** los previstos arriba más admin-service.ts,
+  account-decision.module.css, prueba Node de barreras y prueba de contraste.
+  Guía `docs/operations/admin-offer-management.md`, implementation-status y T259–267
+  actualizados.1387 pruebas unit/UI en112 archivos,60 tooling y1463 SQL/28 archivos
+  PASS; dos conexiones verificaron bloqueo observado, actor revalidado, auditoría
+  única y restauración auditada del admin ficticio. Contactos E2E PASS sin omitir
+  canales. Navegador guardó las tres decisiones y verificó ficha autorizada, páginas
+  posteriores a50, recuperación de rango, historial5→6/foco, reactivación verde en
+  tres formularios y rechazo de dos roles; diez vistas1440/390px con axe0/overflow0.
+  Tipos/lint/build/diff PASS. Fallo auxiliar inicial de redirección se debió a leer
+  URL antes del redirect de Next; se espera destino /account y ausencia de ficha,
+  sin cambiar permisos. Ejecuciones intermedias fallidas se conservan como diagnóstico,
+  no se presentan como recorridos válidos ni se debilitan aserciones de seguridad.
+- **Entorno/límites:** instancia propia funes-admin-cv-check en copia ignorada,
+  sin reset de base habitual ni cambios alojados. Hubo reset frío de esa instancia
+  propia por fixture anterior con versiones modificadas; evidenció EXTRA110.
+  Next mostró su diagnóstico histórico destination stream closed early al cancelar
+  navegación, sin fallo de los recorridos verificados; no se amplía alcance a ese
+  streaming. next-env ajeno mantiene SHA256 original B8B3A344…C491000. Sin commit,
+  PR, CI, revisión humana o despliegue de este incremento; pendientes ajenos intactos.
+
+Publicación posterior de EXTRA109/110/111 solicitada por Mateo: commit sin firma
+f3d460e y [PR87](https://github.com/maximo-Pdev/funes-empleo/pull/87) abierto hacia
+main desde feat/admin-offer-management. Verificación local anterior preservada;
+CI/revisión humana/merge/despliegue pendientes, next-env ajeno excluido.
+
 ## EXTRA-108 — Conservar solo el ajuste de ofertas
 
 - **Fecha/origen:** Mateo, 29/10/2026: «los cambios del login descartalos, lo de

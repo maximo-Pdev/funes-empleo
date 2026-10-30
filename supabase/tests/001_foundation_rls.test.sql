@@ -5,6 +5,7 @@ select has_table('public', 'audit_events', 'T012: auditoría persistente');
 select has_function('public', 'change_account_status', array['uuid','integer','text','text','boolean'], 'T016: transición atómica');
 select ok((select relrowsecurity from pg_class where oid = 'public.accounts'::regclass), 'RLS en cuentas');
 select ok(not has_table_privilege('authenticated','public.accounts','UPDATE'), 'No hay elevación directa de rol/estado');
+select ok(not has_table_privilege('authenticated','public.accounts','DELETE'), 'No se pueden eliminar administradores por escritura directa');
 select ok(not has_table_privilege('authenticated','public.audit_events','INSERT,UPDATE,DELETE'), 'Auditoría no es editable por API');
 select ok(not has_table_privilege('anon','public.candidate_profiles','SELECT'), 'Sin padrón anónimo');
 select ok(not exists(select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r' and not c.relrowsecurity), 'Todas las tablas públicas usan RLS');

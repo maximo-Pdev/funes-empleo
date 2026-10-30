@@ -111,7 +111,7 @@ test("métricas: rechazo anónimo, empresarial y filtros inválidos", async ({ p
   await expect(page).toHaveURL(/\/account$/);
 });
 
-test("seguimiento: canales cronológicos y plantillas sin envío", async ({ page }) => {
+test("seguimiento: conserva canales cronológicos sin plantillas de mensajes", async ({ page }) => {
   runLocalMaintenanceSql(`insert into public.contact_events(participation_id,channel,direction,occurred_at,summary_internal,next_action_at,recorded_by)
     select '${fixtureId("participation",1)}',channel,'outbound','2026-09-20 12:00+00'::timestamptz + n*interval '1 hour',
       'Seguimiento ficticio '||n,'2026-09-28 12:00+00','${fixtureId("admin",1)}'
@@ -128,7 +128,7 @@ test("seguimiento: canales cronológicos y plantillas sin envío", async ({ page
   await expect(timeline.locator("li").first()).toContainText("Teléfono");
   await expect(timeline.locator("li").last()).toContainText("Presencial");
   await expect(timeline.locator("li").first()).toContainText("Próximo seguimiento");
-  await page.getByLabel("Tipo de mensaje").selectOption("appointment");
-  await expect(page.getByLabel("Texto editable")).toHaveValue(/coordinar/);
-  await expect(page.getByText("No se envían mensajes desde el portal.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Plantillas para el personal" })).toHaveCount(0);
+  await expect(page.getByLabel("Tipo de mensaje")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Registrar contacto municipal" })).toBeVisible();
 });

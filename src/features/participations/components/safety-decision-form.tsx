@@ -6,6 +6,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, FeedbackMessage, TextField } from "@/components/ui";
 import { adminMutationError, type AdminMutationResult } from "@/lib/errors/admin-mutation-result";
+import styles from "@/features/accounts/components/account-decision.module.css";
 
 export type SafetyDecisionPayload = {
   resource: "candidate_account" | "candidate_profile" | "opening";
@@ -37,7 +38,7 @@ export function SafetyDecisionForm({ resource, resourceId, version, action, onSu
       } catch { setError("No se pudo guardar. Recargá la página e intentá nuevamente."); }
     });
   }
-  return <Form onSubmit={submit} className={`space-y-4 rounded-lg border p-5 ${action === "suspend" ? "border-red-500 bg-red-50" : "border-amber-500 bg-amber-50"}`} noValidate>
+  return <Form onSubmit={submit} className={`space-y-4 rounded-lg border p-5 ${action === "suspend" ? "border-red-500 bg-red-50" : action === "reactivate" ? styles.reactivation : "border-amber-500 bg-amber-50"}`} noValidate>
     <h2 className="text-lg font-semibold">{action === "suspend" ? "Suspensión de acceso" : action === "reactivate" ? "Reactivación de cuenta" : "Restauración segura"}</h2>
     {action === "restore" && <p>El perfil candidato vuelve a borrador; restaurarlo no reactiva participaciones, derivaciones ni accesos anteriores.</p>}
     {action === "reactivate" && <p>El perfil candidato conserva su estado anterior; reactivar la cuenta no repone participaciones, derivaciones ni accesos revocados.</p>}
@@ -48,7 +49,7 @@ export function SafetyDecisionForm({ resource, resourceId, version, action, onSu
       <input type="checkbox" required checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
       {action === "suspend" ? "Confirmo la suspensión" : action === "reactivate" ? "Confirmo la reactivación" : "Confirmo la restauración"}
     </Field>
-    <Button type="submit" variant={action === "suspend" ? "danger" : "secondary"} busy={pending}>
+    <Button type="submit" variant={action === "suspend" ? "danger" : action === "reactivate" ? "primary" : "secondary"} busy={pending}>
       {action === "suspend" ? "Suspender cuenta" : action === "reactivate" ? "Reactivar cuenta" : "Restaurar a borrador"}
     </Button>
   </Form>;

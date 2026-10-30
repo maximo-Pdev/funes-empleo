@@ -1,5 +1,21 @@
 # Municipal visual reference
 
+## EXTRA109 — Gestión administrativa
+
+EXTRA111: status-amber usa #805900 sobre el mismo fondo #fcf3db para contraste de
+texto pequeño (5.67:1). Token único compartido; no cambiar estados ni duplicar
+excepciones por página. Los demás colores e identidad institucional se conservan.
+
+Revisión pendiente ofrece solo Aprobar/Rechazar/Solicitar correcciones; estados
+restantes mantienen sus acciones. Enlace «Ver perfil de la empresa» desde oferta,
+sin UUID en URL. Ficha empresarial de solo lectura con datos/«Sin informar» y
+ofertas de10 por página; listado general conserva filtros y páginas existentes.
+Historial mantiene cinco eventos iniciales y botón Mostrar más cada cinco, con
+foco/anuncio y sin truncar datos. Quitar Plantillas para el personal.
+Reactivar usa Button municipal primario y variables existentes de submit verdes
+en módulo acotado; rojo solo para decisiones destructivas. Conservar validación,
+motivo, confirmación y mensajes; no reglas CSS globales nuevas ni controles propios.
+
 ## EXTRA106/108 — Acceso desde ofertas públicas
 
 En /ofertas, la tarjeta lateral ofrece el panel del rol si existe una sesión
