@@ -1,6 +1,11 @@
 -- EXTRA102: new voluntary cases after withdrawal, never reopen old history.
 begin;
+-- Fixture dates must share the business timezone used by expiration guards.
+-- UTC midnight precedes Argentina midnight by three hours.
+set local timezone = 'America/Buenos_Aires';
 select no_plan();
+select is(current_date,(current_timestamp at time zone 'America/Buenos_Aires')::date,
+ 'La fecha de la fixture coincide con el día de negocio argentino');
 grant execute on function private.fixture_id(text,integer) to authenticated;
 insert into auth.sessions(id,user_id) values
  ('ee750000-0000-4000-8000-000000000001',private.fixture_id('candidate',200)),
