@@ -6,7 +6,7 @@ import { listPublicOffers, listPublicOfferFilters } from "@/features/openings/pu
 import { PublicOfferSearchForm } from "@/features/openings/components/public-offer-search-form";
 import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
 import { publicOfferSearchSchema } from "@/validation/public-offer-search";
-import { getAccountAccess } from "@/features/accounts/navigation";
+import { getSiteAccess } from "@/features/accounts/navigation";
 import { getRegistrationHref } from "@/features/accounts/registration-navigation";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 
@@ -15,9 +15,9 @@ export const dynamic = "force-dynamic";
 export default async function PublicOffersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const input = publicOfferSearchSchema.safeParse({ ...await searchParams, pageSize: 10 });
   const filters = input.success ? input.data : publicOfferSearchSchema.parse({});
-  const [result, accountAccess, options] = await Promise.all([
+  const [result, { account: accountAccess, panel }, options] = await Promise.all([
     input.success ? listPublicOffers(filters) : Promise.resolve({ total: 0, page: 1, pageSize: 10, items: [] }),
-    getAccountAccess(), listPublicOfferFilters(),
+    getSiteAccess(), listPublicOfferFilters(),
   ]);
   const filtered = hasPublicOfferFilters(filters);
   const hasPrevious = result.page > 1;
@@ -113,9 +113,11 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
           <Card className="border-primary-100 bg-primary-50 p-6">
             <ShieldCheck className="h-7 w-7 text-primary" aria-hidden="true" />
             <h2 id="acompanamiento-title" className="mt-4 text-xl font-bold text-primary-900">Te acompañamos en la búsqueda</h2>
-            <p className="mt-3 text-sm leading-6 text-foreground">Para postularte necesitás una cuenta de candidato y tu perfil completo con CV.</p>
-            <Link href={getRegistrationHref("candidate")} className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-700">Crear cuenta<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
-            <p className="mt-4 text-sm leading-6 text-foreground">¿Ya tenés cuenta? <Link href="/" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Iniciá sesión</Link></p>
+            <p className="mt-3 text-sm leading-6 text-foreground">{panel ? "Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel." : "Para postularte necesitás una cuenta de candidato y tu perfil completo con CV."}</p>
+            {panel ? <Link href={panel.href} className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-700">Ir al {panel.label.toLowerCase()}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link> : <>
+              <Link href={getRegistrationHref("candidate")} className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-700">Crear cuenta<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+              <p className="mt-4 text-sm leading-6 text-foreground">¿Ya tenés cuenta? <Link href="/" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Iniciá sesión</Link></p>
+            </>}
           </Card>
           <div className="rounded-xl border border-border px-6 py-5">
             <h3 className="text-sm font-bold text-primary-900">¿Necesitás ayuda con tu perfil?</h3>

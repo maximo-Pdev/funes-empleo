@@ -1,5 +1,21 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA106/108 — Acceso de ofertas por sesión, 29/10/2026
+
+Rama fix/public-authenticated-access desde main e8ba52c. Mateo descarta todos los
+cambios del inicio/login, restaurados junto con sus pruebas y estilos. Se conserva
+solo /ofertas con CTA al panel del rol para sesión activa; visitante mantiene
+registro/login. Sin cambios de backend, autorización, dependencias o migración.
+next-env ajeno preservado con su hash original.77 pruebas relevantes, tipos,
+lint completo, build y diff PASS;6 E2E finales sin retries/omisiones para tres
+roles con renovación, navegación, inicio anterior y ofertas antes/después del
+cierre. T258 completo y sin brechas nuevas. Sin commit/PR, publicación o cierre
+de gates históricos de revisión humana implícitos.
+
+Publicación posterior solicitada: commit sin firma361f7eb, PR86 abierto hacia
+main: https://github.com/maximo-Pdev/funes-empleo/pull/86. Sin merge ni aprobación
+humana/CI implícitos; next-env ajeno permanece local y excluido.
+
 ## EXTRA105 — Selector nativo restituido,29/10/2026
 
 Publicado con102/103 en commit sin firma2d4da71,

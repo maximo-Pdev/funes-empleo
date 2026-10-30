@@ -48,6 +48,12 @@ it.each([
     const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
     expect(within(navigation).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
     expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
+    if (Page === listPage) {
+      const panelHref = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/account";
+      expect(screen.getByRole("link", { name: /^Ir al panel de / }).getAttribute("href")).toBe(panelHref);
+    }
     view.unmount();
   }
 });
@@ -75,6 +81,8 @@ it("distingue un listado vacío sin inventar ofertas ni paginación", async () =
   expect(screen.queryByRole("list")).toBeNull();
   expect(screen.queryByRole("navigation", { name: "Páginas de ofertas" })).toBeNull();
   expect(screen.queryByRole("link", { name: "Ver ofertas disponibles" })).toBeNull();
+  expect(screen.getByRole("link", { name: /^Crear cuenta$/ }).getAttribute("href")).toBe("/?registro=candidato");
+  expect(screen.getByRole("link", { name: /^Iniciá sesión$/ }).getAttribute("href")).toBe("/");
 });
 
 it("ofrece volver al inicio del listado ante una página fuera de rango", async () => {

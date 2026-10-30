@@ -5,6 +5,16 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA106/108 — Mantener solo el acceso de ofertas por sesión
+
+- [x] T258 [A02/A03] Restaurar inicio/login, conservar CTA de /ofertas por rol
+  activo sin registro/login redundantes; visitante mantiene enlaces originales.
+  Alinear documentación y verificar diff, pruebas relevantes, tipos, lint y build.
+  Preservar next-env ajeno y gates históricos de revisión humana.
+  Diff de inicio/login vacío frente a HEAD;77 pruebas relevantes, tipos/lint/
+  build/diff PASS.6 E2E por rol con renovación, navegación y cierre de sesión,
+  sin retries/omisiones. Sin migración ni publicación implícita.
+
 ## EXTRA102 — Fechas y reintentos
 
 - [x] T254 [EXTRA105,R1] Por corrección expresa, restaurar selector nativo de

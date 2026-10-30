@@ -1,5 +1,132 @@
 # Cambios extra necesarios
 
+## EXTRA-108 — Conservar solo el ajuste de ofertas
+
+- **Fecha/origen:** Mateo, 29/10/2026: «los cambios del login descartalos, lo de
+  las ofertas esta bien». Reduce el alcance de la rama actual.
+- **Evidencia/cambio previo a código:** restaurar Home, login y sus pruebas al
+  estado inicial de la rama. Descartar EXTRA107 y la parte de Home de EXTRA106;
+  conservar /ofertas con CTA por sesión activa y rol. Alinear artefactos vigentes
+  y pruebas de navegación con esa decisión, sin modificar next-env ajeno.
+- **Archivos/contratos:** HomeHero, HomeAccessPanel, HomePage, CSS y pruebas Home
+  restaurados; /ofertas page y pruebas públicas conservados. Spec/plan/UI/tasks,
+  matriz y guía de operación limitados a ofertas. Sin cambio de backend, reglas,
+  permisos, dependencias o migración. Las entradas106/107 quedan como historial.
+- **Riesgos/verificación:** no conservar alteraciones de login, registro, hero o
+  navbar; mantener ocultos Crear cuenta/Iniciá sesión en ofertas autenticadas y
+  disponibles para visitante. Diff, pruebas relevantes, tipos, lint y build.
+- **Estado:** reversión implementada y verificada. Diff confirma que HomePage,
+  HomeHero, HomeAccessPanel, CSS y todas sus pruebas coinciden con HEAD. Solo
+  /ofertas conserva cambios de producto; documentación limitada al alcance final.
+- **Verificación final:** 77 pruebas relevantes, tipos, lint completo, build y
+  diff PASS. Seis E2E sin retries/omisiones (tres roles×renovación pública/privada):
+  inicio anterior, navegación, CTA de ofertas por rol, retorno de enlaces anónimos
+  al cerrar sesión y segunda pestaña. Entorno aislado ficticio sin reset/escritura
+  alojada; next-env ajeno conserva SHA256 B8B3A344…491000. Sin migración, commit,
+  PR/publicación ni revisión humana implícitos. T258 completo; no quedan brechas
+  del alcance reducido ni cambios en gates históricos pendientes.
+- **Publicación solicitada:** commit sin firma 361f7eb; PR86 abierto hacia main:
+  https://github.com/maximo-Pdev/funes-empleo/pull/86. Incluye solo el ajuste de
+  ofertas, sus pruebas y trazabilidad. Sin merge, aceptación humana o CI aprobado
+  implícitos; next-env ajeno excluido.
+
+## EXTRA-107 — Retirar también la tarjeta de sesión iniciada del inicio
+
+**Descartado por Mateo en EXTRA108; no describe el comportamiento vigente.**
+
+- **Fecha/origen:** Mateo, 29/10/2026, aclara con captura que el login del inicio
+  incluye la tarjeta «Ya tenés la sesión iniciada». Sustituye esa presentación
+  de EXTRA-106; conserva el resto del alcance y la rama enfocada actual.
+- **Evidencia/problema:** el formulario se ocultó, pero su tarjeta y la mitad
+  derecha verde permanecen aun con sesión activa.
+- **Cambio previsto antes de implementar:** no montar el área de acceso para
+  sesiones activas; usar una sola columna para la introducción y mantener visible
+  «Mi cuenta» en la navegación, con el panel del rol. Anónimo conserva su diseño.
+- **Archivos/contratos:** HomeHero, HomeAccessPanel, HomePage, home.module.css,
+  pruebas Home/sesión y artefactos UI/spec/plan/tasks. Sin cambio de backend,
+  autorización, contratos de datos, dependencias ni migración.
+- **Riesgos/verificación prevista:** ausencia de tarjeta y espacio vacío en móvil
+  y escritorio; navegación por teclado al panel de los tres roles; retorno de
+  login al cerrar sesión y bloqueo de registros por query/evento autenticado.
+  Pruebas relevantes, tipos, lint, build y navegador local con datos ficticios.
+- **Estado:** implementado y verificado por pedido explícito. HomeHero omite
+  acceso autenticado y conserva exactamente el contenedor anónimo; el enlace a
+  ofertas se comparte sin duplicarlo. HomeAccessPanel desmonta formularios y sus
+  listeners; navbar visible por rol. Sin cambios de reglas ni nueva arquitectura.
+- **Verificación real:** 1362 unit/componentes en 110 archivos y 57 tooling PASS;
+  tipos, lint completo, build y diff PASS. Se actualizó una expectativa antigua
+  de tarjeta/ícono al comportamiento solicitado; el análisis de idioma agotó su
+  tiempo durante concurrencia y pasó con maxWorkers=2, sin cambiar su límite.
+  Tras preservar el contenedor anónimo: 81 focales, lint del hero y build final PASS.
+  Nueve E2E finales sin retries/omisiones: siete de sesión/visitante y dos de
+  diseño anónimo/teclado; 18 vistas de tres roles en 1920/1440/390, axe=0,
+  sin desborde, una columna autenticada y acceso al panel por teclado. Capturas
+  de inicio en escritorio/móvil y aside de ofertas revisadas. Supabase/servidor
+  aislados; next-env ajeno mantiene SHA256 B8B3A344…491000. Sin migración,
+  commit/PR/publicación o aprobación humana implícitos. T257 sin brechas nuevas;
+  revisión humana y gates históricos pendientes conservados.
+
+## EXTRA-106 — Accesos públicos coherentes con sesión iniciada
+
+**Alcance reducido por EXTRA108: solo permanece /ofertas; Home/login descartados.**
+
+- **Fecha/origen:** Mateo,29/10/2026: no mostrar login del inicio ni «Crear cuenta»
+  de /ofertas cuando ya hay sesión. Rama fix/public-authenticated-access desde
+  main e8ba52c; PR85 merge confirmado y rama anterior eliminada local/remota.
+  next-env ajeno preservado (SHA256B8B3A344…491000).
+- **Evidencia previa:** getSiteAccess/getAccountAccess ya leen rol activo verificado
+  en servidor, sin caché global. HomeAccessPanel oculta credenciales solo en modo
+  login, pero mantiene pestañas y formularios de registro vía query/evento aun
+  autenticado. El cierre de Home también invita a registrarse. /ofertas ya adapta
+  su header, pero el aside de registro/login es incondicional.
+- **Cambio propuesto antes de código:** usar la misma sesión verificada por request
+  para header y CTA; Home autenticado muestra aviso/panel sin login, pestañas o
+  registro, incluso con query/eventos previos. Mantener composición y acceso al
+  panel por rol. Cierre de Home y aside de ofertas muestran continuidad al panel,
+  sin sugerir otra cuenta. Anónimo conserva login/registro y recuperación.
+- **Origen/alcance:** A02/A03 y corrección explícita de presentación a EXTRA052/053.
+  No cambia autorización, política de autorregistro, sesiones, roles o validación
+  en servidor/DB; no intenta detectar por email cuentas existentes sin login.
+  Sin dependencia, SQL, endpoint, componente base nuevo ni arquitectura nueva.
+- **Archivos/contratos:** HomePage/HomeHero/HomeAccessPanel y /ofertas page; reutilizar
+  navegación de cuenta y controles adaptados. Spec/plan/UI/tasks alineados. Mantener
+  eventos y borradores de formularios anónimos, teclado, enlaces y listas públicas.
+- **Riesgos/verificación:** cliente conservando modo registro al entrar/salir,
+  caché entre usuarios, query ?registro y evento cliente; probar3 roles/anon,
+  suspendido/sesión ausente, refresh/navegación/login/logout, sin formularios o
+  CTAs anónimos autenticado y sin perder login al cerrar sesión. RED/GREEN de
+  componentes y navegador ficticio; tipos/lint/unit/tooling/build requeridos.
+- **Estado:** solicitud autoriza y coordina este arreglo; implementado tras
+  revisión de artefactos. Gates históricos se conservan; sin ampliación de
+  reglas/arquitectura que requiera repetir gates. No aplicar migración ni publicar
+  commit/PR implícitamente en este pedido.
+- **Archivos reales/evidencia:** HomeAccessPanel separa subárbol anónimo del aviso
+  autenticado; HomePage normaliza vista/key y cierre, HomeHero conserva guía
+  general autenticado, /ofertas usa getSiteAccess una vez para header y aside.
+  Tests ajustan3 expectativas de registro autenticado previas al nuevo pedido;
+  nuevo test de transición/listener/borradores e inactivos. RED8/44, GREEN66
+  focales, suite1362 unit/componentes/110 archivos y57 tooling PASS. Tipos/lint/
+  build PASS. Tipos detectó opción exact de Playwright en query RTL; corregida con
+  regex anclada y14 focales/tipos PASS, sin relajar aserciones.
+- **Navegador:**7/7 recorridos, sin retries/omisiones:3 roles con renovación pública
+  y privada, queries/evento, navegación Next, recarga, segunda pestaña y cierre;
+  visitante abre registro desde oferta y vuelve al login. Cookies privadas
+  no-store y destinos por rol conservados. Sin reset local/hosted o cambios de BD.
+  Docker estaba detenido; se inició oculto y solo se reanudó fixture propio.
+- **Cierre visual:**12 vistas autenticadas (3 roles×2 anchos1440/390×Home/ofertas),
+  axe0, overflow0 y navegación al panel con teclado PASS; capturas revisadas.
+  El script auxiliar corrigió baseURL faltante y esperó título/panel visibles
+  antes de medir el streaming inicial; no hubo cambio de producto o de tiempos.
+  Guía docs/operations/public-authenticated-access.md y contratos actualizados.
+  Convergencia del incremento sin brechas nuevas, sin acreditar revisión humana.
+- **Cierre del entorno:** servidor3001 detenido y Supabase funes-admin-cv-check
+  detenido con backup; ningún reset de servicios habituales o escritura alojada.
+  Se repitió el diagnóstico Next «destination stream closed early» durante
+  navegación/cierre, también observado antes de106; recorridos y respuestas
+  comprobados PASS, sin cambiar código de streaming fuera de alcance. next-env
+  conserva el hash inicial. Commit/PR y publicación pendientes de pedido.
+
+
 ## EXTRA-105 — Restituir selector de contacto municipal
 
 - **Fecha/origen:** Mateo,29/10/2026: el control anterior estaba bien; pidió
