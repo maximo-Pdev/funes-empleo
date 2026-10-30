@@ -38,8 +38,10 @@ beforeEach(() => {
 });
 
 it.each([
-  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Cuenta"],
-])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label) => {
+  ["candidate", "/dashboard?section=perfil", "Mi perfil", "/dashboard", "Ir al panel de usuario"],
+  ["company", "/empresa/perfil", "Mi perfil", "/empresa", "Ir al panel de empresa"],
+  ["admin", "/account", "Cuenta", "/admin", "Ir al panel de administración"],
+])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label, panelHref, panelLabel) => {
   readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
   getPublicOffer.mockResolvedValue(offer);
@@ -48,6 +50,12 @@ it.each([
     const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
     expect(within(navigation).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
     expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
+    if (Page === listPage) {
+      expect(screen.getByRole("link", { name: panelLabel }).getAttribute("href")).toBe(panelHref);
+      expect(screen.getByText("Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel.")).toBeTruthy();
+    }
     view.unmount();
   }
 });
@@ -75,6 +83,8 @@ it("distingue un listado vacío sin inventar ofertas ni paginación", async () =
   expect(screen.queryByRole("list")).toBeNull();
   expect(screen.queryByRole("navigation", { name: "Páginas de ofertas" })).toBeNull();
   expect(screen.queryByRole("link", { name: "Ver ofertas disponibles" })).toBeNull();
+  expect(screen.getByRole("link", { name: /^Crear cuenta$/ }).getAttribute("href")).toBe("/?registro=candidato");
+  expect(screen.getByRole("link", { name: /^Iniciá sesión$/ }).getAttribute("href")).toBe("/");
 });
 
 it("ofrece volver al inicio del listado ante una página fuera de rango", async () => {

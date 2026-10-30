@@ -1,5 +1,47 @@
 # Municipal visual reference
 
+## PR86 documentation integration — current scope and historical evidence
+
+PR86 adds only session-aware public-offer presentation: `/ofertas` reads
+`getSiteAccess` once per request and reuses the verified `panel.href` and
+`panel.label` for its header and sidebar. An active candidate, company or
+administrator sees the correct panel link, not anonymous “Crear cuenta” or
+“Iniciá sesión” calls to action. With no verified active panel, preserve the
+anonymous registration and login links. URL parameters, client registration
+selection and guessed role paths are not authentication evidence. Hiding links
+is presentation, not authorization; keep server guards and database privacy.
+See `docs/operations/public-offers-authenticated-access.md` and
+`specs/001-municipal-employment-portal/contracts/authorization-matrix.md`.
+
+Mateo's EXTRA-108 rollback applies to PR86's own Home/login experiments only;
+it does not revert the feature branch's independently approved session-aware
+Home access panel, anonymous drafts, or chart-first administrative architecture.
+Both `/admin` and `/admin/metrics` retain visible shared bar/donut charts, not
+six summary cards or graphs hidden behind Ver detalle. Keep central labels,
+real values, text equivalents, native GET filters, selected-name tags, keep-open
+multiselect and visible CSV/PDF/XLSX exports. Public Home aggregate cards are
+separate and unchanged. Preserve course links/referral history, private photos,
+individual administrator invitation/password setup, private notifications,
+per-case immutable CVs, date presentation and withdrawn-only new attempts.
+Hiring retains operational consent, changes availability to unavailable and
+preserves only the already-authorized hiring-company access window of 720 hours;
+revoked access never revives. Legal registration receipts remain separate from
+operational privacy in Cuenta. Keep native `datetime-local`, ISO payloads and
+Funes conversion; browser locale display order is not guaranteed.
+
+The retained branch narratives below are historical evidence where superseded.
+In particular, incoming six-card/Perfil wording is explicitly archived inline,
+not a competing current design. Earlier statements that SQL or browser checks
+were pending describe their recorded phase, not a new failure: the task ledger
+contains subsequent isolated SQL, coverage and browser phase results. An
+interrupted local gate is not a pass, and prior CI success is not a fresh
+integrated acceptance run. This unit performs static documentation verification
+only; the parent owns executable gates, task-ledger updates and Git operations.
+No new legal/municipal approval, independent review, acceptance, hosted rollout,
+merge or deployment is established by this union.
+
+Historical EXTRA-106 references are title-qualified in `cambios-extra.md`; PR85 documentation union and PR86 public-access history are distinct entries.
+
 ## Final portal improvements — EXTRA-086 (in progress)
 
 The administrator overview lives at `/admin` and is the first sidebar destination
@@ -16,6 +58,13 @@ verified active sessions keep their role panel access, not registration tabs,
 role selection or closing registration shortcuts. Anonymous registration and
 independent form drafts remain unchanged. See `odd/tasks/final-portal-improvements.md`
 for active scope, pending checks and the separate legal/operational consent rules.
+## EXTRA106/108 — Acceso desde ofertas públicas
+
+En /ofertas, la tarjeta lateral ofrece el panel del rol si existe una sesión
+activa verificada; en ese caso no muestra «Crear cuenta» ni «Iniciá sesión».
+El visitante conserva esos enlaces. Reutilizar controles y tokens existentes.
+Mateo descartó los cambios de inicio/login; su diseño y comportamiento se conservan.
+
 ## EXTRA102 — Fechas y estados de retiro
 
 EXTRA105 sustituye104: Mateo pide conservar exactamente selector de contacto
@@ -59,6 +108,16 @@ nueva pestaña. Reutilizar Form/FileInput/Button y foco de feedback.
 ## EXTRA094 —2026-10-28
 
 CV: Abrir CV, nueva pestaña y rel noopener noreferrer; conservar estilos/primitivas.
+Historical incoming EXTRA094 metrics wording, superseded by the chart-first rule above:
+
+```text
+Métricas: seis tarjetas principales, dos distribuciones de barras con etiquetas/
+valores textuales y tokens, sin depender del color; datos restantes en Ver detalle
+cerrado. Definiciones en Más información, guardas y descargas completas intactas.
+```
+
+Current integrated metrics guidance:
+
 Métricas: gráficos de barras y dona visibles en el paneo de `/admin` y en métricas,
 con el mismo renderer, etiquetas/valores textuales y tokens, sin depender del color.
 Sin las seis tarjetas resumen ni esconder su reemplazo en Ver detalle. La dona usa
@@ -66,6 +125,16 @@ solo estados de oferta mutuamente excluyentes; categorías superpuestas no forma
 una distribución. Definiciones en Más información, guardas, filtros y descargas
 completas CSV/PDF/XLSX intactas. Revisión S2/L36 de EXTRA102 sustituye solo la
 jerarquía visual anterior de EXTRA094, no los indicadores o sus cálculos.
+Historical incoming EXTRA094 consent wording; current placement remains Cuenta:
+
+```text
+Consentimiento aceptado muestra estado, sin checkbox/botón de aceptación. Texto
+explica conservación al contratar y No disponible, acceso720h de empresa contratante
+y que permisos revocados no regresan. Datos de prueba siguen sin aprobación legal.
+```
+
+Current integrated privacy guidance:
+
 Consentimiento aceptado muestra estado, sin checkbox/botón de aceptación. Texto
 explica conservación al contratar y No disponible, acceso720h de empresa contratante
 y que permisos revocados no regresan. Privacidad operativa vive en Cuenta, no en

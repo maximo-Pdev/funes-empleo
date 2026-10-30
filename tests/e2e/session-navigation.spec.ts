@@ -51,6 +51,11 @@ for (const account of [
         const navigation = page.getByRole("navigation", { name: "Accesos principales", exact: true });
         const destination = path === "/" ? { label: account.panelLabel, href: account.panelHref } : account;
         if (path === "/") await expect(page.getByRole("region", { name: "Acceso al portal" })).toContainText("Ya tenés la sesión iniciada");
+        if (path === "/ofertas") {
+          await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toHaveCount(0);
+          await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toHaveCount(0);
+          await expect(page.getByRole("link", { name: account.panelLabel, exact: true })).toHaveAttribute("href", account.panelHref);
+        }
         await expect(navigation.getByRole("link", { name: destination.label, exact: true })).toHaveAttribute("href", destination.href);
         await expect(navigation.getByRole("link", { name: "Iniciar sesión", exact: true })).toHaveCount(0);
         await navigation.getByRole("link", { name: destination.label, exact: true }).click();
@@ -70,6 +75,9 @@ for (const account of [
         await expect(page).toHaveURL(/\/$/);
         await page.goto("/");
         await expect(page.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
+        await page.goto("/ofertas");
+        await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toBeVisible();
+        await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toBeVisible();
         await page.goto(account.href);
         await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
         await tab.goto(account.href);

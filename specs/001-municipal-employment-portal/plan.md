@@ -1,5 +1,47 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## PR86 documentation integration — current scope and historical evidence
+
+PR86 adds only session-aware public-offer presentation: `/ofertas` reads
+`getSiteAccess` once per request and reuses the verified `panel.href` and
+`panel.label` for its header and sidebar. An active candidate, company or
+administrator sees the correct panel link, not anonymous “Crear cuenta” or
+“Iniciá sesión” calls to action. With no verified active panel, preserve the
+anonymous registration and login links. URL parameters, client registration
+selection and guessed role paths are not authentication evidence. Hiding links
+is presentation, not authorization; keep server guards and database privacy.
+See `docs/operations/public-offers-authenticated-access.md` and
+`specs/001-municipal-employment-portal/contracts/authorization-matrix.md`.
+
+Mateo's EXTRA-108 rollback applies to PR86's own Home/login experiments only;
+it does not revert the feature branch's independently approved session-aware
+Home access panel, anonymous drafts, or chart-first administrative architecture.
+Both `/admin` and `/admin/metrics` retain visible shared bar/donut charts, not
+six summary cards or graphs hidden behind Ver detalle. Keep central labels,
+real values, text equivalents, native GET filters, selected-name tags, keep-open
+multiselect and visible CSV/PDF/XLSX exports. Public Home aggregate cards are
+separate and unchanged. Preserve course links/referral history, private photos,
+individual administrator invitation/password setup, private notifications,
+per-case immutable CVs, date presentation and withdrawn-only new attempts.
+Hiring retains operational consent, changes availability to unavailable and
+preserves only the already-authorized hiring-company access window of 720 hours;
+revoked access never revives. Legal registration receipts remain separate from
+operational privacy in Cuenta. Keep native `datetime-local`, ISO payloads and
+Funes conversion; browser locale display order is not guaranteed.
+
+The retained branch narratives below are historical evidence where superseded.
+In particular, incoming six-card/Perfil wording is explicitly archived inline,
+not a competing current design. Earlier statements that SQL or browser checks
+were pending describe their recorded phase, not a new failure: the task ledger
+contains subsequent isolated SQL, coverage and browser phase results. An
+interrupted local gate is not a pass, and prior CI success is not a fresh
+integrated acceptance run. This unit performs static documentation verification
+only; the parent owns executable gates, task-ledger updates and Git operations.
+No new legal/municipal approval, independent review, acceptance, hosted rollout,
+merge or deployment is established by this union.
+
+Historical EXTRA-106 references are title-qualified in `cambios-extra.md`; PR85 documentation union and PR86 public-access history are distinct entries.
+
 ## Final portal improvements — EXTRA-086 (implementation in progress)
 
 Authorized scope and exact user corrections: `odd/tasks/final-portal-improvements.md`.
@@ -26,6 +68,14 @@ The shared sidebar receives the candidate's existing private photo, loaded once 
 account render and reused by Perfil. Optional read failure must not block other forms.
 Visibility toggles for passwords and masked identifiers share the same adapted Button;
 each input retains its own visibility, value, validation and accessible label.
+## EXTRA106/108 — Presentación de acceso en /ofertas
+
+Reutilizar getSiteAccess por request para header y tarjeta lateral en una sola
+lectura de sesión. Si panel existe, ofrecer su href/label por rol; si no,
+conservar registro/login existentes. Sin cambiar servicios de autenticación,
+proxy, autorización, DB, caché global, dependencias ni componentes base.
+Inicio/login y sus pruebas restaurados por pedido explícito de Mateo.
+
 ## EXTRA102 — Diseño de presentación y reintento propio
 
 EXTRA105 sustituye104 por decisión expresa: restaurar TextField datetime-local
@@ -163,6 +213,20 @@ R1: proxy GET CV mantiene sesión/RPC/Storage RLS/no-store/nosniff/refs; cambiar
 solo Content-Disposition a inline y enlaces target=_blank/rel=noopener noreferrer.
 No signed URLs ni rutas nuevas. El visor/configuración del navegador decide soporte.
 
+Historical incoming EXTRA094 metrics wording, superseded by the current integration scope above:
+
+```text
+R2: Dashboard sigue Server Component. Seis tarjetas seleccionadas por indicador
+exacto, no sumas de categorías. Gráficos de barras estáticos con valores/etiquetas
+HTML y barra decorativa, usando tokens municipales; cero/null/ausencia explícitos.
+Sin Recharts/isla cliente: registro oficial chart consultado exige nueva dependencia
+para interacción no solicitada, innecesaria para estas dos distribuciones estáticas.
+No crear imitación de ChartContainer; reutilizar layout/Card donde corresponda.
+Detalle anterior y definiciones en details/summary nativos; exportadores intactos.
+```
+
+Current integrated metrics guidance:
+
 R2: Dashboard sigue Server Component. S2/L36 y EXTRA102 sustituyen las seis tarjetas
 resumen por gráficos visibles de barras y dona; `/admin` y `/admin/metrics`
 comparten renderer. Indicadores exactos, no sumas de categorías; dona únicamente
@@ -184,6 +248,18 @@ ya deniegan en frontera y materializan expiración. Otras derivaciones intactas.
 Mantener bloqueo candidato antes de participación; rollback si falla auditoría.
 Sin backfill, schema/índices/proveedores nuevos. Historial hiring_workflow previo
 permanece legible. Recuperación forward-only, nunca reconsentir/restaurar permisos.
+
+Historical incoming EXTRA094 privacy wording, superseded by the current integration scope above:
+
+```text
+R4: perfil presenta explicación/estado siempre; formulario afirmativo solo si
+último evento no accepted. DB ya impide dos aceptaciones consecutivas. Retiro
+manual y nuevo consentimiento explícito siguen existentes; no ampliar UI de retiro.
+Texto explica indisponibilidad,720h y conservación sin reponer permisos. Guardar
+disponibilidad available sigue su activación vigente; hire no reactiva perfil.
+```
+
+Current integrated privacy guidance:
 
 R4: Cuenta > Privacidad presenta explicación/estado siempre; Perfil no duplica
 controles de consentimiento. Formulario afirmativo solo si

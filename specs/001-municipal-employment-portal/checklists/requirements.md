@@ -1,5 +1,9 @@
 # Specification Quality Checklist: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA106/108: alcance limitado por Mateo a CTA de /ofertas, con tres roles activos
+y visitante definidos. Inicio/login descartados; sin cambios de negocio,
+autorización o arquitectura ni cierre de casillas históricas de revisión humana.
+
 EXTRA085: calidad revisada en incremento P1–P4 antes de implementar: objetivos,
 límites, formatos/scroll confirmados, autorización/CSV compatibilidad, controles
 cliente necesarios, datos/refs/estados y verificación definidos. No resuelve

@@ -5,7 +5,7 @@ import { listPublicOffers, listPublicOfferFilters } from "@/features/openings/pu
 import { PublicOfferSearchForm } from "@/features/openings/components/public-offer-search-form";
 import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
 import { publicOfferSearchSchema } from "@/validation/public-offer-search";
-import { getAccountAccess } from "@/features/accounts/navigation";
+import { getSiteAccess } from "@/features/accounts/navigation";
 import { getRegistrationHref } from "@/features/accounts/registration-navigation";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { HomeNavbar } from "../home-navbar";
@@ -15,9 +15,9 @@ export const dynamic = "force-dynamic";
 export default async function PublicOffersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const input = publicOfferSearchSchema.safeParse({ ...await searchParams, pageSize: 10 });
   const filters = input.success ? input.data : publicOfferSearchSchema.parse({});
-  const [result, accountAccess, options] = await Promise.all([
+  const [result, { account: accountAccess, panel }, options] = await Promise.all([
     input.success ? listPublicOffers(filters) : Promise.resolve({ total: 0, page: 1, pageSize: 10, items: [] }),
-    getAccountAccess(), listPublicOfferFilters(),
+    getSiteAccess(), listPublicOfferFilters(),
   ]);
   const filtered = hasPublicOfferFilters(filters);
   const hasPrevious = result.page > 1;
@@ -171,13 +171,13 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                   <h2 id="acompanamiento-title" className="mt-3 font-heading text-xl font-bold leading-snug text-primary-900">
                     Te acompañamos en la búsqueda
                   </h2>
-                  <p className="mt-3 text-sm leading-6">Para postularte necesitás una cuenta de candidato y tu perfil completo con CV.</p>
-                  {authenticated ? (
+                  <p className="mt-3 text-sm leading-6">{panel ? "Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel." : "Para postularte necesitás una cuenta de candidato y tu perfil completo con CV."}</p>
+                  {panel ? (
                     <Link
-                      href={accountAccess.href}
+                      href={panel.href}
                       className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 font-heading text-sm font-semibold text-white transition-colors hover:bg-brand-text"
                     >
-                      Ir a mi cuenta
+                      Ir al {panel.label.toLowerCase()}
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   ) : (
