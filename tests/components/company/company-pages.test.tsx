@@ -17,6 +17,7 @@ vi.mock("@/features/openings/company-actions", () => ({ saveCompanyOpeningAction
 vi.mock("@/features/referrals/feedback-actions", () => ({ submitFeedbackAction: vi.fn(), submitInterviewAction: vi.fn() }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/empresa", useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), redirect: (url: string) => { throw new Error(`REDIRECT:${url}`); }, notFound: () => { throw new Error("NOT_FOUND"); } }));
 vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn() }));
+vi.mock("@/features/accounts/admin-invitation-actions", () => ({ administratorInvitationAction: vi.fn() }));
 import Dashboard from "@/app/(company)/empresa/page";
 import Profile from "@/app/(company)/empresa/perfil/page";
 import Offers from "@/app/(company)/empresa/ofertas/page";
@@ -57,6 +58,47 @@ it.each([
  expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
  expect(document.querySelector("header[data-home]")).toBeTruthy();
+});
+it("does not invent an interview or report for an administratively confirmed hire", async () => {
+ mocks.referral.mockResolvedValue({ ...referral, candidate: undefined, hiredCandidate: { displayName: "Persona ficticia", outcome: "hired" }, feedback: [] });
+ render(await Opening({ params: Promise.resolve({ openingId: id }) }));
+ const steps = screen.getByRole("list", { name: "Etapas de la derivación" });
+ expect(within(steps).queryByText("Evaluación empresarial")).toBeNull();
+ const report = within(steps).getByText("Respuesta empresarial").closest("li")!;
+ expect(report.getAttribute("data-state")).toBe("pending");
+ expect(steps.querySelector('[aria-current="step"]')?.textContent).toContain("Confirmación municipal");
+});
+it("brings result reporting before profile detail while preserving real anchors", async () => {
+ render(await Opening({ params: Promise.resolve({ openingId: id }) }));
+ const formHeading = screen.getByRole("heading", { name: "Informar resultado a la Oficina" });
+ const profileHeading = screen.getByRole("heading", { name: "Perfil laboral derivado" });
+ expect(formHeading.compareDocumentPosition(profileHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(screen.getByRole("link", { name: "Informar resultado" }).getAttribute("href")).toBe("#company-feedback");
+ expect(document.querySelector("#company-feedback")?.getAttribute("tabindex")).toBe("-1");
+ expect(screen.getByRole("list", { name: "Etapas de la derivación" }).textContent).toContain("Confirmación municipal");
+ expect(screen.getByText(/informar una respuesta no restaura/)).toBeTruthy();
+});
+it("shows offer summary data without opening the company detail", async () => {
+ render(await Offers({ searchParams: Promise.resolve({}) }));
+ const card = screen.getByRole("link", { name: offer.title }).closest("li")!;
+ expect(card.textContent).toContain("Localidad: Funes");
+ expect(card.textContent).toContain("Modalidad: Presencial");
+ expect(card.textContent).toContain("Vacantes: 1");
+ expect(card.textContent).toContain("Administración");
+ expect(card.textContent).toContain("30/11/2026");
+});
+it.each(["draft", "pending_review", "published", "cancelled"])("guides the real company opening state %s", async status => {
+ mocks.offers.mockResolvedValue({ items: [{ ...offer, status }] });
+ render(await Opening({ params: Promise.resolve({ openingId: id }) }));
+ expect(screen.getByRole("list", { name: "Etapas de la oferta" })).toBeTruthy();
+ const guide = screen.getByRole("region", { name: "Próximo paso de la oferta" });
+ const next = within(guide).queryByRole("link", { name: "Continuar con el próximo paso" });
+ if (status === "cancelled") expect(next).toBeNull();
+ else {
+   const href = next!.getAttribute("href")!;
+   expect(href).toBe(status === "published" ? "#derivaciones" : "#offer-management");
+   expect(document.querySelector(href)?.getAttribute("tabindex")).toBe("-1");
+ }
 });
 it("keeps company account settings in the same frame without duplicate logout", async () => {
  const view = render(await Account());

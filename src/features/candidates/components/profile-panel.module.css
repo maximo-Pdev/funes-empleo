@@ -1,6 +1,6 @@
 /* All layout stays inside the profile canvas owned by the account renderer. */
-.panel { display: grid; gap: 28px; min-width: 0; padding: 28px; color: var(--color-brand-text); }
-.section { display: grid; min-width: 0; gap: 16px; padding-top: 24px; border-top: 1px solid var(--color-border); }
+.panel { display: grid; gap: 32px; min-width: 0; padding: 28px; color: var(--color-brand-text); }
+.section { display: grid; min-width: 0; gap: 20px; padding-top: 32px; border-top: 1px solid var(--color-border); }
 .details { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--form-field-gap); min-width: 0; }
 .panel label { row-gap: var(--form-label-gap); }
 .panel :is(button, input[type="file"], summary) { min-height: 44px; }

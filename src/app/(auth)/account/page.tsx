@@ -10,6 +10,7 @@ import { AuthShell } from "../_components/auth-surface";
 import styles from "../_components/auth-forms.module.css";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { logoutAction } from "@/features/accounts/actions";
+import { AdminInvitationForm } from "@/features/accounts/components/admin-invitation-form";
 import { AccountChangeForm } from "@/features/accounts/components/account-change-form";
 import { renderCandidateAccount, type AccountSearchParams } from "./candidate-account";
 import { CompanyShell } from "@/app/(company)/_components/company-shell";
@@ -34,6 +35,7 @@ export default async function AccountPage({ searchParams = Promise.resolve({}) }
     <p className="mt-4 inline-flex items-start gap-2 text-sm leading-6 text-muted-foreground"><ShieldCheck className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Acceso individual activo. Rol: {account.role === "admin" ? "Administración" : "Empresa"}.</p>
     <div className="mt-6 grid gap-6 md:grid-cols-2">
       <Card className="p-6 sm:p-8"><KeyRound className="h-6 w-6 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-bold text-primary-900">Contraseña</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">Actualizá tu contraseña desde tu cuenta. No la compartas con otras personas.</p><Link href="/update-password" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-900">Cambiar contraseña<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card>
+      {account.role === "admin" && <Card className="min-w-0 p-6 sm:p-8"><h2 className="text-xl font-bold text-primary-900">Invitar administrador</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">Enviá una invitación individual a otra persona de la Oficina de Empleo. Tendrá los mismos permisos completos. Cada persona define su propia contraseña; no compartan credenciales.</p><AdminInvitationForm /></Card>}
       {account.role !== "admin" && <Card className="p-6 sm:p-8"><LogOut className="h-6 w-6 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-bold text-primary-900">Cerrar sesión</h2><p className="mt-3 text-sm leading-7 text-muted-foreground">Cerrá tu sesión cuando termines de usar el portal.</p><div className={`${styles.forms} mt-5`}><Form action={logoutAction}><button className="text-white">Cerrar sesión</button></Form></div></Card>}
     </div>
     {account.role === "admin" && <section aria-label="Cuentas administrativas" className="mt-7"><h2 className="text-xl font-bold text-primary-900">Administradores individuales</h2>

@@ -12,7 +12,8 @@ export async function registerCandidate(input: unknown) {
   const { name, dni, email, password } = parsed.data;
   await client.auth.signUp({ email, password, options: {
     emailRedirectTo: getClientEnvironment().NEXT_PUBLIC_APP_URL + "/auth/callback",
-    data: { role: "candidate", candidate_name: name, candidate_dni: dni },
+    data: { role: "candidate", candidate_name: name, candidate_dni: dni,
+      registration_terms_version: parsed.data.termsVersion, registration_terms_accepted: parsed.data.termsAccepted },
   } });
   // Same response for existing email, duplicate DNI and provider failures.
 }

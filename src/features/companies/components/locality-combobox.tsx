@@ -38,7 +38,11 @@ export function LocalityCombobox({ defaultValue, value: controlledValue, onChang
   return (
     <Field label={label ?? <span className="sr-only">{ariaLabel}</span>} className={label ? "grid gap-1" : "sr-only"}>
       {name && <input ref={input} id={id} name={name} defaultValue={initialValue} required={required} minLength={2}
-        className="sr-only" tabIndex={-1} aria-hidden="true" onFocus={() => trigger.current?.focus()} />}
+        className="sr-only" tabIndex={-1} aria-hidden="true" onFocus={() => trigger.current?.focus()}
+        // Transport control for native validation and FormData only. Its own name must not repeat the
+        // visible label: the associated <label> would otherwise name a hidden field and leave two
+        // controls answering to the same accessible name.
+        aria-label="Valor del formulario" />}
       <Combobox value={value} onValueChange={next => {
         if (controlledValue === undefined) setInternalValue(next);
         onChange?.(next);
@@ -47,9 +51,9 @@ export function LocalityCombobox({ defaultValue, value: controlledValue, onChang
           aria-invalid={Boolean(error)} aria-describedby={description}>
           <ComboboxValue placeholder={<span className="text-muted-foreground">{placeholder}</span>} />
         </ComboboxTrigger>
-        <ComboboxContent aria-label="Seleccionar localidad">
+        <ComboboxContent aria-label={`Elegir ${ariaLabel.toLowerCase()}`}>
           <ComboboxInput placeholder="Buscar localidad…" aria-label="Buscar localidad" />
-          <ComboboxList aria-label="Localidades disponibles">
+          <ComboboxList aria-label={`${ariaLabel}: opciones`}>
             {LOCALITIES.map(locality => (
               <ComboboxItem key={locality} value={locality}>{locality}</ComboboxItem>
             ))}

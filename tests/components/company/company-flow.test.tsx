@@ -39,7 +39,7 @@ describe("autogestión de empresa", () => {
   it("exige identificación, responsable, contacto, actividad y localidad sin pedir documentos", () => {
     const valid = { legalName: "Empresa ficticia", cuit: "30-99999999-7", responsibleName: "Responsable ficticio",
       email: "empresa@example.invalid", phone: "", activity: "Servicios", locality: "Funes" };
-    expect(companyRegistrationSchema.safeParse({ ...valid, password: "Fictitious-123", confirmation: "Fictitious-123" }).success).toBe(true);
+    expect(companyRegistrationSchema.safeParse({ ...valid, password: "Fictitious-123", confirmation: "Fictitious-123", termsAccepted: true, termsVersion: "demo-terms-draft-1" }).success).toBe(true);
     expect(companyProfileSchema.safeParse({ ...valid, version: 1, email: "", phone: "" }).success).toBe(false);
     render(<CompanyRegistrationForm />);
     expect(screen.getByLabelText("CUIT")).toBeTruthy();

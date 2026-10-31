@@ -5,6 +5,7 @@ vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/candidates/profile-service", () => ({ getCandidateWorkspace: mocks.workspace }));
 vi.mock("@/features/candidates/photo-service", () => ({ getCandidatePhoto: vi.fn().mockResolvedValue(null), getPhotoCleanupPending: vi.fn().mockResolvedValue(false) }));
 vi.mock("@/features/candidates/consent-service", () => ({ getDemoConsentPolicy: mocks.policy }));
+vi.mock("@/features/training/components/course-links", () => ({ CourseLinks: vi.fn(async () => <p>Cursos públicos ficticios</p>) }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: mocks.offers, getPublicOffer: mocks.selected }));
 vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: mocks.participations }));
 vi.mock("@/features/notifications/service", () => ({ candidatePreinterviewAgenda: vi.fn().mockResolvedValue([]), listNotifications: vi.fn() }));
@@ -12,9 +13,12 @@ vi.mock("@/features/candidates/profile-actions", () => ({ saveProfileAction: vi.
 vi.mock("@/features/candidates/consent-actions", () => ({ changeConsentAction: vi.fn() }));
 vi.mock("@/features/participations/candidate-actions", () => ({ applyToOfferAction: vi.fn(), withdrawParticipationAction: vi.fn() }));
 vi.mock("@/features/accounts/actions", () => ({ logoutAction: vi.fn(), accountStatusAction: vi.fn() }));
+vi.mock("@/features/accounts/admin-invitation-actions", () => ({ administratorInvitationAction: vi.fn() }));
 vi.mock("@/features/accounts/navigation", () => ({ getPanelHref: () => "/dashboard" }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }), usePathname: () => "/account" }));
 import { getCandidatePhoto, getPhotoCleanupPending } from "@/features/candidates/photo-service";
+import { candidatePreinterviewAgenda } from "@/features/notifications/service";
+import { fixtureReference } from "../../fixtures/record-references";
 import DashboardPage from "@/app/(auth)/dashboard/page";
 const OffersPage = async ({ searchParams }: { searchParams: Promise<{ oferta?: string; page?: string }> }) => {
  accountSession();
@@ -77,12 +81,41 @@ it.each([
  if (heading) expect(canvas?.contains(screen.getByRole("heading", { level: 1, name: heading }))).toBe(true);
  expect(canvas?.textContent).toContain("La Oficina de Empleo evalúa las postulaciones y decide qué perfiles compartir con cada empresa.");
 });
+it("suggests public offers matching the candidate categories on the dashboard", async () => {
+ accountSession();
+ render(await DashboardPage({ searchParams: Promise.resolve({}) }));
+ const suggestions = screen.getByRole("region", { name: "Ofertas según tus rubros" });
+ expect(within(suggestions).getByRole("link", { name: offer.title }).getAttribute("href")).toContain("section=ofertas&oferta=");
+ expect(within(suggestions).getByText("Cierre: 30/11/2026")).toBeTruthy();
+ expect(mocks.offers).toHaveBeenCalledWith({ rubro: "ADMIN", page: 1, pageSize: 30 });
+});
+it("keeps previously withdrawn offers out of dashboard recommendations", async () => {
+ accountSession();
+ mocks.participations.mockResolvedValue([{ id: "withdrawn-fixture", opening_id: offer.id, opening_title: offer.title, display_status: "withdrawn", version: 2, created_at: "2026-10-07" }]);
+ render(await DashboardPage({ searchParams: Promise.resolve({}) }));
+ const suggestions = screen.getByRole("region", { name: "Ofertas según tus rubros" });
+ expect(within(suggestions).queryByRole("link", { name: offer.title })).toBeNull();
+ expect(within(suggestions).getByText(/No hay sugerencias nuevas/)).toBeTruthy();
+});
+it("loads the persisted photo for sidebar identity outside the profile section", async () => {
+ accountSession();
+ vi.mocked(getCandidatePhoto).mockResolvedValueOnce({ id: "photo-fixture" });
+ render(await DashboardPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
+ expect(getCandidatePhoto).toHaveBeenCalledExactlyOnceWith(offer.id);
+ const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
+ expect(sidebar.querySelector('[data-slot="sidebar-photo"]')).toBeTruthy();
+});
+it("separates optional contact details from the personal and work form", async () => {
+ render(await ProfilePage({ searchParams: Promise.resolve({}) }));
+ expect(within(screen.getByRole("region", { name: "Contacto" })).getByRole("button", { name: "Guardar teléfono" })).toBeDefined();
+ expect(within(screen.getByRole("region", { name: "Datos laborales y personales" })).queryByRole("button", { name: "Guardar teléfono" })).toBeNull();
+});
 it("renders the requested profile inside its canvas with sidebar identity and navigation intact", async () => {
  accountSession();
  render(await AccountPage({ searchParams: Promise.resolve({ section: "perfil" }) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta", "Notificaciones"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta", "Notificaciones"]);
  expect(within(navigation).getByRole("link", { name: "Perfil" }).getAttribute("aria-current")).toBe("page");
  expect(within(sidebar).getByText("Persona Ficticia")).toBeTruthy();
  expect(within(sidebar).getByText("persona@example.test")).toBeTruthy();
@@ -92,7 +125,7 @@ it("renders the requested profile inside its canvas with sidebar identity and na
  expect(screen.getByRole("main").childElementCount).toBe(1);
  expect(screen.getByRole("main").querySelector('[data-slot="profile-canvas"]')?.contains(screen.getByLabelText("Nombre y apellido"))).toBe(true);
  expect(screen.getByRole("main").getAttribute("aria-label")).toBe("Perfil");
- expect(mocks.policy).toHaveBeenCalledOnce();
+ expect(mocks.policy).not.toHaveBeenCalled();
  expect(screen.queryByRole("button", { name: /Archivar/ })).toBeNull();
  expect(screen.getAllByRole("main")).toHaveLength(1);
  expect(screen.getByRole("main").id).toBe("contenido");
@@ -108,7 +141,7 @@ it.each(["photo", "cleanup"])("keeps profile usable when the %s query fails befo
  expect(screen.getByLabelText("Nombre y apellido")).toHaveProperty("value", "Persona Ficticia");
  expect(screen.getByRole("button", { name: "Guardar teléfono" })).toHaveProperty("disabled", false);
  expect(screen.getByRole("heading", { name: "CV PDF" })).toBeTruthy();
- expect(screen.getByRole("heading", { name: "Consentimiento de prueba" })).toBeTruthy();
+ expect(screen.queryByRole("heading", { name: "Consentimiento de prueba" })).toBeNull();
  expect(screen.getByRole("button", { name: "Subir foto" })).toHaveProperty("disabled", true);
  expect(screen.getByRole("button", { name: "Eliminar foto" })).toHaveProperty("disabled", true);
  expect(screen.getByText("La foto de perfil no está disponible en este momento. Podés completar el resto de tus datos.")).toBeTruthy();
@@ -123,7 +156,7 @@ it("opens the user dashboard by default with participation metrics and states", 
  render(await AccountPage({ searchParams: Promise.resolve({}) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cuenta", "Notificaciones"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta", "Notificaciones"]);
  expect(within(navigation).getByRole("link", { name: "Panel de usuario" }).getAttribute("aria-current")).toBe("page");
  expect(screen.getByRole("heading", { level: 1, name: "Panel de usuario" })).toBeTruthy();
  expect(screen.getByRole("heading", { name: "Postulaciones en curso" })).toBeTruthy();
@@ -155,9 +188,49 @@ it.each([
  fireEvent.submit(logout.closest("form")!);
  expect(logoutAction).toHaveBeenCalledOnce();
  expect(mocks.workspace).toHaveBeenCalledOnce();
- expect(mocks.policy).not.toHaveBeenCalled();
+ expect(mocks.policy).toHaveBeenCalledOnce();
+ expect(within(main).getByRole("region", { name: "Privacidad" })).toBeTruthy();
  expect(mocks.offers).not.toHaveBeenCalled();
  expect(mocks.participations).not.toHaveBeenCalled();
+});
+it("muestra cursos públicos dentro de la sección Cursos", async () => {
+ accountSession();
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "cursos" }) }));
+ expect(screen.getByRole("heading", { level: 1, name: "Cursos" })).toBeTruthy();
+ expect(screen.getByText("Cursos públicos ficticios")).toBeTruthy();
+ expect(mocks.policy).not.toHaveBeenCalled();
+});
+it.each([null, "withdrawn"])("permite otorgar permiso explícito en Cuenta para estado %s", async status => {
+ accountSession();
+ const state = workspace("consent_withdrawn");
+ mocks.workspace.mockResolvedValue({ ...state, consent: status ? { ...state.consent, status } : null });
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
+ const privacy = screen.getByRole("region", { name: "Privacidad" });
+ const form = within(privacy).getByRole("button", { name: "Guardar consentimiento" }).closest("form")!;
+ expect(new FormData(form).get("status")).toBe("accepted");
+ expect(new FormData(form).get("version")).toBe("1");
+ expect(within(form).getByRole("checkbox")).toHaveProperty("checked", false);
+ expect(within(form).getByRole("checkbox")).toHaveProperty("required", true);
+ expect(within(privacy).getByText(/no sustituye los términos/)).toBeTruthy();
+});
+it.each(["perfil", "ofertas", "dashboard"])("enlaza al permiso pendiente desde %s hacia Cuenta", async section => {
+ accountSession();
+ mocks.workspace.mockResolvedValue({ ...workspace("draft"), consent: null });
+ render(await AccountPage({ searchParams: Promise.resolve({ section }) }));
+ expect(screen.getByRole("link", { name: "Gestionar privacidad en Cuenta" }).getAttribute("href")).toBe("/account?section=cuenta");
+});
+it("permite retirar un permiso vigente sin enviar accepted hacia accepted", async () => {
+ accountSession();
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
+ const privacy = screen.getByRole("region", { name: "Privacidad" });
+ expect(within(privacy).getByText("Permiso actual: vigente.")).toBeTruthy();
+ expect(within(privacy).getByText(/Ya aceptaste el consentimiento/)).toBeTruthy();
+ expect(within(privacy).getByText(/Tu consentimiento se conserva/)).toBeTruthy();
+ expect(within(privacy).queryByRole("button", { name: "Guardar consentimiento" })).toBeNull();
+ const form = within(privacy).getByRole("button", { name: "Retirar consentimiento" }).closest("form")!;
+ expect(new FormData(form).get("status")).toBe("withdrawn");
+ expect(within(form).getByRole("checkbox")).toHaveProperty("required", true);
+ expect(within(privacy).getByText(/participaciones abiertas se cerrarán/)).toBeTruthy();
 });
 it("hides the closed participation section until a final state exists", async () => {
  accountSession();
@@ -198,6 +271,37 @@ it("embeds offers with account-local profile and pagination destinations", async
  expect(next.searchParams.get("page")).toBe("2");
  expect(next.searchParams.get("oferta")).toBe(offer.id);
  expect(mocks.workspace).toHaveBeenCalledOnce();
+});
+it.each([false, true])("keeps general CV presentation and panel-aware continuation for selected=%s", async selected => {
+ accountSession();
+ const query = { section: "ofertas", ...(selected ? { oferta: offer.slug } : {}) };
+ const view = render(await AccountPage({ searchParams: Promise.resolve(query) }));
+ expect(screen.getByText(/se usará tu CV del perfil: cv-ficticio.pdf/)).toBeTruthy();
+ expect(screen.getByLabelText("CV específico para esta oferta (opcional)")).toBeTruthy();
+ expect(screen.queryByRole("link", { name: "Ver mis postulaciones" })).toBeNull();
+ view.unmount();
+ mocks.participations.mockResolvedValue([{ opening_id: offer.id }]);
+ render(await AccountPage({ searchParams: Promise.resolve(query) }));
+ expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true);
+ expect(screen.getByRole("link", { name: "Ver mis postulaciones" }).getAttribute("href")).toBe(`/account?section=postulaciones&oferta=${offer.slug}`);
+});
+it("keeps the approved agenda and own case CV beside role-safe workflow steps", async () => {
+ accountSession();
+ const reference = fixtureReference("participation", offer.id);
+ mocks.participations.mockResolvedValue([{ id: offer.id, opening_title: offer.title, display_status: "received", version: 2, created_at: "2026-10-07", cv_document_id: offer.id, cv_name: "cv-del-caso.pdf", summary: "Resumen interno ficticio", recommendation: "Recomendación interna ficticia" }]);
+ vi.mocked(candidatePreinterviewAgenda).mockResolvedValueOnce([{ reference, channel: "phone", scheduledAt: "2026-11-02T12:00:00Z", heldAt: null }]);
+ render(await AccountPage({ searchParams: Promise.resolve({ section: "postulaciones" }) }));
+ const item = screen.getByRole("heading", { name: offer.title }).closest("li")!;
+ expect(item.id).toBe(reference);
+ expect(within(item).getByText("Preentrevista de la Oficina de Empleo")).toBeTruthy();
+ expect(within(item).getByText(/Canal:/)).toBeTruthy();
+ expect(within(item).getByText(/Programada:/)).toBeTruthy();
+ const cv = within(item).getByRole("link", { name: "Abrir CV de esta postulación: cv-del-caso.pdf" });
+ expect(cv.getAttribute("href")).toBe(`/api/cv/${fixtureReference("cv", offer.id)}`);
+ expect(cv.getAttribute("target")).toBe("_blank");
+ expect(cv.getAttribute("rel")).toBe("noopener noreferrer");
+ expect(within(item).getByRole("list", { name: "Etapas de la postulación" })).toBeTruthy();
+ expect(item.textContent).not.toMatch(/Resumen interno ficticio|Recomendación interna ficticia|Preseleccionada|Derivada a empresa/);
 });
 it("embeds participations and preserves withdrawal confirmation", async () => {
  accountSession();

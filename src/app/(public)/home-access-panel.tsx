@@ -21,7 +21,8 @@ type FormDrafts = Record<string, Record<string, string>>;
 
 
 export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel = "Ir al panel de usuario", onViewChange, initialView = "login", accessState = null }: { authenticated?: boolean; panelHref?: string; panelLabel?: string; onViewChange?: (view: HomeAccessView) => void; initialView?: HomeAccessView; accessState?: AccessState | null } = {}) {
-  const [mode, setMode] = useState<"login" | "register">(initialView === "login" ? "login" : "register");
+  const [selectedMode, setMode] = useState<"login" | "register">(initialView === "login" ? "login" : "register");
+  const mode = authenticated ? "login" : selectedMode;
   const [role, setRole] = useState<"candidate" | "company">(initialView === "company" ? "company" : "candidate");
   const notice = authenticated ? null : accessState;
   const contentRef = useRef<HTMLDivElement>(null);
@@ -68,6 +69,7 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
   }, [rememberValues]);
 
   useEffect(() => {
+    if (authenticated) return;
     let focusFrame: number | undefined;
     const focusRegistration = () => {
       if (focusFrame !== undefined) cancelAnimationFrame(focusFrame);
@@ -92,7 +94,7 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
       window.removeEventListener(HOME_REGISTRATION_EVENT, openRegistration);
       if (focusFrame !== undefined) cancelAnimationFrame(focusFrame);
     };
-  }, [initialView, onViewChange, rememberValues]);
+  }, [authenticated, initialView, onViewChange, rememberValues]);
 
   useLayoutEffect(() => {
     const content = contentRef.current;
@@ -112,7 +114,7 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
         <div ref={contentRef} className={styles.panelContent} data-access-key={mode === "login" ? "login" : role}>
           <div className={styles.modes} role="group" aria-label="Opciones de acceso">
             <button type="button" aria-pressed={mode === "login"} onClick={() => { rememberValues(); setMode("login"); setSent(null); onViewChange?.("login"); }}>Iniciar sesión</button>
-            <button type="button" aria-pressed={mode === "register"} onClick={() => { rememberValues(); setMode("register"); setSent(null); onViewChange?.(role); }}>Registrarse</button>
+            {!authenticated && <button type="button" aria-pressed={mode === "register"} onClick={() => { rememberValues(); setMode("register"); setSent(null); onViewChange?.(role); }}>Registrarse</button>}
           </div>
           {mode === "register" && !sent && (
             <fieldset className={styles.roles}>

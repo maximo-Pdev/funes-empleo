@@ -21,6 +21,18 @@ y posiciones históricas debajo se conservan como trazabilidad.
 
 ## Must be resolved during specification and clarification
 
+### Integration authority — EXTRA102 / S18, 2026-10-29
+
+Preserve the superseded decisions below as evidence, not current executable rules.
+EXTRA094 governs hiring: unavailable with consent retained, 720-hour hiring-company
+access only if its own referral remains active and authorized, no revival of revoked
+permissions and no change to other cases. Manual withdrawal remains explicit and
+global in Cuenta > Privacidad; accepted consent is not requested repeatedly. Legal
+terms at registration remain separate and unapproved for real data. S2/L36 replaces
+the six-summary-card hierarchy with visible shared bar/donut reporting on overview
+and metrics, retaining all indicators, filters and CSV/PDF/XLSX exports. None of this
+closes municipal/legal questions or establishes integrated functional acceptance.
+
 ### OQ-021 — Alcance de agenda visible y entrevista empresarial (EXTRA099)
 
 Mateo solicita notificaciones por rol, incluida nominación/preentrevista/derivación
@@ -102,6 +114,22 @@ de contrataciones anteriores ni reaceptación implícita por corregir un resulta
 | OQ-018 | What is the complete mapping of the existing Excel workbook? | Require an anonymized sample and written mapping before importer implementation. | Employment Office |
 
 ## Resolved by the MVP clarifications of 2026-09-19
+
+### Actualización de OQ-019 y referencia de entrega — 2026-10-27, EXTRA-086
+
+Máximo entrega `Beex_Funes_Tech_Lab_Proyecto_Final.pdf` y confirma «Si, lo del PDF
+es lo que se pide». Para esta entrega se requieren curso, postulante, derivación e
+historial independiente de las postulaciones; el alcance anterior de nota libre
+queda superado, sin borrar las notas existentes. No se incluye una plataforma
+educativa ni inscripción automática. FR-042 y el plan reflejan este cambio.
+
+El PDF contiene dos formulaciones sobre preentrevista: su tabla de mínimos dice
+que es opcional y permite derivar directamente; el paso 4 del flujo dice que se
+realiza antes de decidir la derivación. Ante la pregunta explícita sobre mantener
+la preentrevista opcional y permitir derivación directa, Máximo responde afirmativamente.
+Se mantiene ese flujo para la implementación; ambas frases se conservan como evidencia
+de la discrepancia del documento. Esto no acredita una nueva aprobación municipal
+ni cambia los controles de derivación o privacidad.
 
 ### A08 — actualización acotada de OQ-010, 2026-10-19
 

@@ -1,3 +1,6 @@
+import { cloneElement } from "react";
+import { WorkflowSteps } from "@/components/ui/workflow-steps";
+import { companyOpeningWorkflow } from "@/domain/presentation/workflow-steps";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { notFound } from "next/navigation";
 import { CompanyShell } from "../../../_components/company-shell";
@@ -20,12 +23,18 @@ export default async function CompanyOpeningPage({ params, searchParams }: { par
   if (!opening) notFound();
   const referrals = workspace.profile?.status === "active"
     ? await CompanyOpeningReferrals({ openingId, requestedReference: query.referral })
-    : <section aria-labelledby="company-referrals-title" className="mt-8 space-y-4">
+    : <section id="derivaciones" aria-labelledby="company-referrals-title" className="mt-8 space-y-4">
       <h2 id="company-referrals-title" className="text-xl font-semibold">Candidatos derivados</h2>
       <p>Completá y guardá el perfil de tu empresa para consultar las derivaciones. Los accesos anteriores no se restablecen automáticamente.</p>
     </section>;
+  const guidance = companyOpeningWorkflow(opening.status);
   return <CompanyShell name={workspace.profile?.legalName} email={user.email} active="/empresa/ofertas" title={opening.title || "Borrador de oferta"}>
-    <div className={`${styles.forms} ${styles.workspace}`}><CompanyOpeningForm opening={opening} categories={categories} /></div>
-    <div className={`${styles.forms} ${styles.referral}`}>{referrals}</div>
+    <section aria-label="Próximo paso de la oferta" className="mb-6 rounded-lg border border-border p-5">
+      <WorkflowSteps label="Etapas de la oferta" steps={guidance.steps} />
+      <p>{guidance.description}</p>
+      {guidance.target && <a href={guidance.target} className="inline-flex min-h-11 items-center text-primary underline">Continuar con el próximo paso</a>}
+    </section>
+    <div id="offer-management" tabIndex={-1} className={`${styles.forms} ${styles.workspace} scroll-mt-24`}><CompanyOpeningForm opening={opening} categories={categories} /></div>
+    <div className={`${styles.forms} ${styles.referral}`}>{cloneElement(referrals, { tabIndex: -1, className: "mt-8 scroll-mt-24 space-y-4" })}</div>
   </CompanyShell>;
 }

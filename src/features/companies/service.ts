@@ -29,7 +29,8 @@ export async function registerCompany(input: unknown) {
     emailRedirectTo: getClientEnvironment().NEXT_PUBLIC_APP_URL + "/auth/callback",
     data: { role: "company", company_name: value.legalName, company_cuit: value.cuit,
       company_responsible: value.responsibleName, company_email: value.email, company_phone: value.phone,
-      company_activity: value.activity, company_locality: value.locality },
+      company_activity: value.activity, company_locality: value.locality,
+      registration_terms_version: value.termsVersion, registration_terms_accepted: value.termsAccepted },
   } });
   // The same outward response covers duplicate accounts and provider errors.
 }

@@ -13,7 +13,7 @@ const { listPublicOffers, listPublicOfferFilters, getPublicOffer, notFound, read
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer, listPublicOfferFilters }));
-vi.mock("next/navigation", () => ({ notFound }));
+vi.mock("next/navigation", () => ({ notFound, usePathname: () => "/ofertas" }));
 
 import PublicOffersPage from "@/app/(public)/ofertas/page";
 import PublicOfferDetailPage from "@/app/(public)/ofertas/[openingId]/page";
@@ -38,8 +38,10 @@ beforeEach(() => {
 });
 
 it.each([
-  ["candidate", "/dashboard?section=perfil", "Mi perfil"], ["company", "/empresa/perfil", "Mi perfil"], ["admin", "/account", "Cuenta"],
-])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label) => {
+  ["candidate", "/dashboard?section=perfil", "Mi perfil", "/dashboard", "Ir al panel de usuario"],
+  ["company", "/empresa/perfil", "Mi perfil", "/empresa", "Ir al panel de empresa"],
+  ["admin", "/account", "Cuenta", "/admin", "Ir al panel de administración"],
+])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label, panelHref, panelLabel) => {
   readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
   getPublicOffer.mockResolvedValue(offer);
@@ -51,8 +53,8 @@ it.each([
     expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
     expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
     if (Page === listPage) {
-      const panelHref = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/account";
-      expect(screen.getByRole("link", { name: /^Ir al panel de / }).getAttribute("href")).toBe(panelHref);
+      expect(screen.getByRole("link", { name: panelLabel }).getAttribute("href")).toBe(panelHref);
+      expect(screen.getByText("Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel.")).toBeTruthy();
     }
     view.unmount();
   }

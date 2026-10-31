@@ -8,7 +8,7 @@ vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/app/(auth)/account/candidate-account", () => ({ renderCandidateAccount: mocks.renderCandidateAccount }));
 vi.mock("@/features/accounts/navigation", () => ({
-  getPanelHref: (role: string) => (role === "company" ? "/empresa" : "/account"),
+  getPanelHref: (role: string) => (role === "company" ? "/empresa" : "/admin"),
 }));
 import DashboardPage from "@/app/(auth)/dashboard/page";
 
@@ -22,7 +22,7 @@ it.each(["dashboard", "perfil", "postulaciones", "ofertas"])("renders candidate 
   expect(view).toBeTruthy();
 });
 
-it.each([["company", "/empresa"], ["admin", "/account"]])("sends %s to its own panel", async (role, href) => {
+it.each([["company", "/empresa"], ["admin", "/admin"]])("sends %s to its own panel", async (role, href) => {
   mocks.guard.mockResolvedValue({ account: { role }, user: { email: "persona@example.test" } });
   await expect(DashboardPage({ searchParams: Promise.resolve({}) })).rejects.toThrow(`NEXT_REDIRECT:${href}`);
   expect(mocks.redirect).toHaveBeenCalledWith(href);

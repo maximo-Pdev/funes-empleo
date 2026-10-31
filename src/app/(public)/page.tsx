@@ -43,11 +43,11 @@ const faqs = [
 
 export default async function HomePage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> } = {}) {
   const params = await searchParams;
-  const initialView = getRegistrationRole(params?.registro) ?? "login";
   const accessState = getAccessState(params?.acceso);
   const [{ panel }, offers, counts] = await Promise.all([
     getSiteAccess(), getPreviewOffers(), getPublicPortalCounts().catch(() => null),
   ]);
+  const initialView = panel ? "login" : getRegistrationRole(params?.registro) ?? "login";
   return (
     <>
       <HomeNavbar panel={panel} />
@@ -129,11 +129,13 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
             <div className={styles.closingGrid}>
               <div>
                 <h2 id="closing-title" className={styles.closingTitle}>¿Listo para dar el siguiente paso?</h2>
-                <p className={styles.closingLead}>Creá tu cuenta y empezá a usar el portal, o acercate a la Oficina de Empleo para que te acompañemos en el proceso.</p>
-                <div className={styles.closingActions}>
+                <p className={styles.closingLead}>{panel
+                  ? "Acercate a la Oficina de Empleo para que te acompañemos en el proceso."
+                  : "Creá tu cuenta y empezá a usar el portal, o acercate a la Oficina de Empleo para que te acompañemos en el proceso."}</p>
+                {!panel && <div className={styles.closingActions}>
                   <HomeRegistrationLink role="candidate" className={styles.closingPrimary}>Registrarme como postulante<ArrowRight size={16} aria-hidden="true" /></HomeRegistrationLink>
                   <HomeRegistrationLink role="company" className={styles.closingSecondary}>Registrar empresa</HomeRegistrationLink>
-                </div>
+                </div>}
               </div>
               <div className={styles.closingContact}>
                 <p className={styles.closingContactTitle}>Oficina de Empleo</p>

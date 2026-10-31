@@ -48,7 +48,7 @@ test("retirar y volver a postular conserva caso y CV anteriores y muestra rojo",
   await page.goto("/dashboard?section=postulaciones");
   await expect(card).toHaveCount(2);
   await expect(card.filter({hasText:"Retirada"})).toContainText(/Recibida: \d{2}\/\d{2}\/\d{4}/);
-  await expect(card.filter({hasText:"Recibida por la Oficina"})).toContainText("reintento-ficticio.pdf");
+  await expect(card.filter({has:page.locator("p").filter({hasText:/^Estado:/}).getByText("Recibida por la Oficina",{exact:true})})).toContainText("reintento-ficticio.pdf");
   expect(runLocalMaintenanceSql(`select status::text||':'||application_cv_document_id::text from public.participations where id='${first}'`)).toBe(`withdrawn:${originalCv}`);
   expect(runLocalMaintenanceSql(`select count(*) from public.participations where candidate_id='${profile}' and opening_id='${opening}' and status<>'withdrawn'`)).toBe("1");
   for (const width of [390,1440]) {

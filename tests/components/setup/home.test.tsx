@@ -25,7 +25,7 @@ it.each([
   readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
   render(await HomePage());
   const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
-  const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/account";
+  const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
   expect(navigation.querySelector("a")?.getAttribute("href")).toBe(href);
   expect(navigation.querySelector("a")?.textContent).toBe(label);
   expect(screen.getByRole("region", { name: "Acceso al portal" }).contains(navigation)).toBe(true);

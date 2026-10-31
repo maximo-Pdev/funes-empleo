@@ -90,7 +90,7 @@ for (const path of ["/admin/candidates", "/admin/atencion-presencial"]) {
     await page.getByLabel("Correo electrónico").fill("admin1@example.invalid");
     await page.getByLabel("Contraseña", { exact: true }).fill(localFixturePassword());
     await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-    await expect(page).toHaveURL(/\/account$/);
+    await expect(page).toHaveURL(/\/admin$/);
     await page.goto(`${path}?page=2`);
     const form = page.getByRole("search");
     for (const width of [360, 1366]) {

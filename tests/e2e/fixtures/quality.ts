@@ -14,7 +14,19 @@ export async function loginFixture(page: Page, role: "candidate" | "company" | "
   await page.getByLabel("Correo electrónico").fill(`${role}${number}@example.invalid`);
   await page.getByLabel("Contraseña", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
-  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/account$/ }[role]);
+  await expect(page).toHaveURL({ candidate: /\/dashboard$/, company: /\/empresa$/, admin: /\/admin$/ }[role]);
+}
+export async function selectLaborCategories(page: Page, names: readonly string[], label = "Categorías laborales") {
+  const trigger = page.getByRole("combobox", { name: label, exact: true });
+  for (const name of names) {
+    if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click();
+    const option = page.getByRole("option", { name, exact: true });
+    if (await option.getAttribute("aria-selected") !== "true") await option.click();
+  }
+  if (await trigger.getAttribute("aria-expanded") === "true") {
+    await page.getByRole("combobox", { name: "Buscar categoría", exact: true }).press("Escape");
+  }
+  for (const name of names) await expect(page.getByRole("list", { name: "Categorías seleccionadas" }).getByText(name, { exact: true })).toBeVisible();
 }
 export function protectedPages() {
   const root = join(process.cwd(), "src/app");

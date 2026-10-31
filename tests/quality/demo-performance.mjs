@@ -46,7 +46,7 @@ try {
   await page.getByLabel("Correo electrónico").fill(credentials.admin1.email);
   await page.getByLabel("Contraseña",{exact:true}).fill(credentials.admin1.password);
   await page.getByRole("button",{name:"Ingresar",exact:true}).click();
-  await page.waitForURL("**/account");
+  await page.waitForURL("**/admin");
   if (scenario === "concurrent-admins") {
     const pages=[page];
     for (let n=2;n<=4;n++) {
@@ -57,7 +57,7 @@ try {
       await p.getByLabel("Correo electrónico").fill(credentials[`admin${n}`].email);
       await p.getByLabel("Contraseña",{exact:true}).fill(credentials[`admin${n}`].password);
       await p.getByRole("button",{name:"Ingresar",exact:true}).click();
-      await p.waitForURL("**/account"); pages.push(p);
+      await p.waitForURL("**/admin"); pages.push(p);
     }
     const fixture=manifest.concurrentAdmins;
     await pages[0].goto(`/admin/openings/${id("opening",fixture.openingNumber)}`);

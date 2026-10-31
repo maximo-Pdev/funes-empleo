@@ -6,6 +6,7 @@ import { Info } from "lucide-react";
 import { registerCandidateAction } from "../registration-actions";
 import { PasswordField } from "@/features/accounts/components/password-field";
 import { dniField } from "@/components/forms/identifier-fields";
+import { TermsAcceptanceField } from "@/features/accounts/components/terms-acceptance-field";
 
 export function CandidateRegistrationForm({ submitLabel = "Crear cuenta candidata", homepageLayout = false, onSent, defaultValues }: { submitLabel?: string; homepageLayout?: boolean; onSent?: (result: { email: string; message: string }) => void; defaultValues?: Record<string, string> } = {}) {
   const [state, action, pending] = useActionState(registerCandidateAction, { message: "", success: false });
@@ -22,6 +23,7 @@ export function CandidateRegistrationForm({ submitLabel = "Crear cuenta candidat
     <PasswordField name="password" label="Contraseña" autoComplete="new-password" help="Entre 6 y 128 caracteres. No compartas tu contraseña." defaultValue={defaultValues?.password} />
     <PasswordField name="confirmation" label="Confirmar contraseña" autoComplete="new-password" defaultValue={defaultValues?.confirmation} />
     <p className="text-sm">El correo debe verificarse antes de completar el perfil. Si ya existe un perfil asistido, la Oficina realizará la vinculación presencial.</p>
+    <TermsAcceptanceField />
     <p ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{homepageLayout && state.success && state.message && <Info size={16} aria-hidden="true" />}{state.message}</p>
     <button type="submit" disabled={pending} className="rounded bg-blue-800 p-3 font-semibold text-white disabled:opacity-60">{submitLabel}</button>
   </Form>;

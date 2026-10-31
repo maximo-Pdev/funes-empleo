@@ -1,5 +1,65 @@
 # Municipal visual reference
 
+
+## PR86 documentation integration — current scope and historical evidence
+
+PR86 adds only session-aware public-offer presentation: `/ofertas` reads
+`getSiteAccess` once per request and reuses the verified `panel.href` and
+`panel.label` for its header and sidebar. An active candidate, company or
+administrator sees the correct panel link, not anonymous “Crear cuenta” or
+“Iniciá sesión” calls to action. With no verified active panel, preserve the
+anonymous registration and login links. URL parameters, client registration
+selection and guessed role paths are not authentication evidence. Hiding links
+is presentation, not authorization; keep server guards and database privacy.
+See `docs/operations/public-offers-authenticated-access.md` and
+`specs/001-municipal-employment-portal/contracts/authorization-matrix.md`.
+
+Mateo's EXTRA-108 rollback applies to PR86's own Home/login experiments only;
+it does not revert the feature branch's independently approved session-aware
+Home access panel, anonymous drafts, or chart-first administrative architecture.
+Both `/admin` and `/admin/metrics` retain visible shared bar/donut charts, not
+six summary cards or graphs hidden behind Ver detalle. Keep central labels,
+real values, text equivalents, native GET filters, selected-name tags, keep-open
+multiselect and visible CSV/PDF/XLSX exports. Public Home aggregate cards are
+separate and unchanged. Preserve course links/referral history, private photos,
+individual administrator invitation/password setup, private notifications,
+per-case immutable CVs, date presentation and withdrawn-only new attempts.
+Hiring retains operational consent, changes availability to unavailable and
+preserves only the already-authorized hiring-company access window of 720 hours;
+revoked access never revives. Legal registration receipts remain separate from
+operational privacy in Cuenta. Keep native `datetime-local`, ISO payloads and
+Funes conversion; browser locale display order is not guaranteed.
+
+The retained branch narratives below are historical evidence where superseded.
+In particular, incoming six-card/Perfil wording is explicitly archived inline,
+not a competing current design. Earlier statements that SQL or browser checks
+were pending describe their recorded phase, not a new failure: the task ledger
+contains subsequent isolated SQL, coverage and browser phase results. An
+interrupted local gate is not a pass, and prior CI success is not a fresh
+integrated acceptance run. This unit performs static documentation verification
+only; the parent owns executable gates, task-ledger updates and Git operations.
+No new legal/municipal approval, independent review, acceptance, hosted rollout,
+merge or deployment is established by this union.
+
+Historical EXTRA-106 references are title-qualified in `cambios-extra.md`; PR85 documentation union and PR86 public-access history are distinct entries.
+
+## Final portal improvements — EXTRA-086 (in progress)
+
+The administrator overview lives at `/admin` and is the first sidebar destination
+and successful administrator login destination. `/account` remains Cuenta;
+`/admin/metrics` keeps period/category filters and CSV/PDF/XLSX. Both overview and metrics
+reuse actual `getMetrics` rows: horizontal bars replace count cards, and a donut
+shows mutually exclusive opening states, never overlapping category counts.
+Preserve text equivalents, unavailable/zero/pending distinctions and municipal
+tokens. The overview uses today's Argentine date for both bounds and labels
+snapshot counts separately from today's activity; it does not invent a trend.
+
+The latest request supersedes authenticated Home registration availability:
+verified active sessions keep their role panel access, not registration tabs,
+role selection or closing registration shortcuts. Anonymous registration and
+independent form drafts remain unchanged. See `odd/tasks/final-portal-improvements.md`
+for active scope, pending checks and the separate legal/operational consent rules.
+
 ## EXTRA109 — Gestión administrativa
 
 EXTRA111: status-amber usa #805900 sobre el mismo fondo #fcf3db para contraste de
@@ -15,6 +75,7 @@ foco/anuncio y sin truncar datos. Quitar Plantillas para el personal.
 Reactivar usa Button municipal primario y variables existentes de submit verdes
 en módulo acotado; rojo solo para decisiones destructivas. Conservar validación,
 motivo, confirmación y mensajes; no reglas CSS globales nuevas ni controles propios.
+
 
 ## EXTRA106/108 — Acceso desde ofertas públicas
 
@@ -36,6 +97,11 @@ de presentación; entradas nativas y valores ISO internos se conservan. Retirada
 Cancelada de participaciones usan tone red, sin quitar texto o foco accesible.
 
 
+### PR85 integration clarification — EXTRA-106
+
+The dates section above belongs to `EXTRA-102 — Fechas uniformes y nueva postulación tras retiro`; the separate local `EXTRA-102 — Documentation integration for final portal improvements` retains its chart-first history. Both administrator pages keep the same visible bar/donut renderer, never six summary cards or charts hidden behind a detail action. Preserve centralized metric labels, real counts, native GET filters with selected-name tags and keep-open multiselect, and all three visible filtered export actions: CSV, PDF and XLSX. Shared date formatting applies to displayed timestamps and report context, not ISO transport or calendar-day semantics. The separate public Home aggregate cards are unaffected.
+
+EXTRA-105 is the current contact-input decision: native `datetime-local`, `lang="es-AR"`, ISO state and the existing Funes conversion; browser/system regional settings still determine its visible order. EXTRA-104 is retained history, not authorization to restore free text. Only withdrawn self-application history permits a fresh attempt; other blocking states remain blocking. New attempts retain their own fixed CV and history without restoring old access. Existing role-safe workflow guidance, notifications, course links/referral history, private photos and separation of legal terms from operational consent remain intact. This documentation union is static integration, not new browser, SQL, review or acceptance evidence.
 ## EXTRA099 — Notificaciones privadas
 
 Campana en DashboardShell/HomeNavbar privado; inicio público sin consultas de
@@ -61,12 +127,40 @@ nueva pestaña. Reutilizar Form/FileInput/Button y foco de feedback.
 ## EXTRA094 —2026-10-28
 
 CV: Abrir CV, nueva pestaña y rel noopener noreferrer; conservar estilos/primitivas.
+Historical incoming EXTRA094 metrics wording, superseded by the chart-first rule above:
+
+```text
 Métricas: seis tarjetas principales, dos distribuciones de barras con etiquetas/
 valores textuales y tokens, sin depender del color; datos restantes en Ver detalle
 cerrado. Definiciones en Más información, guardas y descargas completas intactas.
+```
+
+Current integrated metrics guidance:
+
+Métricas: gráficos de barras y dona visibles en el paneo de `/admin` y en métricas,
+con el mismo renderer, etiquetas/valores textuales y tokens, sin depender del color.
+Sin las seis tarjetas resumen ni esconder su reemplazo en Ver detalle. La dona usa
+solo estados de oferta mutuamente excluyentes; categorías superpuestas no forman
+una distribución. Definiciones en Más información, guardas, filtros y descargas
+completas CSV/PDF/XLSX intactas. Revisión S2/L36 de EXTRA102 sustituye solo la
+jerarquía visual anterior de EXTRA094, no los indicadores o sus cálculos.
+Historical incoming EXTRA094 consent wording; current placement remains Cuenta:
+
+```text
 Consentimiento aceptado muestra estado, sin checkbox/botón de aceptación. Texto
 explica conservación al contratar y No disponible, acceso720h de empresa contratante
 y que permisos revocados no regresan. Datos de prueba siguen sin aprobación legal.
+```
+
+Current integrated privacy guidance:
+
+Consentimiento aceptado muestra estado, sin checkbox/botón de aceptación. Texto
+explica conservación al contratar y No disponible, acceso720h de empresa contratante
+y que permisos revocados no regresan. Privacidad operativa vive en Cuenta, no en
+Perfil; retiro manual explícito sigue disponible y conserva sus efectos globales.
+Solo ausencia/retiro requiere nueva aceptación afirmativa. Los términos legales
+del registro son independientes y no conceden permiso de derivación. Datos de
+prueba siguen sin aprobación legal.
 
 ## Portal follow-ups — EXTRA085
 
@@ -100,6 +194,7 @@ islands. Candidate locality is optional; matching order applies with an explicit
 and Excel downloads using existing institutional colors and local PDF fonts.
 See `docs/implementation/portal-filters-audit.md` for the surface inventory.
 
+
 ## PR 78 validation and matching corrections — EXTRA-084
 
 Company Localidad remains a required catalog combobox. Its validation participates
@@ -113,6 +208,16 @@ exercise the real combobox with the keyboard.
 candidate and matching results use the adapted table, retaining twelve matching
 results per page, global ordering, accessible profile preview and nomination.
 This records the existing authorized migration, not a new listing redesign.
+
+## Favicon — EXTRA-083
+
+Use `public/brand/funes-favicon-white.png` for root icon metadata, with the
+`?v=white-emblem-1` URL revision to invalidate the browser's prior favicon cache.
+It is the
+user-supplied municipal emblem recolored white, preserving its original alpha
+channel and proportions on a transparent 256×256 canvas. Keep the navbar and
+other in-page municipal logos unchanged. The white silhouette is intended for
+dark browser chrome; transparency does not provide contrast on white tabs.
 
 ## Home live public totals — EXTRA-079
 
@@ -158,6 +263,10 @@ El enlace destacado usa data-slot=link-button para conservar el texto blanco
 de sus variantes frente al override de enlaces del panel, también en hover.
 Historial de moderación conserva cinco eventos iniciales y revela cinco por
 Mostrar más; ocultar ese botón si no quedan otros. Mantener foco y anuncio.
+
+Historical EXTRA072 presentation below is superseded by S12/S18/EXTRA102: privacy
+controls belong to Cuenta, and hiring copy follows EXTRA094. Do not restore the
+Perfil consent block, automatic withdrawal on hire or repeated acceptance.
 
 EXTRA072: Consentimiento de prueba del perfil propio muestra dos párrafos
 visibles y cuatro dentro de Más información, cerrado inicialmente. Usar el texto
@@ -387,6 +496,15 @@ Password visibility toggles remain separate non-submit controls with at least
 uses `--form-submit-background` / `--form-submit-hover` to preserve that meaning.
 Do not remove confirmation, hints, `required`, autocomplete, errors or ARIA links.
 
+Native validation proxies using `input.sr-only` keep 1px width/height/min-height,
+zero padding and zero border through the shared `:root form input.sr-only` rule.
+The visible-input sizing rules (including administrator workspace styles) must not
+expand these absolutely positioned proxies. Keep native `required`, FormData and
+focus redirection to the visible combobox intact; never fix their overflow with
+page clipping or by disabling validation. Visible controls retain their normal
+touch targets. Verify candidate Perfil and admin Atención presencial at both
+360px and 1366px against a fresh production build (EXTRA-086).
+
 The homepage's compact layout uses 6px between labels and their controls,
 16px between field groups, and 12px panel padding. Reuse `--form-label-gap`,
 `--form-field-gap`, and `--form-panel-padding` through `form-compact`.
@@ -542,6 +660,30 @@ Returning to a form restores its own values; clearing a field clears only that
 form's value. This supersedes EXTRA-080's identity-sharing behavior (EXTRA-082).
 Keep state in memory only — no `localStorage`, cookies or server writes —
 and in scope of the card, so a reload starts clean.
+
+## Public offers catalog — EXTRA-085
+
+`/ofertas` uses the same public design as Home: the shared `HomeNavbar` in its
+`alwaysVisible` variant (emblem, identity, Inicio, Ofertas, and Mi cuenta only
+when there is a session) over a primary-green header band with an uppercase
+eyebrow, a Sora `h1` and the intermediary notice. The body keeps the 1280px
+inner width and a `minmax(0,1fr)_20rem` grid: search panel, results and
+pagination on the left, a sticky aside with the candidate CTA and the
+in-office help card on the right.
+
+- Keep the session entry inside `nav[aria-label="Accesos principales"]` with the
+  label and destination from `getAccountAccess()`; the acceptance suite asserts
+  it on `/ofertas`, and anonymous visitors must still see "Iniciar sesión".
+- Use `TextField`, `SelectField` and `Button`/`buttonVariants` for the search
+  panel so labels, underlined controls, 44px targets and focus stay municipal.
+  The filters remain native `select` elements: the browser suite drives them
+  with `selectOption`. Keep the "no disponible" option for a retired filter value.
+- Offer links stay inside `<li>` elements, and the empty, filtered, invalid and
+  out-of-range states keep their literal Spanish copy.
+- Never rename the combobox popup to the field name: the popup renders
+  `role="dialog"` and the list `role="listbox"`, and both need an accessible
+  name (`Elegir <campo>` / `<campo>: opciones`) that does not duplicate the
+  trigger's, or queries and screen readers see two identically named controls.
 
 ## Shared account workspace
 

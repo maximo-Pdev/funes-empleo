@@ -1,7 +1,7 @@
 "use client";
 import { useId, useState, type ChangeEvent } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { Field } from "@/components/forms/field";
+import { InputVisibilityToggle } from "@/components/forms/input-visibility-toggle";
 
 type PasswordFieldProps = {
   name: "password" | "confirmation";
@@ -31,12 +31,7 @@ export function PasswordField({ name, label, autoComplete, help, defaultValue }:
         required minLength={6} maxLength={128} autoComplete={autoComplete}
         onChange={updateConfirmationValidity}
         className="min-w-0 w-full rounded border border-slate-500 bg-white p-3" />
-      <button type="button" aria-controls={inputId} aria-pressed={visible}
-        aria-label={`${visible ? "Ocultar" : "Mostrar"} ${description}`}
-        onClick={() => setVisible(previous => !previous)}
-        className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded border border-brand-text bg-brand-text p-3 text-white hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-        {visible ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
-      </button>
+      <InputVisibilityToggle inputId={inputId} description={description} visible={visible} onToggle={() => setVisible(previous => !previous)} />
     </div>
   </Field>;
 }

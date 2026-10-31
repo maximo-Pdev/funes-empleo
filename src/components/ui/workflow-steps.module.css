@@ -1,0 +1,47 @@
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  position: relative;
+  display: grid;
+  flex: 1 1 8rem;
+  min-width: 0;
+  gap: .375rem;
+  align-content: start;
+  color: var(--color-muted-foreground);
+}
+.step::after {
+  content: "";
+  position: absolute;
+  top: 1.125rem;
+  left: 3rem;
+  right: 0;
+  height: 2px;
+  background: var(--color-border);
+}
+.step:last-child::after { display: none; }
+.circle {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-muted);
+  font-weight: 700;
+}
+.label { overflow-wrap: anywhere; font-size: .875rem; font-weight: 600; }
+.status { font-size: .75rem; }
+.step[data-state="completed"] .circle {
+  color: var(--color-primary-foreground);
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+.step[data-state="completed"]::after { background: var(--color-primary); }
+.step[data-state="current"] { color: var(--color-foreground); }
+.step[data-state="current"] .circle { border-color: var(--color-primary); background: var(--color-secondary); color: var(--color-primary); }

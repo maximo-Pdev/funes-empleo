@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { candidateRegistrationSchema } from "@/validation/candidate-registration";
 import { candidateProfileSchema } from "@/validation/candidate-profile";
@@ -27,7 +27,7 @@ const categoryB = "0a000000-0000-4000-8000-000000000002";
 describe("autogestión candidata", () => {
   it("normaliza el DNI y exige los campos mínimos del autorregistro", () => {
     expect(candidateRegistrationSchema.parse({ name: " Persona Ficticia ", dni: "90.000.001",
-      email: "test@example.invalid", password: "Fictitious-123", confirmation: "Fictitious-123" }).dni).toBe("90000001");
+      email: "test@example.invalid", password: "Fictitious-123", confirmation: "Fictitious-123", termsAccepted: true, termsVersion: "demo-terms-draft-1" }).dni).toBe("90000001");
     expect(candidateRegistrationSchema.safeParse({ name: "A", dni: "abc", email: "invalid", password: "1" }).success).toBe(false);
     render(<CandidateRegistrationForm />);
     expect(screen.getByLabelText("Nombre y apellido")).toBeTruthy();
@@ -65,8 +65,10 @@ describe("autogestión candidata", () => {
     expect(dni).toHaveProperty("type", "password");
     expect(new FormData(form).get("dni")).toBe("90000002");
     expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Categoría A")).toHaveProperty("checked", true);
-    expect(screen.getByLabelText("Categoría B")).toHaveProperty("checked", true);
+    const tags = screen.getByRole("list", { name: "Categorías seleccionadas" });
+    expect(tags.textContent).toContain("Categoría A");
+    expect(tags.textContent).toContain("Categoría B");
+    expect(new FormData(form).getAll("categories")).toEqual([categoryA, categoryB]);
     expect(screen.queryByText(/no es texto municipal aprobado/i)).toBeNull();
     expect(screen.queryByRole("button", { name: "Activar perfil" })).toBeNull();
     expect(screen.queryByRole("button", { name: /archivar|eliminar perfil/i })).toBeNull();
@@ -84,6 +86,27 @@ describe("autogestión candidata", () => {
     expect(screen.getByLabelText(/Confirmo que quiero retirar/)).toHaveProperty("required", true);
     render(<CandidateApplyForm openingId={categoryB} candidateVersion={2} disabled={true} />);
     expect(screen.getByRole("button", { name: "Postularme" })).toHaveProperty("disabled", true);
+  });
+
+  it("continúa al panel correcto tras una postulación multipart sin permitir duplicados", async () => {
+    const request = vi.spyOn(globalThis, "fetch").mockResolvedValue({ ok: true, json: async () => ({ success: true }) } as Response);
+    try {
+      render(<CandidateApplyForm openingId={categoryB} candidateVersion={2} disabled={false} generalCvName="cv-general-ficticio.pdf" participationsHref="/account?section=postulaciones&oferta=oferta-ficticia" />);
+      expect(screen.getByText(/cv-general-ficticio.pdf/)).toBeTruthy();
+      const button = screen.getByRole("button", { name: "Postularme" });
+      const form = button.closest("form")!;
+      fireEvent.submit(form);
+      await waitFor(() => expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true));
+      expect(request).toHaveBeenCalledOnce();
+      const [url, options] = request.mock.calls[0]!;
+      expect(url).toBe("/api/candidate/applications");
+      expect(options?.method).toBe("POST");
+      const payload = options?.body as FormData;
+      expect(payload.get("openingId")).toBe(categoryB);
+      expect(payload.get("candidateVersion")).toBe("2");
+      expect(screen.getByRole("link", { name: "Ver mis postulaciones" }).getAttribute("href")).toBe("/account?section=postulaciones&oferta=oferta-ficticia");
+      expect(screen.queryByLabelText("CV específico para esta oferta (opcional)")).toBeNull();
+    } finally { request.mockRestore(); }
   });
 
   it("rechaza un PDF dañado o con acción ejecutable sin sustituir un CV vigente", () => {

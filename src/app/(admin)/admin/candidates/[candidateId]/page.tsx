@@ -16,6 +16,7 @@ import { SafetyDecisionForm } from "@/features/participations/components/safety-
 import { InternalNoteForm } from "@/features/participations/components/internal-note-form";
 import { recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
+import { recordReference } from "@/lib/records/references";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   const candidateId = await pageRecordIdentifier("candidate", reference, `/admin/candidates/${reference}`, await searchParams);
   const { cv } = await searchParams;
   const { candidate, currentCv, referralEligible, participations, notes, audit, nextAuditCursor } = await getAdminCandidate(candidateId);
+  const courseReference = await recordReference("candidate", candidate.id);
 
   const assisted = candidate.origin === "assisted";
   const maintenance = assisted && !candidate.account_id && candidate.status !== "archived" && !candidate.archived_at
@@ -63,7 +65,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
 
   return <AdminShell email={user?.email} active={assisted ? "/admin/atencion-presencial" : "/admin/candidates"} title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
-    navigation={[{ href: assisted ? "/admin/atencion-presencial" : "/admin/candidates", label: assisted ? "Volver a perfil asistido" : "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }]}>
+    navigation={[{ href: assisted ? "/admin/atencion-presencial" : "/admin/candidates", label: assisted ? "Volver a perfil asistido" : "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }, { href: `/admin/courses?candidate=${encodeURIComponent(courseReference)}`, label: "Cursos y derivaciones" }]}>
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
       {editable && <AssistedProfileForm key={`assisted-profile:${candidateId}:${editable.profile.version}`} candidateId={candidateId}

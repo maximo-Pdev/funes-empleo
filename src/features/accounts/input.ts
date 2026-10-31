@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { passwordConfirmationSchema, passwordSchema } from "@/validation/password";
+import { registrationTermsSchema } from "./legal-terms";
 
 // Account-specific input contracts; shared normalization/catalogs remain owned by T019.
 export const credentialsInput = z.object({
   email: z.email().max(320).transform((value) => value.trim().toLowerCase()),
   password: passwordSchema,
 });
-export const registrationInput = credentialsInput.extend({ role: z.enum(["candidate", "company"]) }).and(passwordConfirmationSchema);
+export const registrationInput = credentialsInput.extend({ role: z.enum(["candidate", "company"]), ...registrationTermsSchema.shape }).and(passwordConfirmationSchema);
 export const emailInput = credentialsInput.pick({ email: true });
 export const passwordInput = passwordConfirmationSchema;
 export const accountCommandInput = z.object({

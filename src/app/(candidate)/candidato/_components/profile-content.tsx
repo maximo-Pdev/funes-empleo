@@ -3,12 +3,13 @@ import { recordReference } from "@/lib/records/references";
 import { UserRound } from "lucide-react";
 import { Card } from "@/components/ui";
 import type { getCandidateWorkspace } from "@/features/candidates/profile-service";
-import { getDemoConsentPolicy } from "@/features/candidates/consent-service";
+
 import { CandidateProfilePanel } from "@/features/candidates/components/candidate-profile-panel";
 
-export async function renderCandidateProfileContent({ workspace, cvMessage, cvReturnTo }: {
+export async function renderCandidateProfileContent({ workspace, cvMessage, cvReturnTo, privacyHref, photoState: existingPhotoState }: {
   workspace: Awaited<ReturnType<typeof getCandidateWorkspace>>;
-  cvMessage?: string; cvReturnTo?: string;
+  cvMessage?: string; cvReturnTo?: string; privacyHref?: string;
+  photoState?: { photo: { id: string } | null; unavailable: boolean };
 }) {
   if (workspace.bootstrap !== "ready" || !workspace.profile) {
     const message = workspace.bootstrap === "pending_in_person_claim" ?
@@ -21,15 +22,15 @@ export async function renderCandidateProfileContent({ workspace, cvMessage, cvRe
   // Photos are optional: a missing migration or temporary photo outage must not
   // prevent access to the existing personal data, CV and consent forms.
   const photoState = Promise.all([
-    getCandidatePhoto(workspace.profile.id), getPhotoCleanupPending(workspace.profile.id),
-  ]).then(([photo, cleanupPending]) => ({ photo, cleanupPending, unavailable: false }))
+    existingPhotoState ? Promise.resolve(existingPhotoState) : getCandidatePhoto(workspace.profile.id).then(photo => ({ photo, unavailable: false })), getPhotoCleanupPending(workspace.profile.id),
+  ]).then(([photo, cleanupPending]) => ({ photo: photo.photo, cleanupPending, unavailable: photo.unavailable }))
     .catch(() => ({ photo: null, cleanupPending: false, unavailable: true }));
-  const [policy, photos] = await Promise.all([getDemoConsentPolicy(), photoState]);
+  const photos = await photoState;
   return <>
     <CandidateProfilePanel profile={workspace.profile} dni={workspace.privateData.dni_display}
       address={workspace.privateData.address} phone={workspace.contacts.find((item) => item.kind === "phone")?.value ?? null}
       categories={workspace.allCategories} selectedCategories={workspace.categories.map((item) => item.category_id)}
-      consent={workspace.consent} cv={workspace.cv} cvReference={workspace.cv ? await recordReference("cv", workspace.cv.id) : undefined} policy={policy}
+      consent={workspace.consent} cv={workspace.cv} cvReference={workspace.cv ? await recordReference("cv", workspace.cv.id) : undefined} privacyHref={privacyHref}
       photo={photos.photo} photoCleanupPending={photos.cleanupPending} photoUnavailable={photos.unavailable} cvMessage={cvMessage} cvReturnTo={cvReturnTo} />
   </>;
 }

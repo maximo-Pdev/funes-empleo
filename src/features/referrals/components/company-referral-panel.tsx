@@ -1,3 +1,4 @@
+import { WorkflowSteps } from "@/components/ui/workflow-steps";
 import { formatFunesDateTime } from "@/lib/time/presentation";
 import { availabilityLabel, interviewStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { availabilityTones, interviewStatusTones, statusTone } from "@/domain/presentation/status-tone";
@@ -16,8 +17,23 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
       <p className="mt-2 text-sm text-slate-700">Oferta: {referral.openingTitle ?? "Oferta sin título"}</p>
       <p className="text-sm text-slate-700">Fecha de derivación: {formatFunesDateTime(referral.referredAt, { seconds: false })}</p>
       {referral.hiredCandidate && <p className="mt-4 font-semibold">Contratado</p>}
+      <WorkflowSteps label="Etapas de la derivación" steps={[
+        { label: "Derivación municipal", state: "completed" },
+        { label: "Respuesta empresarial", state: referral.feedback?.length ? "completed" : referral.hiredCandidate ? "pending" : "current" },
+        { label: "Confirmación municipal", state: referral.hiredCandidate || referral.feedback?.length ? "current" : "pending" },
+      ]} />
+      {!referral.hiredCandidate && <>
+        <p className="mt-4 text-sm">Revisá la derivación e informá tu decisión a la Oficina. Si no contratás, explicá el motivo en el detalle del informe. La Oficina confirma el resultado final.</p>
+        <nav aria-label="Acciones de la derivación" className="flex flex-wrap gap-4">
+          <a href="#company-feedback" className="inline-flex min-h-11 items-center text-primary underline">Informar resultado</a>
+          {candidate && <a href="#referred-profile" className="inline-flex min-h-11 items-center text-primary underline">Revisar perfil derivado</a>}
+        </nav>
+        <div id="company-feedback" tabIndex={-1} className="mt-4 scroll-mt-24">
+          <FeedbackForm openingId={openingId} referralId={referral.referralId} />
+        </div>
+      </>}
       {candidate ? (
-        <div className="mt-6 space-y-5">
+        <div id="referred-profile" tabIndex={-1} className="mt-6 scroll-mt-24 space-y-5">
           <div>
             <h3 className="text-lg font-semibold">Perfil laboral derivado</h3>
             <dl className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -45,9 +61,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
           {referral.hiredCandidate ? "La contratación fue confirmada. Se conserva únicamente el nombre; el perfil, los contactos y el CV ya no están disponibles." : candidateName ? "El acceso al perfil de esta persona finalizó. Se conserva únicamente su nombre para identificar esta derivación; sus contactos, foto y CV ya no están disponibles." : "El acceso al perfil de esta persona finalizó. No hay un nombre disponible para identificar esta derivación. Consultá a la Oficina de Empleo antes de informar un resultado."}
         </p>
       )}
-      {!referral.hiredCandidate && <div className="mt-6">
-        <FeedbackForm openingId={openingId} referralId={referral.referralId} />
-      </div>}
+
     </section>
   );
 }
