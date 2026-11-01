@@ -5,6 +5,8 @@
 Mateo solicita publicar los cambios acumulados112–119. Rama
 feat/desktop-layout-polish sobre main71a758e, fetch sin divergencia. Se excluye
 next-env.d.ts ajeno, conservado por SHA256; sin firmas/signoff/coautoría añadida.
+Commit de implementación:1da5c6a (sin firma). El PR vinculará esta revisión del
+código y el registro posterior de evidencia; no hay merge o aceptación implícitos.
 Verificación final:1624 pruebas/136 archivos PASS con cobertura100% del alcance
 configurado (solo src/lib/env/schema.ts, no cobertura global).64 tooling y
 tipos/lint/build documentados en119; cinco E2E de matching completos PASS tras
