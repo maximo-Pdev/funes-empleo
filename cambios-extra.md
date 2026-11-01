@@ -1,5 +1,42 @@
 # Cambios extra necesarios
 
+## PR88-CI-SESSION-01 — Preparación aislada de vencimiento, 01/11/2026
+
+- **Origen/evidencia:** Mateo pide reparar GitHub. Quality221/41340592318 en
+  03f38ba: database, tipos/lint/tooling/cobertura/build PASS;145 E2E PASS y uno
+  falla en session-navigation42 por cookie ausente tras renovar admin/public.
+  Logs409 conflict de Auth muestran renovaciones concurrentes; ocho dependientes
+  no corrieron. La prueba altera expires_at mientras sigue montado /admin, con
+  navegación/prefetch activo. No se ha probado ese fallo sin alteración artificial.
+- **Cambio antes de implementar:** dejar la pestaña en about:blank antes de
+  manipular su cookie ficticia, conservar el mismo contexto y comprobar expires_at=1
+  antes de entrar a la ruta bajo prueba. Así esa navegación provoca la renovación,
+  sin solicitudes de la página anterior usando la cookie manipulada. Mantener
+  chequeos de renovación real, no-store, tres roles, enlaces, recarga, otra pestaña,
+  logout y denegación posterior; sin retries, sleeps, timeout extra o mocks de Auth.
+- **Evidencia técnica:** guía oficial SSR de Supabase advierte sobre cookies y
+  prefetch concurrente: https://supabase.com/docs/guides/auth/server-side/advanced-guide.
+  auth-js instalado quita la sesión tras refresh no reintentable si expires_at
+  ya venció; el test lo fuerza a1 aunque su JWT siga vigente. Hipótesis acotada
+  de preparación, no autorización para cambiar producción o privacidad.
+- **Archivos/contratos/riesgos:** solo tests/e2e/session-navigation.spec.ts y
+  ledger T295/evidencia. La prueba no debe perder su vencimiento efectivo ni
+  simular una sesión renovada. Sin RPC/esquema/dependencia/variable/configuración.
+- **Verificación prevista/estado:** ejecutar seis recorridos locales reales y
+  repetir preparación admin/public sin reintentos, observar ausencia de409 en esa
+  fase; tipos/lint/pruebas y build requeridos, nueva CI completa en PR88. Usar
+  solo QA propio54341/3001, sin reset habitual/alojado. Propuesto antes de código;
+  autorizado por reparación solicitada y AGENTS.md, revisión humana pendiente.
+- **Resultado local:** seis recorridos repetidos tres veces:18/18 PASS en1,8min,
+  cero reintentos/omisiones, con renovación real y logout/otra pestaña conservados.
+  Sin409/conflict de Auth en la salida del servidor capturada durante esas fases;
+  siguen mensajes de stream cerrado por navegaciones abortadas, sin fallo de caso.
+  38 regresiones de sesión/proxy/login activo PASS; tipos/lint y build QA PASS.
+  La suite1627/136 y database ya pasaban en221; no se atribuyen a una nueva corrida
+  local completa. Solo cuatro líneas de preparación del test, sin código productivo.
+  next-env ajeno intacto, sin reset o SQL alojado. Subir corrección sin firma al
+  mismo PR88 y esperar nueva CI completa; revisión humana permanece pendiente.
+
 ## PR88-MAIN-01 — Integración de main8a0596e, 01/11/2026
 
 - **Origen/evidencia:** Mateo muestra cinco conflictos del PR88. Tras fetch,

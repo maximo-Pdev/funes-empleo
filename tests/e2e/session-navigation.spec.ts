@@ -36,7 +36,11 @@ for (const account of [
   for (const entry of ["public", "private"] as const) {
     test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page, browser }) => {
       await loginFixture(page, account.role);
+      // Stop the previous page's prefetch before editing its session cookie.
+      // The requested entry route must perform the forced refresh itself.
+      await page.goto("about:blank");
       await expireStoredSession(page.context());
+      expect((await sessionCookie(page.context())).expiresAt).toBe(1);
       const response = await page.goto(entry === "public" ? "/ofertas" : account.href);
       expect(response?.headers()["cache-control"]).toContain("no-store");
       const refreshed = await sessionCookie(page.context());

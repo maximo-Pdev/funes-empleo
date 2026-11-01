@@ -5,6 +5,12 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T295 Reparar preparación artificial de vencimiento en sesión E2E de PR88/
+  Quality221: salir de la página con prefetch antes de alterar cookie y comprobar
+  vencimiento previo a renovación. Conservar seis contratos por rol/entrada,
+  permisos y logout;18 E2E sin reintentos/omisiones,38 regresiones, tipos/lint/build
+  PASS. Sin auth productiva/SQL/retries nuevos; nueva CI completa posterior.
+
 - [x] T294 Integrar main8a0596e/PR89 en PR88, conservar bitácoras, tarjeta
   reutilizable y ruta autenticada EXTRA118; verificar ambos contratos por rol,
   visual, tipos/lint/unit/tooling/build y ausencia de conflictos con main.

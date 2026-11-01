@@ -1,5 +1,18 @@
 # Estado de implementación — 2026-09-22
 
+## Preparación de sesión E2E del PR88 — 01/11/2026
+
+Quality221/03f38ba pasa database, tipos/lint/tooling/cobertura/build y145 E2E,
+pero falla admin/public al perder la cookie tras refresh409 concurrente. El test
+vencía almacenamiento mientras /admin seguía haciendo prefetch. Se detiene esa
+página en about:blank antes de modificar la misma cookie y se exige expires_at=1
+antes de la navegación que debe renovarla. Sin tocar auth productiva, permisos,
+timeout, retries o navegación posterior; no demuestra un fallo sin manipulación.
+18/18 recorridos (seis por tres),38 regresiones y tipos/lint/build QA PASS;
+sin409 en salida de servidor capturada, cero omisiones/reintentos. PR88-CI-SESSION-01
+registra hipótesis, evidencia SDK/docs y límites. T295 verificada técnicamente;
+publicación y nueva CI completa posteriores. Sin SQL/reset habitual/alojado.
+
 ## Integración de PR89 en PR88 — 01/11/2026
 
 main avanza71a758e→8a0596e por PR89 y produce cinco conflictos de texto sobre
