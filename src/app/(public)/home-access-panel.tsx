@@ -112,10 +112,10 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
       <section className={`${styles.panel} surface-bevel form-compact`}
         id="acceso" tabIndex={-1} aria-label="Acceso al portal" data-mode={mode} style={panelHeight ? { height: panelHeight } : undefined}>
         <div ref={contentRef} className={styles.panelContent} data-access-key={mode === "login" ? "login" : role}>
-          <div className={styles.modes} role="group" aria-label="Opciones de acceso">
+          {!authenticated && <div className={styles.modes} role="group" aria-label="Opciones de acceso">
             <button type="button" aria-pressed={mode === "login"} onClick={() => { rememberValues(); setMode("login"); setSent(null); onViewChange?.("login"); }}>Iniciar sesión</button>
-            {!authenticated && <button type="button" aria-pressed={mode === "register"} onClick={() => { rememberValues(); setMode("register"); setSent(null); onViewChange?.(role); }}>Registrarse</button>}
-          </div>
+            <button type="button" aria-pressed={mode === "register"} onClick={() => { rememberValues(); setMode("register"); setSent(null); onViewChange?.(role); }}>Registrarse</button>
+          </div>}
           {mode === "register" && !sent && (
             <fieldset className={styles.roles}>
               <legend className="sr-only">Tipo de cuenta</legend>
@@ -129,7 +129,7 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
           <div className={styles.form}>
             {mode === "login" ? authenticated
               ? <>
-                <p role="status" className={styles.sessionMessage}><Info size={16} aria-hidden="true" />Ya tenés la sesión iniciada</p>
+                <p role="status" className={styles.sessionMessage}><Info size={16} aria-hidden="true" />Tu sesión está activa. Continuá desde tu panel.</p>
                 {panelHref && <div className={styles.sessionActions}>
                   <HomeAccountNav href={panelHref} label={panelLabel} />
                 </div>}

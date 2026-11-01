@@ -34,6 +34,10 @@ OQ-010 sigue abierta para equivalencias históricas y ocupaciones no aprobadas.
   móvil/escritorio, sesión renovada y checks de calidad. Sustituye solo el hero
   activo conservado en deltas anteriores; las demás reglas de acceso siguen vigentes.
 
+Integración PR89: su refinamiento de31/10 permanece en HomeAccessPanel reutilizable
+(mensaje gris y sin pestañas si se monta autenticado). No repone ese componente
+en la ruta Home con sesión activa; HN1 sigue omitiendo el hero completo.
+
 ## EXTRA117 — Pie del menú sin superposición
 
 - **SB1:** Cuenta y demás enlaces no quedan tapados por Cerrar sesión o identidad.
@@ -457,8 +461,12 @@ de Funes y la visibilidad inicial actual. La navbar ofrece Ingresar hacia el
 recuadro existente o Mi cuenta hacia el panel correspondiente si hay sesión activa.
 El hero conserva el contenido restante y el fondo animado.
 
-Con sesión activa verificada, el modo Iniciar sesión muestra “Ya tenés la sesión
-iniciada” sin otro formulario de login. El servidor impide otro inicio de sesión
+El componente de acceso reutilizable, si se monta con sesión activa verificada,
+muestra “Tu sesión está activa. Continuá desde
+tu panel.” en gris, sin el contenedor de pestañas de acceso ni otro formulario de
+login (refinamiento solicitado por Máximo el 2026-10-31, EXTRA-112 de PR89).
+EXTRA118 sustituye su montaje en Home autenticada por la sección de ofertas.
+El servidor impide otro inicio de sesión
 antes de autenticar credenciales nuevas. La solicitud de Máximo del 2026-10-27
 reemplaza la disponibilidad anterior de autorregistro con sesión: Home oculta
 el registro y sus accesos cuando hay una sesión activa verificada, incluso ante
@@ -469,8 +477,8 @@ sin repetir “Completá este campo.”. Se conservan errores útiles de formato
 confirmación y servidor, validaciones y semántica accesible. Trazabilidad EXTRA-052.
 
 **Refinamiento autorizado de portada, 2026-10-23:** Máximo solicita retirar Mi
-perfil del cuadrante izquierdo y colocar “Ir al panel de usuario” debajo de
-“Ya tenés la sesión iniciada”. El destino usa el panel vigente por rol y conserva
+perfil del cuadrante izquierdo y colocar “Ir al panel de usuario” debajo del
+mensaje de sesión activa (texto actualizado en EXTRA-112). El destino usa el panel vigente por rol y conserva
 la entrada de navegación accesible dentro del recuadro; ofertas y detalle no
 cambian. Ver ofertas disponibles se desplaza suavemente al cuadrante izquierdo
 al seleccionar Registrarse → Empresa y vuelve al salir de ese modo, sin movimiento

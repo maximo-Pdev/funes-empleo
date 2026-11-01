@@ -5,6 +5,12 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T294 Integrar main8a0596e/PR89 en PR88, conservar bitácoras, tarjeta
+  reutilizable y ruta autenticada EXTRA118; verificar ambos contratos por rol,
+  visual, tipos/lint/unit/tooling/build y ausencia de conflictos con main.
+  58 focales,1627/136 suite,64 tooling, seis visuales1440/390 y tipos/lint/build
+  PASS. next-env ajeno intacto; main ancestro. Publicación/nueva CI posteriores.
+
 - [x] T293 Corregir selectores ambiguos de Quality217/PR88 sin cambiar producto;
   probar estado vigente, CV y alta presencial con paginación real10+1, filtros y
   once consentimientos/altas ficticias sin duplicar. Tres E2E focales GREEN sin

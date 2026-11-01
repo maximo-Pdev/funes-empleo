@@ -1,5 +1,20 @@
 # Estado de implementación — 2026-09-22
 
+## Integración de PR89 en PR88 — 01/11/2026
+
+main avanza71a758e→8a0596e por PR89 y produce cinco conflictos de texto sobre
+2524942. Quality219 estaba verde (ambos jobs,1533 SQL,154 E2E), sin garantizar
+compatibilidad con main posterior. Integración conserva las dos bitácoras,
+HomeAccessPanel sin pestañas/mensaje gris y HomePage autenticada sin hero según
+EXTRA118. Prueba independiente del componente alimenta el visual de PR89;
+los tres roles mantienen pruebas de ruta/ofertas y de transición autenticada.
+Se aclara composición vs reutilización en spec/UI. Sin nueva regla/RPC/migración.
+58 focales, tipos/lint, build y seis composiciones1440/390 PASS; suite completa
+1627/136 y64 tooling PASS en instalación habitual con rutas físicas correctas.
+PR88-MAIN-01 registra limitaciones de junction/node-gyp y recuperación sin cambiar
+tests/dependencias. Ambos padres integrados, main ancestro y cero marcadores;
+next-env ajeno se conserva. Publicar en mismo PR88 y repetir CI; revisión/merge pendientes.
+
 ## Selectores E2E y páginas de diez del PR88 — 01/11/2026
 
 Quality217 pasa tipos/lint/tooling/cobertura/build y143 E2E, pero tres fallan

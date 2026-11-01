@@ -27,7 +27,7 @@ it.each([
   const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
   expect(within(navigation).getByRole("link", { name: /^Mi cuenta$/ }).getAttribute("href")).toBe(href);
   expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
-  expect(screen.queryByText("Ya tenés la sesión iniciada")).toBeNull();
+  expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
   expect(screen.queryByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeNull();
   expect(screen.getByRole("main").firstElementChild?.id).toBe("ofertas-disponibles");
   expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();

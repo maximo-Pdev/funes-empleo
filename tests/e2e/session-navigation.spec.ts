@@ -53,7 +53,7 @@ for (const account of [
         if (path === "/") {
           await expect(page.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeVisible();
           await expect(page.getByRole("region", { name: "Acceso al portal" })).toHaveCount(0);
-          await expect(page.getByText("Ya tenés la sesión iniciada", { exact: true })).toHaveCount(0);
+          await expect(page.getByText("Tu sesión está activa. Continuá desde tu panel.", { exact: true })).toHaveCount(0);
         }
         if (path !== "/") {
           await page.setViewportSize({ width: 320, height: 800 });

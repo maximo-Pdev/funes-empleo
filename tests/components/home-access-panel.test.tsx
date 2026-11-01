@@ -1,6 +1,9 @@
 import React from "react";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import homeStyles from "@/app/(public)/home.module.css";
 
 vi.mock("@/features/accounts/actions", () => ({
   loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(),
@@ -12,6 +15,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
 
 import HomePage from "@/app/(public)/page";
+import { HomeHero } from "@/app/(public)/home-hero";
 import { AuthForm } from "@/features/accounts/components/auth-form";
 import { CandidateRegistrationForm } from "@/features/candidates/components/candidate-registration-form";
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
@@ -62,7 +66,7 @@ describe("Home access panel", () => {
   ])("starts at offers with verified navbar access for an active %s", async (role, href) => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role, status: "active" } } as never);
     const view = render(await HomePage());
-    expect(screen.queryByText("Ya tenés la sesión iniciada")).toBeNull();
+    expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
     expect(view.container.querySelector("form")).toBeNull();
     expect(screen.getByRole("main").firstElementChild?.id).toBe("ofertas-disponibles");
     expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
@@ -74,6 +78,29 @@ describe("Home access panel", () => {
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
     expect(screen.queryByRole("radio")).toBeNull();
     expect(screen.queryByRole("button", { name: "Iniciar sesión" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+  });
+
+  it.each([
+    ["candidate", "/dashboard", "Ir al panel de usuario"],
+    ["company", "/empresa", "Ir al panel de empresa"],
+    ["admin", "/admin", "Ir al panel de administración"],
+  ])("keeps verified panel access in the reusable hero for an active %s", (role, href, label) => {
+    const view = render(<HomeHero authenticated panelHref={href} panelLabel={label} />);
+    const access = screen.getByRole("region", { name: "Acceso al portal" });
+    expect(within(access).getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+    expect(within(access).queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+    expect(within(access).queryAllByRole("button")).toHaveLength(0);
+    expect(access.querySelector("form")).toBeNull();
+    expect(within(access).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    const output = process.env.HOME_SESSION_FIXTURE_DIR;
+    if (output) {
+      const css = readFileSync("src/app/(public)/home.module.css", "utf8")
+        .replace(/\.([a-zA-Z_][\w-]*)/g, (selector, name: string) => homeStyles[name] ? `.${homeStyles[name]}` : selector)
+        .replace(/:global\(([^)]+)\)/g, "$1");
+      mkdirSync(output, { recursive: true });
+      writeFileSync(path.join(output, `${role}.json`), JSON.stringify({ html: view.container.innerHTML, css, href, label }));
+    }
   });
 
   it("suppresses repeated empty-field explanations in all homepage access forms", async () => {
@@ -262,7 +289,7 @@ describe("Home access panel", () => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status: "active" } } as never);
     render(await HomePage({ searchParams: Promise.resolve({ acceso: "suspendido" }) }));
     expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
-    expect(screen.queryByText("Ya tenés la sesión iniciada")).toBeNull();
+    expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
     expect(screen.queryByText("Acceso suspendido")).toBeNull();
   });
 

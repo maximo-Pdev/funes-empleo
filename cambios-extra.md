@@ -1,5 +1,56 @@
 # Cambios extra necesarios
 
+## PR88-MAIN-01 — Integración de main8a0596e, 01/11/2026
+
+- **Origen/evidencia:** Mateo muestra cinco conflictos del PR88. Tras fetch,
+  main incorpora PR89/8a0596e (tarjeta autenticada), sobre la misma base71a758e.
+  Quality219 de2524942 pasó ambos jobs,1533 SQL y154 E2E; eso no resuelve conflictos
+  con nuevos commits de main. next-env.d.ts ajeno se preserva por huella.
+- **Cambio previsto antes de resolver código:** integrar main sin reescribir
+  historia, conservar íntegros ambos registros de cambios y las mejoras de PR89
+  en HomeAccessPanel/CSS. EXTRA118 de Mateo,01/11, sigue gobernando la composición
+  de la ruta: omitir el hero autenticado y empezar en ofertas. La tarjeta reutilizable
+  conserva mensaje gris y ausencia de pestañas cuando se monta de forma independiente.
+- **Archivos/contratos:** cinco conflictos (cambios-extra y cuatro tests Home/
+  sesiones); mantener prueba visual de PR89 alimentada por HomeHero autenticado
+  directo y comprobar por separado HomePage sin hero para tres roles. Aclarar esa
+  distinción en spec/UI, sin cambiar plan/RPC/privacidad/negocio/dependencias.
+  EXTRA-112 de PR89 se identifica por título/PR para distinguirlo del catálogo112.
+- **Riesgo/verificación prevista:** evitar que expectativas antiguas vuelvan a
+  mostrar el hero o pierdan la nueva tarjeta reutilizable. Probar ambos contratos,
+  invitado, cambio de sesión y seis composiciones visuales; tipos/lint/unit/tooling/
+  build y CI completa posterior. Sin reset/migración ni aceptación humana implícita.
+- **Estado/autorización:** integración necesaria dentro del PR solicitado,
+  autorizada por AGENTS.md y los alcances ya pedidos; sin decisión municipal nueva.
+  Resolución/verificación pendientes; se trabaja en checkout aislado de2524942.
+- **Prerrequisito observado antes de verificar el visual:** el script de PR89
+  usa LOCALAPPDATA/hermes/cache/scratch, inexistente aquí (Test-Path=false).
+  Usar tmpdir de node:os con mkdtemp evita depender del equipo del autor, sin
+  dependencia/variable nueva. Afecta solo salida ficticia del script de pruebas;
+  verificar seis composiciones, color, enlaces, foco y ausencia de overflow.
+- **Diagnósticos de entorno:** build en worktree con node_modules como junction
+  rechaza ese enlace por salir de su raíz. Las mismas fuentes íntegramente copiadas
+  al área QA habitual compilan con configuración ficticia/sin base. Primera suite:
+  1626/1627 PASS; contrato next-eslint-glob exige ruta física del adaptador dentro
+  del checkout, incompatible con dependencias enlazadas al principal. Instalar
+  dependencias propias con npm ci y repetir sin modificar esa prueba o el producto.
+  Tipos/lint,58 focales y seis visuales del componente ya PASS; gates finales pendientes.
+- **Recuperación de la verificación:** npm ci aislado falla por node-gyp ausente
+  en el runtime temporal de npm; no cambia manifests/lockfiles del producto.
+  Guardar integración local sin publicar, avanzar la rama original por fast-forward
+  preservando next-env, y ejecutar allí la suite con su instalación existente.
+  Ese entorno conserva la ruta física exigida por el adaptador; no omitir la prueba.
+- **Resultado final:** integración local con padres2524942/8a0596e.1627 pruebas
+  unitarias/componentes en136 archivos y64 herramientas PASS, sin omitir el
+  contrato del adaptador; cobertura100% solo del alcance configurado env/schema.
+  Tipos/lint y build de fuentes integradas PASS;58 focales y seis composiciones
+  visuales1440/390 de tres roles PASS (gris, sin pestañas, foco/enlaces/overflow).
+  HomeAccessPanel coincide con main y HomePage conserva exactamente EXTRA118.
+  Ambas bitácoras preservadas; cinco conflictos sin marcadores y main ancestro.
+  next-env ajeno conserva su SHA256 original. Commit de integración sin firma;
+  publicar en PR88, comprobar estado de integración en GitHub y nueva CI pendiente.
+  No aplicar SQL, reiniciar servicios o acreditar revisión/merge del PR.
+
 ## Selectores E2E y paginación real del PR88 — 01/11/2026
 
 - **Origen/evidencia:** pedido de reparar GitHub; Quality217/41332470427 pasa
@@ -633,6 +684,19 @@ posteriores, no por estas verificaciones locales.
   nueva de este incremento, reset de base habitual o cambio alojado. next-env ajeno
   mantiene hash original; ningún dato real, secreto, dependencia o variable nueva.
   Recuperación y validación: docs/operations/public-offers-presentation.md.
+
+## EXTRA-112 (PR89) — Simplify the authenticated Home access card
+
+- Date: 2026-10-31.
+- Authorization / origin: Máximo requested hiding the entire login/registration tab container while signed in and replacing the active-session message with clearer gray text. This refines the approved session-aware Home access behavior (EXTRA-052 / EXTRA-053).
+- Problem / evidence: HomeAccessPanel hides only the registration button, leaving the login button and a vacant grid column. The generic informational-status rule colors the static session message blue.
+- Proposed change: omit the access-options group only for verified authenticated presentation; show “Tu sesión está activa. Continuá desde tu panel.” in the existing foreground-secondary gray. Preserve the decorative icon, status semantics and verified role-specific panel link.
+- Affected surfaces: Home access component and local CSS, component/session-navigation regressions, UI guidelines and the feature specification. No authentication, database, public component API or dependency contract changes.
+- Risks / recovery: anonymous tab behavior and other informational colors must remain unchanged. Recover by reverting this scoped presentation diff; no persisted data is affected.
+- Verification plan: observe focused failing tests before source changes; run focused regressions, lint, typecheck, production build, unit/tooling suites and DB-free desktop/mobile browser composition/color checks. Do not reset the shared database.
+- Implemented files: `src/app/(public)/home-access-panel.tsx`, `src/app/(public)/home.module.css`; updated Home access, registration-navigation and setup component regressions, `tests/e2e/session-navigation.spec.ts`, `docs/UI_GUIDELINES.md` and `specs/001-municipal-employment-portal/spec.md`. Added `tests/visual/home-active-session-check.mjs` for actual React markup/CSS composition without Auth or database access.
+- Verification: the initial focused run failed for all three active roles on the missing new copy; the focused regression run passed 78 tests. Final pinned Node 24.22.0 / npm 11.19.1 checks passed lint, typecheck, production build, 1,606 unit/component tests across 133 files (two workers), 60 Node tooling tests and `git diff --check`. Chromium composition passed all six desktop/mobile role cases, including gray text/icon `rgb(73, 80, 87)`, absent access-options group, keyboard-reachable role-specific panel link and no horizontal overflow. Evidence: Hermes scratch `home-quality-gates/` and `home-session-NKOMuC/`.
+- Limitations / status: implemented and locally verified; independent/product review pending. The first unconfigured build failed because the new worktree has no private environment; the successful build used explicitly fictitious compilation-only configuration with an unreachable Supabase URL, not live authentication. An initial combined gate command timed out; the final complete unit/tooling runs have persisted exit-zero receipts. DB-resetting E2E/database suites were not run, and their session-navigation assertions remain pending live integration. Existing jsdom canvas warnings were emitted without failing tests. No source edits to the other worktree, shared database reset, commit, PR, municipal acceptance or deployment claimed.
 
 
 ## PR86 documentation integration — current scope and historical evidence

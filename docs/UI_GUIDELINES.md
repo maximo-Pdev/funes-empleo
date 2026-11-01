@@ -10,6 +10,10 @@ registro existentes. Esta solicitud actual sustituye el hero activo antes reteni
 El título de cada oferta del carrusel es h2 cuando la sección es h1, y h3 cuando
 la sección anónima es h2. Conservar la apariencia y evitar saltos de encabezados.
 
+PR89 conserva la tarjeta reutilizable con mensaje gris y sin pestañas al montarla
+autenticada; ese contrato no implica mostrarla en Home, donde EXTRA118 omite todo
+el hero. Probar la ruta y el componente independiente sin mezclar expectativas.
+
 ## EXTRA117 — Altura del menú lateral
 
 En escritorio, el contenido del menú se desplaza dentro del espacio disponible
@@ -698,9 +702,15 @@ empty feedback collapsed without an icon. Static help and standalone forms retai
 their existing appearance. Registration's conditional verification notice is
 informational, not proof that an account or verification email was created.
 
-Resolve the active-session projection once on the server for both navbar and
-access panel. In login mode show “Ya tenés la sesión iniciada” instead of the
-form/recovery link when active; keep both registration roles enabled. The login
+Resolve the active-session projection once on the server. EXTRA118 omits the
+entire hero on authenticated Home; the following PR89 contract applies when the
+reusable access panel is mounted independently. With an active session, omit the
+entire access-options tab group
+and show “Tu sesión está activa. Continuá desde tu panel.” instead of the
+form/recovery link. Use `--color-foreground-secondary` gray for this static
+status message and its decorative icon, not the informational blue used for
+form responses. Hide registration entrances while active; both registration
+roles remain available to anonymous visitors. The login
 service must check the authoritative session before provider sign-in, returning
 the same safe feedback without sign-in, sign-out, redirect or revalidation when
 already active. Keep anonymous login and suspension cleanup intact.
