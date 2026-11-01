@@ -1,5 +1,24 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA120 — Composición local de Privacidad
+
+Separar el contenedor ancho accountActions del wrapper accountPassword de320px.
+CandidatePrivacyForm conserva API/hook/efectos y usa las primitivas existentes
+Card/Badge/Field/Button, más CSS module local: encabezado con estado textual,
+información izquierda y decisión de ancho legible a la derecha desde1280px;
+debajo de ese umbral, orden DOM y una columna. Altura natural, sin JS de medición.
+Texto/More information/policy actuales completos; no nueva copia legal o estado.
+Estilo destructivo existente solo en retirar. El feedback vacío no reserva espacio,
+pero mensajes/errores reales mantienen su rol/foco y validación compartida.
+
+Ruta→workspace/policy autenticados→CandidatePrivacyForm→consent action→servicio/
+DB→refresh permanecen iguales; no nuevas lecturas, endpoints o payloads. CSS no
+oculta condiciones de autorización. Recuperación por revert del delta visual,
+sin modificar eventos de consentimiento. Análisis CP1–CP4/constitución I–VI:
+presentación y contratos existentes, sin arquitectura/SQL ni decisión abierta nueva.
+Pruebas actuales de FormData/estados más navegador real readonly para geometría,
+details/confirmación vacía/foco y axe; verificar tipos/lint/tests/tooling/build.
+
 ## EXTRA119 — Retiro de datos con respaldo privado
 
 Migración transaccional20261101120000, sin RPC ni nuevo contrato de aplicación.

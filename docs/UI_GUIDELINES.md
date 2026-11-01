@@ -1,5 +1,15 @@
 # Municipal visual reference
 
+## EXTRA120 — Consentimiento del postulante
+
+En Cuenta > Privacidad, usar todo el ancho útil, sin el tope320px del enlace de
+contraseña. Tarjeta con encabezado/estado textual, explicación legible y decisión
+separada; dos columnas desde1280 y apilado natural por debajo. Sin igualar alturas
+artificialmente o limitar texto/scroll. Más información sigue plegado inicialmente.
+Conservar todos los textos actuales y sus efectos, confirmación explícita, errores/
+foco/pendiente y estado aceptado sin nueva aceptación. Retiro con Button destructivo
+existente; tokens/formularios del proyecto. No duplicar el formulario en Perfil.
+
 ## EXTRA118 — Primer bloque del inicio por sesión
 
 Home con panel activo verificado comienza en Ofertas disponibles: sin hero,

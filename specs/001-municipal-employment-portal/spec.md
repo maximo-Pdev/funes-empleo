@@ -1,5 +1,22 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA120 — Presentación del consentimiento del postulante
+
+Mateo confirma alcance visual01/11/2026; no cambia R4 de EXTRA094/102.
+
+- **CP1:** Cuenta > Privacidad aprovecha el ancho útil en PC, con lectura limitada
+  por longitud de línea y altura natural. El límite320px solo sigue en contraseña.
+- **CP2:** distinguir título/estado, información y decisión; Más información
+  conserva su apertura explícita y texto íntegro. En móvil apilar sin overflow,
+  alturas fijas, contenido recortado o scroll interno.
+- **CP3:** conservar textos/reglas y ubicación, aceptación una vez y retiro
+  manual explícito. Checkbox requerido inicialmente desmarcado, formulario/acciones/
+  campos y versión iguales; feedback, foco, estado pendiente y refresh intactos.
+  El retiro usa el estilo destructivo compartido; no duplicar aceptación vigente.
+- **CP4:** verificar pendiente/aceptado/retirado, desktop1920/1366 y móvil390/320,
+  teclado/errores/contraste y lectura completa. Perfil mantiene su enlace existente
+  a Cuenta; no cambia política legal, consentimiento operativo, permisos o datos.
+
 ## EXTRA119 — Retiro operativo de categorías ficticias
 
 Mateo,01/11/2026: eliminar A/B quitando asignaciones y conservando respaldo.
