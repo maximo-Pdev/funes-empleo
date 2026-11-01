@@ -1,4 +1,5 @@
 import { WorkflowSteps } from "@/components/ui/workflow-steps";
+import { CategoryLabel } from "@/components/job-category-label";
 import { formatFunesDateTime } from "@/lib/time/presentation";
 import { availabilityLabel, interviewStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { availabilityTones, interviewStatusTones, statusTone } from "@/domain/presentation/status-tone";
@@ -42,7 +43,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
               <div><dt className="font-semibold">Experiencia y habilidades</dt><dd className="whitespace-pre-wrap">{candidate.skillsExperienceSummary ?? "No informadas"}</dd></div>
             </dl>
             <h4 className="mt-4 font-semibold">Categorías laborales</h4>
-            {candidate.categories.length ? <ul className="list-disc pl-6">{candidate.categories.map((category, index) => <li key={`${category.name}-${index}`}>{category.name}</li>)}</ul> : <p>No se informaron categorías.</p>}
+            {candidate.categories.length ? <ul className="list-disc pl-6">{candidate.categories.map((category, index) => <li key={`${category.name}-${index}`}><CategoryLabel name={category.name} /></li>)}</ul> : <p>No se informaron categorías.</p>}
           </div>
           <div>
             <h3 className="text-lg font-semibold">Contactos vigentes</h3>

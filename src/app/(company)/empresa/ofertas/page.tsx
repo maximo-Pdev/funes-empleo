@@ -1,4 +1,5 @@
 import { publicModalityLabel } from "@/features/openings/public-offer-display";
+import { CategoryLabels } from "@/components/job-category-label";
 import { formatCalendarDate } from "@/lib/time/presentation";
 import { openingStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { openingStatusTones, statusTone } from "@/domain/presentation/status-tone";
@@ -24,7 +25,7 @@ export default async function CompanyOffersPage({ searchParams }: { searchParams
         <div className="mt-3 space-y-2 text-sm text-muted-foreground">
           <p>Localidad: {offer.location || "Sin definir"}</p>
           <p>Modalidad: {offer.modality ? publicModalityLabel(offer.modality) : "Sin definir"} · Vacantes: {offer.vacancies ?? "Sin definir"}</p>
-          <p>Rubros: {offer.categories.map(category => category.name).join(", ") || "Sin definir"}</p>
+          <p>Rubros: <CategoryLabels categories={offer.categories} fallback="Sin definir" /></p>
         </div>
 
         {offer.history.at(-1)?.message && <div className="mt-5 rounded-lg border border-border bg-surface-muted p-4"><p className="flex items-center gap-2 text-sm font-semibold text-primary-900"><MessageSquare className="h-4 w-4" aria-hidden="true" />Mensaje de la Oficina</p><p className="mt-2 break-words text-sm leading-6">{offer.history.at(-1)?.message}</p></div>}

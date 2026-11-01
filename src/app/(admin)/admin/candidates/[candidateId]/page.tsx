@@ -1,4 +1,5 @@
 import { formatFunesDate, formatFunesDateTime } from "@/lib/time/presentation";
+import { CategoryLabels } from "@/components/job-category-label";
 import { pageRecordIdentifier } from "@/lib/records/page-references";
 import { RecordLink as Link, RecordAnchor } from "@/components/ui/record-link";
 import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel } from "@/domain/presentation/labels";
@@ -46,7 +47,7 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
         <p className="flex flex-wrap items-center gap-2">Disponibilidad <Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></p>
         <p>Vigencia hasta: {candidate.refresh_due_at ? formatFunesDate(candidate.refresh_due_at) : "Sin definir"}</p>
         <p>Habilidades: {candidate.skills_experience_summary ?? "Sin informar"}</p>
-        <p>Categorías: {candidate.candidate_categories.map((item) => item.job_categories?.name).filter(Boolean).join(", ") || "Sin categorías"}</p>
+        <p>Categorías: <CategoryLabels categories={candidate.candidate_categories.flatMap(item => item.job_categories?.name ? [{ name: item.job_categories.name }] : [])} fallback="Sin categorías" /></p>
       </section>;
   const candidateCv = candidate.status !== "archived" && <section aria-labelledby="candidate-cv" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
         <h2 id="candidate-cv" className="text-xl font-semibold">CV PDF del candidato</h2>

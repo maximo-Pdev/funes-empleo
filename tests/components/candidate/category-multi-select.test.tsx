@@ -7,6 +7,23 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: 
 vi.mock("@/features/candidates/assisted-actions", () => ({ saveAssistedAction: vi.fn(), assistedCommandAction: vi.fn() }));
 vi.mock("@/features/candidates/claim-actions", () => ({ claimAssistedAction: vi.fn() }));
 
+it("decorates options and tags without changing selection names or transport", async () => {
+  const catalog = [{ id: "agro-id", name: "Agro" }, { id: "food-id", name: "Gastronomía y hotelería" }];
+  const { container } = render(<Form><CategoryMultiSelect categories={catalog} defaultSelected={["agro-id"]} required /></Form>);
+  const tags = screen.getByRole("list", { name: "Categorías seleccionadas" });
+  expect(tags.querySelector("svg.lucide-wheat[aria-hidden='true']")).not.toBeNull();
+  fireEvent.click(screen.getByRole("combobox", { name: "Categorías laborales" }));
+  const option = await screen.findByRole("option", { name: "Gastronomía y hotelería" });
+  expect(option.querySelector("svg.lucide-utensils[aria-hidden='true']")).not.toBeNull();
+  fireEvent.click(option);
+  fireEvent.keyDown(screen.getByRole("combobox", { name: "Buscar categoría" }), { key: "Escape" });
+  expect(new FormData(container.querySelector("form")!).getAll("categories")).toEqual(["agro-id", "food-id"]);
+  fireEvent.click(screen.getByRole("button", { name: "Quitar Agro" }));
+  fireEvent.click(screen.getByRole("button", { name: "Quitar Gastronomía y hotelería" }));
+  expect(container.querySelector<HTMLInputElement>("input[required]")!.validity.valueMissing).toBe(true);
+  expect(new FormData(container.querySelector("form")!).getAll("categories")).toEqual([]);
+});
+
 const categories = [
   { id: "0a000000-0000-4000-8000-000000000011", name: "Categoría ficticia A" },
   { id: "0a000000-0000-4000-8000-000000000012", name: "Categoría ficticia B" },

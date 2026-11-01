@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
+import { CategoryLabel } from "@/components/job-category-label";
 import { BriefcaseBusiness, Building2, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui";
 import {
@@ -22,7 +23,7 @@ function OfferCard({ offer }: { offer: PublicOffer }) {
           <div className={styles.offerTags} aria-label="Categorías laborales">
             {offer.categories.slice(0, 2).map(category => (
               <Badge key={category.id} variant="secondary">
-                <span className={styles.offerTagLabel}>{category.name}</span>
+                <CategoryLabel className={styles.offerTagLabel} name={category.name} />
               </Badge>
             ))}
           </div>
