@@ -1,5 +1,216 @@
 # Cambios extra necesarios
 
+## EXTRA-116 — Session-consistent shared navbar (2026-11-01)
+
+- Authorization: Maxi: "claro la distinción de cuando la sesión está iniciada
+  está bien, pero que sea consistente: si la sesión está iniciada que la navbar
+  sea igual en todas las páginas y si no está iniciada lo mismo. Pero si no está
+  iniciada tampoco podríamos ver los dashboards así que está bien".
+- Evidence: !alwaysVisible suppresses anonymous Ingresar on offers/courses;
+  public offers use profile/account destinations instead of panel destinations;
+  four authentication pages use an older header and terms has no shared navbar.
+- Scope: normal application pages use the actual HomeNavbar. Anonymous: Inicio,
+  Ofertas, Ingresar; authenticated: Inicio, Ofertas, notifications and Mi cuenta
+  leading to the same role panel. Preserve Home desktop scroll visibility,
+  current-page semantics, existing application links, session and route guards.
+- Implementation: use verified getSiteAccess panel projection at public/auth/legal
+  callers, keep AuthSurface presentational, reserve fixed-header clearance and
+  retain existing page contents. Minimal global-error/technical fallbacks remain
+  separate from ordinary page composition. No authentication or SQL changes.
+- Files/contracts: HomeNavbar, public offers/detail/terms, AuthSurface and four
+  auth pages; focused component/browser consumers and current UI/spec/plan notes.
+- Risk: shared navigation contract changes (panel destination and access controls);
+  RED/GREEN, non-reset lint/typecheck/build/unit/tooling, desktop/mobile guest
+  browser navigation and independent read-only verification. No reset/publishing.
+- Status: implemented locally. Normal public/auth/legal pages reuse HomeNavbar;
+  anonymous Ingresar no longer depends on alwaysVisible. All active-role navbars
+  use role-panel destinations and notifications. Existing guards, application
+  links, form behavior and Home scroll/timer logic are unchanged.
+- Verification: navbar RED 9 failures then21/21 GREEN; cross-page RED4 then4/4
+  GREEN; focused page regressions51/51 passed. Full unit suite1645/1645 passed
+  before the final fragment-focus hook; final affected43/43 passed afterwards.
+  Final lint/typecheck/build passed. Tooling60/60 passed (inputs unchanged).
+- Browser: final owned production-server probe passed30 scenarios at1366/360:
+  16 real guest-page checks,8 guarded anonymous denials and6 actual shared-navbar
+  SSR role fixtures for geometry (not live authenticated sessions). Ingresar
+  returns to Home at top and focuses #contenido; all controls fit with44px targets,
+  no horizontal overflow and zero mutations. Screenshots inspected/server stopped.
+  Initial client fragment navigation scrolled without focusing; a cancellable
+  Home-only frame now focuses the existing main after navigation. Keyboard
+  regression added to setup.spec.ts. No lint rules or assertions were weakened.
+- Independent final review passed with no EXTRA-116 blocker: final full suite
+  135 files/1645 tests passed, pinned parent/child Node24.22.0, and diff check
+  passed. Guard/session sources, SQL, dependencies and application href unchanged.
+  Reset-backed E2E and real authenticated browser journeys remain unrun to preserve
+  local data and credentials; independent review did not rerun browser geometry.
+  No commit, publication, migration, reset or account creation performed.
+
+## EXTRA-115 — Restore local candidate schema alignment (2026-11-01)
+
+- Authorization: Maxi explicitly answered "si autorizo" to applying the four
+  existing pending migrations only to local Supabase while preserving records.
+- Evidence: getCandidateWorkspace filters cv_documents.opening_id, absent locally;
+  exact read-only SQL reproduces column-not-found. Local ledger ends 20261028023000.
+- Origin: existing approved candidate dashboard, CV, notifications and retry flows.
+- Change: apply 20261028104205, 20261028210445, 20261028235316 and 20261029180304
+  using migration up --local, in timestamp order. No reset, seed, hosted operation,
+  source workaround, migration rewrite or generated-type rewrite.
+- Risk: schema, guards and future workflow behavior change; existing records must
+  remain byte-equivalent under their original columns. Capture server-side counts
+  and aggregate row fingerprints before/after without exposing personal values.
+- Verification: exact missing-column probe, ledger/catalog/RPC grant readback,
+  preservation comparison and independent read-only verification. Existing
+  authenticated browser verification depends on securely available test access.
+- Status: all four migrations applied successfully using migration up --local.
+  Immediate before/after comparison of 72 existing public/private/auth/storage
+  tables found identical record counts and aggregate row fingerprints under
+  original columns. Only newly added CV/participation columns were excluded from
+  comparisons. Migration source hashes and exact ledger delta matched.
+- Original failing CV query now succeeds. All seven workspace projections also
+  succeed as authenticated in a read-only transaction with LIMIT 0 (no personal
+  rows returned). Independent verification passed: all 50 migration versions
+  match files, applied source hashes match, nullable UUID columns and validated
+  ownership FKs/index predicates are correct; checked public RPCs allow
+  authenticated and deny anon, private helpers deny both. Fresh fingerprints
+  independently confirm all 72 original tables unchanged. Actual browser login,
+  populated RLS and PostgREST remain unverified. No reset or seeds ran.
+
+## EXTRA-114 — Home sign-out shortcut (2026-11-01)
+
+- Authorization: Maxi requested "bien, agrega ese boton ahí donde dijiste" after
+  approving a secondary Cerrar sesión action below the role-specific panel link.
+- Evidence/origin: Home's active-session card only provides panel navigation;
+  reuse the existing logoutAction rather than adding authentication behavior.
+- Change/files: home-access-panel.tsx, home.module.css, affected Home component
+  tests and UI_GUIDELINES.md. Use shared Form and adapted base-nova Button with
+  decorative LogOut icon; preserve the primary panel link and anonymous forms.
+- Risk: presentation only; no changes to session guards, signOut scope, schema,
+  stored data or public component contracts. Verify role coverage, submission,
+  anonymous absence, existing Home behavior and non-reset quality gates.
+- Status: implemented locally. Shared Form submits unchanged logoutAction; shared
+  ghost Button is centered below the primary panel shortcut for all active roles.
+  Scoped submit variables preserve transparent background and pale-green hover;
+  scoped text override prevents the global submit rule making it primary.
+- Verification: RED 3 missing-button failures; GREEN Home 35/35. Full unit run
+  yielded 1632 passed and one missing logoutAction mock in information-feedback;
+  corrected that mock and rechecked affected suites: 51/51 passed. The full unit
+  suite was not rerun after that test-only correction. Final lint, typecheck and
+  production build passed; tooling 60/60 passed; git diff --check passed.
+- Browser: fresh owned production server, trusted style-only fixture using the
+  actual shared Button and production CSS, 1366/360px; secondary appearance,
+  hover, focus, 51.5px target, below-link order, containment and zero overflow
+  passed. Screenshots inspected; server stopped. Fixture is not a live sign-out
+  proof. Submission is covered by component tests; real authenticated browser
+  sign-out and reset-backed acceptance remain unrun to preserve local data.
+- Delivery: unrelated dirty work preserved; no commit, publication or reset.
+
+## EXTRA-113 — Shared-style public offer detail (2026-10-31)
+
+- Authorization: Maxi explicitly requests removing the complete detail cards
+  labelled "Tu próxima oportunidad" and "Con acompañamiento municipal", moving
+  application below all offer information, using the shared navbar/current visual
+  language, and adding shadcn breadcrumbs.
+- Evidence: detail still renders a separate old-logo header, gradient hero and
+  sticky two-card aside, unlike HomeNavbar and the existing green/white canvas.
+- Origin: approved public detail browsing/application continuation; presentation
+  revision only. Do not change application eligibility, public fields or session
+  authorization. Preserve the existing application destination and offer slug.
+- Change: reuse HomeNavbar, existing account canvas/section styles, municipal
+  tokens/fonts and adapted official base-nova Breadcrumb primitives. Retain offer
+  conditions, tasks, requirements and optional salary/benefits, followed by the
+  application link. No dependency, RPC, schema or global-style change.
+- Files: public detail page, affected component/session-navigation tests,
+  read-only visual runner and current UI guidance/spec/plan notes.
+- Risk/verification: page composition and session-aware links; failing/passing
+  component checks, existing regressions and non-reset desktop/mobile browser
+  geometry/axe/navigation checks, lint/typecheck/build/tooling. Preserve all dirty
+  work. No database reset, account creation, publication or commit authorized.
+- Implementation: detail now renders the actual shared HomeNavbar, existing
+  candidateCanvas/sectionContent white canvas on static green, adapted base-nova
+  Breadcrumb and a single final LinkButton preserving the application href.
+  Removed both complete aside cards, old-logo header, gradient hero and duplicate
+  closing date. Retained all public conditions and optional business information.
+- Verification: component RED 5 failures then GREEN 15/15. Full non-reset gates
+  passed: lint, typecheck, build, 1633/1633 unit tests across 134 files, tooling
+  60/60. Production browser found a server/client boundary error missed by these
+  gates: calling client-exported buttonVariants from the server page. Replaced
+  that call with the existing LinkButton JSX; focused 15/15, scoped lint and tsc
+  passed again. Fresh production build and exact visual runner then passed.
+- Browser proof at 1366/360: shared navbar, current breadcrumb/title and catalog
+  navigation, absent aside, CTA below all information, zero horizontal overflow
+  and zero axe violations. Canvas dimensions were 1280px/328px with centered
+  43px/16px gutters and 96px top clearance; screenshots inspected. Catalog numeric
+  pagination remained functional. Owned server stopped without touching others.
+- Runtime: correction verifier's first build had an unproven bare-child Node pin;
+  parent reran build with explicit native subprocess PATH after confirming both
+  parent and child v24.22.0 (npm11.19.1), exit 0. Full unit run predates the tiny
+  LinkButton correction; post-correction checks are focused, not a second full run.
+- Status: implemented and locally verified; no reset-backed E2E/DB run, hosted
+  rollout, commit or push. Unrelated dirty source/assets and original next-env.d.ts
+  preserved. No municipal acceptance or independent product approval claimed.
+  Runtime proof: `ofertas-detail-verification/` and `ofertas-detail-recheck/`.
+
+## EXTRA-112 — Public offers simplification and category icons (2026-10-31)
+
+- Authorization: Maxi explicitly requested removal of the two catalog help cards
+  and duplicate profile shortcut, all pagination numbers using shadcn, and
+  meaningful icons for each employment category. This authorizes presentation
+  only; no municipal policy, database, authorization or privacy change.
+- Evidence: `src/app/(public)/ofertas/page.tsx` duplicates the navbar account
+  entry, reserves a 20rem aside, and renders only previous/current/next.
+  Category names are rendered repeatedly without a shared icon presentation.
+- Origin: the approved public-offer browsing/search behavior and category catalog;
+  explicit developer instruction in this session supersedes the older catalog
+  sidebar composition. Detail-page accompaniment remains unchanged.
+- Smallest sufficient addition: centralize decorative category icons with retained
+  text and an unknown-category fallback. Public payloads contain category names,
+  so resolve known names without widening RPC projections. Keep native select
+  options textual. Reuse the existing official base-nova PaginationLink rather
+  than adding a dependency or replacing shared primitives.
+- Affected surfaces: public catalog, category presentations across offers and
+  profiles, shared category multiselect, affected tests and public-offer guidance.
+- Risks: presentation consumers and wrapping; preserve accessible names, native
+  validation, filter URLs, category IDs, FormData, and unchanged detail navigation.
+- Verification plan: focused failing/passing component tests, lint, typecheck,
+  production build, unit/tooling suites and non-reset browser layout checks.
+  Reset-backed database/E2E verification is not authorized by this visual request.
+- Implementation: catalog layout/pagination in `src/app/(public)/ofertas/page.tsx`;
+  centralized `src/components/job-category-label.tsx` reused by public detail,
+  Home, candidate/company/admin category displays, matching, metrics and shared
+  category multiselect. Updated focused tests, session/search E2E expectations,
+  active spec/plan/authorization notes and UI/operations guidance. Added the
+  GET/HEAD-only `tests/visual/public-offers-check.mjs` runner.
+- Verification: observed public removal/pagination RED (6 failures), icon
+  integration RED (missing food icon), then 56 tests/4 files GREEN. Independent
+  lint passed; tooling 60/60 passed. Independent review caught two unsupported
+  Testing Library `exact` options; corrected them and rechecked 56/56 tests plus
+  tsc: those errors are gone. Current typecheck/build remain blocked by absent
+  declared dependencies (`pdfkit`, `write-excel-file`, `read-excel-file`, `fflate`)
+  in unchanged export/CV/test modules. The full unit run exceeded the verifier's
+  420-second foreground limit without final totals; it is not a pass. Production
+  browser/layout/axe proof remains pending because build failed; no screenshots
+  or live numeric-navigation proof claimed. No reset-backed E2E/DB run performed.
+- Dependency recovery authorized by Maxi: pinned Node24.22.0/npm11.19.1
+  `npm install --ignore-scripts --no-save --no-audit --no-fund` added 22 packages;
+  manifest/lock hashes unchanged and all four formerly missing imports succeeded.
+- Recovery verification: typecheck and production build passed. Full unit run
+  completed with 1628 passed/5 failed across 132 passed/2 failed files. These five
+  failures came from two old flat-text queries in `application-retry.test.tsx`
+  and `opening-matches.test.tsx`; category icons introduce nested spans. Kept
+  exact aggregate text assertions and added decorative-icon assertions, then
+  rechecked both complete affected files: 25/25 passed. Scoped ESLint and tsc
+  also passed. This is a focused correction, not a fresh whole-suite pass.
+- Browser runner correction: use an explicit Playwright BrowserContext for axe.
+  The actual working-tree runner then passed at 1366px and 360px: all eight
+  numeric page links, page-2 click/current marker, ten category groups, zero
+  horizontal overflow and zero axe violations. Screenshots inspected; owned
+  temporary production server stopped. No database reset or fixture insertion.
+- Status: implemented and verified with the named full-run/focused-recheck
+  distinction; reset-backed E2E/DB and hosted publication not performed.
+  Preserved unrelated dirty files. No commit, push, deployment, municipal
+  acceptance or final product approval. Evidence in runtime scratch
+  `ofertas-independent-verification/` and `ofertas-dependency-recheck/` (not committed).
+
 
 ## PR86 documentation integration — current scope and historical evidence
 

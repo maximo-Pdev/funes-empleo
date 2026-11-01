@@ -1,5 +1,26 @@
 # Municipal visual reference
 
+## EXTRA-116 — Session-consistent navbar
+
+This explicit revision supersedes earlier public-catalog guidance that omitted
+anonymous Ingresar or directed navbar Mi cuenta to the profile/account section.
+All normal pages use HomeNavbar, including recovery, password, verification,
+logout and terms. Without a verified active panel show Inicio, Ofertas and
+Ingresar; elsewhere Ingresar links to /#contenido, while Home retains its native
+#contenido shortcut. With a session show Inicio, Ofertas, notification center
+and Mi cuenta to the role panel (/dashboard, /empresa, /admin), consistently.
+Preserve Home desktop scroll/reveal behavior and the always-visible mobile and
+inner-page navbar. Authentication/authorization guards and existing application
+links remain unchanged. Reserve clearance below the fixed 64px header. Minimal
+global-error/technical fallback screens are not ordinary page composition.
+
+## EXTRA-114 — Home sign-out shortcut
+
+Authenticated Home access cards keep the role panel link as their primary action
+and a centered secondary Cerrar sesión button below it, with a decorative LogOut
+icon. Reuse the shared Form, base-nova Button and existing logoutAction unchanged.
+The shortcut is absent from anonymous login and both registration modes.
+
 
 ## PR86 documentation integration — current scope and historical evidence
 
@@ -667,13 +688,21 @@ and in scope of the card, so a reload starts clean.
 `alwaysVisible` variant (emblem, identity, Inicio, Ofertas, and Mi cuenta only
 when there is a session) over a primary-green header band with an uppercase
 eyebrow, a Sora `h1` and the intermediary notice. The body keeps the 1280px
-inner width and a `minmax(0,1fr)_20rem` grid: search panel, results and
-pagination on the left, a sticky aside with the candidate CTA and the
-in-office help card on the right.
+inner width. Search, results and pagination occupy the full content area:
+EXTRA-112 removes the sticky accompaniment/help aside and its calls to action.
 
-- Keep the session entry inside `nav[aria-label="Accesos principales"]` with the
-  label and destination from `getAccountAccess()`; the acceptance suite asserts
-  it on `/ofertas`, and anonymous visitors must still see "Iniciar sesión".
+- Keep the verified session entry only in HomeNavbar's
+  `nav[aria-label="Navegación principal"]`: "Mi cuenta" uses the existing
+  account destination. Do not repeat the profile shortcut in the catalog header.
+  Anonymous visitors can return to Home using "Inicio". EXTRA-113 also migrates
+  offer detail to this actual shared navbar, without a separate legacy header.
+- Reuse the official adapted base-nova `PaginationLink` for every page number,
+  with `aria-current="page"` on the current page, previous/next where available,
+  preserved GET filters and wrapping on small screens. Do not elide numbers.
+- Use `CategoryLabel` for displayed employment categories: one centralized,
+  decorative Lucide icon per known catalog category, retained readable text and
+  a neutral fallback for unknown/fictitious categories. Native select options
+  remain textual; do not change their transport or validation to add icons.
 - Use `TextField`, `SelectField` and `Button`/`buttonVariants` for the search
   panel so labels, underlined controls, 44px targets and focus stay municipal.
   The filters remain native `select` elements: the browser suite drives them
@@ -686,6 +715,17 @@ in-office help card on the right.
   trigger's, or queries and screen readers see two identically named controls.
 
 ## Shared account workspace
+
+Public offer detail (EXTRA-113) now reuses `candidateCanvas` and `sectionContent`
+for the same centered white 1280px canvas and municipal typography on static
+primary-green exterior, without introducing the account sidebar or its decorative
+junction. Keep 64px navbar clearance plus outer spacing, 16px mobile/24px desktop
+gutters, all public offer information and one final shared-style application
+link after optional salary/benefits. The former opportunity/accompaniment aside
+and duplicate closing date are removed, not hidden. Use existing adapted official
+base-nova Breadcrumb composition for Inicio / Ofertas / current offer title;
+retain wrapping, current-page semantics and 44px linked targets. No gradient,
+alternate logo, local palette, contact disclosure or eligibility change.
 
 Candidate, company and administrator panels use the same `DashboardShell` in
 `src/components/ui/dashboard-shell.tsx` and the same `account.module.css` below.

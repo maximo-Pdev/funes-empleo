@@ -1,5 +1,15 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA-116 — Consistent navigation by session
+
+Maxi explicitly requests the same navbar across normal pages for each session
+state. Anonymous visitors see Inicio, Ofertas and Ingresar; authenticated users
+see Inicio, Ofertas, notifications and Mi cuenta to their role panel. Apply the
+shared navbar to auth lifecycle and terms pages too. Preserve Home desktop scroll
+visibility, mobile visibility, existing guarded dashboards and form behavior.
+This replaces the earlier offers-navbar profile/account target and omission of
+anonymous Ingresar; it does not change offer application links or permissions.
+
 ## EXTRA109 — Gestión administrativa, 29/10/2026
 
 Pedido autorizado de Mateo, dentro de la intermediación y permisos existentes.
@@ -39,6 +49,23 @@ otra regla. AD6 incluye la lista de ofertas dentro de empresa actualmente sin
 páginas. Sin cambio de modelo o arquitectura ni migración prevista.
 
 ## EXTRA106/108 — CTA de ofertas públicas, 29/10/2026
+
+EXTRA-113, revisión explícita de Maxi 31/10/2026: también se retiran del detalle
+las tarjetas "Tu próxima oportunidad" y "Con acompañamiento municipal". El botón
+"Postularme con mi cuenta" aparece después de toda la información, conservando
+su destino. El detalle usa HomeNavbar, lienzo blanco con exterior verde y estilos
+compartidos, más breadcrumbs shadcn Inicio / Ofertas / título actual. Esto
+sustituye las referencias anteriores a conservar la tarjeta/header del detalle;
+no cambia datos públicos, elegibilidad, postulación ni permisos.
+
+Revisión EXTRA-112 autorizada por Maxi, 31/10/2026: en el catálogo /ofertas se
+eliminan las dos tarjetas laterales y el acceso duplicado al perfil del header.
+La navbar conserva «Mi cuenta» y su destino verificado; «Inicio» sigue disponible
+para visitantes. La composición anterior del párrafo siguiente queda como
+antecedente, no como requisito vigente del catálogo. El detalle no cambia.
+La paginación muestra todos los números usando el componente compartido shadcn,
+con filtros preservados y página actual identificada. Los rubros muestran íconos
+decorativos semánticos junto a su texto; las opciones nativas mantienen texto.
 
 Mateo conserva únicamente el ajuste de /ofertas y descarta los cambios de inicio/
 login. Con sesión activa verificada de candidato, empresa o administración,

@@ -1,5 +1,10 @@
 # Contrato de autorización y visibilidad
 
+EXTRA-112: el catálogo /ofertas conserva el acceso de cuenta verificado solo en
+la navbar («Mi cuenta»); retira el header/CTA lateral duplicados. La nota
+EXTRA106/108 debajo describe el ajuste anterior, no una tarjeta aún vigente.
+Ninguna autorización, proyección privada, sesión ni destino de rol cambia.
+
 EXTRA109: la ficha empresarial administrativa usa los datos ya autorizados al
 admin activo (razón social, CUIT, responsable, contactos, actividad, localidad).
 Enlace desde oferta y páginas de sus ofertas no amplían visibilidad a otros roles.

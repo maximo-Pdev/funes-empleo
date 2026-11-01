@@ -29,9 +29,9 @@ function hasScrolled() {
   return window.scrollY > 0;
 }
 
-type PanelAccess = { href: string; label: string };
+export type PanelAccess = { href: string; label: string };
 
-export function HomeNavbar({ alwaysVisible = false, panel = null, notifications = false }: { alwaysVisible?: boolean; panel?: PanelAccess | null; notifications?: boolean } = {}) {
+export function HomeNavbar({ alwaysVisible = false, panel = null, notifications = Boolean(panel) }: { alwaysVisible?: boolean; panel?: PanelAccess | null; notifications?: boolean } = {}) {
   const pathname = usePathname();
   const homeCurrent = pathname === "/" ? "page" : undefined;
   const offersCurrent = pathname === "/ofertas" || pathname?.startsWith("/ofertas/") ? "page" : undefined;
@@ -78,6 +78,13 @@ export function HomeNavbar({ alwaysVisible = false, panel = null, notifications 
     };
   }, [alwaysVisible]);
 
+  useEffect(() => {
+    if (pathname !== "/" || window.location.hash !== "#contenido") return;
+    // Client navigation scrolls to the fragment but does not focus its landmark.
+    const frame = requestAnimationFrame(() => document.getElementById("contenido")?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
+
   const visible = alwaysVisible || scrollVisible || lingering || hovered || focused;
 
   return (
@@ -93,9 +100,10 @@ export function HomeNavbar({ alwaysVisible = false, panel = null, notifications 
         <div className={styles.navbarLinks}>
           {alwaysVisible ? <Link href="/" aria-current={homeCurrent}>Inicio</Link> : <a href="#contenido" aria-current={homeCurrent}>Inicio</a>}
           <Link href="/ofertas" aria-current={offersCurrent}>Ofertas</Link>
-          {notifications && <NotificationCenter />}
+          {panel && notifications && <NotificationCenter />}
           {panel ? <Link href={panel.href} className={styles.navbarPanel} aria-current={panelCurrent}>Mi cuenta</Link>
-            : !alwaysVisible && <a href="#contenido" className={styles.navbarPanel}>Ingresar</a>}
+            : pathname === "/" ? <a href="#contenido" className={styles.navbarPanel}>Ingresar</a>
+              : <Link href="/#contenido" className={styles.navbarPanel}>Ingresar</Link>}
         </div>
       </nav>
     </header>

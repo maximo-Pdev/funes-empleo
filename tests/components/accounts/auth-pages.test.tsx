@@ -8,6 +8,8 @@ import formStyles from "@/components/forms/form.module.css";
 import adminStyles from "@/app/(admin)/_components/admin-workspace.module.css";
 import authStyles from "@/app/(auth)/_components/auth-forms.module.css";
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), neq: vi.fn(), order: vi.fn(), logout: vi.fn(), candidate: vi.fn() }));
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn(async () => null) }));
 vi.mock("@/app/(auth)/account/candidate-account", () => ({ renderCandidateAccount: mocks.candidate }));
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: mocks.guard }));
 vi.mock("@/features/companies/service", () => ({ getCompanyWorkspace: vi.fn().mockResolvedValue({ profile: { legalName: "Empresa Ficticia" } }) }));
@@ -36,8 +38,8 @@ vi.mock("@/components/ui/record-link", async () => (await import("../../fixtures
 it.each([
  [Recovery, "Solicitar enlace de recuperación"],
  [Expired, "Reenviar verificación"],
-])("conserva el formulario de correo de %s", (Page, button) => {
- render(<Page />);
+])("conserva el formulario de correo de %s", async (Page, button) => {
+ render(await Page());
  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
  expect(screen.getByLabelText("Correo electrónico")).toHaveProperty("required", true);
  expect(screen.getByLabelText("Correo electrónico")).toHaveProperty("type", "email");
@@ -105,8 +107,8 @@ function saveAdminFixture(section: string, html: string) {
  mkdirSync(output, { recursive: true });
  writeFileSync(path.join(output, `${section}.json`), JSON.stringify({ section, html, css }));
 }
-it("mantiene la confirmación explícita de cierre de sesión", () => {
- render(<Logout />);
+it("mantiene la confirmación explícita de cierre de sesión", async () => {
+ render(await Logout());
  expect(screen.getByRole("button", { name: "Confirmar cierre de sesión" })).toBeTruthy();
  expect(mocks.logout).not.toHaveBeenCalled();
 });

@@ -8,7 +8,7 @@ vi.mock("server-only", () => ({}));
 const { readSession } = vi.hoisted(() => ({ readSession: vi.fn() }));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: readSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: vi.fn(async () => ({ items: [] })) }));
-vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn(), logoutAction: vi.fn() }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 import HomePage from "@/app/(public)/page";
@@ -65,7 +65,9 @@ it.each(["candidate", "company", "admin"])("ignores registration route selection
       expect(screen.getByRole("heading", { level: 1 }).parentElement?.getAttribute("data-view")).toBe("login");
       expect(screen.getByRole("region", { name: "Acceso al portal" }).getAttribute("data-mode")).toBe("login");
       expect(screen.queryByRole("radio")).toBeNull();
-      expect(view.container.querySelector("form")).toBeNull();
+      expect(view.container.querySelectorAll("form")).toHaveLength(1);
+      expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
+      expect(screen.queryByLabelText("Correo electrónico")).toBeNull();
     };
     assertLogin();
     for (const requestedRole of ["candidate", "company"]) {
@@ -83,7 +85,8 @@ it("returns the hero and access panel to login when a session becomes active", (
   expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
   expect(screen.getByRole("heading", { level: 1 }).parentElement?.getAttribute("data-view")).toBe("login");
   expect(screen.queryByRole("radio")).toBeNull();
-  expect(view.container.querySelector("form")).toBeNull();
+  expect(view.container.querySelectorAll("form")).toHaveLength(1);
+  expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
 });
 
 it.each(["candidate", "company", "admin"])("hides closing registration entrances for an active %s while keeping municipal contact", async role => {

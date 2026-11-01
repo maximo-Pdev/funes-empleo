@@ -1,5 +1,14 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA-116 — Shared session navigation
+
+Use the existing verified getSiteAccess().panel projection for every normal
+public/auth/legal navbar. AuthSurface remains presentational with an optional
+panel prop resolved by its server page; retain the password page's guard. Reuse
+HomeNavbar's material, responsive behavior and notification center, deriving
+anonymous login navigation independently of alwaysVisible. No SQL, auth service,
+dependency or application-link change. Technical fallbacks remain minimal.
+
 
 ## PR86 documentation integration — current scope and historical evidence
 
@@ -118,6 +127,22 @@ axe (4.24→5.67:1); no agrega reglas o paletas locales. Evidencia y recuperaci�
 
 
 ## EXTRA106/108 — Presentación de acceso en /ofertas
+
+EXTRA-113 amplía la revisión visual al detalle: reemplazar su header antiguo por
+HomeNavbar con getAccountAccess verificado; reutilizar candidateCanvas y
+sectionContent, sin sidebar/curva de panel privado. Usar Breadcrumb existente
+base-nova con enlaces Inicio/Ofertas y título actual, retirar ambos bloques del
+aside y mover el enlace de postulación existente al final de la ficha. No se
+modifican componentes compartidos, servicios, proyecciones, permisos o BD.
+
+EXTRA-112, 31/10/2026, sustituye únicamente la composición de catálogo descrita
+abajo y el resumen histórico inicial: getSiteAccess conserva una lectura por
+request para HomeNavbar; se retiran el acceso repetido del header y las dos
+tarjetas del aside. El listado ocupa el área completa. Se reutiliza
+PaginationLink base-nova para todos los números, aria-current y enlaces GET con
+filtros preservados y flex-wrap. CategoryLabel centraliza íconos Lucide por
+nombre/código conocido con fallback neutro, sin cambiar proyecciones públicas,
+catálogo persistido ni opciones select nativas. El detalle conserva su tarjeta.
 
 Reutilizar getSiteAccess por request para header y tarjeta lateral en una sola
 lectura de sesión. Si panel existe, ofrecer su href/label por rol; si no,

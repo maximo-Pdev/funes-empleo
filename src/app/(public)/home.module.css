@@ -600,6 +600,19 @@
   outline-color: var(--color-ring);
 }
 
+.sessionLogout {
+  --form-submit-background: transparent;
+  --form-submit-hover: var(--color-surface-muted);
+  display: flex;
+  justify-content: center;
+  margin: 0 0 16px;
+}
+
+:global(:root) .form .sessionLogout button[type="submit"][data-slot="button"] {
+  color: var(--color-brand-text);
+  font-weight: 400;
+}
+
 .form p[role]:empty {
   display: none;
 }
