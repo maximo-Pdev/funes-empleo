@@ -5,6 +5,18 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T296 EXTRA120: leer contexto/precedencia094/102 y registrar aclaración visual,
+  evidencia320px, requisitos CP1–CP4, plan/checklist y análisis antes de código.
+- [x] T297 Reordenar tarjeta Privacidad con primitivas existentes y CSS local;
+  liberar contenedor de Cuenta, limitar solo contraseña y preservar todos los
+  textos/estados/acciones/validación sin backend o datos nuevos.
+- [x] T298 Verificar pendiente/aceptado/retirado, campos/feedback/refresh, anchuras
+ 1920/1366/390/320, teclado/details/confirmación vacía/axe; tipos/lint/pruebas/
+  tooling/build, evidencia y límites, conservando next-env ajeno.
+  Tipos/lint/build,71 regresiones,1627/136 suite,64 tooling y2 E2E focales PASS;
+  axe sin violaciones en cuatro anchos, cero POST sin confirmación. EXTRA120
+  registra medidas/capturas y límites; sin backend/SQL/revisión humana nueva.
+
 - [x] T295 Reparar preparación artificial de vencimiento en sesión E2E de PR88/
   Quality221: salir de la página con prefetch antes de alterar cookie y comprobar
   vencimiento previo a renovación. Conservar seis contratos por rol/entrada,

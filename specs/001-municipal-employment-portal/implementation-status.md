@@ -1,5 +1,24 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA120 — Distribución del consentimiento — 01/11/2026
+
+Rama feat/candidate-consent-layout desde main1e3cdab tras merge de PR88 y retiro
+verificado de su rama. Se libera el ancho de Cuenta > Privacidad: tarjeta con
+estado visible, explicación y decisión separadas; columnas desde1280px y orden
+natural móvil. Solo contraseña conserva máximo320px. Textos completos, detalles,
+campos, confirmación requerida, acciones, foco y refresh se mantienen. Contratar
+conserva el consentimiento según094/102; no se altera lógica, SQL o privacidad.
+
+En1920×1080 la tarjeta pasa de320×1047,5 a1544×555,25px y entra sin scroll vertical;
+1366×900 y móviles390/320 usan scroll natural, sin desborde horizontal. Dos E2E
+reales con fixture QA PASS sin omisiones/reintentos (geometría RED→GREEN, teclado,
+axe cero violaciones, validación sin POST).71 regresiones de estados/payload/
+feedback,1627 pruebas en136 archivos,64 tooling, tipos/lint/build PASS. Build
+conserva avisos previos de lockfiles/escaneo CSS, sin fallos nuevos. Cobertura100%
+corresponde solo al módulo env configurado; no se ejecutó toda la suite SQL/E2E.
+T296–T298 verificadas; EXTRA120 contiene evidencia y recuperación visual sin
+afectar datos. next-env ajeno intacto. Sin commit/PR ni aprobación humana todavía.
+
 ## Preparación de sesión E2E del PR88 — 01/11/2026
 
 Quality221/03f38ba pasa database, tipos/lint/tooling/cobertura/build y145 E2E,
