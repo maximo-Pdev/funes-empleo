@@ -13,6 +13,8 @@ import { candidateSearchSchema } from "@/validation/candidate-search";
 import { availabilityLabel, candidateProfileStatusLabels, displayLabel } from "@/domain/presentation/labels";
 import { availabilityTones, candidateProfileStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { Badge } from "@/components/ui";
+import layout from "@/components/ui/detail-layout.module.css";
+import { RECORD_PAGE_SIZE } from "@/lib/collections/limits";
 
 export const dynamic = "force-dynamic";
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -20,7 +22,7 @@ type SearchParams = Record<string, string | string[] | undefined>;
 export default async function AssistedCandidatesPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   await requireActiveAccount(["admin"]);
   const raw = await referenceFilters("/admin/atencion-presencial", await searchParams, { categoryId: "category" });
-  const parsed = candidateSearchSchema.safeParse({ eligibility: "all", ...raw });
+  const parsed = candidateSearchSchema.safeParse({ eligibility: "all", ...raw, pageSize: RECORD_PAGE_SIZE });
   const [categories, creationPolicy] = await Promise.all([listCandidateSearchCategories(), getAssistedCreationPolicy()]);
   const references = await recordReferences("category", categories.map(category => category.id));
   const results = parsed.success ? await searchAssistedCandidates(parsed.data) : null;
@@ -39,7 +41,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
 
   return <AdminShell active="/admin/atencion-presencial" title="Perfil asistido"
     description="Creá un perfil mediante atención presencial o consultá los ya creados, incluidos quienes vincularon una cuenta.">
-    <section aria-label="Crear perfil presencial" className="mb-8">
+    <section aria-label="Crear perfil presencial" className={`${layout.fieldPairs} mb-8`}>
       <AssistedProfileForm categories={categories} creationPolicy={creationPolicy} />
     </section>
     <h2 className="mb-4 text-xl font-semibold">Perfiles creados</h2>

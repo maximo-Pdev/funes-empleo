@@ -14,7 +14,7 @@ import { formatPublicClosingDate, publicModalityLabel } from "@/features/opening
 import type { PublicOffer } from "@/features/openings/public-service";
 import styles from "./home.module.css";
 
-function OfferCard({ offer }: { offer: PublicOffer }) {
+function OfferCard({ offer, heading: Heading }: { offer: PublicOffer; heading: "h2" | "h3" }) {
   return (
     <article className={styles.offerCard}>
       <div>
@@ -27,9 +27,9 @@ function OfferCard({ offer }: { offer: PublicOffer }) {
             ))}
           </div>
         )}
-        <h3 className={styles.offerCardTitle}>
+        <Heading className={styles.offerCardTitle}>
           <Link href={`/ofertas/${offer.slug}`}>{offer.title}</Link>
-        </h3>
+        </Heading>
         <p className={styles.offerCompany}>
           <Building2 aria-hidden="true" />
           <span className={styles.offerCompanyName}>{offer.company_name}</span>
@@ -49,7 +49,7 @@ function OfferCard({ offer }: { offer: PublicOffer }) {
   );
 }
 
-export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
+export function HomeOffersCarousel({ offers, headingLevel = "h3" }: { offers: PublicOffer[]; headingLevel?: "h2" | "h3" }) {
   const [vertical, setVertical] = useState(false);
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [canPrev, setCanPrev] = useState(false);
@@ -106,7 +106,7 @@ export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
 
   const slides = offers.map(offer => (
     <CarouselItem key={offer.id}>
-      <OfferCard offer={offer} />
+      <OfferCard offer={offer} heading={headingLevel} />
     </CarouselItem>
   ));
 
@@ -150,7 +150,7 @@ export function HomeOffersCarousel({ offers }: { offers: PublicOffer[] }) {
               inert={hidden}
               aria-hidden={hidden}
             >
-              <OfferCard offer={offer} />
+              <OfferCard offer={offer} heading={headingLevel} />
             </div>
           );
         })}

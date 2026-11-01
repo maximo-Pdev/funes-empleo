@@ -1,6 +1,728 @@
 # Cambios extra necesarios
 
-## EXTRA-112 — Simplify the authenticated Home access card
+## PR88-CI-SESSION-01 — Preparación aislada de vencimiento, 01/11/2026
+
+- **Origen/evidencia:** Mateo pide reparar GitHub. Quality221/41340592318 en
+  03f38ba: database, tipos/lint/tooling/cobertura/build PASS;145 E2E PASS y uno
+  falla en session-navigation42 por cookie ausente tras renovar admin/public.
+  Logs409 conflict de Auth muestran renovaciones concurrentes; ocho dependientes
+  no corrieron. La prueba altera expires_at mientras sigue montado /admin, con
+  navegación/prefetch activo. No se ha probado ese fallo sin alteración artificial.
+- **Cambio antes de implementar:** dejar la pestaña en about:blank antes de
+  manipular su cookie ficticia, conservar el mismo contexto y comprobar expires_at=1
+  antes de entrar a la ruta bajo prueba. Así esa navegación provoca la renovación,
+  sin solicitudes de la página anterior usando la cookie manipulada. Mantener
+  chequeos de renovación real, no-store, tres roles, enlaces, recarga, otra pestaña,
+  logout y denegación posterior; sin retries, sleeps, timeout extra o mocks de Auth.
+- **Evidencia técnica:** guía oficial SSR de Supabase advierte sobre cookies y
+  prefetch concurrente: https://supabase.com/docs/guides/auth/server-side/advanced-guide.
+  auth-js instalado quita la sesión tras refresh no reintentable si expires_at
+  ya venció; el test lo fuerza a1 aunque su JWT siga vigente. Hipótesis acotada
+  de preparación, no autorización para cambiar producción o privacidad.
+- **Archivos/contratos/riesgos:** solo tests/e2e/session-navigation.spec.ts y
+  ledger T295/evidencia. La prueba no debe perder su vencimiento efectivo ni
+  simular una sesión renovada. Sin RPC/esquema/dependencia/variable/configuración.
+- **Verificación prevista/estado:** ejecutar seis recorridos locales reales y
+  repetir preparación admin/public sin reintentos, observar ausencia de409 en esa
+  fase; tipos/lint/pruebas y build requeridos, nueva CI completa en PR88. Usar
+  solo QA propio54341/3001, sin reset habitual/alojado. Propuesto antes de código;
+  autorizado por reparación solicitada y AGENTS.md, revisión humana pendiente.
+- **Resultado local:** seis recorridos repetidos tres veces:18/18 PASS en1,8min,
+  cero reintentos/omisiones, con renovación real y logout/otra pestaña conservados.
+  Sin409/conflict de Auth en la salida del servidor capturada durante esas fases;
+  siguen mensajes de stream cerrado por navegaciones abortadas, sin fallo de caso.
+  38 regresiones de sesión/proxy/login activo PASS; tipos/lint y build QA PASS.
+  La suite1627/136 y database ya pasaban en221; no se atribuyen a una nueva corrida
+  local completa. Solo cuatro líneas de preparación del test, sin código productivo.
+  next-env ajeno intacto, sin reset o SQL alojado. Subir corrección sin firma al
+  mismo PR88 y esperar nueva CI completa; revisión humana permanece pendiente.
+
+## PR88-MAIN-01 — Integración de main8a0596e, 01/11/2026
+
+- **Origen/evidencia:** Mateo muestra cinco conflictos del PR88. Tras fetch,
+  main incorpora PR89/8a0596e (tarjeta autenticada), sobre la misma base71a758e.
+  Quality219 de2524942 pasó ambos jobs,1533 SQL y154 E2E; eso no resuelve conflictos
+  con nuevos commits de main. next-env.d.ts ajeno se preserva por huella.
+- **Cambio previsto antes de resolver código:** integrar main sin reescribir
+  historia, conservar íntegros ambos registros de cambios y las mejoras de PR89
+  en HomeAccessPanel/CSS. EXTRA118 de Mateo,01/11, sigue gobernando la composición
+  de la ruta: omitir el hero autenticado y empezar en ofertas. La tarjeta reutilizable
+  conserva mensaje gris y ausencia de pestañas cuando se monta de forma independiente.
+- **Archivos/contratos:** cinco conflictos (cambios-extra y cuatro tests Home/
+  sesiones); mantener prueba visual de PR89 alimentada por HomeHero autenticado
+  directo y comprobar por separado HomePage sin hero para tres roles. Aclarar esa
+  distinción en spec/UI, sin cambiar plan/RPC/privacidad/negocio/dependencias.
+  EXTRA-112 de PR89 se identifica por título/PR para distinguirlo del catálogo112.
+- **Riesgo/verificación prevista:** evitar que expectativas antiguas vuelvan a
+  mostrar el hero o pierdan la nueva tarjeta reutilizable. Probar ambos contratos,
+  invitado, cambio de sesión y seis composiciones visuales; tipos/lint/unit/tooling/
+  build y CI completa posterior. Sin reset/migración ni aceptación humana implícita.
+- **Estado/autorización:** integración necesaria dentro del PR solicitado,
+  autorizada por AGENTS.md y los alcances ya pedidos; sin decisión municipal nueva.
+  Resolución/verificación pendientes; se trabaja en checkout aislado de2524942.
+- **Prerrequisito observado antes de verificar el visual:** el script de PR89
+  usa LOCALAPPDATA/hermes/cache/scratch, inexistente aquí (Test-Path=false).
+  Usar tmpdir de node:os con mkdtemp evita depender del equipo del autor, sin
+  dependencia/variable nueva. Afecta solo salida ficticia del script de pruebas;
+  verificar seis composiciones, color, enlaces, foco y ausencia de overflow.
+- **Diagnósticos de entorno:** build en worktree con node_modules como junction
+  rechaza ese enlace por salir de su raíz. Las mismas fuentes íntegramente copiadas
+  al área QA habitual compilan con configuración ficticia/sin base. Primera suite:
+  1626/1627 PASS; contrato next-eslint-glob exige ruta física del adaptador dentro
+  del checkout, incompatible con dependencias enlazadas al principal. Instalar
+  dependencias propias con npm ci y repetir sin modificar esa prueba o el producto.
+  Tipos/lint,58 focales y seis visuales del componente ya PASS; gates finales pendientes.
+- **Recuperación de la verificación:** npm ci aislado falla por node-gyp ausente
+  en el runtime temporal de npm; no cambia manifests/lockfiles del producto.
+  Guardar integración local sin publicar, avanzar la rama original por fast-forward
+  preservando next-env, y ejecutar allí la suite con su instalación existente.
+  Ese entorno conserva la ruta física exigida por el adaptador; no omitir la prueba.
+- **Resultado final:** integración local con padres2524942/8a0596e.1627 pruebas
+  unitarias/componentes en136 archivos y64 herramientas PASS, sin omitir el
+  contrato del adaptador; cobertura100% solo del alcance configurado env/schema.
+  Tipos/lint y build de fuentes integradas PASS;58 focales y seis composiciones
+  visuales1440/390 de tres roles PASS (gris, sin pestañas, foco/enlaces/overflow).
+  HomeAccessPanel coincide con main y HomePage conserva exactamente EXTRA118.
+  Ambas bitácoras preservadas; cinco conflictos sin marcadores y main ancestro.
+  next-env ajeno conserva su SHA256 original. Commit de integración sin firma;
+  publicar en PR88, comprobar estado de integración en GitHub y nueva CI pendiente.
+  No aplicar SQL, reiniciar servicios o acreditar revisión/merge del PR.
+
+## Selectores E2E y paginación real del PR88 — 01/11/2026
+
+- **Origen/evidencia:** pedido de reparar GitHub; Quality217/41332470427 pasa
+  tipos/lint/tooling/cobertura/build y143 recorridos. Tres fallos estrictos:
+  assisted-section56 encuentra dos Activo; intermediation73/127 encuentra avisos
+  de paginación además del estado vigente. Ocho dependientes no se ejecutan.
+  El listado presencial ya fija10 por EXTRA116 y no admite reducirlo con pageSize=1.
+- **Cambio antes de implementar:** limitar las consultas de estado al bloque
+  «Resultado o estado vigente», como los otros recorridos del mismo archivo.
+  En alta presencial crear11 perfiles ficticios por el flujo autorizado, comprobar
+  10+1 filas/estados/enlaces, filtros y ausencia de duplicados; retirar la suposición
+  de página de1. Ampliar solo el tiempo de ese recorrido por sus nueve altas extra.
+- **Alcance/justificación:** tests/e2e/assisted-section.spec.ts e
+  intermediation.spec.ts; documentación de evidencia/T293. Sin API, SQL, UI,
+  permisos, datos reales o reglas nuevas; no omitir pruebas ni debilitar privacidad.
+- **Riesgo/verificación prevista:** mayor duración y mutaciones ficticias; nombre
+  aislado, DNI sintético y categorías deterministas. Reproducir/validar ambos
+  recorridos en fixture propia local; tipos/lint/diff y CI completa posterior.
+  database217 falla al arrancar Docker por54324 ocupado (antes de SQL); repetir
+  sobre runner nuevo, sin cambiar configuración compartida por esa evidencia sola.
+- **Estado:** propuesto antes del cambio; autorizado por reparación pedida y
+  AGENTS.md. Revisión humana y ejecución completa pendientes.
+- **Resultado local:** tres recorridos GREEN sin omisiones/reintentos (1,2min):
+  11 altas activas por UI, orden exacto10+1 aun con pageSize=1, filtro A, detalle,
+  consentimiento asistido y conteo sin duplicados; estado contratado e historial;
+  CV200 para roles autorizados,404 para ajeno y tras última revocación, acceso
+  propio200 y nombre mínimo conservado. Tipos/lint de checkout limpio, build
+  actualizado y pgTAP completo de fixture QA PASS. Base QA propia54341/54342,
+  aplicación3001; sin reset de habitual/alojada ni cambios de next-env ajeno.
+  Se sincronizaron fuentes/tests actuales, preservando guards/puertos propios.
+  Publicar sin firma en PR88; nueva CI completa y revisión humana pendientes.
+
+## Corrección CI del PR88 — 01/11/2026
+
+- **Origen/evidencia:** Mateo pide reparar GitHub. Quality41331558058, application
+ 124922570841 falla en typecheck: TS2769 en home-access-panel71/273 y setup/home28/34.
+  ByRoleOptions de Testing Library no admite exact; ese atributo sí pertenece a
+  Playwright. database124922571060 PASS; no falla la migración o el producto.
+- **Cambio previo a implementar:** reemplazar las cuatro opciones por expresiones
+  de nombre ancladas, manteniendo coincidencia exacta y comprobaciones de destinos,
+  sesión e invitado. Revisar llamadas similares sin cambiar las válidas de Playwright.
+  Solo dos tests, sin API, permisos, UI, esquema o dependencia nueva; delta118.
+- **Causa de verificación local:** la copia aislada conservaba versiones anteriores
+  de esos tests. Verificar desde checkout limpio versionado y copiar únicamente
+  archivos corregidos, sin usar next-env.d.ts ajeno o una copia parcial de tests.
+- **Verificación prevista:** reproducir TS2769 sobre HEAD del PR; tipos y tests
+  corregidos, lint y diff; commit sin firma en misma rama/PR, CI completa posterior.
+  Revisión/aceptación humana intactas; no reducir controles ni omitir pruebas.
+- **Resultado local:** RED reproduce los cuatro TS2769 sobre f17a01f limpio;
+  GREEN tipos,39 tests de ambos archivos, lint y diff PASS tras usar /^nombre$/.
+  Se validan los archivos actuales dentro de checkout aislado versionado, sin
+  .env.local ni next-env ajeno. Sin cambios de comportamiento o SQL; database
+  ya aprobada en216. Publicar en mismo PR88 y verificar la nueva CI completa.
+
+## Preparación de PR — 01/11/2026
+
+Mateo solicita publicar los cambios acumulados112–119. Rama
+feat/desktop-layout-polish sobre main71a758e, fetch sin divergencia. Se excluye
+next-env.d.ts ajeno, conservado por SHA256; sin firmas/signoff/coautoría añadida.
+Commit de implementación:1da5c6a (sin firma). El PR vinculará esta revisión del
+código y el registro posterior de evidencia; no hay merge o aceptación implícitos.
+Verificación final:1624 pruebas/136 archivos PASS con cobertura100% del alcance
+configurado (solo src/lib/env/schema.ts, no cobertura global).64 tooling y
+tipos/lint/build documentados en119; cinco E2E de matching completos PASS tras
+alinear expectativas y oráculo SQL12→10, conservando todas las aserciones.
+SQL119 ya aplicado local/alojado y registrado sin reparar historia ajena; filtro
+de métricas y demás cambios UI requieren despliegue del código. Revisión humana,
+CI completa de application/database y publicación se acreditan por sus resultados
+posteriores, no por estas verificaciones locales.
+
+## EXTRA-119 — Retirar categorías ficticias A/B con respaldo
+
+- **Fecha/origen:** Mateo,01/11/2026, pide eliminar las categorías ficticias A/B.
+  Decide expresamente «Quitar las asignaciones y conservar un respaldo histórico».
+  Sustituye conservación operativa de DEMO-A/B en A08; no autoriza equivalencias
+  o cambios de categorías reales. Rama actual y trabajo112–118/next-env preservados.
+- **Evidencia previa:** en local cada código v1 activo tiene265 asignaciones
+  candidatas; A64/B60 de ofertas. Proyecto vinculado kyjycjojzhwggjuqjnki: A1/B0
+  candidatas y ninguna oferta. Solo conteos/metadatos consultados, sin PII. Conector
+  integrado sin proyectos; CLI vinculada permite lectura. OQ-010 no define mapeo.
+- **Diseño antes de código:** migración20261101120000, alcance exacto códigos
+  DEMO-A/DEMO-B versión1 y nombres esperados. Respaldar filas originales de catálogo
+  y relaciones candidate_categories/opening_categories en tabla privada con clave,
+  snapshot, fecha/actor SQL, versión y motivo. RLS, sin grants a aplicación y
+  append-only con deny_history_change existente, como patrón057. Después quitar
+  solo esas relaciones y desactivar categorías; conservar filas/IDs del catálogo.
+- **Atomicidad/concurrencia:** transacción única, lock_timeout5s/statement30s;
+  cuentas en EXCLUSIVE antes de relaciones para esperar guards FOR SHARE de
+  comandos vigentes y evitar validación/asignación concurrente. Lecturas simples
+  siguen disponibles. Orden consistente, fallo revierte también el respaldo.
+  Comprobar que cada fila retirada esté respaldada, antes de eliminarla. No tocar
+  perfiles/ofertas, versiones, estados, consentimientos, casos, CV o auditoría previa.
+- **Archivos/contratos:** migración, prueba de migración real con datos sintéticos
+  y guía de retiro/recuperación; spec/plan/modelo/contrato/checklist/tasks. Sin
+  endpoints o UI nueva. Seed/fixtures de aceptación conservan A/B deliberadamente:
+  son datos sintéticos de pruebas, no el catálogo operativo. Una semilla/reset
+  posterior no es un despliegue; no ejecutar semillas sobre bases operativas.
+- **Riesgos:** registros solo A/B quedan sin categorías, por decisión expresa;
+  no inferir reemplazos ni cambiar estados. Backup privado por IDs, sin copiar
+  nombres/contactos de personas. Nunca borrar asociaciones sin su snapshot. Si
+  hay nombres v1 inesperados o locks ocupados, abortar, no corregir datos a ciegas.
+- **Verificación prevista:** transacción con rollback sobre fixture propio;
+  conteos/snapshots exactos, categorías reales/relaciones/entidades/historial
+  intactos, backup inaccesible/append-only, reejecución y recuperación sin pérdida;
+  fallo simulado prueba rollback. Tipos/lint/unit/build y verificaciones de lecturas.
+  Aplicar solo esta migración al proyecto vinculado/local sin reset; inspeccionar
+  dry-run e historial antes, no reparar versiones ajenas ni empujar cambios pendientes.
+- **Gates previos:** DC1–DC5 definidos/clarificados, plan/modelo/contrato/checklist/
+  tareas y análisis constitucional II–V registrados antes de implementación.
+  Patrón privado ya aprobado057, sin stack/arquitectura de aplicación nueva;
+  no críticos/altos abiertos en delta. Solicitud/decisión autoriza alcance;
+  implementación/verificación/revisión humana pendientes, gates históricos intactos.
+- **Adición detectada antes de código de lectura:** metricsCategories ofrece
+  también categorías inactivas para consultas históricas, por lo que desactivar
+  A/B no basta para retirarlas de ese selector. Añadir active a lectura servidor
+  y excluir exclusivamente DEMO-A/B v1 con active=false; devolver DTO previo.
+  Otras inactivas y A/B activas de fixtures siguen disponibles. No alterar cálculo,
+  exportación o datos históricos. Archivos metrics/service y prueba específica;
+  verificar roles, activos/inactivos/versiones y errores. Sin nuevo endpoint/RPC.
+- **Implementado:** migración y tabla privada con snapshots íntegros, trigger
+  append-only reutilizado, recuperación con detección de conflictos y verificación
+  por conteos/metadatos. Guías retire/recover/verify-demo-categories en operations;
+  test ejecuta SQL real dentro de transacciones revertidas, sin copiar algoritmo.
+  Lectura metrics/service omite solo v1 A/B inactivas y devuelve el DTO anterior.
+- **Verificación técnica:** SQL real PASS para respaldo exacto, retiro, catálogo/
+  padres/historia intactos, reejecución, nombres/backup/recuperación contradictorios,
+  privacidad de tres roles, append-only y fallo inyectado con rollback total. Una
+  sesión con ROW SHARE bloquea el retiro y provoca timeout sin efectos parciales.
+  208 regresiones unitarias/componentes en10 archivos,64 tooling (4 guards nuevos),
+  tipos/lint/build frío/diff PASS. Un E2E sin retries/omisiones comprueba selector
+  con flags sintéticos retirados y los restaura en finally. QA propio54341/3001;
+  una invocación desde root con puertos de QA fue rechazada antes de Docker/SQL,
+  como exige el guard. Sin resets o cambios a fixtures compartidas.
+- **Aplicación verificada:** versión20261101120000 ejecutada y registrada en
+  local y kyjycjojzhwggjuqjnki. Ambas: A/B inactivas, cero relaciones vigentes,
+  filtros públicos limpios y15 categorías v2 activas. Local respalda2 categorías,
+ 530 relaciones candidatas y124 de ofertas; alojado2 categorías y1 relación
+  candidata. RLS/grants/append-only/metadatos completos verificados.
+- **Historia/conservación:** db push dry-run detecta divergencia histórica previa
+  de versiones20260927/28. Se aplica solamente el archivo nuevo vía conexión
+  administrativa y se registra solo20261101120000 con repairAll=false; no se
+  revierte/repara ninguna versión ajena. Huellas previas/posteriores de estados/
+  versiones de candidatos, ofertas y participaciones, consentimientos, auditorías,
+  otras categorías/relaciones e historial anterior idénticas en ambas bases.
+- **Cierre y límites:** DC1–DC5/T289–T291 verificados técnicamente. Datos ya
+  aplicados; filtro de métricas listo en código, pendiente del despliegue habitual.
+  Build solo advierte raíz por lockfile del snapshot; sin advertencias CSS. Código
+  previo112–118 y next-env ajeno intactos por hash; servicios QA detenidos sin
+  tocar base/servidor habituales. Sin commit/PR/CI/revisión humana acreditados.
+
+## EXTRA-118 — Inicio con sesión desde ofertas disponibles
+
+- **Fecha/origen:** Mateo, 01/11/2026, solicita ocultar el bloque inicial completo
+  de presentación/acceso con sesión iniciada y comenzar en Ofertas disponibles,
+  según sus dos capturas. Esta solicitud sustituye la conservación del hero para
+  usuarios activos de108/112; no revierte la presentación anónima o autenticación.
+  Mantener rama feat/desktop-layout-polish,112–117 y next-env ajeno.
+- **Evidencia/cambio antes de código:** Home ya obtiene panel mediante
+  getSiteAccess servidor, pero monta HomeHero incluso activo. Condicionar su
+  composición al panel activo verificado. Navbar siempre visible en ese caso,
+  reservar64px y promover Ofertas a h1; sin hueco de hero ni scroll imperativo.
+  Mantener carousel10, vacío, contenido restante y acceso al panel por rol.
+- **Archivos/contratos:** public/page.tsx y home.module.css, pruebas Home/acceso/
+  registro/sesión, spec/plan/tasks/UI/status. Sin backend, SQL, grants, dependencia
+  o contrato nuevo. No inferir sesión por cookie sin verificar, query o estado cliente.
+- **Riesgos/verificación prevista:** invitados/errores/suspendidos siguen viendo
+  acceso y avisos; activos de tres roles no montan formularios ni hero, incluso con
+  registro/acceso en URL. Un h1 y navbar sin cubrir título; escritorio/móvil,
+  vacío/carrusel, panel correcto, recarga/navegación/salida y no-store. Tipos/lint,
+  pruebas relevantes y build; QA propio ficticio, sin reset habitual o alojado.
+- **Gates previos:** HN1–HN4 explícitos, sin nueva arquitectura, privacidad o
+  decisión municipal. Diseño/análisis constitucional II/IV/V acotados, sin críticos
+  o altos; revisión humana pendiente. Recuperación por revert de aplicación.
+- **Prerrequisito detectado antes de ajustar carrusel:** axe detecta salto h1→h3
+  al convertir Ofertas en título principal. Añadir headingLevel h2/h3 al carrusel,
+  default h3 para preservar composición anónima; activo usa h2 en ambos modos.
+  Contrato de presentación servidor/cliente, sin cambio de autoplay/datos/controles.
+  Archivos page.tsx/home-offers-carousel.tsx y tests de Home. Verificar axe sin
+  omitir heading-order; adaptar expectativa E2E antigua que aún buscaba el hero.
+- **Implementado/verificado:** Home omite hero en servidor para panel activo y
+  muestra navbar permanente, h1 de ofertas e inset64px. Carrusel conserva últimas10,
+  modos/autoplay y estilo; títulos hijos h2 activo/h3 anónimo. Sin APIs, SQL,
+  controles nuevos o cambio de autenticación/registro/avisos de visitantes.
+  Archivos reales: public/page.tsx, home.module.css, home-offers-carousel.tsx;
+  tests home-access-panel, home-registration-navigation, setup/home,
+  e2e/home-session-entry y session-navigation. Artefactos/UI alineados.
+- **Evidencia:** RED7/37 en expectativas del nuevo alcance; primera suite completa
+  encuentra tres expectativas antiguas adicionales de setup/Home, adaptadas al
+  nuevo destino manteniendo comprobación de rol. Primer navegador detecta
+  heading-order en3 roles y seis expectativas antiguas de tarjeta; se corrige
+  jerarquía y recorrido sin desactivar axe, omitir o debilitar checks de sesión.
+  Final1618 pruebas/135 archivos, tipos/lint/build frío/diff-check PASS. Build
+  solo advierte raíz por lockfile del snapshot, sin advertencias CSS.
+- **Navegador final:**13/13 sin reintentos/omisiones: visitante, Home por tres
+  roles, seis renovaciones/navegación/salidas y tres regresiones de menú. Cada rol
+  se comprueba a1920×1080,1366×768,390×844 y320×800, con query de registro/aviso,
+  primer bloque/h1/navbar por encima del título, scrollY0 y sin overflow. Tres
+  axe móviles0; capturas1920/390 revisadas. Recargar mantiene inicio en ofertas;
+  logout recupera login/registro, sin caché pública de sesión. Vacío/fallo de
+  datos, suspensión y URLs se cubren en componentes y contratos existentes.
+- **Cierre:** HN1–HN4/T287–T288 verificados técnicamente. Datos/servicios propios
+ 54341/3001, sin reset habitual, nuevas fixtures, migración o cambio alojado;
+  servicios QA detenidos conservando backup. Trabajo112–117 y next-env ajeno
+  preservados. Revisión humana/commit/PR/CI/despliegue pendientes, no acreditados.
+
+## EXTRA-117 — Evitar superposición del pie del menú lateral
+
+- **Fecha/origen:** Mateo, 01/11/2026, aporta captura administrativa: Cerrar
+  sesión tapa Cuenta. Continuar rama feat/desktop-layout-polish y preservar112–116,
+  next-env ajeno y cambios locales; sin commit/PR implícitos.
+- **Evidencia:** SidebarContent tiene flex-1/min-h-0 sin overflow propio. Al
+  reducir altura, sus enlaces desbordan por detrás de SidebarFooter. No es un
+  problema de permisos ni del orden de navegación.
+- **Cambio antes de código:** recuperar overflow-auto en SidebarContent y evitar
+  compresión de SidebarFooter. Documentación oficial Base Sidebar y registro
+  base-nova consultados: content es la región desplazable entre cabecera/pie.
+  Reutilizar composición adaptada sin reemplazar componentes o estilos de botones.
+- **Archivos/contratos:** components/ui/sidebar.tsx; guía UI, spec/plan/tasks y
+  evidencia de estado. Sin APIs, datos, permisos, dependencias o migración.
+- **Riesgo/verificación prevista:** foco/último enlace visible al desplazarse,
+  pie dentro del viewport, sin solapamientos a alturas1080/900/768/600 y zoom,
+  admin/candidato/empresa; móvil expandido/contraído sin recortes. Prueba de
+  navegador de geometría y teclado, tipos/lint/pruebas relevantes/build. Rollback
+  por revert de las clases sin cambios de datos. No tests que solo comparen CSS.
+- **Estado previo:** autorizado por solicitud explícita; delta de presentación
+  SB1–SB3 y análisis constitucional IV/V sin arquitectura/reglas nuevas. Revisión
+  humana independiente y verificación pendientes, gates históricos intactos.
+- **Resultado:** dos clases en sidebar.tsx: overflow-auto en contenido y shrink-0
+  en pie. No cambia menú, controles, logout, identidad ni permisos. T285–T286
+  verificados; recuperación por revert. next-env ajeno conserva SHA256 original.
+- **Verificación:** RED administrativo reproduce Cuenta67px fuera del área del
+  contenido a900px de altura; GREEN tres roles sin retries/omisiones. Seis
+  viewports1920×1080,1366×900,1366×768,1024×600,960×540 y768×500; foco en Cuenta,
+  último enlace y logout, pie dentro del viewport y sin solapamiento.960×540
+  cubre espacio equivalente al zoom200% sobre1920×1080, sin afirmar automatizar
+  el control de zoom nativo. Móvil390×844 expandido/contraído y tres axe0 PASS.
+  121 pruebas de composición/3 archivos, tipos/lint/build frío/diff-check PASS.
+  Build solo advierte raíz por lockfiles de snapshot, sin advertencias CSS.
+  QA ficticio54341/3001, sin reset, migración, cambio alojado o nuevas fixtures.
+  Revisión humana/PR/CI/despliegue pendientes; no se acreditan por estas pruebas.
+- **Revisión visual:** captura1366×900 con datos/fuentes cargados y Cuenta
+  enfocada revisada: pie separado32px, contenido termina719.5px y pie comienza
+ 751.5px; Cuenta completa y accesible. Los tres E2E esperan identidad real cargada,
+  además de comprobar la composición. Servicios QA detenidos conservando backup.
+
+## EXTRA-116 — Colecciones limitadas y navegables por rol
+
+- **Revisión al preparar PR,01/11/2026:** job-category-matching.spec aún espera
+  páginas12 y construye su oráculo SQL con limit/offset12. Alinear esos cuatro
+  valores al alcance aprobado10 antes de publicar, conservando orden global,
+  exclusión entre páginas, popup, permisos y nominación. Solo regresión E2E;
+  no modificar el matching para satisfacer expectativas antiguas.
+
+- **Fecha/origen:** Mateo, 01/11/2026, solicita revisar todas las páginas con
+  información. Confirma: historiales/notas internas5; perfiles/ofertas/empresas10.
+  La captura muestra9 ofertas y ya usa páginas10: no inventar una falla allí.
+  Conservar112–115, rama actual y next-env ajeno; sin commit/PR implícitos.
+- **Evidencia previa:** candidato administrativo corta notas/participaciones en50
+  sin acceso al resto; listas candidatas, contactos, cronología, preentrevistas,
+  notas de caso, cursos, derivaciones y tiempos de métricas renderizan arrays enteros.
+  Búsqueda candidata default20, matching12, seguimiento default20 y cursos historial20.
+  Moderación y cuenta-perfil ya muestran5 con revelado; empresas/ofertas ya paginan10.
+- **Diseño antes de código:** constantes comunes10/5. Mantener GET servidor donde
+  existe; notas de candidato se consultan5+1 con página propia y orden fecha/id.
+  Participaciones recientes limitan10 y enlazan a todos los casos filtrados. Nuevas
+  colecciones completas autorizadas usan composición cliente reutilizable: páginas10
+  o Mostrar más por5, sin mover filtros al cliente, truncar datos o alterar acciones.
+  Conservar selección de derivación y destino hash de notificaciones aunque esté
+  fuera del primer bloque. Foco en registros nuevos, contador y anuncio accesibles.
+- **Consultas/contratos:** consultas de historial por tabla recorren lotes ordenados
+  para no perder registros por el tope PostgREST; no prometer carga SQL diferida en
+  RPC que devuelven proyecciones completas. Búsqueda/estadísticas/selecciones de
+  evidencia necesitan su universo autorizado; no recortar esos cálculos/opciones
+  por el límite visual. Categorías/estados son catálogos, no historiales paginables.
+  API de notas amplía respuesta con hasNext; privacidad y guard admin se mantienen.
+- **Archivos previstos:** ui/bounded-list, lib/collections, consultas administrativas,
+  páginas de candidato y cuenta, listas de candidato/cursos/derivaciones, historiales
+  de caso/entrevistas, métricas y defaults de búsqueda/matching/seguimiento. Spec,
+  plan/tasks/checklist/UI, contratos de lectura y matriz de cobertura afectados.
+  Sin esquema, migración, dependencia o variable nueva; no borrar auditoría/datos.
+- **Verificación prevista:** límites0/5/6/10/11 y más de50, todos accesibles sin
+  duplicación; orden estable/errores/autorización; mostrar más/página previa/final,
+  foco, hash lejano y selección. Guardar filtros/cuentas/resultado de contratación,
+  conteos y exportaciones completos; simetría115/móvil/axe, tipos/lint/unit/build
+  y recorridos relevantes con fixture local propio. Rollback por revert sin datos.
+- **Gates antes de implementar:** alcance PG1–PG6 explicitado por el solicitante,
+  clarificación numérica resuelta, diseño/checklist/tareas y análisis acotado de
+  constituciónI–VI sin críticos/altos nuevos. No arquitectura/SQL nuevo ni decisión
+  municipal pendiente. Implementación/verificación pendientes; revisión humana aparte.
+- **Detalle antes del acabado:** los avisos ya estaban paginados a20. Unificar su
+  pantalla completa a10 como listado de registros, conservando campana5, total/
+  no leídos y contrato RPC (parámetro existente). Sin cambio de eventos o lectura.
+- **Implementado:** `ui/bounded-list`, `lib/collections/{limits,read-all}`, lecturas
+  candidates/search-service, openings/admin-service, participations/admin-query,
+  training/service y notifications/service. Composición en cursos, cuenta,
+  participaciones candidatas, derivaciones empresariales, historiales de caso,
+  tiempos de métricas, búsquedas/matching y resumen candidato. Notas del perfil
+  usan notesPage5+1; casos recientes10 enlazan al listado completo. Inventario de
+  31 páginas en `docs/implementation/collection-pagination-audit.md` y contrato
+  `contracts/collection-read-pagination.md`; spec/plan/tasks/checklist/UI alineados.
+- **Pruebas y diagnóstico:** 1616 unit/componentes en135 archivos y60 tooling
+  PASS; tipos/lint/build/diff PASS. Una corrida simultánea con build agotó5s en
+  tres inventarios de archivos; suite completa repetida con dos workers PASS,
+  sin elevar timeouts u omitir pruebas. La compilación final advierte caché CSS
+  incremental (dos selectores inválidos adicionales) y raíz por lockfile de la
+  copia QA; el build frío anterior compiló CSS sin esas advertencias. No cambios
+  de tokens/clases válidas para encubrirlo. La regresión visual detectó medición
+  secuencial durante scroll de foco: medir ambas tarjetas en el mismo fotograma
+  elimina esa carrera, conservando tolerancia1px y todas las aserciones.
+- **Navegador funcional:** cinco pruebas nuevas PASS (57 notas/12 páginas sin
+  pérdidas o duplicados, contactos5+2/foco, filtros/diez registros, cursos en
+  tres superficies, tiempos/exportación sin truncado). Nueve búsquedas/sesiones
+  previas PASS; tres pruebas finales de composición PASS tras corrección de
+  medición. Diecisiete recorridos verificados, sin omisiones/reintentos automáticos.
+  Fixture propio54341/3001; solo notas/contactos/cursos ficticios idempotentes,
+  sin borrar datos, reset habitual, cambio alojado o alteración de negocio.
+- **Cierre técnico:** inventario31 páginas;59 rutas/variantes de público,
+  candidato, empresa y admin,118 vistas1920/390px PASS.59 análisis axe sin
+  infracciones,26 comprobaciones de bloques acotados y geometría real de detalles,
+  cero overflow/fallos de cliente. Capturas de cursos y seguimiento revisadas.
+  Hash lejano/selección posterior a20 se prueban en componente; no se afirma una
+  fixture empresarial de más de20 derivaciones en navegador. Solo Chromium;
+  gates humanos históricos intactos. PG1–PG6/T282–T284 verificados técnicamente.
+  next-env ajeno preservado por SHA256, sin firmas/commit/PR/CI/despliegue nuevos.
+  Revisión humana pendiente; no se marca aprobada por pruebas automáticas.
+- **Aviso conocido del runtime:** navegación interrumpida/cierre de contextos
+  vuelve a registrar Next `destination stream closed early`, digest2894301752,
+  ya documentado en115. No produjo error cliente ni fallo de recorrido final;
+  no se amplía este delta de paginación para sustituir el runtime.
+
+## EXTRA-115 — Composición simétrica de todas las páginas
+
+- **Fecha/origen:** Mateo, 31/10/2026, rechaza la cobertura limitada de114 y aporta
+  captura de seguimiento administrativo con columnas desalineadas. Su pedido
+  incluye revisar todas las páginas. Continúa la misma rama y conserva112–114
+  y next-env ajeno. La verificación114 prueba listados, no aceptación de detalles.
+- **Evidencia previa:** seguimiento usa dos pilas independientes; un aviso terminal
+  desplaza Registrar contacto respecto de Historial. Perfil administrativo repite
+  pilas con controles condicionales; oferta acumula moderación/historia en una
+  columna. Métricas usan anchos1/.85 y align-items:start. Cursos separa dos pilas.
+- **Cambio previsto antes de código:** detalles con grilla de filas compartidas,
+  columnas iguales y tarjetas estiradas solo al alto natural de su fila; avisos
+  generales ocupan fila completa. Seguimiento: acciones aparte, contacto/historial,
+  preentrevistas/respuestas y cronología/notas. Perfil: mantenimiento primero,
+  perfil/CV antes de notas y participaciones, con alta/vinculación condicionales.
+  Oferta conserva información izquierda/decisión derecha y pasa historial debajo.
+  Revisar cuentas, empresas, cursos, métricas, derivaciones y todos los públicos.
+  No columnas de tarjetas apiladas de forma independiente ni cambios de CSS order.
+- **Criterio:** sustituye la exclusión demasiado amplia de SM3 para detalles. Las
+  tarjetas de una misma fila se alinean arriba/abajo también si contienen funciones
+  distintas. Los controles y texto conservan su tamaño; sin alto de viewport,
+  recorte, contenido ficticio en producto, JS de medición o campos nuevos. Navegación
+  lateral y contenido principal no son tarjetas pares: revisar y documentar estos
+  casos concretos. Formulario único/legal mantiene ancho legible, no pares vacíos.
+- **Archivos/contratos previstos:** CSS module opt-in de composición, páginas
+  admin detalle de participación/candidato/oferta/empresa/cursos y cuenta; CSS de
+  métricas y revisión de superficies restantes, docs/spec/plan/tasks. Reusar Card,
+  formularios, claves/IDs/anclas, guards, políticas y datos actuales. Sin SQL,
+  dependencia, variables o arquitectura nueva; fuentes oficiales de Card consultadas.
+- **Riesgos/verificación:** condicionales pueden dejar una celda sola; darle fila
+  completa sin hueco ficticio. Revisar casos finalizados/abiertos, feedback pendiente,
+  vacío/datos, presencial no vinculado/vinculado, activo/suspendido/archivado. Inventario
+  de31 páginas y variantes, medición de tarjetas reales (no solo contenedores),
+  igualdad por fila dentro de1px a1366/1920/2560, apilado320/390, texto largo,
+  formularios expandidos/errores, teclado/axe; tipos/lint/unit/build/E2E relevantes.
+- **Preparación:** alcance explícito coordinado; especificación, clarificación,
+  diseño, checklist y tareas del delta revisados antes de producto. Análisis
+  SY1–SY5/constituciónI–VI sin decisión municipal nueva o brecha crítica/alta.
+  Gates humanos históricos intactos; esta preparación no implicaba aceptación visual.
+- **Hallazgo antes de corregir AuthSurface:** auditoría completa detecta /recover
+  a320: tarjetas miden311px dentro de288px útiles. Grilla implícita usa ancho
+  intrínseco y texto de introducción no puede encoger; desktop además usa .95/1.05
+  y alineación inicial. Ajustar solo AuthSurface (recover, verificación y cambio
+  de contraseña): columna minmax0/mínimos de texto, columnas desktop iguales y
+  paneles estirados por fila. Mantener Home/login, ancho de lectura, campos, orden
+  móvil y todas las acciones. Verificar tres páginas y sus variantes/ambos roles.
+- **Detalle previo al acabado:** capturas muestran inset20 en secciones y24 en
+  formularios pares. Unificar24 (20 en móvil) solo en la grilla opt-in; conservar
+  rojo de decisiones destructivas y no duplicar padding de cronologías enmarcadas.
+  El mantenimiento presencial ahora ocupa una fila completa: agrupar nombre/DNI,
+  teléfono/correo y detalle/domicilio en pares desktop, con el resto a ancho completo,
+  sin reordenar campos/DOM. Aplicar también al alta presencial; móvil conserva una
+  columna. Es composición necesaria para evitar campos estirados de1500px.
+- **Implementado:** detail-layout.module.css opt-in, seis páginas administrativas
+  (participación, candidato, oferta, empresa, cursos y atención presencial), cuenta,
+  AuthSurface y dashboard.module.css de métricas. Campos/acciones/keys/IDs/anclas/
+  guards y estados intactos; sin SQL, dependencia o variable nueva. Fuentes oficiales
+  de Card/registro base-nova consultadas, sin sobrescribir componentes compartidos.
+  Artefactos y docs/implementation/card-symmetry-audit.md reflejan el alcance final.
+- **Verificación final:** inventario de31 páginas y59 variantes/rutas de los cuatro
+  perfiles:295 vistas en Chromium a1366/1920/2560/390/320. Cero overflow, errores de
+  cliente o fallas de geometría.95 mediciones de detalles verifican el marco real,
+  no solo wrapper;30 de AuthSurface,78 barridos axe sin infracciones. Se revisaron
+  capturas, texto extenso y estados disponibles: referido/contratado/no seleccionado/
+  retirado; candidato activo/needs_update y presencial; seis estados de ofertas,
+  cursos con/sin candidato. Estados archivados/suspendidos/vinculados adicionales
+  conservan cobertura de componentes; no afirmar que todos tuvieron fixture navegador.
+- **Regresiones:** tres nuevos E2E persistentes PASS: contacto/historial en caso
+  referido y contratado, error de fecha sin perder resumen, teclado/axe/apilado;
+  acceso secundario a1920/320. Nueve E2E finales de búsqueda/sesión PASS. Total12,
+  sin retries/omisiones.1608 unit/componentes/133 archivos,60 tooling, tipos, lint,
+  build frío y diff PASS. React revisado: solo composición/CSS, sin estado/efectos/
+  JS nuevos o alteración de identidad/props de formularios.
+- **Hallazgos conservados:** primer recorrido detectó seis vistas AuthSurface con
+  overflow320; resueltas. Tres comparaciones iniciales de ancho de navegación/lector
+  eran incorrectas: excepción documentada y ahora verificada por top/gap/límites,
+  sin ocultar la medición ni cambiar esa navegación. La primera prueba nueva usaba
+  received, ausente en el fixture: se eligió el caso abierto referido que sí existe,
+  sin crear datos, omitir la prueba o aumentar timeout. Unitarias de orden se
+  actualizaron a orden semántico conservado y grilla nueva, no pilas retiradas.
+- **Cierre:** SY1–SY5/T279–T281 verificados sin brechas nuevas; evidencia local
+  ignorada extra115-before-final/final-* y capturas. Solo instancia QA ficticia propia;
+  sin reset habitual o cambios alojados. next-env ajeno conserva hash. Sin commit,
+  PR, CI, despliegue o revisión/aceptación humana. Solo Chromium medido; no se afirma
+  cobertura de otros motores. Avisos previos de stream cancelado en navegación
+  interrumpida no produjeron fallos finales; no se modifica streaming en este alcance.
+  Recuperación por revert visual conservando todos los registros.
+
+
+## EXTRA-114 — Simetría de tarjetas comparables
+
+- **Fecha/origen:** Mateo,31/10/2026, pide comprobar que las cards sean simétricas.
+  Continúa feat/desktop-layout-polish conservando112/113 y next-env ajeno.
+- **Evidencia previa:** listados ya igualan altura exterior con h-full, pero título
+  largo desplaza empresa/categorías/datos frente a sus pares; ofertas empresariales
+  y participaciones no separan encabezado, cuerpo y cierre. Recomendaciones del
+  dashboard tienen metadatos a alturas distintas y resumen empresarial usa1.4fr/1fr.
+- **Cambio antes de código:** grupos equivalentes comparten ancho/altura por fila,
+  encabezado/cuerpo/cierre alineados mediante CSS subgrid opt-in desde768 con
+  fallback flex. Tres grupos estables, orden/contenido completo y controles actuales;
+  no clamp, alturas fijas, medición JS en producto o igualdad artificial entre filas
+  distintas. En móvil una columna conserva altura natural. Dashboard alinea sus
+  metadatos y resumen de empresa usa dos columnas iguales.
+- **Justificación/contratos:** detalle técnico necesario para simetría sin recortar
+  datos o estirar toda la página. Mantener Card/primitivas, formularios, acciones,
+  foco, campos requeridos, mensajes y claves de intentos. Fuente técnica: CSS Grid
+  subgrid (MDN, developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Subgrid),
+  con @supports para mejora progresiva; sin dependencias o arquitectura nueva.
+- **Archivos previstos:** CSS de layout opt-in en components/ui; catálogo público,
+  ofertas/participaciones de candidato, ofertas/resumen empresarial, CSS de dashboard;
+  spec/plan/tasks/UI y evidencia. Home (números/proceso/carrusel) y grupos de cuentas
+  se revisan; no forzar simetría entre un formulario y una tarjeta de otra función.
+- **Riesgos/verificación:** subgrid anidado, padding/filas incompletas, títulos/
+  mensajes extensos, formularios de distinto estado, interacción y móvil. Medir
+  anchos, alturas y coordenadas internas por fila a1366/1920/2560 y320/390, sin
+  overflow/cortes/solapamientos; teclado/axe, tipos/lint/unit/build y recorridos
+  relevantes. Fallback y grupos ya simétricos se preservan. Sin SQL/datos nuevos.
+- **Estado:** implementado y verificado; registro previo a código y análisis
+  SM1–SM4 sin brechas constitucionales ni decisión municipal nueva. Gates humanos
+  históricos intactos; commit/PR, CI, despliegue y revisión humana no realizados.
+- **Detalle visual antes del ajuste final:** las capturas muestran enlaces del
+  resumen empresarial a distinta altura pese a sus bordes iguales. Aplicar flex
+  vertical y margen automático a los enlaces existentes, sin cambiar destinos,
+  controles o altura fija. Verificar que ambos queden al pie en desktop y que
+  móvil conserve el contenido completo y el foco.
+- **Archivos finales:** components/ui/card-layout.module.css; catálogo público
+  y su CSS; ofertas/participaciones de candidato; ofertas y panel empresarial;
+  account.module.css; artefactos spec/plan/tasks, UI_GUIDELINES, implementation-status
+  y docs/implementation/desktop-layout-audit.md. Card, servicios, acciones, claves
+  de intentos y permisos conservados. Sin SQL, dependencias o variables nuevas.
+- **Verificación real:** 40 vistas en Chromium (ocho rutas/variantes de cuatro
+  perfiles × 1366/1920/2560/390/320), con igualdad por fila dentro de 1px, tres
+  grupos alineados, títulos completos y sin overflow/errores de cliente. 16
+  barridos axe y dos adicionales con CV desplegado por teclado y mensaje largo
+  ficticio insertado solo en DOM: cero infracciones. Cuatro comprobaciones del
+  fallback flex mediante estilos de prueba; no equivalen a probar otros motores.
+  Capturas revisadas; metadatos y enlaces del resumen empresarial alineados.
+- **Checks:** 1608 unit/componentes en 133 archivos, 60 tooling, tipos, lint,
+  build frío y nueve E2E finales de búsqueda/sesión PASS (sin retries/omisiones).
+  La primera suite tuvo un timeout de 5s en el escaneo español mientras compilaba;
+  se repitió completa sin modificar prueba/timeout: 1608 PASS. Caché incremental
+  volvió a producir dos selectores CSS basura; build frío del snapshot, sin tocar
+  fuente/configuración, pasó sin esos avisos. Advertencia de raíz por copia anidada
+  solo del entorno QA. next-env ajeno conserva su hash; servicios propios cerrados
+  al terminar, sin reset o cambios en Supabase habitual/alojado. Recuperar por
+  revert visual del PR, sin alterar datos. Evidencia local ignorada extra114-*.
+- **Límite observado:** Next conserva el aviso previo de stream cancelado
+  (digest2894301752) en navegaciones interrumpidas de QA; no hubo errores de
+  cliente ni fallos en los nueve recorridos finales. No se cambia streaming como
+  parte de este ajuste de composición.
+
+## EXTRA-113 — Aprovechamiento del escritorio en todas las páginas
+
+- **Fecha/origen:** Mateo,31/10/2026, amplía la revisión visual a todas las páginas
+  para aprovechar pantallas de PC. Se conserva íntegro el trabajo pendiente112;
+  rama local renombrada feat/desktop-layout-polish, sin borrar trabajo ni publicar.
+- **Evidencia previa:** DashboardShell de los tres roles limita candidateCanvas
+  a1280px aunque el espacio de trabajo sea mayor. Ofertas, secciones inferiores
+  de Home y cursos repiten ese tope; listados conservan dos columnas a1920/2560.
+  Formularios breves, términos y páginas de error tienen límites de lectura que
+  son deliberados, no equivalentes a un listado limitado artificialmente.
+- **Cambio previsto antes de implementar:** lienzo privado ocupa el espacio útil
+  tras sidebar/márgenes; máximo público compartido1280→1800 solo desde1440px.
+  Catálogo y listados de tarjetas existentes ganan columnas en escritorio ancho;
+  preservar orden DOM, paginación, filtros, contenido y acciones. Datos empresariales
+  simples usan tercera columna cuando hay espacio. No inflar tipografías, campos,
+  altos de tarjetas ni llenar con contenido artificial vistas cortas/vacías.
+- **Alcance/autorización:** pedido global coordina las bases visuales compartidas.
+  Auditoría de31 page.tsx, variantes de candidato y /account por rol, detalles,
+  públicos, auth, redirecciones y estados. No rediseñar controles, perder simetría,
+  cambiar navegación, permisos, reglas, CV, sesión o datos. Mantener límites de
+  párrafos/formularios cortos y encabezados legibles, además del funcionamiento112.
+- **Archivos/contratos:** globals.css (solo variable de ancho), account.module.css,
+  home.module.css, public-offers.module.css y catálogo, cursos; listas privadas
+  de candidato/empresa y ficha empresarial administrativa; docs/spec/plan/tasks y
+  matriz de revisión. Contratos y modelo intactos; sin migración/dependencia/variable
+  de entorno. CSS con tokens actuales, ajustes desktop opt-in; móvil conserva diseño.
+- **Riesgos/verificación:** todos los roles usan shell común; comprobar anchos reales
+  útiles antes/después, filas/tarjetas y lectura en1366/1920/2560, sin scroll
+  horizontal o huecos por alturas forzadas. Móvil390/320 y teclado/axe de regresión.
+  Recorrer páginas reales con fixture local propio, tipos/lint/unit/tooling/build
+  y pruebas relevantes. Recuperar por revert de presentación, sin modificar datos.
+- **Estado real:** implementado y verificado. Registro previo a código y análisis
+  SP1–SP5 sin incertidumbre municipal, arquitectura nueva o críticos/altos. Las31
+  páginas y46 variantes fueron revisadas; sin brechas nuevas del alcance. Gates
+  humanos históricos intactos; sin commit/PR/CI/revisión humana o despliegue implícitos.
+- **Prerrequisito visual demostrado antes de corregir:** al revisar regresión móvil,
+  navbar privada320px usa44px para la marca y0px de separación, mientras Mi cuenta
+  termina en327.48px. El ajuste112 solo cubre ofertas. Reutilizar esa regla probada
+  en home.module.css compartido y retirar duplicado local: padding10/gap8, marca sin
+  compresión y separaciones internas6 bajo359. Mismos enlaces/44px/visibilidad,
+  ninguna interacción o control nuevo. Verificar todos los roles a320/390, límites
+  reales de cada elemento y ausencia de overflow; riesgo compartido de CSS acotado.
+- **Detalle derivado SP3 antes de código:** el formulario público conserva tres
+  filas de campos/acciones aunque su columna ahora dispone de más de1000px.
+  Bajo alcance de composición, desde1600 distribuir texto (dos unidades) y tres
+  selectores en cinco columnas, acciones en una fila completa. Solo CSS local
+  contra el formulario existente por su nombre accesible; campos/GET/errores/foco
+  intactos, móvil/tablet conservados. Verificar alineación de cuatro campos,
+  altura natural más corta y envío/limpieza a1920/2560, sin mover inputs de orden.
+- **Archivos finales:** previstos arriba; grillas privadas opt-in en account.module.css
+  reutilizadas por listas de candidato/empresa, datos simples en ficha de empresa;
+  regla estrecha centralizada en home.module.css y eliminada del módulo de ofertas.
+  Inventario/evidencia en docs/implementation/desktop-layout-audit.md y artefactos
+  spec/plan/tasks/checklist/UI/implementation-status alineados. Sin SQL de producto,
+  permisos, handlers, dependencias, variables de entorno o cambios alojados.
+- **Medición real:** antes46 vistas a1920; después154 mediciones (46 variantes en
+  1366/1920/2560 y16 móviles320/390), cero overflow/errores de cliente/boundaries.
+  Paneles1920:1280→1608px útiles completos; a2560:2248px. Ofertas1920:1280→1800;
+  cursos/Home amplían sus bloques según la misma variable. Tarjetas privadas3 a
+  1920 y4 a2560, catálogo público3. Límites de lectura de términos/auth conservados.
+  Filtro público revalidado tras el último ajuste en seis anchos:352→185px a1920/
+  2560, campos alineados, tabulación/GET/persistencia/limpiar/axe correctos.
+- **Verificación:**1608 unit/componentes/133 archivos,60 tooling, tipos/lint/
+  build frío/diff PASS. Nueve E2E finales sin retries/omisiones: búsqueda y tres
+  roles con renovación, reapertura, navegación y cierre explícito. Axe0 en28
+  barridos seleccionados de la revisión general y seis finales de filtros; no se
+  presenta como axe en todas las154 mediciones. Capturas desktop/móvil revisadas.
+- **Diagnósticos/límites:** el build incremental generó dos selectores basura de
+  CSS; fuentes verificadas sin caracteres de control y build frío de la copia
+  propia PASS sin esas advertencias, sin parchear compilador/configuración. Axe
+  auxiliar exigió browser.newContext explícito; corregido el harness y repetidos
+  seis checks sin cambiar reglas. Persiste aviso histórico de stream cancelado
+  al navegar, sin errores cliente o fallos finales; fuera del alcance visual.
+- **Entorno/recuperación:** solo funes-admin-cv-check, API54341/DB54342/app3001.
+  Un perfil presencial ficticio independiente creado por RPC activo autorizado,
+  con consentimiento/auditoría conservados y sesión temporal eliminada. Sin reset
+  de base habitual ni datos reales. Se detienen únicamente servidor/instancia
+  propios conservando respaldo. next-env ajeno mantiene B8B3A344…C491000.
+  Recuperar mediante revert de presentación; no borrar registros o auditorías.
+
+## EXTRA-112 — Presentación pública de ofertas y navegación común
+
+- **Fecha/origen:** Mateo,31/10/2026, solicita adecuar /ofertas y cada oferta al
+  estilo vigente y corregir navbar distinta. Rama feat/public-offers-style desde
+  main71a758e actualizado; PR87 mergeado, rama anterior eliminada local/remota.
+  next-env ajeno preservado con hash B8B3A344…C491000.
+- **Evidencia previa:** catálogo tiene HomeNavbar pero le pasa acceso al perfil
+  en lugar del panel y duplica navegación en banda propia; detalle conserva logo,
+  header, gradiente y enlaces de registro independientes. Ambos usan composición
+  previa al panel blanco sobre espacio verde de las vistas actuales. Detalle ofrece
+  registro/postulación también a empresa/admin aunque esos roles no pueden postular.
+- **Cambio previsto antes de código:** reutilizar HomeNavbar sin modificar su
+  comportamiento global, con panel verificado y campana solo en sesión activa.
+  Contenedor servidor común de ambas páginas, espacio verde y lienzo blanco con
+  tokens municipales, encabezado compacto Sora, tarjetas equilibradas, controles
+  existentes y aside que respeta header fijo. Reutilizar variantes Button en links
+  semánticos; sin fuente/paleta nueva ni rediseño de Home/cursos/dashboards.
+- **Detalle necesario de presentación:** detalle lee getSiteAccess una vez como
+  catálogo. Candidato mantiene destino por slug para postular, visitante conserva
+  postulación/registro/login; otros roles ven acceso a su propio panel en lugar de
+  acciones candidatas. No autoriza acciones nuevas: guards servidor/SQL intactos.
+- **Archivos/contratos:** páginas de ofertas, contenedor/CSS local nuevos, pruebas
+  de páginas/navegador; spec/plan/tasks/checklist/UI y evidencia. Contratos públicos
+  de búsqueda, filtros GET, fechas, slugs, DTO, publicación/privacidad, CV y sesión
+  se preservan. Sin migración, dependencia, variable o arquitectura nueva.
+- **Riesgos/verificación:** teclado/foco/contraste, navegación móvil con campana,
+  encabezado fijo sin tapar contenido, textos largos, tarjetas equilibradas,
+  empty/invalid/404 y filtros/paginación; visitante y tres roles, destinos/ausencia
+  de registro y uso de sesión servidor. Tipos/lint/pruebas/build y revisión visual
+  a1920/1440/390/320px con datos ficticios; no datos privados o escrituras alojadas.
+- **Estado real:** implementado y verificado; pedido explícito coordina/autoriza
+  alcance. Documentado antes de código; revisión acotada PO1–PO5 sin críticos/altos
+  o decisión municipal nueva. Sin brechas de implementación nuevas; pendientes
+  humanos históricos intactos. Commit/PR/CI/revisión humana/despliegue no acreditados.
+- **Diagnóstico intermedio:** navegador real mostró que buttonVariants de un módulo
+  use-client no puede invocarse desde RSC, aunque unit/tipos/build pasen. Corregir
+  reutilizando LinkButton existente, que aplica la variante dentro del límite
+  cliente y conserva semántica link. Sin mover páginas/búsqueda al cliente ni
+  cambiar componentes compartidos. Repetir build y recorridos reales antes de cierre.
+- **Hallazgo visual antes de corregir:** captura activa320px muestra el emblema y
+  el comienzo de Inicio tocándose aunque scrollWidth y axe pasen. Derivación PO5:
+  reducir padding de navbar y separación interna solo bajo359px y dentro del
+  contenedor público local, sin ocultar links/campana ni tocar HomeNavbar global.
+  Verificar geometría real (al menos8px entre marca y primer link), además de
+  overflow/axe; añadir la comprobación a navegación E2E por rol. Riesgo acotado a
+  CSS de estas dos vistas en móvil estrecho; mismas acciones y mínimos táctiles.
+- **Archivos finales:** páginas catálogo/detalle, public-offers-shell.tsx y módulo
+  CSS local; public-offers.test.tsx, public-offer-search.spec.ts y
+  session-navigation.spec.ts; spec/plan/tasks/checklist/contrato de autorización,
+  UI_GUIDELINES, guías operativas e implementation-status. Servicios/RPC, filtros,
+  HomeNavbar/globales, modelo y dependencias sin cambios.
+- **Verificación real:** RED5/16 de navegación/accesos; suite1608/133 PASS y66/5
+  focales finales tras corregir LinkButton;60 tooling PASS. Tipos/lint/build/diff
+  PASS. Nueve E2E finales sin omisiones/reintentos verifican filtros/teclado/páginas,
+  inválidos/cerradas, tres roles, renovación, reapertura y cierre de sesión.
+  Veinte vistas finales a320/390/1440/1920px con axe0/overflow0/errores cliente0,
+  títulos/cuerpo extensos, opcionales, foco y separación marca/Inicio>=8px; solo
+  sesiones activas consultan avisos y su API responde200. Slug inexistente mantiene
+  no disponible/noindex/sin postulación. Capturas normales/largas revisadas.
+- **Diagnósticos preservados:** primer ajuste estrecho seguía dejando0px entre
+  marca y primer link; seis E2E geométricos lo rechazaron. Se midieron anchos,
+  reservó gap8px y se redujeron solo espacios locales; mismos umbrales y nueve
+  recorridos posteriores PASS. No se rebajó axe/overflow/geometría ni se omitieron
+  pruebas. Next conserva diagnóstico histórico de stream cerrado al cancelar
+  navegación, sin error de cliente o fallo en recorridos finales; no se amplía
+  este cambio visual a un arreglo general de streaming.
+- **Entorno/límites:** copia ignorada e instancia propia funes-admin-cv-check,
+  API54341/DB54342/aplicación3001, exclusivamente ficticias. Se actualizaron allí
+  tres migraciones ya mergeadas de main que faltaban en su respaldo; no migración
+  nueva de este incremento, reset de base habitual o cambio alojado. next-env ajeno
+  mantiene hash original; ningún dato real, secreto, dependencia o variable nueva.
+  Recuperación y validación: docs/operations/public-offers-presentation.md.
+
+## EXTRA-112 (PR89) — Simplify the authenticated Home access card
 
 - Date: 2026-10-31.
 - Authorization / origin: Máximo requested hiding the entire login/registration tab container while signed in and replacing the active-session message with clearer gray text. This refines the approved session-aware Home access behavior (EXTRA-052 / EXTRA-053).

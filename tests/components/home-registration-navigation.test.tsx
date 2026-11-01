@@ -60,18 +60,17 @@ it.each(["candidate", "company", "admin"])("ignores registration route selection
   for (const registro of ["candidato", "empresa"]) {
     readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
     const view = render(await HomePage({ searchParams: Promise.resolve({ registro }) }));
-    const assertLogin = () => {
-      expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
-      expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
-      expect(screen.getByRole("heading", { level: 1 }).parentElement?.getAttribute("data-view")).toBe("login");
-      expect(screen.getByRole("region", { name: "Acceso al portal" }).getAttribute("data-mode")).toBe("login");
+    const assertOffers = () => {
+      expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
+      expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
+      expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
       expect(screen.queryByRole("radio")).toBeNull();
       expect(view.container.querySelector("form")).toBeNull();
     };
-    assertLogin();
+    assertOffers();
     for (const requestedRole of ["candidate", "company"]) {
       act(() => { window.dispatchEvent(new CustomEvent(HOME_REGISTRATION_EVENT, { detail: requestedRole })); });
-      assertLogin();
+      assertOffers();
     }
     view.unmount();
   }

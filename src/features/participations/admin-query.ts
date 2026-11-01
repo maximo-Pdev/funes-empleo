@@ -3,12 +3,14 @@ import { z } from "zod";
 import { participationStatusSchema } from "@/domain/states";
 import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
+import { RECORD_PAGE_SIZE } from "@/lib/collections/limits";
+import { readAllRows } from "@/lib/collections/read-all";
 
 const id = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 const listInput = z.object({
   openingId: id.optional(), candidateId: id.optional(), status: participationStatusSchema.optional(),
   page: z.coerce.number().int().min(1).max(1000).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(20),
+  pageSize: z.coerce.number().int().min(1).max(50).default(RECORD_PAGE_SIZE),
 });
 
 async function adminClient() {
@@ -26,7 +28,7 @@ export async function listAdminParticipations(input: unknown) {
   const client = await adminClient();
   let query = client.from("participations")
     .select("id,status,origin,created_at,candidate_profiles!participations_candidate_id_fkey(id,display_name),job_openings!participations_opening_id_fkey(id,title)", { count: "exact" })
-    .is("archived_at", null).order("created_at", { ascending: false })
+    .is("archived_at", null).order("created_at", { ascending: false }).order("id")
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (openingId) query = query.eq("opening_id", openingId);
   if (candidateId) query = query.eq("candidate_id", candidateId);
@@ -45,17 +47,17 @@ export async function getAdminParticipation(participationId: string) {
       .select("id,status,origin,version,created_at,feedback_due_at,final_outcome_at,application_cv_document_id,application_cv:cv_documents!participation_cv_owner_fk(id,original_name_safe,status,archived_at),candidate_profiles!participations_candidate_id_fkey(id,display_name),job_openings!participations_opening_id_fkey(id,title,status)")
       .eq("id", participationId).is("archived_at", null).maybeSingle(),
     client.rpc("admin_workflow_timeline", { p_entity_type: "participations", p_entity_id: participationId }),
-    client.from("preinterviews")
+    readAllRows((from, to) => client.from("preinterviews")
       .select("id,channel,scheduled_at,held_at,summary_internal,recommendation,created_at")
       .eq("participation_id", participationId).is("archived_at", null)
-      .order("created_at", { ascending: false }),
-    client.from("contact_events")
+      .order("created_at", { ascending: false }).order("id", { ascending: false }).range(from, to)),
+    readAllRows((from, to) => client.from("contact_events")
       .select("id,channel,direction,occurred_at,summary_internal,created_at")
-      .eq("participation_id", participationId).order("occurred_at", { ascending: false }),
-    client.from("internal_notes")
+      .eq("participation_id", participationId).order("occurred_at", { ascending: false }).order("id", { ascending: false }).range(from, to)),
+    readAllRows((from, to) => client.from("internal_notes")
       .select("id,note_kind,body,created_at")
       .eq("participation_id", participationId).is("archived_at", null)
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false }).order("id", { ascending: false }).range(from, to)),
     client.from("referrals")
       .select("id,access_status,post_hire_access_until")
       .eq("participation_id", participationId).is("archived_at", null).maybeSingle(),
@@ -64,9 +66,9 @@ export async function getAdminParticipation(participationId: string) {
     throw new AppError("INTERNAL_ERROR");
   }
   if (!participation.data) throw new AppError("NOT_FOUND");
-  const feedback = referral.data ? await client.from("company_feedback")
+  const feedback = referral.data ? await readAllRows((from, to) => client.from("company_feedback")
     .select("id,reported_outcome,reported_at,review_status,message")
-    .eq("referral_id", referral.data.id).order("reported_at", { ascending: false }) : null;
+    .eq("referral_id", referral.data!.id).order("reported_at", { ascending: false }).order("id", { ascending: false }).range(from, to)) : null;
   if (feedback?.error) throw new AppError("INTERNAL_ERROR");
   return {
     participation: participation.data,

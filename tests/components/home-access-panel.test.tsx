@@ -15,6 +15,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
 
 import HomePage from "@/app/(public)/page";
+import { HomeHero } from "@/app/(public)/home-hero";
 import { AuthForm } from "@/features/accounts/components/auth-form";
 import { CandidateRegistrationForm } from "@/features/candidates/components/candidate-registration-form";
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
@@ -59,23 +60,39 @@ describe("Home access panel", () => {
   });
 
   it.each([
-    ["candidate", "Ir al panel de usuario"],
-    ["company", "Ir al panel de empresa"],
-    ["admin", "Ir al panel de administración"],
-  ])("keeps verified panel access without registration controls for an active %s", async (role, label) => {
+    ["candidate", "/dashboard"],
+    ["company", "/empresa"],
+    ["admin", "/admin"],
+  ])("starts at offers with verified navbar access for an active %s", async (role, href) => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role, status: "active" } } as never);
     const view = render(await HomePage());
-    expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+    expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
     expect(view.container.querySelector("form")).toBeNull();
-    const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
-    expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    expect(screen.getByRole("main").firstElementChild?.id).toBe("ofertas-disponibles");
+    expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("banner").getAttribute("data-visible")).toBe("true");
+    expect(screen.getByRole("link", { name: /^Mi cuenta$/ }).getAttribute("href")).toBe(href);
+    expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Registrarse" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
     expect(screen.queryByRole("radio")).toBeNull();
     expect(screen.queryByRole("button", { name: "Iniciar sesión" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
-    expect(view.container.querySelector("form")).toBeNull();
-    expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+  });
+
+  it.each([
+    ["candidate", "/dashboard", "Ir al panel de usuario"],
+    ["company", "/empresa", "Ir al panel de empresa"],
+    ["admin", "/admin", "Ir al panel de administración"],
+  ])("keeps verified panel access in the reusable hero for an active %s", (role, href, label) => {
+    const view = render(<HomeHero authenticated panelHref={href} panelLabel={label} />);
+    const access = screen.getByRole("region", { name: "Acceso al portal" });
+    expect(within(access).getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+    expect(within(access).queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+    expect(within(access).queryAllByRole("button")).toHaveLength(0);
+    expect(access.querySelector("form")).toBeNull();
+    expect(within(access).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
     const output = process.env.HOME_SESSION_FIXTURE_DIR;
     if (output) {
       const css = readFileSync("src/app/(public)/home.module.css", "utf8")
@@ -271,7 +288,16 @@ describe("Home access panel", () => {
   it("ignores an access notice while a verified session is active", async () => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status: "active" } } as never);
     render(await HomePage({ searchParams: Promise.resolve({ acceso: "suspendido" }) }));
-    expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
+    expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
     expect(screen.queryByText("Acceso suspendido")).toBeNull();
+  });
+
+  it.each(["suspended", "archived"])("keeps anonymous access when the account is %s", async status => {
+    vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status } } as never);
+    render(await HomePage());
+    expect(screen.getByRole("region", { name: "Acceso al portal" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Ingresar$/ })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Ofertas disponibles" })).toBeTruthy();
   });
 });

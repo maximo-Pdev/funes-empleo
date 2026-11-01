@@ -18,6 +18,7 @@ import { requireActiveAccount } from "@/lib/auth/guards";
 import { OpeningCandidateMatches } from "@/features/participations/components/opening-candidate-matches";
 import { LinkButton } from "@/components/ui/link-button";
 import { RecordLink } from "@/components/ui/record-link";
+import layout from "@/components/ui/detail-layout.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -45,9 +46,8 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         <a href="#candidate-matches" className="inline-flex min-h-11 items-center text-primary underline">Revisar candidatos coincidentes</a>
       </div>
     </section>
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="space-y-6">
-      <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+    <div className={layout.grid} data-detail-grid="opening">
+      <section aria-labelledby="opening-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5" data-detail-cell="opening">
         <h2 id="opening-details" className="text-xl font-semibold">Oferta y empresa</h2>
         <p>Empresa: <strong>{opening.company_profiles?.legal_name ?? "Sin nombre"}</strong></p>
         {opening.company_profiles?.id && <RecordLink href={`/admin/empresas/${opening.company_profiles.id}`} className="font-semibold underline">Ver perfil de la empresa</RecordLink>}
@@ -62,10 +62,11 @@ export default async function AdminOpeningDetailPage({ params, searchParams }: {
         <div><h3 className="font-semibold">Requisitos</h3><p className="whitespace-pre-wrap">{opening.requirements ?? "Sin definir"}</p></div>
         <LinkButton href={`/admin/participations?openingId=${openingReference}`}>Ver participaciones de esta oferta</LinkButton>
       </section>
-      </div>
-      <div id="opening-moderation" tabIndex={-1} className="scroll-mt-24 space-y-6">
+      <div id="opening-moderation" tabIndex={-1} className={`${layout.cell} ${layout.notice} scroll-mt-24`} data-detail-cell="moderation">
       <ModerationForm key={`${opening.status}-${opening.version}`} openingId={opening.id}
         version={opening.version} status={opening.status} onSubmit={moderateOpeningAction} />
+      </div>
+      <div className={`${layout.cell} ${layout.full} ${layout.surface}`}>
       <ModerationHistory key={`${opening.id}:${opening.version}`} events={events.map(event => ({
         id: event.id, decision: event.decision, previousStatus: event.previous_status, newStatus: event.new_status,
         at: event.created_at, message: event.company_message, internalReason: event.internal_reason,

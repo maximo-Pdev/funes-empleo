@@ -63,5 +63,6 @@ test("búsqueda pública: título de oferta cerrada no aparece como resultado", 
   await page.goto(`/ofertas?${new URLSearchParams({ q: title })}`);
   await expect(page.getByText("No encontramos ofertas con esos filtros.", { exact: true })).toBeVisible();
   await expect(page.locator('li a[href^="/ofertas/"]')).toHaveCount(0);
-  await expect(page.getByRole("navigation", { name: "Accesos principales", exact: true }).getByRole("link", { name: "Iniciar sesión", exact: true })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Navegación principal", exact: true }).getByRole("link", { name: "Inicio", exact: true })).toHaveAttribute("href", "/");
+  await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toBeVisible();
 });

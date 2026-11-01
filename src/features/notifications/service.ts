@@ -3,6 +3,7 @@ import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
 import { workflowRpcError } from "@/lib/errors/workflow-rpc";
 import { notificationReference, notificationSchema, notificationsSchema, notificationTarget, notificationsHref, preinterviewAgendaSchema } from "./contracts";
+import { RECORD_PAGE_SIZE } from "@/lib/collections/limits";
 
 async function activeSession() {
   const session = await readAccountSession();
@@ -10,7 +11,7 @@ async function activeSession() {
   if (session.account.status !== "active") throw new AppError("ACCESS_DENIED");
   return session;
 }
-export async function listNotifications(page = 1, size = 20) {
+export async function listNotifications(page = 1, size = RECORD_PAGE_SIZE) {
   const session = await activeSession();
   if (!Number.isInteger(page) || page < 1 || page > 10000 || !Number.isInteger(size) || size < 1 || size > 20) throw new AppError("VALIDATION_ERROR");
   const result = await session.client.rpc("list_my_notifications", { p_page: page, p_page_size: size });

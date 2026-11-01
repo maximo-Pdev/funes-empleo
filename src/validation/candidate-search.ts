@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RECORD_PAGE_SIZE } from "@/lib/collections/limits";
 
 const scalar = (value: unknown) => Array.isArray(value) ? value[0] : value;
 const optionalText = (maximum: number) => z.preprocess((value) => {
@@ -20,7 +21,7 @@ export const candidateSearchSchema = z.object({
   locality: optionalText(100),
   eligibility: z.enum(["eligible", "ineligible", "all"]).default("eligible"),
   page: pageNumber(1, 1000),
-  pageSize: pageNumber(20, 50),
+  pageSize: pageNumber(RECORD_PAGE_SIZE, 50),
 });
 
 export type CandidateSearchFilters = z.infer<typeof candidateSearchSchema>;

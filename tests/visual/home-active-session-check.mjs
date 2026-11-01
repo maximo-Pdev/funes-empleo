@@ -1,13 +1,15 @@
-// Actual Home React markup and CSS with mocked session projections; no Auth or database access.
+// Reusable HomeHero markup/CSS in authenticated mode; HomePage itself omits it
+// for verified active sessions (EXTRA118). No Auth or database access.
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import postcss from "postcss";
 import tailwind from "@tailwindcss/postcss";
 import { chromium } from "@playwright/test";
 
-const output = await mkdtemp(path.join(process.env.LOCALAPPDATA, "hermes/cache/scratch/home-session-"));
+const output = await mkdtemp(path.join(tmpdir(), "funes-home-session-"));
 const generated = spawnSync(process.execPath, ["node_modules/vitest/vitest.mjs", "run", "tests/components/home-access-panel.test.tsx", "-t", "keeps verified panel access", "--maxWorkers=2"], {
   env: { ...process.env, HOME_SESSION_FIXTURE_DIR: output }, encoding: "utf8",
 });
