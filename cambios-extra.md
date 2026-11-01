@@ -1,5 +1,37 @@
 # Cambios extra necesarios
 
+## Selectores E2E y paginación real del PR88 — 01/11/2026
+
+- **Origen/evidencia:** pedido de reparar GitHub; Quality217/41332470427 pasa
+  tipos/lint/tooling/cobertura/build y143 recorridos. Tres fallos estrictos:
+  assisted-section56 encuentra dos Activo; intermediation73/127 encuentra avisos
+  de paginación además del estado vigente. Ocho dependientes no se ejecutan.
+  El listado presencial ya fija10 por EXTRA116 y no admite reducirlo con pageSize=1.
+- **Cambio antes de implementar:** limitar las consultas de estado al bloque
+  «Resultado o estado vigente», como los otros recorridos del mismo archivo.
+  En alta presencial crear11 perfiles ficticios por el flujo autorizado, comprobar
+  10+1 filas/estados/enlaces, filtros y ausencia de duplicados; retirar la suposición
+  de página de1. Ampliar solo el tiempo de ese recorrido por sus nueve altas extra.
+- **Alcance/justificación:** tests/e2e/assisted-section.spec.ts e
+  intermediation.spec.ts; documentación de evidencia/T293. Sin API, SQL, UI,
+  permisos, datos reales o reglas nuevas; no omitir pruebas ni debilitar privacidad.
+- **Riesgo/verificación prevista:** mayor duración y mutaciones ficticias; nombre
+  aislado, DNI sintético y categorías deterministas. Reproducir/validar ambos
+  recorridos en fixture propia local; tipos/lint/diff y CI completa posterior.
+  database217 falla al arrancar Docker por54324 ocupado (antes de SQL); repetir
+  sobre runner nuevo, sin cambiar configuración compartida por esa evidencia sola.
+- **Estado:** propuesto antes del cambio; autorizado por reparación pedida y
+  AGENTS.md. Revisión humana y ejecución completa pendientes.
+- **Resultado local:** tres recorridos GREEN sin omisiones/reintentos (1,2min):
+  11 altas activas por UI, orden exacto10+1 aun con pageSize=1, filtro A, detalle,
+  consentimiento asistido y conteo sin duplicados; estado contratado e historial;
+  CV200 para roles autorizados,404 para ajeno y tras última revocación, acceso
+  propio200 y nombre mínimo conservado. Tipos/lint de checkout limpio, build
+  actualizado y pgTAP completo de fixture QA PASS. Base QA propia54341/54342,
+  aplicación3001; sin reset de habitual/alojada ni cambios de next-env ajeno.
+  Se sincronizaron fuentes/tests actuales, preservando guards/puertos propios.
+  Publicar sin firma en PR88; nueva CI completa y revisión humana pendientes.
+
 ## Corrección CI del PR88 — 01/11/2026
 
 - **Origen/evidencia:** Mateo pide reparar GitHub. Quality41331558058, application

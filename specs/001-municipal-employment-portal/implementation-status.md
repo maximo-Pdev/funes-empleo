@@ -1,5 +1,18 @@
 # Estado de implementación — 2026-09-22
 
+## Selectores E2E y páginas de diez del PR88 — 01/11/2026
+
+Quality217 pasa tipos/lint/tooling/cobertura/build y143 E2E, pero tres fallan
+por selectores estrictos ambiguos. Intermediation limita el estado al bloque
+vigente, conservando autorización y revocación. Alta presencial usa11 registros
+ficticios y verifica10+1, orden, filtros, aceptación y ausencia de duplicados;
+pageSize=1 ya no altera el límite aprobado. Tres recorridos focales GREEN1,2min
+sin omisiones/reintentos, build/tipos/lint y pgTAP de QA propia PASS. Sin cambios
+de producto, SQL, permisos o datos reales. T293/registro previo en cambios-extra.
+database217 falla por puerto Docker54324 ocupado antes de SQL; reintento en
+runner nuevo en curso. Publicación sin firma y nueva CI completa posteriores;
+no acreditar revisión humana, merge o aceptación global. next-env ajeno intacto.
+
 ## Corrección de tipos del PR88 — 01/11/2026
 
 Quality216 falla application en typecheck por cuatro opciones exact no admitidas

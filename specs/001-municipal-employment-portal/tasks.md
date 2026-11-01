@@ -5,6 +5,11 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T293 Corregir selectores ambiguos de Quality217/PR88 sin cambiar producto;
+  probar estado vigente, CV y alta presencial con paginación real10+1, filtros y
+  once consentimientos/altas ficticias sin duplicar. Tres E2E focales GREEN sin
+  omisiones/reintentos, tipos/lint/build/pgTAP QA PASS; nueva CI completa pendiente.
+
 - [x] T292 Reparar TS2769 de PR88/Quality216 en cuatro consultas ByRole de Home,
   reproducir en checkout limpio y preservar coincidencia exacta con RegExp anclada;
   tipos/39 pruebas/lint/diff PASS. Sin cambio de producto; CI completa posterior.

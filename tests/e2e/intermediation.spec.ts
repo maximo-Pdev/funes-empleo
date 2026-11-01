@@ -70,7 +70,7 @@ test("la Oficina ve estado vigente y trazas sin borrar el cierre anterior", asyn
   await signIn(page, "admin1@example.invalid", "admin");
   await page.goto(`/admin/participations/${fixtureId("participation", 1)}`);
   await expect(page.getByRole("heading", { name: "Seguimiento de participación" })).toBeVisible();
-  await expect(page.getByRole("status")).toContainText("Persona contratada");
+  await expect(page.getByRole("status").filter({ hasText: "Resultado o estado vigente" })).toContainText("Persona contratada");
   await expect(page.getByRole("heading", { name: "Historial de la participación" })).toBeVisible();
   await expect(page.getByText("Persona ficticia 001")).toBeVisible();
 });
@@ -124,11 +124,12 @@ test("CV privado: solo permisos vigentes permiten descargar y la última revocac
 
     async function cancelCase(number: number) {
       await admin.goto(`/admin/participations/${fixtureId("participation", number)}`);
-      await expect(admin.getByRole("status")).toContainText("Derivada");
+      const currentStatus = admin.getByRole("status").filter({ hasText: "Resultado o estado vigente" });
+      await expect(currentStatus).toContainText("Derivada");
       await admin.getByLabel("Acción").selectOption("cancel_individual");
       await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Cancelación operativa ficticia para verificar revocación.");
       await admin.getByRole("button", { name: "Registrar acción" }).click();
-      await expect(admin.getByRole("status")).toContainText("Cancelada");
+      await expect(currentStatus).toContainText("Cancelada");
     }
     await cancelCase(5);
     // El fixture tiene otra derivación vigente del mismo CV a esta empresa.
