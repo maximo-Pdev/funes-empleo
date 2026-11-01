@@ -26,8 +26,11 @@ test("búsqueda pública: cuatro filtros, teclado, paginación persistente y lim
   expect(firstUrl.searchParams.get("rubro")).toBe(category);
   const next = page.getByRole("navigation", { name: "Páginas de ofertas", exact: true }).getByRole("link", { name: "Siguiente", exact: true });
   await expect(next).toBeVisible();
+  await expect(page.getByRole("link", { name: "Página 1", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("link", { name: "Página 2", exact: true })).toBeVisible();
   await next.click();
   await expect(page).toHaveURL(/page=2$/);
+  await expect(page.getByRole("link", { name: "Página 2", exact: true })).toHaveAttribute("aria-current", "page");
   const url = new URL(page.url());
   expect(url.searchParams.get("q")).toBe("Oferta ficticia");
   expect(url.searchParams.get("rubro")).toBe(category);
@@ -63,5 +66,5 @@ test("búsqueda pública: título de oferta cerrada no aparece como resultado", 
   await page.goto(`/ofertas?${new URLSearchParams({ q: title })}`);
   await expect(page.getByText("No encontramos ofertas con esos filtros.", { exact: true })).toBeVisible();
   await expect(page.locator('li a[href^="/ofertas/"]')).toHaveCount(0);
-  await expect(page.getByRole("navigation", { name: "Accesos principales", exact: true }).getByRole("link", { name: "Iniciar sesión", exact: true })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Navegación principal", exact: true }).getByRole("link", { name: "Inicio", exact: true })).toBeVisible();
 });

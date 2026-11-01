@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, BriefcaseBusiness, Building2, CalendarDays, MapPin, ShieldCheck, UserRound, Users } from "lucide-react";
-import { Badge, Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
+import { ArrowRight, BriefcaseBusiness, Building2, CalendarDays, MapPin, ShieldCheck, Users } from "lucide-react";
+import { Badge, Card, Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { listPublicOffers, listPublicOfferFilters } from "@/features/openings/public-service";
 import { PublicOfferSearchForm } from "@/features/openings/components/public-offer-search-form";
 import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
 import { publicOfferSearchSchema } from "@/validation/public-offer-search";
 import { getSiteAccess } from "@/features/accounts/navigation";
-import { getRegistrationHref } from "@/features/accounts/registration-navigation";
+import { CategoryLabel } from "@/components/job-category-label";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { HomeNavbar } from "../home-navbar";
 
@@ -15,18 +15,19 @@ export const dynamic = "force-dynamic";
 export default async function PublicOffersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const input = publicOfferSearchSchema.safeParse({ ...await searchParams, pageSize: 10 });
   const filters = input.success ? input.data : publicOfferSearchSchema.parse({});
-  const [result, { account: accountAccess, panel }, options] = await Promise.all([
+  const [result, { panel }, options] = await Promise.all([
     input.success ? listPublicOffers(filters) : Promise.resolve({ total: 0, page: 1, pageSize: 10, items: [] }),
     getSiteAccess(), listPublicOfferFilters(),
   ]);
   const filtered = hasPublicOfferFilters(filters);
   const hasPrevious = result.page > 1;
   const hasNext = result.page * result.pageSize < result.total;
-  const authenticated = accountAccess.label !== "Iniciar sesión";
+  const pageCount = Math.ceil(result.total / result.pageSize);
+
 
   return (
     <>
-      <HomeNavbar alwaysVisible panel={authenticated ? accountAccess : null} />
+      <HomeNavbar alwaysVisible panel={panel} />
       <main id="contenido" tabIndex={-1} className="min-h-screen bg-page pt-16 text-foreground">
         <header className="bg-brand-primary text-brand-secondary">
           <div className="mx-auto flex max-w-[1280px] flex-wrap items-start justify-between gap-x-10 gap-y-8 px-5 pb-12 pt-10 sm:px-10 lg:px-20 lg:pb-14 lg:pt-12">
@@ -43,20 +44,11 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                 La Oficina de Empleo revisa las postulaciones y decide qué perfiles derivar a cada empresa.
               </p>
             </div>
-            <nav aria-label="Accesos principales" className="shrink-0">
-              <Link
-                href={accountAccess.href}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/45 px-5 py-2 font-heading text-sm font-semibold text-white transition-colors hover:border-white hover:bg-white hover:text-brand-primary"
-              >
-                <UserRound className="h-4 w-4" aria-hidden="true" />
-                {accountAccess.label}
-              </Link>
-            </nav>
           </div>
         </header>
 
         <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-8 sm:px-10 lg:px-20 lg:pb-20 lg:pt-10">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-10">
+          <div className="min-w-0">
             <section className="min-w-0" aria-labelledby="listado-title">
               <PublicOfferSearchForm filters={filters} options={options} />
               {!input.success && (
@@ -132,7 +124,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                         <div className="flex flex-wrap gap-2" aria-label="Categorías laborales">
                           {offer.categories.length > 0 ? offer.categories.map((category) => (
                             <Badge key={category.id} variant="outline" className="max-w-full leading-5">
-                              <span className="min-w-0 break-words">{category.name}</span>
+                              <CategoryLabel name={category.name} />
                             </Badge>
                           )) : <Badge variant="outline" className="leading-5">Sin categorías</Badge>}
                         </div>
@@ -155,56 +147,20 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
 
               {(hasPrevious || hasNext) && (
                 <Pagination aria-label="Páginas de ofertas" className="mt-8 border-t border-border pt-6">
-                  <PaginationContent className="w-full justify-between">
+                  <PaginationContent className="flex-wrap justify-center">
                     {hasPrevious && <PaginationItem><PaginationPrevious href={publicOffersPageHref(filters, result.page - 1)} rel="prev" /></PaginationItem>}
-                    <PaginationItem><span className="text-sm font-medium text-muted-foreground">Página {result.page}</span></PaginationItem>
+                    {Array.from({ length: pageCount }, (_, index) => index + 1).map(page => (
+                      <PaginationItem key={page}>
+                        <PaginationLink href={publicOffersPageHref(filters, page)} aria-label={`Página ${page}`} isActive={page === result.page}>
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
                     {hasNext && <PaginationItem><PaginationNext href={publicOffersPageHref(filters, result.page + 1)} rel="next" /></PaginationItem>}
                   </PaginationContent>
                 </Pagination>
               )}
             </section>
-
-            <aside aria-labelledby="acompanamiento-title" className="min-w-0 space-y-5 lg:sticky lg:top-24">
-              <Card className="overflow-hidden">
-                <div className="border-b border-border bg-primary-50 px-6 py-6">
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary-700">Con acompañamiento municipal</p>
-                  <h2 id="acompanamiento-title" className="mt-3 font-heading text-xl font-bold leading-snug text-primary-900">
-                    Te acompañamos en la búsqueda
-                  </h2>
-                  <p className="mt-3 text-sm leading-6">{panel ? "Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel." : "Para postularte necesitás una cuenta de candidato y tu perfil completo con CV."}</p>
-                  {panel ? (
-                    <Link
-                      href={panel.href}
-                      className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 font-heading text-sm font-semibold text-white transition-colors hover:bg-brand-text"
-                    >
-                      Ir al {panel.label.toLowerCase()}
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </Link>
-                  ) : (
-                    <>
-                      <Link
-                        href={getRegistrationHref("candidate")}
-                        className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 font-heading text-sm font-semibold text-white transition-colors hover:bg-brand-text"
-                      >
-                        Crear cuenta
-                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                      </Link>
-                      <p className="mt-4 text-sm leading-6">
-                        ¿Ya tenés cuenta? <Link href="/" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-brand-text">Iniciá sesión</Link>
-                      </p>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-start gap-3 px-6 py-5">
-                  <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                  <p className="text-sm leading-6 text-muted-foreground">Tu información se comparte con la empresa únicamente después de una derivación de la Oficina.</p>
-                </div>
-              </Card>
-              <div className="rounded-xl border border-border bg-surface px-6 py-5 shadow-card">
-                <h3 className="font-heading text-base font-bold text-primary-900">¿Necesitás ayuda con tu perfil?</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">La Oficina de Empleo también puede ayudarte de manera presencial a completar tus datos.</p>
-              </div>
-            </aside>
           </div>
         </div>
       </main>
