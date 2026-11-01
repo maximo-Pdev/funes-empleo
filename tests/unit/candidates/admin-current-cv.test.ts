@@ -8,10 +8,14 @@ const id = "0a000000-0000-4000-8000-000000000001";
 const cv = { id, original_name_safe: "cv-ficticio.pdf", byte_size: 2048 };
 const results = new Map<string, { data: unknown; error: unknown }>();
 function query(table: string) {
-  const builder = { select: vi.fn(), eq: vi.fn(), is: vi.fn(), in: vi.fn(), or: vi.fn(), order: vi.fn(), maybeSingle: vi.fn(), limit: vi.fn() };
+  const builder = { select: vi.fn(), eq: vi.fn(), is: vi.fn(), in: vi.fn(), or: vi.fn(), order: vi.fn(), maybeSingle: vi.fn(), limit: vi.fn(), range: vi.fn() };
   for (const method of [builder.select, builder.eq, builder.is, builder.in, builder.or, builder.order]) method.mockReturnValue(builder);
   builder.maybeSingle.mockImplementation(async () => results.get(table));
   builder.limit.mockImplementation(async () => results.get(table));
+  builder.range.mockImplementation(async (from: number, to: number) => {
+    const result = results.get(table)!;
+    return { ...result, data: Array.isArray(result.data) ? result.data.slice(from, to + 1) : result.data };
+  });
   return builder;
 }
 const queries = new Map<string, ReturnType<typeof query>>();
@@ -50,4 +54,16 @@ it.each([null, { role: "candidate", status: "active" }, { role: "company", statu
 it("rechaza identificadores inválidos antes de acceder a datos", async () => {
   await expect(getAdminCandidate("invalid")).rejects.toMatchObject({ code: "NOT_FOUND" });
   expect(mocks.from).not.toHaveBeenCalled();
+});
+
+it("pagina notas de cinco y permite leer después de la antigua nota cincuenta", async () => {
+  const notes = Array.from({ length: 57 }, (_, index) => ({ id: `nota-${index + 1}`, body: `Texto ficticio ${index + 1}` }));
+  results.set("internal_notes", { data: notes, error: null });
+  const first = await getAdminCandidate(id);
+  expect(first.notes).toEqual(notes.slice(0, 5)); expect(first.notesHasNext).toBe(true);
+  const later = await getAdminCandidate(id, 11);
+  expect(later.notes).toEqual(notes.slice(50, 55)); expect(later.notesHasNext).toBe(true);
+  const last = await getAdminCandidate(id, 12);
+  expect(last.notes).toEqual(notes.slice(55)); expect(last.notesHasNext).toBe(false);
+  expect(queries.get("internal_notes")!.range).toHaveBeenCalledWith(55, 60);
 });

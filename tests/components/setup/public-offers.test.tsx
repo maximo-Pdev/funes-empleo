@@ -14,6 +14,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer, listPublicOfferFilters }));
 vi.mock("next/navigation", () => ({ notFound, usePathname: () => "/ofertas" }));
+vi.mock("@/features/notifications/components/notification-center", () => ({ NotificationCenter: () => <button>Notificaciones</button> }));
 
 import PublicOffersPage from "@/app/(public)/ofertas/page";
 import PublicOfferDetailPage from "@/app/(public)/ofertas/[openingId]/page";
@@ -38,24 +39,52 @@ beforeEach(() => {
 });
 
 it.each([
-  ["candidate", "/dashboard?section=perfil", "Mi perfil", "/dashboard", "Ir al panel de usuario"],
-  ["company", "/empresa/perfil", "Mi perfil", "/empresa", "Ir al panel de empresa"],
-  ["admin", "/account", "Cuenta", "/admin", "Ir al panel de administración"],
-])("mantiene acceso de %s en listado y detalle públicos", async (role, href, label, panelHref, panelLabel) => {
+  ["candidate", "/dashboard", "Ir al panel de usuario"],
+  ["company", "/empresa", "Ir al panel de empresa"],
+  ["admin", "/admin", "Ir al panel de administración"],
+])("mantiene navbar común y acciones del rol %s en listado y detalle", async (role, panelHref, panelLabel) => {
   readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
   getPublicOffer.mockResolvedValue(offer);
   for (const Page of [listPage, detailPage]) {
+    readAccountSession.mockClear();
     const view = render(await Page());
-    const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
-    expect(within(navigation).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
+    expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("href")).toBe(panelHref);
     expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+    expect(within(navigation).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
+    expect(within(navigation).getByRole("link", { name: "Ofertas" }).getAttribute("aria-current")).toBe("page");
+    expect(within(navigation).getByRole("button", { name: "Notificaciones" })).toBeTruthy();
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(readAccountSession).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
     expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Registrate" })).toBeNull();
     if (Page === listPage) {
       expect(screen.getByRole("link", { name: panelLabel }).getAttribute("href")).toBe(panelHref);
       expect(screen.getByText("Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel.")).toBeTruthy();
+    } else if (role === "candidate") {
+      expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/dashboard?section=ofertas&oferta=${offer.slug}`);
+    } else {
+      expect(screen.queryByRole("link", { name: "Postularme con mi cuenta" })).toBeNull();
+      expect(screen.getByRole("link", { name: panelLabel }).getAttribute("href")).toBe(panelHref);
     }
+    view.unmount();
+  }
+});
+
+it.each(["anonymous", "suspended"])("no muestra controles privados en la navbar pública: %s", async state => {
+  readAccountSession.mockResolvedValue(state === "anonymous" ? null : { account: { role: "candidate", status: "suspended" } });
+  listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
+  getPublicOffer.mockResolvedValue(offer);
+  for (const Page of [listPage, detailPage]) {
+    const view = render(await Page());
+    const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(within(navigation).queryByRole("button", { name: "Notificaciones" })).toBeNull();
+    expect(within(navigation).queryByRole("link", { name: "Mi cuenta" })).toBeNull();
+    expect(within(navigation).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
+    expect(screen.getByRole("link", { name: Page === listPage ? "Crear cuenta" : "Registrate" }).getAttribute("href")).toBe("/?registro=candidato");
     view.unmount();
   }
 });

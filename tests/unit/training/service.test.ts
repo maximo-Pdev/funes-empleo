@@ -59,7 +59,7 @@ describe("independent municipal course records", () => {
   it("paginates history scoped to one candidate", async () => {
     expect(await getCourseReferralHistory(candidateId, 2)).toEqual({ items: [], hasNext: false });
     expect(query.eq).toHaveBeenCalledWith("candidate_id", candidateId);
-    expect(query.range).toHaveBeenCalledWith(20, 40);
+    expect(query.range).toHaveBeenCalledWith(5, 10);
   });
   it("maps RPC rejection without leaking provider details", async () => {
     rpc.mockResolvedValue({ data: null, error: { message: "INVALID_TRANSITION" } });

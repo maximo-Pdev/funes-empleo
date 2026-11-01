@@ -18,23 +18,20 @@ import { HomeNavbar } from "@/app/(public)/home-navbar";
 afterEach(() => vi.unstubAllGlobals());
 
 it.each([
-  ["candidate", "Ir al panel de usuario"],
-  ["company", "Ir al panel de empresa"],
-  ["admin", "Ir al panel de administración"],
-])("places %s panel access below the session notice instead of the hero", async (role, label) => {
+  ["candidate", "/dashboard"],
+  ["company", "/empresa"],
+  ["admin", "/admin"],
+])("keeps %s panel access in the navbar above the initial offers", async (role, href) => {
   readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
   render(await HomePage());
-  const navigation = screen.getByRole("navigation", { name: "Accesos principales" });
-  const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
-  expect(navigation.querySelector("a")?.getAttribute("href")).toBe(href);
-  expect(navigation.querySelector("a")?.textContent).toBe(label);
-  expect(screen.getByRole("region", { name: "Acceso al portal" }).contains(navigation)).toBe(true);
-  expect(screen.getByText("Ya tenés la sesión iniciada").compareDocumentPosition(navigation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  const intro = screen.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." }).parentElement!;
-  expect(within(intro).queryAllByRole("link")).toHaveLength(0);
-  expect(navigation.querySelectorAll("a")).toHaveLength(1);
+  const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
+  expect(within(navigation).getByRole("link", { name: "Mi cuenta", exact: true }).getAttribute("href")).toBe(href);
+  expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
+  expect(screen.queryByText("Ya tenés la sesión iniciada")).toBeNull();
+  expect(screen.queryByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeNull();
+  expect(screen.getByRole("main").firstElementChild?.id).toBe("ofertas-disponibles");
   expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
-  expect(within(navigation).queryByRole("link", { name: "Ofertas" })).toBeNull();
+  expect(within(navigation).getByRole("link", { name: "Ofertas", exact: true }).getAttribute("href")).toBe("/ofertas");
 });
 
 it("keeps the municipal introduction free of duplicate account and offers links", async () => {

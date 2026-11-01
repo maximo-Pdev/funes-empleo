@@ -4,6 +4,8 @@ import { publicModalityLabel } from "@/features/openings/public-offer-display";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin, ShieldCheck, CircleAlert } from "lucide-react";
 import { Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import styles from "../_components/candidate-forms.module.css";
+import layoutStyles from "@/app/(auth)/account/account.module.css";
+import cardLayout from "@/components/ui/card-layout.module.css";
 import type { getCandidateWorkspace } from "@/features/candidates/profile-service";
 import { getPublicOffer, listPublicOffers, type PublicOffer } from "@/features/openings/public-service";
 import { CandidateApplyForm } from "@/features/participations/components/candidate-status";
@@ -63,11 +65,14 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
     </section>}
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-primary-900">Ofertas vigentes</h2><p className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700"><ShieldCheck className="h-4 w-4" aria-hidden="true" />Revisadas por la Oficina</p></div>
     {offers.items.length === 0 ? <Card className="p-8 text-center sm:p-12"><BriefcaseBusiness className="mx-auto h-10 w-10 text-primary" aria-hidden="true" /><h3 className="mt-4 text-xl font-bold text-primary-900">No hay ofertas vigentes en esta página.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Podés volver a consultar más adelante y mantener tu perfil actualizado.</p><Link href={profileHref} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-primary hover:bg-secondary">Ir a mi perfil<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card> :
-      <ul className="grid gap-5 md:grid-cols-2">{offers.items.filter((offer) => offer.id !== selectedOffer?.id).map((offer) => <li key={offer.id} className="min-w-0">
-        <Card className="flex h-full flex-col p-6"><h3 className="break-words text-xl font-bold leading-7"><Link href={`/ofertas/${offer.slug}`} className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary">{offer.title}</Link></h3>
-          <OfferSummary offer={offer} />
-          {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-auto pt-5`}><CandidateApplyForm key={attemptKey(offer.id)} openingId={offer.id} candidateVersion={workspace.profile.version}
-            generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} participationsHref={participationsHref(offer.slug)} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
+      <ul className={`${layoutStyles.desktopCards} ${cardLayout.grid} grid gap-5 md:grid-cols-2`}>{offers.items.filter((offer) => offer.id !== selectedOffer?.id).map((offer) => <li key={offer.id} className="min-w-0">
+        <Card className={`${cardLayout.card} p-6`}>
+          <div data-card-part="header" className={cardLayout.header}><h3 className="break-words text-xl font-bold leading-7"><Link href={`/ofertas/${offer.slug}`} className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary">{offer.title}</Link></h3></div>
+          <div data-card-part="content" className={cardLayout.content}><OfferSummary offer={offer} /></div>
+          <div data-card-part="footer" className={cardLayout.footer}>
+            {workspace.profile && <div className={`${styles.forms} ${styles.apply}`}><CandidateApplyForm key={attemptKey(offer.id)} openingId={offer.id} candidateVersion={workspace.profile.version}
+              generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} participationsHref={participationsHref(offer.slug)} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
+          </div>
         </Card>
       </li>)}</ul>}
     <Pagination aria-label="Páginas de ofertas" className="mt-6">

@@ -4,7 +4,7 @@ import { RecordLink as Link, RecordAnchor } from "@/components/ui/record-link";
 import { candidateProfileStatusLabels, accountStatusLabels, displayLabel, availabilityLabel } from "@/domain/presentation/labels";
 import { accountStatusTones, availabilityTones, candidateProfileStatusTones, statusTone } from "@/domain/presentation/status-tone";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
-import { Badge, EmptyState } from "@/components/ui";
+import { Badge, EmptyState, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { getAdminCandidate } from "@/features/candidates/search-service";
 import { getAssistedWorkspace } from "@/features/candidates/assisted-service";
 import { AssistedProfileForm, AssistedCommands, ClaimForm } from "@/features/candidates/components/assisted/assisted-forms";
@@ -17,17 +17,20 @@ import { InternalNoteForm } from "@/features/participations/components/internal-
 import { recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { recordReference } from "@/lib/records/references";
+import layout from "@/components/ui/detail-layout.module.css";
+import { collectionPage } from "@/lib/collections/limits";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCandidateDetailPage({ params, searchParams }: {
-  params: Promise<{ candidateId: string }>; searchParams: Promise<{ cv?: string }>;
+  params: Promise<{ candidateId: string }>; searchParams: Promise<{ cv?: string; notesPage?: string | string[] }>;
 }) {
   const { user } = await requireActiveAccount(["admin"]);
   const { candidateId: reference } = await params;
   const candidateId = await pageRecordIdentifier("candidate", reference, `/admin/candidates/${reference}`, await searchParams);
-  const { cv } = await searchParams;
-  const { candidate, currentCv, referralEligible, participations, notes, audit, nextAuditCursor } = await getAdminCandidate(candidateId);
+  const { cv, notesPage: rawNotesPage } = await searchParams;
+  const notesPage = collectionPage(rawNotesPage);
+  const { candidate, currentCv, referralEligible, participations, notes, notesHasNext, audit, nextAuditCursor } = await getAdminCandidate(candidateId, notesPage);
   const courseReference = await recordReference("candidate", candidate.id);
 
   const assisted = candidate.origin === "assisted";
@@ -66,46 +69,59 @@ export default async function AdminCandidateDetailPage({ params, searchParams }:
   return <AdminShell email={user?.email} active={assisted ? "/admin/atencion-presencial" : "/admin/candidates"} title={candidate.display_name}
     description="Perfil laboral y participaciones. La empresa no puede consultar este padrón."
     navigation={[{ href: assisted ? "/admin/atencion-presencial" : "/admin/candidates", label: assisted ? "Volver a perfil asistido" : "Volver a candidatos" }, { href: "/admin/openings", label: "Ofertas" }, { href: `/admin/courses?candidate=${encodeURIComponent(courseReference)}`, label: "Cursos y derivaciones" }]}>
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="space-y-6">
-      {editable && <AssistedProfileForm key={`assisted-profile:${candidateId}:${editable.profile.version}`} candidateId={candidateId}
-        version={editable.profile.version} categories={maintenance!.categories} initial={editable.data} />}
-      {profileDetails}
-      {candidateCv}
+    <div className={layout.grid} data-detail-grid="candidate">
+      {editable && <>
+        <div className={`${layout.cell} ${layout.full} ${layout.fieldPairs}`}>
+          <AssistedProfileForm key={`assisted-profile:${candidateId}:${editable.profile.version}`} candidateId={candidateId}
+            version={editable.profile.version} categories={maintenance!.categories} initial={editable.data} />
+        </div>
+        <div className={layout.cell} data-detail-cell="activation">
+          <AssistedCommands key={`consent:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version}
+            status={editable.profile.status} />
+        </div>
+        <div className={layout.cell} data-detail-cell="claim">
+          <ClaimForm key={`claim:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version} requests={editable.requests} />
+        </div>
+      </>}
+      <div className={`${layout.cell} ${!candidateCv ? layout.full : ""}`} data-detail-cell="profile">{profileDetails}</div>
+      {candidateCv && <div className={layout.cell} data-detail-cell="cv">{candidateCv}</div>}
+      <div className={layout.cell} data-detail-cell="note-form">
       <InternalNoteForm key={`${candidate.id}:${candidate.version}`} candidateId={candidate.id}
         version={candidate.version} onSubmit={recordEvaluationAction} />
-      <section aria-labelledby="candidate-notes" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
-        <h2 id="candidate-notes" className="text-lg font-semibold">Notas internas</h2>
-        {notes.length === 0 ? <EmptyState title="Sin notas" description="Todavía no hay notas para este perfil." /> :
+      </div>
+      <section aria-labelledby="candidate-notes" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5" data-detail-cell="notes">
+        <h2 id="candidate-notes" className="scroll-mt-24 text-lg font-semibold">Notas internas</h2>
+        {notes.length === 0 ? <EmptyState title={notesPage > 1 ? "Página sin notas" : "Sin notas"} description={notesPage > 1 ? "No hay notas en esta página. Volvé a una página anterior." : "Todavía no hay notas para este perfil."} /> :
           <ul className="space-y-3">{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
             <p><strong>{item.note_kind === "training_guidance" ? "Orientación y capacitación" : "Nota sobre postulante"}</strong> · {formatFunesDateTime(item.created_at)}</p>
             <p className="whitespace-pre-wrap">{item.body}</p>
           </li>)}</ul>}
+        {(notesPage > 1 || notesHasNext) && <Pagination aria-label="Páginas de notas internas">
+          <PaginationContent>
+            {notesPage > 1 && <PaginationItem><PaginationPrevious href={`/admin/candidates/${courseReference}?notesPage=${notesPage - 1}#candidate-notes`} /></PaginationItem>}
+            <PaginationItem><span className="px-2 text-sm">Página {notesPage}</span></PaginationItem>
+            {notesHasNext && <PaginationItem><PaginationNext href={`/admin/candidates/${courseReference}?notesPage=${notesPage + 1}#candidate-notes`} /></PaginationItem>}
+          </PaginationContent>
+        </Pagination>}
       </section>
-      <CandidateHistory key={`history:${candidate.id}:${candidate.version}:${audit[0]?.id ?? "empty"}`}
+      <div className={layout.cell} data-detail-cell="history"><CandidateHistory key={`history:${candidate.id}:${candidate.version}:${audit[0]?.id ?? "empty"}`}
         candidateId={candidate.id} initialEvents={audit} initialCursor={nextAuditCursor ?? null} />
       </div>
-      <div className="space-y-6">
-      {editable && <>
-        <AssistedCommands key={`consent:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version}
-          status={editable.profile.status} />
-        <ClaimForm key={`claim:${editable.profile.version}`} candidateId={candidateId} version={editable.profile.version} requests={editable.requests} />
-      </>}
-      {candidate.account_id && candidate.accounts && candidate.accounts.status !== "pending_verification" &&
-        <SafetyDecisionForm key={`${candidate.accounts.status}-${candidate.accounts.version}`}
-          resource="candidate_account" resourceId={candidate.account_id}
-          version={candidate.accounts.version}
-          action={candidate.accounts.status === "active" ? "suspend" : candidate.accounts.status === "suspended" ? "reactivate" : "restore"}
-          onSubmit={candidateAccountDecisionAction} />}
-      <section aria-labelledby="candidate-participations" className="space-y-4">
+      <section aria-labelledby="candidate-participations" className={`${layout.surface} space-y-4`} data-detail-cell="participations">
         <h2 id="candidate-participations" className="text-xl font-semibold">Participaciones recientes</h2>
+        <Link href={`/admin/participations?candidateId=${courseReference}`} className="inline-flex min-h-11 items-center font-semibold underline">Ver todas las participaciones</Link>
         {participations.length === 0 ? <EmptyState title="Sin participaciones" description="Aún no hay postulaciones o nominaciones para este perfil." /> :
           <ul className="space-y-3">{participations.map((item) => <li key={item.id} className="rounded-lg border border-slate-300 bg-white p-4">
             <Link href={`/admin/participations/${item.id}`} className="font-semibold text-blue-800 underline">{item.job_openings?.title ?? "Oferta sin título"}</Link>
             <p className="text-sm">{participationStatusLabel(item.status)} · {item.origin === "admin_nomination" ? "Nominación administrativa" : "Postulación"}</p>
           </li>)}</ul>}
       </section>
-      </div>
+      {candidate.account_id && candidate.accounts && candidate.accounts.status !== "pending_verification" &&
+        <div className={`${layout.cell} ${layout.full}`}><SafetyDecisionForm key={`${candidate.accounts.status}-${candidate.accounts.version}`}
+          resource="candidate_account" resourceId={candidate.account_id}
+          version={candidate.accounts.version}
+          action={candidate.accounts.status === "active" ? "suspend" : candidate.accounts.status === "suspended" ? "reactivate" : "restore"}
+          onSubmit={candidateAccountDecisionAction} /></div>}
     </div>
   </AdminShell>;
 }

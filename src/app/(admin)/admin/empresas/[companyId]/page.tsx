@@ -8,6 +8,8 @@ import { notFound } from "next/navigation";
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { AdminCompanyDecision } from "@/features/companies/components/admin-company-decision";
+import layoutStyles from "@/app/(auth)/account/account.module.css";
+import layout from "@/components/ui/detail-layout.module.css";
 
 export const dynamic = "force-dynamic";
 export default async function AdminCompanyPage({ params, searchParams = Promise.resolve({}) }: {
@@ -57,14 +59,16 @@ export default async function AdminCompanyPage({ params, searchParams = Promise.
     <div className="flex flex-wrap items-center gap-2">Cuenta <Badge variant="status" tone={statusTone(accountStatusTones, account.data.status)}>{displayLabel(accountStatusLabels, account.data.status)}</Badge> Perfil <Badge variant="status" tone={statusTone(companyProfileStatusTones, profile.data.status)}>{displayLabel(companyProfileStatusLabels, profile.data.status)}</Badge> {profile.data.archived_at ? "Archivada." : ""}</div>
     <section aria-labelledby="company-profile" className="mt-6 rounded-lg border border-border bg-surface p-5">
       <h2 id="company-profile" className="text-xl font-semibold">Perfil de la empresa</h2>
-      <dl className="mt-4 grid gap-4 sm:grid-cols-2">{fields.map(([label, value]) => <div key={label} className="min-w-0">
+      <dl className={`${layoutStyles.desktopFields} mt-4 grid gap-4 sm:grid-cols-2`}>{fields.map(([label, value]) => <div key={label} className="min-w-0">
         <dt className="font-semibold">{label}</dt><dd className="mt-1 break-words">{value?.trim() || "Sin informar"}</dd>
       </div>)}</dl>
     </section>
     <p className="mt-4">Una reactivación deja el perfil incompleto. Restaurar deja las ofertas archivadas en borrador; ninguna decisión recupera accesos revocados.</p>
     <h2 className="mt-6 text-xl font-semibold">Gestión de acceso</h2>
-    <AdminCompanyDecision accountId={account.data.id} version={account.data.version} command={command} />
-    {account.data.status !== "archived" && <AdminCompanyDecision accountId={account.data.id} version={account.data.version} command="archive" />}
+    <div className={`${layout.grid} mt-4`} data-detail-grid="company-access">
+      <div className={`${layout.cell} ${account.data.status === "archived" ? layout.full : ""}`} data-detail-cell="account-command"><AdminCompanyDecision accountId={account.data.id} version={account.data.version} command={command} /></div>
+      {account.data.status !== "archived" && <div className={layout.cell} data-detail-cell="archive-command"><AdminCompanyDecision accountId={account.data.id} version={account.data.version} command="archive" /></div>}
+    </div>
     <section aria-labelledby="company-offers" className="mt-8 space-y-4">
       <h2 id="company-offers" className="text-xl font-semibold">Ofertas de la empresa{offers ? `: ${total}` : ""}</h2>
       {invalidPage ? <FeedbackMessage tone="error">Revisá la página solicitada.</FeedbackMessage> : outOfRange ? <div className="space-y-3">

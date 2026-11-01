@@ -7,7 +7,7 @@ import { notificationSchema, notificationTarget, type NotificationRole } from "@
 
 const reference = "aviso-" + "a".repeat(24);
 const item = { reference, kind: "candidate_nominated", createdAt: "2026-10-28T10:00:00+00:00", readAt: null, available: true, subject: "Oferta ficticia", target: { kind: "candidate_participation", reference: "cas-" + "b".repeat(24) } };
-const payload = { total: 1, unread: 1, page: 1, pageSize: 20, items: [item] };
+const payload = { total: 1, unread: 1, page: 1, pageSize: 10, items: [item] };
 function session(role: NotificationRole = "candidate", status = "active") { return { account: { role, status }, client: { rpc: mocks.rpc } }; }
 beforeEach(() => { vi.resetAllMocks(); mocks.session.mockResolvedValue(session()); mocks.rpc.mockResolvedValue({ data: payload, error: null }); });
 
@@ -19,7 +19,7 @@ it.each(["suspended", "archived", "pending_verification"])("bloquea cuenta %s", 
 });
 it("consulta exclusivamente al actor sin parámetro de destinatario", async () => {
   await expect(listNotifications()).resolves.toMatchObject({ ...payload, listHref: "/dashboard?section=notificaciones" });
-  expect(mocks.rpc).toHaveBeenCalledExactlyOnceWith("list_my_notifications", { p_page: 1, p_page_size: 20 });
+  expect(mocks.rpc).toHaveBeenCalledExactlyOnceWith("list_my_notifications", { p_page: 1, p_page_size: 10 });
 });
 it.each([[0,20],[1,21],[1,0],[10001,20],[1.5,5],[NaN,5]])("rechaza paginación inválida %s/%s", async (page,size) => {
   await expect(listNotifications(page,size)).rejects.toMatchObject({ code: "VALIDATION_ERROR" }); expect(mocks.rpc).not.toHaveBeenCalled();

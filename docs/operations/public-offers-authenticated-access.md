@@ -1,5 +1,11 @@
 # Acceso desde ofertas públicas
 
+EXTRA112,31/10/2026: catálogo y detalle comparten ahora HomeNavbar y getSiteAccess
+por request. Mi cuenta abre el panel del rol y la campana solo se monta con panel
+verificado. El detalle tampoco ofrece registro a personas ya autenticadas y solo
+candidato/visitante conservan postulación; otros roles reciben su propio panel.
+Sin cambiar guards, sesión o permisos. Ver public-offers-presentation.md.
+
 EXTRA106/108, 29/10/2026. Mateo conserva solo el ajuste de /ofertas y descarta los
 cambios del inicio/login, cuyo diseño y comportamiento vuelven al estado previo.
 

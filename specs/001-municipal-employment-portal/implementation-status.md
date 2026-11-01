@@ -1,5 +1,186 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA119 — A/B retiradas con respaldo, 01/11/2026
+
+Mateo elige quitar asignaciones sin reemplazo y conservar respaldo. Migración
+20261101120000 aplicada y registrada en local y kyjycjojzhwggjuqjnki: A/B v1
+inactivas y sin relaciones vigentes,15 categorías v2 conservadas. Tabla privada
+RLS/append-only y sin grants app guarda filas originales por clave, fecha/actor/
+versión/motivo: local2 categorías+530 relaciones candidatas+124 de ofertas;
+alojado2 categorías+1 relación candidata. No se eliminan filas del catálogo o
+historia; perfiles solo A/B quedan sin categorías por decisión expresa.
+
+Huellas antes/después idénticas para estados/versiones de entidades padre,
+consentimientos/auditoría, otras categorías/relaciones y versiones históricas.
+Dry-run falla por divergencia histórica existente: solo se ejecuta el SQL nuevo
+y se registra esa versión, sin reparar versiones anteriores ni aplicar seeds.
+metricsCategories omite solo A/B v1 retiradas; otras inactivas históricas y datos
+de informes conservados. Ese filtro de código requiere el despliegue habitual.
+
+SQL real con rollback, conflictos, reejecución, recuperación exacta, permisos de
+tres roles, append-only y lock concurrente/timeout PASS.208 regresiones en10
+archivos,64 tooling,1 E2E de selector con fixture restaurada, tipos/lint/build
+frío/diff PASS. DC1–DC5/T289–T291 verificados técnicamente. Guías operations
+retire/recover/verify-demo-categories; límites y diagnósticos en EXTRA119.
+Trabajo112–118/next-env ajeno preservados; no reset de base habitual, nuevas
+credenciales/PII, commit/PR/CI/revisión humana o despliegue de código implícitos.
+
+## EXTRA118 — Inicio autenticado desde ofertas, 01/11/2026
+
+Con panel activo verificado por getSiteAccess, Home omite todo el hero/acceso
+inicial en servidor y comienza en Ofertas disponibles. Navbar siempre visible,
+espacio64px y título h1; carrusel con títulos h2, default h3 para su sección
+anónima. Visitantes conservan presentación, login, registro y avisos. Sin scroll
+imperativo, hueco del hero, nuevas consultas o cambios de permisos/autenticación.
+No cambia carrusel10/autoplay o el resto de Home. Esta solicitud sustituye el hero
+activo conservado en deltas anteriores, sin revertir mejoras independientes.
+
+1618 unit/componentes/135 archivos y13 E2E finales PASS: visitante, tres roles
+a1920/1366/390/320, renovación/navegación/salida y menú. Tres axe móviles0,
+capturas de1920/390 revisadas, tipos/lint/build frío/diff PASS. Se corrigió salto
+h1→h3 detectado en navegador mediante contrato mínimo de títulos del carrusel;
+expectativas antiguas de tarjeta actualizadas manteniendo aserciones de sesión.
+HN1–HN4/T287–T288 verificados técnicamente. EXTRA118 detalla diagnósticos, sin
+omisiones/reintentos automáticos finales, migración o cambio alojado.112–117 y
+next-env ajeno preservados; revisión humana/PR/CI/despliegue no acreditados.
+
+## EXTRA117 — Menú lateral sin superposición, 01/11/2026
+
+La captura muestra Cuenta debajo del botón de cierre en alturas reducidas.
+SidebarContent recupera overflow-auto; SidebarFooter no se comprime. Mantener
+el pie separado del menú desplazable, en los tres roles; móvil conserva flujo
+natural y colapso. Dos clases, sin backend, migración, dependencia o permiso nuevo.
+RED administrativo/GREEN tres E2E,121 pruebas de composición y tipos/lint/build
+frío/diff PASS. Seis viewports de1080 a500 de alto, foco en Cuenta/último enlace/
+cierre, móvil390×844 expandido/contraído y axe0. Espacio960×540 representa zoom
+200% equivalente, no un control de zoom nativo automatizado. Evidencia EXTRA117;
+SB1–SB3/T285–T286 verificados técnicamente. Trabajo112–116 y next-env preservados,
+sin publicación/revisión humana/CI implícitas.
+
+## EXTRA116 — Límites de colecciones en todos los roles, 01/11/2026
+
+Mateo confirma historiales/notas de5 y listados de perfiles/ofertas/empresas de10.
+31 páginas inventariadas; navegaciones existentes conservadas y listas restantes
+con páginas10 o Mostrar más5. Notas administrativas usan5+1 con notesPage y
+acceso posterior a50; participaciones recientes10 enlazan a todos los casos del
+candidato. Matching/búsquedas/avisos unifican defaults10; campana mantiene5.
+Historiales de tablas se leen en lotes ordenados sin corte implícito PostgREST;
+las proyecciones RPC completas siguen completas. Conteos, exportaciones y
+evidencia de decisiones no se truncan. Sin migración, dependencia o permiso nuevo.
+
+1616 unit/componentes/135 archivos,60 tooling, tipos/lint/build/diff PASS.
+Cinco E2E nuevos prueban57 notas sin pérdidas, contactos5+2/foco, filtros/páginas,
+cursos por rol y tiempos/exportación completos; nueve búsquedas/sesiones y tres
+visuales finales PASS. La medición visual ahora toma ambos marcos en un mismo
+fotograma para evitar scroll de validación entre llamadas; tolerancia intacta.
+Suite de inventarios repetida con dos workers después de tres timeouts por
+competir con build; sin ampliar timeout ni omitir. Advertencias de caché CSS
+incremental/lockfiles de snapshot registradas en EXTRA116, sin fallo de build.
+
+59 variantes por cuatro roles,118 vistas1920/390px,59 axe sin infracciones,
+26 bloques acotados y geometría de detalles PASS; cero overflow/errores cliente.
+Cobertura Chromium; hash lejano/selección posterior a20 en componentes, sin
+inventar fixture empresarial inexistente. Inventario en
+`docs/implementation/collection-pagination-audit.md`; contrato de lectura propio.
+PG1–PG6/T282–T284 verificados; cambios112–115 y next-env ajeno preservados.
+Sin reset de base habitual ni cambios alojados; CI/PR/revisión humana pendientes.
+
+## EXTRA115 — Simetría de detalles y revisión completa, 31/10/2026
+
+Mateo detecta que114 no cubrió la composición de seguimiento. Se sustituyen pilas
+independientes por filas compartidas en participación/candidato/oferta, decisiones
+de empresa y cursos. Avisos/bloques solos ocupan fila completa; Perfil/CV antes de
+notas y participaciones. Gráficos pares, encabezados de cuenta e insets comunes.
+Alta/mantenimiento presencial usa pares de campos existentes sin reordenarlos.
+AuthSurface corrige columnas desiguales y overflow320; Home conserva su composición.
+
+Inventario de31 páginas;59 rutas/variantes por cuatro roles,295 vistas Chromium
+a1366/1920/2560/390/320 PASS.95 mediciones de marcos reales de detalles,30 de
+AuthSurface;78 axe sin infracciones. Cero overflow/errores de cliente. Navegación
+lateral/lector se verifica como tal, no como tarjetas pares. Estados disponibles
+ficticios y capturas revisados; archivado/vinculación/suspensión adicionales en
+componentes, sin afirmar fixtures navegador inexistentes. Documentación detallada
+en docs/implementation/card-symmetry-audit.md y EXTRA115.
+
+1608 unit/componentes/133 archivos,60 tooling, tipos/lint/build frío/diff y12 E2E
+(tres regresiones nuevas y nueve de búsqueda/sesión) PASS, sin retries/omisiones
+en E2E finales. Contacto incompleto conserva texto y alineación; acceso a320 sin
+desbordamiento. SY1–SY5/T279–T281 verificados; no cambios de permisos/negocio/SQL.
+next-env ajeno y trabajo112–114 preservados. Sin commit/PR/CI/despliegue/revisión
+humana implícitos; gates históricos abiertos se conservan.
+
+## EXTRA114 — Simetría de tarjetas, 31/10/2026
+
+Listas comparables comparten ancho/alto por fila y tres grupos internos mediante
+subgrid opt-in con fallback flex. Catálogo público, ofertas/participaciones de
+candidato y ofertas de empresa conservan texto completo y acciones; móvil usa
+altura natural. Dashboard alinea metadatos, resumen empresarial usa dos columnas
+iguales y enlaces al pie. Home/cuentas se revisaron sin forzar grupos distintos.
+
+40 vistas Chromium a1366/1920/2560/390/320, 16 axe y dos pruebas adicionales
+(CV desplegado por teclado; texto extenso ficticio solo en DOM) PASS. Cuatro
+checks de fallback simulado, sin afirmar cobertura de otros motores. Geometría
+por fila dentro de1px, sin overflow, recorte ni errores de cliente. Capturas
+revisadas. 1608 unit/componentes,60 tooling, tipos/lint/build frío y nueve E2E
+finales PASS, sin retries/omisiones en E2E. Primera suite: timeout aislado durante
+compilación; repetición completa1608 PASS sin cambiar límites. Evidencia y límites
+en cambios-extra.md y docs/implementation/desktop-layout-audit.md.
+
+SM1–SM4/T276–T278 completos; contratos, acciones, intentos, permisos y negocio
+intactos. React: claves estables, sin estado/efectos/JS nuevos, etiquetas/foco y
+guards preservados. Sin migración o dependencia. next-env ajeno y112/113 intactos.
+Sin commit/PR/CI/despliegue o aprobación humana implícitos; gates previos abiertos.
+
+## EXTRA113 — Espacio de escritorio,31/10/2026
+
+Mateo amplía112 a todas las páginas. Rama renombrada feat/desktop-layout-polish;
+trabajo112 y next-env ajeno conservados. Inventario de31 páginas/46 variantes por
+rol, sección y detalle; medición previa46 y posterior154 a1366/1920/2560 y320/390.
+Canvas privados utilizan1608px útiles a1920 (antes1280),2248 a2560. Públicos
+amplios usan máximo1800 desde1440; Home/cursos/ofertas comparten variable. Tarjetas
+privadas3/4 columnas según ancho, públicas3 y datos empresariales simples3.
+Filtros públicos compactos desde1600:352→185px; mismos controles, orden y GET.
+
+1608 unit/componentes/133 archivos,60 tooling, tipos/lint/build frío/diff y nueve
+E2E finales sin retries/omisiones PASS. Cero overflow/errores de cliente en154
+mediciones; axe0 en28 barridos seleccionados y seis finales del filtro. Registros,
+perfil presencial, navegación, accesibilidad y estados vacíos/404/auth revisados.
+Límites de lectura de formularios cortos/términos y alturas naturales conservados.
+Regla móvil112 centralizada en navbar compartida tras hallar ancho327.48 en320;
+no se ocultan accesos ni cambia timing. Build frío elimina advertencias CSS de
+caché incremental; fuentes sin corrupción y sin cambios de compilador/config.
+
+SP1–SP5/T272–T275 completos, sin brechas nuevas o decisión municipal pendiente.
+Inventario, mediciones y recuperación: docs/implementation/desktop-layout-audit.md.
+Sin SQL/permiso/negocio/dep nuevos; fixture asistido solo propio, sin reset habitual
+o cambios alojados. Sin commit/PR/CI/despliegue/revisión humana implícitos.
+
+## EXTRA112 — Catálogo/detalle públicos,31/10/2026
+
+Rama feat/public-offers-style desde main71a758e actualizado; PR87 mergeado y rama
+anterior eliminada local/remota. Cambio ajeno next-env preservado con hash original.
+Contenedor servidor/CSS local comparte navbar, lienzo blanco/verde y tipografías
+vigentes. Catálogo mantiene filtros/páginas/tarjetas; detalle conserva campos y
+opcionales. Mi cuenta y campana por panel verificado; candidato/visitante mantienen
+postulación, registro solo sin sesión, otros roles van a su propio panel.
+
+1608 unit/componentes/133 archivos y66 focales finales,60 tooling, tipos/lint/
+build/diff PASS. Nueve E2E finales sin retries/omisiones: búsqueda y renovación,
+navegación/reapertura/cierre de tres roles; incluyen geometría de navbar320px.
+Veinte vistas320/390/1440/1920 con axe0/overflow0 y separación marca/Inicio>=8px,
+sin errores cliente; foco, textos largos, opcionales y avisos por sesión verificados.
+Detalle normal y slug inexistente/noindex/sin postulación también revisados.
+Navegador detectó límite RSC/client de buttonVariants: se reutiliza LinkButton.
+Primer ajuste móvil rechazado por seis pruebas; separación corregida sin rebajar
+umbrales, build y recorridos finales repetidos. Evidencia local ignorada extra112-*.
+
+T268–T271 completas y PO1–PO5 contrastados sin brechas nuevas; constitución I–VI,
+permisos, privacidad/GET/fechas/slugs y negocio intactos. Sin cambios de servicios,
+SQL nuevo, dependencias o variables. Tres migraciones existentes de main aplicadas
+solo a instancia ficticia propia para QA, sin reset habitual ni cambios alojados.
+Guía y recuperación: docs/operations/public-offers-presentation.md. Sin commit/PR,
+CI, revisión humana o despliegue implícitos; gates históricos intactos.
+
 ## EXTRA109/110/111 — Gestión administrativa,29/10/2026
 
 Rama feat/admin-offer-management desde main9cf0741, PR86 mergeado y rama anterior

@@ -5,6 +5,97 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA119 — Retiro de A/B con conservación
+
+- [x] T289 Verificar catálogo/usos sin PII, resolver asignaciones con Mateo y
+  registrar DC1–DC5/plan/modelo/contrato/análisis antes de implementar.
+- [x] T290 Implementar migración/respaldo privado/guía y probar cuerpo real,
+  atomicidad/privacidad/recuperación/otras relaciones, checks técnicos.
+  SQL real/locks/fallos/roles/recovery PASS;208 regresiones,64 tooling,1 E2E,
+  tipos/lint/build frío/diff PASS. Selector de métricas excluye solo A/B v1 retiradas.
+- [x] T291 Inspeccionar versiones/dry-run y aplicar únicamente retiro aprobado
+  a local/vinculado; verificar conteos/backups y documentar sin reset/reparaciones ajenas.
+ 20261101120000 aplicada/registrada en ambas; A/B inactivas/sin relaciones, backup
+  local656 filas y alojado3,15 rubros reales intactos. Huellas de estados/historia/
+  otras relaciones idénticas; no se corrige divergencia histórica ajena. EXTRA119.
+
+## EXTRA118 — Home activo comienza en ofertas
+
+- [x] T287 Revisar fuente de sesión, Home/nav/tests y registrar HN1–HN4, diseño
+  y análisis antes de código; conservar trabajo previo y next-env ajeno.
+- [x] T288 Omitir hero activo desde servidor, adaptar encabezado/inset y pruebas;
+  verificar invitados/roles/URL/avisos, ofertas vacío/carrusel, navegación/salida,
+  responsive/axe, tipos/lint/pruebas/build y documentar límites.
+  1618 unit/componentes,13 E2E por rol/sesión/menú, cuatro viewports y axe0;
+  tipos/lint/build frío/diff PASS. Capturas revisadas, sin cambios de permisos/SQL,
+  controles o autoplay. EXTRA118 registra diagnósticos y revisión humana pendiente.
+
+## EXTRA117 — Menú y pie sin solapamiento
+
+- [x] T285 Revisar contexto/captura/composición/registro oficial y documentar
+  SB1–SB3 y corrección mínima antes de código; preservar trabajo previo.
+- [x] T286 Corregir región desplazable/pie y comprobar geometría, teclado,
+  roles, alturas/zoom y móvil; tipos/lint/pruebas relevantes/build y evidencia.
+  RED1/GREEN3 E2E por rol, seis viewports y móvil/colapso/axe0;121 pruebas de
+  composición, tipos/lint/build frío/diff PASS. Zoom por espacio equivalente,
+  revisión humana pendiente y sin cambios de permisos/datos.
+
+## EXTRA116 — Listados e historiales acotados
+
+- [x] T282 Revisar consultas/colecciones de todas las páginas, resolver5/10 con
+  Mateo y registrar PG1–PG6/diseño/análisis antes de código, preservando112–115.
+- [x] T283 Implementar navegación accesible común y límites por tipo; conservar
+  GET existente, selección/hash, permisos/cálculos y acceso a registros más allá de50.
+- [x] T284 Probar límites/recorridos completos/orden/error/autorización, todos los
+  roles y superficies afectadas; móvil/axe/simetría y tipos/lint/unit/build; documentar.
+  1616 unit/componentes,60 tooling,17 recorridos E2E finales (5 nuevos/9 previos/
+  3 visuales),118 vistas por cuatro roles y59 axe PASS. Tipos/lint/build/diff PASS;
+  inventario/contrato/EXTRA116 registran carga completa vs rango servidor y límites.
+
+## EXTRA115 — Corregir composición de detalles y revisar todas las páginas
+
+- [x] T279 Revisar contexto/captura/inventario, registrar delta SY1–SY5 y analizar
+  diseño/constitución antes de código; preservar112–114 y cambios ajenos.
+- [x] T280 Sustituir pilas independientes y ajustar pares de detalles, cuentas,
+  empresas/cursos/métricas; preservar campos, acciones, IDs y orden requerido.
+- [x] T281 Recorrer31 páginas/variantes con tarjetas reales, estados abiertos/
+  finales/presenciales/vinculados/vacíos y dinámicos; geometría/teclado/axe/móvil,
+  tipos/lint/unit/build y E2E relevantes; documentar cobertura y límites.
+
+## EXTRA114 — Simetría de tarjetas
+
+- [x] T276 Revisar grupos y SM1–SM4, registrar evidencia/diseño antes de código y
+  preservar trabajo112/113/next-env; análisis acotado sin críticos/altos nuevos.
+- [x] T277 Aplicar layout opt-in por fila con tres grupos y fallback; alinear
+  metadatos de dashboard y columnas del resumen empresarial, sin cambiar controles.
+- [x] T278 Verificar geometría por fila, títulos/mensajes, móvil/fallback/teclado/
+  axe, tipos/lint/unit/build y recorridos relevantes; documentar evidencia y límites.
+
+## EXTRA113 — Anchos y distribución de escritorio
+
+- [x] T272 Revisar contexto, inventario y SP1–SP5; preservar112/next-env, registrar
+  evidencia/diseño/alcance y analizar delta antes de código, sin gates humanos nuevos.
+- [x] T273 Auditar las31 rutas y variantes por rol/sección/detalle; registrar medidas
+  antes/después, límites intencionales y decisiones en docs/implementation/desktop-layout-audit.md.
+- [x] T274 Ajustar anchos compartidos y grillas de listas/datos simples solo donde
+  se demuestra desaprovechamiento, conservando lectura, controles, orden y contratos.
+- [x] T275 Verificar roles/escritorio/móvil/teclado/axe, tipos/lint/unit/tooling/build
+  y regresiones relevantes; documentar convergencia SP1–SP5, resultados y límites.
+  Depende de T273/T274; sin migración o publicación implícita.
+
+## EXTRA112 — Presentación pública de ofertas
+
+- [x] T268 Revisar contexto vigente, UI/contratos y PO1–PO5 antes de código; rama
+  desde main actualizado, preservar next-env, registrar EXTRA112 y diseño/análisis
+  acotados sin críticos/altos nuevos. No cerrar pendientes humanos históricos.
+- [x] T269 PO1/PO3: compartir shell/navbar con panel y avisos de sesión verificada;
+  probar visitante/candidato/empresa/admin y conservar acciones autorizadas por slug.
+- [x] T270 PO2/PO4/PO5: ajustar catálogo y detalle con CSS local/tokens/primitivas
+  actuales; conservar campos, GET, paginación, vacíos, inválidos, errores y404.
+- [x] T271 Verificar tipos/lint/unit/tooling/build y navegador ficticio por roles,
+  móvil/escritorio/teclado/axe; documentar resultados, recuperación y convergencia
+  PO1–PO5, sin migración ni publicación implícita. Depende de T269/T270.
+
 ## EXTRA109 — Administración de ofertas y cuentas
 
 ### Preparación y fundamento

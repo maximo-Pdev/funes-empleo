@@ -85,7 +85,7 @@ it("rechaza arrays sin convertirlos en una página válida", async () => {
 it("resuelve componente servidor y pagina en el servicio real por contrato", async () => {
   service.mockResolvedValue(matches);
   render(await OpeningCandidateMatches({ openingId: id, page: "2" }));
-  expect(service).toHaveBeenCalledWith({ openingId: id, page: 2, pageSize: 12, order: "updated_desc" });
+  expect(service).toHaveBeenCalledWith({ openingId: id, page: 2, pageSize: 10, order: "updated_desc" });
   expect(screen.getByText("Persona ficticia")).toBeTruthy();
 });
 

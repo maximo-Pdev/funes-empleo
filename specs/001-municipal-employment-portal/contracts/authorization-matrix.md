@@ -1,5 +1,21 @@
 # Contrato de autorización y visibilidad
 
+EXTRA119: respaldo de retiro A/B exclusivamente en private, RLS y sin grants a
+public/anon/authenticated/service_role; no nueva consulta de PII ni RPC. Lecturas
+vigentes dejan de recibir esas relaciones y selectores activos las omiten. Guards,
+permisos de perfiles/CV y auditoría previa permanecen intactos. Restauración solo
+por operación SQL revisada, no por un rol de aplicación.
+
+EXTRA116: límites visuales 10/5 y rangos de lectura no cambian guards, RLS ni
+visibilidad entre roles. Notas de candidato siguen exclusivas de administración;
+preentrevistas candidatas no exponen evaluación interna. Una página posterior,
+hash o selección no concede acceso. Ver `collection-read-pagination.md`.
+
+EXTRA112: catálogo/detalle públicos reutilizan getSiteAccess y navbar existentes.
+Presentación del panel, campana y acciones por rol; ningún grant/RLS/RPC nuevo.
+La ausencia de registro o CTA candidata no autoriza acciones ni sustituye guards.
+Visitante conserva publicación pública; candidato mantiene destino de postulación.
+
 EXTRA109: la ficha empresarial administrativa usa los datos ya autorizados al
 admin activo (razón social, CUIT, responsable, contactos, actividad, localidad).
 Enlace desde oferta y páginas de sus ofertas no amplían visibilidad a otros roles.

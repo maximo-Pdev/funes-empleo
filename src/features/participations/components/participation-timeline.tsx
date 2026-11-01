@@ -3,6 +3,7 @@ import { Badge, FeedbackMessage } from "@/components/ui";
 import type { ParticipationStatus } from "@/domain/states";
 import { participationStatusLabels, displayLabel, auditActionLabel, reasonLabel } from "@/domain/presentation/labels";
 import { participationStatusTones, statusTone } from "@/domain/presentation/status-tone";
+import { BoundedList } from "@/components/ui/bounded-list";
 
 export type ParticipationHistoryEvent = {
   id: string; occurredAt: string; action: string; actorLabel: string;
@@ -26,13 +27,13 @@ export function ParticipationTimeline({ currentStatus, events }: {
       Resultado o estado vigente <Badge variant="status" tone={statusTone(participationStatusTones, currentStatus)}>{participationStatusLabel(currentStatus)}</Badge>
     </div>
     {hasLateCorrection && <FeedbackMessage tone="info">Sin respuesta empresarial: cierre automático anterior reemplazado por el resultado vigente. El historial se conserva.</FeedbackMessage>}
-    {events.length === 0 ? <p>No hay eventos registrados todavía.</p> : <ol className="space-y-3 border-l-2 border-slate-300 pl-5">
+    {events.length === 0 ? <p>No hay eventos registrados todavía.</p> : <BoundedList as="ol" label="Historial de la participación" className="space-y-3 border-l-2 border-slate-300 pl-5">
       {events.map((event) => <li key={event.id} className="rounded-md border border-slate-200 bg-white p-3">
         <p className="font-medium">{displayLabel(participationStatusLabels, event.newStatus, auditActionLabel(event.action))}</p>
         <p className="text-sm text-slate-700">{formatFunesDateTime(event.occurredAt)} · {event.actorLabel}</p>
         {event.reasonCode && <p className="mt-1 text-sm">Motivo: {reasonLabel(event.reasonCode)}</p>}
         {event.reason && <p className="mt-1 text-sm">Motivo interno: {event.reason}</p>}
       </li>)}
-    </ol>}
+    </BoundedList>}
   </section>;
 }

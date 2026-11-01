@@ -9,6 +9,7 @@ import { candidateStatusLabels } from "@/features/participations/candidate-statu
 import { candidateProfileStatusTones, participationStatusTones, statusTone, type StatusTone } from "@/domain/presentation/status-tone";
 import styles from "./account.module.css";
 import { listSuggestedOffers } from "@/features/openings/recommendations-service";
+import { HISTORY_PAGE_SIZE, RECORD_PAGE_SIZE } from "@/lib/collections/limits";
 
 const closedStatuses = ["hired", "not_selected", "withdrawn", "cancelled", "no_company_response"];
 
@@ -95,7 +96,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
       </div>
       {open.length === 0
         ? <Card className={styles.dashboardEmpty}><BriefcaseBusiness className="h-6 w-6 text-primary" aria-hidden="true" /><p className="mt-3 text-sm leading-6 text-muted-foreground">No tenés postulaciones en curso. Cuando te postules a una oferta, vas a verla acá con su estado.</p><Link href={offersHref} className={styles.emptyLink}>Explorar ofertas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card>
-        : <ul className={styles.dashboardList}>{open.map((item) => <li key={item.id}>
+        : <ul className={styles.dashboardList}>{open.slice(0, RECORD_PAGE_SIZE).map((item) => <li key={item.id}>
           <Card className={styles.dashboardItem}>
             <div className={styles.itemHead}><h3 className={styles.itemTitle}>{item.opening_title ?? "Oferta"}</h3><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></div>
             <p className={styles.itemMeta}><CalendarDays className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {receivedOn(item.created_at)}</p>
@@ -108,7 +109,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
         <h2 id="dashboard-cerradas" className={styles.sectionTitle}>Postulaciones cerradas</h2>
         <Link href={participationsHref} className={styles.sectionLink}>Ver todas<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
       </div>
-      <ul className={styles.dashboardList}>{closed.map((item) => <li key={item.id}>
+      <ul className={styles.dashboardList}>{closed.slice(0, HISTORY_PAGE_SIZE).map((item) => <li key={item.id}>
         <Card className={styles.dashboardItem}>
           <div className={styles.itemHead}><h3 className={styles.itemTitle}>{item.opening_title ?? "Oferta"}</h3><Badge variant="status" tone={statusTone(participationStatusTones, item.display_status)}><span className="min-w-0 break-words">{candidateStatusLabels[item.display_status] ?? "Resultado registrado"}</span></Badge></div>
           <p className={styles.itemMeta}><CalendarDays className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Recibida: {receivedOn(item.created_at)}</p>

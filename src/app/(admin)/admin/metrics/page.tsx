@@ -51,7 +51,7 @@ export default async function MetricsPage({ searchParams }: { searchParams: Prom
         <RecordAnchor href={`/api/admin/exports/operations.pdf?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar PDF filtrado</RecordAnchor>
         <RecordAnchor href={`/api/admin/exports/operations.xlsx?${metricsQuery(result.filters)}`} className="inline-block rounded bg-blue-800 px-4 py-2 text-white">Descargar Excel filtrado</RecordAnchor>
       </div>
-      <Dashboard rows={result.rows} />
+      <Dashboard key={metricsQuery(result.filters)} rows={result.rows} />
     </>}
   </AdminShell>;
 }

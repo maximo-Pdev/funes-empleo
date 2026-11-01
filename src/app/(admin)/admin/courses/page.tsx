@@ -5,6 +5,8 @@ import { isRecordReference } from "@/lib/records/reference-format";
 import { recordReferences } from "@/lib/records/references";
 import { CourseLinkForm, CourseReferralForm } from "@/features/training/components/course-forms";
 import { getCourseCandidate, getCourseReferralHistory, listCourseLinks, type CourseLink } from "@/features/training/service";
+import layout from "@/components/ui/detail-layout.module.css";
+import { BoundedList } from "@/components/ui/bounded-list";
 
 export const dynamic = "force-dynamic";
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -55,18 +57,18 @@ export default async function AdminCoursesPage({ searchParams }: { searchParams:
   const selected = valid && typeof reference === "string"
     ? await SelectedCandidate({ reference, page: Number(pageValue), courses }) : null;
   return <AdminShell email={user?.email} active="/admin/courses" title="Cursos y derivaciones" description="Enlaces oficiales y antecedentes de capacitación independientes de las postulaciones laborales.">
-    <div className="grid gap-10 xl:grid-cols-2">
-      <section aria-label="Enlaces municipales" className="min-w-0 space-y-6">
+    <div className={layout.grid} data-detail-grid="courses">
+      <section aria-label="Enlaces municipales" className={`${layout.surface} space-y-6`} data-detail-cell="course-links">
         <h2 className="text-xl font-semibold">Enlaces municipales</h2>
         {courses === null ? <p role="alert">No pudimos cargar los cursos. Volvé a intentar más tarde.</p> : <>
           <CourseLinkForm />
-          {courses.length === 0 ? <p>Todavía no hay enlaces registrados.</p> : courses.map(course => <details key={course.id} className="border-b border-border pb-4">
+          {courses.length === 0 ? <p>Todavía no hay enlaces registrados.</p> : <BoundedList mode="pages" as="div" label="Enlaces municipales" className="space-y-4">{courses.map(course => <details key={course.id} className="border-b border-border pb-4">
             <summary className="min-h-11 cursor-pointer py-3 font-semibold">{course.title} · {course.published ? "Publicado" : "Sin publicar"}</summary>
             <div className="pt-4"><CourseLinkForm course={course} /></div>
-          </details>)}
+          </details>)}</BoundedList>}
         </>}
       </section>
-      <div className="min-w-0">
+      <div className={`${layout.cell} ${layout.surface}`} data-detail-cell="course-referrals">
         {!valid ? <p role="alert">Revisá la referencia del candidato y la página solicitada.</p> : selected ?? <section className="space-y-4">
           <h2 className="text-xl font-semibold">Registrar o consultar una derivación</h2>
           <p>Buscá al postulante y abrí Cursos desde su perfil. No hace falta una postulación laboral.</p>

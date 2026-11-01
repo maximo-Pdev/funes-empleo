@@ -46,8 +46,19 @@ test("administración: métricas filtradas, PDF, Excel y CSV compatible en menos
   }
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.locator("[data-metrics-chart-first] details")).toHaveCount(0);
-  await expect(page.getByTestId(`duration-first_hire_days-${fixtureId("opening",22)}`)).toContainText("10 días");
-  await expect(page.getByTestId(`duration-coverage_days-${fixtureId("opening",22)}`)).toContainText("Pendiente");
+  const durations = page.locator('[data-bounded-list="Tiempos por oferta"]');
+  await expect(durations.locator(":scope > ul > li")).toHaveCount(10);
+  for (const [indicator, expected] of [["first_hire_days", "10 días"], ["coverage_days", "Pendiente"]] as const) {
+    const previous = durations.getByRole("button", { name: "Anterior", exact: true });
+    while (await previous.isEnabled()) await previous.click();
+    const record = page.getByTestId(`duration-${indicator}-${fixtureId("opening",22)}`);
+    while (await record.count() === 0) {
+      const next = durations.getByRole("button", { name: "Siguiente", exact: true });
+      await expect(next).toBeEnabled();
+      await next.click();
+    }
+    await expect(record).toContainText(expected);
+  }
   const csvLink = page.getByRole("link", { name: "Descargar CSV filtrado", exact: true });
   await expect(csvLink).toBeVisible();
   const csvPath = (await csvLink.getAttribute("href"))!;

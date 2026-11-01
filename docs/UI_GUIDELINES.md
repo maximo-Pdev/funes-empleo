@@ -1,5 +1,82 @@
 # Municipal visual reference
 
+## EXTRA118 — Primer bloque del inicio por sesión
+
+Home con panel activo verificado comienza en Ofertas disponibles: sin hero,
+formulario o tarjeta de sesión iniciada. Navbar visible desde arriba y espacio64px
+para no cubrir el único h1. Sección inicial usa el alto restante del viewport;
+sin scroll automático ni hueco del hero. Visitantes conservan presentación/acceso/
+registro existentes. Esta solicitud actual sustituye el hero activo antes retenido.
+El título de cada oferta del carrusel es h2 cuando la sección es h1, y h3 cuando
+la sección anónima es h2. Conservar la apariencia y evitar saltos de encabezados.
+
+## EXTRA117 — Altura del menú lateral
+
+En escritorio, el contenido del menú se desplaza dentro del espacio disponible
+entre navbar y pie; el pie de Cerrar sesión/identidad no se comprime ni tapa Cuenta.
+Conservar foco y acceso a todos los enlaces por teclado. En móvil el menú mantiene
+altura natural y su colapso existente, sin recortar opciones.
+
+## EXTRA116 — Colecciones visibles
+
+Perfiles/ofertas/empresas y otros listados de registros: diez por página.
+Historiales/notas: cinco inicialmente, con Mostrar más o paginación; conservar
+moderación/cuenta-perfil ya implementados. Indicar cantidad mostrada y acceso al
+resto, sin truncar auditoría. Mantener filtros GET, simetría115 y acciones existentes.
+Mostrar el registro de un hash/derivación seleccionada fuera del bloque inicial;
+foco/anuncio al navegar. No recortar catálogos de opciones, conteos o exportaciones.
+
+## EXTRA115 — Simetría también en detalles
+
+Las tarjetas pares de un detalle comparten inicio/final de fila y columnas iguales,
+aunque tengan distinta función. Usar grilla plana por filas, no dos pilas verticales
+independientes. Avisos generales y bloques sin par ocupan fila completa. Campos y
+texto mantienen su tamaño; alto según contenido natural, nunca viewport. En móvil,
+apilar por filas y orden DOM. Preservar Perfil/CV antes de notas y participaciones.
+Esto acota la exclusión de funciones distintas de114: no justifica detalles torcidos.
+Solo navegación lateral/lector y formularios únicos tienen proporción deliberada;
+inventariar y comprobar cada excepción, sin agregar tarjetas vacías para emparejar.
+
+## EXTRA114 — Simetría por grupo y fila
+
+Listas de tarjetas comparables alinean encabezado/contenido/cierre, además de sus
+bordes. Usar layout CSS opt-in/subgrid con fallback flex; Card y controles actuales
+se conservan. Sin recortar títulos, alturas fijas de viewport o igualdad forzada
+entre filas diferentes. Móvil en una columna mantiene altura natural. No igualar
+artificialmente un formulario con una tarjeta de función distinta. Resumen de
+empresa usa dos columnas iguales; dashboard alinea metadatos al pie.
+
+## EXTRA113 — Distribución en escritorio
+
+Paneles privados usan el ancho útil después de sidebar/márgenes; no limitar todo
+el canvas a1280 si queda espacio libre. Máximo público compartido1280,1800 desde
+1440px para ofertas, cursos y secciones amplias de Home. Párrafos siguen en ch;
+formularios cortos y textos legales mantienen límites intencionales de lectura.
+Listas privadas de tarjetas: tres columnas desde1600 y cuatro desde2200, con
+misma secuencia DOM y acciones; catálogo público hasta tres por su aside. No
+estirar alturas, fuentes o campos ni rellenar vacíos con contenido artificial.
+Móvil/controles/reglas intactos; medir espacio útil, solapamientos y overflow.
+
+El espaciado estrecho de navbar112 pasa a home.module.css para todos sus usos:
+bajo359px, padding10, gap marca/enlaces8, marca sin compresión y gap interno6.
+Sustituye el duplicado local de ofertas; acciones/timing/mínimos táctiles intactos.
+
+## EXTRA112 — Catálogo y detalle públicos
+
+/ofertas y /ofertas/{slug} reutilizan HomeNavbar siempre visible, acceso al panel
+verificado y campana solo en sesión activa. Evitar otra marca o header local.
+Un mismo contenedor servidor/CSS local presenta lienzo blanco sobre verde con
+espaciado de navbar64px, encabezado Sora compacto y cuerpo Be Vietnam. Usar tokens
+y controles existentes; sin reglas globales o cambios al inicio. Tarjetas parejas,
+campos completos, aside a88px en desktop y apilado móvil. Mantener GET y mensajes,
+foco y enlaces semánticos. Detalle: postular para candidato/visitante, registro solo
+sin sesión; empresa/admin reciben su propio panel. Sin cambio de permisos.
+
+Bajo359px, reducir espacios solo dentro del contenedor de ofertas, sin modificar
+la navbar global ni ocultar accesos. Conservar al menos8px reales entre marca e
+Inicio: comprobar geometría/captura además de axe y scrollWidth. Los enlaces de
+acción reutilizan LinkButton; no llamar su utilidad de variantes cliente desde RSC.
+
 
 ## PR86 documentation integration — current scope and historical evidence
 

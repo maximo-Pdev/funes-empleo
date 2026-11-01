@@ -1,5 +1,144 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA119 — Retiro operativo de categorías ficticias
+
+Mateo,01/11/2026: eliminar A/B quitando asignaciones y conservando respaldo.
+
+- **DC1:** retirar del catálogo activo DEMO-A/DEMO-B v1; conservar sus IDs/filas.
+- **DC2:** respaldar íntegramente sus asignaciones candidatas/de ofertas antes de
+  quitarlas, con actor, fecha, motivo y versión; sin exponer el respaldo a roles app.
+- **DC3:** sin equivalencias automáticas; registros solo A/B quedan sin categoría.
+  No modificar estados, versiones, consentimiento, participaciones o historia previa.
+- **DC4:** operación atómica, serializada con mutaciones concurrentes, recuperable;
+  otras categorías/asignaciones intactas. Abortado equivale a ningún cambio.
+- **DC5:** verificar respaldo/permisos/rollback/recuperación e impacto antes y
+  después en local y vinculado. Fixtures sintéticas de aceptación siguen aisladas;
+  no declarar revisión humana, reset o despliegue a partir de tests.
+
+El selector de métricas omite únicamente A/B v1 retiradas; conserva otras categorías
+inactivas para historia. No cambia resultados/exportación ni borra categorías de
+hechos históricos; A/B activas solo en fixtures mantienen sus pruebas deterministas.
+
+Sustituye únicamente la conservación activa de esas dos categorías de A08.
+OQ-010 sigue abierta para equivalencias históricas y ocupaciones no aprobadas.
+
+## EXTRA118 — Inicio autenticado en ofertas
+
+- **HN1:** con sesión activa verificada, omitir todo el hero/acceso inicial y
+  comenzar Home en Ofertas disponibles, sin reservar su altura ni desplazar vía JS.
+- **HN2:** conservar navbar visible, destinos por rol y un h1 para ofertas;
+  el título no queda detrás de la navbar fija. Carrusel/vacío y resto de Home iguales.
+- **HN3:** sin panel activo verificado, mantener acceso/registro y avisos vigentes.
+  Query registro/acceso no cambia la decisión de sesión; no alterar autorización.
+- **HN4:** comprobar tres roles, invitado, errores/suspensión, recarga, logout,
+  móvil/escritorio, sesión renovada y checks de calidad. Sustituye solo el hero
+  activo conservado en deltas anteriores; las demás reglas de acceso siguen vigentes.
+
+## EXTRA117 — Pie del menú sin superposición
+
+- **SB1:** Cuenta y demás enlaces no quedan tapados por Cerrar sesión o identidad.
+- **SB2:** si la altura no alcanza, el menú puede desplazarse; el pie conserva su
+  espacio y se puede alcanzar el último enlace mediante teclado.
+- **SB3:** conservar navegación, logout autorizado, identidad y menú móvil
+  expandido/contraído en todos los roles, sin modificar páginas o permisos.
+
+## EXTRA116 — Colecciones paginadas, 01/11/2026
+
+Mateo confirma5 para historiales/notas y10 para perfiles/ofertas/empresas.
+
+- **PG1:** inventariar todas las colecciones visibles por rol; mantener listados
+  principales de10 y resúmenes recientes con límite explícito/enlace a lista completa.
+- **PG2:** historiales y notas muestran5 inicialmente, con acceso a los restantes
+  mediante Mostrar más o páginas. No eliminar, recortar silenciosamente a50 ni
+  perder eventos por el límite de respuesta de tablas.
+- **PG3:** conservar GET/filtros y orden estable, contenido completo y todos los
+  destinos. Notificación/hash o derivación seleccionada fuera del bloque inicial
+  debe poder mostrarse sin obligar a recorrer páginas manualmente.
+- **PG4:** paginar presentación no altera permisos, formularios, selección de
+  evidencia, cálculos, contadores o exportaciones. Catálogos funcionales y gráficos
+  agregados mantienen su alcance; no confundirlos con registros de un historial.
+- **PG5:** navegación por teclado, foco en contenido nuevo, anuncio/contador,
+  vacío/error/rango y última página correctos; conservar simetría y móvil.
+- **PG6:** verificar todas las superficies, umbrales5/10 y acceso más allá de50,
+  permisos/orden/errores y checks técnicos. Identificar consultas completas frente
+  a paginación SQL real; no afirmar optimización de contratos RPC no modificados.
+
+## EXTRA115 — Filas compartidas en detalles, 31/10/2026
+
+Corrige la cobertura limitada de114 tras la captura aportada por Mateo.
+
+- **SY1:** revisar las31 páginas y variantes por rol/estado; medir tarjetas reales,
+  no limitarse a listados o a ausencia de overflow.
+- **SY2:** tarjetas pares de detalles comparten columnas iguales, inicio y final
+  de fila. Avisos generales no desplazan solo una columna. Sin pilas independientes.
+- **SY3:** contacto/historial y los demás grupos de seguimiento funcionan tanto
+  en casos abiertos como finales y con/sin registros. Perfil digital/presencial,
+  oferta, empresa, cursos, métricas y cuentas usan el mismo criterio por fila.
+- **SY4:** conservar todos los controles/estados/IDs/anclas/acciones y restricciones
+  de privacidad; Perfil/CV antes de notas y participaciones. Móvil respeta orden
+  DOM por filas, sin CSS order, recorte, altura de viewport o relleno artificial.
+- **SY5:** verificar alineación por fila, contenido real extenso, vacíos, cambios
+  dinámicos/errores, navegación/teclado/axe y checks técnicos; documentar cobertura
+  y excepciones concretas de navegación lateral y lecturas/formularios únicos.
+
+SM3 anterior queda acotado: las funciones distintas no excluyen pares de detalles
+de la simetría solicitada. No se obliga a convertir navegación en una tarjeta par.
+
+## EXTRA114 — Tarjetas simétricas,31/10/2026
+
+- **SM1:** tarjetas equivalentes de una fila comparten ancho, altura y alineación
+  de encabezado, contenido y cierre aun con títulos/mensajes de distinta longitud.
+- **SM2:** conservar texto completo, orden DOM, información y acciones/formularios;
+  no truncar ni imponer altura fija común a todo el sitio o a distintas filas.
+- **SM3:** móvil mantiene altura natural por tarjeta; grupos distintos como
+  información/decisión o formularios no se estiran para igualarlos artificialmente.
+- **SM4:** revisar catálogo, candidato y empresa, recomendaciones/resúmenes y grupos
+  ya equilibrados de Home/cuentas; verificar geometría, teclado, a11y y regresiones.
+
+Se conserva el ancho/columnas113 y la navegación112. Sin cambio de negocio o datos.
+
+## EXTRA113 — Escritorio aprovechado,31/10/2026
+
+Pedido de Mateo amplía el alcance visual de112 a todas las páginas actuales.
+
+- **SP1:** revisar31 páginas y variantes por rol/sección/detalle, identificando
+  topes artificiales y límites intencionales de lectura; documentar cobertura.
+- **SP2:** paneles privados utilizan el ancho disponible después de sidebar y
+  márgenes; páginas públicas con listas/secciones amplias aprovechan escritorio
+  1920/2560 con máximo1800 desde1440, conservando composición en anchos menores.
+- **SP3:** listados de tarjetas distribuyen más columnas cuando hay espacio,
+  conservando orden, contenido, acciones y paginación. Datos empresariales simples
+  aprovechan tercera columna. No forzar alturas para llenar el viewport.
+- **SP4:** formularios breves, textos legales, errores y vacíos siguen legibles y
+  proporcionados; no agrandar campos/fuentes o inventar datos para llenar espacio.
+- **SP5:** sin scroll horizontal, solapamientos o regresiones en1366/1920/2560 y
+  móvil320/390; preservar accesibilidad, navegación112, todos los contratos y reglas.
+
+La ampliación permite ajustar anchos de Home/cursos/paneles, antes excluidos de112;
+no autoriza cambiar su contenido, interacción o identidad visual por otro motivo.
+
+## EXTRA112 — Ofertas públicas coherentes,31/10/2026
+
+Pedido visual de Mateo, sin modificar negocio o contratos:
+
+- **PO1:** /ofertas y /ofertas/{slug} comparten la navegación institucional vigente,
+  siempre visible. Sesión activa muestra Mi cuenta con el panel correcto y campana;
+  visitante no consulta notificaciones privadas. Sin navbar/logo alternativos.
+- **PO2:** ambas vistas siguen el lienzo blanco sobre verde, tipografía Sora/Be
+  Vietnam y controles municipales actuales. Catálogo mantiene tarjetas equilibradas,
+  filtros y paginación; detalle conserva todos los campos y opcionales registrados.
+- **PO3:** candidato mantiene acción de postular por slug; visitante conserva
+  acceso y registro. Empresa/admin acceden a su propio panel, sin CTA candidata ni
+  registro redundante. Visibilidad no sustituye autorización servidor/SQL.
+- **PO4:** filtros GET, orden, límites, fechas, slugs y consultas públicas actuales
+  permanecen intactos; vacío, filtros inválidos, errores y oferta no disponible
+  conservan respuestas. No modificar Home, paneles, cursos o reglas de sesión.
+- **PO5:** teclado, foco, contraste, móvil320/390 y escritorio1440/1920, textos
+  largos y barra fija sin tapar encabezados o acciones. Sin scroll horizontal.
+
+Clarificación resuelta por repositorio: reutilizar HomeNavbar y tokens existentes,
+sin nueva navegación global o decisión de privacidad. Permisos/reglas no cambian.
+
 ## EXTRA109 — Gestión administrativa, 29/10/2026
 
 Pedido autorizado de Mateo, dentro de la intermediación y permisos existentes.

@@ -2,6 +2,7 @@ import { RecordLabel } from "@/components/ui/record-link";
 import type { MetricRow } from "@/validation/metrics";
 import styles from "./dashboard.module.css";
 import { metricLabel } from "../labels";
+import { BoundedList } from "@/components/ui/bounded-list";
 export { metricLabel } from "../labels";
 const openingIndicators = new Set(["openings_draft", "openings_pending_review", "openings_changes_requested", "openings_published", "openings_paused", "openings_closed", "openings_rejected", "openings_cancelled", "openings_archived"]);
 const formatCount = (value: number | null) => value === null ? "No disponible" : value.toLocaleString("es-AR");
@@ -54,11 +55,11 @@ export function Dashboard({ rows }: { rows: readonly MetricRow[] }) {
     </section>
     <section aria-labelledby="metric-durations"><h2 id="metric-durations" className="mb-3 text-xl font-semibold">Tiempos por oferta</h2>
       {durations.length === 0 ? <p>No hay ofertas publicadas en este período y categoría. Los conteos cero no equivalen a tiempos de cero días.</p> :
-        <ul className="grid gap-3 sm:grid-cols-2">{durations.map((r) => <li key={`${r.indicator}:${r.opening_id}`} data-testid={`duration-${r.indicator}-${r.opening_id}`} className="rounded border bg-white p-4">
+        <BoundedList mode="pages" label="Tiempos por oferta" className="grid gap-3 sm:grid-cols-2">{durations.map((r) => <li key={`${r.indicator}:${r.opening_id}`} data-testid={`duration-${r.indicator}-${r.opening_id}`} className="rounded border bg-white p-4">
           <h3 className="font-semibold break-words">{r.opening_title ?? "Oferta sin título"}</h3>
           <p className="break-all text-sm">Código: {r.opening_id && <RecordLabel kind="opening" id={r.opening_id} />}</p>
           <p>{metricLabel(r.indicator)}: <strong>{r.state === "pending" ? (r.indicator === "coverage_days" ? "Pendiente de cubrir todas las vacantes" : "Pendiente de primera contratación") : r.value === null ? "No disponible" : `${r.value.toLocaleString("es-AR", { maximumFractionDigits: 2 })} días`}</strong></p>
-        </li>)}</ul>}
+        </li>)}</BoundedList>}
     </section>
   </div>;
 }

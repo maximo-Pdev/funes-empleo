@@ -298,11 +298,11 @@ it.each([
  const noteForm = screen.getByRole("heading", { name: "Nota interna de la Oficina" }).closest("form");
  if (state.status === "archived") {
    expect(screen.queryByRole("region", { name: "CV PDF del candidato" })).toBeNull();
-   expect(profileDetails.nextElementSibling).toBe(noteForm);
+   expect(profileDetails.compareDocumentPosition(noteForm!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  } else {
    const cvDetails = screen.getByRole("region", { name: "CV PDF del candidato" });
-   expect(profileDetails.nextElementSibling).toBe(cvDetails);
-   expect(cvDetails.nextElementSibling).toBe(noteForm);
+   expect(profileDetails.compareDocumentPosition(cvDetails) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+   expect(cvDetails.compareDocumentPosition(noteForm!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  }
  expect(within(screen.getByRole("complementary", { name: "Panel de administración" })).getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/admin/openings");
  expect(mocks.nominations).not.toHaveBeenCalled();
@@ -322,8 +322,11 @@ it("muestra candidatos después de la información e historial de oferta y fuera
  const history = screen.getByRole("region", { name: "Historial de moderación" });
  const matches = screen.getByRole("region", { name: "Candidatos coincidentes de prueba" });
  const decision = screen.getByRole("heading", { name: "Decisión municipal sobre la oferta" }).closest("form");
- expect(details.parentElement).not.toBe(decision?.parentElement);
- expect(history.parentElement).toBe(decision?.parentElement);
+ const grid = document.querySelector('[data-detail-grid="opening"]');
+ expect(details.parentElement).toBe(grid);
+ expect(decision?.parentElement?.parentElement).toBe(grid);
+ expect(history.parentElement?.parentElement).toBe(grid);
+ expect(decision?.parentElement?.nextElementSibling).toBe(history.parentElement);
  const link = screen.getByRole("link", { name: "Ver participaciones de esta oferta" });
  expect(link.getAttribute("href")).toBe(`/admin/participations?openingId=${fixtureReference("opening", id)}`);
  expect(link.className).toContain("min-h-11");
@@ -373,9 +376,10 @@ it.each(["active", "draft", "consent_withdrawn", "needs_update"])("integra mante
  const maintenanceForm = screen.getByRole("heading", { name: "Mantener perfil" }).closest("form");
  const profileDetails = screen.getByRole("region", { name: "Perfil candidato" });
  const cvDetails = screen.getByRole("region", { name: "CV PDF del candidato" });
- expect(maintenanceForm?.nextElementSibling).toBe(profileDetails);
- expect(profileDetails.nextElementSibling).toBe(cvDetails);
- expect(cvDetails.nextElementSibling).toBe(screen.getByRole("heading", { name: "Nota interna de la Oficina" }).closest("form"));
+ expect(maintenanceForm!.compareDocumentPosition(profileDetails) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(profileDetails.compareDocumentPosition(cvDetails) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(cvDetails.compareDocumentPosition(screen.getByRole("heading", { name: "Nota interna de la Oficina" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(profileDetails.closest('[data-detail-cell]')?.nextElementSibling).toBe(cvDetails.closest('[data-detail-cell]'));
  expect(screen.getByLabelText("DNI exhibido")).toHaveProperty("type", "password"); expect(screen.getByRole("button", { name: "Vincular conservando historial" })).toHaveProperty("disabled", true);
  expect(screen.getByLabelText("Archivo de CV").getAttribute("accept")).toBe(".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png");
  expect(screen.getByRole("button", { name: "Cargar CV" })).toBeTruthy();

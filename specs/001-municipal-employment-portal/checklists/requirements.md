@@ -1,5 +1,47 @@
 # Specification Quality Checklist: MVP del Portal Municipal de Empleo de Funes
 
+EXTRA119: alcance DC1–DC5 y decisión de quitar asignaciones/resguardar resueltos
+por Mateo antes de código. Plan/modelo/contrato/tareas y análisis II–V registrados;
+sin equivalencias inventadas, nuevas APIs o permisos. SQL real/recuperación/locks,
+208 regresiones,64 tooling,1 E2E y checks técnicos PASS. Aplicada/verificada solo
+20261101120000 en local/alojado; filtro de métricas en código pendiente despliegue.
+Revisión y aceptación humanas independientes; no se completan sus casillas.
+
+EXTRA118: HN1–HN4 y diseño registrados antes de código; Home activo empieza en
+ofertas usando panel verificado, visitante conserva acceso. Prerrequisito de
+jerarquía de títulos registrado antes de cambiar contrato visual del carrusel.
+1618 pruebas,13 E2E, tipos/lint/build/diff y capturas PASS; sin cambio municipal,
+arquitectura de sesión o permisos. No completa revisión/aceptación humana.
+
+EXTRA117: SB1–SB3 acotan el defecto de altura del menú, sin cambio de navegación,
+permisos o arquitectura. Análisis IV/V y registro antes de código; geometría/foco,
+tres roles, seis viewports y móvil verificados,121 pruebas y checks técnicos PASS.
+La revisión/aceptación humana y sus casillas no se completan con estos resultados.
+
+EXTRA116: PG1–PG6 delimitan la revisión de colecciones en 31 páginas y todos los
+roles. Mateo resolvió 5 para historiales/notas y 10 para registros. Diseño,
+contratos y tareas registrados antes de código; análisis constitucional acotado
+sin nueva arquitectura, regla municipal, permiso o decisión pendiente. No se
+confunde paginación de presentación con carga SQL diferida. Evidencia final en
+EXTRA116/inventario; las casillas de revisión y aceptación humana se conservan.
+
+EXTRA115: SY1–SY5 corrigen el alcance limitado de114; criterios de composición,
+tarjetas reales,31 páginas/variantes, vacíos/estados y errores dinámicos definidos
+en el delta antes de código. Sin cambio de negocio, permisos, arquitectura o
+decisión municipal. Análisis constitucional acotado, preservando controles y
+gates humanos. Evidencia final115:295 vistas/59 variantes,78 axe,95 mediciones de
+detalles,12 E2E y checks técnicos PASS. Esto no completa revisión/aceptación humana.
+
+EXTRA113: SP1–SP5 delimitan revisión de31 páginas/variantes, ancho útil, densidad,
+excepciones de lectura y regresión móvil; diseño y análisis acotados antes de código,
+sin decisión municipal o arquitectura nueva. T273–T275 verificadas y evidencia en
+desktop-layout-audit.md/EXTRA113; no se completan casillas humanas.
+
+EXTRA112: delta visual PO1–PO5 revisado antes de código; alcance, roles, destinos,
+estados, responsive y contratos preservados definidos. Sin cuestión municipal,
+arquitectura o aceptación humana nueva. T269–T271 verificadas: guía operativa y
+EXTRA112 registran resultados; esto no completa casillas de revisión humana.
+
 EXTRA109: revisión acotada antes de código: siete criterios AD1–AD7 verificables,
 estados/permisos vigentes y retirada explícita de FR057; paginación empresarial
 sin truncado y controles de último admin conservados. Datos privados solo admin,

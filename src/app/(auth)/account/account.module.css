@@ -48,7 +48,7 @@
 
 .candidateCanvas {
   width: 100%;
-  max-width: 1280px;
+  max-width: none;
   margin-inline: auto;
   background: var(--color-surface);
 }
@@ -417,8 +417,27 @@
 }
 
 .dashboardItem {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   padding: 20px;
+}
+
+.dashboardItem > .itemTitle,
+.dashboardItem > .itemHead {
+  margin-bottom: auto;
+}
+
+/* Opt-in grids keep their existing mobile/tablet composition. */
+@media (min-width: 1600px) {
+  .desktopCards,
+  .dashboardList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .desktopFields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 2200px) {
+  .desktopCards,
+  .dashboardList { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 .itemHead {

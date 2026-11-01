@@ -1,5 +1,127 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA119 — Retiro de datos con respaldo privado
+
+Migración transaccional20261101120000, sin RPC ni nuevo contrato de aplicación.
+Tabla private.demo_category_retirement_backup con source_table, record_key,
+row_snapshot JSONB íntegro, migration_version, captured_at, captured_by y motivo.
+Clave fuente/registro; RLS sin políticas/grants app y trigger append-only existente.
+Scope DEMO-A/B v1 y comprobación de nombres; sin IDs generados codificados.
+Snapshots previos, eliminación de relaciones y active=false en una transacción.
+Cuenta EXCLUSIVE primero serializa guards FOR SHARE; después tablas de categorías
+y relaciones, con límites de espera. No tocar entidades padre o historia previa.
+Recuperación revisada repone categorías/relaciones desde snapshots sin pisar
+modificaciones posteriores. Prueba ejecuta cuerpo real de migración en transacción
+local propia y revierte; no duplica el algoritmo de retiro. Aplicación inspecciona
+historial/dry-run, solo versión nueva, sin semillas ni reparación ajena.
+DC1–DC5/II–V analizados antes de código: patrón057 reutilizado, sin brecha nueva.
+
+metricsCategories lee active y filtra en servidor el catálogo acotado: excluir solo
+v1 DEMO-A/B inactivas. Mapear al DTO previo, sin modificar consultas de métricas ni
+selección de otras versiones/inactivas. Justificación y prueba en EXTRA119.
+
+## EXTRA118 — Composición Home según panel verificado
+
+Reutilizar getSiteAccess una vez por request en Home force-dynamic. Panel activo
+omite HomeHero; no ocultarlo con CSS ni montar sus formularios/ribbons. Navbar
+alwaysVisible y clase opt-in con inset64px, sección inicial alto mínimo del espacio
+restante. Título intrínseco h1 activo/h2 anónimo conserva estilos; hero anónimo ya
+provee h1. No cambiar funciones de sesión o contrato HomeHero reutilizable, ni
+agregar scroll/estado cliente. HN1–HN4/II/IV/V analizados antes de código; delta
+presentacional sin schema/arquitectura nueva ni gates humanos omitidos.
+
+Prerrequisito de accesibilidad detectado en navegador: el carrusel recibe
+headingLevel h2/h3 (default h3), para acompañar el nivel del título de su sección
+sin saltar h1→h3. Ambas presentaciones de tarjetas comparten ese contrato mínimo;
+ofertas, autoplay, permisos y controles se mantienen.
+
+## EXTRA117 — Ajuste de composición existente
+
+SidebarContent conserva flex-1/min-h-0 y recupera overflow-auto del registro
+oficial Base Nova; SidebarFooter no se comprime. El contenedor fijo dispone el
+espacio de ambos sin desbordamiento de enlaces detrás del pie. En móvil sin
+altura fija, el menú conserva su flujo y el colapso actual. Sin JS de medición,
+controles nuevos, backend o dependencia. SB1–SB3/constitución IV/V analizados
+antes de código, sin contradicción o decisión municipal nueva.
+
+## EXTRA116 — Paginación de presentación y consultas existentes
+
+Dos constantes comunes para límites10/5. Mantener GET y rangos servidor actuales;
+notas administrativas usan notesPage y5+1 con desempate id, recuperando páginas
+posteriores al antiguo tope50. Casos recientes10 enlazan al listado existente.
+Colecciones devueltas completas por contratos autorizados usan BoundedList con
+children servidor y páginas10/revelado5; botones/Pagination adaptados existentes,
+sin render props servidor-cliente. Identificar hash e índice seleccionado, foco y
+contador. No modificar el universo necesario para cálculos o decisiones.
+Leer historiales de tabla en lotes estables, evitando corte implícito PostgREST;
+esto conserva contratos de lectura completa, no es carga diferida en cada clic.
+Sin RPC, permisos o datos nuevos. PG1–PG6/constituciónI–VI analizados antes de código;
+gates de calidad y revisión humana preservados. Documentar inventario y límites.
+
+## EXTRA115 — Grilla plana para detalles
+
+CSS module opt-in: grilla responsive de dos columnas iguales desde1024, celdas
+con un único panel que ocupa su fila y align-content:start para no estirar campos
+de formularios grid. Avisos y bloques solos usan fila completa. Sin render condicional
+CSS de permisos ni medición JS. Reordenar JSX por grupos lógicos conservando claves,
+IDs, acciones y contexto; sin cambiar contratos servidor/cliente o fuentes de datos.
+Detalles abandonan pilas independientes. Oferta sigue información izquierda y
+decisión derecha; historial en fila completa antes del matching. CSS de gráficos
+iguala paneles sin cambiar indicadores, leyendas, filtros o exportación.
+SY1–SY5/constituciónI–VI analizados antes de código: simple composición y pruebas
+visuales sobre instancia ficticia propia; sin gates de arquitectura nuevos. Cierre
+requiere inventario completo, casos condicionales y verificación de tarjetas reales.
+
+## EXTRA114 — Layout de tarjetas por fila
+
+CSS module opt-in reutiliza Card actual y agrega tres grupos neutros sin nuevos
+landmarks: encabezado/contenido/cierre. Li y tarjeta comparten tres tracks mediante
+subgrid desde768 dentro de @supports; fallback flex conserva altura y cierre al
+pie. No cambiar número de columnas, orden, semántica de controles o servicios.
+Alto basado en contenido de la fila, no viewport ni medición JS. Recomendaciones
+usan flex y metadatos al pie; resumen empresarial dos columnas iguales.
+Gates SM1–SM4/constituciónI–VI: alcance visual y contratos preservados, sin decisión
+municipal/arquitectura nueva. Verificación geométrica real, contenido extenso,
+fallback/móvil, a11y/teclado y checks técnicos; recuperación por revert visual.
+
+## EXTRA113 — Ancho útil y densidad de escritorio
+
+Una variable CSS compartida de ancho público mantiene1280 hasta1439 y1800 desde
+1440. Consumidores: lienzo de ofertas, secciones Home y cursos. DashboardShell
+mantiene estructura/sidebar/padding y libera únicamente el max-width de su canvas.
+Listas existentes agregan clase de grilla opt-in: tres columnas desde1600 y cuatro
+desde2200 para tarjetas privadas; catálogo público conserva máximo tres por el
+aside. La ficha empresarial simple usa tres columnas desde1600. Sin reordenar DOM,
+fuentes, contratos, datos o acciones. Alturas naturales, límites ch conservados.
+
+Inventario de31 rutas más estados/variantes, con excepciones deliberadas de lectura
+y medición antes/después. Gates SP1–SP5/constituciónI–VI: cobertura de auditoría,
+accesibilidad y contratos definidos, sin nueva decisión municipal o arquitectura.
+Calidad: recorridos reales de todos los roles/anchos, teclado/axe/móvil, pruebas
+relevantes y gates técnicos. No SQL nuevo, dependencia o configuración remota.
+
+Regresión móvil detecta navbar privada hasta327.48px en viewport320. EXTRA113
+centraliza en home.module.css la regla estrecha ya probada de112, quitando su
+duplicación local; no modificar HomeNavbar.tsx, ocultar accesos o cambiar timing.
+
+## EXTRA112 — Composición pública reutilizada
+
+PublicOffersShell servidor comparte HomeNavbar(alwaysVisible,panel,notifications)
+y CSS module local para espacio verde/lienzo blanco. Cada página mantiene lectura
+paralela de oferta/búsqueda, opciones y getSiteAccess por request; sin caché global
+de sesión. Detalle sustituye getAccountAccess por la misma lectura única del catálogo.
+El panel candidato se identifica con getPanelHref existente; destinos de acciones
+se conservan y otros roles reciben su panel. Sin DTO nuevo, API, SQL o dependencia.
+
+Filtros/controles existentes no se reemplazan; enlaces nuevos reutilizan LinkButton,
+que aplica buttonVariants dentro del límite cliente con semántica link según Base.
+Las páginas servidor no invocan esa función cliente. CSS local deja espacio
+para navbar fija; ninguna regla global o cambio de HomeNavbar. Contratos de slugs,
+publicación, privacidad, GET, error/404 y fechas intactos. Gates del delta PO1–PO5:
+requisitos explícitos y cubiertos, constitución I–VI preservada, sin nueva decisión
+municipal o arquitectura. Calidad: roles/GET/detalle/errores y navegador ficticio,
+tipos/lint/unit/tooling/build; recuperación por revert de presentación, sin datos.
+
 
 ## PR86 documentation integration — current scope and historical evidence
 
