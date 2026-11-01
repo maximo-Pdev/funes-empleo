@@ -1,5 +1,16 @@
 # Estado de implementación — 2026-09-22
 
+## Corrección de tipos del PR88 — 01/11/2026
+
+Quality216 falla application en typecheck por cuatro opciones exact no admitidas
+en ByRoleOptions de Testing Library; database PASS. Reproducción sobre checkout
+limpio f17a01f confirma los cuatro errores. Se reemplazan por nombres RegExp
+anclados sin cambiar precisión, destinos, estados o producto. Tipos/39 tests/
+lint/diff GREEN sobre los mismos archivos corregidos. La copia de verificación
+anterior tenía tests viejos; se reemplaza por checkout versionado para este gate.
+Sin cambios de SQL/permisos/negocio ni next-env local; actualización sin firma del
+mismo PR88. Nueva CI completa/revisión humana se acreditarán con resultado posterior.
+
 ## EXTRA119 — A/B retiradas con respaldo, 01/11/2026
 
 Mateo elige quitar asignaciones sin reemplazo y conservar respaldo. Migración

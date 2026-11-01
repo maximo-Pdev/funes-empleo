@@ -25,13 +25,13 @@ it.each([
   readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
   render(await HomePage());
   const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
-  expect(within(navigation).getByRole("link", { name: "Mi cuenta", exact: true }).getAttribute("href")).toBe(href);
+  expect(within(navigation).getByRole("link", { name: /^Mi cuenta$/ }).getAttribute("href")).toBe(href);
   expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
   expect(screen.queryByText("Ya tenés la sesión iniciada")).toBeNull();
   expect(screen.queryByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeNull();
   expect(screen.getByRole("main").firstElementChild?.id).toBe("ofertas-disponibles");
   expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
-  expect(within(navigation).getByRole("link", { name: "Ofertas", exact: true }).getAttribute("href")).toBe("/ofertas");
+  expect(within(navigation).getByRole("link", { name: /^Ofertas$/ }).getAttribute("href")).toBe("/ofertas");
 });
 
 it("keeps the municipal introduction free of duplicate account and offers links", async () => {

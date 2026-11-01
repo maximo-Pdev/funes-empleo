@@ -68,7 +68,7 @@ describe("Home access panel", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("banner").getAttribute("data-visible")).toBe("true");
-    expect(screen.getByRole("link", { name: "Mi cuenta", exact: true }).getAttribute("href")).toBe(href);
+    expect(screen.getByRole("link", { name: /^Mi cuenta$/ }).getAttribute("href")).toBe(href);
     expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Registrarse" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
@@ -270,7 +270,7 @@ describe("Home access panel", () => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status } } as never);
     render(await HomePage());
     expect(screen.getByRole("region", { name: "Acceso al portal" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Ingresar", exact: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Ingresar$/ })).toBeTruthy();
     expect(screen.getByRole("heading", { level: 2, name: "Ofertas disponibles" })).toBeTruthy();
   });
 });

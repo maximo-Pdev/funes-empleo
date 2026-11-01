@@ -1,5 +1,27 @@
 # Cambios extra necesarios
 
+## Corrección CI del PR88 — 01/11/2026
+
+- **Origen/evidencia:** Mateo pide reparar GitHub. Quality41331558058, application
+ 124922570841 falla en typecheck: TS2769 en home-access-panel71/273 y setup/home28/34.
+  ByRoleOptions de Testing Library no admite exact; ese atributo sí pertenece a
+  Playwright. database124922571060 PASS; no falla la migración o el producto.
+- **Cambio previo a implementar:** reemplazar las cuatro opciones por expresiones
+  de nombre ancladas, manteniendo coincidencia exacta y comprobaciones de destinos,
+  sesión e invitado. Revisar llamadas similares sin cambiar las válidas de Playwright.
+  Solo dos tests, sin API, permisos, UI, esquema o dependencia nueva; delta118.
+- **Causa de verificación local:** la copia aislada conservaba versiones anteriores
+  de esos tests. Verificar desde checkout limpio versionado y copiar únicamente
+  archivos corregidos, sin usar next-env.d.ts ajeno o una copia parcial de tests.
+- **Verificación prevista:** reproducir TS2769 sobre HEAD del PR; tipos y tests
+  corregidos, lint y diff; commit sin firma en misma rama/PR, CI completa posterior.
+  Revisión/aceptación humana intactas; no reducir controles ni omitir pruebas.
+- **Resultado local:** RED reproduce los cuatro TS2769 sobre f17a01f limpio;
+  GREEN tipos,39 tests de ambos archivos, lint y diff PASS tras usar /^nombre$/.
+  Se validan los archivos actuales dentro de checkout aislado versionado, sin
+  .env.local ni next-env ajeno. Sin cambios de comportamiento o SQL; database
+  ya aprobada en216. Publicar en mismo PR88 y verificar la nueva CI completa.
+
 ## Preparación de PR — 01/11/2026
 
 Mateo solicita publicar los cambios acumulados112–119. Rama
