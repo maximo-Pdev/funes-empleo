@@ -567,6 +567,7 @@
 }
 
 .form .sessionMessage {
+  color: var(--color-foreground-secondary);
   padding: 28px 8px;
   font-size: 16px;
   font-weight: 600;
@@ -604,7 +605,7 @@
   display: none;
 }
 
-.form p[role="status"]:not(:empty):not(:global(.text-red-700)) {
+.form p[role="status"]:not(:empty):not(:global(.text-red-700)):not(.sessionMessage) {
   color: var(--color-feedback-info);
 }
 

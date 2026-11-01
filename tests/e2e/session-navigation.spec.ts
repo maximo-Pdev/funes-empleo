@@ -50,7 +50,11 @@ for (const account of [
         await page.goto(path);
         const navigation = page.getByRole("navigation", { name: "Accesos principales", exact: true });
         const destination = path === "/" ? { label: account.panelLabel, href: account.panelHref } : account;
-        if (path === "/") await expect(page.getByRole("region", { name: "Acceso al portal" })).toContainText("Ya tenés la sesión iniciada");
+        if (path === "/") {
+          const access = page.getByRole("region", { name: "Acceso al portal" });
+          await expect(access).toContainText("Tu sesión está activa. Continuá desde tu panel.");
+          await expect(access.getByRole("group", { name: "Opciones de acceso" })).toHaveCount(0);
+        }
         if (path === "/ofertas") {
           await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toHaveCount(0);
           await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toHaveCount(0);

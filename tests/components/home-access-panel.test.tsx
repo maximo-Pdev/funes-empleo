@@ -1,6 +1,9 @@
 import React from "react";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import homeStyles from "@/app/(public)/home.module.css";
 
 vi.mock("@/features/accounts/actions", () => ({
   loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(),
@@ -62,17 +65,25 @@ describe("Home access panel", () => {
   ])("keeps verified panel access without registration controls for an active %s", async (role, label) => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role, status: "active" } } as never);
     const view = render(await HomePage());
-    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+    expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
     expect(view.container.querySelector("form")).toBeNull();
     const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
     expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
     expect(screen.queryByRole("button", { name: "Registrarse" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
     expect(screen.queryByRole("radio")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Iniciar sesión" }));
-    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Iniciar sesión" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
     expect(view.container.querySelector("form")).toBeNull();
     expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    const output = process.env.HOME_SESSION_FIXTURE_DIR;
+    if (output) {
+      const css = readFileSync("src/app/(public)/home.module.css", "utf8")
+        .replace(/\.([a-zA-Z_][\w-]*)/g, (selector, name: string) => homeStyles[name] ? `.${homeStyles[name]}` : selector)
+        .replace(/:global\(([^)]+)\)/g, "$1");
+      mkdirSync(output, { recursive: true });
+      writeFileSync(path.join(output, `${role}.json`), JSON.stringify({ html: view.container.innerHTML, css, href, label }));
+    }
   });
 
   it("suppresses repeated empty-field explanations in all homepage access forms", async () => {
@@ -260,7 +271,7 @@ describe("Home access panel", () => {
   it("ignores an access notice while a verified session is active", async () => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status: "active" } } as never);
     render(await HomePage({ searchParams: Promise.resolve({ acceso: "suspendido" }) }));
-    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+    expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
     expect(screen.queryByText("Acceso suspendido")).toBeNull();
   });
 });
