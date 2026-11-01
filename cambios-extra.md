@@ -1,5 +1,18 @@
 # Cambios extra necesarios
 
+## EXTRA-112 — Simplify the authenticated Home access card
+
+- Date: 2026-10-31.
+- Authorization / origin: Máximo requested hiding the entire login/registration tab container while signed in and replacing the active-session message with clearer gray text. This refines the approved session-aware Home access behavior (EXTRA-052 / EXTRA-053).
+- Problem / evidence: HomeAccessPanel hides only the registration button, leaving the login button and a vacant grid column. The generic informational-status rule colors the static session message blue.
+- Proposed change: omit the access-options group only for verified authenticated presentation; show “Tu sesión está activa. Continuá desde tu panel.” in the existing foreground-secondary gray. Preserve the decorative icon, status semantics and verified role-specific panel link.
+- Affected surfaces: Home access component and local CSS, component/session-navigation regressions, UI guidelines and the feature specification. No authentication, database, public component API or dependency contract changes.
+- Risks / recovery: anonymous tab behavior and other informational colors must remain unchanged. Recover by reverting this scoped presentation diff; no persisted data is affected.
+- Verification plan: observe focused failing tests before source changes; run focused regressions, lint, typecheck, production build, unit/tooling suites and DB-free desktop/mobile browser composition/color checks. Do not reset the shared database.
+- Implemented files: `src/app/(public)/home-access-panel.tsx`, `src/app/(public)/home.module.css`; updated Home access, registration-navigation and setup component regressions, `tests/e2e/session-navigation.spec.ts`, `docs/UI_GUIDELINES.md` and `specs/001-municipal-employment-portal/spec.md`. Added `tests/visual/home-active-session-check.mjs` for actual React markup/CSS composition without Auth or database access.
+- Verification: the initial focused run failed for all three active roles on the missing new copy; the focused regression run passed 78 tests. Final pinned Node 24.22.0 / npm 11.19.1 checks passed lint, typecheck, production build, 1,606 unit/component tests across 133 files (two workers), 60 Node tooling tests and `git diff --check`. Chromium composition passed all six desktop/mobile role cases, including gray text/icon `rgb(73, 80, 87)`, absent access-options group, keyboard-reachable role-specific panel link and no horizontal overflow. Evidence: Hermes scratch `home-quality-gates/` and `home-session-NKOMuC/`.
+- Limitations / status: implemented and locally verified; independent/product review pending. The first unconfigured build failed because the new worktree has no private environment; the successful build used explicitly fictitious compilation-only configuration with an unreachable Supabase URL, not live authentication. An initial combined gate command timed out; the final complete unit/tooling runs have persisted exit-zero receipts. DB-resetting E2E/database suites were not run, and their session-navigation assertions remain pending live integration. Existing jsdom canvas warnings were emitted without failing tests. No source edits to the other worktree, shared database reset, commit, PR, municipal acceptance or deployment claimed.
+
 
 ## PR86 documentation integration — current scope and historical evidence
 

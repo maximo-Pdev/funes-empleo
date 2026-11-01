@@ -29,7 +29,7 @@ it.each([
   expect(navigation.querySelector("a")?.getAttribute("href")).toBe(href);
   expect(navigation.querySelector("a")?.textContent).toBe(label);
   expect(screen.getByRole("region", { name: "Acceso al portal" }).contains(navigation)).toBe(true);
-  expect(screen.getByText("Ya tenés la sesión iniciada").compareDocumentPosition(navigation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.").compareDocumentPosition(navigation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   const intro = screen.getByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." }).parentElement!;
   expect(within(intro).queryAllByRole("link")).toHaveLength(0);
   expect(navigation.querySelectorAll("a")).toHaveLength(1);
