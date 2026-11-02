@@ -1,5 +1,58 @@
 # Cambios extra necesarios
 
+## EXTRA123 — Documentación para la entrega del curso, 02/11/2026
+
+- **Origen/autorización:** Mateo pide una rama para entregar enlace Vercel,
+  repositorio actualizado, README con instrucciones/tecnologías y usuarios de
+  demostración de postulante, empresa y Municipalidad, sin contraseñas personales
+  ni datos sensibles. PR92 confirmado mergeado; base main681adea.
+- **Problema/evidencia:** README conserva snapshot06/10 y referencias Draft/locales
+  superadas. demo-runbook conserva recibo29/09 sobre el dominio anterior;
+  demo-credentials documenta diez identidades ficticias con contraseña privada
+  individual, sin prueba actual de sus logins. Inicio, /ofertas y repositorio
+  canónicos responden HTTP200 el02/11, sin autenticar. El conector Vercel no lista
+  proyectos para esta sesión: no acredita SHA/configuración del despliegue.
+- **Propuesta antes de implementar:** actualizar README con enlaces canónicos,
+  stack del lockfile/package, arranque local seguro y verificaciones; guía de
+  entrega separada con matriz de roles, acceso privado individual, recorrido
+  demostrable y pendientes verificables. Distinguir cuentas documentadas de
+  cuentas confirmadas en el despliegue. Referenciar desde manual/credenciales.
+- **Archivos/contratos:** README.md, docs/operations/course-delivery.md,
+  demo-runbook.md, demo-credentials.md y ledger/estado Spec Kit. Deriva T090/T097;
+  no modifica FR, arquitectura, Auth, esquema, RLS, datos ni scripts. No copiar
+  seeds locales al servidor ni ejecutar reset/rotación/aprovisionamiento implícitos.
+- **Riesgos/recuperación:** confundir URL disponible con build/login verificado;
+  publicar secretos o compartir administrador; resetear datos ajenos al reproducir.
+  Evitar contraseñas en Git, asignar admin individual y requerir propiedad local
+  exclusiva antes de comandos destructivos. Recuperación documental por revert.
+- **Análisis/gates:** alcance documental; no requisito funcional/arquitectura
+  nuevo, por lo que no se regenera el MVP. Constitución I–VI y contrato vigente de
+  demo-credentials preservados. Revisar enlaces locales/remotos, nombres de scripts,
+  variables/stack, diff sin secretos, tipos/lint/unit/tooling/build. No ejecutar
+  BD/E2E destructivos para un cambio solo documental. T096/T097 y aceptación humana
+  no se cierran por inferencia. Selección de usuarios de entrega consultada a Mateo;
+  ninguna contraseña solicitada. Mateo proporciona postulante1@prueba.com,
+  empresa1@prueba.com y admin1@prueba.com; no se infiere login probado.
+- **Implementación:** README y guía de entrega creados/actualizados; manual y
+  credenciales separan cuentas actuales de fixtures/históricos. T306 y estado
+  reflejan alcance documental. Sin código, paquetes, entorno alojado o datos
+  modificados; next-env.d.ts ajeno conserva hash previo.
+- **Verificación:**28 enlaces locales, versiones reales de stack/Node/npm,
+  scripts, ayuda CLI y diff/patrones de secretos PASS. HTTP200 en tres enlaces
+  canónicos. Tipos/lint,66 tooling y1695 pruebas/142 archivos PASS. Primera suite
+  falla ENOENT de temporales del sandbox antes de cargar141 archivos; repetición
+  fuera del aislamiento con mismas pruebas PASS. Build inicial falla conexión
+  al proceso CSS de Turbopack dentro del sandbox; repetición externa con caché
+  fallida también falla. Se preserva únicamente .next QA en respaldo ignorado
+  .next-before-course-delivery y build limpio externo PASS, sin cambiar código,
+  dependencias, controles o .next del checkout principal. Conserva avisos previos
+  de lockfiles anidados/escaneo CSS; no se atribuyen a esta edición documental.
+  Tipos/build usan copia QA ignorada con fuentes/configuración equivalentes
+  normalizando CRLF, configuración ficticia y sin iniciar/resetear Supabase.
+  DB/E2E no repetidos por cambio solo documental. Logs course-delivery-* en
+  test-results ignorado. T306 implementada/verificada localmente; login alojado,
+  SHA desplegado, entrega privada de acceso, revisión humana y PR/merge pendientes.
+
 ## PR92-CI-CONCURRENCY-01 — Preparación de preselección compatible con EXTRA122
 
 - **Origen/evidencia:** Mateo pide reparar GitHub,02/11/2026. Quality229/run
