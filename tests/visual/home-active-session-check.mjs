@@ -1,5 +1,5 @@
-// Reusable HomeHero markup/CSS in authenticated mode; HomePage itself omits it
-// for verified active sessions (EXTRA118). No Auth or database access.
+// Authenticated HomeHero markup/CSS fixture, not a real Auth session.
+// HomePage retains this hero for every role. No Auth or database access.
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -35,8 +35,12 @@ try {
       await page.evaluate(() => document.fonts.ready);
       const access = page.getByRole("region", { name: "Acceso al portal" });
       assert.equal(await access.getByRole("group", { name: "Opciones de acceso" }).count(), 0);
-      assert.equal(await access.getByRole("button").count(), 0);
-      assert.equal(await access.locator("form").count(), 0);
+      assert.equal(await access.getByRole("button").count(), 1);
+      assert.equal(await access.getByRole("button", { name: "Cerrar sesión", exact: true }).count(), 1);
+      assert.equal(await access.locator("form").count(), 1);
+      assert.equal(await access.locator('input:not([type="hidden"]), select, textarea').count(), 0);
+      assert.equal(await access.getByRole("heading", { name: "Continuá en el portal" }).count(), 1);
+      assert.equal(await access.getByRole("link", { name: "Ver ofertas", exact: true }).getAttribute("href"), "/ofertas");
       assert.equal(await access.getByRole("status").textContent(), "Tu sesión está activa. Continuá desde tu panel.");
       const link = access.getByRole("link", { name: fixture.label });
       assert.equal(await link.getAttribute("href"), fixture.href);

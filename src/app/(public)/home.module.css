@@ -2,14 +2,6 @@
   background: var(--color-brand-secondary);
 }
 
-.signedInPage {
-  padding-top: 64px;
-}
-
-.signedInPage .information {
-  min-height: calc(100svh - 64px);
-  scroll-margin-top: 64px;
-}
 
 .hero {
   position: relative;
@@ -576,6 +568,32 @@
   font-size: 12px;
 }
 
+.sessionTitle {
+  margin: 16px 0 0;
+  color: var(--color-brand-text);
+  font-size: 20px;
+  text-align: center;
+}
+
+.sessionOffers {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.sessionOffers a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-brand-primary);
+  text-underline-offset: 3px;
+}
+
+.sessionOffers a:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 3px;
+}
+
 .form .sessionMessage {
   color: var(--color-foreground-secondary);
   padding: 28px 8px;
@@ -609,6 +627,19 @@
 
 .sessionActions .accountNav a:focus-visible {
   outline-color: var(--color-ring);
+}
+
+.sessionLogout {
+  --form-submit-background: transparent;
+  --form-submit-hover: var(--color-surface-muted);
+  display: flex;
+  justify-content: center;
+  margin: 0 0 16px;
+}
+
+:global(:root) .form .sessionLogout button[type="submit"][data-slot="button"] {
+  color: var(--color-brand-text);
+  font-weight: 400;
 }
 
 .form p[role]:empty {

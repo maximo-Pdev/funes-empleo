@@ -16,7 +16,7 @@ test("empresa edita publicada, sigue moderación/derivaciones y cancela conserva
     insert into public.job_openings
     select (jsonb_populate_record(null::public.job_openings,to_jsonb(template)||jsonb_build_object(
       'id',chosen.id,'slug',null,'title',chosen.title,'status',chosen.status,'version',1,'created_at',clock_timestamp(),
-      'closing_date',current_date+30))).* from public.job_openings template cross join
+      'closing_date',(clock_timestamp() at time zone 'America/Buenos_Aires')::date+30))).* from public.job_openings template cross join
       (values('${opening}'::uuid,'${title}','published'),('${draft}'::uuid,'${draftTitle}','draft')) chosen(id,title,status)
       where template.id=private.fixture_id('opening',1);
     insert into public.opening_categories(opening_id,category_id) values('${opening}',private.fixture_id('category',1));
@@ -28,8 +28,10 @@ test("empresa edita publicada, sigue moderación/derivaciones y cancela conserva
       where template.id=private.fixture_id('participation',1);
     insert into public.referrals
     select (jsonb_populate_record(null::public.referrals,to_jsonb(template)||jsonb_build_object(
-      'id','${referral}','participation_id','${part}','post_hire_access_until',null))).*
-      from public.referrals template where template.id=private.fixture_id('referral',1);
+      'id','${referral}','participation_id','${part}','post_hire_access_until',null,
+      'referred_at',scenario.referred_at,'feedback_due_at',scenario.referred_at+interval '720 hours'))).*
+      from public.referrals template cross join (select clock_timestamp() as referred_at) scenario
+      where template.id=private.fixture_id('referral',1);
     insert into public.opening_moderation_events(opening_id,decision,previous_status,new_status,company_message,internal_reason,actor_type,actor_account_id,created_at)
       select '${opening}','changes_requested','pending_review','changes_requested','Mensaje ficticio '||n,'Privado ficticio '||n,
       'account',private.fixture_id('admin',1),now()-n*interval '1 hour' from generate_series(1,7) n;
@@ -90,6 +92,7 @@ test("empresa edita publicada, sigue moderación/derivaciones y cancela conserva
     await page.goto(`/ofertas/${slug}`);
     await expect(page.getByRole("heading", { name: `${title} editada`, exact: true })).toBeVisible();
     await page.goto(companyUrl);
+    expect(runLocalMaintenanceSql(`select status from public.participations where id='${part}';`)).toBe("referred");
     await page.getByLabel("Motivo de la cancelación").fill("Cancelación ficticia de prueba.");
     await page.getByLabel(/Confirmo que quiero cancelar/).check();
     await page.getByRole("button", { name: "Eliminar oferta", exact: true }).click();

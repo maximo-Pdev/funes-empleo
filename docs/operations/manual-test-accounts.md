@@ -24,7 +24,23 @@ Credentials are outside Git, protected by Windows current-user DPAPI encryption.
 
 The viewer shows environment, email, password, role and initial scenario. It decrypts into a local window; passwords are not printed in this document or stored in application configuration. Do not commit or attach plaintext credentials, screenshots containing passwords, session cookies or tokens. Share any needed access with the teammate through a private channel. DPAPI ciphertext alone is not portable to the teammate's Windows account.
 
-## Starting records
+## Local login recovery (2026-10-26)
+
+The local database was found with 554 automated `@example.invalid` identities and
+none of the seven manual identities. An additive recovery restored the seven
+manual logins using their existing **local** passwords in the private viewer.
+The existing 554 identities and their business data were preserved; no reset,
+password rotation or hosted operation was performed.
+
+The recovered local candidate1 has a **draft** self-service profile with fictitious
+private data and an email contact, not the complete profile described in the
+original starting records below. No CV, consent, openings, applications, referrals,
+or assisted/archived/stale profile scenarios were recreated. The three manual
+company profiles were restored; company3 remains suspended and candidate2 remains
+unverified without a linked profile. The original scenario list below describes
+the initial dataset, not the complete state of this recovered local database.
+
+## Original starting records
 
 - Four fictitious candidate profiles: active self-service candidate (`99000001`); assisted draft reserved for the second candidate (`99000002`); archived assisted profile (`99000003`); stale assisted profile requiring an update (`99000004`). The numbers are fixtures, not real identity information.
 - The assisted draft uses `postulante2@prueba.com`. Complete and activate it through the administrator's assisted-profile workflow before testing in-person linkage. After deliberately confirming the second Auth email in the test environment, use the same DNI and email; do not create a conflicting independent profile.

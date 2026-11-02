@@ -1,7 +1,7 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 
-vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: vi.fn() }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 vi.mock("server-only", () => ({}));

@@ -4,6 +4,7 @@ import { afterEach, expect, it, vi } from "vitest";
 
 const { route } = vi.hoisted(() => ({ route: { pathname: "/" } }));
 vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
+vi.mock("@/features/notifications/components/notification-center", () => ({ NotificationCenter: () => <button aria-label="Notificaciones" /> }));
 
 import { HomeNavbar } from "@/app/(public)/home-navbar";
 
@@ -141,11 +142,31 @@ it("preserves Home's native anchors without marking the access shortcut as a pag
   expect(container.querySelector('a[href="/ofertas"]')?.hasAttribute("aria-current")).toBe(false);
 });
 
-it("preserves account destinations without falsely highlighting Home", () => {
+it("offers anonymous access outside Home without falsely highlighting Home", () => {
   route.pathname = "/account";
   render(<HomeNavbar alwaysVisible />);
   expect(screen.getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
   expect(screen.getByRole("link", { name: "Inicio" }).hasAttribute("aria-current")).toBe(false);
   expect(screen.getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/ofertas");
-  expect(screen.queryByRole("link", { name: "Ingresar" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Ingresar" }).getAttribute("href")).toBe("/#contenido");
+  expect(screen.queryByRole("button", { name: "Notificaciones" })).toBeNull();
+});
+
+it.each(["/ofertas", "/ofertas/ejemplo", "/cursos", "/recover", "/terminos"])("keeps anonymous controls consistent at %s", pathname => {
+  route.pathname = pathname;
+  render(<HomeNavbar alwaysVisible />);
+  expect(screen.getAllByRole("link").map(link => link.textContent)).toEqual(["Oficina de EmpleoMunicipalidad de Funes", "Inicio", "Ofertas", "Ingresar"]);
+  expect(screen.getByRole("link", { name: "Ingresar" }).getAttribute("href")).toBe("/#contenido");
+  expect(screen.queryByRole("link", { name: "Mi cuenta" })).toBeNull();
+});
+
+it.each(["/dashboard", "/empresa", "/admin"])("keeps authenticated controls in both visibility modes for %s", href => {
+  route.pathname = "/ofertas";
+  const view = render(<HomeNavbar alwaysVisible panel={{ href, label: "Panel" }} />);
+  for (const alwaysVisible of [true, false]) {
+    view.rerender(<HomeNavbar alwaysVisible={alwaysVisible} panel={{ href, label: "Panel" }} />);
+    expect(view.container.querySelector('a[href="' + href + '"]')?.textContent).toBe("Mi cuenta");
+    expect(view.container.querySelector('button[aria-label="Notificaciones"]')).toBeTruthy();
+    expect(Array.from(view.container.querySelectorAll("a")).some(link => link.textContent === "Ingresar")).toBe(false);
+  }
 });

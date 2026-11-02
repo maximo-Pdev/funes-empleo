@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, Building2, CalendarDays, MapPin, ShieldCheck, Users } from "lucide-react";
-import { Badge, Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
+import { Badge, Card, Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui";
 import { listPublicOffers, listPublicOfferFilters } from "@/features/openings/public-service";
 import { PublicOfferSearchForm } from "@/features/openings/components/public-offer-search-form";
 import { hasPublicOfferFilters, publicOffersPageHref } from "@/features/openings/public-search";
 import { publicOfferSearchSchema } from "@/validation/public-offer-search";
 import { getSiteAccess } from "@/features/accounts/navigation";
-import { getRegistrationHref } from "@/features/accounts/registration-navigation";
+import { CategoryLabel } from "@/components/job-category-label";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { LinkButton } from "@/components/ui/link-button";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
   const filtered = hasPublicOfferFilters(filters);
   const hasPrevious = result.page > 1;
   const hasNext = result.page * result.pageSize < result.total;
+  const pageCount = Math.ceil(result.total / result.pageSize);
 
   return (
     <PublicOffersShell panel={panel}>
@@ -119,7 +120,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                         <div data-card-part="content" className="flex flex-wrap items-start gap-2" aria-label="Categorías laborales">
                           {offer.categories.length > 0 ? offer.categories.map((category) => (
                             <Badge key={category.id} variant="outline" className="max-w-full leading-5">
-                              <span className="min-w-0 break-words">{category.name}</span>
+                              <CategoryLabel name={category.name} />
                             </Badge>
                           )) : <Badge variant="outline" className="leading-5">Sin categorías</Badge>}
                         </div>
@@ -142,56 +143,20 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
 
               {(hasPrevious || hasNext) && (
                 <Pagination aria-label="Páginas de ofertas" className="mt-8 border-t border-border pt-6">
-                  <PaginationContent className="w-full justify-between">
+                  <PaginationContent className="flex-wrap justify-center">
                     {hasPrevious && <PaginationItem><PaginationPrevious href={publicOffersPageHref(filters, result.page - 1)} rel="prev" /></PaginationItem>}
-                    <PaginationItem><span className="text-sm font-medium text-muted-foreground">Página {result.page}</span></PaginationItem>
+                    {Array.from({ length: pageCount }, (_, index) => index + 1).map(page => (
+                      <PaginationItem key={page}>
+                        <PaginationLink href={publicOffersPageHref(filters, page)} aria-label={`Página ${page}`} isActive={page === result.page}>
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
                     {hasNext && <PaginationItem><PaginationNext href={publicOffersPageHref(filters, result.page + 1)} rel="next" /></PaginationItem>}
                   </PaginationContent>
                 </Pagination>
               )}
             </section>
-
-            <aside aria-labelledby="acompanamiento-title" className={cn(styles.aside, "space-y-5")}>
-              <Card className={cn(styles.card, "overflow-hidden")}>
-                <div className="border-b border-border bg-primary-50 px-6 py-6">
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary-700">Con acompañamiento municipal</p>
-                  <h2 id="acompanamiento-title" className="mt-3 font-heading text-xl font-bold leading-snug text-primary-900">
-                    Te acompañamos en la búsqueda
-                  </h2>
-                  <p className="mt-3 text-sm leading-6">{panel ? "Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel." : "Para postularte necesitás una cuenta de candidato y tu perfil completo con CV."}</p>
-                  {panel ? (
-                    <LinkButton
-                      href={panel.href}
-                      className={styles.action}
-                    >
-                      Ir al {panel.label.toLowerCase()}
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </LinkButton>
-                  ) : (
-                    <>
-                      <LinkButton
-                        href={getRegistrationHref("candidate")}
-                        className={styles.action}
-                      >
-                        Crear cuenta
-                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                      </LinkButton>
-                      <p className="mt-4 text-sm leading-6">
-                        ¿Ya tenés cuenta? <Link href="/" className="inline-flex min-h-11 items-center rounded-sm font-semibold text-primary underline underline-offset-4 hover:text-brand-text">Iniciá sesión</Link>
-                      </p>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-start gap-3 px-6 py-5">
-                  <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                  <p className="text-sm leading-6 text-muted-foreground">Tu información se comparte con la empresa únicamente después de una derivación de la Oficina.</p>
-                </div>
-              </Card>
-              <div className="rounded-xl border border-border bg-surface px-6 py-5">
-                <h3 className="font-heading text-base font-bold text-primary-900">¿Necesitás ayuda con tu perfil?</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">La Oficina de Empleo también puede ayudarte de manera presencial a completar tus datos.</p>
-              </div>
-            </aside>
           </div>
     </PublicOffersShell>
   );

@@ -1,8 +1,9 @@
 import React from "react";
 import { act, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
-vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: vi.fn() }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 const { listPublicOffers } = vi.hoisted(() => ({ listPublicOffers: vi.fn() }));
@@ -21,17 +22,18 @@ it.each([
   ["candidate", "/dashboard"],
   ["company", "/empresa"],
   ["admin", "/admin"],
-])("keeps %s panel access in the navbar above the initial offers", async (role, href) => {
+])("keeps %s panel access with the shared hero and scroll navbar", async (role, href) => {
   readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
   render(await HomePage());
-  const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
-  expect(within(navigation).getByRole("link", { name: /^Mi cuenta$/ }).getAttribute("href")).toBe(href);
-  expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
-  expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
-  expect(screen.queryByRole("heading", { name: "El empleo en Funes, con acompañamiento municipal." })).toBeNull();
-  expect(screen.getByRole("main").firstElementChild?.id).toBe("ofertas-disponibles");
+  const navigation = screen.getByRole("navigation", { name: "Navegación principal", hidden: true });
+  expect(within(navigation).getByRole("link", { name: /^Mi cuenta$/, hidden: true }).getAttribute("href")).toBe(href);
+  expect(screen.getByRole("region", { name: "Acceso al portal" })).toBeTruthy();
+  expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+  expect(screen.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
+  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  expect(screen.getByRole("banner", { hidden: true }).getAttribute("data-home")).toBe("true");
   expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
-  expect(within(navigation).getByRole("link", { name: /^Ofertas$/ }).getAttribute("href")).toBe("/ofertas");
+  expect(within(navigation).getByRole("link", { name: /^Ofertas$/, hidden: true }).getAttribute("href")).toBe("/ofertas");
 });
 
 it("keeps the municipal introduction free of duplicate account and offers links", async () => {

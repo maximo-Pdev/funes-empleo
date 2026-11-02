@@ -1,5 +1,7 @@
 import { expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn(async () => null) }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 import { CandidateRegistrationForm } from "@/features/candidates/components/candidate-registration-form";
@@ -7,7 +9,7 @@ import { CompanyRegistrationForm } from "@/features/companies/components/company
 
 it("publica el texto completo, las fuentes y los pendientes municipales sin exigir sesión", async () => {
   const { default: TermsPage } = await import("@/app/(public)/terminos/page");
-  render(<TermsPage />);
+  render(await TermsPage());
   expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   expect(screen.getByRole("heading", { name: "Términos de uso y aviso de privacidad" })).toBeTruthy();
   expect(screen.getByText(/demo-terms-draft-1/)).toBeTruthy();

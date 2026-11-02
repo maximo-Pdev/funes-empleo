@@ -1,4 +1,5 @@
 "use client";
+import { CategoryLabels } from "@/components/job-category-label";
 import { formatFunesDate } from "@/lib/time/presentation";
 
 import Link from "next/link";
@@ -115,7 +116,7 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
               {visible.map(candidate => <TableRow key={candidate.id}>
                 <TableCell className="font-semibold">{candidate.displayName}</TableCell>
                 <TableCell>{candidate.locality ?? "Localidad no informada"}</TableCell>
-                <TableCell>{candidate.matchedCategories.map(category => category.name).join(", ")}</TableCell>
+                <TableCell><CategoryLabels categories={candidate.matchedCategories} /></TableCell>
                 <TableCell className="text-right">
                   <button type="button" className="rounded border border-blue-800 px-3 py-1.5 text-sm font-medium text-blue-800"
                     aria-label={`Ver perfil de ${candidate.displayName}`} onClick={event => openProfile({ id: candidate.id, name: candidate.displayName }, event.currentTarget)}>Ver perfil y nominar</button>
@@ -147,9 +148,9 @@ export function OpeningCandidateMatchesList({ openingId, openingReference, match
           <div><dt className="font-semibold">Localidad</dt><dd>{profile.locality ?? "Sin informar"}</dd></div>
           <div><dt className="font-semibold">Disponibilidad</dt><dd>Disponible</dd></div>
           <div><dt className="font-semibold">Vigencia del perfil</dt><dd>{formatFunesDate(profile.refreshDueAt)}</dd></div>
-          <div><dt className="font-semibold">Rubros coincidentes</dt><dd>{profile.matchedCategories.map(category => category.name).join(", ")}</dd></div>
+          <div><dt className="font-semibold">Rubros coincidentes</dt><dd><CategoryLabels categories={profile.matchedCategories} /></dd></div>
         </dl>
-        <div><h3 className="font-semibold">Categorías laborales</h3><p>{profile.categories.map(category => category.name).join(", ")}</p></div>
+        <div><h3 className="font-semibold">Categorías laborales</h3><p><CategoryLabels categories={profile.categories} /></p></div>
         <div><h3 className="font-semibold">Habilidades y experiencia</h3><p className="whitespace-pre-wrap break-words">{profile.skills ?? "Sin información adicional"}</p></div>
         <a className="inline-block text-blue-800 underline" href={`/api/cv/${profile.cvReference}`} target="_blank" rel="noopener noreferrer">Abrir CV PDF en otra pestaña</a>
         <p className="text-sm">Nominar no comparte el perfil con la empresa. La derivación requiere otra decisión municipal.</p>

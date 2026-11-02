@@ -32,6 +32,13 @@ const offer: PublicOffer = {
 const listPage = (page?: string) => PublicOffersPage({ searchParams: Promise.resolve({ page }) });
 const detailPage = () => PublicOfferDetailPage({ params: Promise.resolve({ openingId: offer.slug }) });
 
+it("shows a decorative food icon beside the catalog category label", async () => {
+  listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [{ ...offer, categories: [{ id: "food", name: "Gastronomía y hotelería" }] }] });
+  render(await listPage());
+  const label = screen.getByText("Gastronomía y hotelería");
+  expect(label.parentElement?.querySelector("svg.lucide-utensils")?.getAttribute("aria-hidden")).toBe("true");
+});
+
 beforeEach(() => {
   vi.resetAllMocks();
   readAccountSession.mockResolvedValue(null);
@@ -39,10 +46,10 @@ beforeEach(() => {
 });
 
 it.each([
-  ["candidate", "/dashboard", "Ir al panel de usuario"],
-  ["company", "/empresa", "Ir al panel de empresa"],
-  ["admin", "/admin", "Ir al panel de administración"],
-])("mantiene navbar común y acciones del rol %s en listado y detalle", async (role, panelHref, panelLabel) => {
+  ["candidate", "/dashboard"],
+  ["company", "/empresa"],
+  ["admin", "/admin"],
+])("mantiene acceso de %s en la navbar compartida sin duplicarlo", async (role, href) => {
   readAccountSession.mockResolvedValue({ account: { role, status: "active" } });
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
   getPublicOffer.mockResolvedValue(offer);
@@ -50,8 +57,8 @@ it.each([
     readAccountSession.mockClear();
     const view = render(await Page());
     const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
-    expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("href")).toBe(panelHref);
-    expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+    expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("href")).toBe(href);
+    expect(within(navigation).queryByRole("link", { name: "Ingresar" })).toBeNull();
     expect(within(navigation).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
     expect(within(navigation).getByRole("link", { name: "Ofertas" }).getAttribute("aria-current")).toBe("page");
     expect(within(navigation).getByRole("button", { name: "Notificaciones" })).toBeTruthy();
@@ -60,14 +67,17 @@ it.each([
     expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
     expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
     expect(screen.queryByRole("link", { name: "Registrate" })).toBeNull();
-    if (Page === listPage) {
-      expect(screen.getByRole("link", { name: panelLabel }).getAttribute("href")).toBe(panelHref);
-      expect(screen.getByText("Ya tenés una sesión iniciada. Continuá con tus gestiones desde tu panel.")).toBeTruthy();
-    } else if (role === "candidate") {
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(screen.getAllByRole("link", { name: "Mi cuenta" })).toHaveLength(1);
+    if (Page === detailPage) {
       expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/dashboard?section=ofertas&oferta=${offer.slug}`);
-    } else {
-      expect(screen.queryByRole("link", { name: "Postularme con mi cuenta" })).toBeNull();
-      expect(screen.getByRole("link", { name: panelLabel }).getAttribute("href")).toBe(panelHref);
+    }
+    if (Page === listPage) {
+      expect(screen.queryByRole("navigation", { name: "Accesos principales" })).toBeNull();
+      expect(screen.queryByRole("complementary")).toBeNull();
+      expect(screen.queryByText("Con acompañamiento municipal")).toBeNull();
+      expect(screen.queryByText("¿Necesitás ayuda con tu perfil?")).toBeNull();
+      expect(screen.getByText("La Oficina de Empleo revisa las postulaciones y decide qué perfiles derivar a cada empresa.")).toBeTruthy();
     }
     view.unmount();
   }
@@ -84,7 +94,10 @@ it.each(["anonymous", "suspended"])("no muestra controles privados en la navbar 
     expect(within(navigation).queryByRole("button", { name: "Notificaciones" })).toBeNull();
     expect(within(navigation).queryByRole("link", { name: "Mi cuenta" })).toBeNull();
     expect(within(navigation).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
-    expect(screen.getByRole("link", { name: Page === listPage ? "Crear cuenta" : "Registrate" }).getAttribute("href")).toBe("/?registro=candidato");
+    expect(within(navigation).getByRole("link", { name: "Ingresar" }).getAttribute("href")).toBe("/#contenido");
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(screen.queryByRole("link", { name: "Crear cuenta" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Registrate" })).toBeNull();
     view.unmount();
   }
 });
@@ -96,12 +109,17 @@ it("renderiza el listado y enlaces de paginación usando la página solicitada",
   const date = container.querySelector("time");
   expect(date?.textContent).toBe("31/12/2099");
   expect(date?.getAttribute("datetime")).toBe("2099-12-31");
-  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 2, q: "", rubro: "", localidad: "", modalidad: "" }));
+  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 2, pageSize: 10, q: "", rubro: "", localidad: "", modalidad: "" }));
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Ofertas laborales vigentes");
   expect(screen.getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.slug}`);
   const pagination = screen.getByRole("navigation", { name: "Páginas de ofertas" });
   expect(within(pagination).getByRole("link", { name: "Anterior" }).getAttribute("href")).toBe("/ofertas?page=1");
   expect(within(pagination).getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe("/ofertas?page=3");
+  for (const page of [1, 2, 3]) {
+    const link = within(pagination).getByRole("link", { name: `Página ${page}` });
+    expect(link.getAttribute("href")).toBe(`/ofertas?page=${page}`);
+    expect(link.getAttribute("aria-current")).toBe(page === 2 ? "page" : null);
+  }
 });
 
 it("distingue un listado vacío sin inventar ofertas ni paginación", async () => {
@@ -112,8 +130,9 @@ it("distingue un listado vacío sin inventar ofertas ni paginación", async () =
   expect(screen.queryByRole("list")).toBeNull();
   expect(screen.queryByRole("navigation", { name: "Páginas de ofertas" })).toBeNull();
   expect(screen.queryByRole("link", { name: "Ver ofertas disponibles" })).toBeNull();
-  expect(screen.getByRole("link", { name: /^Crear cuenta$/ }).getAttribute("href")).toBe("/?registro=candidato");
-  expect(screen.getByRole("link", { name: /^Iniciá sesión$/ }).getAttribute("href")).toBe("/");
+  expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
+  expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
+  expect(within(screen.getByRole("navigation", { name: "Navegación principal" })).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
 });
 
 it("ofrece volver al inicio del listado ante una página fuera de rango", async () => {
@@ -150,6 +169,7 @@ it("conserva filtros y opciones, pagina sin UUID y reinicia página al buscar", 
   expect(form.querySelector('[name="page"]')).toBeNull();
   const pagination = screen.getByRole("navigation", { name: "Páginas de ofertas" });
   expect(within(pagination).getByRole("link", { name: "Siguiente" }).getAttribute("href")).toBe("/ofertas?q=auxiliar&rubro=ADMIN&localidad=funes&modalidad=onsite&page=3");
+  expect(within(pagination).getByRole("link", { name: "Página 1" }).getAttribute("href")).toBe("/ofertas?q=auxiliar&rubro=ADMIN&localidad=funes&modalidad=onsite&page=1");
   expect(screen.getByRole("link", { name: "Limpiar filtros" }).getAttribute("href")).toBe("/ofertas");
 });
 
@@ -167,7 +187,7 @@ it.each([false, true])("renderiza detalle y campos opcionales solo si existen (%
   expect(screen.getByText("Presencial")).toBeTruthy();
   expect(screen.getByText("A plazo fijo")).toBeTruthy();
   const dates = container.querySelectorAll("time");
-  expect(dates).toHaveLength(2);
+  expect(dates).toHaveLength(1);
   for (const date of dates) {
     expect(date.textContent).toBe("31/12/2099");
     expect(date.getAttribute("datetime")).toBe("2099-12-31");
@@ -179,6 +199,17 @@ it.each([false, true])("renderiza detalle y campos opcionales solo si existen (%
   expect(Boolean(screen.queryByRole("heading", { name: "Salario" }))).toBe(optional);
   expect(Boolean(screen.queryByRole("heading", { name: "Beneficios" }))).toBe(optional);
   expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/dashboard?section=ofertas&oferta=${offer.slug}`);
+  expect(screen.queryByRole("complementary")).toBeNull();
+  expect(screen.queryByText("Tu próxima oportunidad")).toBeNull();
+  expect(screen.queryByText("Con acompañamiento municipal")).toBeNull();
+  const breadcrumb = screen.getByRole("navigation", { name: "Ruta de navegación" });
+  expect(within(breadcrumb).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
+  expect(within(breadcrumb).getByRole("link", { name: "Ofertas" }).getAttribute("href")).toBe("/ofertas");
+  expect(within(breadcrumb).getByRole("link", { name: offer.title }).getAttribute("aria-current")).toBe("page");
+  const application = screen.getByRole("link", { name: "Postularme con mi cuenta" });
+  for (const title of ["La oferta en un vistazo", "Tareas", "Requisitos", ...(optional ? ["Salario", "Beneficios"] : [])]) {
+    expect(screen.getByRole("heading", { name: title }).compareDocumentPosition(application) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  }
 });
 
 it("traduce solo NOT_FOUND a navegación notFound", async () => {
@@ -194,4 +225,13 @@ it("propaga errores técnicos del detalle sin convertirlos en oferta ausente", a
   getPublicOffer.mockRejectedValue(error);
   await expect(detailPage()).rejects.toBe(error);
   expect(notFound).not.toHaveBeenCalled();
+});
+
+it("shows semantic category icons on the detail canvas", async () => {
+  getPublicOffer.mockResolvedValue({ ...offer, categories: [{ id: "food", name: "Gastronomía y hotelería" }] });
+  const { container } = render(await detailPage());
+  expect(screen.getByText("Gastronomía y hotelería").parentElement?.querySelector("svg.lucide-utensils")?.getAttribute("aria-hidden")).toBe("true");
+  const canvas = container.querySelector<HTMLElement>('[data-slot="public-offer-canvas"]');
+  expect(canvas).toBeTruthy();
+  expect(canvas?.style.maxWidth).toBe("1280px");
 });

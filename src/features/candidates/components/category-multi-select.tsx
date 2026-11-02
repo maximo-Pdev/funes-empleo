@@ -4,6 +4,7 @@ import { useContext, useEffect, useId, useRef, useState } from "react";
 import { Field } from "@/components/forms/field";
 import { FormErrorsContext, FormSummarizedFieldsContext } from "@/components/forms/form";
 import { X } from "lucide-react";
+import { CategoryLabel } from "@/components/job-category-label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,7 +69,7 @@ export function CategoryMultiSelect({ categories, name = "categories", defaultSe
         <ComboboxContent aria-label={`Elegir ${label.toLowerCase()}`}>
           <ComboboxInput placeholder="Buscar categoría…" aria-label="Buscar categoría" />
           <ComboboxList aria-label={`${label}: opciones`}>
-            {categories.map(category => <ComboboxItem key={category.id} value={category.id}>{category.name}</ComboboxItem>)}
+            {categories.map(category => <ComboboxItem key={category.id} value={category.id}><CategoryLabel name={category.name} /></ComboboxItem>)}
           </ComboboxList>
           <ComboboxEmpty>Sin resultados</ComboboxEmpty>
         </ComboboxContent>
@@ -78,7 +79,7 @@ export function CategoryMultiSelect({ categories, name = "categories", defaultSe
           const category = categories.find(category => category.id === id);
           if (!category) return null;
           return <li key={id}><Badge variant="secondary" className="max-w-full whitespace-normal gap-1">
-            {category.name}
+            <CategoryLabel name={category.name} />
             <Button type="button" variant="ghost" size="icon-xs" aria-label={`Quitar ${category.name}`}
               onClick={() => setSelected(selected.filter(value => value !== id))}><X aria-hidden="true" /></Button>
           </Badge></li>;

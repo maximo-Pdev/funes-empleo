@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleAlert, Clock3, Info, KeyRound, MailCheck, ShieldAlert } from "lucide-react";
+import { CircleAlert, Clock3, Info, KeyRound, LogOut, MailCheck, ShieldAlert } from "lucide-react";
+import { Form } from "@/components/forms/form";
+import { Button } from "@/components/ui/button";
+import { logoutAction } from "@/features/accounts/actions";
 import { AuthForm } from "@/features/accounts/components/auth-form";
 import { AccessNotice } from "@/features/accounts/components/access-notice";
 import { ResendVerification } from "@/features/accounts/components/resend-verification";
@@ -129,10 +132,15 @@ export function HomeAccessPanel({ authenticated = false, panelHref, panelLabel =
           <div className={styles.form}>
             {mode === "login" ? authenticated
               ? <>
+                <h2 className={styles.sessionTitle}>Continuá en el portal</h2>
                 <p role="status" className={styles.sessionMessage}><Info size={16} aria-hidden="true" />Tu sesión está activa. Continuá desde tu panel.</p>
                 {panelHref && <div className={styles.sessionActions}>
                   <HomeAccountNav href={panelHref} label={panelLabel} />
                 </div>}
+                <div className={styles.sessionOffers}><Link href="/ofertas">Ver ofertas</Link></div>
+                <Form action={logoutAction} className={styles.sessionLogout}>
+                  <Button type="submit" variant="ghost" size="sm"><LogOut aria-hidden="true" />Cerrar sesión</Button>
+                </Form>
               </>
               : notice === "suspended" ? (
                 <div className={styles.accessNotice}>

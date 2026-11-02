@@ -1,4 +1,5 @@
 import { AdminShell } from "@/app/(admin)/_components/admin-shell";
+import { CategoryLabels } from "@/components/job-category-label";
 import { RecordLink as Link } from "@/components/ui/record-link";
 import { EmptyState, FeedbackMessage, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
 import { requireActiveAccount } from "@/lib/auth/guards";
@@ -71,7 +72,7 @@ export default async function AssistedCandidatesPage({ searchParams }: { searchP
                 <TableCell><Badge variant="status" tone={statusTone(candidateProfileStatusTones, candidate.status)}>{displayLabel(candidateProfileStatusLabels, candidate.status)}</Badge></TableCell>
                 <TableCell>{candidate.locality ?? "Localidad no informada"}</TableCell>
                 <TableCell><Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></TableCell>
-                <TableCell>{candidate.categories.map(category => category.name).join(", ") || "Sin categorías activas"}</TableCell>
+                <TableCell><CategoryLabels categories={candidate.categories} fallback="Sin categorías activas" /></TableCell>
                 <TableCell>{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</TableCell>
               </TableRow>)}
             </TableBody>

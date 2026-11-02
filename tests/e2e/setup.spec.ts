@@ -58,7 +58,7 @@ for (const path of ["/", "/?registro=candidato", "/?registro=empresa", "/recover
     if (path === "/recover") {
       const focused = page.locator(":focus");
       await expect(focused).toBeVisible();
-      await expect(focused).toHaveAttribute("href", "/");
+      await expect(focused).toHaveAttribute("href", "https://funes.gob.ar/");
     } else {
       // En la home (login y registro) la navbar queda inerte mientras está oculta,
       // así que el primer foco cae en el conmutador del panel de acceso unificado.
@@ -69,3 +69,20 @@ for (const path of ["/", "/?registro=candidato", "/?registro=empresa", "/recover
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   });
 }
+
+test("anonymous navbar consistently returns to the Home access landmark", async ({ page }) => {
+  for (const path of ["/ofertas", "/cursos", "/recover", "/terminos", "/verification-expired", "/logout"]) {
+    await page.goto(path);
+    const navigation = page.getByRole("navigation", { name: "Navegación principal", exact: true });
+    await expect(navigation.getByRole("link", { name: "Inicio", exact: true })).toHaveAttribute("href", "/");
+    await expect(navigation.getByRole("link", { name: "Ofertas", exact: true })).toHaveAttribute("href", "/ofertas");
+    const access = navigation.getByRole("link", { name: "Ingresar", exact: true });
+    await expect(access).toHaveAttribute("href", "/#contenido");
+    await expect(navigation.getByRole("link", { name: "Mi cuenta", exact: true })).toHaveCount(0);
+    await access.focus();
+    await access.press("Enter");
+    await expect(page).toHaveURL(/\/#contenido$/);
+    await expect(page.getByRole("main")).toBeFocused();
+    await expect(page.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
+  }
+});

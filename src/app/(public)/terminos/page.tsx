@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { REGISTRATION_TERMS_VERSION } from "@/features/accounts/legal-terms";
+import { HomeNavbar } from "@/app/(public)/home-navbar";
+import { getSiteAccess } from "@/features/accounts/navigation";
 
 export const metadata = { title: "Términos de uso y aviso de privacidad" };
 const sections = [
@@ -74,8 +76,9 @@ const sections = [
   }
 ];
 
-export default function TermsPage() {
-  return <main id="contenido" tabIndex={-1} className="mx-auto max-w-4xl space-y-8 px-4 py-12 sm:px-8">
+export default async function TermsPage() {
+  const { panel } = await getSiteAccess();
+  return <><HomeNavbar alwaysVisible panel={panel} /><main id="contenido" tabIndex={-1} className="mx-auto max-w-4xl space-y-8 px-4 pb-12 pt-24 sm:px-8">
     <header className="space-y-4">
       <Link href="/" className="inline-flex min-h-11 items-center underline underline-offset-4">Volver al inicio</Link>
       <h1 className="font-heading text-3xl font-bold text-primary">Términos de uso y aviso de privacidad</h1>
@@ -96,5 +99,5 @@ export default function TermsPage() {
         <li><a className="underline" href="https://www.argentina.gob.ar/aaip/datospersonales/derechos">AAIP: derechos sobre datos personales</a>.</li>
       </ul>
     </section>
-  </main>;
+  </main></>;
 }
