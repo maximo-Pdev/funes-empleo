@@ -34,11 +34,15 @@ for (const account of [
   { role: "admin", href: "/account", label: "Cuenta", panelHref: "/admin", panelLabel: "Ir al panel de administración" },
 ] as const) {
   for (const entry of ["public", "private"] as const) {
-    test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page, browser }) => {
-      await loginFixture(page, account.role);
-      // Stop the previous page's prefetch before editing its session cookie.
-      // The requested entry route must perform the forced refresh itself.
-      await page.goto("about:blank");
+    test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page: loginPage, browser }) => {
+      await loginFixture(loginPage, account.role);
+      const storageState = await loginPage.context().storageState();
+      // Dispose the login document and its background requests before injecting
+      // expiry. The new context has no pending admin prefetch/notification work.
+      await loginPage.context().close();
+      const isolatedContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000", storageState });
+      try {
+      const page = await isolatedContext.newPage();
       await expireStoredSession(page.context());
       expect((await sessionCookie(page.context())).expiresAt).toBe(1);
       const response = await page.goto(entry === "public" ? "/ofertas" : account.href);
@@ -107,6 +111,7 @@ for (const account of [
         await tab.goto("/");
         await expect(tab.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
       } finally { await resumed.close(); }
+      } finally { await isolatedContext.close(); }
     });
   }
 }

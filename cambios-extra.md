@@ -1,5 +1,14 @@
 # Cambios extra necesarios
 
+## PR91-CI-01 — Isolate cancellation deadlines and forced-refresh setup
+
+- Origin/authorization: Maxi requests "Arregla el problema necesito que entre en verde" for PR91; trace T4/S6 in `odd/tasks/ofertas-navigation-integration.md`.
+- Evidence: Quality41378802662 has three browser failures. Company-management setup clones an October18 referral deadline and ran across the03:00UTC maintenance schedule; maintenance can legitimately terminalize that overdue participation before cancellation. Both admin refresh cases lose cookies after forced expiry with Auth409 concurrent-refresh errors; the exact competing request is not yet established.
+- Minimal change: capture one current referral timestamp and derive its future feedback deadline with the schema-required exact720-hour interval; assert the intended referred precondition before cancellation. Move forced-expiry navigation into a fresh browser context after closing the login context, preserving actual refresh/navigation/logout assertions. This tests whether earlier admin background requests contaminate the forced-expiry setup without assuming a production-auth defect.
+- Files/contracts: the two failing E2E specs and focused fixture-isolation regression tests. No changes to cancellation rules, terminal outcomes, authentication, guards, token verification, retry budgets or test selection.
+- Risk/recovery: test setup and acceptance evidence; actual refresh behavior must still pass. Revert only this test delta if disproven; do not disable cron, notifications, prefetch or security checks to obtain green.
+- Verification/status: implemented; observed CI RED retained, new guards RED then GREEN2, direct typecheck/scoped lint and tooling66 passed. Independent review retained all six role/entry cases and every refresh/navigation/logout/cancellation assertion. Its exact720-hour constraint blocker was corrected and independently rechecked; read-only typed PostgreSQL projection returned true for exact equality and a future deadline, without inserted records. Final runtime and full exact-head isolated GitHub application/database checks remain pending. No curated local reset, seed, new accounts, hosted SQL or PR merge.
+
 
 ## EXTRA-120 — Offers/navigation integration with Hero retained for every role (2026-11-01)
 
