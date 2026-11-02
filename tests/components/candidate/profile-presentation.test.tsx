@@ -204,7 +204,11 @@ describe("presentación de consentimiento y activación", () => {
     fireEvent.click(screen.getByRole("button", { name: "Guardar consentimiento" }));
     await waitFor(() => expect(privacyMocks.refresh).toHaveBeenCalledTimes(1));
     expect(document.activeElement).toBe(screen.getByRole("status"));
+    const confirmation = screen.getByRole("status");
     view.rerender(<CandidatePrivacyForm version={4} consent={props.consent} policy={props.policy!} />);
+    expect(screen.getByRole("status")).toBe(confirmation);
+    expect(confirmation.textContent).toBe("Decisión registrada.");
+    expect(document.activeElement).toBe(confirmation);
     expect(screen.queryByRole("checkbox")).toBeNull();
     expect(screen.queryByRole("button", { name: "Retirar consentimiento" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Gestionar consentimiento" })).toBeNull();

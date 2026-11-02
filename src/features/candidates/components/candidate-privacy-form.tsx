@@ -57,10 +57,10 @@ export function CandidatePrivacyForm({ version, consent, policy }: {
       <input type="hidden" name="version" value={version} />
       <input type="hidden" name="status" value="accepted" />
       <Field className={styles.confirmation}><input type="checkbox" name="confirmed" required />Confirmo esta decisión y entiendo sus efectos.</Field>
-      <p className={styles.feedback} ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{state.message}</p>
       <Button type="submit" variant="primary" disabled={pending}>Guardar consentimiento</Button>
     </Form>
     </>}
+    <p className={styles.feedback} ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{state.message}</p>
     </div>
     </div>
     <p className={styles.policy}>Política operativa: {policy.version}. Es una política de demostración pendiente de aprobación municipal.</p>
