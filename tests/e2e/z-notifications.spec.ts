@@ -15,6 +15,7 @@ async function openNotice(page:Page,href:string,title:string,text:string) {
  const popover=page.getByRole("dialog",{name:"Notificaciones",exact:true});
  const notice=popover.getByRole("listitem").filter({hasText:title}).getByRole("button",{name:new RegExp(text)}).first();
  await expect(popover).toBeVisible();
+ await expect(popover.locator('[aria-busy="true"]')).toHaveCount(0);
  while(await notice.count()===0){
   const next=popover.getByRole("button",{name:"Ver más actividad",exact:true});
   await expect(next).toBeEnabled();
