@@ -11,6 +11,7 @@ import type { getCandidateWorkspace } from "@/features/candidates/profile-servic
 import { getPublicOffer, listPublicOffers, type PublicOffer } from "@/features/openings/public-service";
 import { CandidateApplyForm } from "@/features/participations/components/candidate-status";
 import { listMyParticipations } from "@/features/participations/candidate-service";
+import { getOfferApplicationState } from "@/features/participations/application-state";
 import { AppError } from "@/lib/errors/public-error";
 
 function OfferSummary({ offer }: { offer: PublicOffer }) {
@@ -42,9 +43,6 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
     params.set("oferta", slug);
     return `${path}?${params}`;
   };
-  const joinedOfferIds = new Set(participations.filter(item => item.display_status !== "withdrawn").map(item => item.opening_id));
-  // Each attempt has a fresh form, without the previous submission's success state.
-  const attemptKey = (openingId: string) => `${openingId}:${participations.filter(item => item.opening_id === openingId).map(item => `${item.id}:${item.display_status}`).sort().join(",")}`;
   let selectedOffer: Awaited<ReturnType<typeof getPublicOffer>> | null = null;
   if (oferta) {
     try { selectedOffer = await getPublicOffer(oferta); }
@@ -52,6 +50,7 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
   }
   const enabled = workspace.bootstrap === "ready" && workspace.profile?.status === "active" && workspace.cv !== null &&
     workspace.consent?.status === "accepted" && workspace.profile?.availability === "available";
+  const selectedState = selectedOffer ? getOfferApplicationState(participations, selectedOffer.id) : null;
   return <>
     {!enabled && <div role="status" className="mb-6 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
       <CircleAlert className="mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><div><p className="font-semibold">Revisá tu perfil antes de postularte</p><p className="mt-2 text-sm leading-6">Para postularte necesitás el perfil activo, disponible, con consentimiento vigente y CV válido.</p><Link href={profileHref} className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-semibold underline underline-offset-4">Revisar perfil<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></div>
@@ -61,21 +60,23 @@ export async function renderCandidateOffersContent({ workspace, page, oferta, pr
       <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-primary-700"><BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />Tu oferta seleccionada</p>
       <h2 className="break-words text-xl font-bold text-primary-900">Oferta elegida: {selectedOffer.title}</h2>
       <OfferSummary offer={selectedOffer} />
-      {workspace.profile && <div className={`${styles.forms} ${styles.apply} mt-5 max-w-md`}><CandidateApplyForm key={attemptKey(selectedOffer.id)} openingId={selectedOffer.id} candidateVersion={workspace.profile.version}
-        generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} participationsHref={participationsHref(selectedOffer.slug)} alreadyApplied={joinedOfferIds.has(selectedOffer.id)} /></div>}
+      {workspace.profile && selectedState && <div className={`${styles.forms} ${styles.apply} mt-5 max-w-md`}><CandidateApplyForm key={selectedState.attemptKey} openingId={selectedOffer.id} candidateVersion={workspace.profile.version}
+        generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} participationsHref={participationsHref(selectedOffer.slug)} alreadyApplied={selectedState.alreadyApplied} previouslyWithdrawn={selectedState.previouslyWithdrawn} /></div>}
     </section>}
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-primary-900">Ofertas vigentes</h2><p className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700"><ShieldCheck className="h-4 w-4" aria-hidden="true" />Revisadas por la Oficina</p></div>
     {offers.items.length === 0 ? <Card className="p-8 text-center sm:p-12"><BriefcaseBusiness className="mx-auto h-10 w-10 text-primary" aria-hidden="true" /><h3 className="mt-4 text-xl font-bold text-primary-900">No hay ofertas vigentes en esta página.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Podés volver a consultar más adelante y mantener tu perfil actualizado.</p><Link href={profileHref} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-primary hover:bg-secondary">Ir a mi perfil<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Card> :
-      <ul className={`${layoutStyles.desktopCards} ${cardLayout.grid} grid gap-5 md:grid-cols-2`}>{offers.items.filter((offer) => offer.id !== selectedOffer?.id).map((offer) => <li key={offer.id} className="min-w-0">
+      <ul className={`${layoutStyles.desktopCards} ${cardLayout.grid} grid gap-5 md:grid-cols-2`}>{offers.items.filter((offer) => offer.id !== selectedOffer?.id).map((offer) => {
+        const application = getOfferApplicationState(participations, offer.id);
+        return <li key={offer.id} className="min-w-0">
         <Card className={`${cardLayout.card} p-6`}>
           <div data-card-part="header" className={cardLayout.header}><h3 className="break-words text-xl font-bold leading-7"><Link href={`/ofertas/${offer.slug}`} className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary">{offer.title}</Link></h3></div>
           <div data-card-part="content" className={cardLayout.content}><OfferSummary offer={offer} /></div>
           <div data-card-part="footer" className={cardLayout.footer}>
-            {workspace.profile && <div className={`${styles.forms} ${styles.apply}`}><CandidateApplyForm key={attemptKey(offer.id)} openingId={offer.id} candidateVersion={workspace.profile.version}
-              generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} participationsHref={participationsHref(offer.slug)} alreadyApplied={joinedOfferIds.has(offer.id)} /></div>}
+            {workspace.profile && <div className={`${styles.forms} ${styles.apply}`}><CandidateApplyForm key={application.attemptKey} openingId={offer.id} candidateVersion={workspace.profile.version}
+              generalCvName={workspace.cv?.original_name_safe} disabled={!enabled} participationsHref={participationsHref(offer.slug)} alreadyApplied={application.alreadyApplied} previouslyWithdrawn={application.previouslyWithdrawn} /></div>}
           </div>
         </Card>
-      </li>)}</ul>}
+      </li>; })}</ul>}
     <Pagination aria-label="Páginas de ofertas" className="mt-6">
       <PaginationContent>
         {offers.page > 1 && <PaginationItem><PaginationPrevious href={pageHref(offers.page - 1)} /></PaginationItem>}

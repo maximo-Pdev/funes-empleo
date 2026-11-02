@@ -103,13 +103,10 @@ test("atención sin PDF, derivación protegida, consentimiento y vinculación pr
   expect(page.url()).toBe(originalPage);
   await pdfTab.close();
   await nominateFromOpening(page, id, opening);
-  await page.getByLabel("Acción", { exact: true }).selectOption("skip_to_preselected");
+  await page.getByLabel("Acción", { exact: true }).selectOption("refer");
   await page.getByRole("textbox", { name: "Motivo interno" }).fill("Evaluación presencial ficticia realizada");
   await page.getByRole("button", { name: "Registrar acción" }).click();
   const status = page.getByRole("status").filter({ hasText: "Resultado o estado vigente" });
-  await expect(status).toContainText("Preseleccionada");
-  await page.getByLabel("Acción", { exact: true }).selectOption("refer");
-  await page.getByRole("button", { name: "Registrar acción" }).click();
   await expect(status).toContainText("Derivada");
 
   const candidateContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000" });

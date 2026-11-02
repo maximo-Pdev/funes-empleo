@@ -1,5 +1,17 @@
 # Cambios extra necesarios
 
+## Desambiguación de EXTRA-121 en PR92 y PR93
+
+El identificador por sí solo no distingue estas dos incorporaciones independientes. Se conservan sus referencias y evidencias históricas; ambas reglas siguen vigentes en su alcance.
+
+| Referencia | Título | Alcance |
+| --- | --- | --- |
+| PR93, EXTRA-121 | Portal interface corrections | Carga, registro, consentimiento general, notificaciones y gráficos. |
+| PR92, EXTRA-121 / EXTRA121 | Estado coherente y aviso de nueva postulación tras retiro | Retiro de una participación y nueva postulación elegible, sin restaurar casos ni accesos anteriores. |
+
+La aceptación del consentimiento general no equivale a una postulación; impedir su retiro desde la cuenta no elimina el retiro individual de una participación. Los cambios EXTRA122 de PR92 también conservan su vigencia.
+
+
 ## EXTRA-121 — Portal interface corrections (2026-11-02)
 
 - Authorization: Maxi requests matching skeletons, anonymous application entry without expired-session feedback, compact registration and removal of the terms new-tab suffix, acceptance-only operational consent, navbar-only notification Popover and enhanced administrator charts. Explicit clarification: "Si, conserva unicamente la aceptación inicial". Trace: `odd/tasks/ajustes-interfaz-portal.md`, S1–S6.
@@ -9,6 +21,175 @@
 - Files/contracts: loading boundaries, Home registration styles/terms, auth guard, candidate consent presentation/validation/service and any narrowly required SQL guard, notification presentation/navigation, metrics CSS, corresponding tests and current specification/plan/UI notes.
 - Risks/recovery: auth/consent contracts and notification route retirement require independent review. Revert only this delta; never reset curated local data or rewrite historical records. Reduced motion, exact metrics, accessible keyboard controls and role privacy remain required.
 - Verification/status: implemented and verified locally; final lint/typecheck/build passed, Vitest143files/1705tests passed with maxWorkers2, tooling66 passed. Independent SQL/security review passed after52 migrations,32pgTAP files/1557assertions; populated upgrade preserved74table snapshots and reacceptance never restored cases/accesses. Browser39 component-fixture cases,10 registration-fixture states and12 fresh production registration states passed; actual public offer application redirected anonymous visitor to plain Home, retired notification GET/HEAD routes returned404 and Home axe found0violations. Scope/results are separate, not a combined test total. Recovery preserved completed gate receipts after provider interruption. Shared/hosted consent migration rollout and reset-backed full E2E/authenticated delivery remain unperformed; no final product/municipal acceptance claimed. No commits, PR, push, merge, deployment or curated-data reset. Exact evidence and remaining boundaries: `odd/tasks/ajustes-interfaz-portal.md`, L8–L13.
+
+## PR92-CI-CONCURRENCY-01 — Preparación de preselección compatible con EXTRA122
+
+- **Origen/evidencia:** Mateo pide reparar GitHub,02/11/2026. Quality229/run
+  41494204528 en0a8742d: database/Vercel, tipos/lint/tooling/unit/build y156 E2E
+  PASS; solo SC-008A vence measurementTimeout90s. demo-performance prepara admin2
+  con preselect sobre fixture775 under_review, opción retirada expresamente de
+  estados iniciales en EXTRA122. El selector espera antes de llegar a la barrera.
+  No hay evidencia de cuatro acciones que excedan5s en esa corrida.
+- **Cambio propuesto antes de implementar:** preparar el caso775 como preinterview
+  con preentrevista ficticia y sin derivación, fuera de la medición. Desde ese
+  estado preselect permanece disponible; quitar llenado de motivo de salto que
+  ya no corresponde. Auditar participation_advanced en vez de stage_skipped.
+  Identificar variante nueva en manifiesto/recibo y guía, sin cambiar hash/conteos
+  base500/50/100/1000, versión inicial2 o final3 del caso.
+- **Contratos preservados:** cuatro admins/casos independientes, barrera común,
+  cuatro mutaciones y auditorías con actor/request ID, límite5s por operación,
+  presupuesto90s, preparación fría y protección local. No restaurar opciones de
+  producto, tocar backend/SQL productivo, relajar tiempos, añadir retries/skips o
+  resetear datos habituales/alojados. Preentrevista preparada no inventa held_at.
+- **Archivos/riesgos/verificación:** prepare-demo-concurrency.sql, manifiesto,
+  demo-performance, acceptance-concurrency y regresión que cruza fixture/comando
+  real con formulario; guía y ledger. Riesgos: fase/versión/evento incoherentes,
+  medición de preparación o fixture parcial. RED→GREEN, cuatro acciones reales
+  y auditoría tras reset propio, tipos/lint/unit/tooling/build y nueva CI completa.
+- **Gates/estado:** requisito técnico derivado de PA2/PA4 y SC-008A/T089; T305.
+  Se conserva alcance/método/budgets; no arquitectura o decisión municipal nueva.
+  Constitución I–VI preservada, sin conflictos críticos/altos; autorización de
+  reparación/AGENTS.md, implementación y revisión humana todavía pendientes.
+- **Resultado local:** regresión nueva RED por preselect ausente en under_review,
+  GREEN con variante posterior a preentrevista;16 pruebas focales y66 tooling,
+  tipos/lint PASS. SC-008A completo PASS3,3min con reset frío, cuatro sesiones,
+  barrera, cada mutación≤5s y verificación de estados/versiones/auditorías/variante.
+  Sin retries/skips o ampliación de presupuestos. El build de producto usado es
+  el que ya pasó en229; no cambia src/migraciones. QA propio54341/3001, sin tocar
+  .env o datos habituales/alojados; next-env ajeno conserva su huella. Corrección
+  local verificada; publicar en el mismo PR92 y acreditar CI nueva por separado.
+
+
+## EXTRA-122 — Acciones del caso junto a sus datos y fechas de entrevista simples
+
+- **Fecha/origen:** Mateo,02/11/2026, marca la zona derecha de Caso para ubicar
+  Acciones sobre la participación; reduce acciones iniciales a registrar
+  preentrevista, derivar y cancelar este caso. Renombra Derivar a la empresa y
+  pide quitar Fecha realizada de preentrevista y entrevista empresarial.
+- **Evidencia previa:** el formulario está debajo del flujo/feedback y ocupa
+  una fila completa. received/under_review ofrecen saltos/revisión/preselección
+  además de retiro/cancelación. Ambos formularios tienen fechas programada y
+  realizada opcionales con validación al menos una; servidor/SQL admiten fecha
+  programada con realizada null, incluso entrevista completed. El historial
+  conserva campos anteriores, que no deben eliminarse o reinterpretarse.
+- **Cambio propuesto:** fila superior Caso/Acciones con layout compartido en PC
+  y apilado móvil, mismo ID case-actions y foco. Reducir únicamente received/
+  under_review a las tres opciones solicitadas, conservando posteriores. Toda
+  opción refer se muestra como Derivar a la empresa. Quitar controles/estado UI
+  de fecha realizada; fecha programada requerida como única fecha visible.
+- **Prerrequisito técnico/justificación:** ajustar validación cliente y su mensaje
+  para que no señalen un campo eliminado. Enviar solo fecha programada; no
+  fabricar una fecha realizada a partir de la programada o del reloj. Mantener
+  campos opcionales y compatibilidad del contrato servidor, historial y DB.
+- **Archivos/contratos afectados:** página administrativa de participación,
+  participation-action-form, referral-forms, tests de páginas/componentes/E2E,
+  spec/plan/tasks/UI y guía. Sin esquema/RPC/grants, migración, borrado de datos,
+  eliminación de comandos autorizados de API o cambio de reglas de derivación.
+- **Riesgos/verificación:** estados iniciales y finales, motivos/evidencias,
+  fechas requeridas/retención, entrevista empresarial realizada con fecha
+  programada y heldAt ausente, UTC/Funes, IDs/foco/orden PC/móvil, derivación
+  explícita y privacidad existentes. Tipos/lint/pruebas/build y QA aislado.
+- **Estado/autorización:** pedido explícito en rama feat/candidate-reapplication
+  con EXTRA121 sin commitear; se preserva ese trabajo y next-env ajeno. Registrar
+  y revisar delta por etapas antes de código. Sin PR/commit o revisión humana.
+- **Gates antes de implementar:** PA1→fila compartida/anchor (T303/T304),
+  PA2→catálogo de presentación/motivos (T303/T304), PA3→fecha requerida/payload sin
+  heldAt (T303/T304), PA4→regresiones/QA. Calidad revisada: estados y breakpoint
+  explícitos, no fecha realizada automática, contratos históricos conservados,
+  escenarios y recuperación definidos. Sin críticos/altos o arquitectura nueva;
+  constitución I–VI y excepciones históricas expresas intactas. Tests antiguos
+  que seleccionaban saltos retirados deben recorrer la derivación directa con
+  motivo, conservando sus comprobaciones de autorización y revocación.
+- **Implementación/convergencia:** PA1–PA4 implementados en las tres superficies
+  previstas, usando layout compartido sin CSS global nuevo. Caso/Acciones son
+  hermanos, case-actions conserva foco y destino único. Opciones iniciales
+  exactas, etiqueta refer uniforme y Fecha programada requerida en ambos
+  formularios; no se envía heldAtLocal/heldAt desde esos controles. Servicios,
+  validadores de servidor, SQL, datos históricos y comandos autorizados intactos.
+- **Resultados:**124 regresiones focales, suite1694/141 archivos,66 tooling,
+  tipos/lint/build PASS. Dos recorridos intermediation PASS: geometría de columnas
+  iguales/alineadas1920/1366 y apilado390, axe cero violaciones/no overflow,
+  preentrevista/entrevista empresarial persistidas con scheduled_at no null y
+  held_at null, privacidad, motivos, derivación/retiros/revocaciones conservados.
+  Recorrido assisted-candidate PASS28,4s tras alinear el entorno QA: primer fallo
+  por APP_ENV/CONSENT_POLICY_VERSION ausentes; segundo por buzón copiado54324
+  en vez del propio54344. Se corrigió solo la configuración/copia ignorada QA,
+  sin debilitar pruebas, añadir retries o modificar variables habituales.
+  Tres recorridos distintos verificados; no suite E2E completa nueva.
+- **Evidencia/límites/estado:** capturas ficticias1920/390 revisadas en
+  test-results/participation-layout-*, sin enviar acciones en la captura; logs
+  de unit/lint/tooling y QA tipos/build/E2E con el mismo prefijo. Build mantiene
+  avisos previos de raíz/escaneo CSS; cobertura configurada solo env/schema.ts.
+  No migración o cambios alojados; servicios/DB y next-env ajenos intactos por
+  diff/huella. EXTRA121 permanece incluido, T302–T304 verificadas. Sin commit/PR
+  o revisión humana todavía; recuperación solo de composición/controles.
+
+
+## EXTRA-121 — Estado coherente y aviso de nueva postulación tras retiro
+
+- **Fecha/origen:** Mateo,02/11/2026, muestra el listado bloqueado por
+  «Participación registrada» y el detalle con «Postularme con mi cuenta»; solicita
+  volver a postular tras cancelar personalmente, con aviso del intento anterior.
+- **Evidencia antes de código:** main e89a849 incluye PR90 y PR91. El detalle
+  público siempre ofrece el mismo enlace, sin consultar participación propia.
+  offers-content ya excluye display_status=withdrawn del bloqueo; la migración
+  20261029180304, EXTRA102 «Fechas y nueva postulación» y FR-016 ya permiten un
+  nuevo caso tras retiros. Cancelación municipal y otros finales no son retiros.
+  No hay evidencia de que deba cambiarse esa regla persistente.
+- **Cambio propuesto/justificación:** derivar el estado de presentación por
+  oferta con un único helper compartido. Caso no retirado: consultar postulaciones
+  en detalle y bloqueo actual en formulario; solo retiros: enlace para volver a
+  postularse y aviso del historial en ambas entradas; sin casos: enlace normal.
+  Consultar historial privado solo para la sesión candidata verificada; si falla
+  la consulta, ofrecer revisar postulaciones sin afirmar que puede enviar.
+  Mantener destino protegido, slug, envío/CV, aptitud, actor y validación de BD.
+- **Archivos/contratos previstos:** helper de presentación, CandidateApplyForm,
+  offers-content, detalle público, pruebas unit/componentes/E2E y artefactos
+  spec/plan/tasks/UI/operación. Sin RPC nuevo, esquema, permisos, estados, cambios
+  de datos o migración. No reabrir casos ni revivir permisos o reemplazar sus CV.
+- **Riesgos y verificación:** coherencia entre entradas, historial de otra oferta,
+  estados finales, más de un retiro, error de lectura, sesiones no candidatas,
+  doble envío, CV general/específico, historial/auditoría/accesos conservados;
+  pruebas existentes SQL075 y retry, regresiones de navegación/roles, tipos,
+  lint, unit/tooling/build y navegador móvil/PC con fixture QA propia.
+- **Autorización/estado:** pedido explícito y coordinación de AGENTS.md. Nueva
+  rama feat/candidate-reapplication desde main actualizado; PR90 mergeado y su
+  rama local/remota retirada con comprobación de SHA. next-env ajeno preservado.
+  Alcance y gates del delta por revisar antes de implementación; no constituye
+  aceptación jurídica/municipal, revisión humana, despliegue o PR nuevo.
+- **Análisis previo de consistencia:** AP1→helper y ambas entradas (T300),
+  AP2→aviso/key/controles conservados (T300/T301), AP3→lector privado condicionado
+  y fallback (T300/T301), AP4→regresiones/SQL/navegador (T301). Calidad de requisitos
+  revisada en tabla independiente; gates históricos de ofertas permanecen con la
+  excepción previa expresa de Mateo, sin marcarlos aprobados. El CTA adaptado
+  sustituye solo la promesa invariable de PR91 por pedido posterior. Sin críticos,
+  altos, requisito huérfano o arquitectura nueva; constitución I–VI preservada.
+  Changelog Supabase y documentación/registro Button base-nova consultados02/11.
+  No se requiere cambiar SQL existente; prueba real pendiente de entorno propio.
+- **Implementación/convergencia:** AP1–AP4 cubiertos por application-state.ts,
+  offers-content, CandidateApplyForm y detalle público. Solo presentación: helper
+  y aviso compartidos; se conservan payload, key por intento, CV y guardas. Un
+  caso no retirado prevalece; fallo de lectura muestra consultar sin exponer error.
+  Sin diferencias en servicios/acciones/endpoint de postulación o Supabase.
+- **Verificación actual:**56 pruebas focales PASS (regresión del detalle RED8
+  fallos→GREEN); suite1692 pruebas/140 archivos,66 tooling, tipos/lint/build PASS.
+  Dos E2E ampliados PASS en15,4s, cero retries/skips: detalle/listado/elegida,
+  envío→retiro→nuevo CV/caso, historial anterior y envíos simultáneos200/422.
+  Axe cero violaciones y sin overflow390/1440. SQL075 actual41/41 PASS con actor,
+  aptitud, finales, atomicidad, CV/permisos e historial; no se modificó esa prueba.
+  Revisión de navegador adicional/capturas ficticias y cache-control real
+  «private, no-cache, no-store, must-revalidate, max-age=0» PASS.
+- **Límites/evidencia:** logs/capturas ignorados test-results/reapplication-* y
+  copia QA propia portal-followups-check (54341/3001). La preparación ejecutó1467
+  SQL antiguos; al cotejar se detectaron4 tests QA distintos. Se sincronizaron y
+  se ejecutó075 actual (41); no se acredita la suite SQL actual completa ni todos
+  los E2E. Todas las migraciones QA coinciden con la rama. El build conserva los
+  avisos anteriores de lockfiles/escaneo CSS. Cobertura100% solo env/schema.ts.
+  No reset o mutación habitual/alojada; next-env ajeno mantiene SHA256 original.
+  T299–T301 verificadas técnicamente, recuperación solo visual. Sin commit/PR
+  todavía; revisión humana/municipal no se infieren de estas comprobaciones.
+
+
 
 ## PR91-CI-01 — Isolate cancellation deadlines and forced-refresh setup
 

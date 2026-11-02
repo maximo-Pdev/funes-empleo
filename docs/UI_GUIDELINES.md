@@ -1,5 +1,8 @@
 # Municipal visual reference
 
+Identifier scope: PR93's EXTRA-121 interface amendment and PR92's EXTRA121 application-entry/EXTRA122 case-date amendments are compatible and remain current together. Qualify EXTRA-121 by PR and title as recorded in `cambios-extra.md`; the supersession notices below apply only to their explicit feature-local deltas.
+
+
 ## Current interface amendment — EXTRA-121 (2026-11-02)
 
 This amendment supersedes only the conflicting presentation requirements below. Loading skeletons must match the current Home/public/private containers. Home registration height follows actual inner content, without a trailing empty feedback reservation; retain required fields, natural scrolling, independent drafts, transitions and 44px controls. Remove the visible "(se abre en otra pestaña)" terms suffix without removing the required legal checkbox or safe link behavior.
@@ -9,6 +12,31 @@ Cuenta > Privacidad keeps explicit initial acceptance and useful policy/status i
 Notifications live only in the existing official adapted Base Popover at the far right of the navbar, after Mi cuenta, not in sidebars or a separate dashboard section. Show recent real activity and permit older-page browsing within the popup. Keep role-safe individual destinations, unread indicators, keyboard/Escape/focus return, error/empty/loading states and mobile fit. Keep the Home navbar visible while the popup is open. Retired admin/company notification URLs return 404, not compatibility redirects.
 
 Administrative charts may add restrained shadows, gradients and entry motion using municipal tokens. Respect reduced motion and retain exact numeric text, zero/unavailable distinctions, definitions, filters and all exports. Anonymous offer-application entry returns to Home without expiry feedback; do not suppress genuine suspension or inactive-account feedback.
+
+## EXTRA122 — Acciones del caso y fecha visible única
+
+Seguimiento administrativo presenta Caso y Acciones sobre la participación en
+dos columnas iguales desde1024px, con layout compartido y alturas naturales;
+apiladas Caso→Acciones en móvil. El ID case-actions conserva foco/enlace de guía.
+received/under_review muestran Registrar preentrevista, Derivar a la empresa y
+Cancelar solo este caso; las fases posteriores conservan sus opciones. No se
+eliminan motivos/evidencias o permisos de servidor al simplificar la presentación.
+Preentrevista e entrevista empresarial muestran solo Fecha programada requerida;
+no input Fecha realizada ni timestamp implícito. Mantener calendario nativo,
+hora Funes, mensajes/foco/retención y datos históricos de entrevistas existentes.
+
+## EXTRA121 — Entrada coherente a postulaciones
+
+En el detalle público, la sesión candidata ve «Ver mi postulación» si tiene un
+caso no retirado; «Volver a postularme» y aviso de historial si solo tiene retiros;
+sin historial conserva «Postularme con mi cuenta». El aviso de retiro aparece
+también en el formulario elegido/listado y se oculta tras registrar el nuevo
+intento. No prometer aptitud: el aviso condiciona el envío a perfil/oferta
+habilitados. Consulta fallida ofrece revisar postulaciones sin exponer detalles.
+Conservar LinkButton/Button/Form/FileInput compartidos, textos legibles, orden
+natural y foco; no introducir paleta, componente o formulario alternativos.
+Solo se adapta ese CTA del contrato de PR91 por pedido posterior de Mateo.
+
 
 
 ## Current integration authority — EXTRA-120

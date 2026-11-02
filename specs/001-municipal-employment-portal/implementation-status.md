@@ -1,5 +1,57 @@
 # Estado de implementación — 2026-09-22
 
+## PR92 — Preparación de concurrencia tras EXTRA122 — 02/11/2026
+
+Quality229 en0a8742d pasa database1533 SQL, tipos/lint/tooling/unit/build y156 E2E;
+SC-008A vence90s porque intenta seleccionar preselect en under_review, opción
+inicial retirada. Se prepara caso775 preinterview/version2 con preentrevista
+ficticia, sin derivación, fuera del reloj. Misma operación de preselección termina
+version3, con participation_advanced en lugar del salto anterior. Variante nueva
+en manifiesto/recibo; seed/hash/conteos y cuatro operaciones/actores/barrera/5s
+no cambian. No modificación de producto, migración, budgets o retries.
+Regresión RED→GREEN,16 focales,66 tooling, tipos/lint y SC-008A frío completo
+PASS3,3min en QA propio. T305 técnicamente verificada; PR92-CI-CONCURRENCY-01
+registra evidencia y límites. Nueva CI completa posterior; no revisión humana.
+
+## EXTRA122 — Acciones junto al caso y entrevistas simples — 02/11/2026
+
+En la rama actual con EXTRA121 preservado, Caso/Acciones comparten fila PC y se
+apilan en móvil; mismo case-actions/foco/enlace. received/under_review ofrecen
+solo preentrevista, Derivar a la empresa y cancelación individual. Fases posteriores
+y motivos/evidencias se conservan; refer solo cambia etiqueta. Ambos formularios
+quitan Fecha realizada y requieren Fecha programada, sin generar realización
+implícita o cambiar históricos/validadores/SQL. No requiere migración.
+
+124 focales,1694 pruebas/141 archivos,66 tooling, tipos/lint/build PASS. Dos E2E
+intermediation y uno presencial PASS: columnas iguales/alineadas1920/1366 y apilado
+390, axe sin violaciones, persistencia scheduled_at no null/held_at null, derivación,
+privacidad y revocación. Presencial tuvo dos fallos de preparación propios QA:
+variables de política ausentes y buzón54324; corregidos solo en proceso/copia QA
+(54344), sin alterar producto o relajar tests. No se acredita E2E/SQL completo nuevo.
+Capturas ficticias verificadas, fuentes iguales a build QA y next-env ajeno intacto.
+T302–T304 verificadas; EXTRA122 documenta evidencia/recuperación/avisos de build
+previos. Sin commit/PR nuevo ni revisión humana; EXTRA121 sigue incluido.
+
+## EXTRA121 — Postulación coherente tras retiro — 02/11/2026
+
+feat/candidate-reapplication desde main e89a849 (PR90/91 incorporados); rama
+anterior retirada después de confirmar merge/SHA, next-env ajeno preservado.
+Detalle público consulta participación propia solo con panel candidato verificado
+y servicio autorizado. Caso no retirado: Ver mi postulación; solo retiros: Volver
+a postularme y aviso; sin historial: entrada existente. Aviso compartido en listado
+y oferta elegida; error privado permite consultar sin afirmar elegibilidad.
+El helper mantiene prioridad y key por intento; no altera aptitud, consentimiento,
+CV, estados, acciones, datos o guardas SQL. No requiere otra migración.
+
+56 focales y suite1692/140,66 tooling, tipos/lint/build PASS. Dos E2E reales PASS
+sin retries/skips: detalle/listado/elegida, retiro/nuevo CV/historial y concurrencia
+200/422 con un nuevo caso. Axe390/1440 cero violaciones; SQL075 actual41/41 PASS.
+Capturas de ambas vistas y header private/no-store verificados con fixture propio.
+La preparación previa usó1467 SQL QA antiguos; se cotejaron/sincronizaron4 archivos
+y se repitió075 actual. No se atribuye una ejecución SQL actual completa ni todos
+los E2E. Migraciones QA idénticas; avisos previos de build y cobertura limitada al
+módulo env quedan en EXTRA121. Sin cambios alojados, commit/PR o revisión humana.
+
 ## EXTRA120 — Distribución del consentimiento — 01/11/2026
 
 Rama feat/candidate-consent-layout desde main1e3cdab tras merge de PR88 y retiro

@@ -23,18 +23,15 @@ type EvidenceOption = { id: string; label: string; direction?: string };
 
 const actions: Partial<Record<ParticipationStatus, readonly { value: ParticipationCommand; label: string }[]>> = {
   received: [
-    { value: "start_review", label: "Iniciar revisión" }, { value: "record_preinterview", label: "Registrar preentrevista" },
-    { value: "skip_to_preinterview", label: "Omitir revisión y pasar a preentrevista" },
-    { value: "skip_to_preselected", label: "Omitir etapas y preseleccionar" },
-    { value: "refer", label: "Derivar explícitamente" },
+    { value: "record_preinterview", label: "Registrar preentrevista" },
+    { value: "refer", label: "Derivar a la empresa" },
   ],
   under_review: [
-    { value: "record_preinterview", label: "Registrar preentrevista" }, { value: "preselect", label: "Preseleccionar" },
-    { value: "skip_to_preselected", label: "Omitir preentrevista y preseleccionar" },
-    { value: "refer", label: "Derivar explícitamente" },
+    { value: "record_preinterview", label: "Registrar preentrevista" },
+    { value: "refer", label: "Derivar a la empresa" },
   ],
-  preinterview: [{ value: "preselect", label: "Preseleccionar" }, { value: "refer", label: "Derivar explícitamente" }],
-  preselected: [{ value: "refer", label: "Derivar explícitamente" }],
+  preinterview: [{ value: "preselect", label: "Preseleccionar" }, { value: "refer", label: "Derivar a la empresa" }],
+  preselected: [{ value: "refer", label: "Derivar a la empresa" }],
   referred: [{ value: "mark_awaiting_feedback", label: "Marcar espera de respuesta" },
     { value: "confirm_hired", label: "Confirmar contratación" }, { value: "confirm_not_selected", label: "Confirmar no selección" }],
   company_interview: [{ value: "mark_awaiting_feedback", label: "Marcar espera de respuesta" },
@@ -68,7 +65,6 @@ export function ParticipationActionForm({ participationId, version, status, cont
   const [channel, setChannel] = useState("");
   const [summary, setSummary] = useState("");
   const [scheduledAtLocal, setScheduledAtLocal] = useState("");
-  const [heldAtLocal, setHeldAtLocal] = useState("");
   const [recommendation, setRecommendation] = useState<ParticipationActionPayload["recommendation"]>("pending");
   const [feedbackId, setFeedbackId] = useState("");
   const [contactId, setContactId] = useState("");
@@ -76,7 +72,7 @@ export function ParticipationActionForm({ participationId, version, status, cont
   const [pending, startTransition] = useTransition();
   const choices = [...(actions[status] ?? [])];
   if (!["hired", "not_selected", "withdrawn", "cancelled", "no_company_response"].includes(status)) {
-    choices.push({ value: "withdraw_on_request", label: "Registrar retiro pedido por candidato" });
+    if (status !== "received" && status !== "under_review") choices.push({ value: "withdraw_on_request", label: "Registrar retiro pedido por candidato" });
     choices.push({ value: "cancel_individual", label: "Cancelar solo este caso" });
   }
 
@@ -89,8 +85,8 @@ export function ParticipationActionForm({ participationId, version, status, cont
     if (command === "record_preinterview" && !channel) {
       setError("Indicá el canal de la preentrevista."); return;
     }
-    if (command === "record_preinterview" && (!summary.trim() || (!scheduledAtLocal && !heldAtLocal))) {
-      setError("Registrá un resumen y la fecha programada o realizada de la preentrevista."); return;
+    if (command === "record_preinterview" && (!summary.trim() || !scheduledAtLocal)) {
+      setError("Registrá un resumen y la fecha programada de la preentrevista."); return;
     }
     if (command === "withdraw_on_request" && !contactId) {
       setError("Seleccioná el contacto entrante donde el candidato pidió el retiro."); return;
@@ -107,7 +103,7 @@ export function ParticipationActionForm({ participationId, version, status, cont
       try {
         const result = await onSubmit({ participationId, version, command, reason: reason.trim(), channel,
           summary: summary.trim(), scheduledAtLocal: scheduledAtLocal || undefined,
-          heldAtLocal: heldAtLocal || undefined, recommendation,
+          recommendation,
           feedbackId: feedbackId || undefined, contactId: contactId || undefined,
           candidateRequestId: command === "withdraw_on_request" ? contactId || undefined : undefined });
         const message = adminMutationError(result);
@@ -118,9 +114,7 @@ export function ParticipationActionForm({ participationId, version, status, cont
   }
 
   if (choices.length === 0) return <p>Este caso tiene un resultado final y no admite nuevas acciones.</p>;
-  return <Form onSubmit={submit} requirements={command === "record_preinterview"
-    ? [{ names: ["scheduledAtLocal", "heldAtLocal"], message: "Indicá la fecha programada o realizada de la preentrevista." }]
-    : command.startsWith("correct_") ? [{ names: ["feedbackId", "contactId"], message: "Seleccioná una respuesta empresarial o un contacto municipal como evidencia." }]
+  return <Form onSubmit={submit} requirements={command.startsWith("correct_") ? [{ names: ["feedbackId", "contactId"], message: "Seleccioná una respuesta empresarial o un contacto municipal como evidencia." }]
       : command === "confirm_hired" || command === "confirm_not_selected"
         ? [{ names: ["feedbackId", "contactId", "reason"], message: "Registrá un motivo o seleccioná la evidencia del resultado." }] : []}
     className="space-y-4 rounded-lg border border-slate-300 bg-white p-5" noValidate>
@@ -135,10 +129,8 @@ export function ParticipationActionForm({ participationId, version, status, cont
         options={PREINTERVIEW_CHANNELS.map((value) => ({ value, label: ({ phone: "Teléfono", email: "Correo", whatsapp: "WhatsApp", in_person: "Presencial", video: "Video" })[value] }))} />
       <TextField id="preinterview-summary" label="Resumen interno" required value={summary}
         onChange={(event) => setSummary(event.target.value)} maxLength={5000} />
-      <TextField id="preinterview-scheduled" name="scheduledAtLocal" label="Fecha programada" type="datetime-local"
+      <TextField id="preinterview-scheduled" name="scheduledAtLocal" label="Fecha programada" type="datetime-local" required
         value={scheduledAtLocal} onChange={(event) => setScheduledAtLocal(event.target.value)} />
-      <TextField id="preinterview-held" name="heldAtLocal" label="Fecha realizada" type="datetime-local"
-        value={heldAtLocal} onChange={(event) => setHeldAtLocal(event.target.value)} />
       <SelectField id="preinterview-recommendation" label="Recomendación" value={recommendation}
         onChange={(event) => setRecommendation(event.target.value as ParticipationActionPayload["recommendation"])}
         options={[{ value: "pending", label: "Pendiente" }, { value: "preselect", label: "Preseleccionar" },
