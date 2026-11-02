@@ -1,5 +1,16 @@
 # Manual de operación ficticia: local, preview y demo
 
+## Referencia de entrega vigente — 02/11/2026
+
+La URL indicada por Mateo es [funes-empleo.vercel.app](https://funes-empleo.vercel.app/).
+Correos de prueba actuales, recorrido y controles pendientes están en
+[la guía de entrega](course-delivery.md). Se comprobaron HTTP200 en inicio,
+/ofertas y GitHub; no login ni SHA/configuración alojada en esta tarea.
+Los recibos29/09 siguientes documentan exclusivamente el dominio/despliegue
+anterior y no prueban la configuración actual. Los scripts históricos fijados
+a ese dominio no validan el nuevo. Se conservan las evidencias originales;
+esta tarea no ejecuta resets ni rotaciones.
+
 Alcance T090, actualizado para PC1/EXTRA-017. **Default interactivo: 10 cuentas;
 aceptación: fixture TEST-ONLY local/CI de 4 admins y 500/50/100/1000.** Nunca cargar
 el fixture de aceptación en el demo alojado. Reset alojado bloqueado; credenciales
