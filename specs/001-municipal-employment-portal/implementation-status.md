@@ -1,5 +1,18 @@
 # Estado de implementación — 2026-09-22
 
+## PR92 — Preparación de concurrencia tras EXTRA122 — 02/11/2026
+
+Quality229 en0a8742d pasa database1533 SQL, tipos/lint/tooling/unit/build y156 E2E;
+SC-008A vence90s porque intenta seleccionar preselect en under_review, opción
+inicial retirada. Se prepara caso775 preinterview/version2 con preentrevista
+ficticia, sin derivación, fuera del reloj. Misma operación de preselección termina
+version3, con participation_advanced en lugar del salto anterior. Variante nueva
+en manifiesto/recibo; seed/hash/conteos y cuatro operaciones/actores/barrera/5s
+no cambian. No modificación de producto, migración, budgets o retries.
+Regresión RED→GREEN,16 focales,66 tooling, tipos/lint y SC-008A frío completo
+PASS3,3min en QA propio. T305 técnicamente verificada; PR92-CI-CONCURRENCY-01
+registra evidencia y límites. Nueva CI completa posterior; no revisión humana.
+
 ## EXTRA122 — Acciones junto al caso y entrevistas simples — 02/11/2026
 
 En la rama actual con EXTRA121 preservado, Caso/Acciones comparten fila PC y se

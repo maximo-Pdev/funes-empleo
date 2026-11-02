@@ -1,5 +1,43 @@
 # Cambios extra necesarios
 
+## PR92-CI-CONCURRENCY-01 — Preparación de preselección compatible con EXTRA122
+
+- **Origen/evidencia:** Mateo pide reparar GitHub,02/11/2026. Quality229/run
+  41494204528 en0a8742d: database/Vercel, tipos/lint/tooling/unit/build y156 E2E
+  PASS; solo SC-008A vence measurementTimeout90s. demo-performance prepara admin2
+  con preselect sobre fixture775 under_review, opción retirada expresamente de
+  estados iniciales en EXTRA122. El selector espera antes de llegar a la barrera.
+  No hay evidencia de cuatro acciones que excedan5s en esa corrida.
+- **Cambio propuesto antes de implementar:** preparar el caso775 como preinterview
+  con preentrevista ficticia y sin derivación, fuera de la medición. Desde ese
+  estado preselect permanece disponible; quitar llenado de motivo de salto que
+  ya no corresponde. Auditar participation_advanced en vez de stage_skipped.
+  Identificar variante nueva en manifiesto/recibo y guía, sin cambiar hash/conteos
+  base500/50/100/1000, versión inicial2 o final3 del caso.
+- **Contratos preservados:** cuatro admins/casos independientes, barrera común,
+  cuatro mutaciones y auditorías con actor/request ID, límite5s por operación,
+  presupuesto90s, preparación fría y protección local. No restaurar opciones de
+  producto, tocar backend/SQL productivo, relajar tiempos, añadir retries/skips o
+  resetear datos habituales/alojados. Preentrevista preparada no inventa held_at.
+- **Archivos/riesgos/verificación:** prepare-demo-concurrency.sql, manifiesto,
+  demo-performance, acceptance-concurrency y regresión que cruza fixture/comando
+  real con formulario; guía y ledger. Riesgos: fase/versión/evento incoherentes,
+  medición de preparación o fixture parcial. RED→GREEN, cuatro acciones reales
+  y auditoría tras reset propio, tipos/lint/unit/tooling/build y nueva CI completa.
+- **Gates/estado:** requisito técnico derivado de PA2/PA4 y SC-008A/T089; T305.
+  Se conserva alcance/método/budgets; no arquitectura o decisión municipal nueva.
+  Constitución I–VI preservada, sin conflictos críticos/altos; autorización de
+  reparación/AGENTS.md, implementación y revisión humana todavía pendientes.
+- **Resultado local:** regresión nueva RED por preselect ausente en under_review,
+  GREEN con variante posterior a preentrevista;16 pruebas focales y66 tooling,
+  tipos/lint PASS. SC-008A completo PASS3,3min con reset frío, cuatro sesiones,
+  barrera, cada mutación≤5s y verificación de estados/versiones/auditorías/variante.
+  Sin retries/skips o ampliación de presupuestos. El build de producto usado es
+  el que ya pasó en229; no cambia src/migraciones. QA propio54341/3001, sin tocar
+  .env o datos habituales/alojados; next-env ajeno conserva su huella. Corrección
+  local verificada; publicar en el mismo PR92 y acreditar CI nueva por separado.
+
+
 ## EXTRA-122 — Acciones del caso junto a sus datos y fechas de entrevista simples
 
 - **Fecha/origen:** Mateo,02/11/2026, marca la zona derecha de Caso para ubicar

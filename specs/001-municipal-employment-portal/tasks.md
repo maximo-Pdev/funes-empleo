@@ -5,6 +5,13 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T305 PR92-CI-CONCURRENCY-01: alinear preparación SC-008A con opción
+  preselect posterior a preentrevista (EXTRA122), conservar cuatro acciones,
+  barrera,5s/auditorías; regresión fixture/UI y prueba real fría.
+  RED→GREEN,16 focales,66 tooling, tipos/lint y SC-008A completo3,3min PASS;
+  sin presupuestos/retries nuevos o código productivo. Publicación y nueva CI
+  posteriores; no se acredita aceptación humana con la automatización.
+
 - [x] T302 EXTRA122: registrar PA1–PA4/evidencia y plan antes de código; revisar
   contrato SQL de fechas, estados/acciones, foco/anchor y alcance de presentación.
 - [x] T303 Ubicar Caso/Acciones juntos, reducir opciones iniciales y renombrar

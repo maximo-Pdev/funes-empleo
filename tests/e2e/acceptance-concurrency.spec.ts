@@ -30,7 +30,7 @@ test("SC-008A: cuatro admins locales, barrera común, cuatro mutaciones y audito
   let parsed: unknown;
   try { parsed = JSON.parse(measured.stdout); }
   catch { throw new Error("La medición local no devolvió un recibo JSON válido."); }
-  const receipt = parsed as { dataset: string; acceptanceBenchmark: boolean; pass: boolean;
+  const receipt = parsed as { dataset: string; acceptanceBenchmark: boolean; pass: boolean; variant: string;
     concurrentResults: { admin: number; milliseconds: number; startOffset: number; pass: boolean }[] };
   const safeTimings = Array.isArray(receipt?.concurrentResults) ? receipt.concurrentResults
     .filter(r => Number.isInteger(r.admin) && r.admin >= 1 && r.admin <= 4 && Number.isFinite(r.milliseconds))
@@ -38,6 +38,7 @@ test("SC-008A: cuatro admins locales, barrera común, cuatro mutaciones y audito
   expect(measured.status, `Las cuatro acciones deben confirmar éxito visible en hasta cinco segundos cada una (${safeTimings})`).toBe(0);
   expect(receipt.dataset).toBe("acceptance");
   expect(receipt.acceptanceBenchmark).toBe(true);
+  expect(receipt.variant).toBe(fixtures.acceptance.concurrentAdmins.variant);
   expect(receipt.pass).toBe(true);
   expect(receipt.concurrentResults.map(r => r.admin)).toEqual([1, 2, 3, 4]);
   for (const result of receipt.concurrentResults) {
@@ -55,7 +56,8 @@ test("SC-008A: cuatro admins locales, barrera común, cuatro mutaciones y audito
     and exists(select 1 from public.participations where id='${contact}' and status='referred' and version=2)
     and exists(select 1 from public.participations where id='${outcome}' and status='hired' and version=2)
     and exists(select 1 from public.audit_events where entity_id='${opening}' and action='opening_approved' and actor_account_id='${fixtureId("admin", 1)}' and request_id is not null)
-    and exists(select 1 from public.audit_events where entity_id='${preselection}' and action='stage_skipped' and actor_account_id='${fixtureId("admin", 2)}' and request_id is not null)
+    and exists(select 1 from public.preinterviews where participation_id='${preselection}' and scheduled_at is not null and held_at is null and recorded_by='${fixtureId("admin", 2)}')
+    and exists(select 1 from public.audit_events where entity_id='${preselection}' and action='participation_advanced' and actor_account_id='${fixtureId("admin", 2)}' and request_id is not null)
     and exists(select 1 from public.audit_events a join public.contact_events c on c.id=a.entity_id where c.participation_id='${contact}' and a.action='contact_recorded' and a.actor_account_id='${fixtureId("admin", 3)}' and a.request_id is not null)
     and exists(select 1 from public.audit_events where entity_id='${outcome}' and action='outcome_confirmed' and actor_account_id='${fixtureId("admin", 4)}' and request_id is not null))::text;`);
   expect(integrity, "Entidades, versiones, actores individuales y auditorías completas").toBe("true");

@@ -23,9 +23,15 @@ begin
   then raise exception 'DEMO_CONCURRENCY_FIXTURE_GUARD'; end if;
   update public.job_openings set status='pending_review',published_at=null where id=private.fixture_id('opening',80);
   delete from public.referrals where id=private.fixture_id('referral',775) and participation_id=private.fixture_id('participation',775);
-  update public.participations set status='under_review',feedback_due_at=null where id=private.fixture_id('participation',775);
+  -- EXTRA122 keeps preselection after the preinterview, outside the initial menu.
+  -- This preparation is outside the SC-008A clock and preserves case version 2.
+  update public.participations set status='preinterview',feedback_due_at=null where id=private.fixture_id('participation',775);
+  insert into public.preinterviews(id,participation_id,scheduled_at,channel,summary_internal,recommendation,recorded_by)
+  values(private.fixture_id('concurrency-preinterview',775),private.fixture_id('participation',775),
+    clock_timestamp(),'in_person','Preentrevista ficticia preparada antes de la medición SC-008A.',
+    'pending',private.fixture_id('admin',2));
 end $setup$;
-select jsonb_build_object('variant','funes-acceptance-v2-concurrency','opening',80,'preselection',775,'contact',765,'outcome',755,
+select jsonb_build_object('variant','funes-acceptance-v2-concurrency-post-preinterview','opening',80,'preselection',775,'contact',765,'outcome',755,
   'openingVersion',(select version from public.job_openings where id=private.fixture_id('opening',80)),
   'preselectionVersion',(select version from public.participations where id=private.fixture_id('participation',775)),
   'at',clock_timestamp()) as preparation;

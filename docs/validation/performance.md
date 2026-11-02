@@ -1,5 +1,21 @@
 # Rendimiento y aceptación — T089
 
+## Variante vigente de concurrencia — PR92, 02/11/2026
+
+EXTRA122 reduce las acciones de estados iniciales; SC-008A conserva las cuatro
+operaciones y sus límites. La variante actual es
+`funes-acceptance-v2-concurrency-post-preinterview`: después del reset frío, la
+preparación local deja el caso775 en preinterview/version2, sin derivación y con
+preentrevista ficticia programada (held_at null). Todo ello queda fuera del reloj.
+Admin2 guarda la preselección desde esa fase permitida; termina preselected/version3
+y genera participation_advanced, no stage_skipped. El recibo valida la variante.
+
+No se amplían5s por acción,90s del subproceso o el presupuesto de preparación;
+se mantienen cuatro sesiones/casos independientes, barrera común, mutaciones y
+auditorías actor/request ID. El hash del seed y conteos500/50/100/1000 no cambian.
+Las mediciones históricas bajo under_review que siguen debajo conservan validez
+histórica para su variante; no acreditan esta preparación ni aceptación humana.
+
 Estado PC1/EXTRA-017: **datasets separados; aceptación humana y DB/E2E del candidato
 reparado pendientes de CI aislado**. La demo interactiva tiene 10 cuentas (2/4/4),
 4 candidatos, 4 empresas, 8 ofertas y 8 casos; sus checks individuales no prueban
