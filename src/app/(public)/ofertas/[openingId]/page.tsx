@@ -22,7 +22,9 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbS
 import { HomeNavbar } from "@/app/(public)/home-navbar";
 import accountStyles from "@/app/(auth)/account/account.module.css";
 import { getPublicOffer } from "@/features/openings/public-service";
-import { getSiteAccess } from "@/features/accounts/navigation";
+import { getPanelHref, getSiteAccess } from "@/features/accounts/navigation";
+import { listMyParticipations } from "@/features/participations/candidate-service";
+import { getOfferApplicationState, WITHDRAWN_APPLICATION_NOTICE } from "@/features/participations/application-state";
 import { formatPublicClosingDate, publicContractTypeLabel, publicModalityLabel } from "@/features/openings/public-offer-display";
 import { AppError } from "@/lib/errors/public-error";
 
@@ -33,6 +35,20 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
   let offer, access;
   try { [offer, access] = await Promise.all([getPublicOffer(slug), getSiteAccess()]); }
   catch (error) { if (error instanceof AppError && error.code === "NOT_FOUND") notFound(); throw error; }
+  const participationsHref = `/dashboard?section=postulaciones&oferta=${offer.slug}`;
+  let application = { href: `/dashboard?section=ofertas&oferta=${offer.slug}`, label: "Postularme con mi cuenta", message: "" };
+  if (access.panel?.href === getPanelHref("candidate")) {
+    try {
+      const state = getOfferApplicationState(await listMyParticipations(), offer.id);
+      if (state.alreadyApplied) {
+        application = { href: participationsHref, label: "Ver mi postulación", message: "Ya tenés una participación registrada en esta oferta." };
+      } else if (state.previouslyWithdrawn) {
+        application = { ...application, label: "Volver a postularme", message: WITHDRAWN_APPLICATION_NOTICE };
+      }
+    } catch {
+      application = { href: participationsHref, label: "Revisar mis postulaciones", message: "No pudimos comprobar tu postulación. Revisá tus postulaciones antes de volver a enviar." };
+    }
+  }
   const conditions = [
     { label: "Ubicación", value: offer.location, icon: MapPin },
     { label: "Modalidad", value: publicModalityLabel(offer.modality), icon: BriefcaseBusiness },
@@ -145,8 +161,9 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
         </div>
 
         <div className="mt-8 border-t border-border pt-8">
-          <LinkButton href={`/dashboard?section=ofertas&oferta=${offer.slug}`} className="gap-2">
-            Postularme con mi cuenta
+          {application.message && <p className="mb-4 max-w-prose text-sm leading-7 text-muted-foreground">{application.message}</p>}
+          <LinkButton href={application.href} className="gap-2">
+            {application.label}
             <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
           </LinkButton>
         </div>

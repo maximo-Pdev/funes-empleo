@@ -66,7 +66,6 @@ try {
     await pages[1].goto(`/admin/participations/${id("participation",fixture.preselectionParticipation)}`);
     await pages[1].waitForLoadState("networkidle");
     await pages[1].getByLabel("Acción",{exact:true}).selectOption("preselect");
-    await pages[1].getByLabel(/^Motivo interno/).fill("Prueba ficticia concurrente: omisión justificada de preentrevista");
     await pages[2].goto(`/admin/participations/${id("participation",fixture.contactParticipation)}`);
     await pages[2].waitForLoadState("networkidle");
     await pages[2].getByLabel(/^Fecha y hora \(Funes\)/).fill("2026-09-29T12:00");

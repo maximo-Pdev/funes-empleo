@@ -1,5 +1,29 @@
 # Municipal visual reference
 
+## EXTRA122 — Acciones del caso y fecha visible única
+
+Seguimiento administrativo presenta Caso y Acciones sobre la participación en
+dos columnas iguales desde1024px, con layout compartido y alturas naturales;
+apiladas Caso→Acciones en móvil. El ID case-actions conserva foco/enlace de guía.
+received/under_review muestran Registrar preentrevista, Derivar a la empresa y
+Cancelar solo este caso; las fases posteriores conservan sus opciones. No se
+eliminan motivos/evidencias o permisos de servidor al simplificar la presentación.
+Preentrevista e entrevista empresarial muestran solo Fecha programada requerida;
+no input Fecha realizada ni timestamp implícito. Mantener calendario nativo,
+hora Funes, mensajes/foco/retención y datos históricos de entrevistas existentes.
+
+## EXTRA121 — Entrada coherente a postulaciones
+
+En el detalle público, la sesión candidata ve «Ver mi postulación» si tiene un
+caso no retirado; «Volver a postularme» y aviso de historial si solo tiene retiros;
+sin historial conserva «Postularme con mi cuenta». El aviso de retiro aparece
+también en el formulario elegido/listado y se oculta tras registrar el nuevo
+intento. No prometer aptitud: el aviso condiciona el envío a perfil/oferta
+habilitados. Consulta fallida ofrece revisar postulaciones sin exponer detalles.
+Conservar LinkButton/Button/Form/FileInput compartidos, textos legibles, orden
+natural y foco; no introducir paleta, componente o formulario alternativos.
+Solo se adapta ese CTA del contrato de PR91 por pedido posterior de Mateo.
+
 
 ## Current integration authority — EXTRA-120
 

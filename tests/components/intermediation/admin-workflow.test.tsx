@@ -71,19 +71,10 @@ describe("intermediación administrativa", () => {
     expect(form.querySelector('[name="locality"]')).toHaveProperty("required", false);
   });
 
-  it("no permite omitir una etapa sin motivo ni convierte la derivación en un salto implícito", () => {
-    const submit = vi.fn();
-    render(<ParticipationActionForm participationId="case-1" version={4} status="under_review" onSubmit={submit} />);
-    fireEvent.change(screen.getByLabelText("Acción"), { target: { value: "skip_to_preselected" } });
-    fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
-    expect(submit).not.toHaveBeenCalled();
-    expect(screen.getByRole("textbox", { name: /^Motivo interno/ }).getAttribute("aria-invalid")).toBe("true");
-    fireEvent.change(screen.getByRole("textbox", { name: /^Motivo interno/ }), { target: { value: "Evaluación documentada." } });
-    fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
-    expect(submit).toHaveBeenCalledWith(expect.objectContaining({
-      participationId: "case-1", command: "skip_to_preselected", reason: "Evaluación documentada.",
-    }));
-    expect(screen.getByText(/derivación requiere una decisión explícita/i)).toBeTruthy();
+  it.each(["received", "under_review"] as const)("muestra solo las tres decisiones iniciales en %s", status => {
+    render(<ParticipationActionForm participationId="case-1" version={4} status={status} onSubmit={vi.fn()} />);
+    expect(screen.getAllByRole("option").filter(option => (option as HTMLOptionElement).value).map(option => option.textContent))
+      .toEqual(["Registrar preentrevista", "Derivar a la empresa", "Cancelar solo este caso"]);
   });
 
   it("exige motivo si una derivación directa omite etapas", () => {
@@ -177,12 +168,14 @@ describe("intermediación administrativa", () => {
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
     expect(screen.getByLabelText("Canal de preentrevista").getAttribute("aria-invalid")).toBe("true");
     expect(screen.getByRole("textbox", { name: "Resumen interno" }).getAttribute("aria-invalid")).toBe("true");
-    expect(screen.getByLabelText("Fecha realizada").getAttribute("aria-invalid")).toBe("true");
+    expect(screen.queryByLabelText("Fecha realizada")).toBeNull();
+    expect(screen.getByLabelText("Fecha programada").getAttribute("aria-invalid")).toBe("true");
     fireEvent.change(screen.getByLabelText("Canal de preentrevista"), { target: { value: "phone" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Resumen interno" }), { target: { value: "Llamada ficticia" } });
-    fireEvent.change(screen.getByLabelText("Fecha realizada"), { target: { value: "2026-09-23T15:00" } });
+    fireEvent.change(screen.getByLabelText("Fecha programada"), { target: { value: "2026-09-23T15:00" } });
     fireEvent.click(screen.getByRole("button", { name: "Registrar acción" }));
-    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ command: "record_preinterview", channel: "phone", summary: "Llamada ficticia" }));
+    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ command: "record_preinterview", channel: "phone", summary: "Llamada ficticia", scheduledAtLocal: "2026-09-23T15:00" }));
+    expect(submit.mock.calls[0]![0]).not.toHaveProperty("heldAtLocal");
   });
 
   it("muestra un conflicto de versión sin filtrar detalles del servidor", async () => {

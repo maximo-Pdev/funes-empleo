@@ -1,5 +1,53 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA122 — Composición superior del caso y fecha única visible
+
+Reutilizar detail-layout.grid/cell/notice para fila superior de Caso y Acciones;
+dos columnas desde1024px, apilado natural móvil y mismo anchor case-actions.
+El resto del detalle conserva orden y contratos. El formulario terminal sigue
+mostrando su mensaje en la celda de acciones, sin tarjeta vacía inventada.
+
+Limitar catálogo de opciones UI received/under_review a record_preinterview y
+refer, más cancel_individual; no agregar withdraw_on_request en esos dos estados.
+Conservar comandos tipados/servidor para compatibilidad y estados posteriores;
+refer se etiqueta Derivar a la empresa en todos sus estados. Motivo de salto y
+cancelación, autorización y efectos de cada comando no cambian.
+
+Quitar estado/control heldAtLocal de ParticipationActionForm y heldAt del
+InterviewForm. Fecha programada requerida con validación compartida/foco/errores;
+enviar scheduledAtLocal o scheduledAt actuales, nunca sintetizar heldAt.
+Backend y datos históricos siguen admitiendo ambos campos opcionales. No esquema,
+RPC, paquete o permisos nuevos. Revertir solo composición/controles para recuperar
+la vista anterior sin tocar entrevistas o auditoría.
+
+Verificar opciones iniciales/posteriores/finales, payload sin fecha realizada,
+conversión Funes, errores y retención; tests de páginas y mediciones reales de
+fila superior PC y apilado móvil, guardas de empresa/admin, tipos/lint/unit/build.
+
+## EXTRA121 — Estado compartido de la entrada a postulaciones
+
+AP1–AP4 implementan presentación coherente sobre el modelo/RPC existentes de
+EXTRA102 «Fechas y nueva postulación». Helper puro por opening_id determina
+bloqueo por cualquier estado distinto de withdrawn, existencia de retiros y key
+de remount ordenada por IDs/estados de intentos. Reutilizarlo en ofertas del
+candidato y detalle público. No inferir elegibilidad completa con ese helper.
+
+El detalle consulta listMyParticipations solo cuando getSiteAccess devuelve el
+panel candidato verificado (comparar getPanelHref); el servicio vuelve a exigir
+cuenta candidata activa. No usar metadata editable o parámetros del navegador
+para decidir la lectura. Consulta fallida: mensaje seguro y enlace a postulaciones,
+sin afirmar que puede postular. No añadir cache compartida de datos privados.
+
+CandidateApplyForm recibe indicador de retiro previo; aviso solo antes de un
+nuevo envío, conservando props/campos actuales, límite/formatos de CV, fetch,
+validación, refresh y key por intento. Detail reutiliza LinkButton, formulario
+reutiliza Button/Form/FileInput. Sin dependencias, schema, RPC o migración nuevos.
+Recuperación: revertir presentación/helper sin modificar intentos o permisos.
+
+Verificar helper, ambas páginas y estados/roles/errores; navegador aislado con
+retiro y dos nuevos casos distintos, CV/auditoría anteriores intactos, concurrencia
+y SQL075 existentes. Tipos/lint/unit/tooling/build, móvil/PC y acceso por teclado.
+
 
 ## Current integration authority — EXTRA-120
 

@@ -82,7 +82,7 @@
     },
     "concurrentAdmins": {
       "administrators": 4,
-      "variant": "funes-acceptance-v2-concurrency",
+      "variant": "funes-acceptance-v2-concurrency-post-preinterview",
       "preparation": "tests/fixtures/prepare-demo-concurrency.sql",
       "openingNumber": 80,
       "preselectionParticipation": 775,

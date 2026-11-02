@@ -5,6 +5,7 @@ import type { PublicOffer } from "@/features/openings/public-service";
 const mocks = vi.hoisted(() => ({ session: vi.fn(), pathname: "/ofertas" }));
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: mocks.session }));
+vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: vi.fn(async () => []) }));
 vi.mock("@/lib/auth/guards", () => ({ requireActiveAccount: vi.fn(async () => ({})) }));
 vi.mock("next/navigation", () => ({ usePathname: () => mocks.pathname, notFound: vi.fn() }));
 vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: vi.fn() }));
