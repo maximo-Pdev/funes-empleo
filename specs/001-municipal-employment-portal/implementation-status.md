@@ -1,5 +1,20 @@
 # Estado de implementación — 2026-09-22
 
+## EXTRA123 — Preparación de entrega del curso, 02/11/2026
+
+README actualizado con enlaces, tecnologías, arranque/configuración local y
+gates seguros. course-delivery.md reúne usuarios proporcionados por Mateo
+(postulante1, empresa1 y admin1 @prueba.com), entrega privada de contraseñas por
+identidad y recorrido de tres roles. No se consultaron contraseñas ni se cambió
+Auth/DB/scripts. Los fixtures @example.invalid permanecen separados.
+Inicio/ofertas/GitHub HTTP200; login, SHA desplegado, entrega privada, PR/merge
+y validaciones humanas pendientes. No se cierran T096/T097 por estos enlaces.
+T306 documenta verificación local de esta tarea; sin nueva migración.
+28 enlaces locales, versiones/scripts y tres HTTP200 PASS; tipos/lint,
+66 tooling,1695 pruebas/142 archivos y build limpio QA PASS. EXTRA123 conserva
+fallos ambientales previos (temporales Vitest/caché Turbopack) y recuperación
+sin alterar pruebas/código. Sin nueva ejecución DB/E2E por alcance documental.
+
 ## PR92 — Preparación de concurrencia tras EXTRA122 — 02/11/2026
 
 Quality229 en0a8742d pasa database1533 SQL, tipos/lint/tooling/unit/build y156 E2E;

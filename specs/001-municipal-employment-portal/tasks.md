@@ -5,6 +5,16 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T306 EXTRA123: actualizar README de entrega, tecnologías/instrucciones,
+  enlaces canónicos, usuarios proporcionados por Mateo y procedimiento privado
+  por identidad; guía de evaluación y distinción demo alojada/fixture local.
+  Verificar documentos/enlaces, tipos/lint/unit/tooling/build; no inferir login,
+  SHA desplegado, aceptación humana ni cierre T096/T097.
+  28 enlaces locales/3 HTTP200, stack/scripts y diff sin secretos PASS;
+  tipos/lint,66 tooling,1695 pruebas/142 archivos y build limpio QA PASS.
+  Fallos ambientales/recuperación en EXTRA123; login alojado/entrega de acceso
+  y PR/merge pendientes, no forman evidencia de aceptación humana.
+
 - [x] T305 PR92-CI-CONCURRENCY-01: alinear preparación SC-008A con opción
   preselect posterior a preentrevista (EXTRA122), conservar cuatro acciones,
   barrera,5s/auditorías; regresión fixture/UI y prueba real fría.

@@ -1,5 +1,16 @@
 # Credenciales de prueba: una contraseña privada por identidad
 
+## Cuentas de entrega del curso — 02/11/2026
+
+Mateo identificó `postulante1@prueba.com`, `empresa1@prueba.com` y
+`admin1@prueba.com` para la entrega. Consultar [la guía](course-delivery.md)
+para roles, validaciones pendientes y entrega privada individual de contraseñas.
+Este inventario no prueba sus logins. No son las identidades de los scripts
+siguientes: no cambiar el resolver ni usar contraseñas locales como fallback
+alojado. Esta tarea no creó ni rotó usuarios.
+
+## Identidades técnicas de fixtures y scripts
+
 La demo interactiva usa **10 identidades ficticias: 2 admin, 4 candidate y 4 company**.
 Cada identidad alojada conserva su contraseña única existente. Los scripts no rotan
 contraseñas, no leen `.env`, no consultan la bóveda y no usan fallback por rol.

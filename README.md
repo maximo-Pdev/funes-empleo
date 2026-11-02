@@ -1,67 +1,154 @@
 # Portal Municipal de Empleo de Funes
 
-MVP de intermediación: la Oficina modera ofertas, preselecciona y deriva candidatos.
-No es un padrón público ni un mercado de contacto directo.
+MVP de intermediación laboral: la Oficina de Empleo modera ofertas, evalúa
+postulaciones y decide qué candidatos deriva a las empresas. Las empresas no
+pueden consultar el padrón de candidatos.
 
-## Estado y límites
+## Entrega del curso
 
-Al 2026-10-06, existe implementación de fases 1–8 y controles parciales de fase 9;
-convergencia y aceptación no completas: 91/97 tareas marcadas, T069/T087/T089/T092/
-T096/T097 abiertas. La constitución 1.0.0 está ratificada; spec conserva `Draft`,
-pendiente de reconciliación de evidencia por su propietario. Solo datos ficticios. La importación usa
-`demo-candidates-v1`, no el Excel municipal. Producción, catálogo oficial, consentimiento
-y otras aprobaciones siguen bloqueados: [gates](docs/validation/release-gates.md).
-Las pruebas automatizadas no sustituyen aceptación humana ni revisión del compañero.
-[Estado vigente](specs/001-municipal-employment-portal/implementation-status.md):
-snapshot local main/origin `523ee4a` con PR #33–39 integradas; steps 1–3 son commits
-locales sin push/merge. Evidencia local final en [calidad](docs/validation/quality-gates.md)
-y [accesibilidad](docs/validation/accessibility.md); este handoff documental no repite gates.
+- **Aplicación Vercel:** [funes-empleo.vercel.app](https://funes-empleo.vercel.app/).
+- **GitHub:** [maximo-Pdev/funes-empleo](https://github.com/maximo-Pdev/funes-empleo).
+- **Recorrido y controles de entrega:** [guía de evaluación](docs/operations/course-delivery.md).
+
+| Rol | Usuario de demostración | Panel después de ingresar |
+| --- | --- | --- |
+| Postulante | `postulante1@prueba.com` | `/dashboard` |
+| Empresa | `empresa1@prueba.com` | `/empresa` |
+| Municipalidad | `admin1@prueba.com` | `/admin` |
+
+Las contraseñas de demostración se entregan **por un canal privado al evaluador**;
+no están en Git ni se deben reutilizar contraseñas personales. Cada administrador
+debe tener una identidad individual: no repartir la misma cuenta municipal a
+varios evaluadores simultáneamente. El acceso autenticado debe comprobarse antes
+de la entrega; esta actualización documental no prueba los logins.
+
+El portal es una **demostración con datos ficticios**, sin habilitar operación
+municipal con datos reales. Inicio, catálogo y repositorio respondieron HTTP 200
+el 02/11/2026; eso no acredita el commit desplegado ni los recorridos privados.
+Ver [estado de implementación](specs/001-municipal-employment-portal/implementation-status.md)
+y [validaciones pendientes](docs/validation/release-gates.md).
+
+## Tecnologías
+
+Versiones declaradas en [package.json](package.json), con resolución fijada en
+[package-lock.json](package-lock.json):
+
+| Área | Tecnología |
+| --- | --- |
+| Aplicación y servidor | Next.js 16.3.8, React 19.3.0, TypeScript 6.0.3 |
+| Interfaz | Tailwind CSS 4.3.3, shadcn/ui con Base UI 1.9.0, Lucide |
+| Entorno | Node.js 24.22.0 LTS y npm 11.19.1 |
+| Datos, acceso y archivos privados | Supabase: PostgreSQL, Auth y Storage; supabase-js 2.116.0 y SSR 0.12.7 |
+| Validación y documentos | Zod, Sharp, PDFKit y write-excel-file |
+| Pruebas | Vitest, Testing Library, Playwright, axe y pgTAP |
+| Colaboración y publicación | Git, GitHub Actions y Vercel |
+
+## Funciones principales
+
+- Postulantes: perfil, categorías laborales, consentimiento, disponibilidad, CV,
+  postulaciones, seguimiento y notificaciones.
+- Empresas: perfil, ofertas sujetas a moderación, candidatos derivados a sus
+  propias ofertas, entrevistas, informes de resultados y notificaciones.
+- Municipalidad: padrón y atención presencial, empresas, moderación de ofertas,
+  participaciones, preentrevistas, derivaciones, confirmación de resultados,
+  cursos, historial, notas internas, importación controlada y métricas con
+  exportación CSV, PDF y Excel.
+
+Solo una derivación municipal con permiso vigente habilita el perfil, contactos,
+foto y CV autorizados para la empresa correspondiente. Al terminar el permiso,
+puede conservar únicamente el nombre para identificar su derivación y comunicar
+resultados, según las reglas aprobadas.
 
 ## Desarrollo local
 
-Node **24.22.0**, npm **11.19.1**, Git y Docker Desktop activo. Supabase CLI es dependencia
-local; no instalar otro gestor. Ver [quickstart](specs/001-municipal-employment-portal/quickstart.md).
+Requisitos: Git, Node.js **24.22.0**, npm **11.19.1** y Docker Desktop activo.
+La CLI de Supabase ya es dependencia local; no hace falta instalarla globalmente
+ni ejecutar `supabase init` en este repositorio.
 
 ```powershell
+git clone https://github.com/maximo-Pdev/funes-empleo.git
+Set-Location funes-empleo
 npm ci
 npx supabase start
-node tests/fixtures/reset-local.mjs --confirm-local-reset
-# Solo si no existe .env.local; nunca sobrescribirlo.
+# Crear solo si no existe; no sobrescribir una configuración previa.
 if (!(Test-Path .env.local)) { Copy-Item .env.example .env.local }
+```
+
+Completar `.env.local` **privadamente** con la configuración de Supabase local.
+Consultar `npx supabase status` en la terminal local sin copiar su salida a Git,
+capturas, chat o informes. La configuración requerida es:
+
+| Variable | Valor o finalidad local |
+| --- | --- |
+| `APP_ENV` | `local` |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `http://127.0.0.1:54321` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave publicable del servicio **local**; nunca service-role/secret |
+| `CONSENT_POLICY_VERSION` | `demo-not-approved`, texto ficticio sin aprobación jurídica |
+
+Las demás variables y sus límites están en [.env.example](.env.example) y en el
+[manual de operación](docs/operations/demo-runbook.md). El arranque normal no
+requiere `SUPABASE_SECRET_KEY` ni contraseñas `DEMO_*` en el navegador.
+
+Para cargar un CV se admiten PDF, JPG/JPEG y PNG, hasta **5 MiB** por archivo.
+Las imágenes se normalizan a PDF privado. No se admiten WebP ni videos.
+
+```powershell
 npm run dev
 ```
 
-Completar `.env.local` privadamente con valores de Supabase **local**, sin pegarlos al chat.
-Abrir `http://localhost:3000`. Las cuentas y datos del seed son ficticios; nunca
-reutilizar sus contraseñas en un entorno con personas reales. El reset destruye solo
-datos locales de prueba y valida 500 candidatos/50 empresas/100 ofertas/1.000 casos.
+Abrir [localhost:3000](http://localhost:3000). Para ejecutar el build local:
 
-## Calidad
+```powershell
+npm run build
+npm run start
+```
+
+El seed interactivo local tiene **2 administradores, 4 postulantes y 4 empresas**
+ficticios. Usa identidades `@example.invalid`, distintas de las cuentas alojadas
+de la tabla de entrega. La preparación de CV de prueba y el reset protegido se
+explican en el [manual](docs/operations/demo-runbook.md#preparación-local-y-controles).
+No ejecutar un reset sobre el servicio compartido de otro desarrollador.
+
+## Verificaciones
 
 ```powershell
 npm run typecheck
 npm run lint
+npm run test:tooling
 npm run test:unit
-npm run test:db
 npm run build
-# Cargar blobs y validar fixture antes de E2E; test:db no carga archivos de Storage.
-node tests/fixtures/reset-local.mjs --confirm-local-reset
+```
+
+Los gates siguientes **reinician los datos** y requieren Supabase local de
+propiedad exclusiva o CI aislado. No ejecutarlos contra datos de trabajo ni
+proyectos alojados. Revisar primero [preparación, variables y autorización local](docs/operations/demo-runbook.md#preparación-local-y-controles):
+
+```powershell
+npm run test:db
 npm run test:e2e -- --workers=1
 ```
 
-Los E2E necesitan variables locales cargadas en el proceso, URL `127.0.0.1:54321`
-y build. `metrics-fixture` se ejecuta primero; luego `quality-boundaries` y los
-recorridos que mutan datos. No repetir contra el fixture alterado sin restablecerlo.
-Recuperación requiere además `LOCAL_MAILPIT_URL`; una omisión no acredita cobertura.
+Estos gates usan el dataset TEST-ONLY de **4 administradores / 500 candidatos /
+50 empresas / 100 ofertas / 1.000 participaciones**. El gate E2E carga además los
+CV ficticios y exige todos los recorridos sin omisiones. No confundirlo con el
+seed interactivo ni copiarlo al servidor. El reset alojado permanece bloqueado.
 
-## Operación y revisión
+## Documentación y límites
 
-- [Manual local/preview/demo y recuperación](docs/operations/demo-runbook.md).
+- [Inicio rápido](specs/001-municipal-employment-portal/quickstart.md) y
+  [manual local/preview/demo y recuperación](docs/operations/demo-runbook.md).
+- [Acceso privado y separación de credenciales](docs/operations/demo-credentials.md).
 - [Calidad](docs/validation/quality-gates.md), [autorización](docs/validation/authorization.md),
-  [auditoría](docs/validation/audit-matrix.md), [accesibilidad](docs/validation/accessibility.md).
-- [Aceptación y rendimiento](docs/validation/performance.md),
-  [resultados quickstart](docs/validation/quickstart-results.md), [revisión final](docs/validation/final-review.md).
+  [auditoría](docs/validation/audit-matrix.md), [accesibilidad](docs/validation/accessibility.md)
+  y [revisión final](docs/validation/final-review.md).
 
-Rama dedicada, PR y revisión del segundo desarrollador; nunca implementar en `main`.
-Leer `AGENTS.md` y artefactos aprobados antes de cambiar producto. Registrar extras
-necesarios en `cambios-extra.md`; no cerrar decisiones municipales por inferencia.
+La importación usa el mapeo sintético `demo-candidates-v1`, no el Excel municipal.
+SMTP, validaciones humanas y decisiones municipales pendientes deben revisarse
+en los gates; no asumir que un registro nuevo o la recuperación por correo
+funcionan para cualquier destinatario. No cargar datos reales, CV reales,
+contraseñas personales ni claves de Supabase/Vercel en la demostración.
+
+Trabajar en ramas enfocadas y presentar PR; nunca implementar directamente en
+`main`. Leer [AGENTS.md](AGENTS.md) y los artefactos aprobados antes de cambiar el
+producto. Registrar agregados necesarios en [cambios-extra.md](cambios-extra.md).
