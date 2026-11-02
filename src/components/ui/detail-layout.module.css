@@ -1,0 +1,64 @@
+.grid {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.cell {
+  display: grid;
+  min-width: 0;
+}
+
+/* Let the panel stretch, while keeping its fields at their natural height. */
+.cell > :only-child {
+  min-width: 0;
+  margin-block: 0;
+  align-content: start;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.grid > section[data-detail-cell],
+.cell:not(.surface) > :is(form, section) {
+  padding: 24px;
+}
+
+.surface,
+.notice > p {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fieldPairs > form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fieldPairs > form > * {
+    grid-column: 1 / -1;
+  }
+
+  .fieldPairs > form > [data-form-field]:has([name="name"], [name="dni"], [name="phone"], [name="email"], [name="detail"], [name="address"]) {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 639px) {
+  .surface,
+  .notice > p,
+  .grid > section[data-detail-cell],
+  .cell:not(.surface) > :is(form, section) {
+    padding: 20px;
+  }
+}

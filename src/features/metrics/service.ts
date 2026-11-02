@@ -27,8 +27,10 @@ export async function getMetrics(input: unknown, exporting = false) {
 }
 export async function metricsCategories() {
   const { client } = await metricsSession();
-  // Inactive categories remain selectable for historical queries.
-  const result = await client.from("job_categories").select("id,name,code,version").order("name");
+  // Preserve historical filters except the explicitly retired synthetic A/B v1.
+  const result = await client.from("job_categories").select("id,name,code,version,active").order("name");
   if (result.error) throw new AppError("INTERNAL_ERROR");
-  return result.data;
+  return (result.data ?? [])
+    .filter(category => !(category.active === false && category.version === 1 && (category.code === "DEMO-A" || category.code === "DEMO-B")))
+    .map(({ id, name, code, version }) => ({ id, name, code, version }));
 }

@@ -1,5 +1,29 @@
 # Municipal visual reference
 
+## Current integration authority — EXTRA-120
+
+Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.
+
+| Surface | Current contract |
+| --- | --- |
+| Home, every role | Keep the animated Hero and institutional introduction. Guests retain the existing login/registration, role guides, draft isolation and lifecycle notices unchanged. Active sessions keep the right card with a brief welcome/status, primary verified role-panel link, Ver ofertas and secondary existing logout action; omit login/registration tabs/forms and anonymous closing registration entrances. Keep PR89's gray active-state treatment. Active registration/access queries cannot reopen forms or replace the session. |
+| Shared navigation | Reuse actual HomeNavbar on normal public, auth/legal and dashboard pages. Guests: Inicio, Ofertas, Ingresar; active sessions: Inicio, Ofertas, notifications and Mi cuenta. Resolve all panel links from the same verified `getSiteAccess().panel`: candidate `/dashboard`, company `/empresa`, administrator `/admin`. No guessed roles, private notification reads for guests or navigation-based authorization. Preserve Home desktop scroll/reveal/timers, mobile visibility, fixed-header clearance and inner-page visibility. Ingresar uses `#contenido` on Home and `/#contenido` elsewhere, with main focus. Minimal technical fallbacks remain separate. |
+| Public catalog | Remove both help/accompaniment cards and duplicate header/profile shortcut. Use the full content area, retained GET filters, shared numeric pagination for every page with current-page semantics and wrapping, and centralized decorative category icons with readable text/neutral unknown fallback. Native select text, IDs, validation and FormData stay unchanged. |
+| Public detail | Use the actual shared navbar and existing white `candidateCanvas`/`sectionContent` canvas capped at 1280px on static green, without sidebar/junction. Breadcrumbs are Inicio / Ofertas / current title using adapted base-nova primitives. Retain every condition, task, requirement and optional salary/benefit, closing date once, then one unchanged final application link and slug. Remove both entire opportunity/accompaniment cards. Do not replace that application link with role-panel or registration CTAs; panel access belongs in the navbar and destination guards remain authoritative. Use LinkButton JSX, never call client `buttonVariants` from a server page. |
+| Compatible main layout | Retain public catalog/courses/wide Home section expansion to 1800px from 1440px and private usable-width layouts, card/row symmetry, natural mobile heights, stable DOM order and complete actions. Detail's explicit 1280px cap is the exception; removed asides cannot justify empty pairing cards or an aside-dependent grid. Retain narrow-navbar spacing, touch targets and sidebar footer/scroll access. |
+| Collections and retirement | Retain main's 10-record pages, initial five history/note records with access to all remaining records, selected/hash reveal, stable order/focus/counters, complete aggregate/export/option scope and unchanged privacy. Retain EXTRA-119's private append-only backup, atomic retirement/recovery, active-selector and metrics behavior, no automatic equivalence or history loss. This integration authorizes no migration execution or reset. |
+
+### Evidence and precedence
+
+The branch paragraphs below are preserved verbatim as provenance wherever possible. Any older header/sidebar/account-section target, role-override application CTA, active registration-tab instruction, uniform private-canvas cap or authenticated no-Hero requirement is **historical and superseded only for the scope in the table above**. Compatible requirements and all existing consent, referral, CV/photo, notification, hiring-window, audit and retirement restrictions remain effective; presentation is not authorization. EXTRA106/108 rollback is limited to its originating Home/login experiment, not independently approved features.
+
+Historical verification and approval paragraphs retain their original qualifications; they do not prove this integrated tree, current CI, PR review, product acceptance or municipal/legal approval. Integrated source/browser/non-reset gates and exact-head GitHub application/database checks remain **PENDING**, owned by the parent. This documentation unit runs structural checks only and changes no source, tests, schema, credentials, local records or remote state.
+
+See the title/branch disambiguation table in `cambios-extra.md` under EXTRA-120; bare EXTRA112–116 references are not globally unique.
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+
 ## EXTRA-116 — Session-consistent navbar
 
 This explicit revision supersedes earlier public-catalog guidance that omitted
@@ -21,8 +45,104 @@ and a centered secondary Cerrar sesión button below it, with a decorative LogOu
 icon. Reuse the shared Form, base-nova Button and existing logoutAction unchanged.
 The shortcut is absent from anonymous login and both registration modes.
 
+> Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+
+> **Historical main decision — superseded by EXTRA-120.** Keep the following approval, intent and verification evidence verbatim; do not implement its no-Hero composition.
+
+## EXTRA118 — Primer bloque del inicio por sesión
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+Home con panel activo verificado comienza en Ofertas disponibles: sin hero,
+formulario o tarjeta de sesión iniciada. Navbar visible desde arriba y espacio64px
+para no cubrir el único h1. Sección inicial usa el alto restante del viewport;
+sin scroll automático ni hueco del hero. Visitantes conservan presentación/acceso/
+registro existentes. Esta solicitud actual sustituye el hero activo antes retenido.
+El título de cada oferta del carrusel es h2 cuando la sección es h1, y h3 cuando
+la sección anónima es h2. Conservar la apariencia y evitar saltos de encabezados.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+PR89 conserva la tarjeta reutilizable con mensaje gris y sin pestañas al montarla
+autenticada; ese contrato no implica mostrarla en Home, donde EXTRA118 omite todo
+el hero. Probar la ruta y el componente independiente sin mezclar expectativas.
+
+## EXTRA117 — Altura del menú lateral
+
+En escritorio, el contenido del menú se desplaza dentro del espacio disponible
+entre navbar y pie; el pie de Cerrar sesión/identidad no se comprime ni tapa Cuenta.
+Conservar foco y acceso a todos los enlaces por teclado. En móvil el menú mantiene
+altura natural y su colapso existente, sin recortar opciones.
+
+## EXTRA116 — Colecciones visibles
+
+Perfiles/ofertas/empresas y otros listados de registros: diez por página.
+Historiales/notas: cinco inicialmente, con Mostrar más o paginación; conservar
+moderación/cuenta-perfil ya implementados. Indicar cantidad mostrada y acceso al
+resto, sin truncar auditoría. Mantener filtros GET, simetría115 y acciones existentes.
+Mostrar el registro de un hash/derivación seleccionada fuera del bloque inicial;
+foco/anuncio al navegar. No recortar catálogos de opciones, conteos o exportaciones.
+
+## EXTRA115 — Simetría también en detalles
+
+Las tarjetas pares de un detalle comparten inicio/final de fila y columnas iguales,
+aunque tengan distinta función. Usar grilla plana por filas, no dos pilas verticales
+independientes. Avisos generales y bloques sin par ocupan fila completa. Campos y
+texto mantienen su tamaño; alto según contenido natural, nunca viewport. En móvil,
+apilar por filas y orden DOM. Preservar Perfil/CV antes de notas y participaciones.
+Esto acota la exclusión de funciones distintas de114: no justifica detalles torcidos.
+Solo navegación lateral/lector y formularios únicos tienen proporción deliberada;
+inventariar y comprobar cada excepción, sin agregar tarjetas vacías para emparejar.
+
+## EXTRA114 — Simetría por grupo y fila
+
+Listas de tarjetas comparables alinean encabezado/contenido/cierre, además de sus
+bordes. Usar layout CSS opt-in/subgrid con fallback flex; Card y controles actuales
+se conservan. Sin recortar títulos, alturas fijas de viewport o igualdad forzada
+entre filas diferentes. Móvil en una columna mantiene altura natural. No igualar
+artificialmente un formulario con una tarjeta de función distinta. Resumen de
+empresa usa dos columnas iguales; dashboard alinea metadatos al pie.
+
+## EXTRA113 — Distribución en escritorio
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+Paneles privados usan el ancho útil después de sidebar/márgenes; no limitar todo
+el canvas a1280 si queda espacio libre. Máximo público compartido1280,1800 desde
+1440px para ofertas, cursos y secciones amplias de Home. Párrafos siguen en ch;
+formularios cortos y textos legales mantienen límites intencionales de lectura.
+Listas privadas de tarjetas: tres columnas desde1600 y cuatro desde2200, con
+misma secuencia DOM y acciones; catálogo público hasta tres por su aside. No
+estirar alturas, fuentes o campos ni rellenar vacíos con contenido artificial.
+Móvil/controles/reglas intactos; medir espacio útil, solapamientos y overflow.
+
+El espaciado estrecho de navbar112 pasa a home.module.css para todos sus usos:
+bajo359px, padding10, gap marca/enlaces8, marca sin compresión y gap interno6.
+Sustituye el duplicado local de ofertas; acciones/timing/mínimos táctiles intactos.
+
+## EXTRA112 — Catálogo y detalle públicos
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+/ofertas y /ofertas/{slug} reutilizan HomeNavbar siempre visible, acceso al panel
+verificado y campana solo en sesión activa. Evitar otra marca o header local.
+Un mismo contenedor servidor/CSS local presenta lienzo blanco sobre verde con
+espaciado de navbar64px, encabezado Sora compacto y cuerpo Be Vietnam. Usar tokens
+y controles existentes; sin reglas globales o cambios al inicio. Tarjetas parejas,
+campos completos, aside a88px en desktop y apilado móvil. Mantener GET y mensajes,
+foco y enlaces semánticos. Detalle: postular para candidato/visitante, registro solo
+sin sesión; empresa/admin reciben su propio panel. Sin cambio de permisos.
+
+Bajo359px, reducir espacios solo dentro del contenedor de ofertas, sin modificar
+la navbar global ni ocultar accesos. Conservar al menos8px reales entre marca e
+Inicio: comprobar geometría/captura además de axe y scrollWidth. Los enlaces de
+acción reutilizan LinkButton; no llamar su utilidad de variantes cliente desde RSC.
+
 
 ## PR86 documentation integration — current scope and historical evidence
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
 
 PR86 adds only session-aware public-offer presentation: `/ofertas` reads
 `getSiteAccess` once per request and reuses the verified `panel.href` and
@@ -642,9 +762,38 @@ empty feedback collapsed without an icon. Static help and standalone forms retai
 their existing appearance. Registration's conditional verification notice is
 informational, not proof that an account or verification email was created.
 
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
 Resolve the active-session projection once on the server for both navbar and
 access panel. In login mode show “Ya tenés la sesión iniciada” instead of the
 form/recovery link when active; keep both registration roles enabled. The login
+service must check the authoritative session before provider sign-in, returning
+the same safe feedback without sign-in, sign-out, redirect or revalidation when
+already active. Keep anonymous login and suspension cleanup intact.
+Below the active-session message, show a green role-specific panel link:
+“Ir al panel de usuario” for candidates, “Ir al panel de empresa” for companies,
+and “Ir al panel de administración” for administrators. Resolve its label from
+the same verified session projection as its existing destination, never from the
+registration role selector. Keep its
+`Accesos principales` navigation landmark inside the access card, not in the
+left introduction. Hide this card shortcut in registration modes and for anonymous
+visitors. Public offers/detail pages retain their existing profile entries.
+
+> Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+Resolve the active-session projection once on the server. EXTRA118 omits the
+entire hero on authenticated Home; the following PR89 contract applies when the
+reusable access panel is mounted independently. With an active session, omit the
+entire access-options tab group
+and show “Tu sesión está activa. Continuá desde tu panel.” instead of the
+form/recovery link. Use `--color-foreground-secondary` gray for this static
+status message and its decorative icon, not the informational blue used for
+form responses. Hide registration entrances while active; both registration
+roles remain available to anonymous visitors. The login
 service must check the authoritative session before provider sign-in, returning
 the same safe feedback without sign-in, sign-out, redirect or revalidation when
 already active. Keep anonymous login and suspension cleanup intact.
@@ -684,12 +833,18 @@ and in scope of the card, so a reload starts clean.
 
 ## Public offers catalog — EXTRA-085
 
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
 `/ofertas` uses the same public design as Home: the shared `HomeNavbar` in its
 `alwaysVisible` variant (emblem, identity, Inicio, Ofertas, and Mi cuenta only
 when there is a session) over a primary-green header band with an uppercase
 eyebrow, a Sora `h1` and the intermediary notice. The body keeps the 1280px
 inner width. Search, results and pagination occupy the full content area:
 EXTRA-112 removes the sticky accompaniment/help aside and its calls to action.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
 
 - Keep the verified session entry only in HomeNavbar's
   `nav[aria-label="Navegación principal"]`: "Mi cuenta" uses the existing
@@ -714,7 +869,37 @@ EXTRA-112 removes the sticky accompaniment/help aside and its calls to action.
   name (`Elegir <campo>` / `<campo>: opciones`) that does not duplicate the
   trigger's, or queries and screen readers see two identically named controls.
 
+> Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+`/ofertas` uses the same public design as Home: the shared `HomeNavbar` in its
+`alwaysVisible` variant (emblem, identity, Inicio, Ofertas, and Mi cuenta only
+when there is a session) over a primary-green header band with an uppercase
+eyebrow, a Sora `h1` and the intermediary notice. The body keeps the 1280px
+inner width and a `minmax(0,1fr)_20rem` grid: search panel, results and
+pagination on the left, a sticky aside with the candidate CTA and the
+in-office help card on the right.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+- Keep the session entry inside `nav[aria-label="Accesos principales"]` with the
+  label and destination from `getAccountAccess()`; the acceptance suite asserts
+  it on `/ofertas`, and anonymous visitors must still see "Iniciar sesión".
+- Use `TextField`, `SelectField` and `Button`/`buttonVariants` for the search
+  panel so labels, underlined controls, 44px targets and focus stay municipal.
+  The filters remain native `select` elements: the browser suite drives them
+  with `selectOption`. Keep the "no disponible" option for a retired filter value.
+- Offer links stay inside `<li>` elements, and the empty, filtered, invalid and
+  out-of-range states keep their literal Spanish copy.
+- Never rename the combobox popup to the field name: the popup renders
+  `role="dialog"` and the list `role="listbox"`, and both need an accessible
+  name (`Elegir <campo>` / `<campo>: opciones`) that does not duplicate the
+  trigger's, or queries and screen readers see two identically named controls.
+
 ## Shared account workspace
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
 
 Public offer detail (EXTRA-113) now reuses `candidateCanvas` and `sectionContent`
 for the same centered white 1280px canvas and municipal typography on static
@@ -752,6 +937,8 @@ it cannot restyle the shared sidebar/navbar. Admin account retains password
 and peer-administration controls, with logout only in the sidebar (EXTRA-068).
 
 ### Candidate account workspace
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
 
 Candidate `/dashboard` (also rendered by `/account`) uses one shared centered white,
 natural-height canvas capped at 1280px for Perfil, Panel de usuario, Postulaciones

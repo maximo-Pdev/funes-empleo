@@ -24,7 +24,7 @@ import Account from "@/app/(auth)/account/page";
 
 function session(role = "candidate") {
  mocks.order.mockResolvedValue({ data: [{ id: "admin-ficticio-2", status: "active", version: 2 }, { id: "admin-ficticio-3", status: "suspended", version: 3 }], error: null });
- mocks.neq.mockReturnValue({ order: mocks.order });
+ mocks.neq.mockReturnValue({ order: vi.fn().mockReturnThis(), range: mocks.order });
  return { user: role === "candidate" ? undefined : { email: role === "admin" ? "admin@example.invalid" : "empresa@example.invalid" }, account: { id: "cuenta-ficticia", role, version: 1 }, client: { from: vi.fn(() => ({ select: vi.fn(() => ({ eq: vi.fn(() => ({ neq: mocks.neq })) })) })) } };
 }
 beforeEach(() => { vi.clearAllMocks(); mocks.guard.mockResolvedValue(session()); });

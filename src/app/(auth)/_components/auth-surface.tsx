@@ -17,14 +17,15 @@ export function AuthShell({ children, panel = null }: { children: ReactNode; pan
   </div>;
 }
 export function AuthSurface({ title, description, icon: Icon = KeyRound, children, panel = null }: { title: string; description?: string; icon?: LucideIcon; children?: ReactNode; panel?: PanelAccess | null }) {
-  return <AuthShell panel={panel}><div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-8">
-    <section aria-label="Portal Municipal de Empleo" className="order-2 rounded-2xl bg-primary-900 p-6 text-white sm:p-8 lg:order-1 lg:p-10">
-      <div className="flex items-center gap-3"><Image src="/brand/logo-funes-verde.svg" alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl" /><p className="text-sm font-semibold leading-6">Oficina de Empleo<span className="block font-normal text-white/90">Municipalidad de Funes</span></p></div>
-      <h2 className="mt-7 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Tu acceso al portal, con acompañamiento municipal.</h2>
+  return <AuthShell panel={panel}><div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-8" data-auth-panels>
+    <section aria-label="Portal Municipal de Empleo" className="order-2 min-w-0 rounded-2xl bg-primary-900 p-6 text-white sm:p-8 lg:order-1 lg:p-10">
+      <div className="flex items-center gap-3"><Image src="/brand/logo-funes-verde.svg" alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-xl" /><p className="min-w-0 text-sm font-semibold leading-6">Oficina de Empleo<span className="block font-normal text-white/90">Municipalidad de Funes</span></p></div>
+      <h2 className="mt-7 break-words text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Tu acceso al portal, con acompañamiento municipal.</h2>
+
       <p className="mt-5 text-base leading-7 text-white/90">Gestioná tu cuenta para continuar con tus trámites en el Portal de Empleo.</p>
       <div className="mt-7 flex items-start gap-3 border-t border-white/20 pt-5"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary-400" aria-hidden="true" /><p className="text-sm leading-6 text-white/90">Usá tu cuenta individual y no compartas tu contraseña. Si necesitás ayuda, contactá a la Oficina de Empleo.</p></div>
     </section>
-    <section aria-labelledby="auth-title" className="order-1 min-w-0 lg:order-2"><Card className="p-6 sm:p-8 lg:p-10">
+    <section aria-labelledby="auth-title" className="order-1 grid min-w-0 lg:order-2"><Card className="p-6 sm:p-8 lg:p-10">
       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary" aria-hidden="true"><Icon className="h-5 w-5" /></span>
       <h1 id="auth-title" className="mt-5 break-words text-3xl font-bold tracking-tight text-primary-900">{title}</h1>
       {description && <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>}

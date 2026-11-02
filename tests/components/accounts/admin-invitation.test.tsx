@@ -15,7 +15,7 @@ import { administratorInvitationAction } from "@/features/accounts/admin-invitat
 import { AdminInvitationForm } from "@/features/accounts/components/admin-invitation-form";
 
 it.each(["admin", "candidate", "company"])("shows invitations only in the administrator Cuenta: %s", async role => {
-  const query = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), neq: vi.fn().mockReturnThis(), order: vi.fn(async () => ({ data: [], error: null })) };
+  const query = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), neq: vi.fn().mockReturnThis(), order: vi.fn().mockReturnThis(), range: vi.fn(async () => ({ data: [], error: null })) };
   vi.mocked(requireActiveAccount).mockResolvedValue({ account: { role, id: "actor" }, user: { email: "staff@example.test" }, client: { from: () => query } } as never);
   render(await AccountPage());
   expect(screen.queryByRole("form", { name: "Invitar administrador" }) !== null).toBe(role === "admin");

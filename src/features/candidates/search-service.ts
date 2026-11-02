@@ -6,6 +6,7 @@ import { referralEligibility } from "@/domain/permissions/referral";
 import { candidateSearchSchema, type CandidateSearchFilters } from "@/validation/candidate-search";
 import { candidateHistoryEventsSchema, candidateHistoryQuerySchema } from "@/validation/candidate-history";
 import { candidateHistoryActions, candidateHistoryPageSize, type CandidateHistoryCursor, type CandidateHistoryPage } from "./candidate-history";
+import { HISTORY_PAGE_SIZE, RECORD_PAGE_SIZE } from "@/lib/collections/limits";
 
 // PostgreSQL UUIDs in the deterministic local fixture are MD5-derived and do
 // not necessarily carry RFC version bits.
@@ -141,9 +142,10 @@ export async function listCandidateSearchCategories() {
   return result.data ?? [];
 }
 
-export async function getAdminCandidate(candidateId: string) {
+export async function getAdminCandidate(candidateId: string, notesPage = 1) {
   const parsed = candidateIdSchema.safeParse(candidateId);
   if (!parsed.success || !parsed.data) throw new AppError("NOT_FOUND");
+  if (!Number.isInteger(notesPage) || notesPage < 1 || notesPage > 100000) throw new AppError("VALIDATION_ERROR");
   const client = await adminClient();
   await refreshDueProfiles(client, parsed.data);
   const [candidate, participations, notes, currentCv] = await Promise.all([
@@ -152,11 +154,12 @@ export async function getAdminCandidate(candidateId: string) {
       .eq("id", parsed.data).maybeSingle(),
     client.from("participations")
       .select("id,status,origin,created_at,job_openings!participations_opening_id_fkey(id,title)")
-      .eq("candidate_id", parsed.data).is("archived_at", null).order("created_at", { ascending: false }).limit(50),
+      .eq("candidate_id", parsed.data).is("archived_at", null).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(RECORD_PAGE_SIZE),
     client.from("internal_notes")
       .select("id,note_kind,body,created_at")
       .eq("candidate_id", parsed.data).is("archived_at", null)
-      .is("participation_id", null).order("created_at", { ascending: false }).limit(50),
+      .is("participation_id", null).order("created_at", { ascending: false }).order("id", { ascending: false })
+      .range((notesPage - 1) * HISTORY_PAGE_SIZE, notesPage * HISTORY_PAGE_SIZE),
     client.from("cv_documents").select("id,original_name_safe,byte_size")
       .eq("candidate_id", parsed.data).is("opening_id", null).eq("status", "valid").is("archived_at", null).maybeSingle(),
   ]);
@@ -165,7 +168,9 @@ export async function getAdminCandidate(candidateId: string) {
   const row = candidate.data as unknown as CandidateSearchRow;
   const history = await readCandidateHistory(client, candidate.data, null);
   return { candidate: candidate.data, currentCv: currentCv.data ?? null, referralEligible: candidateIsReferralEligible(row, new Date()),
-    participations: participations.data ?? [], notes: notes.data ?? [], audit: history.events, nextAuditCursor: history.nextCursor };
+    participations: participations.data ?? [], notes: (notes.data ?? []).slice(0, HISTORY_PAGE_SIZE),
+    notesHasNext: (notes.data?.length ?? 0) > HISTORY_PAGE_SIZE,
+    audit: history.events, nextAuditCursor: history.nextCursor };
 }
 
 async function readCandidateHistory(client: Awaited<ReturnType<typeof adminClient>>,

@@ -52,7 +52,7 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
     <>
       <HomeNavbar panel={panel} />
       <main id="contenido" tabIndex={-1} className={styles.page}>
-        <HomeHero key={initialView} authenticated={panel !== null} panelHref={panel?.href} panelLabel={panel ? `Ir al ${panel.label.toLowerCase()}` : undefined} initialView={initialView} accessState={accessState} />
+        <HomeHero key={initialView} authenticated={panel !== null} panelHref={panel?.href} panelLabel={panel ? `Ir al ${panel.label.toLocaleLowerCase("es-AR")}` : undefined} initialView={initialView} accessState={accessState} />
         <section id="ofertas-disponibles" tabIndex={-1} className={styles.information} aria-labelledby="ofertas-titulo">
           <div className={styles.offersSection}>
             <div className={styles.offersHeader}>
@@ -63,7 +63,7 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
               <Link href="/ofertas" className={styles.offersAllLink}>Ver todas las ofertas<ArrowRight size={16} aria-hidden="true" /></Link>
             </div>
             {offers.length > 0 ? (
-              <HomeOffersCarousel key={offers[0]?.id} offers={offers} />
+              <HomeOffersCarousel key={offers[0]?.id} offers={offers} headingLevel="h3" />
             ) : (
               <div className={styles.offersEmpty}>
                 <p>No hay ofertas vigentes para mostrar en este momento.</p>

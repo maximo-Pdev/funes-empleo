@@ -14,6 +14,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer, listPublicOfferFilters }));
 vi.mock("next/navigation", () => ({ notFound, usePathname: () => "/ofertas" }));
+vi.mock("@/features/notifications/components/notification-center", () => ({ NotificationCenter: () => <button>Notificaciones</button> }));
 
 import PublicOffersPage from "@/app/(public)/ofertas/page";
 import PublicOfferDetailPage from "@/app/(public)/ofertas/[openingId]/page";
@@ -53,12 +54,24 @@ it.each([
   listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
   getPublicOffer.mockResolvedValue(offer);
   for (const Page of [listPage, detailPage]) {
+    readAccountSession.mockClear();
     const view = render(await Page());
     const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
     expect(within(navigation).getByRole("link", { name: "Mi cuenta" }).getAttribute("href")).toBe(href);
-    expect(within(navigation).queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
+    expect(within(navigation).queryByRole("link", { name: "Ingresar" })).toBeNull();
+    expect(within(navigation).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
+    expect(within(navigation).getByRole("link", { name: "Ofertas" }).getAttribute("aria-current")).toBe("page");
+    expect(within(navigation).getByRole("button", { name: "Notificaciones" })).toBeTruthy();
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(readAccountSession).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("link", { name: /^Crear cuenta$/ })).toBeNull();
     expect(screen.queryByRole("link", { name: /^Iniciá sesión$/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Registrate" })).toBeNull();
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(screen.getAllByRole("link", { name: "Mi cuenta" })).toHaveLength(1);
+    if (Page === detailPage) {
+      expect(screen.getByRole("link", { name: "Postularme con mi cuenta" }).getAttribute("href")).toBe(`/dashboard?section=ofertas&oferta=${offer.slug}`);
+    }
     if (Page === listPage) {
       expect(screen.queryByRole("navigation", { name: "Accesos principales" })).toBeNull();
       expect(screen.queryByRole("complementary")).toBeNull();
@@ -70,6 +83,25 @@ it.each([
   }
 });
 
+it.each(["anonymous", "suspended"])("no muestra controles privados en la navbar pública: %s", async state => {
+  readAccountSession.mockResolvedValue(state === "anonymous" ? null : { account: { role: "candidate", status: "suspended" } });
+  listPublicOffers.mockResolvedValue({ total: 1, page: 1, pageSize: 10, items: [offer] });
+  getPublicOffer.mockResolvedValue(offer);
+  for (const Page of [listPage, detailPage]) {
+    const view = render(await Page());
+    const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(within(navigation).queryByRole("button", { name: "Notificaciones" })).toBeNull();
+    expect(within(navigation).queryByRole("link", { name: "Mi cuenta" })).toBeNull();
+    expect(within(navigation).getByRole("link", { name: "Inicio" }).getAttribute("href")).toBe("/");
+    expect(within(navigation).getByRole("link", { name: "Ingresar" }).getAttribute("href")).toBe("/#contenido");
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(screen.queryByRole("link", { name: "Crear cuenta" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Registrate" })).toBeNull();
+    view.unmount();
+  }
+});
+
 it("renderiza el listado y enlaces de paginación usando la página solicitada", async () => {
   listPublicOffers.mockResolvedValue({ total: 5, page: 2, pageSize: 2, items: [offer] });
   const { container } = render(await listPage("2"));
@@ -77,7 +109,7 @@ it("renderiza el listado y enlaces de paginación usando la página solicitada",
   const date = container.querySelector("time");
   expect(date?.textContent).toBe("31/12/2099");
   expect(date?.getAttribute("datetime")).toBe("2099-12-31");
-  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 2, q: "", rubro: "", localidad: "", modalidad: "" }));
+  expect(listPublicOffers).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ page: 2, pageSize: 10, q: "", rubro: "", localidad: "", modalidad: "" }));
   expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Ofertas laborales vigentes");
   expect(screen.getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.slug}`);
   const pagination = screen.getByRole("navigation", { name: "Páginas de ofertas" });
@@ -193,4 +225,13 @@ it("propaga errores técnicos del detalle sin convertirlos en oferta ausente", a
   getPublicOffer.mockRejectedValue(error);
   await expect(detailPage()).rejects.toBe(error);
   expect(notFound).not.toHaveBeenCalled();
+});
+
+it("shows semantic category icons on the detail canvas", async () => {
+  getPublicOffer.mockResolvedValue({ ...offer, categories: [{ id: "food", name: "Gastronomía y hotelería" }] });
+  const { container } = render(await detailPage());
+  expect(screen.getByText("Gastronomía y hotelería").parentElement?.querySelector("svg.lucide-utensils")?.getAttribute("aria-hidden")).toBe("true");
+  const canvas = container.querySelector<HTMLElement>('[data-slot="public-offer-canvas"]');
+  expect(canvas).toBeTruthy();
+  expect(canvas?.style.maxWidth).toBe("1280px");
 });

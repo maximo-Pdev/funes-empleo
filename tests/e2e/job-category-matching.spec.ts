@@ -35,7 +35,7 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   const table = section.getByRole("table");
   await expect(table.getByRole("columnheader")).toHaveText(["Candidato", "Localidad", "Rubros coincidentes", "Acción"]);
   const rows = table.locator("tbody").getByRole("row");
-  await expect(rows).toHaveCount(12);
+  await expect(rows).toHaveCount(10);
   const firstRow = await rows.nth(0).boundingBox();
   const secondRow = await rows.nth(1).boundingBox();
   expect(secondRow!.y).toBeGreaterThanOrEqual(firstRow!.y + firstRow!.height);
@@ -47,7 +47,7 @@ test("matching compacto pagina y abre perfil modal sin nominar", async ({ page }
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(new RegExp(`/admin/openings/${persistedReference("opening", id)}\\?matchOrder=updated_desc&matchPage=2#opening-matches$`));
   await expect(section.getByText(/Página 2 de/)).toBeVisible();
-  await expect(rows).toHaveCount(12);
+  await expect(rows).toHaveCount(10);
   const secondNames = await rows.locator("td:first-child").allTextContents();
   expect(secondNames.some(name => firstNames.includes(name))).toBe(false);
   await page.reload();
@@ -120,7 +120,7 @@ test("ordena globalmente por actualización, conserva orden al paginar y reinici
     select jsonb_agg(display_name order by updated_at ${direction},display_name,id) from (
       select pool.id,pool.display_name,candidate.updated_at from private.opening_candidate_pool('${id}') pool
       join public.candidate_profiles candidate on candidate.id=pool.id
-      order by candidate.updated_at ${direction},pool.display_name,pool.id limit 12 offset ${offset}
+      order by candidate.updated_at ${direction},pool.display_name,pool.id limit 10 offset ${offset}
     ) ordered`)) as string[];
   await signIn(page, "admin1@example.invalid", "admin");
   await page.goto(`/admin/openings/${id}`);
@@ -135,7 +135,7 @@ test("ordena globalmente por actualización, conserva orden al paginar y reinici
   await expect(names).toHaveText(expected("asc"));
   await section.getByRole("link", { name: "Siguiente", exact: true }).click();
   await expect(page).toHaveURL(/\?matchOrder=updated_asc&matchPage=2#opening-matches$/);
-  await expect(names).toHaveText(expected("asc", 12));
+  await expect(names).toHaveText(expected("asc", 10));
   await page.reload();
   await expect(selector).toHaveValue("updated_asc");
   await selector.focus();

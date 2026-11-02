@@ -1,6 +1,9 @@
 import React from "react";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import homeStyles from "@/app/(public)/home.module.css";
 
 vi.mock("@/features/accounts/actions", () => ({
   loginAction: vi.fn(), passwordAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), logoutAction: vi.fn(),
@@ -12,6 +15,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: vi.fn() }));
 
 import HomePage from "@/app/(public)/page";
+import { HomeHero } from "@/app/(public)/home-hero";
 import { AuthForm } from "@/features/accounts/components/auth-form";
 import { CandidateRegistrationForm } from "@/features/candidates/components/candidate-registration-form";
 import { CompanyRegistrationForm } from "@/features/companies/components/company-registration-form";
@@ -57,31 +61,61 @@ describe("Home access panel", () => {
   });
 
   it.each([
-    ["candidate", "Ir al panel de usuario"],
-    ["company", "Ir al panel de empresa"],
-    ["admin", "Ir al panel de administración"],
-  ])("keeps verified panel access without registration controls for an active %s", async (role, label) => {
+    ["candidate", "/dashboard"],
+    ["company", "/empresa"],
+    ["admin", "/admin"],
+  ])("retains the animated hero with adapted access for an active %s", async (role, href) => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role, status: "active" } } as never);
     const view = render(await HomePage());
-    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+    const access = screen.getByRole("region", { name: "Acceso al portal" });
+    expect(within(access).getByRole("heading", { name: "Continuá en el portal" })).toBeTruthy();
+    expect(within(access).getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+    expect(view.container.querySelector('canvas[data-ribbons="true"]')).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     const logout = screen.getByRole("button", { name: "Cerrar sesión" });
     expect(logout.getAttribute("type")).toBe("submit");
     expect(logout.querySelector('svg[aria-hidden="true"]')).toBeTruthy();
     expect(view.container.querySelectorAll("form")).toHaveLength(1);
     expect(screen.queryByLabelText("Correo electrónico")).toBeNull();
-    const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
-    expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
-    expect(screen.getByRole("link", { name: label }).compareDocumentPosition(logout) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const label = role === "candidate" ? "Ir al panel de usuario" : role === "company" ? "Ir al panel de empresa" : "Ir al panel de administración";
+    const panelLink = within(access).getByRole("link", { name: label });
+    expect(panelLink.getAttribute("href")).toBe(href);
+    expect(panelLink.compareDocumentPosition(logout) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(access).getByRole("link", { name: "Ver ofertas" }).getAttribute("href")).toBe("/ofertas");
+    expect(within(access).getByRole("navigation", { name: "Accesos principales" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Ofertas disponibles" })).toBeTruthy();
     vi.mocked(logoutAction).mockClear();
     fireEvent.click(logout);
     await waitFor(() => expect(logoutAction).toHaveBeenCalledTimes(1));
     expect(screen.queryByRole("button", { name: "Registrarse" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Tipo de cuenta" })).toBeNull();
     expect(screen.queryByRole("radio")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Iniciar sesión" }));
-    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
-    expect(view.container.querySelectorAll("form")).toHaveLength(1);
-    expect(screen.getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    expect(screen.queryByRole("button", { name: "Iniciar sesión" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+  });
+
+  it.each([
+    ["candidate", "/dashboard", "Ir al panel de usuario"],
+    ["company", "/empresa", "Ir al panel de empresa"],
+    ["admin", "/admin", "Ir al panel de administración"],
+  ])("keeps verified panel access in the reusable hero for an active %s", (role, href, label) => {
+    const view = render(<HomeHero authenticated panelHref={href} panelLabel={label} />);
+    const access = screen.getByRole("region", { name: "Acceso al portal" });
+    expect(within(access).getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+    expect(within(access).queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+    expect(within(access).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
+    expect(access.querySelectorAll("form")).toHaveLength(1);
+    expect(within(access).getByRole("link", { name: label }).getAttribute("href")).toBe(href);
+    const output = process.env.HOME_SESSION_FIXTURE_DIR;
+    if (output) {
+      const css = readFileSync("src/app/(public)/home.module.css", "utf8")
+        .replace(/\.([a-zA-Z_][\w-]*)/g, (selector, name: string) => homeStyles[name] ? `.${homeStyles[name]}` : selector)
+        .replace(/:global\(([^)]+)\)/g, "$1");
+      mkdirSync(output, { recursive: true });
+      writeFileSync(path.join(output, `${role}.json`), JSON.stringify({ html: view.container.innerHTML, css, href, label }));
+    }
+
   });
 
   it("suppresses repeated empty-field explanations in all homepage access forms", async () => {
@@ -270,7 +304,16 @@ describe("Home access panel", () => {
   it("ignores an access notice while a verified session is active", async () => {
     vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status: "active" } } as never);
     render(await HomePage({ searchParams: Promise.resolve({ acceso: "suspendido" }) }));
-    expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
+    expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
     expect(screen.queryByText("Acceso suspendido")).toBeNull();
+  });
+
+  it.each(["suspended", "archived"])("keeps anonymous access when the account is %s", async status => {
+    vi.mocked(readAccountSession).mockResolvedValueOnce({ account: { role: "candidate", status } } as never);
+    render(await HomePage());
+    expect(screen.getByRole("region", { name: "Acceso al portal" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Ingresar$/ })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Ofertas disponibles" })).toBeTruthy();
   });
 });

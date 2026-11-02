@@ -5,12 +5,14 @@ import { readAccountSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/errors/public-error";
 import { workflowRpcError } from "@/lib/errors/workflow-rpc";
 import { openingModerationInput } from "@/validation/opening-moderation";
+import { RECORD_PAGE_SIZE } from "@/lib/collections/limits";
+import { readAllRows } from "@/lib/collections/read-all";
 
 const idSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 const listInput = z.object({
   status: openingStatusSchema.exclude(["draft"]).optional(),
   page: z.coerce.number().int().min(1).max(1000).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(20),
+  pageSize: z.coerce.number().int().min(1).max(50).default(RECORD_PAGE_SIZE),
 });
 
 async function adminClient() {
@@ -54,9 +56,9 @@ export async function getAdminOpening(openingId: string) {
     client.from("job_openings")
       .select("id,title,tasks,requirements,vacancies,location,modality,schedule,contract_type,closing_date,status,version,moderation_message_public,company_profiles!job_openings_company_id_fkey(id,legal_name,status)")
       .eq("id", parsed.data).is("archived_at", null).maybeSingle(),
-    client.from("opening_moderation_events")
+    readAllRows((from, to) => client.from("opening_moderation_events")
       .select("id,decision,previous_status,new_status,company_message,internal_reason,actor_type,actor_account_id,created_at")
-      .eq("opening_id", parsed.data).order("created_at", { ascending: false }).order("id", { ascending: false }),
+      .eq("opening_id", parsed.data).order("created_at", { ascending: false }).order("id", { ascending: false }).range(from, to)),
   ]);
   if (opening.error || events.error) throw new AppError("INTERNAL_ERROR");
   if (!opening.data) throw new AppError("NOT_FOUND");

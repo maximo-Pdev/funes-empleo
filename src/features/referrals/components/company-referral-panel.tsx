@@ -7,6 +7,7 @@ import { RecordLink as Link, RecordLabel } from "@/components/ui/record-link";
 import { Badge } from "@/components/ui";
 import type { CompanyReferral } from "@/features/referrals/service";
 import { FeedbackForm, InterviewForm } from "./referral-forms";
+import { BoundedList } from "@/components/ui/bounded-list";
 
 export function CompanyReferralPanel({ referral, openingId }: { referral: CompanyReferral; openingId: string }) {
   const candidate = referral.candidate;
@@ -53,7 +54,7 @@ export function CompanyReferralPanel({ referral, openingId }: { referral: Compan
           <p className="text-sm text-slate-700">El acceso puede revocarse en cualquier momento. Una copia ya descargada no puede retirarse técnicamente.</p>
           <div>
             <h3 className="text-lg font-semibold">Entrevistas registradas</h3>
-            {referral.interviews?.length ? <ul className="mt-2 grid gap-2">{referral.interviews.map((interview) => <li key={interview.id} className="flex flex-wrap items-center gap-2"><Badge variant="status" tone={statusTone(interviewStatusTones, interview.status)}>{displayLabel(interviewStatusLabels, interview.status)}</Badge>{interview.scheduledAt ? formatFunesDateTime(interview.scheduledAt) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</ul> : <p>Aún no hay entrevistas registradas.</p>}
+            {referral.interviews?.length ? <BoundedList label="Entrevistas registradas" className="mt-2 grid gap-2">{referral.interviews.map((interview) => <li key={interview.id} className="flex flex-wrap items-center gap-2"><Badge variant="status" tone={statusTone(interviewStatusTones, interview.status)}>{displayLabel(interviewStatusLabels, interview.status)}</Badge>{interview.scheduledAt ? formatFunesDateTime(interview.scheduledAt) : "sin fecha programada"}{interview.companyMessage ? ` — ${interview.companyMessage}` : ""}</li>)}</BoundedList> : <p>Aún no hay entrevistas registradas.</p>}
           </div>
           {referral.participationVersion && <InterviewForm openingId={openingId} referralId={referral.referralId} version={referral.participationVersion} />}
         </div>

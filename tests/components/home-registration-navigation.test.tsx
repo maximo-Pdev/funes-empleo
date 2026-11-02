@@ -60,19 +60,22 @@ it.each(["candidate", "company", "admin"])("ignores registration route selection
   for (const registro of ["candidato", "empresa"]) {
     readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
     const view = render(await HomePage({ searchParams: Promise.resolve({ registro }) }));
-    const assertLogin = () => {
-      expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
-      expect(screen.getByRole("heading", { level: 1 }).parentElement?.getAttribute("data-view")).toBe("login");
+    const assertOffers = () => {
+      expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+      expect(screen.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
       expect(screen.getByRole("region", { name: "Acceso al portal" }).getAttribute("data-mode")).toBe("login");
+      expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+      const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
+      expect(within(screen.getByRole("navigation", { name: "Accesos principales" })).getByRole("link").getAttribute("href")).toBe(href);
       expect(screen.queryByRole("radio")).toBeNull();
       expect(view.container.querySelectorAll("form")).toHaveLength(1);
       expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
       expect(screen.queryByLabelText("Correo electrónico")).toBeNull();
     };
-    assertLogin();
+    assertOffers();
     for (const requestedRole of ["candidate", "company"]) {
       act(() => { window.dispatchEvent(new CustomEvent(HOME_REGISTRATION_EVENT, { detail: requestedRole })); });
-      assertLogin();
+      assertOffers();
     }
     view.unmount();
   }
@@ -82,7 +85,8 @@ it("returns the hero and access panel to login when a session becomes active", (
   const view = render(<HomeHero authenticated={false} initialView="company" />);
   expect(screen.getByLabelText("CUIT")).toBeTruthy();
   view.rerender(<HomeHero authenticated panelHref="/empresa" panelLabel="Ir al panel de empresa" initialView="company" />);
-  expect(screen.getByText("Ya tenés la sesión iniciada")).toBeTruthy();
+  expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+  expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
   expect(screen.getByRole("heading", { level: 1 }).parentElement?.getAttribute("data-view")).toBe("login");
   expect(screen.queryByRole("radio")).toBeNull();
   expect(view.container.querySelectorAll("form")).toHaveLength(1);

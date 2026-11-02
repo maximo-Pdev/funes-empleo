@@ -90,12 +90,17 @@
 
 :root {
   color-scheme: light;
+  --layout-content-max: 1280px;
   --surface-bevel-gradient: linear-gradient(135deg, var(--color-brand-secondary) 0%, #f5ffed 16%, #aabb9f 34%, var(--color-brand-secondary) 48%, #e5efdc 60%, #879c7a 83%, #f4ffe9 100%);
   --form-control-height: 44px;
   --form-control-padding: 6px 12px 6px 0;
   --form-label-gap: 6px;
   --form-field-gap: 16px;
   --form-panel-padding: 12px;
+}
+
+@media (min-width: 1440px) {
+  :root { --layout-content-max: 1800px; }
 }
 
 /* Compact layout remains opt-in; control appearance is shared below. */

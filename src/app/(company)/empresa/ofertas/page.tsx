@@ -10,6 +10,8 @@ import { CompanyShell } from "../../_components/company-shell";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { listCompanyOffers } from "@/features/openings/company-service";
 import { getCompanyWorkspace } from "@/features/companies/service";
+import layoutStyles from "@/app/(auth)/account/account.module.css";
+import cardLayout from "@/components/ui/card-layout.module.css";
 
 export const dynamic = "force-dynamic";
 export default async function CompanyOffersPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
@@ -21,14 +23,17 @@ export default async function CompanyOffersPage({ searchParams }: { searchParams
   return <CompanyShell name={workspace.profile?.legalName} email={user.email} title="Mis ofertas" active="/empresa/ofertas" description="Prepará borradores y seguí cada decisión municipal. Solo las ofertas aprobadas aparecen públicamente.">
     <div className="flex flex-wrap items-center justify-between gap-4"><p className="text-sm text-muted-foreground">{offers.total} ofertas registradas</p><Link className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-700" href="/empresa/ofertas/nueva"><Plus className="h-4 w-4" aria-hidden="true" />Nueva oferta</Link></div>
     {offers.items.length === 0 ? <Card className="mt-6 p-8 text-center sm:p-12"><BriefcaseBusiness className="mx-auto h-10 w-10 text-primary" aria-hidden="true" /><h2 className="mt-4 text-xl font-bold text-primary-900">Todavía no hay ofertas en esta página.</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">Creá un borrador para preparar tu búsqueda laboral.</p></Card> :
-      <ul className="mt-6 grid gap-5 md:grid-cols-2">{offers.items.map(offer => <li key={offer.id} className="min-w-0"><Card className="h-full p-6"><Badge variant="status" tone={statusTone(openingStatusTones, offer.status)}><span className="min-w-0 break-words">{displayLabel(openingStatusLabels, offer.status)}</span></Badge><h2 className="mt-4 break-words text-xl font-bold leading-7"><Link className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary" href={`/empresa/ofertas/${offer.id}`}>{offer.title || "Borrador sin título"}</Link></h2><p className="mt-4 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {offer.closingDate ? formatCalendarDate(offer.closingDate) : "sin definir"}.</p>
+      <ul className={`${layoutStyles.desktopCards} ${cardLayout.grid} mt-6 grid gap-5 md:grid-cols-2`}>{offers.items.map(offer => <li key={offer.id} className="min-w-0"><Card className={`${cardLayout.card} p-6`}>
+        <div data-card-part="header" className={cardLayout.header}><Badge variant="status" tone={statusTone(openingStatusTones, offer.status)}><span className="min-w-0 break-words">{displayLabel(openingStatusLabels, offer.status)}</span></Badge><h2 className="mt-4 break-words text-xl font-bold leading-7"><Link className="rounded-sm text-primary-900 underline decoration-border underline-offset-4 hover:decoration-primary" href={`/empresa/ofertas/${offer.id}`}>{offer.title || "Borrador sin título"}</Link></h2></div>
+        <div data-card-part="content" className={cardLayout.content}><p className="flex items-start gap-2 text-sm leading-6 text-muted-foreground"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {offer.closingDate ? formatCalendarDate(offer.closingDate) : "sin definir"}.</p>
         <div className="mt-3 space-y-2 text-sm text-muted-foreground">
           <p>Localidad: {offer.location || "Sin definir"}</p>
           <p>Modalidad: {offer.modality ? publicModalityLabel(offer.modality) : "Sin definir"} · Vacantes: {offer.vacancies ?? "Sin definir"}</p>
           <p>Rubros: <CategoryLabels categories={offer.categories} fallback="Sin definir" /></p>
         </div>
 
-        {offer.history.at(-1)?.message && <div className="mt-5 rounded-lg border border-border bg-surface-muted p-4"><p className="flex items-center gap-2 text-sm font-semibold text-primary-900"><MessageSquare className="h-4 w-4" aria-hidden="true" />Mensaje de la Oficina</p><p className="mt-2 break-words text-sm leading-6">{offer.history.at(-1)?.message}</p></div>}
+        </div>
+        <div data-card-part="footer" className={cardLayout.footer}>{offer.history.at(-1)?.message && <div className="rounded-lg border border-border bg-surface-muted p-4"><p className="flex items-center gap-2 text-sm font-semibold text-primary-900"><MessageSquare className="h-4 w-4" aria-hidden="true" />Mensaje de la Oficina</p><p className="mt-2 break-words text-sm leading-6">{offer.history.at(-1)?.message}</p></div>}</div>
       </Card></li>)}</ul>}
     <Pagination aria-label="Páginas de ofertas" className="mt-6">
       <PaginationContent>

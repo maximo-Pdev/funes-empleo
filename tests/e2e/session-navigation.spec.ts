@@ -36,7 +36,11 @@ for (const account of [
   for (const entry of ["public", "private"] as const) {
     test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page, browser }) => {
       await loginFixture(page, account.role);
+      // Stop the previous page's prefetch before editing its session cookie.
+      // The requested entry route must perform the forced refresh itself.
+      await page.goto("about:blank");
       await expireStoredSession(page.context());
+      expect((await sessionCookie(page.context())).expiresAt).toBe(1);
       const response = await page.goto(entry === "public" ? "/ofertas" : account.href);
       expect(response?.headers()["cache-control"]).toContain("no-store");
       const refreshed = await sessionCookie(page.context());
@@ -51,7 +55,23 @@ for (const account of [
         const navigation = page.getByRole("navigation", { name: path === "/" ? "Accesos principales" : "Navegación principal", exact: true });
         const destination = path === "/" ? { label: account.panelLabel, href: account.panelHref }
           : { label: "Mi cuenta", href: account.panelHref };
-        if (path === "/") await expect(page.getByRole("region", { name: "Acceso al portal" })).toContainText("Ya tenés la sesión iniciada");
+        if (path === "/") {
+          await expect(page.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeVisible();
+          await expect(page.getByRole("region", { name: "Acceso al portal" })).toContainText("Tu sesión está activa. Continuá desde tu panel.");
+          await expect(page.getByRole("region", { name: "Acceso al portal" }).getByRole("button", { name: "Cerrar sesión", exact: true })).toHaveCount(1);
+        }
+        if (path !== "/") {
+          await page.setViewportSize({ width: 320, height: 800 });
+          await expect(navigation).toBeVisible();
+          await page.evaluate(() => document.fonts.ready);
+          const brand = await navigation.getByRole("link", { name: "Ir al sitio de la Municipalidad de Funes" }).boundingBox();
+          const first = await navigation.getByRole("link", { name: "Inicio", exact: true }).boundingBox();
+          if (!brand || !first) throw new Error("Falta navegación pública visible.");
+          expect(first.x).toBeGreaterThanOrEqual(brand.x + brand.width + 8);
+          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+          await page.setViewportSize({ width: 1280, height: 720 });
+        }
+
         if (path === "/ofertas") {
           await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toHaveCount(0);
           await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toHaveCount(0);

@@ -8,7 +8,11 @@ import { publicOfferSearchSchema } from "@/validation/public-offer-search";
 import { getSiteAccess } from "@/features/accounts/navigation";
 import { CategoryLabel } from "@/components/job-category-label";
 import { formatPublicClosingDate, publicModalityLabel } from "@/features/openings/public-offer-display";
-import { HomeNavbar } from "../home-navbar";
+import { LinkButton } from "@/components/ui/link-button";
+import { cn } from "@/lib/utils";
+import { PublicOffersShell } from "./public-offers-shell";
+import styles from "./public-offers.module.css";
+import cardLayout from "@/components/ui/card-layout.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -24,31 +28,23 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
   const hasNext = result.page * result.pageSize < result.total;
   const pageCount = Math.ceil(result.total / result.pageSize);
 
-
   return (
-    <>
-      <HomeNavbar alwaysVisible panel={panel} />
-      <main id="contenido" tabIndex={-1} className="min-h-screen bg-page pt-16 text-foreground">
-        <header className="bg-brand-primary text-brand-secondary">
-          <div className="mx-auto flex max-w-[1280px] flex-wrap items-start justify-between gap-x-10 gap-y-8 px-5 pb-12 pt-10 sm:px-10 lg:px-20 lg:pb-14 lg:pt-12">
-            <div className="min-w-0 max-w-3xl">
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary-100">Portal Municipal de Empleo</p>
-              <h1 className="mt-3 font-heading text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
+    <PublicOffersShell panel={panel}>
+        <section aria-labelledby="public-offers-title" className={styles.heading}>
+              <p className={styles.eyebrow}>Portal Municipal de Empleo</p>
+              <h1 id="public-offers-title">
                 Ofertas laborales vigentes
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/85">
+              <p className={styles.introduction}>
                 Explorá las búsquedas y encontrá tu próxima oportunidad laboral. Solo se muestran ofertas aprobadas y dentro de su fecha de cierre.
               </p>
-              <p className="mt-6 flex max-w-2xl items-start gap-3 text-sm font-semibold leading-6 text-white">
+              <p className={styles.notice}>
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
                 La Oficina de Empleo revisa las postulaciones y decide qué perfiles derivar a cada empresa.
               </p>
-            </div>
-          </div>
-        </header>
+        </section>
 
-        <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-8 sm:px-10 lg:px-20 lg:pb-20 lg:pt-10">
-          <div className="min-w-0">
+          <div className={styles.contentGrid}>
             <section className="min-w-0" aria-labelledby="listado-title">
               <PublicOfferSearchForm filters={filters} options={options} />
               {!input.success && (
@@ -84,22 +80,22 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                         : "Podés volver a la primera página para consultar las búsquedas disponibles."}
                   </p>
                   {result.total > 0 && (
-                    <Link
+                    <LinkButton
                       href={filtered ? publicOffersPageHref(filters, 1) : "/ofertas"}
-                      className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-sm bg-primary px-5 py-3 font-heading text-sm font-semibold text-white transition-colors hover:bg-brand-text"
+                      className="mt-6 gap-2"
                     >
                       Ver ofertas disponibles
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </Link>
+                    </LinkButton>
                   )}
                 </Card>
               ) : (
-                <ul className="grid gap-5 md:grid-cols-2">
+                <ul className={cn(styles.offerGrid, cardLayout.grid, "grid gap-5 md:grid-cols-2")}>
                   {result.items.map((offer) => (
                     <li key={offer.id} className="min-w-0">
-                      <article className="flex h-full flex-col gap-4 rounded-xl border border-border bg-surface p-5 shadow-card transition-shadow hover:shadow-elevated focus-within:shadow-elevated sm:p-6">
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
+                      <article className={cn(styles.offerCard, cardLayout.card)}>
+                        <div data-card-part="header" className={cardLayout.header}>
+                          <div className="flex w-full flex-wrap items-center justify-between gap-2">
                             <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-primary-700">
                               <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" />
                               Búsqueda vigente
@@ -115,13 +111,13 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                               <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-primary transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
                             </Link>
                           </h3>
-                          <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-primary">
+                          <p className={cn(styles.companyName, "flex items-start gap-2 text-sm font-semibold text-primary")}>
                             <Building2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                             <span className="min-w-0 break-words">{offer.company_name}</span>
                           </p>
                         </div>
 
-                        <div className="flex flex-wrap gap-2" aria-label="Categorías laborales">
+                        <div data-card-part="content" className="flex flex-wrap items-start gap-2" aria-label="Categorías laborales">
                           {offer.categories.length > 0 ? offer.categories.map((category) => (
                             <Badge key={category.id} variant="outline" className="max-w-full leading-5">
                               <CategoryLabel name={category.name} />
@@ -129,7 +125,7 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
                           )) : <Badge variant="outline" className="leading-5">Sin categorías</Badge>}
                         </div>
 
-                        <div className="mt-auto grid gap-2 border-t border-border pt-4 text-sm leading-6">
+                        <div data-card-part="footer" className={cn(cardLayout.footer, "gap-2 border-t border-border pt-4 text-sm leading-6")}>
                           <p className="flex items-start gap-2 text-muted-foreground">
                             <MapPin className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                             <span className="min-w-0 break-words">{offer.location} · {publicModalityLabel(offer.modality)}</span>
@@ -162,8 +158,6 @@ export default async function PublicOffersPage({ searchParams }: { searchParams:
               )}
             </section>
           </div>
-        </div>
-      </main>
-    </>
+    </PublicOffersShell>
   );
 }

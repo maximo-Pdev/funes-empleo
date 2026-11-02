@@ -33,7 +33,6 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
   let offer, access;
   try { [offer, access] = await Promise.all([getPublicOffer(slug), getSiteAccess()]); }
   catch (error) { if (error instanceof AppError && error.code === "NOT_FOUND") notFound(); throw error; }
-
   const conditions = [
     { label: "Ubicación", value: offer.location, icon: MapPin },
     { label: "Modalidad", value: publicModalityLabel(offer.modality), icon: BriefcaseBusiness },
@@ -47,7 +46,7 @@ export default async function PublicOfferDetailPage({ params }: { params: Promis
     <>
       <HomeNavbar alwaysVisible panel={access.panel} />
       <main id="contenido" tabIndex={-1} className="min-h-screen bg-brand-primary px-4 pb-8 pt-24 text-foreground sm:px-6">
-        <div className={accountStyles.candidateCanvas} data-slot="public-offer-canvas">
+        <div className={accountStyles.candidateCanvas} style={{ maxWidth: 1280 }} data-slot="public-offer-canvas">
           <div className={accountStyles.sectionContent}>
             <Breadcrumb>
               <BreadcrumbList>

@@ -38,6 +38,7 @@ export default async function AdminOpeningsPage({ searchParams }: {
     {invalid && <div className="mt-5"><FeedbackMessage tone="error">Revisá el estado o la página solicitada.</FeedbackMessage></div>}
     {result && <section className="mt-8 space-y-4" aria-label="Listado de ofertas">
       <h2 className="text-xl font-semibold">Ofertas: {result.total}</h2>
+      {!outOfRange && result.items.length > 0 && <p className="text-sm text-muted-foreground">Mostrando {(result.page - 1) * result.pageSize + 1}–{Math.min(result.page * result.pageSize, result.total)} de {result.total} · hasta 10 por página</p>}
       {outOfRange ? <div className="space-y-3"><EmptyState title="Página sin ofertas" description="La página solicitada está fuera del listado actual." /><Link href={urlForPage(1)} className="font-semibold underline">Volver a la primera página</Link></div> : result.items.length === 0 ? <EmptyState title="Sin ofertas" description="No hay ofertas con estos filtros." /> :
         <ul className="space-y-3">{result.items.map((opening) => <li key={opening.id} className="rounded-lg border border-slate-300 bg-white p-4">
           <Link href={`/admin/openings/${opening.id}`} className="font-semibold text-blue-800 underline">{opening.title ?? "Oferta sin título"}</Link>

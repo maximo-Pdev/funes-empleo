@@ -8,6 +8,7 @@ import { recordIdentifier } from "@/lib/records/references";
 import { isRecordReference } from "@/lib/records/reference-format";
 import { databaseUuidSchema } from "@/validation/common";
 import { courseLinkSchema, courseReferralSchema } from "@/validation/training";
+import { HISTORY_PAGE_SIZE } from "@/lib/collections/limits";
 
 export type CourseLink = { id: string; title: string; url: string; published: boolean };
 export type CourseReferral = { id: string; course_title: string; course_url: string; referred_at: string; referred_by: string };
@@ -67,7 +68,7 @@ export async function getCourseReferralHistory(candidateId: string, page = 1) {
   if (!databaseUuidSchema.safeParse(candidateId).success || !Number.isInteger(page) || page < 1 || page > 100000) throw new AppError("VALIDATION_ERROR");
   const result = await client.from("course_referrals").select("id,course_title,course_url,referred_at,referred_by")
     .eq("candidate_id", candidateId).order("referred_at", { ascending: false }).order("id", { ascending: false })
-    .range((page - 1) * 20, page * 20);
+    .range((page - 1) * HISTORY_PAGE_SIZE, page * HISTORY_PAGE_SIZE);
   if (result.error) throw new AppError("INTERNAL_ERROR");
-  return { items: result.data.slice(0, 20), hasNext: result.data.length > 20 };
+  return { items: result.data.slice(0, HISTORY_PAGE_SIZE), hasNext: result.data.length > HISTORY_PAGE_SIZE };
 }

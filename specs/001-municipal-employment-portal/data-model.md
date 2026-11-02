@@ -1,5 +1,15 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA119 — Respaldo de retiro A/B
+
+private.demo_category_retirement_backup conserva snapshots originales de filas
+job_categories/candidate_categories/opening_categories para DEMO-A/B v1. Clave
+(source_table,record_key), JSONB sin PII de perfiles/ofertas, captured_at/by,
+motivo y versión20261101120000. RLS y append-only sin grants de aplicación.
+Tras respaldo, se quitan relaciones vigentes y se desactivan filas del catálogo;
+IDs, entidades padre, versiones, estados y otras categorías no cambian. El respaldo
+es administrativo SQL, sin API/UI; recuperación explícita no sobreescribe cambios.
+
 ## Course links and independent referrals — EXTRA-086
 
 Here EXTRA-086 means “Mejoras finales del portal y recorridos del PDF de Beex”,

@@ -11,6 +11,7 @@ import { CandidateSearchForm } from "@/features/participations/components/candid
 import { listCandidateSearchCategories, searchCandidates } from "@/features/candidates/search-service";
 import { requireActiveAccount } from "@/lib/auth/guards";
 import { candidateSearchSchema } from "@/validation/candidate-search";
+import { RECORD_PAGE_SIZE } from "@/lib/collections/limits";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ type SearchParams = Record<string, string | string[] | undefined>;
 export default async function AdminCandidatesPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const { user } = await requireActiveAccount(["admin"]);
   const raw = await referenceFilters("/admin/candidates", await searchParams, { categoryId: "category" });
-  const parsed = candidateSearchSchema.safeParse(raw);
+  const parsed = candidateSearchSchema.safeParse({ ...raw, pageSize: RECORD_PAGE_SIZE });
   const categories = await listCandidateSearchCategories();
   const categoryReferences = await recordReferences("category", categories.map(category => category.id));
   const results = parsed.success ? await searchCandidates(parsed.data) : null;

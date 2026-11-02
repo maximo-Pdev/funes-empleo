@@ -17,6 +17,8 @@ import { getContactTimeline } from "@/features/participations/contact-service";
 import { ContactTimeline } from "@/features/participations/components/contact-timeline";
 import { adminParticipationAction, confirmFeedbackAction, recordEvaluationAction } from "@/features/participations/evaluation-actions";
 import { requireActiveAccount } from "@/lib/auth/guards";
+import layout from "@/components/ui/detail-layout.module.css";
+import { BoundedList } from "@/components/ui/bounded-list";
 
 export const dynamic = "force-dynamic";
 
@@ -70,9 +72,8 @@ export default async function AdminParticipationDetailPage({ params }: {
             message: item.message }))}
           onConfirm={confirmFeedbackAction} />
     </div>
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="space-y-6">
-        <div id="case-actions" tabIndex={-1} className="scroll-mt-24">
+    <div className={layout.grid} data-detail-grid="participation">
+        <div id="case-actions" tabIndex={-1} className={`${layout.cell} ${layout.full} ${layout.notice} scroll-mt-24`}>
         <ParticipationActionForm key={`${participation.id}:${participation.version}`} participationId={participation.id}
           version={participation.version} status={participation.status}
           contacts={contacts.map((item) => ({ id: item.id, direction: item.direction,
@@ -82,48 +83,47 @@ export default async function AdminParticipationDetailPage({ params }: {
               label: `${localDate(item.reported_at)} · ${displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}` }))}
           onSubmit={adminParticipationAction} />
         </div>
-        <div id="contact-record" tabIndex={-1} className="scroll-mt-24">
+        <div id="contact-record" tabIndex={-1} className={`${layout.cell} scroll-mt-24`} data-detail-cell="contact-form">
         <ContactRecordForm key={`contact:${participation.id}:${participation.version}`}
           participationId={participation.id} version={participation.version}
           onSubmit={recordEvaluationAction} />
         </div>
-        <ParticipationTimeline currentStatus={participation.status} events={audit.map((event) => ({
-          id: event.event_id, occurredAt: event.occurred_at, action: event.action,
-          actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`,
-          previousStatus: event.previous_state, newStatus: event.new_state,
-          reason: event.reason, reasonCode: event.reason_code,
-        }))} />
-      </div>
-      <div className="space-y-6">
-        <ContactTimeline contacts={contactHistory} />
-        <section aria-labelledby="preinterviews-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+        <div className={layout.cell} data-detail-cell="contacts"><ContactTimeline contacts={contactHistory} /></div>
+        <section aria-labelledby="preinterviews-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5" data-detail-cell="preinterviews">
           <h2 id="preinterviews-title" className="text-xl font-semibold">Preentrevistas</h2>
           {preinterviews.length === 0 ? <EmptyState title="Sin preentrevistas" description="Todavía no se registró una preentrevista." /> :
-            <ul className="space-y-3">{preinterviews.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
+            <BoundedList label="Preentrevistas" className="space-y-3">{preinterviews.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
               <p><strong>{displayLabel(contactChannelLabels, item.channel, "Canal no informado")}</strong> · {localDate(item.created_at)}</p>
               {item.summary_internal && <p className="whitespace-pre-wrap">{item.summary_internal}</p>}
-            </li>)}</ul>}
+            </li>)}</BoundedList>}
         </section>
-        <section aria-labelledby="feedback-history-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+        <section aria-labelledby="feedback-history-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5" data-detail-cell="feedback">
           <h2 id="feedback-history-title" className="text-xl font-semibold">Respuesta empresarial</h2>
           {feedback.length === 0 ? <EmptyState title="Sin respuesta" description="La empresa todavía no comunicó un resultado." /> :
-            <ul className="space-y-3">{feedback.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
+            <BoundedList label="Respuesta empresarial" className="space-y-3">{feedback.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
               <p><strong>{displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}</strong> · {localDate(item.reported_at)}</p>
               <p className="flex flex-wrap items-center gap-2"><Badge variant="status" tone={statusTone(feedbackReviewTones, item.review_status)}>{item.review_status === "pending_admin" ? "Pendiente de confirmación administrativa" : "Revisado"}</Badge></p>
               {item.message && <p className="whitespace-pre-wrap">{item.message}</p>}
-            </li>)}</ul>}
+            </li>)}</BoundedList>}
           {feedback.some((item) => item.review_status === "pending_admin") && <FeedbackMessage tone="info">Un resultado informado por la empresa no cambia el resultado final hasta la confirmación de la Oficina.</FeedbackMessage>}
         </section>
-        <section aria-labelledby="internal-records-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+        <div className={`${layout.cell} ${layout.surface}`} data-detail-cell="timeline">
+          <ParticipationTimeline currentStatus={participation.status} events={audit.map((event) => ({
+            id: event.event_id, occurredAt: event.occurred_at, action: event.action,
+            actorLabel: event.actor_type === "system" ? "Sistema" : `Cuenta ${(event.actor_account_id ? actors[event.actor_account_id] : undefined) ?? "sin identificar"}`,
+            previousStatus: event.previous_state, newStatus: event.new_state,
+            reason: event.reason, reasonCode: event.reason_code,
+          }))} />
+        </div>
+        <section aria-labelledby="internal-records-title" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5" data-detail-cell="notes">
           <h2 id="internal-records-title" className="text-xl font-semibold">Notas internas</h2>
           {notes.length === 0 ? <EmptyState title="Sin notas internas" description="No hay notas relacionadas con este caso." /> : <>
-            <ul className="space-y-3">{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
+            <BoundedList label="Notas internas del caso" className="space-y-3">{notes.map((item) => <li key={item.id} className="border-t border-slate-200 pt-3">
               <p><strong>{item.note_kind === "training_guidance" ? "Orientación y capacitación" : "Nota sobre postulante"}</strong> · {localDate(item.created_at)}</p>
               <p className="whitespace-pre-wrap">{item.body}</p>
-            </li>)}</ul>
+            </li>)}</BoundedList>
           </>}
         </section>
-      </div>
     </div>
   </AdminShell>;
 }
