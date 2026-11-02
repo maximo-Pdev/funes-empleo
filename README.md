@@ -16,7 +16,6 @@ pueden consultar el padrón de candidatos.
 | Empresa | `empresa1@prueba.com` | `/empresa` |
 | Municipalidad | `admin1@prueba.com` | `/admin` |
 
-Mateo identificó estos usuarios como cuentas de prueba el **02/11/2026**.
 Las contraseñas de demostración se entregan **por un canal privado al evaluador**;
 no están en Git ni se deben reutilizar contraseñas personales. Cada administrador
 debe tener una identidad individual: no repartir la misma cuenta municipal a
