@@ -7,6 +7,16 @@ const offers: PublicOffer[] = Array.from({ length: 10 }, (_, index) => ({
   tasks: "", requirements: "", vacancies: 1, location: "Funes", modality: "onsite", schedule: "", contract_type: "permanent",
   closing_date: "2027-01-01", salary: null, benefits: null, categories: [],
 }));
+it("renders meaningful category icons from the name-only public payload", () => {
+  const offer = { ...offers[0]!, categories: [{ id: "agro", name: "Agro" }, { id: "food", name: "Gastronomía y hotelería" }] };
+  const { container } = render(<HomeOffersCarousel offers={[offer]} />);
+  expect(screen.getByText("Agro")).toBeTruthy();
+  expect(screen.getByText("Gastronomía y hotelería")).toBeTruthy();
+  expect(container.querySelector("svg.lucide-wheat[aria-hidden='true']")).not.toBeNull();
+  expect(container.querySelector("svg.lucide-utensils[aria-hidden='true']")).not.toBeNull();
+  expect(screen.getByRole("link", { name: offer.title }).getAttribute("href")).toBe(`/ofertas/${offer.slug}`);
+});
+
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 it("muestra vecinos circulares en ambos extremos y las flechas recorren el ciclo", () => {
   const view = render(<HomeOffersCarousel offers={offers} />);

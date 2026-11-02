@@ -39,7 +39,9 @@ it.each(contexts)("permite nuevos intentos y conserva continuación en $base, el
     const view = render(await content(context));
     expect(screen.getByText(/Cierre: 01\/11\/2026/)).toBeTruthy();
     expect(screen.getByText(/Modalidad:.*Vacantes: 2/)).toBeTruthy();
-    expect(screen.getByText("Rubros: Administración")).toBeTruthy();
+    const categories = screen.getByText("Administración").closest("p");
+    expect(categories?.textContent).toBe("Rubros: Administración");
+    expect(categories?.querySelector("svg.lucide-clipboard-list")?.getAttribute("aria-hidden")).toBe("true");
     expect(screen.getByText(/se usará tu CV del perfil: general.pdf/)).toBeTruthy();
     expect(screen.queryByRole("region", { name: "Oferta elegida" }) !== null).toBe(context.selected);
     const assertContinuation = () => {

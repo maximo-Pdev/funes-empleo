@@ -1,5 +1,46 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+
+## Current integration authority — EXTRA-120
+
+Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.
+
+| Surface | Current contract |
+| --- | --- |
+| Home, every role | Keep the animated Hero and institutional introduction. Guests retain the existing login/registration, role guides, draft isolation and lifecycle notices unchanged. Active sessions keep the right card with a brief welcome/status, primary verified role-panel link, Ver ofertas and secondary existing logout action; omit login/registration tabs/forms and anonymous closing registration entrances. Keep PR89's gray active-state treatment. Active registration/access queries cannot reopen forms or replace the session. |
+| Shared navigation | Reuse actual HomeNavbar on normal public, auth/legal and dashboard pages. Guests: Inicio, Ofertas, Ingresar; active sessions: Inicio, Ofertas, notifications and Mi cuenta. Resolve all panel links from the same verified `getSiteAccess().panel`: candidate `/dashboard`, company `/empresa`, administrator `/admin`. No guessed roles, private notification reads for guests or navigation-based authorization. Preserve Home desktop scroll/reveal/timers, mobile visibility, fixed-header clearance and inner-page visibility. Ingresar uses `#contenido` on Home and `/#contenido` elsewhere, with main focus. Minimal technical fallbacks remain separate. |
+| Public catalog | Remove both help/accompaniment cards and duplicate header/profile shortcut. Use the full content area, retained GET filters, shared numeric pagination for every page with current-page semantics and wrapping, and centralized decorative category icons with readable text/neutral unknown fallback. Native select text, IDs, validation and FormData stay unchanged. |
+| Public detail | Use the actual shared navbar and existing white `candidateCanvas`/`sectionContent` canvas capped at 1280px on static green, without sidebar/junction. Breadcrumbs are Inicio / Ofertas / current title using adapted base-nova primitives. Retain every condition, task, requirement and optional salary/benefit, closing date once, then one unchanged final application link and slug. Remove both entire opportunity/accompaniment cards. Do not replace that application link with role-panel or registration CTAs; panel access belongs in the navbar and destination guards remain authoritative. Use LinkButton JSX, never call client `buttonVariants` from a server page. |
+| Compatible main layout | Retain public catalog/courses/wide Home section expansion to 1800px from 1440px and private usable-width layouts, card/row symmetry, natural mobile heights, stable DOM order and complete actions. Detail's explicit 1280px cap is the exception; removed asides cannot justify empty pairing cards or an aside-dependent grid. Retain narrow-navbar spacing, touch targets and sidebar footer/scroll access. |
+| Collections and retirement | Retain main's 10-record pages, initial five history/note records with access to all remaining records, selected/hash reveal, stable order/focus/counters, complete aggregate/export/option scope and unchanged privacy. Retain EXTRA-119's private append-only backup, atomic retirement/recovery, active-selector and metrics behavior, no automatic equivalence or history loss. This integration authorizes no migration execution or reset. |
+
+### Evidence and precedence
+
+The branch paragraphs below are preserved verbatim as provenance wherever possible. Any older header/sidebar/account-section target, role-override application CTA, active registration-tab instruction, uniform private-canvas cap or authenticated no-Hero requirement is **historical and superseded only for the scope in the table above**. Compatible requirements and all existing consent, referral, CV/photo, notification, hiring-window, audit and retirement restrictions remain effective; presentation is not authorization. EXTRA106/108 rollback is limited to its originating Home/login experiment, not independently approved features.
+
+Historical verification and approval paragraphs retain their original qualifications; they do not prove this integrated tree, current CI, PR review, product acceptance or municipal/legal approval. Integrated source/browser/non-reset gates and exact-head GitHub application/database checks remain **PENDING**, owned by the parent. This documentation unit runs structural checks only and changes no source, tests, schema, credentials, local records or remote state.
+
+See the title/branch disambiguation table in `cambios-extra.md` under EXTRA-120; bare EXTRA112–116 references are not globally unique.
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+
+## EXTRA-116 — Consistent navigation by session
+
+Maxi explicitly requests the same navbar across normal pages for each session
+state. Anonymous visitors see Inicio, Ofertas and Ingresar; authenticated users
+see Inicio, Ofertas, notifications and Mi cuenta to their role panel. Apply the
+shared navbar to auth lifecycle and terms pages too. Preserve Home desktop scroll
+visibility, mobile visibility, existing guarded dashboards and form behavior.
+This replaces the earlier offers-navbar profile/account target and omission of
+anonymous Ingresar; it does not change offer application links or permissions.
+
+> Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+### Current independent upstream addition — PR90
+
+The following consent layout remains current and is not superseded by the independent EXTRA-120 offers/navigation integration. Qualify this duplicate identifier by title and PR90 provenance.
+
 ## EXTRA120 — Presentación del consentimiento del postulante
 
 Mateo confirma alcance visual01/11/2026; no cambia R4 de EXTRA094/102.
@@ -16,6 +57,8 @@ Mateo confirma alcance visual01/11/2026; no cambia R4 de EXTRA094/102.
 - **CP4:** verificar pendiente/aceptado/retirado, desktop1920/1366 y móvil390/320,
   teclado/errores/contraste y lectura completa. Perfil mantiene su enlace existente
   a Cuenta; no cambia política legal, consentimiento operativo, permisos o datos.
+
+> Preserved main branch wording below remains historical only where superseded by the offers/navigation integration.
 
 ## EXTRA119 — Retiro operativo de categorías ficticias
 
@@ -38,6 +81,8 @@ hechos históricos; A/B activas solo en fixtures mantienen sus pruebas determini
 
 Sustituye únicamente la conservación activa de esas dos categorías de A08.
 OQ-010 sigue abierta para equivalencias históricas y ocupaciones no aprobadas.
+
+> **Historical main decision — superseded by EXTRA-120.** Keep the following approval, intent and verification evidence verbatim; do not implement its no-Hero composition.
 
 ## EXTRA118 — Inicio autenticado en ofertas
 
@@ -199,6 +244,27 @@ otra regla. AD6 incluye la lista de ofertas dentro de empresa actualmente sin
 páginas. Sin cambio de modelo o arquitectura ni migración prevista.
 
 ## EXTRA106/108 — CTA de ofertas públicas, 29/10/2026
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+EXTRA-113, revisión explícita de Maxi 31/10/2026: también se retiran del detalle
+las tarjetas "Tu próxima oportunidad" y "Con acompañamiento municipal". El botón
+"Postularme con mi cuenta" aparece después de toda la información, conservando
+su destino. El detalle usa HomeNavbar, lienzo blanco con exterior verde y estilos
+compartidos, más breadcrumbs shadcn Inicio / Ofertas / título actual. Esto
+sustituye las referencias anteriores a conservar la tarjeta/header del detalle;
+no cambia datos públicos, elegibilidad, postulación ni permisos.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+Revisión EXTRA-112 autorizada por Maxi, 31/10/2026: en el catálogo /ofertas se
+eliminan las dos tarjetas laterales y el acceso duplicado al perfil del header.
+La navbar conserva «Mi cuenta» y su destino verificado; «Inicio» sigue disponible
+para visitantes. La composición anterior del párrafo siguiente queda como
+antecedente, no como requisito vigente del catálogo. El detalle no cambia.
+La paginación muestra todos los números usando el componente compartido shadcn,
+con filtros preservados y página actual identificada. Los rubros muestran íconos
+decorativos semánticos junto a su texto; las opciones nativas mantienen texto.
 
 Mateo conserva únicamente el ajuste de /ofertas y descarta los cambios de inicio/
 login. Con sesión activa verificada de candidato, empresa o administración,
@@ -477,6 +543,31 @@ emblema del hero a la navbar en escritorio, conservando el enlace al sitio ofici
 de Funes y la visibilidad inicial actual. La navbar ofrece Ingresar hacia el
 recuadro existente o Mi cuenta hacia el panel correspondiente si hay sesión activa.
 El hero conserva el contenido restante y el fondo animado.
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+Con sesión activa verificada, el modo Iniciar sesión muestra “Ya tenés la sesión
+iniciada” sin otro formulario de login. El servidor impide otro inicio de sesión
+antes de autenticar credenciales nuevas. La solicitud de Máximo del 2026-10-27
+reemplaza la disponibilidad anterior de autorregistro con sesión: Home oculta
+el registro y sus accesos cuando hay una sesión activa verificada, incluso ante
+selectores de URL o eventos de registro. Sin sesión, ambos autorregistros mantienen
+sus reglas de confirmación existentes. Los campos vacíos de estos formularios
+de portada mantienen las líneas rojas y el resumen “Revisá los x campos indicados.”,
+sin repetir “Completá este campo.”. Se conservan errores útiles de formato,
+confirmación y servidor, validaciones y semántica accesible. Trazabilidad EXTRA-052.
+
+**Refinamiento autorizado de portada, 2026-10-23:** Máximo solicita retirar Mi
+perfil del cuadrante izquierdo y colocar “Ir al panel de usuario” debajo de
+“Ya tenés la sesión iniciada”. El destino usa el panel vigente por rol y conserva
+la entrada de navegación accesible dentro del recuadro; ofertas y detalle no
+cambian. Ver ofertas disponibles se desplaza suavemente al cuadrante izquierdo
+al seleccionar Registrarse → Empresa y vuelve al salir de ese modo, sin movimiento
+horizontal móvil ni animación con movimiento reducido. Trazabilidad EXTRA-053.
+
+> Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
 
 El componente de acceso reutilizable, si se monta con sesión activa verificada,
 muestra “Tu sesión está activa. Continuá desde

@@ -34,11 +34,15 @@ for (const account of [
   { role: "admin", href: "/account", label: "Cuenta", panelHref: "/admin", panelLabel: "Ir al panel de administración" },
 ] as const) {
   for (const entry of ["public", "private"] as const) {
-    test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page, browser }) => {
-      await loginFixture(page, account.role);
-      // Stop the previous page's prefetch before editing its session cookie.
-      // The requested entry route must perform the forced refresh itself.
-      await page.goto("about:blank");
+    test(`${account.role}: renueva en página ${entry}, conserva sesión al navegar y cierra explícitamente`, async ({ page: loginPage, browser }) => {
+      await loginFixture(loginPage, account.role);
+      const storageState = await loginPage.context().storageState();
+      // Dispose the login document and its background requests before injecting
+      // expiry. The new context has no pending admin prefetch/notification work.
+      await loginPage.context().close();
+      const isolatedContext = await browser.newContext({ baseURL: "http://127.0.0.1:3000", storageState });
+      try {
+      const page = await isolatedContext.newPage();
       await expireStoredSession(page.context());
       expect((await sessionCookie(page.context())).expiresAt).toBe(1);
       const response = await page.goto(entry === "public" ? "/ofertas" : account.href);
@@ -52,12 +56,13 @@ for (const account of [
 
       for (const path of ["/", "/ofertas", detail]) {
         await page.goto(path);
-        const navigation = page.getByRole("navigation", { name: "Navegación principal", exact: true });
-        const destination = { label: "Mi cuenta", href: account.panelHref };
+        const navigation = page.getByRole("navigation", { name: path === "/" ? "Accesos principales" : "Navegación principal", exact: true });
+        const destination = path === "/" ? { label: account.panelLabel, href: account.panelHref }
+          : { label: "Mi cuenta", href: account.panelHref };
         if (path === "/") {
-          await expect(page.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeVisible();
-          await expect(page.getByRole("region", { name: "Acceso al portal" })).toHaveCount(0);
-          await expect(page.getByText("Tu sesión está activa. Continuá desde tu panel.", { exact: true })).toHaveCount(0);
+          await expect(page.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeVisible();
+          await expect(page.getByRole("region", { name: "Acceso al portal" })).toContainText("Tu sesión está activa. Continuá desde tu panel.");
+          await expect(page.getByRole("region", { name: "Acceso al portal" }).getByRole("button", { name: "Cerrar sesión", exact: true })).toHaveCount(1);
         }
         if (path !== "/") {
           await page.setViewportSize({ width: 320, height: 800 });
@@ -70,10 +75,12 @@ for (const account of [
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           await page.setViewportSize({ width: 1280, height: 720 });
         }
+
         if (path === "/ofertas") {
           await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toHaveCount(0);
           await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toHaveCount(0);
-          await expect(page.getByRole("link", { name: account.panelLabel, exact: true })).toHaveAttribute("href", account.panelHref);
+          await expect(page.getByRole("complementary")).toHaveCount(0);
+          await expect(page.getByRole("navigation", { name: "Accesos principales", exact: true })).toHaveCount(0);
         }
         await expect(navigation.getByRole("link", { name: destination.label, exact: true })).toHaveAttribute("href", destination.href);
         await expect(navigation.getByRole("link", { name: "Iniciar sesión", exact: true })).toHaveCount(0);
@@ -95,8 +102,8 @@ for (const account of [
         await page.goto("/");
         await expect(page.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
         await page.goto("/ofertas");
-        await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toBeVisible();
-        await expect(page.getByRole("link", { name: "Iniciá sesión", exact: true })).toBeVisible();
+        await expect(page.getByRole("navigation", { name: "Navegación principal", exact: true }).getByRole("link", { name: "Inicio", exact: true })).toHaveAttribute("href", "/");
+        await expect(page.getByRole("link", { name: "Mi cuenta", exact: true })).toHaveCount(0);
         await page.goto(account.href);
         await expect(page).toHaveURL(/\?acceso=sesion-vencida$/);
         await tab.goto(account.href);
@@ -104,6 +111,7 @@ for (const account of [
         await tab.goto("/");
         await expect(tab.getByRole("button", { name: "Ingresar", exact: true })).toBeVisible();
       } finally { await resumed.close(); }
+      } finally { await isolatedContext.close(); }
     });
   }
 }

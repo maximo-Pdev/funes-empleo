@@ -1,5 +1,6 @@
 import { formatCalendarDate } from "@/lib/time/presentation";
 import Link from "next/link";
+import { CategoryLabels } from "@/components/job-category-label";
 import { publicModalityLabel } from "@/features/openings/public-offer-display";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, MapPin, ShieldCheck, CircleAlert } from "lucide-react";
 import { Card, Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui";
@@ -18,7 +19,7 @@ function OfferSummary({ offer }: { offer: PublicOffer }) {
     <p className="flex items-start gap-2"><MapPin className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{offer.location}</p>
     <p className="flex items-start gap-2"><CalendarDays className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />Cierre: {formatCalendarDate(offer.closing_date)}</p>
     <p>Modalidad: {publicModalityLabel(offer.modality)} · Vacantes: {offer.vacancies}</p>
-    <p>Rubros: {offer.categories.map(category => category.name).join(", ") || "Sin rubros informados"}</p>
+    <p>Rubros: <CategoryLabels categories={offer.categories} fallback="Sin rubros informados" /></p>
   </div>;
 }
 export async function renderCandidateOffersContent({ workspace, page, oferta, profileHref = "/dashboard?section=perfil", offersHref = "/dashboard?section=ofertas" }: {

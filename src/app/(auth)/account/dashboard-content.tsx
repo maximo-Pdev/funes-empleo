@@ -1,5 +1,6 @@
 import { formatCalendarDate, formatFunesDate } from "@/lib/time/presentation";
 import Link from "next/link";
+import { CategoryLabels } from "@/components/job-category-label";
 import { ArrowRight, BriefcaseBusiness, CalendarDays, ClipboardList, CircleCheck, CircleSlash, FileText, ShieldCheck, UserRound } from "lucide-react";
 import { Badge, Card } from "@/components/ui";
 import type { getCandidateWorkspace } from "@/features/candidates/profile-service";
@@ -85,7 +86,7 @@ export async function renderCandidateDashboardContent({ workspace, profileHref, 
               <h3 className={styles.itemTitle}><Link href={selectedOfferHref(offer.slug)} className={styles.sectionLink}>{offer.title}</Link></h3>
               <p className={styles.itemMeta}>{offer.company_name} · {offer.location}</p>
               <p className={styles.itemMeta}>Cierre: {formatCalendarDate(offer.closing_date)}</p>
-              <p className="text-sm text-muted-foreground">Rubros: {offer.categories.map(category => category.name).join(", ")}</p>
+              <p className="text-sm text-muted-foreground">Rubros: <CategoryLabels categories={offer.categories} /></p>
             </article></li>)}</ul>}
     </section>
 

@@ -1,5 +1,45 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+
+## Current integration authority — EXTRA-120
+
+Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.
+
+| Surface | Current contract |
+| --- | --- |
+| Home, every role | Keep the animated Hero and institutional introduction. Guests retain the existing login/registration, role guides, draft isolation and lifecycle notices unchanged. Active sessions keep the right card with a brief welcome/status, primary verified role-panel link, Ver ofertas and secondary existing logout action; omit login/registration tabs/forms and anonymous closing registration entrances. Keep PR89's gray active-state treatment. Active registration/access queries cannot reopen forms or replace the session. |
+| Shared navigation | Reuse actual HomeNavbar on normal public, auth/legal and dashboard pages. Guests: Inicio, Ofertas, Ingresar; active sessions: Inicio, Ofertas, notifications and Mi cuenta. Resolve all panel links from the same verified `getSiteAccess().panel`: candidate `/dashboard`, company `/empresa`, administrator `/admin`. No guessed roles, private notification reads for guests or navigation-based authorization. Preserve Home desktop scroll/reveal/timers, mobile visibility, fixed-header clearance and inner-page visibility. Ingresar uses `#contenido` on Home and `/#contenido` elsewhere, with main focus. Minimal technical fallbacks remain separate. |
+| Public catalog | Remove both help/accompaniment cards and duplicate header/profile shortcut. Use the full content area, retained GET filters, shared numeric pagination for every page with current-page semantics and wrapping, and centralized decorative category icons with readable text/neutral unknown fallback. Native select text, IDs, validation and FormData stay unchanged. |
+| Public detail | Use the actual shared navbar and existing white `candidateCanvas`/`sectionContent` canvas capped at 1280px on static green, without sidebar/junction. Breadcrumbs are Inicio / Ofertas / current title using adapted base-nova primitives. Retain every condition, task, requirement and optional salary/benefit, closing date once, then one unchanged final application link and slug. Remove both entire opportunity/accompaniment cards. Do not replace that application link with role-panel or registration CTAs; panel access belongs in the navbar and destination guards remain authoritative. Use LinkButton JSX, never call client `buttonVariants` from a server page. |
+| Compatible main layout | Retain public catalog/courses/wide Home section expansion to 1800px from 1440px and private usable-width layouts, card/row symmetry, natural mobile heights, stable DOM order and complete actions. Detail's explicit 1280px cap is the exception; removed asides cannot justify empty pairing cards or an aside-dependent grid. Retain narrow-navbar spacing, touch targets and sidebar footer/scroll access. |
+| Collections and retirement | Retain main's 10-record pages, initial five history/note records with access to all remaining records, selected/hash reveal, stable order/focus/counters, complete aggregate/export/option scope and unchanged privacy. Retain EXTRA-119's private append-only backup, atomic retirement/recovery, active-selector and metrics behavior, no automatic equivalence or history loss. This integration authorizes no migration execution or reset. |
+
+### Evidence and precedence
+
+The branch paragraphs below are preserved verbatim as provenance wherever possible. Any older header/sidebar/account-section target, role-override application CTA, active registration-tab instruction, uniform private-canvas cap or authenticated no-Hero requirement is **historical and superseded only for the scope in the table above**. Compatible requirements and all existing consent, referral, CV/photo, notification, hiring-window, audit and retirement restrictions remain effective; presentation is not authorization. EXTRA106/108 rollback is limited to its originating Home/login experiment, not independently approved features.
+
+Historical verification and approval paragraphs retain their original qualifications; they do not prove this integrated tree, current CI, PR review, product acceptance or municipal/legal approval. Integrated source/browser/non-reset gates and exact-head GitHub application/database checks remain **PENDING**, owned by the parent. This documentation unit runs structural checks only and changes no source, tests, schema, credentials, local records or remote state.
+
+See the title/branch disambiguation table in `cambios-extra.md` under EXTRA-120; bare EXTRA112–116 references are not globally unique.
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+
+## EXTRA-116 — Shared session navigation
+
+Use the existing verified getSiteAccess().panel projection for every normal
+public/auth/legal navbar. AuthSurface remains presentational with an optional
+panel prop resolved by its server page; retain the password page's guard. Reuse
+HomeNavbar's material, responsive behavior and notification center, deriving
+anonymous login navigation independently of alwaysVisible. No SQL, auth service,
+dependency or application-link change. Technical fallbacks remain minimal.
+
+> Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+### Current independent upstream addition — PR90
+
+The following consent layout remains current and is not superseded by the independent EXTRA-120 offers/navigation integration. Qualify this duplicate identifier by title and PR90 provenance.
+
 ## EXTRA120 — Composición local de Privacidad
 
 Separar el contenedor ancho accountActions del wrapper accountPassword de320px.
@@ -18,6 +58,8 @@ sin modificar eventos de consentimiento. Análisis CP1–CP4/constitución I–V
 presentación y contratos existentes, sin arquitectura/SQL ni decisión abierta nueva.
 Pruebas actuales de FormData/estados más navegador real readonly para geometría,
 details/confirmación vacía/foco y axe; verificar tipos/lint/tests/tooling/build.
+
+> Preserved main branch wording below remains historical only where superseded by the offers/navigation integration.
 
 ## EXTRA119 — Retiro de datos con respaldo privado
 
@@ -39,7 +81,11 @@ metricsCategories lee active y filtra en servidor el catálogo acotado: excluir 
 v1 DEMO-A/B inactivas. Mapear al DTO previo, sin modificar consultas de métricas ni
 selección de otras versiones/inactivas. Justificación y prueba en EXTRA119.
 
+> **Historical main decision — superseded by EXTRA-120.** Keep the following approval, intent and verification evidence verbatim; do not implement its no-Hero composition.
+
 ## EXTRA118 — Composición Home según panel verificado
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
 
 Reutilizar getSiteAccess una vez por request en Home force-dynamic. Panel activo
 omite HomeHero; no ocultarlo con CSS ni montar sus formularios/ribbons. Navbar
@@ -105,6 +151,8 @@ fallback/móvil, a11y/teclado y checks técnicos; recuperación por revert visua
 
 ## EXTRA113 — Ancho útil y densidad de escritorio
 
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
 Una variable CSS compartida de ancho público mantiene1280 hasta1439 y1800 desde
 1440. Consumidores: lienzo de ofertas, secciones Home y cursos. DashboardShell
 mantiene estructura/sidebar/padding y libera únicamente el max-width de su canvas.
@@ -125,6 +173,8 @@ duplicación local; no modificar HomeNavbar.tsx, ocultar accesos o cambiar timin
 
 ## EXTRA112 — Composición pública reutilizada
 
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
 PublicOffersShell servidor comparte HomeNavbar(alwaysVisible,panel,notifications)
 y CSS module local para espacio verde/lienzo blanco. Cada página mantiene lectura
 paralela de oferta/búsqueda, opciones y getSiteAccess por request; sin caché global
@@ -143,6 +193,8 @@ tipos/lint/unit/tooling/build; recuperación por revert de presentación, sin da
 
 
 ## PR86 documentation integration — current scope and historical evidence
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
 
 PR86 adds only session-aware public-offer presentation: `/ofertas` reads
 `getSiteAccess` once per request and reuses the verified `panel.href` and
@@ -259,6 +311,28 @@ axe (4.24→5.67:1); no agrega reglas o paletas locales. Evidencia y recuperaci�
 
 
 ## EXTRA106/108 — Presentación de acceso en /ofertas
+
+> Preserved local branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+EXTRA-113 amplía la revisión visual al detalle: reemplazar su header antiguo por
+HomeNavbar con getAccountAccess verificado; reutilizar candidateCanvas y
+sectionContent, sin sidebar/curva de panel privado. Usar Breadcrumb existente
+base-nova con enlaces Inicio/Ofertas y título actual, retirar ambos bloques del
+aside y mover el enlace de postulación existente al final de la ficha. No se
+modifican componentes compartidos, servicios, proyecciones, permisos o BD.
+
+> **Historical presentation wording:** any conflicting Hero, aside, CTA, width or navigation-target clause in this preserved paragraph is superseded by the current EXTRA-120 contract above; unrelated privacy and business restrictions remain unchanged.
+
+EXTRA-112, 31/10/2026, sustituye únicamente la composición de catálogo descrita
+abajo y el resumen histórico inicial: getSiteAccess conserva una lectura por
+request para HomeNavbar; se retiran el acceso repetido del header y las dos
+tarjetas del aside. El listado ocupa el área completa. Se reutiliza
+PaginationLink base-nova para todos los números, aria-current y enlaces GET con
+filtros preservados y flex-wrap. CategoryLabel centraliza íconos Lucide por
+nombre/código conocido con fallback neutro, sin cambiar proyecciones públicas,
+catálogo persistido ni opciones select nativas. El detalle conserva su tarjeta.
 
 Reutilizar getSiteAccess por request para header y tarjeta lateral en una sola
 lectura de sesión. Si panel existe, ofrecer su href/label por rol; si no,

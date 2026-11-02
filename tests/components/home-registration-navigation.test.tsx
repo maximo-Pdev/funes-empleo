@@ -8,7 +8,7 @@ vi.mock("server-only", () => ({}));
 const { readSession } = vi.hoisted(() => ({ readSession: vi.fn() }));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession: readSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers: vi.fn(async () => ({ items: [] })) }));
-vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn(), logoutAction: vi.fn() }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 import HomePage from "@/app/(public)/page";
@@ -61,11 +61,16 @@ it.each(["candidate", "company", "admin"])("ignores registration route selection
     readSession.mockResolvedValueOnce({ account: { role, status: "active" } });
     const view = render(await HomePage({ searchParams: Promise.resolve({ registro }) }));
     const assertOffers = () => {
-      expect(screen.queryByText("Tu sesión está activa. Continuá desde tu panel.")).toBeNull();
-      expect(screen.getByRole("heading", { level: 1, name: "Ofertas disponibles" })).toBeTruthy();
-      expect(screen.queryByRole("region", { name: "Acceso al portal" })).toBeNull();
+      expect(screen.getByText("Tu sesión está activa. Continuá desde tu panel.")).toBeTruthy();
+      expect(screen.getByRole("heading", { level: 1, name: "El empleo en Funes, con acompañamiento municipal." })).toBeTruthy();
+      expect(screen.getByRole("region", { name: "Acceso al portal" }).getAttribute("data-mode")).toBe("login");
+      expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
+      const href = role === "candidate" ? "/dashboard" : role === "company" ? "/empresa" : "/admin";
+      expect(within(screen.getByRole("navigation", { name: "Accesos principales" })).getByRole("link").getAttribute("href")).toBe(href);
       expect(screen.queryByRole("radio")).toBeNull();
-      expect(view.container.querySelector("form")).toBeNull();
+      expect(view.container.querySelectorAll("form")).toHaveLength(1);
+      expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
+      expect(screen.queryByLabelText("Correo electrónico")).toBeNull();
     };
     assertOffers();
     for (const requestedRole of ["candidate", "company"]) {
@@ -84,7 +89,8 @@ it("returns the hero and access panel to login when a session becomes active", (
   expect(screen.queryByRole("group", { name: "Opciones de acceso" })).toBeNull();
   expect(screen.getByRole("heading", { level: 1 }).parentElement?.getAttribute("data-view")).toBe("login");
   expect(screen.queryByRole("radio")).toBeNull();
-  expect(view.container.querySelector("form")).toBeNull();
+  expect(view.container.querySelectorAll("form")).toHaveLength(1);
+  expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
 });
 
 it.each(["candidate", "company", "admin"])("hides closing registration entrances for an active %s while keeping municipal contact", async role => {

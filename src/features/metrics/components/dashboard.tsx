@@ -1,4 +1,5 @@
 import { RecordLabel } from "@/components/ui/record-link";
+import { CategoryLabel } from "@/components/job-category-label";
 import type { MetricRow } from "@/validation/metrics";
 import styles from "./dashboard.module.css";
 import { metricLabel } from "../labels";
@@ -49,7 +50,7 @@ export function Dashboard({ rows }: { rows: readonly MetricRow[] }) {
       <p className="mb-3">Una persona u oferta puede pertenecer a varias categorías; los desgloses no deben sumarse como un total único.</p>
       {categories.length === 0 && <p>No hay datos por categoría para este período.</p>}
       <ul className={styles.categories}>{categories.map((r) =>
-        <li key={`${r.indicator}:${r.category_id}`} className={styles.category}>{r.category_name ?? "Categoría sin nombre"}: {metricLabel(r.indicator)} — <strong>{formatCount(r.value)}</strong>
+        <li key={`${r.indicator}:${r.category_id}`} className={styles.category}><CategoryLabel name={r.category_name ?? "Categoría sin nombre"} />: {metricLabel(r.indicator)} — <strong>{formatCount(r.value)}</strong>
           <div className={styles.track} data-metric-bar aria-hidden="true">{r.value !== null && <div className={styles.bar} style={{ width: `${Math.max(0, r.value) / categoryMaximum * 100}%` }} />}</div>
         </li>)}</ul>
     </section>

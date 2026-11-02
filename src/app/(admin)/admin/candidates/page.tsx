@@ -1,4 +1,5 @@
 import { referenceFilters } from "@/lib/records/page-references";
+import { CategoryLabels } from "@/components/job-category-label";
 import { referenceUrl } from "@/lib/records/reference-url";
 import { recordReferences } from "@/lib/records/references";
 import { RecordLink as Link } from "@/components/ui/record-link";
@@ -60,7 +61,7 @@ export default async function AdminCandidatesPage({ searchParams }: { searchPara
                 <TableCell className="font-semibold"><Link className="text-blue-800 underline" href={`/admin/candidates/${candidate.id}`}>{candidate.displayName}</Link></TableCell>
                 <TableCell>{candidate.locality ?? "Localidad no informada"}</TableCell>
                 <TableCell><Badge variant="status" tone={statusTone(availabilityTones, candidate.availability)}>{availabilityLabel(candidate.availability)}</Badge></TableCell>
-                <TableCell>{candidate.categories.length ? candidate.categories.map((category) => category.name).join(", ") : "Sin categorías activas"}</TableCell>
+                <TableCell><CategoryLabels categories={candidate.categories} fallback="Sin categorías activas" /></TableCell>
                 <TableCell>{candidate.referralEligible ? "Apto para evaluar derivación" : "No apto para nueva derivación"}</TableCell>
               </TableRow>)}
             </TableBody>

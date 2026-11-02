@@ -11,7 +11,7 @@ vi.mock("react", async importOriginal => ({
   ...await importOriginal<typeof import("react")>(),
   useActionState: () => [response.state, vi.fn(), response.pending],
 }));
-vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn() }));
+vi.mock("@/features/accounts/actions", () => ({ loginAction: vi.fn(), recoveryAction: vi.fn(), verificationAction: vi.fn(), passwordAction: vi.fn(), logoutAction: vi.fn() }));
 vi.mock("@/features/candidates/registration-actions", () => ({ registerCandidateAction: vi.fn() }));
 vi.mock("@/features/companies/company-actions", () => ({ registerCompanyAction: vi.fn() }));
 
