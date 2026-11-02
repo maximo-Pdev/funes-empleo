@@ -68,10 +68,12 @@ it.each(contexts)("permite nuevos intentos y conserva continuación en $base, el
     assertContinuation();
     mocks.list.mockResolvedValue([{ id: "attempt-1", opening_id: offer.id, display_status: "withdrawn" }]);
     view.rerender(await content(context));
+    expect(screen.getByText(/Tu postulación anterior fue retirada/)).toBeTruthy();
     expect(screen.getByRole("button", { name: "Postularme" })).toHaveProperty("disabled", false);
     expect(screen.queryByText("Postulación recibida por la Oficina de Empleo.")).toBeNull();
     expect(screen.getByLabelText("CV específico para esta oferta (opcional)")).toHaveProperty("disabled", false);
     await submit();
+    expect(screen.queryByText(/Tu postulación anterior fue retirada/)).toBeNull();
 
     // A new withdrawn attempt must reset success even when the visible status is unchanged.
     mocks.list.mockResolvedValue([
@@ -87,4 +89,13 @@ it.each(["received", "hired", "not_selected", "cancelled", "no_company_response"
   mocks.list.mockResolvedValue([{ id: "old", opening_id: offer.id, display_status: "withdrawn" }, { id: "new", opening_id: offer.id, display_status }]);
   render(await content(contexts[0]!));
   expect(screen.getByRole("button", { name: "Participación registrada" })).toHaveProperty("disabled", true);
+  expect(screen.queryByText(/Tu postulación anterior fue retirada/)).toBeNull();
+});
+
+it("el aviso de retiro no omite los requisitos del perfil", async () => {
+  mocks.list.mockResolvedValue([{ id: "old", opening_id: offer.id, display_status: "withdrawn" }]);
+  render(await renderCandidateOffersContent({ workspace: { ...workspace, profile: { ...workspace.profile, availability: "unavailable" } } as Parameters<typeof renderCandidateOffersContent>[0]["workspace"] }));
+  expect(screen.getByText(/Tu postulación anterior fue retirada/)).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Postularme" })).toHaveProperty("disabled", true);
+  expect(screen.getByText(/Para postularte necesitás el perfil activo/)).toBeTruthy();
 });

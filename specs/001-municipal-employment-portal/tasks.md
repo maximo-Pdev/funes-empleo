@@ -5,6 +5,29 @@ description: "Dependency-ordered tasks for the Funes Municipal Employment Portal
 
 # Tasks: MVP del Portal Municipal de Empleo de Funes
 
+- [x] T302 EXTRA122: registrar PA1–PA4/evidencia y plan antes de código; revisar
+  contrato SQL de fechas, estados/acciones, foco/anchor y alcance de presentación.
+- [x] T303 Ubicar Caso/Acciones juntos, reducir opciones iniciales y renombrar
+  derivación; quitar Fecha realizada en ambos formularios y validar la programada.
+- [x] T304 Verificar opciones/errores/payload/retención, fases posteriores,
+  página/anchors, PC/móvil y entrevistas admin/empresa; tipos/lint/pruebas/build,
+  documentación y límites sin modificar EXTRA121 o next-env ajeno.
+  124 focales,1694/141 suite,66 tooling, tipos/lint/build PASS; tres E2E distintos
+  PASS (dos intermediation y presencial tras corregir env/buzón propios QA).
+  Geometría1920/1366/390/axe, fechas persistidas sin held_at y capturas verificadas;
+  EXTRA122 registra fallos de preparación/límites, sin SQL nuevo/revisión humana.
+
+- [x] T299 EXTRA121: leer contexto, verificar merge/árbol/rama, inspeccionar R2,
+  SQL/lectores/CTA, registrar AP1–AP4 y revisar plan/calidad/análisis del delta.
+- [x] T300 Unificar estado propio por oferta en helper/listado/detalle, agregar
+  aviso tras retiro y fallback seguro; conservar backend, permisos, CV e historial.
+- [x] T301 Verificar estados/roles/errores, retiro→nuevo intento/concurrencia,
+  SQL075, tipos/lint/unit/tooling/build y navegador; documentar resultados/límites
+  sin atribuir aprobación humana ni tocar next-env o entornos ajenos.
+  56 focales,1692/140 suite,66 tooling, tipos/lint/build, SQL075 actual41 y2 E2E
+  sin retries/skips PASS. Capturas/axe390/1440/cache privada verificadas; EXTRA121
+  documenta límite de SQL QA antiguo y ausencia de ejecución SQL actual completa.
+
 - [x] T296 EXTRA120: leer contexto/precedencia094/102 y registrar aclaración visual,
   evidencia320px, requisitos CP1–CP4, plan/checklist y análisis antes de código.
 - [x] T297 Reordenar tarjeta Privacidad con primitivas existentes y CSS local;

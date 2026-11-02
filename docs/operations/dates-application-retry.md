@@ -1,5 +1,24 @@
 # Fechas y nueva postulación tras retiro
 
+## Consistencia entre listado y detalle — EXTRA121, 02/11/2026
+
+El detalle de la oferta consulta el estado propio solo para candidatos con
+sesión activa verificada. Si ya participa muestra «Ver mi postulación»; si solo
+hay retiros anteriores muestra «Volver a postularme». El formulario del listado
+y el de la oferta elegida muestran el mismo aviso del historial retirado. Un
+intento nuevo conserva el caso anterior y puede usar otro CV; ni la cancelación
+municipal ni otros resultados finales se convierten en retiros del candidato.
+
+Ante fallo al consultar, el detalle ofrece revisar postulaciones sin afirmar que
+se puede enviar. El enlace público de visitantes/otros roles sigue protegido por
+los controles actuales de sesión/rol. La aptitud final se valida al enviar en
+servidor y BD; el aviso no habilita perfiles no disponibles o sin consentimiento.
+
+No requiere otra migración: usa 20261029180304 ya existente. Recuperación visual
+mediante revert del helper/entradas, conservando todo el historial y las guardas
+SQL. Pruebas adicionales: application-state.test.ts y public-offer-application-
+state.test.tsx; z-application-retry verifica ambas entradas y nuevo CV.
+
 EXTRA102,2026-10-29. Fechas visibles en DD/MM/YYYY, con día/mes de dos cifras y
 año completo. Historiales conservan hora y segundos; notificaciones y fecha de
 derivación conservan precisión de minutos. Instantes se muestran en Funes; fechas

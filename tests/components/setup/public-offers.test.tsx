@@ -13,6 +13,7 @@ const { listPublicOffers, listPublicOfferFilters, getPublicOffer, notFound, read
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth/session", () => ({ readAccountSession }));
 vi.mock("@/features/openings/public-service", () => ({ listPublicOffers, getPublicOffer, listPublicOfferFilters }));
+vi.mock("@/features/participations/candidate-service", () => ({ listMyParticipations: vi.fn(async () => []) }));
 vi.mock("next/navigation", () => ({ notFound, usePathname: () => "/ofertas" }));
 vi.mock("@/features/notifications/components/notification-center", () => ({ NotificationCenter: () => <button>Notificaciones</button> }));
 

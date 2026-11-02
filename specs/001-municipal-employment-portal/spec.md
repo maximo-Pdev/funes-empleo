@@ -1,5 +1,43 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA122 — Acciones iniciales y formulario de entrevistas, 02/11/2026
+
+- **PA1:** en seguimiento administrativo, Acciones sobre la participación queda
+  al lado derecho de Caso en PC y después de Caso en móvil. Conserva case-actions,
+  foco/enlaces de guía, datos y secciones de resultados/historial existentes.
+- **PA2:** en received y under_review solo mostrar Registrar preentrevista,
+  Derivar a la empresa y Cancelar solo este caso. Mantener acciones de estados
+  posteriores y sus validaciones, motivos, evidencias y permisos; refer cambia
+  su etiqueta en todos los estados que lo ofrecen, no su comando o efectos.
+- **PA3:** quitar Fecha realizada en registrar preentrevista y entrevista de
+  empresa; Fecha programada es requerida como única fecha de esos formularios.
+  No deducir una realización automática. Históricos y contratos de servidor
+  conservan sus fechas opcionales existentes; no cambia agenda/privacidad.
+- **PA4:** verificar opciones por estado, guardas de motivo, error/retención/
+  foco, envío sin fecha realizada, conversión Funes y persistencia, ubicación
+  PC/móvil y recorrido administrativo/empresa con autorizaciones actuales.
+
+## EXTRA121 — Coherencia de postulación propia, 02/11/2026
+
+Este pedido de Mateo ajusta el CTA invariable del detalle público de PR91 solo
+para informar correctamente el estado de la sesión candidata. Mantiene el resto
+de la integración visual y la regla R2 de EXTRA102 «Fechas y nueva postulación».
+
+- **AP1:** detalle y formulario de ofertas distinguen sin historial, solo retiros
+  y participación existente en cualquier otro estado no archivado. Un caso que
+  bloquea prevalece sobre los retiros previos; otra oferta no influye.
+- **AP2:** tras retiro, mostrar que hubo una postulación retirada y que se puede
+  volver a postular si perfil/oferta siguen habilitados. Es un nuevo intento con
+  historial conservado, no una restauración. El formulario conserva sus controles
+  de perfil, consentimiento, disponibilidad, vigencia, CV y duplicados.
+- **AP3:** con participación existente, el detalle ofrece consultar las propias
+  postulaciones, sin prometer un nuevo envío. Para visitantes y otros roles se
+  conserva la entrada pública protegida actual. Lectura privada solo candidata;
+  ante error, aviso seguro y acceso a consultar, nunca elegibilidad inventada.
+- **AP4:** verificar detalle→formulario→envío→retiro→nuevo envío desde ambas
+  entradas, estados finales/concurrencia, CV e historial intactos, error de
+  lectura, roles/no lectura privada, teclado y responsive. Sin cambio de BD.
+
 
 ## Current integration authority — EXTRA-120
 

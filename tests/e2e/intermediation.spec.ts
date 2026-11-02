@@ -1,6 +1,7 @@
 import { referenceIdentifier, persistedReference } from "./fixtures/record-reference";
 import { nominateFromOpening } from "./fixtures/nomination";
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
 import fixtures from "../fixtures/acceptance-manifest.json" with { type: "json" };
 const fixture = { ...fixtures, ...fixtures.acceptance };
@@ -189,9 +190,11 @@ test("entrevista, no selección y cancelación individual revocan cada permiso s
     await company.goto(`/empresa/ofertas/${opening}?referral=${fixtureId("referral", 9)}#derivaciones`);
     await expect(company.getByRole("heading", { name: "Derivación de Persona ficticia 009", exact: true })).toBeVisible();
     await company.getByLabel("Estado", { exact: true }).selectOption("completed");
-    await company.getByLabel("Fecha realizada (Funes)").fill("2026-09-24T14:00");
+    await expect(company.getByLabel("Fecha realizada (Funes)")).toHaveCount(0);
+    await company.getByLabel("Fecha programada (Funes)").fill("2026-09-24T14:00");
     await company.getByRole("button", { name: "Registrar entrevista" }).click();
     await expect(company.getByText("La entrevista quedó registrada.")).toBeVisible();
+    expect(runLocalMaintenanceSql(`select scheduled_at is not null and held_at is null from public.company_interviews where referral_id='${fixtureId("referral", 9)}' order by created_at desc,id desc limit 1`)).toBe("t");
     await company.getByLabel("Resultado informado").selectOption("not_selected");
     await company.getByLabel("Motivo de no selección", { exact: true }).fill("Otro perfil reúne la experiencia requerida.");
     await company.getByRole("button", { name: "Enviar informe" }).click();
@@ -307,12 +310,32 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await expect(admin.getByText("Origen: Nominación administrativa")).toBeVisible();
     const currentStatus = admin.getByRole("status").filter({ hasText: "Resultado o estado vigente" });
     await expect(currentStatus).toContainText("En revisión");
+    const overview = admin.locator('[data-detail-grid="participation-overview"]');
+    for (const width of [1920,1366,390]) {
+      await admin.setViewportSize({width,height:1080});
+      const identity = await overview.locator('[data-detail-cell="case"]').boundingBox();
+      const actions = await overview.locator('#case-actions').boundingBox();
+      expect(identity).not.toBeNull(); expect(actions).not.toBeNull();
+      if (width >= 1024) {
+        expect(Math.abs(identity!.y-actions!.y)).toBeLessThan(1);
+        expect(actions!.x).toBeGreaterThanOrEqual(identity!.x+identity!.width);
+        expect(Math.abs(identity!.width-actions!.width)).toBeLessThan(1);
+      } else { expect(actions!.y).toBeGreaterThanOrEqual(identity!.y+identity!.height); }
+      expect(await admin.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+      expect((await new AxeBuilder({page:admin}).analyze()).violations).toEqual([]);
+    }
+    await admin.setViewportSize({width:1920,height:1080});
+    expect(await admin.getByLabel("Acción").locator("option").evaluateAll(options => options
+      .filter(option => (option as HTMLOptionElement).value).map(option => option.textContent)))
+      .toEqual(["Registrar preentrevista", "Derivar a la empresa", "Cancelar solo este caso"]);
     await admin.getByLabel("Acción").selectOption("record_preinterview");
+    await expect(admin.getByLabel("Fecha realizada")).toHaveCount(0);
     await admin.getByLabel("Canal de preentrevista").selectOption("phone");
     await admin.locator("#preinterview-summary").fill("Preentrevista municipal ficticia.");
-    await admin.getByLabel("Fecha realizada").fill("2026-09-24T14:00");
+    await admin.getByLabel("Fecha programada").fill("2026-09-24T14:00");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Preentrevista");
+    expect(runLocalMaintenanceSql(`select scheduled_at is not null and held_at is null from public.preinterviews i join public.participations p on p.id=i.participation_id where p.candidate_id='${fixtureId("profile", 1)}' and p.opening_id='${fixtureId("opening", 2)}' order by i.created_at desc,i.id desc limit 1`)).toBe("t");
     await admin.getByLabel("Acción").selectOption("preselect");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Preseleccionada");
@@ -330,7 +353,8 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     // municipal evaluation or the actual internal participation stage.
     await expect(nominated.getByRole("heading", { name: "Preentrevista de la Oficina de Empleo", exact: true })).toBeVisible();
     await expect(nominated).toContainText("Canal: Teléfono");
-    await expect(nominated.getByText(/^Realizada:/)).toContainText("24/09/2026");
+    await expect(nominated.getByText(/^Programada:/)).toContainText("24/09/2026");
+    await expect(nominated.getByText(/^Realizada:/)).toHaveCount(0);
     await expect(nominated).not.toContainText(/Preseleccionada|Derivada|Resumen interno|Recomendación/);
     await expect(nominated).not.toContainText("Preentrevista municipal ficticia.");
     await nominated.getByLabel("Confirmo que quiero retirar esta participación.").check();
@@ -342,12 +366,8 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
 
     await nominateFromOpening(admin, fixtureId("profile", 1), fixtureId("opening", 3));
     await expect(currentStatus).toContainText("En revisión");
-    await admin.getByLabel("Acción").selectOption("skip_to_preselected");
-    await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Omisión justificada de etapas ficticias.");
-    await admin.getByRole("button", { name: "Registrar acción" }).click();
-    await expect(currentStatus).toContainText("Preseleccionada");
-    await expect(currentStatus).not.toContainText("Derivada");
     await admin.getByLabel("Acción").selectOption("refer");
+    await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Omisión justificada de etapas ficticias.");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Derivada");
     await admin.getByLabel("Acción").selectOption("withdraw_on_request");
@@ -384,12 +404,8 @@ test("la Oficina nomina, preentrevista, preselecciona y deriva; candidato y admi
     await admin.goto(`/admin/candidates/${fixtureId("profile", 1)}`);
     await admin.getByRole("link", { name: "Oferta ficticia 004" }).click();
     await expect(currentStatus).toContainText("Recibida");
-    await admin.getByLabel("Acción").selectOption("skip_to_preselected");
-    await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Evaluación previa ficticia documentada.");
-    await admin.getByRole("button", { name: "Registrar acción" }).click();
-    await expect(currentStatus).toContainText("Preseleccionada");
-    await expect(currentStatus).not.toContainText("Derivada");
     await admin.getByLabel("Acción").selectOption("refer");
+    await admin.getByRole("textbox", { name: "Motivo interno" }).fill("Evaluación previa ficticia documentada.");
     await admin.getByRole("button", { name: "Registrar acción" }).click();
     await expect(currentStatus).toContainText("Derivada");
   } finally { await Promise.all([adminContext.close(), candidateContext.close(), companyContext.close()]); }

@@ -42,7 +42,8 @@ export default async function AdminParticipationDetailPage({ params }: {
   return <AdminShell email={user?.email} active="/admin/participations" title="Seguimiento de participación"
     description="Estado vigente, decisiones y registros internos de este caso."
     navigation={[{ href: "/admin/participations", label: "Volver a casos" }, { href: "/admin/openings", label: "Ofertas" }]}>
-        <section aria-labelledby="participation-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
+    <div className={`${layout.grid} mb-6`} data-detail-grid="participation-overview">
+        <section data-detail-cell="case" aria-labelledby="participation-details" className="space-y-3 rounded-lg border border-slate-300 bg-white p-5">
           <h2 id="participation-details" className="text-xl font-semibold">Caso</h2>
           <p>Candidato: <Link href={`/admin/candidates/${participation.candidate_profiles.id}`} className="text-blue-800 underline">{participation.candidate_profiles.display_name}</Link></p>
           <p>Oferta: <Link href={`/admin/openings/${participation.job_openings.id}`} className="text-blue-800 underline">{participation.job_openings.title ?? "Oferta sin título"}</Link></p>
@@ -55,6 +56,18 @@ export default async function AdminParticipationDetailPage({ params }: {
           {referral && <p className="flex flex-wrap items-center gap-2">Acceso empresarial <Badge variant="status" tone={statusTone(referralAccessTones, referral.access_status)}>{displayLabel(referralAccessLabels, referral.access_status)}</Badge>{referral.access_status === "active" ? <span className="text-sm text-muted-foreground">bajo condiciones vigentes</span> : null}</p>}
           {referral?.post_hire_access_until && <p>Fin de ventana poscontratación: {localDate(referral.post_hire_access_until)}</p>}
         </section>
+
+        <div id="case-actions" tabIndex={-1} className={`${layout.cell} ${layout.notice} scroll-mt-24`}>
+        <ParticipationActionForm key={`${participation.id}:${participation.version}`} participationId={participation.id}
+          version={participation.version} status={participation.status}
+          contacts={contacts.map((item) => ({ id: item.id, direction: item.direction,
+            label: `${localDate(item.occurred_at)} · ${displayLabel(contactChannelLabels, item.channel, "Canal no informado")} · ${item.summary_internal.slice(0, 60)}` }))}
+          feedback={feedback.filter((item) => item.review_status === "pending_admin")
+            .map((item) => ({ id: item.id,
+              label: `${localDate(item.reported_at)} · ${displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}` }))}
+          onSubmit={adminParticipationAction} />
+        </div>
+    </div>
 
     <section aria-label="Próximo paso" className="my-6 rounded-lg border border-border p-5">
       <WorkflowSteps label="Etapas del caso" steps={guidance.steps} />
@@ -73,16 +86,6 @@ export default async function AdminParticipationDetailPage({ params }: {
           onConfirm={confirmFeedbackAction} />
     </div>
     <div className={layout.grid} data-detail-grid="participation">
-        <div id="case-actions" tabIndex={-1} className={`${layout.cell} ${layout.full} ${layout.notice} scroll-mt-24`}>
-        <ParticipationActionForm key={`${participation.id}:${participation.version}`} participationId={participation.id}
-          version={participation.version} status={participation.status}
-          contacts={contacts.map((item) => ({ id: item.id, direction: item.direction,
-            label: `${localDate(item.occurred_at)} · ${displayLabel(contactChannelLabels, item.channel, "Canal no informado")} · ${item.summary_internal.slice(0, 60)}` }))}
-          feedback={feedback.filter((item) => item.review_status === "pending_admin")
-            .map((item) => ({ id: item.id,
-              label: `${localDate(item.reported_at)} · ${displayLabel(feedbackOutcomeLabels, item.reported_outcome, "Respuesta informada")}` }))}
-          onSubmit={adminParticipationAction} />
-        </div>
         <div id="contact-record" tabIndex={-1} className={`${layout.cell} scroll-mt-24`} data-detail-cell="contact-form">
         <ContactRecordForm key={`contact:${participation.id}:${participation.version}`}
           participationId={participation.id} version={participation.version}

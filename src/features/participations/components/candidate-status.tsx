@@ -8,9 +8,10 @@ import { withdrawParticipationAction } from "../candidate-actions";
 import { FileInput } from "@/components/forms/file-input";
 import { Button } from "@/components/ui/button";
 import { CV_ACCEPT, CV_FILE_ERROR, CV_FORMAT_HINT, MAX_CV_BYTES } from "@/lib/files/cv-policy";
+import { WITHDRAWN_APPLICATION_NOTICE } from "../application-state";
 
-export function CandidateApplyForm({ openingId, candidateVersion, disabled, alreadyApplied = false, generalCvName, participationsHref = "/dashboard?section=postulaciones" }: {
-  openingId: string; candidateVersion: number; disabled: boolean; alreadyApplied?: boolean; participationsHref?: string; generalCvName?: string;
+export function CandidateApplyForm({ openingId, candidateVersion, disabled, alreadyApplied = false, previouslyWithdrawn = false, generalCvName, participationsHref = "/dashboard?section=postulaciones" }: {
+  openingId: string; candidateVersion: number; disabled: boolean; alreadyApplied?: boolean; previouslyWithdrawn?: boolean; participationsHref?: string; generalCvName?: string;
 }) {
   const router = useRouter();
   const [state, setState] = useState({ message: "", success: false });
@@ -37,6 +38,7 @@ export function CandidateApplyForm({ openingId, candidateVersion, disabled, alre
   }}>
     <input type="hidden" name="openingId" value={openingId} /><input type="hidden" name="candidateVersion" value={candidateVersion} />
     {!alreadyApplied && !state.success && <>
+      {previouslyWithdrawn && <p className="rounded-lg border border-border bg-secondary p-3 text-sm leading-6 text-primary-900">{WITHDRAWN_APPLICATION_NOTICE}</p>}
       <p className="text-sm text-muted-foreground">Si no adjuntás otro archivo, se usará tu CV del perfil{generalCvName ? `: ${generalCvName}` : ""}.</p>
       <details className="rounded-lg border border-border p-3">
         <summary className="cursor-pointer text-sm font-semibold text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">Usar otro CV para esta oferta</summary>

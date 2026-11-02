@@ -75,6 +75,11 @@ it("puts case identity before actionable guidance and preserves evidence destina
  expect(identity.compareDocumentPosition(guide) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(within(guide).getByRole("link", { name: "Ir a la acción disponible" }).getAttribute("href")).toBe("#case-actions");
  expect(document.querySelector("#case-actions")?.getAttribute("tabindex")).toBe("-1");
+ const overview = document.querySelector('[data-detail-grid="participation-overview"]')!;
+ expect(overview.querySelector('[data-detail-cell="case"]')).toBeTruthy();
+ expect(overview.querySelector("#case-actions")).toBeTruthy();
+ expect(identity.compareDocumentPosition(document.querySelector("#case-actions")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(document.querySelector("#case-actions")!.compareDocumentPosition(guide) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(document.querySelector("#contact-record")).toBeTruthy();
  expect(screen.getByRole("list", { name: "Etapas del caso" })).toBeTruthy();
 });
@@ -85,7 +90,7 @@ it("prioritizes confirmation of a pending company response with unique anchors",
  const ids = Array.from(document.querySelectorAll("[id]")).map(node => node.id);
  expect(new Set(ids).size).toBe(ids.length);
  const review = document.querySelector("#feedback-review")!;
- expect(review.compareDocumentPosition(document.querySelector("#case-actions")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ expect(document.querySelector("#case-actions")!.compareDocumentPosition(review) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 it("surfaces existing closing dates in administrative offer summaries", async () => {
  render(await Openings({ searchParams: Promise.resolve({}) }));

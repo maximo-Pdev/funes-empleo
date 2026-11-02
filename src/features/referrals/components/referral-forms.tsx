@@ -39,9 +39,9 @@ export function FeedbackForm({ openingId, referralId }: { openingId: string; ref
 export function InterviewForm({ openingId, referralId, version }: { openingId: string; referralId: string; version: number }) {
   const [state, action, pending] = useActionState(submitInterviewAction, initialReferralActionState);
   return (
-    <Form action={action} result={state} requirements={[{ names: ["scheduledAt", "heldAt"], message: "Indicá la fecha programada o realizada de la entrevista." }]} className="rounded-md border border-slate-300 p-4">
+    <Form action={action} result={state} className="rounded-md border border-slate-300 p-4">
       <h3 className="text-lg font-semibold">Registrar entrevista</h3>
-      <p className="mt-1 text-sm text-slate-700">Indicá al menos una fecha. Las horas se interpretan en la zona de Funes.</p>
+      <p className="mt-1 text-sm text-slate-700">Indicá la fecha programada. Las horas se interpretan en la zona de Funes.</p>
       <input type="hidden" name="openingId" value={openingId} />
       <input type="hidden" name="referralId" value={referralId} />
       <input type="hidden" name="expectedVersion" value={version} />
@@ -51,8 +51,7 @@ export function InterviewForm({ openingId, referralId, version }: { openingId: s
         <option value="cancelled">Cancelada</option>
         <option value="no_show">No se presentó</option>
       </select></Field>
-      <Field className="mt-4 block font-medium" label={<>Fecha programada (Funes)</>}><input id="fecha-programada" name="scheduledAt" type="datetime-local" className="mt-1 min-h-11 w-full rounded-md border border-slate-500 px-3 py-2 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700" /></Field>
-      <Field className="mt-4 block font-medium" label={<>Fecha realizada (Funes)</>}><input id="fecha-realizada" name="heldAt" type="datetime-local" className="mt-1 min-h-11 w-full rounded-md border border-slate-500 px-3 py-2 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700" /></Field>
+      <Field className="mt-4 block font-medium" label={<>Fecha programada (Funes)</>}><input id="fecha-programada" name="scheduledAt" type="datetime-local" required className="mt-1 min-h-11 w-full rounded-md border border-slate-500 px-3 py-2 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700" /></Field>
       <Field className="mt-4 block font-medium" label={<>Observación para la Oficina (opcional)</>}><textarea id="detalle-entrevista" name="message" maxLength={2000} rows={3} className="mt-1 w-full rounded-md border border-slate-500 p-3 focus-visible:outline focus-visible:outline-3 focus-visible:outline-blue-700" /></Field>
       <div className="mt-4"><Button type="submit" busy={pending} busyLabel="Guardando…">Registrar entrevista</Button></div>
       {state.status !== "idle" && <p role={state.status === "error" ? "alert" : "status"} className="mt-3" aria-live="polite">{state.message}</p>}
