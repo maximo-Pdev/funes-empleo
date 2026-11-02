@@ -1,5 +1,6 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+
 ## Current integration authority — EXTRA-120
 
 Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.
@@ -36,6 +37,28 @@ anonymous Ingresar; it does not change offer application links or permissions.
 
 > Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
 
+### Current independent upstream addition — PR90
+
+The following consent layout remains current and is not superseded by the independent EXTRA-120 offers/navigation integration. Qualify this duplicate identifier by title and PR90 provenance.
+
+## EXTRA120 — Presentación del consentimiento del postulante
+
+Mateo confirma alcance visual01/11/2026; no cambia R4 de EXTRA094/102.
+
+- **CP1:** Cuenta > Privacidad aprovecha el ancho útil en PC, con lectura limitada
+  por longitud de línea y altura natural. El límite320px solo sigue en contraseña.
+- **CP2:** distinguir título/estado, información y decisión; Más información
+  conserva su apertura explícita y texto íntegro. En móvil apilar sin overflow,
+  alturas fijas, contenido recortado o scroll interno.
+- **CP3:** conservar textos/reglas y ubicación, aceptación una vez y retiro
+  manual explícito. Checkbox requerido inicialmente desmarcado, formulario/acciones/
+  campos y versión iguales; feedback, foco, estado pendiente y refresh intactos.
+  El retiro usa el estilo destructivo compartido; no duplicar aceptación vigente.
+- **CP4:** verificar pendiente/aceptado/retirado, desktop1920/1366 y móvil390/320,
+  teclado/errores/contraste y lectura completa. Perfil mantiene su enlace existente
+  a Cuenta; no cambia política legal, consentimiento operativo, permisos o datos.
+
+> Preserved main branch wording below remains historical only where superseded by the offers/navigation integration.
 
 ## EXTRA119 — Retiro operativo de categorías ficticias
 

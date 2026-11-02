@@ -1,5 +1,6 @@
 # Municipal visual reference
 
+
 ## Current integration authority — EXTRA-120
 
 Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.
@@ -49,6 +50,21 @@ The shortcut is absent from anonymous login and both registration modes.
 
 
 > **Historical main decision — superseded by EXTRA-120.** Keep the following approval, intent and verification evidence verbatim; do not implement its no-Hero composition.
+### Current independent upstream addition — PR90
+
+The following consent layout remains current and is not superseded by the independent EXTRA-120 offers/navigation integration. Qualify this duplicate identifier by title and PR90 provenance.
+
+## EXTRA120 — Consentimiento del postulante
+
+En Cuenta > Privacidad, usar todo el ancho útil, sin el tope320px del enlace de
+contraseña. Tarjeta con encabezado/estado textual, explicación legible y decisión
+separada; dos columnas desde1280 y apilado natural por debajo. Sin igualar alturas
+artificialmente o limitar texto/scroll. Más información sigue plegado inicialmente.
+Conservar todos los textos actuales y sus efectos, confirmación explícita, errores/
+foco/pendiente y estado aceptado sin nueva aceptación. Retiro con Button destructivo
+existente; tokens/formularios del proyecto. No duplicar el formulario en Perfil.
+
+> Preserved main branch wording below remains historical only where superseded by the offers/navigation integration.
 
 ## EXTRA118 — Primer bloque del inicio por sesión
 

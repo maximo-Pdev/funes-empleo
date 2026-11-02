@@ -165,6 +165,12 @@
 }
 
 .accountActions {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+}
+
+.accountPassword {
   max-width: 320px;
 }
 

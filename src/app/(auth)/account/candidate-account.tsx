@@ -48,7 +48,7 @@ export async function renderCandidateAccount({ params, email, basePath = "/accou
   const href = (id: (typeof sections)[number]["id"], extra = "") => `${basePath}?section=${id}${extra}`;
   const content = section === "notificaciones" ? <NotificationsContent page={params.page} unavailable={params.unavailable} /> : section === "cuenta"
     ? <div className={styles.accountActions}>
-      <Link href="/update-password" className={styles.secondaryLink}><KeyRound className="h-4 w-4" aria-hidden="true" />Cambiar contraseña</Link>
+      <div className={styles.accountPassword}><Link href="/update-password" className={styles.secondaryLink}><KeyRound className="h-4 w-4" aria-hidden="true" />Cambiar contraseña</Link></div>
       {workspace.bootstrap === "ready" && workspace.profile
         ? <CandidatePrivacyForm version={workspace.profile.version} consent={workspace.consent} policy={await getDemoConsentPolicy()} />
         : <p>Para gestionar los permisos de privacidad, primero completá la vinculación de tu perfil con la Oficina.</p>}

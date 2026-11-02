@@ -1,5 +1,6 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+
 ## Current integration authority — EXTRA-120
 
 Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.
@@ -35,6 +36,30 @@ dependency or application-link change. Technical fallbacks remain minimal.
 
 > Preserved main branch wording; historical wherever superseded by EXTRA-120 above. Compatible requirements remain effective.
 
+### Current independent upstream addition — PR90
+
+The following consent layout remains current and is not superseded by the independent EXTRA-120 offers/navigation integration. Qualify this duplicate identifier by title and PR90 provenance.
+
+## EXTRA120 — Composición local de Privacidad
+
+Separar el contenedor ancho accountActions del wrapper accountPassword de320px.
+CandidatePrivacyForm conserva API/hook/efectos y usa las primitivas existentes
+Card/Badge/Field/Button, más CSS module local: encabezado con estado textual,
+información izquierda y decisión de ancho legible a la derecha desde1280px;
+debajo de ese umbral, orden DOM y una columna. Altura natural, sin JS de medición.
+Texto/More information/policy actuales completos; no nueva copia legal o estado.
+Estilo destructivo existente solo en retirar. El feedback vacío no reserva espacio,
+pero mensajes/errores reales mantienen su rol/foco y validación compartida.
+
+Ruta→workspace/policy autenticados→CandidatePrivacyForm→consent action→servicio/
+DB→refresh permanecen iguales; no nuevas lecturas, endpoints o payloads. CSS no
+oculta condiciones de autorización. Recuperación por revert del delta visual,
+sin modificar eventos de consentimiento. Análisis CP1–CP4/constitución I–VI:
+presentación y contratos existentes, sin arquitectura/SQL ni decisión abierta nueva.
+Pruebas actuales de FormData/estados más navegador real readonly para geometría,
+details/confirmación vacía/foco y axe; verificar tipos/lint/tests/tooling/build.
+
+> Preserved main branch wording below remains historical only where superseded by the offers/navigation integration.
 
 ## EXTRA119 — Retiro de datos con respaldo privado
 

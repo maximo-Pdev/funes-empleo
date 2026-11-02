@@ -1,5 +1,6 @@
 # Cambios extra necesarios
 
+
 ## EXTRA-120 — Offers/navigation integration with Hero retained for every role (2026-11-01)
 
 - Authorization / origin: Maxi requests "arreglemos los conflictos así hacemos que entre el PR en verde"; final Home decision: "bueno conservamos el hero para todos y adaptamos la tarjeta derecha". This records the integration before counterpart source resolution is complete; trace: `odd/tasks/ofertas-navigation-integration.md`, S1–S3/S5 and T2.
@@ -391,6 +392,77 @@ The preceding historical sentence “EXTRA102 governs only this integration” r
 - **Estado:** implementado; registrado durante la implementación. Revisión humana, PR y despliegue pendientes.
 
 ## Main branch history — main at 1e3cdab
+
+### Independent upstream addition — PR90
+
+The following EXTRA-120 identifies Mateo's candidate-consent layout from main 06f2fcd. It is independent of the same-numbered offers/navigation integration above; preserve both qualified histories without global renumbering.
+
+## EXTRA-120 — Distribución visual del consentimiento del postulante
+
+- **Fecha/origen:** Mateo,01/11/2026, pide acomodar el consentimiento y confirma
+  «Distribución y aspecto visual». PR88 mergeado en main1e3cdab; rama nueva
+  feat/candidate-consent-layout. Rama anterior local/remota borrada tras verificar
+  merge y SHA; next-env.d.ts ajeno preservado.
+- **Problema/evidencia previa:** accountActions aplica max-width320px tanto al
+  enlace de contraseña como a CandidatePrivacyForm. Medición real con candidato
+  ficticio: en1920×1080 Privacidad mide320×1047,5px y documento1510px de alto;
+  en390×844 mide320×1047,5px y documento2173px. Capturas y JSON antes en test-results.
+  La sección conserva mucho ancho vacío y decisiones sin separación visual.
+- **Alcance antes de código:** mantener Cuenta > Privacidad (R4/EXTRA094/102), sin
+  duplicar controles en Perfil. Liberar ancho del contenido y limitar320px solo
+  el enlace existente de contraseña. Tarjeta con título/estado, explicación y
+  zona de decisión; columnas en escritorio y orden natural apilado en móvil.
+  Anchos de lectura, espacios y alturas según contenido; sin scroll interno.
+- **Contratos que se conservan:** mismos textos actuales completos, detalles
+  cerrados inicialmente, política demo, props/field names/version/status/confirmed,
+  checkbox requerido sin marcar, key de remount, acciones, refresh, foco/error/
+  pending y aceptación una vez. Retiro manual explícito conserva efectos; contratar
+  mantiene consentimiento y cambia disponibilidad. Sin cambiar backend/DB.
+- **Archivos propuestos:** candidate-privacy-form.tsx y CSS module local;
+  account/candidate-account.tsx y account.module.css para ancho; spec/plan/UI/
+  checklist/tasks/estado; regresiones de los estados y medición navegador.
+- **Componentes/fuentes:** reutilizar Card/Badge/Field/Button del proyecto y
+  details nativo. Docs y registro oficial base-nova de card/badge/button leídos
+  el01/11; sin reinstalar primitivas ni dependencias. Retirar usa variante
+  destructiva existente; confirmar conserva el tratamiento compartido.
+- **Riesgos/verificación prevista:** evitar cambios en otras secciones y datos,
+  CTA o explicación recortados, columnas estrechas y pérdida de validación/foco.
+  Componente pendiente/aceptado/retirado, FormData/errores/refresh existentes;
+  escritorio1920/1366 y móvil390/320, Más información/teclado/contraste/axe y
+  ausencia de POST con confirmación vacía. Tipos/lint/pruebas/tooling/build.
+  Solo fixture QA propia; sin reset habitual/alojado o aceptación legal nueva.
+- **Estado/autorización:** solicitado y acotado explícitamente a presentación.
+  Requisitos/diseño/checklist/tareas y análisis del delta se revisan por etapas
+  antes de código; implementación/verificación/revisión humana aún pendientes.
+- **Gates revisados antes de implementar:** CP1–CP4→plan CSS local→checklist6/6
+  de calidad de requisitos→T296–T298. Cobertura: CP1 en wrapper/ancho y medición;
+  CP2 en tarjeta/details y teclado/móvil; CP3 en controles compartidos y regresión
+  FormData/efectos; CP4 en estados/viewports/axe. Constitución I–VI preservada:
+  intermediación, consentimiento/política/datos/servidor intactos, accesibilidad,
+  simplicidad y fuente actual verificados. Sin críticos/altos o nueva arquitectura
+  que requiera decisión; pendientes históricos/revisión humana se conservan.
+- **Implementación y convergencia:** CP1–CP4 implementados en los cuatro archivos
+  de presentación previstos; CSS module nuevo y Card/Badge/Button compartidos.
+  Información y decisión en columnas desde1280px, apiladas debajo de ese ancho;
+  detalles nativos, confirmación explícita y textos completos conservados.
+  Sin diferencias en acciones/servicios de consentimiento, proxy o Supabase.
+- **Verificación real:** tipos/lint/build PASS;1627 pruebas en136 archivos y64
+  chequeos tooling PASS. Las71 regresiones de presentación/páginas cubren permiso
+  pendiente, vigente y retirado, payload, feedback y refresh. Nuevo E2E falla antes
+  con320px y pasa después:2/2 sin retries/skips, cuatro anchos1920/1366/390/320,
+  axe sin violaciones, teclado/details, error/foco sin confirmación y cero POST.
+  Recorrido Perfil→Cuenta con candidato ficticio QA; no se retira su permiso.
+  En1920×1080 la sección pasa de320×1047,5 a1544×555,25px y el documento entra
+  en1080px. En1366×900/móvil conserva scroll natural y no desborda horizontalmente.
+  Capturas/JSON/logs locales ignorados en test-results/consent-*; referencia
+  reproducible: tests/e2e/candidate-consent-layout.spec.ts.
+- **Límites/recuperación/estado final:** build conserva avisos previos de raíz con
+  lockfiles anidados y dos selectores CSS del escaneo; ya existían en PR88. No se
+  atribuye cobertura completa de app al100% configurado solo para env/schema.ts,
+  ni una suite SQL/E2E completa a estas dos pruebas focales. Revertir únicamente
+  composición/CSS recupera la vista previa sin modificar eventos o datos.
+  next-env.d.ts ajeno conserva su SHA256 original. Verificado técnicamente;
+  sin commit/PR todavía, revisión humana y aceptación municipal pendientes.
 
 
 ## PR88-CI-SESSION-01 — Preparación aislada de vencimiento, 01/11/2026
