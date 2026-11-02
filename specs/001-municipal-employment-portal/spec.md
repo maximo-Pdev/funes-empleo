@@ -1,5 +1,17 @@
 # Feature Specification: MVP del Portal Municipal de Empleo de Funes
 
+## Current amendment — EXTRA-121 (2026-11-02)
+
+Maxi requests the corrections recorded verbatim in `odd/tasks/ajustes-interfaz-portal.md`, S1–S6, and confirms: "Si, conserva unicamente la aceptación inicial".
+
+- Candidate self-service retains explicit operational acceptance for pending or historically withdrawn consent. A current acceptance is informational: no "Gestionar consentimiento", repeated acceptance or withdrawal control. Direct candidate withdrawal requests are rejected. Account archival remains administrator-managed; no new self-archival flow is authorized. This supersedes older manual-withdrawal self-service requirements, including EXTRA120 CP3 and the former Cuenta withdrawal rules, not their historical evidence. Existing events, historical withdrawn states, closed participations and revoked company access remain intact. Never infer consent from registration terms or reactivate access through reacceptance.
+- Notifications are recent activity in the adapted official Base Popover at the far right of the shared navbar, after Mi cuenta. No notification sidebar entry or dedicated dashboard section/page remains. Five recent items appear initially; older activity remains accessible through pagination inside the Popover. Preview does not mark items read; opening an individual notification retains the authorized POST and role-safe destination. Preserve per-user unread counts, errors, privacy and real data.
+- Anonymous offer-application entry redirects to Home without an expired-session notice. Existing suspended/inactive/wrong-role checks and other lifecycle notices remain effective.
+- Loading states match the current containers; registration has content-driven height without trailing unused space and no visible new-tab suffix after terms. Required acceptance/receipts, validation, draft separation and accessible controls remain unchanged.
+- Administrative charts may use scoped shadows, gradients and decorative motion with reduced-motion support; preserve exact values, metric definitions, filters and exports.
+
+This is a developer-approved demo amendment, not municipal/legal approval. OQ-001/OQ-002/OQ-004/OQ-006 and existing real-data restrictions remain open. Superseded paragraphs below are historical only for the explicit deltas above.
+
 
 ## Current integration authority — EXTRA-120
 

@@ -18,7 +18,7 @@ it.each(["suspended", "archived", "pending_verification"])("bloquea cuenta %s", 
   mocks.session.mockResolvedValue(session("candidate", status)); await expect(listNotifications()).rejects.toMatchObject({ code: "ACCESS_DENIED" }); expect(mocks.rpc).not.toHaveBeenCalled();
 });
 it("consulta exclusivamente al actor sin parámetro de destinatario", async () => {
-  await expect(listNotifications()).resolves.toMatchObject({ ...payload, listHref: "/dashboard?section=notificaciones" });
+  await expect(listNotifications()).resolves.toMatchObject({ ...payload, listHref: "/dashboard" });
   expect(mocks.rpc).toHaveBeenCalledExactlyOnceWith("list_my_notifications", { p_page: 1, p_page_size: 10 });
 });
 it.each([[0,20],[1,21],[1,0],[10001,20],[1.5,5],[NaN,5]])("rechaza paginación inválida %s/%s", async (page,size) => {
@@ -38,9 +38,9 @@ it("marca y navega al caso opaco", async () => {
 it.each(["../otro", "https://externo.test/", "00000000-0000-4000-8000-000000000001", undefined])("rechaza referencia inválida %s", async ref => {
   await expect(openNotification(ref)).rejects.toMatchObject({code:"NOT_FOUND"}); expect(mocks.rpc).not.toHaveBeenCalled();
 });
-it("recurso inaccesible vuelve a lista sin URL o asunto viejo", async () => {
+it("recurso inaccesible vuelve al panel sin URL o asunto viejo", async () => {
   mocks.rpc.mockResolvedValue({data:{...item,available:false,subject:null,target:null},error:null});
-  await expect(openNotification(reference)).resolves.toBe("/dashboard?section=notificaciones&unavailable=1");
+  await expect(openNotification(reference)).resolves.toBe("/dashboard?unavailable=1");
 });
 it("no expone errores internos SQL", async () => {
   mocks.rpc.mockResolvedValue({data:null,error:{message:"secret SQL"}}); await expect(listNotifications()).rejects.toMatchObject({code:"INTERNAL_ERROR"});

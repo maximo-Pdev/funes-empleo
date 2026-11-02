@@ -1,5 +1,9 @@
 # Modelo de datos: MVP del Portal Municipal de Empleo de Funes
 
+## EXTRA-121 — Operational acceptance-only command
+
+The additive `20261102090000_acceptance_only_candidate_consent.sql` replaces the existing RPC body with acceptance-only validation while preserving its signature, grants and append-only consent schema. No backfill, enum removal, history rewriting, account self-archival or change to stored cases/referral permissions is authorized. Pending/historically withdrawn consent remains explicitly acceptable; accepted consent is informational. Older manual-withdrawal self-service statements below are superseded for this demo amendment, not removed from historical evidence. Legal registration receipts remain entirely separate.
+
 ## EXTRA119 — Respaldo de retiro A/B
 
 private.demo_category_retirement_backup conserva snapshots originales de filas
@@ -32,7 +36,7 @@ Registration terms use separate append-only `private.registration_terms_receipts
 for account/role/version/time under `20261028013000_registration_terms.sql`.
 No legal receipt populates `candidate_consents`, activates referral permission or
 backfills existing accounts. Operational controls live in Cuenta > Privacidad,
-with explicit manual withdrawal and no repeated accepted-to-accepted submission.
+with explicit acceptance only and no repeated accepted-to-accepted submission (EXTRA-121).
 Chart-first reporting adds no persisted metric entities: overview and metrics use
 the same real rows, labels, snapshot/event definitions and CSV/PDF/XLSX exports.
 

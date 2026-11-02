@@ -4,7 +4,7 @@ import { afterEach, expect, it, vi } from "vitest";
 
 const { route } = vi.hoisted(() => ({ route: { pathname: "/" } }));
 vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
-vi.mock("@/features/notifications/components/notification-center", () => ({ NotificationCenter: () => <button aria-label="Notificaciones" /> }));
+vi.mock("@/features/notifications/components/notification-center", () => ({ NotificationCenter: ({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) => <button aria-label="Notificaciones" onClick={() => onOpenChange?.(true)} /> }));
 
 import { HomeNavbar } from "@/app/(public)/home-navbar";
 
@@ -167,6 +167,23 @@ it.each(["/dashboard", "/empresa", "/admin"])("keeps authenticated controls in b
     view.rerender(<HomeNavbar alwaysVisible={alwaysVisible} panel={{ href, label: "Panel" }} />);
     expect(view.container.querySelector('a[href="' + href + '"]')?.textContent).toBe("Mi cuenta");
     expect(view.container.querySelector('button[aria-label="Notificaciones"]')).toBeTruthy();
+    expect(view.container.querySelector('button[aria-label="Notificaciones"]')?.previousElementSibling?.textContent).toBe("Mi cuenta");
     expect(Array.from(view.container.querySelectorAll("a")).some(link => link.textContent === "Ingresar")).toBe(false);
   }
+});
+
+it("keeps the Home navbar visible while focus moves into its portaled notifications", () => {
+  route.pathname = "/";
+  vi.useFakeTimers();
+  vi.stubGlobal("scrollY", 100);
+  vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  render(<HomeNavbar panel={{ href: "/dashboard", label: "Panel" }} />);
+  const header = screen.getByRole("banner");
+  fireEvent.click(screen.getByRole("button", { name: "Notificaciones" }));
+  scrollToPosition(0);
+  fireEvent.mouseLeave(header);
+  fireEvent.focusOut(header, { relatedTarget: document.body });
+  act(() => vi.advanceTimersByTime(3000));
+  expect(header.getAttribute("aria-hidden")).toBe("false");
+  expect(header.hasAttribute("inert")).toBe(false);
 });

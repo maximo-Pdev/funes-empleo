@@ -467,7 +467,7 @@ it.each([
  expect(within(sidebar).getByText("Administración")).toBeTruthy();
  expect(within(sidebar).getByTitle("admin@example.invalid")).toBeTruthy();
  const nav = within(sidebar).getByRole("navigation", { name: "Navegación de Oficina de Empleo" });
- expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin", "/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/courses", "/admin/metrics", "/admin/notificaciones", "/account"]);
+ expect(within(nav).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/admin", "/admin/candidates", "/admin/atencion-presencial", "/admin/empresas", "/admin/openings", "/admin/participations", "/admin/courses", "/admin/metrics", "/account"]);
  expect(nav.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe(active);
  expect(within(sidebar).getByRole("button", { name: "Cerrar sesión" })).toBeTruthy();
  expect(within(main).queryByRole("button", { name: "Cerrar sesión" })).toBeNull();

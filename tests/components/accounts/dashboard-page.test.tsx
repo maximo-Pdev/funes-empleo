@@ -18,6 +18,7 @@ it.each(["dashboard", "perfil", "postulaciones", "ofertas"])("renders candidate 
   mocks.renderCandidateAccount.mockResolvedValue(<p>panel</p>);
   const view = await DashboardPage({ searchParams: Promise.resolve({ section }) });
   expect(mocks.renderCandidateAccount).toHaveBeenCalledWith({ params: { section }, email: "persona@example.test", basePath: "/dashboard" });
+  expect(mocks.guard).toHaveBeenCalledWith(undefined, section === "ofertas" ? { anonymousRedirect: "/" } : {});
   expect(mocks.redirect).not.toHaveBeenCalled();
   expect(view).toBeTruthy();
 });

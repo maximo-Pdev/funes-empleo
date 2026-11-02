@@ -29,6 +29,10 @@ function hasScrolled() {
   return window.scrollY > 0;
 }
 
+function hasUnavailableNotification() {
+  return new URLSearchParams(window.location.search).get("unavailable") === "1";
+}
+
 export type PanelAccess = { href: string; label: string };
 
 export function HomeNavbar({ alwaysVisible = false, panel = null, notifications = Boolean(panel) }: { alwaysVisible?: boolean; panel?: PanelAccess | null; notifications?: boolean } = {}) {
@@ -38,9 +42,11 @@ export function HomeNavbar({ alwaysVisible = false, panel = null, notifications 
   const panelCurrent = panel && pathname === panel.href ? "page" : undefined;
   const scrollVisible = useSyncExternalStore(subscribeToVisibility, isNavbarVisible, serverSnapshot);
   const scrolled = useSyncExternalStore(subscribeToVisibility, hasScrolled, serverSnapshot);
+  const unavailableNotification = useSyncExternalStore(subscribeToVisibility, hasUnavailableNotification, serverSnapshot);
   const [lingering, setLingering] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
 
   useEffect(() => {
     if (alwaysVisible) return;
@@ -85,7 +91,7 @@ export function HomeNavbar({ alwaysVisible = false, panel = null, notifications 
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
-  const visible = alwaysVisible || scrollVisible || lingering || hovered || focused;
+  const visible = alwaysVisible || scrollVisible || lingering || hovered || focused || notificationOpen;
 
   return (
     <header className={styles.navbar} data-home={!alwaysVisible} data-visible={visible} data-scrolled={scrolled} aria-hidden={!visible} inert={!visible}
@@ -100,10 +106,10 @@ export function HomeNavbar({ alwaysVisible = false, panel = null, notifications 
         <div className={styles.navbarLinks}>
           {alwaysVisible ? <Link href="/" aria-current={homeCurrent}>Inicio</Link> : <a href="#contenido" aria-current={homeCurrent}>Inicio</a>}
           <Link href="/ofertas" aria-current={offersCurrent}>Ofertas</Link>
-          {panel && notifications && <NotificationCenter />}
           {panel ? <Link href={panel.href} className={styles.navbarPanel} aria-current={panelCurrent}>Mi cuenta</Link>
             : pathname === "/" ? <a href="#contenido" className={styles.navbarPanel}>Ingresar</a>
               : <Link href="/#contenido" className={styles.navbarPanel}>Ingresar</Link>}
+          {panel && notifications && <NotificationCenter key={String(unavailableNotification)} unavailable={unavailableNotification} onOpenChange={setNotificationOpen} />}
         </div>
       </nav>
     </header>

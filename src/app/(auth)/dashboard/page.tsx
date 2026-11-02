@@ -6,7 +6,8 @@ import { renderCandidateAccount, type AccountSearchParams } from "../account/can
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({ searchParams = Promise.resolve({}) }: { searchParams?: Promise<AccountSearchParams> } = {}) {
-  const { account, user } = await requireActiveAccount();
+  const params = await searchParams;
+  const { account, user } = await requireActiveAccount(undefined, params.section === "ofertas" ? { anonymousRedirect: "/" } : {});
   if (account.role !== "candidate") redirect(getPanelHref(account.role));
-  return renderCandidateAccount({ params: await searchParams, email: user?.email, basePath: "/dashboard" });
+  return renderCandidateAccount({ params, email: user?.email, basePath: "/dashboard" });
 }

@@ -1,5 +1,9 @@
 # Contratos de comandos y estados
 
+## EXTRA-121 — Candidate acceptance-only amendment (2026-11-02)
+
+The candidate self-service command `change_candidate_consent(integer,text,text,text)` accepts only the exact status `accepted`, with a live authorized candidate session, expected profile version and current policy hash. Repeated accepted-to-accepted, withdrawal, null and unknown status requests are rejected without mutation. A pending/historically withdrawn profile may explicitly accept; `consent_withdrawn` returns to `draft`, never directly to active. Prior consent rows, cases and referral permissions remain unchanged. This supersedes the older candidate manual-withdrawal transition below without removing historical states or changing administrative archival, application withdrawal, hiring windows or consent-dependent access checks. No account self-archival is introduced and no real-data policy is approved.
+
 EXTRA069: conservar nombre en toda derivación propia es una proyección mínima,
 no transición ni restauración de acceso. Informe tardío, contratación normal/
 tardía, retiros, cierres y auditoría mantienen exactamente sus reglas.
