@@ -43,7 +43,7 @@ export type Notification = z.infer<typeof notificationSchema>;
 export type Notifications = z.infer<typeof notificationsSchema>;
 export type NotificationRole = "admin" | "candidate" | "company";
 export function notificationsHref(role: NotificationRole) {
-  return role === "admin" ? "/admin/notificaciones" : role === "company" ? "/empresa/notificaciones" : "/dashboard?section=notificaciones";
+  return role === "admin" ? "/admin" : role === "company" ? "/empresa" : "/dashboard";
 }
 export function notificationTarget(item: Notification, role: NotificationRole): string | null {
   const target = item.target;

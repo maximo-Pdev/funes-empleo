@@ -51,16 +51,16 @@ export function CandidatePrivacyForm({ version, consent, policy }: {
     </details>
     </div>
     <div className={styles.decision}>
-    <h3>Gestionar consentimiento</h3>
-    {accepted && <p className={styles.stateDescription}>Ya aceptaste el consentimiento. No necesitás volver a aceptarlo mientras siga vigente.</p>}
+    {accepted ? <p className={styles.stateDescription}>Ya aceptaste el consentimiento. No necesitás volver a aceptarlo mientras siga vigente.</p> : <>
+    <h3>Aceptar consentimiento</h3>
     <Form key={`${version}-${consent?.status ?? "pending"}`} action={action} result={state} className={styles.form} aria-busy={pending}>
       <input type="hidden" name="version" value={version} />
-      <input type="hidden" name="status" value={accepted ? "withdrawn" : "accepted"} />
-      {accepted && <p>Si retirás este permiso, las participaciones abiertas se cerrarán y los accesos empresariales quedarán revocados. El historial se conserva.</p>}
-      <Field className={styles.confirmation}><input type="checkbox" name="confirmed" required />{accepted ? "Confirmo que quiero retirar el consentimiento y entiendo sus efectos." : "Confirmo esta decisión y entiendo sus efectos."}</Field>
-      <p className={styles.feedback} ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{state.message}</p>
-      <Button type="submit" variant={accepted ? "destructive" : "primary"} disabled={pending}>{accepted ? "Retirar consentimiento" : "Guardar consentimiento"}</Button>
+      <input type="hidden" name="status" value="accepted" />
+      <Field className={styles.confirmation}><input type="checkbox" name="confirmed" required />Confirmo esta decisión y entiendo sus efectos.</Field>
+      <Button type="submit" variant="primary" disabled={pending}>Guardar consentimiento</Button>
     </Form>
+    </>}
+    <p className={styles.feedback} ref={feedback} tabIndex={-1} role={state.success ? "status" : "alert"} aria-live="polite">{state.message}</p>
     </div>
     </div>
     <p className={styles.policy}>Política operativa: {policy.version}. Es una política de demostración pendiente de aprobación municipal.</p>

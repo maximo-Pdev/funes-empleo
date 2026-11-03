@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -5,6 +6,14 @@ import { Dashboard, metricLabel } from "@/features/metrics/components/dashboard"
 import { metricLabel as centralMetricLabel } from "@/features/metrics/labels";
 import { ContactTimeline } from "@/features/participations/components/contact-timeline";
 describe("métricas accesibles", () => {
+  it("adds municipal chart depth and entrance motion with an explicit reduced-motion fallback", () => {
+    const css = readFileSync("src/features/metrics/components/dashboard.module.css", "utf8");
+    expect(css).toMatch(/\.bar\s*\{[^}]*linear-gradient\(/s);
+    expect(css).toMatch(/\.donut\s*\{[^}]*box-shadow:/s);
+    expect(css).toMatch(/@keyframes metric-bar-enter/);
+    expect(css).toMatch(/@keyframes metric-donut-enter/);
+    expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[^}]*\.bar[^}]*\.donut[^}]*animation:\s*none/s);
+  });
   it("presents real counts as bars and opening states as a distribution", () => {
     const base = { unit: "count" as const, state: "calculated" as const, category_id: null, category_name: null, opening_id: null, opening_title: null };
     render(<Dashboard rows={[

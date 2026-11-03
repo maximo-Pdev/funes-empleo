@@ -11,7 +11,19 @@ test.use({trace:"off",screenshot:"off"});
 async function summary(page:Page) { const response=await page.request.get("/api/notifications?size=5");expect(response.ok()).toBe(true);return response.json() as Promise<{unread:number;items:{reference:string;kind:string;subject:string|null}[]}>; }
 async function openNotice(page:Page,href:string,title:string,text:string) {
  await page.goto(href);
- await page.getByRole("main").getByRole("listitem").filter({hasText:title}).getByRole("button",{name:new RegExp(text)}).first().click();
+ await page.getByRole("button",{name:/^Notificaciones:/}).click();
+ const popover=page.getByRole("dialog",{name:"Notificaciones",exact:true});
+ const notice=popover.getByRole("listitem").filter({hasText:title}).getByRole("button",{name:new RegExp(text)}).first();
+ await expect(popover).toBeVisible();
+ await expect(popover.locator('[aria-busy="true"]')).toHaveCount(0);
+ while(await notice.count()===0){
+  const next=popover.getByRole("button",{name:"Ver más actividad",exact:true});
+  await expect(next).toBeEnabled();
+  const response=page.waitForResponse(r=>r.url().includes("/api/notifications?")&&r.url().includes("page="));
+  await next.click();await response;
+  await expect(popover.locator('[aria-busy="true"]')).toHaveCount(0);
+ }
+ await notice.click();
 }
 
 test("avisos privados: postulación, nominación, agenda, derivación y contratación con lectura individual",async({page,browser})=>{
@@ -34,7 +46,7 @@ test("avisos privados: postulación, nominación, agenda, derivación y contrata
   await expect(page.getByRole("region",{name:"Oferta elegida",exact:true}).getByRole("button",{name:"Participación registrada",exact:true})).toBeDisabled();
   const otherBefore=(await summary(otherAdmin)).unread;
   const adminBefore=(await summary(admin)).unread;
-  await openNotice(admin,"/admin/notificaciones",titles[0],"Se recibió una nueva postulación");
+  await openNotice(admin,"/admin",titles[0],"Se recibió una nueva postulación");
   await expect(admin).toHaveURL(/\/admin\/participations\/cas-[0-9a-f]{24}$/);
   expect((await summary(admin)).unread).toBe(adminBefore-1);expect((await summary(otherAdmin)).unread).toBe(otherBefore);
   const otherReference=(await summary(otherAdmin)).items.find(i=>i.kind==="admin_application")!.reference;
@@ -42,7 +54,7 @@ test("avisos privados: postulación, nominación, agenda, derivación y contrata
   await nominateFromOpening(admin,profile,offers[1]);
   const part=runLocalMaintenanceSql(`select id from public.participations where candidate_id='${profile}' and opening_id='${offers[1]}'`);
   const partRef=persistedReference("participation",part);
-  await openNotice(page,"/dashboard?section=notificaciones",titles[1],"La Oficina te incorporó");
+  await openNotice(page,"/dashboard",titles[1],"La Oficina te incorporó");
   await expect(page).toHaveURL(new RegExp(`section=postulaciones#${partRef}$`));
   await expect(page.locator(`#${partRef}`)).toContainText(titles[1]);
   await admin.getByLabel("Acción",{exact:true}).selectOption("record_preinterview");
@@ -51,7 +63,7 @@ test("avisos privados: postulación, nominación, agenda, derivación y contrata
   await admin.getByLabel("Fecha programada",{exact:true}).fill("2026-11-15T10:30");
   await admin.getByRole("button",{name:"Registrar acción",exact:true}).click();
   await expect.poll(()=>runLocalMaintenanceSql(`select count(*) from public.preinterviews where participation_id='${part}'`)).toBe("1");
-  await openNotice(page,"/dashboard?section=notificaciones",titles[1],"La Oficina registró una preentrevista");
+  await openNotice(page,"/dashboard",titles[1],"La Oficina registró una preentrevista");
   await expect(page.locator(`#${partRef}`)).toContainText("Videollamada");
   await expect(page.locator(`#${partRef}`)).toContainText("15/11/2026");
   await expect(page.locator("body")).not.toContainText(/RESUMEN_INTERNO_NO_VISIBLE_AVISO|MOTIVO_INTERNO_NO_VISIBLE_AVISO|Recomendación/);
@@ -59,16 +71,16 @@ test("avisos privados: postulación, nominación, agenda, derivación y contrata
   await admin.getByLabel("Motivo interno",{exact:true}).fill("Derivación ficticia autorizada");
   await admin.getByRole("button",{name:"Registrar acción",exact:true}).click();
   await expect.poll(()=>runLocalMaintenanceSql(`select status from public.participations where id='${part}'`)).toBe("referred");
-  await openNotice(company,"/empresa/notificaciones",titles[1],"Recibiste una nueva derivación");
+  await openNotice(company,"/empresa",titles[1],"Recibiste una nueva derivación");
   await expect(company).toHaveURL(/\/empresa\/ofertas\/ofe-[0-9a-f]{24}\?referral=der-[0-9a-f]{24}#derivaciones$/);
   await expect(company.getByRole("heading",{name:"Derivación de Persona ficticia 480",exact:true})).toBeVisible();
   await company.getByLabel("Resultado informado").selectOption("hired");await company.getByRole("button",{name:"Enviar informe",exact:true}).click();
   await expect(company.getByText("El resultado informado quedó pendiente de revisión municipal.",{exact:true})).toBeVisible();
   expect((await summary(page)).items.some(i=>i.kind==="candidate_hired"&&i.subject===titles[1])).toBe(false);
-  await openNotice(admin,"/admin/notificaciones",titles[1],"Una empresa informó una contratación");
+  await openNotice(admin,"/admin",titles[1],"Una empresa informó una contratación");
   await admin.getByRole("button",{name:"Confirmar resultado",exact:true}).click();
   await expect.poll(()=>runLocalMaintenanceSql(`select status from public.participations where id='${part}'`)).toBe("hired");
-  await openNotice(page,"/dashboard?section=notificaciones",titles[1],"La Oficina confirmó tu contratación");
+  await openNotice(page,"/dashboard",titles[1],"La Oficina confirmó tu contratación");
   await expect(page.locator(`#${partRef}`)).toContainText("Contratación confirmada");
   expect(runLocalMaintenanceSql(`select availability from public.candidate_profiles where id='${profile}'`)).toBe("unavailable");
   await page.setViewportSize({width:390,height:844});
@@ -113,19 +125,21 @@ test("revisión, aprobación y rechazo enlazan la oferta propia sin exponer moti
    await page.goto(`/empresa/ofertas/${persistedReference("opening",id)}`);
    await page.getByRole("button",{name:"Enviar a revisión municipal",exact:true}).click();
    await expect(page.getByText("Estado:")).toContainText("Pendiente de revisión");
-   await openNotice(admin,"/admin/notificaciones",titles[index]!,"Hay una oferta pendiente de revisión");
+   await openNotice(admin,"/admin",titles[index]!,"Hay una oferta pendiente de revisión");
    await expect(admin).toHaveURL(new RegExp(`/admin/openings/${persistedReference("opening",id)}$`));
    await admin.getByLabel("Decisión",{exact:true}).selectOption(index===0?"approved":"rejected");
    if(index===1){await admin.getByLabel("Explicación para la empresa").fill("Explicación pública ficticia");await admin.getByLabel("Motivo interno",{exact:true}).fill("MOTIVO_MODERACION_PRIVADO_AVISO");}
    await admin.getByRole("button",{name:"Guardar decisión",exact:true}).click();
    await expect.poll(()=>runLocalMaintenanceSql(`select status from public.job_openings where id='${id}'`)).toBe(index===0?"published":"rejected");
-   await openNotice(page,"/empresa/notificaciones",titles[index]!,index===0?"La Oficina aprobó y publicó":"La Oficina rechazó");
+   await openNotice(page,"/empresa",titles[index]!,index===0?"La Oficina aprobó y publicó":"La Oficina rechazó");
    await expect(page).toHaveURL(new RegExp(`/empresa/ofertas/${persistedReference("opening",id)}$`));
    await expect(page.locator("body")).not.toContainText("MOTIVO_MODERACION_PRIVADO_AVISO");
   }
-  await page.goto("/empresa/notificaciones");await page.setViewportSize({width:1440,height:900});
-  await expect(page.getByRole("heading",{level:1,name:"Notificaciones",exact:true})).toBeVisible();
-  await expect(page.getByRole("main").getByRole("listitem").first()).toBeVisible();
+  await page.goto("/empresa");await page.setViewportSize({width:1440,height:900});
+  await page.getByRole("button",{name:/^Notificaciones:/}).click();
+  const popover=page.getByRole("dialog",{name:"Notificaciones",exact:true});
+  await expect(popover).toBeVisible();
+  await expect(popover.getByRole("listitem").first()).toBeVisible();
   expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
   await page.screenshot({path:test.info().outputPath("notificaciones-empresa-1440.png"),fullPage:true});
  }finally{await adminContext.close();}

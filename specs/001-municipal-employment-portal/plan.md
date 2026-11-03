@@ -1,5 +1,18 @@
 # Plan de implementación: MVP del Portal Municipal de Empleo de Funes
 
+Identifier scope: PR93's EXTRA-121 interface amendment and PR92's EXTRA121 application-entry/EXTRA122 case-date amendments remain current together. See the PR/title disambiguation in `cambios-extra.md`. Recovery and supersession boundaries are feature-local; retain both consent eligibility and individual reapplication without restoring prior cases/access.
+
+
+## Current implementation amendment — EXTRA-121 (2026-11-02)
+
+Trace S1–S6 in `odd/tasks/ajustes-interfaz-portal.md`. Reuse the current shells and tokens for loading frames; no guessed sessions or private loading reads. Registration sizing must follow measured inner content and preserve its animations/44px controls, legal acceptance and independent drafts.
+
+Candidate consent remains an explicit acceptance-only action. Accepted UI is informational and pending/historical withdrawal can be accepted explicitly. Restrict validation, action/service and the candidate RPC boundary without rewriting stored events or changing `private.current_consent`, application/referral checks, hiring windows, administrative archival or company visibility. Preserve the RPC signature for consumers and document rollout separately. Earlier self-service withdrawal instructions, including EXTRA120 destructive-button wording, are superseded only for this amendment.
+
+Reuse `NotificationCenter` and the adapted base-nova Popover in `HomeNavbar`, last after Mi cuenta. Keep preview/pagination on GET and individual reads on the existing guarded POST; remove notification sidebar links, candidate section and admin/company page implementations. Paginate five items inside the Popover; do not truncate access to older activity. Unavailable resources return to the verified role panel with feedback in the Popover. Keep the navbar visible while its portaled Popover is open.
+
+For anonymous offer entry, pass a narrow guest redirect option from the dashboard offer section to the existing account guard; preserve all existing status/role guards and default lifecycle behavior. Enhance only chart presentation, not metrics or exports. Non-reset application gates, browser geometry/keyboard checks and independent auth/consent/retirement review are required; shared acceptance/DB resets are not authorized. Schema execution/hosted deployment and human/legal acceptance are separate evidence.
+
 ## EXTRA122 — Composición superior del caso y fecha única visible
 
 Reutilizar detail-layout.grid/cell/notice para fila superior de Caso y Acciones;
@@ -47,6 +60,7 @@ Recuperación: revertir presentación/helper sin modificar intentos o permisos.
 Verificar helper, ambas páginas y estados/roles/errores; navegador aislado con
 retiro y dos nuevos casos distintos, CV/auditoría anteriores intactos, concurrencia
 y SQL075 existentes. Tipos/lint/unit/tooling/build, móvil/PC y acceso por teclado.
+
 
 
 ## Current integration authority — EXTRA-120

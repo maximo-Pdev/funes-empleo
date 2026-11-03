@@ -84,10 +84,18 @@ select set_config('request.jwt.claim.sub',private.fixture_id('candidate',1)::tex
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('candidate',1),'session_id','ee720000-0000-4000-8000-000000000002')::text,true);
 select * from pg_temp.audit_case('Corrección perfil', $$select public.save_candidate_profile(1,'Persona ficticia 001','90000001','Funes','Prueba ficticia','available','','',array[private.fixture_id('category',1)])$$,'profile_updated',private.fixture_id('candidate',1));
 select * from pg_temp.audit_case('Contacto candidato', $$select public.set_candidate_phone(1,'3410000000')$$,'profile_updated',private.fixture_id('candidate',1));
-select * from pg_temp.audit_case('Retiro consentimiento', $$select public.change_candidate_consent(1,'withdrawn','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'consent_withdrawn',private.fixture_id('candidate',1));
+do $$ begin perform set_config('test.consent_rejection_before',pg_temp.audit_snapshot()::text,true); end $$;
+select throws_ok($$select public.change_candidate_consent(1,'withdrawn','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'P0001','INVALID_INPUT','Retiro propio rechazado antes de auditoría');
+select is(pg_temp.audit_snapshot(),current_setting('test.consent_rejection_before')::jsonb,'Rechazo conserva negocio/permisos/historia');
 select throws_ok($$select public.change_account_status(private.fixture_id('candidate',1),1,'archive',null,true)$$,'P0001','FORBIDDEN','Autoarchivo rechazado antes de cualquier auditoría');
 select * from pg_temp.audit_case('Retiro postulación', $$select public.transition_participation(private.fixture_id('participation',501),1,'withdraw')$$,'outcome_confirmed',private.fixture_id('candidate',1),'referred','withdrawn');
-select public.change_candidate_consent(1,'withdrawn','demo-not-approved',(select policy_hash from public.candidate_consent_policy()));
+reset role;
+-- Trusted historical fixture preserves append-only events without invoking the retired command.
+insert into public.candidate_consents(candidate_id,policy_version,policy_hash,status,recorded_by,recorded_at,source)
+select private.fixture_id('profile',1),version,policy_hash,'withdrawn',private.fixture_id('candidate',1),clock_timestamp(),'self_service'
+from private.consent_policies where version='demo-not-approved';
+update public.candidate_profiles set status='consent_withdrawn' where id=private.fixture_id('profile',1);
+set local role authenticated;
 select * from pg_temp.audit_case('Aceptación consentimiento', $$select public.change_candidate_consent(2,'accepted','demo-not-approved',(select policy_hash from public.candidate_consent_policy()))$$,'consent_accepted',private.fixture_id('candidate',1));
 
 reset role;

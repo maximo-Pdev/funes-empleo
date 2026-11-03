@@ -31,7 +31,7 @@ export async function openNotification(reference: unknown) {
   if (!item.success) throw new AppError("INTERNAL_ERROR");
   const href = notificationTarget(item.data, session.account.role);
   if (item.data.available && !href) throw new AppError("INTERNAL_ERROR");
-  return href ?? `${notificationsHref(session.account.role)}${session.account.role === "candidate" ? "&" : "?"}unavailable=1`;
+  return href ?? `${notificationsHref(session.account.role)}?unavailable=1`;
 }
 export async function candidatePreinterviewAgenda() {
   const session = await activeSession();

@@ -1,13 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// El hero de la home anima el h1 con un fade de 420 ms desde opacity 0. Playwright lo
-// considera visible desde el primer pintado, pero axe todavía no lo cuenta como título
-// visible, así que el barrido tiene que esperar el final de la animación.
+// The loading frame has its own accessible h1. Wait for actual page content,
+// then the hero entrance and registration's initial client-side focus effect.
 async function waitForHeroEntrance(page: Page) {
-  const heading = page.getByRole("heading", { level: 1 });
+  const heading = page.locator('main:not([aria-busy="true"])').getByRole("heading", { level: 1 });
   await expect(heading).toBeVisible();
   await expect.poll(() => heading.evaluate(element => Number(getComputedStyle(element).opacity))).toBe(1);
+  const url = new URL(page.url());
+  if (url.pathname === "/") {
+    await expect(page.getByRole("button", { name: "Iniciar sesión", exact: true })).toBeVisible();
+    if (["candidato", "empresa"].includes(url.searchParams.get("registro") ?? "")) {
+      await expect(page.getByRole("region", { name: "Acceso al portal", exact: true })).toBeFocused();
+    }
+  }
 }
 
 test("base pública en español sin barreras automáticas detectadas", async ({ page }) => {

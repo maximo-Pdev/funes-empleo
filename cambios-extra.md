@@ -1,5 +1,28 @@
 # Cambios extra necesarios
 
+
+## Desambiguación de EXTRA-121 en PR92 y PR93
+
+El identificador por sí solo no distingue estas dos incorporaciones independientes. Se conservan sus referencias y evidencias históricas; ambas reglas siguen vigentes en su alcance.
+
+| Referencia | Título | Alcance |
+| --- | --- | --- |
+| PR93, EXTRA-121 | Portal interface corrections | Carga, registro, consentimiento general, notificaciones y gráficos. |
+| PR92, EXTRA-121 / EXTRA121 | Estado coherente y aviso de nueva postulación tras retiro | Retiro de una participación y nueva postulación elegible, sin restaurar casos ni accesos anteriores. |
+
+La aceptación del consentimiento general no equivale a una postulación; impedir su retiro desde la cuenta no elimina el retiro individual de una participación. Los cambios EXTRA122 de PR92 también conservan su vigencia.
+
+
+## EXTRA-121 — Portal interface corrections (2026-11-02)
+
+- Authorization: Maxi requests matching skeletons, anonymous application entry without expired-session feedback, compact registration and removal of the terms new-tab suffix, acceptance-only operational consent, navbar-only notification Popover and enhanced administrator charts. Explicit clarification: "Si, conserva unicamente la aceptación inicial". Trace: `odd/tasks/ajustes-interfaz-portal.md`, S1–S6.
+- Evidence: anonymous application reaches a guard that treats every missing session as expired; loading boundaries retain obsolete layouts; registration height requires rendered measurement; consent UI currently offers withdrawal; notifications already use adapted Base Popover but duplicate dedicated sections; charts have a shared CSS renderer.
+- Proposed minimal changes: align loading frames, distinguish guest entry, remove unused registration whitespace/copy, retain affirmative operational acceptance without self-service withdrawal, remove dedicated notification sections and show recent activity from the far-right navbar, add scoped chart depth/motion without changing figures.
+- Consent rule amendment: supersedes prior explicit manual-withdrawal UI requirements for candidate self-service only. Account archival remains administrator-managed. Preserve historical consent events, pending/withdrawn acceptance, eligibility checks, company visibility and revocation safeguards; no backfill, autoacceptance, legal approval or database weakening.
+- Files/contracts: loading boundaries, Home registration styles/terms, auth guard, candidate consent presentation/validation/service and any narrowly required SQL guard, notification presentation/navigation, metrics CSS, corresponding tests and current specification/plan/UI notes.
+- Risks/recovery: auth/consent contracts and notification route retirement require independent review. Revert only this delta; never reset curated local data or rewrite historical records. Reduced motion, exact metrics, accessible keyboard controls and role privacy remain required.
+- Verification/status: implemented and verified locally; final lint/typecheck/build passed, Vitest143files/1705tests passed with maxWorkers2, tooling66 passed. Independent SQL/security review passed after52 migrations,32pgTAP files/1557assertions; populated upgrade preserved74table snapshots and reacceptance never restored cases/accesses. Browser39 component-fixture cases,10 registration-fixture states and12 fresh production registration states passed; actual public offer application redirected anonymous visitor to plain Home, retired notification GET/HEAD routes returned404 and Home axe found0violations. Scope/results are separate, not a combined test total. Recovery preserved completed gate receipts after provider interruption. Shared/hosted consent migration rollout and reset-backed full E2E/authenticated delivery remain unperformed; no final product/municipal acceptance claimed. No commits, PR, push, merge, deployment or curated-data reset. Exact evidence and remaining boundaries: `odd/tasks/ajustes-interfaz-portal.md`, L8–L13.
+
 ## EXTRA123 — Documentación para la entrega del curso, 02/11/2026
 
 - **Origen/autorización:** Mateo pide una rama para entregar enlace Vercel,
@@ -52,6 +75,7 @@
   DB/E2E no repetidos por cambio solo documental. Logs course-delivery-* en
   test-results ignorado. T306 implementada/verificada localmente; login alojado,
   SHA desplegado, entrega privada de acceso, revisión humana y PR/merge pendientes.
+
 
 ## PR92-CI-CONCURRENCY-01 — Preparación de preselección compatible con EXTRA122
 
@@ -219,6 +243,7 @@
   No reset o mutación habitual/alojada; next-env ajeno mantiene SHA256 original.
   T299–T301 verificadas técnicamente, recuperación solo visual. Sin commit/PR
   todavía; revisión humana/municipal no se infieren de estas comprobaciones.
+
 
 
 ## PR91-CI-01 — Isolate cancellation deadlines and forced-refresh setup

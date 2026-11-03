@@ -21,15 +21,13 @@ test("privacidad aprovecha PC, apila móvil y conserva lectura completa y teclad
     expect(box).not.toBeNull();
     if (width >= 1280) {
       expect(box!.width).toBeGreaterThan(width === 1920 ? 1000 : 700);
-      const information = await privacy.getByText(/^Al aceptar, autorizás/).boundingBox();
-      const decision = await privacy.getByRole("heading", { name: "Gestionar consentimiento" }).boundingBox();
-      expect(decision!.x).toBeGreaterThanOrEqual(information!.x + information!.width);
     } else {
       expect(box!.x + box!.width).toBeLessThanOrEqual(width);
-      const information = await privacy.getByText(/^Si la Oficina confirma una contratación,/).boundingBox();
-      const decision = await privacy.getByRole("button", { name: "Retirar consentimiento" }).boundingBox();
-      expect(decision!.y).toBeGreaterThan(information!.y + information!.height);
     }
+    await expect(privacy.getByText(/^Al aceptar, autorizás/)).toBeVisible();
+    await expect(privacy.getByRole("heading", { name: "Gestionar consentimiento" })).toHaveCount(0);
+    await expect(privacy.getByRole("button", { name: "Retirar consentimiento" })).toHaveCount(0);
+    await expect(privacy.getByRole("checkbox")).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await new AxeBuilder({ page }).analyze()).violations.map(item => item.id)).toEqual([]);
   }
@@ -45,22 +43,16 @@ test("privacidad aprovecha PC, apila móvil y conserva lectura completa y teclad
   await expect(privacy.getByRole("button", { name: "Guardar consentimiento" })).toHaveCount(0);
 });
 
-test("la confirmación vacía conserva el permiso y explica el error sin enviar una acción", async ({ page }) => {
+test("el permiso vigente es informativo y no ofrece otra aceptación ni retiro", async ({ page }) => {
   const privacy = page.getByRole("region", { name: "Privacidad", exact: true });
-  const confirmation = privacy.getByRole("checkbox");
   const submissions: string[] = [];
   page.on("request", request => {
     if (request.method() === "POST" && request.headers()["next-action"]) submissions.push(request.url());
   });
-  await expect(confirmation).not.toBeChecked();
-  await expect(confirmation).toHaveJSProperty("required", true);
-  await privacy.getByRole("button", { name: "Retirar consentimiento" }).click();
-  await expect(privacy.getByText("Revisá el campo indicado.", { exact: true })).toBeVisible();
-  await expect(confirmation).toHaveAttribute("aria-invalid", "true");
-  await expect(confirmation).toBeFocused();
+  await expect(privacy.locator("form")).toHaveCount(0);
+  await expect(privacy.getByRole("button", { name: "Retirar consentimiento" })).toHaveCount(0);
+  await expect(privacy.getByRole("button", { name: "Guardar consentimiento" })).toHaveCount(0);
+  await expect(privacy.getByRole("checkbox")).toHaveCount(0);
   expect(submissions).toHaveLength(0);
   await expect(privacy.getByText("Permiso actual: vigente.", { exact: true })).toBeVisible();
-  await confirmation.check();
-  await expect(confirmation).not.toHaveAttribute("aria-invalid", "true");
-  expect(submissions).toHaveLength(0);
 });

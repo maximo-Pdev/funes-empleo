@@ -3,7 +3,7 @@ begin;
 select no_plan();
 select has_function('public','bootstrap_candidate',array['text','text'],'Alta verificada crea perfil o deja reclamo presencial');
 select has_function('public','save_candidate_profile',array['integer','text','text','text','text','text','text','text','uuid[]'],'Corrección propia transaccional');
-select has_function('public','change_candidate_consent',array['integer','text','text','text'],'Consentimiento versionado y retiro atómico');
+select has_function('public','change_candidate_consent',array['integer','text','text','text'],'Aceptación explícita versionada sin retiro propio');
 select has_function('public','my_candidate_participations',array[]::text[],'Proyección limitada del candidato');
 select has_function('public','published_offers',array['integer','integer','uuid'],'Proyección pública de ofertas');
 select has_function('public','refresh_candidate_freshness',array['uuid'],'Vigencia a demanda atribuida a una cuenta');
@@ -54,13 +54,31 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub',private.fixture_id('candidate',5)::text,true);
 select set_config('request.jwt.claims',jsonb_build_object('sub',private.fixture_id('candidate',5)::text,
   'session_id','ee200000-0000-4000-8000-000000000001')::text,true);
-select lives_ok($$select public.change_candidate_consent(2,'withdrawn','demo-not-approved',
-  (select policy_hash from public.candidate_consent_policy()))$$,'Retiro de consentimiento transaccional');
+select throws_ok($$select public.change_candidate_consent(2,'withdrawn','demo-not-approved',
+  (select policy_hash from public.candidate_consent_policy()))$$,'P0001','INVALID_INPUT','Retiro propio rechazado');
+select is((select count(*) from public.candidate_consents),1::bigint,'Rechazo conserva historial');
+select is((select version from public.candidate_profiles),2,'Rechazo conserva versión');
+reset role;
+-- Historical state fixture, not a currently supported self-service command.
+insert into public.candidate_consents(candidate_id,policy_version,policy_hash,status,recorded_by,recorded_at,source)
+select private.fixture_id('profile',5),version,policy_hash,'withdrawn',private.fixture_id('candidate',5),clock_timestamp(),'self_service'
+from private.consent_policies where version='demo-not-approved';
+update public.candidate_profiles set status='consent_withdrawn' where id=private.fixture_id('profile',5);
+update public.participations set status='withdrawn',final_outcome_at=clock_timestamp(),
+  final_outcome_by=private.fixture_id('candidate',5),withdrawal_reason='consent_withdrawn'
+where candidate_id=private.fixture_id('profile',5) and archived_at is null
+  and status not in ('hired','not_selected','withdrawn','cancelled','no_company_response');
+do $history$ declare item public.referrals; begin
+  for item in select * from public.referrals where candidate_id=private.fixture_id('profile',5) and access_status='active' loop
+    perform private.revoke_workflow_referral(item.participation_id,private.fixture_id('candidate',5),'consent_withdrawn');
+  end loop;
+end $history$;
+set local role authenticated;
 select is((select count(*) from public.my_candidate_participations() where display_status='withdrawn'),2::bigint,
-  'Retiro cierra todas las participaciones abiertas');
+  'Fixture histórica conserva participaciones cerradas por retiro anterior');
 select is((select display_status from public.my_candidate_participations()
   where id='ee500000-0000-4000-8000-000000000002'),'not_selected',
-  'Retiro de consentimiento conserva resultados finales previos');
+  'Fixture histórica conserva resultados finales previos');
 select throws_ok($$select public.change_candidate_consent(3,'accepted','demo-not-approved',repeat('0',64))$$,
   'P0001','INVALID_INPUT','No se acepta hash inventado');
 select lives_ok($$select public.change_candidate_consent(3,'accepted','demo-not-approved',

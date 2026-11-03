@@ -1,12 +1,54 @@
 // Read-only homepage layout proof. Never submits forms or resets fixtures.
 import assert from "node:assert/strict";
 import { chromium } from "@playwright/test";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import postcss from "postcss";
+import tailwind from "@tailwindcss/postcss";
 
 const baseURL = process.env.VISUAL_BASE_URL ?? "http://127.0.0.1:3000";
 const browser = await chromium.launch();
 const results = [];
 const viewports = [[1440, 900], [1280, 720], [768, 900], [390, 844], [320, 640]];
+
+// Optional current-component fixtures isolate geometry from stale shared Next builds.
+// Generate with HOME_REGISTRATION_FIXTURE_DIR and registration-pages.test.tsx first.
+if (process.env.HOME_REGISTRATION_FIXTURE_DIR) {
+  try {
+    const globals = (await postcss([tailwind({ optimize: false })]).process(await readFile("src/app/globals.css", "utf8"), { from: path.resolve("src/app/globals.css") })).css;
+    const page = await browser.newPage();
+    await page.route("**/*", route => route.abort());
+    for (const [width, height] of viewports) {
+      await page.setViewportSize({ width, height });
+      for (const role of ["candidate", "company"]) {
+        const fixture = JSON.parse(await readFile(path.join(process.env.HOME_REGISTRATION_FIXTURE_DIR, `${role}.json`), "utf8"));
+        await page.setContent(`<style>${globals}\n${fixture.css}</style>${fixture.html}`);
+        const geometry = await page.locator("#acceso").evaluate(card => {
+          const checkbox = card.querySelector('input[name="termsAccepted"]');
+          const label = checkbox.closest("label");
+          const caption = label.querySelector("span");
+          const box = node => node.getBoundingClientRect();
+          const submit = card.querySelector('button[type="submit"]');
+          return { cardHeight: box(card).height, checkboxWidth: box(checkbox).width, labelHeight: box(label).height, captionRight: box(caption).right, labelRight: box(label).right, termsToSubmit: box(submit).top - box(label).bottom, submitInside: box(submit).bottom <= box(card).bottom, overflow: document.documentElement.scrollWidth > innerWidth, controls: [...card.querySelectorAll('form input:not([type="hidden"]):not([type="checkbox"]):not([aria-hidden="true"]), form button[type="submit"]')].map(node => box(node).height) };
+        });
+        console.log(JSON.stringify({ width, role, ...geometry }));
+        assert.equal(geometry.checkboxWidth, 20, "Legal checkbox must not inherit the full text-input width");
+        assert.ok(geometry.captionRight <= geometry.labelRight + 1, "Acceptance text stays within its label");
+        assert.ok(geometry.labelHeight >= 44, "Acceptance retains a 44px touch target");
+        assert.ok(Math.abs(geometry.termsToSubmit - 16) < 1, "Only the ordinary field gap separates acceptance and submit");
+        assert.ok(geometry.controls.every(height => height >= 44), "All ordinary controls retain 44px targets");
+        assert.equal(geometry.submitInside, true);
+        assert.equal(geometry.overflow, false);
+        assert.doesNotMatch(await page.locator("#acceso").innerText(), /\(se abre en otra pestaña\)/);
+        results.push({ width, role, ...geometry });
+      }
+    }
+    assert.equal(results.length, viewports.length * 2);
+    if (process.env.HOME_LAYOUT_REPORT) await writeFile(process.env.HOME_LAYOUT_REPORT, JSON.stringify(results, null, 2));
+    console.log(JSON.stringify({ status: "PASS", fixtureOnly: true, states: results.length }));
+  } finally { await browser.close(); }
+  process.exit(0);
+}
 
 async function sampleRoleChange(page, role) {
   return page.evaluate(value => new Promise(resolve => {

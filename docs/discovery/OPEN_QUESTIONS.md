@@ -1,5 +1,9 @@
 # Open questions and validation backlog
 
+## Current demo consent amendment — EXTRA-121 (2026-11-02)
+
+Maxi confirms "Si, conserva unicamente la aceptación inicial": retain explicit operational acceptance but remove candidate self-service withdrawal. Accepted consent is informational, account archival remains administrator-managed, and historical consent/participation/referral records and eligibility/access restrictions remain unchanged. This supersedes the manual-withdrawal self-service wording below, including EXTRA102, only for the demo product scope. It does not approve a legal policy for real data or close OQ-001/OQ-002/OQ-004. Prior decisions remain evidence rather than current UI instructions.
+
 These questions must not be silently answered by implementation. Defaults listed here are temporary assumptions for discussion, not stakeholder approval.
 
 2026-10-28, EXTRA096: Mateo confirma CV general o por postulación, PDF/JPG/JPEG/PNG

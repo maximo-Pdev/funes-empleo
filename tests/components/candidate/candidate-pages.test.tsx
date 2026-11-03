@@ -115,7 +115,7 @@ it("renders the requested profile inside its canvas with sidebar identity and na
  render(await AccountPage({ searchParams: Promise.resolve({ section: "perfil" }) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta", "Notificaciones"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta"]);
  expect(within(navigation).getByRole("link", { name: "Perfil" }).getAttribute("aria-current")).toBe("page");
  expect(within(sidebar).getByText("Persona Ficticia")).toBeTruthy();
  expect(within(sidebar).getByText("persona@example.test")).toBeTruthy();
@@ -156,7 +156,7 @@ it("opens the user dashboard by default with participation metrics and states", 
  render(await AccountPage({ searchParams: Promise.resolve({}) }));
  const sidebar = screen.getByRole("complementary", { name: "Panel de usuario" });
  const navigation = within(sidebar).getByRole("navigation", { name: "Secciones de mi cuenta" });
- expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta", "Notificaciones"]);
+ expect(within(navigation).getAllByRole("link").map(link => link.textContent)).toEqual(["Panel de usuario", "Perfil", "Postulaciones", "Ofertas", "Cursos", "Cuenta"]);
  expect(within(navigation).getByRole("link", { name: "Panel de usuario" }).getAttribute("aria-current")).toBe("page");
  expect(screen.getByRole("heading", { level: 1, name: "Panel de usuario" })).toBeTruthy();
  expect(screen.getByRole("heading", { name: "Postulaciones en curso" })).toBeTruthy();
@@ -219,7 +219,7 @@ it.each(["perfil", "ofertas", "dashboard"])("enlaza al permiso pendiente desde %
  render(await AccountPage({ searchParams: Promise.resolve({ section }) }));
  expect(screen.getByRole("link", { name: "Gestionar privacidad en Cuenta" }).getAttribute("href")).toBe("/account?section=cuenta");
 });
-it("permite retirar un permiso vigente sin enviar accepted hacia accepted", async () => {
+it("conserva el permiso vigente sin formulario de retiro ni nueva aceptación", async () => {
  accountSession();
  render(await AccountPage({ searchParams: Promise.resolve({ section: "cuenta" }) }));
  const privacy = screen.getByRole("region", { name: "Privacidad" });
@@ -227,10 +227,10 @@ it("permite retirar un permiso vigente sin enviar accepted hacia accepted", asyn
  expect(within(privacy).getByText(/Ya aceptaste el consentimiento/)).toBeTruthy();
  expect(within(privacy).getByText(/Tu consentimiento se conserva/)).toBeTruthy();
  expect(within(privacy).queryByRole("button", { name: "Guardar consentimiento" })).toBeNull();
- const form = within(privacy).getByRole("button", { name: "Retirar consentimiento" }).closest("form")!;
- expect(new FormData(form).get("status")).toBe("withdrawn");
- expect(within(form).getByRole("checkbox")).toHaveProperty("required", true);
- expect(within(privacy).getByText(/participaciones abiertas se cerrarán/)).toBeTruthy();
+ expect(within(privacy).queryByRole("button", { name: "Retirar consentimiento" })).toBeNull();
+ expect(within(privacy).queryByRole("heading", { name: "Gestionar consentimiento" })).toBeNull();
+ expect(within(privacy).queryByRole("checkbox")).toBeNull();
+ expect(privacy.querySelector("form")).toBeNull();
 });
 it("hides the closed participation section until a final state exists", async () => {
  accountSession();

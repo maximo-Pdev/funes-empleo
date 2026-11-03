@@ -60,7 +60,7 @@ add("candidates/assisted-actions", "admin", "assistedCommandAction", { candidate
 add("candidates/claim-actions", "admin", "claimAssistedAction", { candidateId: id, accountId: id, version: 1, dni: profile.dni, verifiedInPerson: true });
 add("candidates/duplicate-actions", "admin", "screenDuplicatesAction", profile);
 for (const name of ["saveProfileAction", "savePhoneAction", "activateProfileAction"]) add("candidates/profile-actions", "candidate", name, profile, true);
-add("candidates/consent-actions", "candidate", "changeConsentAction", { status: "withdrawn" }, true);
+add("candidates/consent-actions", "candidate", "changeConsentAction", { status: "accepted" }, true);
 for (const name of ["applyToOfferAction", "withdrawParticipationAction"]) add("participations/candidate-actions", "candidate", name, {}, true);
 add("participations/evaluation-actions", "admin", "recordEvaluationAction", { participationId: id, version: 1, command: "start_review" });
 add("participations/evaluation-actions", "admin", "adminParticipationAction", { participationId: id, version: 1, command: "start_review" });

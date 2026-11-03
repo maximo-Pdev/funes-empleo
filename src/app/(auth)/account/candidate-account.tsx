@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Bell, BriefcaseBusiness, ClipboardList, GraduationCap, KeyRound, LayoutDashboard, Settings, UserRound } from "lucide-react";
+import { BriefcaseBusiness, ClipboardList, GraduationCap, KeyRound, LayoutDashboard, Settings, UserRound } from "lucide-react";
 import { CourseLinks } from "@/features/training/components/course-links";
 import { CandidatePrivacyForm } from "@/features/candidates/components/candidate-privacy-form";
 import { getDemoConsentPolicy } from "@/features/candidates/consent-service";
-import { NotificationsContent } from "@/features/notifications/components/notifications-content";
+
 import { DashboardShell } from "@/components/ui/dashboard-shell";
 import { getCandidateWorkspace } from "@/features/candidates/profile-service";
 import { renderCandidateProfileContent } from "../../(candidate)/candidato/_components/profile-content";
@@ -23,16 +23,16 @@ const sections = [
   { id: "ofertas", label: "Ofertas", icon: BriefcaseBusiness },
   { id: "cursos", label: "Cursos", icon: GraduationCap },
   { id: "cuenta", label: "Cuenta", icon: Settings },
-  { id: "notificaciones", label: "Notificaciones", icon: Bell },
+
 ] as const;
 
 const sectionCopy = {
   dashboard: { title: "Panel de usuario", description: "Resumen de tu perfil y de tus postulaciones en el portal." },
   perfil: { title: "Mi perfil", description: "Completá y corregí tus datos. La Oficina decide qué perfiles deriva a cada empresa." },
   postulaciones: { title: "Mis postulaciones", description: "Consultá tus postulaciones, las preentrevistas registradas y los resultados confirmados por la Oficina de Empleo." },
-  notificaciones: { title: "Notificaciones", description: "Novedades de tus postulaciones y del acompañamiento de la Oficina de Empleo." },
+
   ofertas: { title: "Ofertas para postularme", description: "Explorá las ofertas vigentes y enviá tu postulación. La Oficina de Empleo acompaña el proceso de selección." },
-  cuenta: { title: "Cuenta", description: "Gestioná la contraseña y los permisos de privacidad de tu cuenta." },
+  cuenta: { title: "Cuenta", description: "Gestioná la contraseña y consultá el permiso operativo de tu cuenta." },
   cursos: { title: "Cursos", description: "Consultá los enlaces de formación publicados por la Oficina de Empleo." },
 } as const;
 
@@ -46,7 +46,7 @@ export async function renderCandidateAccount({ params, email, basePath = "/accou
     : { photo: null, unavailable: false };
   const { title, description } = sectionCopy[section];
   const href = (id: (typeof sections)[number]["id"], extra = "") => `${basePath}?section=${id}${extra}`;
-  const content = section === "notificaciones" ? <NotificationsContent page={params.page} unavailable={params.unavailable} /> : section === "cuenta"
+  const content = section === "cuenta"
     ? <div className={styles.accountActions}>
       <div className={styles.accountPassword}><Link href="/update-password" className={styles.secondaryLink}><KeyRound className="h-4 w-4" aria-hidden="true" />Cambiar contraseña</Link></div>
       {workspace.bootstrap === "ready" && workspace.profile

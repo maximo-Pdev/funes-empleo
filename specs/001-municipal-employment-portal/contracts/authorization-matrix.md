@@ -1,5 +1,11 @@
 # Contrato de autorización y visibilidad
 
+## EXTRA-121 — Acceptance-only candidate consent and navbar activity
+
+Maxi confirms initial acceptance only (2026-11-02). An active candidate may record explicit acceptance through the existing versioned policy-checked RPC; self-service withdrawal is rejected by validation/service and the additive SQL replacement. Accepted consent is not duplicated. Existing withdrawn events stay immutable and explicit reacceptance does not restore closed participations or revoked company permissions. Archival remains administrator-managed; no new actor permissions, legal approval or automatic consent are granted. This supersedes older candidate self-withdrawal rows below only; other account/consent-dependent restrictions remain effective.
+
+Notification presentation is the far-right navbar Popover, not sidebar/dedicated sections. Recipient isolation, ordinary-session GET/POST authorization, live target checks and individual read state remain unchanged. Anonymous offer-section entry may redirect to plain Home; suspension, inactive-account and wrong-role checks cannot be bypassed by that presentation option.
+
 ## Current integration authority — EXTRA-120
 
 Maxi's final decision is **"bueno conservamos el hero para todos y adaptamos la tarjeta derecha"**. This is the current presentation amendment for the open merge of local `3d162f3` and main `1e3cdab`, traced by S2/S3/S5 in `odd/tasks/ofertas-navigation-integration.md`. It supersedes main EXTRA-118's authenticated offers-first/no-Hero route composition, including later PR88-MAIN-01 statements retaining it; those statements remain historical evidence, not current instructions.

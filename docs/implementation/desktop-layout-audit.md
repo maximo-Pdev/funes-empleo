@@ -37,7 +37,7 @@ dos columnas, son los ajustes principales. No cambian consultas o permisos.
 | `/empresa/ofertas` | Tres columnas desde1600 y cuatro desde2200, misma paginación y orden. |
 | `/empresa/ofertas/nueva` | Ancho del shell; conservar composición/validación de alta. |
 | `/empresa/ofertas/[openingId]` | Ancho del shell; consulta, edición por botón, derivaciones e historial conservados. |
-| `/empresa/notificaciones` | Ancho del shell; mantener secuencia cronológica y estados de lectura. |
+| Notification Popover (company, EXTRA-121) | Navbar popup with chronological pagination and reading states; separate page retired. |
 | `/admin` | Gráficos visibles ocupan el ancho útil; sin cambiar datos, escalas o indicadores. |
 | `/admin/candidates` | Tabla y filtros usan el espacio disponible, sin cargar más registros. |
 | `/admin/candidates/[candidateId]` | Revisar perfil propio digital y presencial no vinculado; orden de tarjetas y acciones conservado. |
@@ -51,7 +51,7 @@ dos columnas, son los ajustes principales. No cambian consultas o permisos.
 | `/admin/participations/[participationId]` | Columnas existentes de seguimiento y decisiones, sin alterar historial o acciones. |
 | `/admin/courses` | Dos áreas existentes de gestión dentro del ancho útil. |
 | `/admin/metrics` | Gráficos, tabla y filtros amplios; cálculos y exportaciones intactos. |
-| `/admin/notificaciones` | Secuencia cronológica dentro del shell; no repartir avisos fuera de orden. |
+| Notification Popover (admin, EXTRA-121) | Navbar popup with chronological pagination; separate page retired. |
 | `/recover` | Mantener composición de acceso y formulario corto con ancho controlado. |
 | `/verification-expired` | Mantener aviso y formulario breve de reenvío, sin estirarlos. |
 | `/update-password` | Revisada con los tres roles; mantener ancho de formulario y controles actuales. |

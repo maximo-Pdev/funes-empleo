@@ -49,7 +49,7 @@ Padding24px (20 móvil), con los tokens/controles existentes y significado de ro
 | `/empresa/ofertas` | Listado por filas, títulos/estados y páginas intactos. |
 | `/empresa/ofertas/nueva` | Formulario único y controles actuales; ancho común. |
 | `/empresa/ofertas/[openingId]` | Consulta/edición e historial; navegación de derivaciones se verifica separada del lector. |
-| `/empresa/notificaciones` | Lista cronológica de ancho común; sin dividir el orden. |
+| Notification Popover (company, EXTRA-121) | Chronological activity in the navbar popup; separate page retired. |
 | `/admin` | Paneles de gráficos con columnas/bordes alineados. |
 | `/admin/candidates` | Tabla/filtros de ancho disponible; no convertir filas en tarjetas. |
 | `/admin/candidates/[candidateId]` | Grilla plana; digital, presencial sin cuenta, vinculado y estados disponibles. |
@@ -63,7 +63,7 @@ Padding24px (20 móvil), con los tokens/controles existentes y significado de ro
 | `/admin/participations/[participationId]` | Corrección de la captura: pares por fila incluso con caso finalizado o vacío. |
 | `/admin/courses` | Gestión de enlaces y candidato/historial con marcos alineados; con/sin selección. |
 | `/admin/metrics` | Paneles pares y filtros/exportación conservados. |
-| `/admin/notificaciones` | Cronología de ancho común; sin reordenar avisos. |
+| Notification Popover (admin, EXTRA-121) | Chronological activity in the navbar popup; separate page retired. |
 | `/recover` | Tarjetas iguales en PC, columna explícita y texto adaptable a320. |
 | `/verification-expired` | Mismo AuthSurface, incluyendo título largo. |
 | `/update-password` | Mismo acabado para los tres roles; controles/validación intactos. |
